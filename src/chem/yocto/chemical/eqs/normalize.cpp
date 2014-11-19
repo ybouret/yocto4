@@ -3,8 +3,9 @@
 #include "yocto/math/kernel/tao.hpp"
 #include "yocto/math/kernel/det.hpp"
 #include "yocto/math/kernel/crout.hpp"
-#include "yocto/math/opt/bracket.hpp"
-#include "yocto/math/opt/minimize.hpp"
+//#include "yocto/math/opt/bracket.hpp"
+//#include "yocto/math/opt/minimize.hpp"
+#include "yocto/sort/index.hpp"
 
 #include "yocto/exception.hpp"
 
@@ -14,7 +15,7 @@ namespace yocto
     {
         
         using namespace math;
-
+        
         
         void equilibria:: updateGammaAndPhi()
         {
@@ -40,7 +41,7 @@ namespace yocto
                 Gamma[i] = eqs[i]->computeGammaAndPhi(t,C, K[i], Phi[i]);
             }
         }
-    
+        
         
         void equilibria:: computeK(double t)
         {
@@ -49,7 +50,7 @@ namespace yocto
                 K[i] = eqs[i]->K(t);
             }
         }
-
+        
         void equilibria:: clip_extents()
         {
             for(size_t i=N;i>0;--i)
@@ -60,35 +61,50 @@ namespace yocto
             }
         }
         
-        double equilibria:: GammaNorm()
+        void equilibria:: adjust( equilibrium &eq )
         {
-            double ans = 0;
-            for(size_t i=N;i>0;--i)
+            const size_t   i   = eq.indx;
+            array<double> &phi = Phi[i];
+            const double   Ki  = K[i];
+            vector<double> nu(M,0);
+            for(size_t j=M;j>0;--j) nu[j] = Nu[i][j];
+            std::cerr << "-------- [[ " << eq.name << " ]] --------" << std::endl;
+            std::cerr << "C" << i << "=" << C << std::endl;
+            std::cerr << "nu=" << nu << std::endl;
+            
+            size_t count = 0;
+            while(true)
             {
-                const equilibrium &eq = *eqs[i];
-                double g = fabs(Gamma[i]);
-                if(eq.SumNuP>0)
+                const double G = eq.updateGammaAndPhi(C, Ki, phi);
+                std::cerr << "\tG=" << G << std::endl;
+                std::cerr << "\tphi=" << phi << std::endl;
+                const double sig = tao::dot(phi, nu);
+                std::cerr << "\tsig=" << sig << std::endl;
+                if(sig>=0)
                 {
-                    g = pow(g,1.0/eq.SumNuP);
+                    return;
                 }
-                ans += g;
-            }
-            return ans/N;
-        }
-
-        
-        double equilibria:: H(double U)
-        {
-            for(size_t j=M;j>0;--j)
-            {
-                C[j] = Cs[j] + U * dC[j];
-                if(active[j])
+                const double xnewt = G/(-sig);
+                std::cerr << "\txnewt=" << xnewt << std::endl;
+                eq.compute_limits(C);
+                eq.show_limits(std::cerr);
+                const double x = eq.apply_limits(xnewt);
+                std::cerr << "\tx=" << x << std::endl;
+                if(fabs(x)<=0)
+                    return;
+                for(size_t j=M;j>0;--j)
                 {
-                    if(C[j]<=0) C[j] = 0;
+                    if(active[j])
+                    {
+                        C[j] += nu[j] * x;
+                        if(C[j]<=0) C[j] = 0;
+                    }
                 }
+                std::cerr << "C" << i << "=" << C << std::endl;
+                if(++count>20)
+                    break;
             }
-            updateGamma();
-            return GammaNorm();
+            
         }
         
         bool equilibria:: normalize( array<double> &C0, double t, bool recomputeK )
@@ -101,18 +117,42 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // balancing
+            // Load concentrations
             //__________________________________________________________________
-            if(!balance(C0))
+            for(size_t j=M;j>0;--j)
             {
-                return false;
+                C[j] = C0[j];
+                assert(!(active[j]&&C[j]<0));
             }
             
+            
             std::cerr << "C=" << C << std::endl;
+#if 0
             //__________________________________________________________________
             //
-            // initializing: at this point, C=C0
+            // initializing constants
             //__________________________________________________________________
+            if(recomputeK)
+            {
+                computeK(t);
+            }
+            
+            //__________________________________________________________________
+            //
+            // indexing
+            //__________________________________________________________________
+            uvector_t Kid(N,0);
+            make_index(K,Kid,__compare<size_t> );
+            std::cerr << "K="   << K   << std::endl;
+            std::cerr << "Kid=" << Kid << std::endl;
+            for(size_t i=N;i>0;--i)
+            {
+                adjust( *eqs[ Kid[i] ] );
+                //exit(1);
+            }
+#endif
+            
+            
             if(recomputeK)
             {
                 computeGammaAndPhi(t);
@@ -122,98 +162,71 @@ namespace yocto
                 updateGammaAndPhi();
             }
             
-            //computeGammaScaling();
-            //std::cerr << "Scaling=" << GamSF << std::endl;
-            
             size_t count = 0;
             while(true)
             {
-                //______________________________________________________________
-                //
-                // Starting Point
-                //______________________________________________________________
-                tao::set(Cs,C);
-                std::cerr << std::endl;
-                std::cerr << "Gamma=" << Gamma << std::endl;
-                std::cerr << "Phi=" << Phi << std::endl;
-                tao::mmul_rtrn(W, Phi, Nu);
-                std::cerr << "W=" << W << std::endl;
                 
                 //______________________________________________________________
                 //
-                // compute full unconstrained Newton Step
+                // Gamma And Phi are computed: compute Jacobian W=Phi*Nu'
+                //______________________________________________________________
+                tao::mmul_rtrn(W,Phi,Nu);
+                std::cerr << std::endl;
+                std::cerr << "Gamma=" << Gamma << std::endl;
+                std::cerr << "Phi="   << Phi   << std::endl;
+                std::cerr << "W=" << W << std::endl;
+                
+                
+                //______________________________________________________________
+                //
+                // Compute full Newton's step = -inv(W)*Gamma
                 //______________________________________________________________
                 if( !crout<double>::build(W) )
                 {
-                    std::cerr << "-- Normalize: singular concentrations" << std::endl;
+                    std::cerr << "-- Normalize: singular system" << std::endl;
                     return false;
                 }
+                
                 tao::neg(xi,Gamma);
                 crout<double>::solve(W,xi);
-                
                 std::cerr << "xi0=" << xi << std::endl;
+                clip_extents();
+                std::cerr << "xi="  << xi << std::endl;
                 
                 //______________________________________________________________
                 //
-                // clip constraints
-                //______________________________________________________________
-                for(size_t i=N;i>0;--i)
-                {
-                    eqs[i]->compute_limits(Cs);
-                    xi[i] = eqs[i]->apply_limits(xi[i]);
-                }
-                std::cerr << "xi1=" << xi << std::endl;
-
-                //______________________________________________________________
-                //
-                // initial dC
+                // estimate dC
                 //______________________________________________________________
                 tao::mul_trn(dC, Nu, xi);
                 std::cerr << "dC=" << dC << std::endl;
-                
-                const double F0 = GammaNorm();
-                
-                func_type    Fn(this,&equilibria::H);
-                const double F1 = Fn(1);
-                
-                std::cerr << "F: " << F0 << " --> " << F1 << std::endl;
-                
-                if( F1>= F0 )
-                {
-                    std::cerr << "Need To Backtrack" << std::endl;
-                    triplet<double> U = {0, 1, 1 };
-                    triplet<double> F = {F0,F1,F1};
-                    if(!bracket<double>::inside(Fn,U,F))
-                    {
-                        std::cerr << "-- Bracketing Failure..." << std::endl;
-                        return false;
-                    }
-                    minimize<double>(Fn, U, F, 0);
-                    std::cerr << "U=" << U.b << std::endl;
-                    Fn(U.b);
-                }
-                
-                // compute effective dC
                 for(size_t j=M;j>0;--j)
                 {
-                    dC[j] = C[j] - Cs[j];
+                    Cs[j] = C[j];
+                    if(active[j])
+                    {
+                        C[j] += dC[j];
+                        if(C[j]<=0) C[j] = 0;
+                    }
+                    else
+                    {
+                        assert(fabs(dC[j])<=0);
+                    }
+                    dC[j] = fabs(C[j] - Cs[j]);
                 }
-                std::cerr << "delta=" << dC << std::endl;
+                std::cerr << "C=" << C << std::endl;
+                std::cerr << "err=" << dC << std::endl;
+                if(++count>20)
+                    break;
                 
                 updateGammaAndPhi();
-                if(++count>10)
-                    break;
             }
             
-            for(size_t j=M;j>0;--j)
-            {
-                C0[j] = C[j];
-            }
-            return true;
+            
+            return false;
         }
         
-
+        
     }
-
+    
 }
 
