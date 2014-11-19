@@ -35,7 +35,7 @@ namespace yocto
             explicit constraint(const double l) throw();
             virtual ~constraint() throw();
             
-            void   add( const species::pointer &sp, const int weight );
+            constraint  &add( const species::pointer &sp, const int weight );
             size_t count() const throw();
             
             const member & operator[](size_t i) const throw();
@@ -65,6 +65,11 @@ namespace yocto
                 b.output(os);
                 return os;
             }
+            
+            void conserve( const double Ctot, const species::pointer &sp );
+            void conserve( const double Ctot, const species::pointer &A, const species::pointer &B);
+            void conserve( const double Ctot, const species::pointer &A, const species::pointer &B, const species::pointer &C);
+
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(boot);
