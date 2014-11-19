@@ -101,7 +101,7 @@ namespace yocto
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );
             
-            void   adjust( equilibrium &eq );
+            double H(double omega);
             
             
         };
