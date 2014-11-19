@@ -100,14 +100,14 @@ namespace yocto
                     // check constraints rank and compute helper matrix
                     //__________________________________________________________
                     {
-                        matrix_t J(Nc,Nc);
+                        imatrix_t J(Nc,Nc);
                         tao::mmul_rtrn(J, P, P);
                         std::cerr << "J=" << J << std::endl;
-                        detJ = Rint(determinant_of(J));
+                        detJ = determinant_of(J);
                         std::cerr << "detJ=" << detJ << std::endl;
                         if(!detJ)
                             throw exception("singular set of chemical constraints!");
-                        matrix_t AJ(Nc,Nc);
+                        imatrix_t AJ(Nc,Nc);
                         adjoint(AJ, J);
                         std::cerr << "AJ=" << AJ << std::endl;
                         tao::mmul_ltrn(MU, P, AJ);
