@@ -159,6 +159,8 @@ namespace yocto
                         C[j] = (detJ*C[j] +U[j])/detJ;
                     }
                     std::cerr << "CU=" << C << std::endl;
+                    tao::mul(dL, P, C);
+                    std::cerr << "dL=" << dL << std::endl;
                     
                 }
                 
