@@ -61,7 +61,7 @@ namespace yocto
                 imatrix_t        Q;
                 vector_t         Lam;
                 integer_t        detJ;
-                matrix_t         MU;     //!< MU=P'*adjoint(P*P')
+                matrix_t         MU;     //!< MU=P'*adjoint(P*P') TODO: check..
                 vector_t         dL;
                 inline BootMgr(equilibria &cs,
                                const boot &loader) :
