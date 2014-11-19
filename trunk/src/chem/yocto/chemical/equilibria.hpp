@@ -83,7 +83,7 @@ namespace yocto
             void updateGamma();
             
             
-            //! balance and normalize
+            //!  normalize AFTER a balancing was done..
             bool normalize( array<double> &C0, double t, bool recomputeK );
             
             //! clip xi according to C
@@ -101,9 +101,8 @@ namespace yocto
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );
             
-            double H(double U);
+            void   adjust( equilibrium &eq );
             
-            double GammaNorm();
             
         };
         
