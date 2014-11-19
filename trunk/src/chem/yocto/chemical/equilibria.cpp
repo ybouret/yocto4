@@ -139,6 +139,7 @@ namespace yocto
                 restore_topology();
                 
                 
+                
             }
             catch(...)
             {

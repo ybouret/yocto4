@@ -101,6 +101,7 @@ namespace yocto
             }
         }
         
+        
         template <typename T>
         inline void adjoint( matrix<T> &A, const matrix<T> &M )
         {
