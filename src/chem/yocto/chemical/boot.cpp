@@ -19,7 +19,7 @@ namespace yocto
         {
         }
         
-        void constraint:: add( const species::pointer &sp, const int weight )
+        constraint  &constraint:: add( const species::pointer &sp, const int weight )
         {
             if(weight)
             {
@@ -29,13 +29,14 @@ namespace yocto
                     if(m.sp->name==sp->name)
                     {
                         ((int&)(m.weight)) += weight;
-                        return;
+                        return *this;
                     }
                 }
                 
                 const member tmp(sp,weight);
                 members.push_back(tmp);
             }
+            return *this;
         }
         
         size_t constraint:: count() const throw()
@@ -74,6 +75,8 @@ namespace yocto
     
 }
 
+
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -142,6 +145,27 @@ namespace yocto
             }
         }
         
+        
+        void boot:: conserve(const double Ctot, const species::pointer &sp)
+        {
+            if(Ctot<0)
+                throw exception("boot.conserve('%s'): negative concentration", sp->name.c_str());
+            new_constraint(Ctot).add(sp,1);
+        }
+        
+        void boot:: conserve(const double Ctot, const species::pointer &A, const species::pointer &B)
+        {
+            if(Ctot<0)
+                throw exception("boot.conserve('%s','%s'): negative concentration", A->name.c_str(),B->name.c_str());
+            new_constraint(Ctot).add(A,1).add(B,1);
+        }
+        
+        void boot:: conserve( const double Ctot, const species::pointer &A, const species::pointer &B, const species::pointer &C)
+        {
+            if(Ctot<0)
+                throw exception("boot.conserve('%s','%s','%s'): negative concentration", A->name.c_str(),B->name.c_str(),C->name.c_str());
+            new_constraint(Ctot).add(A,1).add(B,1).add(C,1);
+        }
         
     }
     
