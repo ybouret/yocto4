@@ -61,6 +61,11 @@ YOCTO_UNIT_TEST_IMPL(z)
 	test_ops< complex<float> >();
 	test_ops< complex<double> >();
     
+    double x = -1566;
+    std::cerr << "RInt(" << x << ")=" << RInt(x) << std::endl;
+    x = -245.99;
+    std::cerr << "RInt(" << x << ")=" << RInt(x) << std::endl;
+
 }
 YOCTO_UNIT_TEST_DONE()
 

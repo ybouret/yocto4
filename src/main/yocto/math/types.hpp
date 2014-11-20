@@ -166,9 +166,12 @@ namespace yocto
             return (a<b) ? -1 : ( (b<a) ? 1 : 0 );
         }
         
-        inline ptrdiff_t RInt( float  x   ) throw() { return ptrdiff_t( floorf(x+0.5f) ); }
-        inline ptrdiff_t RInt( double x   ) throw() { return ptrdiff_t( floor( x+0.5 ) ); }
-        inline ptrdiff_t Rint( ptrdiff_t x) throw() { return x; }
+        template <typename T> ptrdiff_t RInt(const T &) throw();
+        template <> inline ptrdiff_t RInt<float>    (const float     &x) throw() { return ptrdiff_t( floorf(x+0.5f) ); }
+        template <> inline ptrdiff_t RInt<double>   (const double    &x) throw() { return ptrdiff_t( floor(x+0.5)   ); }
+        template <> inline ptrdiff_t RInt<ptrdiff_t>(const ptrdiff_t &x) throw() { return x; }
+
+        
 	}
 	
 }
