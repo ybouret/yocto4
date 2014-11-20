@@ -96,7 +96,7 @@ namespace yocto
             void clip_extents();
             
             
-            void solve( const boot &loader );
+            void solve( const boot &loader, const double t);
             
             
         private:

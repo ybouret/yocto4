@@ -32,14 +32,30 @@ YOCTO_UNIT_TEST_IMPL(boot)
     eqs.compile_for(lib);
     std::cerr << "Nu=" << eqs.Nu << std::endl;
     
-    boot loader;
+    {
+        boot loader;
+        
+        loader.electroneutrality(lib);
+        __lua::load(L,loader, "ini", lib);
+        
+        std::cerr << loader << std::endl;
+        
+        eqs.solve(loader,0.0);
+    }
     
-    loader.electroneutrality(lib);
-    __lua::load(L,loader, "ini", lib);
+    return 0;
     
-    std::cerr << loader << std::endl;
-    
-    eqs.solve(loader);
+    {
+        boot loader;
+        
+        loader.electroneutrality(lib);
+        __lua::load(L,loader, "ini2", lib);
+        
+        std::cerr << loader << std::endl;
+        
+        eqs.solve(loader,0.0);
+    }
 
+    
 }
 YOCTO_UNIT_TEST_DONE()
