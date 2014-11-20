@@ -49,17 +49,77 @@ void perform_det()
         std::cerr << "x0=" << x << std::endl;
         improve(x, M, A, D, b);
         std::cerr << "x=" << x << std::endl;
-
+        
         
     }
 }
 
+template<typename T>
+static inline
+void perform_f_det()
+{
+    std::cerr << std::endl;
+    std::cerr << "-- performing for T=" << typeid(T).name() << " --" << std::endl;
+    for(size_t n=3;n<=5;++n)
+    {
+        matrix<T> M(n,n);
+        for(size_t i=1;i<=n;++i)
+        {
+            for(size_t j=1;j<=n;++j)
+            {
+                M[i][j] = T( int(20*(alea<double>()-0.5)) );
+            }
+        }
+        std::cerr << "M" << n << "=" << M << std::endl;
+        matrix<T> Mb(M);
+        const T D = kernel::f_determinant_of(M);
+        std::cerr << "detM" << n << "=" << D << std::endl;
+    }
+    
+}
+
+static inline
+void perform_i_det()
+{
+    std::cerr << std::endl;
+    std::cerr << "-- performing for T=" << typeid(ptrdiff_t).name() << " --" << std::endl;
+    for(size_t n=3;n<=5;++n)
+    {
+        matrix<ptrdiff_t> M(n,n);
+        for(size_t i=1;i<=n;++i)
+        {
+            for(size_t j=1;j<=n;++j)
+            {
+                M[i][j] = ptrdiff_t( int(20*(alea<double>()-0.5)) );
+            }
+        }
+        std::cerr << "M" << n << "=" << M << std::endl;
+        matrix<ptrdiff_t> Mb(M);
+        const ptrdiff_t D = kernel::i_determinant_of(M);
+        std::cerr << "detM" << n << "=" << D << std::endl;
+    }
+    
+}
+
+
+
+
+
 YOCTO_UNIT_TEST_IMPL(det)
 {
+#if 0
     perform_det<double>();
     perform_det<float>();
     perform_det< complex<float> >();
     perform_det<ptrdiff_t>();
+#endif
+    
+    perform_f_det<float>();
+    perform_f_det<double>();
+    perform_f_det< complex<float> >();
+    perform_f_det< complex<double> >();
+    
+    perform_i_det();
     
 }
 YOCTO_UNIT_TEST_DONE()

@@ -73,8 +73,8 @@ namespace yocto
 		
         
 		
-		inline float  Fabs( float x  ) throw() { return fabsf( x ); }
-		inline double Fabs( double x ) throw() { return fabs( x );  }
+		inline float     Fabs( float x  ) throw() { return fabsf( x ); }
+		inline double    Fabs( double x ) throw() { return fabs( x );  }
         inline ptrdiff_t Fabs( ptrdiff_t x) throw() { return (x < 0) ? -x : x; }
         
         template <typename T, typename U>
