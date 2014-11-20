@@ -72,6 +72,7 @@ namespace yocto
                 vector_t          &xi;
                 vector_t          &dC;
                 const array<bool> &active;
+                ivector_t         &beta;
                 vector_t           Cfixed;
                 uvector_t          Jfixed;
                 const size_t       Mfixed;
@@ -97,6 +98,7 @@ namespace yocto
                 xi(cs.xi),
                 dC(cs.dC),
                 active(cs.active),
+                beta(cs.beta),
                 Cfixed(M,0),
                 Jfixed(M,0),
                 Mfixed(0),
@@ -125,6 +127,10 @@ namespace yocto
                     std::cerr << "Lam0=" << Lam << std::endl;
                     std::cerr << "P0="   << P   << std::endl;
                     
+                    //__________________________________________________________
+                    //
+                    // factorize data: get constant and check structure
+                    //__________________________________________________________
                     rewrite_constraints();
                     std::cerr << "Lam=" << Lam << std::endl;
                     std::cerr << "P="   << P   << std::endl;
@@ -247,11 +253,34 @@ namespace yocto
                 
                 void solve();
                 
+                inline bool has_bad() throw()
+                {
+                    bool bad = false;
+                    for(size_t j=M;j>0;--j)
+                    {
+                        beta[j] = 0;
+                        if(active[j]&&C[j]<0)
+                        {
+                            beta[j] = 1;
+                            bad = true;
+                        }
+                    }
+                    return bad;
+                }
+                
+                void rebalance();
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(BootMgr);
             };
             
-            
+            //__________________________________________________________________
+            //
+            //
+            // Tuning constraints
+            //
+            //__________________________________________________________________
+
             static inline
             size_t count_species( const array<ptrdiff_t> &row, size_t &single ) throw()
             {
@@ -323,6 +352,27 @@ namespace yocto
                 std::cerr << "Cfixed=" << Cfixed << std::endl;
             }
             
+            //__________________________________________________________________
+            //
+            //
+            // Balancing C
+            //
+            //__________________________________________________________________
+            void BootMgr:: rebalance()
+            {
+                while( has_bad() )
+                {
+                    std::cerr << "beta=" << beta << std::endl;
+                    break;
+                }
+            }
+            
+            //__________________________________________________________________
+            //
+            //
+            // solve all
+            //
+            //__________________________________________________________________
             void BootMgr::solve()
             {
                 std::cerr << "--solving " << std::endl;
@@ -375,7 +425,8 @@ namespace yocto
                 
                 std::cerr << "C=" << C << std::endl;
                 
-                
+                //-- rebalance
+                rebalance();
             }
             
         }
