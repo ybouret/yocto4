@@ -103,8 +103,6 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
             vector<equilibrium::pointer> eqs;
             
-            //! count negative concentration
-            size_t count_negative() throw();
             
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );

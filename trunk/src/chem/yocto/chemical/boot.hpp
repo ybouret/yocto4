@@ -48,6 +48,7 @@ namespace yocto
         
         typedef vector<constraint::pointer> constraints;
         
+        
         class boot : public constraints
         {
         public:

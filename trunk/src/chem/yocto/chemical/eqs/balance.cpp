@@ -25,6 +25,8 @@ namespace yocto
             }
         }
         
+        
+#if 0
         size_t equilibria:: count_negative() throw()
         {
             size_t ans=0;
@@ -46,6 +48,8 @@ namespace yocto
             assert(Jneg.size()==ans);
             return ans;
         }
+#endif
+        
         
         double equilibria:: computeE( array<ptrdiff_t> &dEdC )
         {
