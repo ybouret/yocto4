@@ -11,6 +11,87 @@ namespace yocto
     namespace math
     {
         
+        namespace kernel
+        {
+            //! triangulate M to find determinant
+            /**
+             T is a floating point value: float, double, complex<float/double>
+             */
+            template <typename T>
+            inline T f_determinant_of( matrix<T> &M ) throw()
+            {
+                assert(M.is_square());
+                assert(M.rows>0);
+                
+                bool         s = false;
+                const size_t n = M.rows;
+                for(size_t i=1,i1=i+1;i<=n;++i,++i1)
+                {
+                    //__________________________________________________________
+                    //
+                    // find max pivot
+                    // if i==n, just check no singular matrix
+                    //__________________________________________________________
+                    typename real_of<T>::type piv = Fabs(M[i][i]);
+                    register size_t           ipv = i;
+                    for(register size_t k=i1;k<=n;++k)
+                    {
+                        const typename real_of<T>::type tmp = Fabs(M[k][i]);
+                        if( tmp > piv )
+                        {
+                            piv = tmp;
+                            ipv = k;
+                        }
+                    }
+                    if(piv<=0)
+                    {
+                        return 0; // singular matrix
+                    }
+                    
+                    //__________________________________________________________
+                    //
+                    // set the pivot row
+                    //__________________________________________________________
+                    if(ipv!=i)
+                    {
+                        s = !s;
+                        M.swap_rows(ipv,i);
+                    }
+                    const T pivot(M[i][i]);
+                    for(size_t k=i1;k<=n;++k)
+                    {
+                        array<T> &Mk = M[k];
+                        const T coef(Mk[i]);
+                        Mk[i] = T(0);
+                        for(size_t j=i1;j<=n;++j)
+                        {
+                            Mk[j] -= (M[i][j]*coef)/pivot;
+                        }
+                    }
+                }
+                
+                //__________________________________________________________________
+                //
+                // Compute determinant
+                //__________________________________________________________________
+                T d(1);
+                for(size_t i=n;i>0;--i)
+                {
+                    d *= M[i][i];
+                }
+                
+                return s ? -d : d;
+            }
+            
+           
+            
+            ptrdiff_t i_determinant_of( matrix<ptrdiff_t> &M ) throw();
+            
+            
+           
+            
+        }
+        
         //! M is destroyed on ouput
         /**
          T: float, double, complex<>
@@ -213,7 +294,7 @@ namespace yocto
                 }
             }
         }
-
+        
         
         
         
