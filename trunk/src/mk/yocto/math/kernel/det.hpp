@@ -63,9 +63,9 @@ namespace yocto
                     d *= pivot;
                     
                     
-                    const typename real_of<T>::type XX = *(typename real_of<T>::type *)&d;
-                    std::cerr.flush();
-                    fprintf(stderr, "\t%.10f\n", double(XX) ); fflush(stderr);
+                    //const typename real_of<T>::type XX = *(typename real_of<T>::type *)&d;
+                    //std::cerr.flush();
+                    //fprintf(stderr, "\t%.10f\n", double(XX) ); fflush(stderr);
                     for(size_t k=i1;k<=n;++k)
                     {
                         array<T> &Mk = M[k];
@@ -82,9 +82,7 @@ namespace yocto
                 //
                 // Compute determinant
                 //______________________________________________________________
-                const T D = s ? -d : d;
-                std::cerr << "D=" << D << std::endl;
-                return D;
+                return s ? -d : d;
             }
             
             
@@ -104,7 +102,6 @@ namespace yocto
         template <>
         inline ptrdiff_t determinant_of<ptrdiff_t>( const matrix<ptrdiff_t> &M )
         {
-            std::cerr << "IDET" << std::endl;
             matrix<double> MM(M.rows,M.cols);
             for(size_t i=M.rows;i>0;--i)
             {
@@ -227,7 +224,6 @@ namespace yocto
         
         
         
-#if 0
         //! linear improvement
         /**
          assuming that
@@ -323,7 +319,6 @@ namespace yocto
                 
             }
         }
-#endif
         
     }
 }
