@@ -69,7 +69,7 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // Load concentrations
+            // Load pre-balanced concentrations
             //__________________________________________________________________
             for(size_t j=M;j>0;--j)
             {
@@ -77,7 +77,10 @@ namespace yocto
                 assert(!(active[j]&&C[j]<0));
             }
             
-            
+            //__________________________________________________________________
+            //
+            // Initialize
+            //__________________________________________________________________
             
             if(recomputeK)
             {
@@ -87,6 +90,7 @@ namespace yocto
             {
                 updateGammaAndPhi();
             }
+            
             
             typedef crout<double> LU;
             size_t count = 0;
@@ -103,7 +107,7 @@ namespace yocto
                 
                 if(! LU::build(W) )
                 {
-                    std::cerr << "-- Normalize: singular concs..." << std::endl;
+                    std::cerr << "-- Normalize: singular concentrations" << std::endl;
                     return false;
                 }
                 

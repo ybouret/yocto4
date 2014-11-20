@@ -15,6 +15,7 @@ namespace yocto
         
         namespace
         {
+            //! integer Gram-Schmidt
             static inline
             bool igs( imatrix_t &A)
             {
