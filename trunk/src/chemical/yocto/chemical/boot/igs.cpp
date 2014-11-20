@@ -4,6 +4,7 @@
 
 #include "yocto/math/types.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/code/arith.hpp"
 
 
 namespace yocto

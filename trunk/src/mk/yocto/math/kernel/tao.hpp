@@ -182,7 +182,7 @@ namespace yocto
                 
                 for(register size_t i=n;i>0;--i)
                 {
-                    w[i] = Rint(w[i]);
+                    w[i] = RInt(w[i]);
                     const ptrdiff_t wi = static_cast<ptrdiff_t>(w[i]);
                     const ptrdiff_t ai = wi < 0 ? -wi : wi;
                     if(!ai)
@@ -190,7 +190,7 @@ namespace yocto
                     
                     for(register size_t j=i;j>0;--j)
                     {
-                        w[j] = Rint(w[j]);
+                        w[j] = RInt(w[j]);
                         const ptrdiff_t wj = static_cast<ptrdiff_t>(w[j]);
                         const ptrdiff_t aj = wj < 0 ? -wj : wj;
                         if(!aj)
