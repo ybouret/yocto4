@@ -3,6 +3,7 @@
 
 #include "yocto/math/kernel/tao.hpp"
 #include "yocto/math/kernel/det.hpp"
+#include "yocto/math/kernel/crout.hpp"
 
 #include "yocto/exception.hpp"
 #include "yocto/code/rand.hpp"
@@ -15,7 +16,10 @@ namespace yocto
         
         namespace
         {
+            //__________________________________________________________________
+            //
             //! integer Gram-Schmidt
+            //__________________________________________________________________
             static inline
             bool igs( imatrix_t &A)
             {
@@ -49,28 +53,53 @@ namespace yocto
                 return true;
             }
             
+            //__________________________________________________________________
+            //
+            //! Boot Algorithm Manager
+            //__________________________________________________________________
             class BootMgr
             {
             public:
-                const size_t     M;
-                const size_t     N;
-                const size_t     Nc;
-                const imatrix_t &Nu;
-                vector_t        &C;
-                vector_t         U;
-                imatrix_t        P;
-                imatrix_t        Q;
-                vector_t         Lam;
-                integer_t        detJ;
-                imatrix_t        MU;     //!< MU=P'*adjoint(P*P') TODO: check..
-                vector_t         dL;
+                equilibria        &eqs;
+                const size_t       M;
+                const size_t       N;
+                const size_t       Nc;
+                const imatrix_t   &Nu;
+                vector_t          &C;
+                vector_t          &Gamma;
+                matrix_t          &Phi;
+                matrix_t          &W;
+                vector_t          &xi;
+                vector_t          &dC;
+                const array<bool> &active;
+                vector_t           Cfixed;
+                uvector_t          Jfixed;
+                const size_t       Mfixed;
+                vector_t           U;
+                imatrix_t          P;
+                imatrix_t          Q;
+                vector_t           Lam;
+                integer_t          detJ;
+                imatrix_t          MU;     //!< MU=P'*adjoint(P*P') TODO: check..
+                vector_t           dL;
+                
                 inline BootMgr(equilibria &cs,
                                const boot &loader) :
+                eqs(cs),
                 M(cs.M),
                 N(cs.N),
                 Nc(loader.size()),
                 Nu( cs.Nu ),
                 C(cs.C),
+                Gamma(cs.Gamma),
+                Phi(cs.Phi),
+                W(cs.W),
+                xi(cs.xi),
+                dC(cs.dC),
+                active(cs.active),
+                Cfixed(M,0),
+                Jfixed(M,0),
+                Mfixed(0),
                 U(M,0),
                 P(Nc,M),
                 Q(N,M),
@@ -79,10 +108,10 @@ namespace yocto
                 MU(M,Nc),
                 dL(Nc,0)
                 {
-                    //______________________________________________________________
+                    //__________________________________________________________
                     //
-                    // create data from
-                    //______________________________________________________________
+                    // create data from boot loader
+                    //__________________________________________________________
                     for(size_t i=Nc;i>0;--i)
                     {
                         const constraint &c = *loader[i];
@@ -93,8 +122,13 @@ namespace yocto
                             P[i][m.sp->indx] = m.weight;
                         }
                     }
+                    std::cerr << "Lam0=" << Lam << std::endl;
+                    std::cerr << "P0="   << P   << std::endl;
+                    
+                    rewrite_constraints();
                     std::cerr << "Lam=" << Lam << std::endl;
                     std::cerr << "P="   << P   << std::endl;
+                    
                     
                     //__________________________________________________________
                     //
@@ -163,29 +197,190 @@ namespace yocto
                     tao::mul(dL, P, C);
                     std::cerr << "dL=" << dL << std::endl;
                     
+                    
                 }
                 
                 inline ~BootMgr() throw() {}
                 
                 
-                inline void compute_U()
+                inline void compute_U() throw()
                 {
                     tao::mul(dL, P, C);
                     tao::subp(dL, Lam);
                     tao::mul(U,MU,dL);
-                    std::cerr << "C=" << C << std::endl;
-                    std::cerr << "U=" << U << "/" << detJ << std::endl;
-                    
                 }
+                
+                inline void set_Cfixed() throw()
+                {
+                    for(size_t j=Mfixed;j>0;--j)
+                    {
+                        C[Jfixed[j]] = Cfixed[j];
+                    }
+                }
+                
+                inline  void compute_U_and_update_C() throw()
+                {
+                    compute_U();
+                    for(size_t j=M;j>0;--j)
+                    {
+                        C[j] = (detJ*C[j]+U[j])/detJ;
+                    }
+                    set_Cfixed();
+                }
+                
+                
+                inline void clear_Phi() throw()
+                {
+                    for(size_t i=N;i>0;--i)
+                    {
+                        array<double> &phi = Phi[i];
+                        for(size_t j=Mfixed;j>0;--j)
+                        {
+                            phi[Jfixed[j]] = 0;
+                        }
+                    }
+                }
+                
+                
+                
+                void rewrite_constraints();
+                
+                void solve();
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(BootMgr);
             };
             
             
+            static inline
+            size_t count_species( const array<ptrdiff_t> &row, size_t &single ) throw()
+            {
+                size_t ans = 0;
+                for(size_t j=row.size();j>0;--j)
+                {
+                    if(0!=row[j])
+                    {
+                        single = j;
+                        ++ans;
+                    }
+                }
+                return ans;
+            }
+            
+            void BootMgr::rewrite_constraints()
+            {
+                Jfixed.free();
+                Cfixed.free();
+                
+                size_t ifixed = 0; // last fixed index
+                for(size_t i=1;i<=Nc;++i)
+                {
+                    size_t       jfixed = 0;
+                    const size_t ns = count_species(P[i],jfixed);
+                    switch(ns)
+                    {
+                        case 0:
+                            throw exception("boot: deduced an empty constraint");
+                            
+                        case 1:
+                        {
+                            std::cerr << "Fixed species #" << jfixed << std::endl;
+                            //-- re order matrix
+                            ++ifixed;
+                            P.swap_rows(ifixed,i);
+                            cswap(Lam[ifixed],Lam[i]);
+                            
+                            //-- simplify row/level
+                            const double cfixed = (Lam[ifixed]/=P[ifixed][jfixed]);
+                            P[ifixed][jfixed] = 1;
+                            
+                            //-- check possible
+                            if( (cfixed<0) && active[jfixed])
+                                throw exception("Fixed species #%u set to a negative value", unsigned(jfixed));
+                            
+                            //-- propagate information below
+                            for(size_t k=ifixed+1;k<=Nc;++k)
+                            {
+                                const ptrdiff_t p = P[k][jfixed];
+                                Lam[k] -= p * cfixed;
+                                P[k][jfixed] = 0;
+                            }
+                            
+                            //-- register who/value
+                            Jfixed.push_back(jfixed);
+                            Cfixed.push_back(cfixed);
+                            
+                            
+                        } break;
+                            
+                        default:
+                            break;
+                    }
+                }
+                (size_t&)Mfixed = Cfixed.size();
+                co_qsort(Jfixed,Cfixed);
+                std::cerr << "Jfixed=" << Jfixed << std::endl;
+                std::cerr << "Cfixed=" << Cfixed << std::endl;
+            }
+            
+            void BootMgr::solve()
+            {
+                std::cerr << "--solving " << std::endl;
+                std::cerr << "K=" << eqs.K << std::endl;
+                
+                //-- generate random C
+                for(size_t j=M;j>0;--j)
+                {
+                    C[j] = alea<double>();
+                }
+                set_Cfixed();
+                
+                std::cerr << "C=" << C << std::endl;
+                
+                //-- compute status: Gamma and Phi
+                eqs.updateGammaAndPhi();
+                std::cerr << "Gamma=" << Gamma << std::endl;
+                std::cerr << "Phi0="  << Phi   << std::endl;
+                clear_Phi();
+                std::cerr << "Phi ="  << Phi   << std::endl;
+                
+                //-- compute U and update C
+                compute_U_and_update_C();
+                std::cerr << "Cu=" << C << std::endl;
+                
+                //-- compute W=Phi*Q'
+                tao::mmul_rtrn(W,Phi,Q);
+                std::cerr << "W=" << W << std::endl;
+                if( !crout<double>::build(W) )
+                {
+                    // WHAT DO I DO ?
+                    std::cerr << "Singular Value..." << std::endl;
+                    exit(1);
+                }
+                
+                //-- compute xi = -(Gamma+Phi*U)
+                tao::mul(xi, Phi, U);
+                for(size_t i=N;i>0;--i)
+                {
+                    xi[i] = -(detJ*Gamma[i]+xi[i])/detJ;
+                }
+                crout<double>::solve(W, xi);
+                std::cerr << "xi=" << xi << std::endl;
+                
+                //-- compute dC = Q'*xi and add to C
+                tao::mul_trn(dC, Q, xi);
+                std::cerr << "dC=" << dC << std::endl;
+                tao::add(C,dC);
+                set_Cfixed();
+                
+                std::cerr << "C=" << C << std::endl;
+                
+                
+            }
+            
         }
         
-        void equilibria:: solve( const boot &loader )
+        void equilibria:: solve( const boot &loader, const double t)
         {
             
             if(N>M)
@@ -208,7 +403,8 @@ namespace yocto
             else
             {
                 BootMgr mgr(*this,loader);
-                
+                computeK(t);
+                mgr.solve();
                 
                 
             }
