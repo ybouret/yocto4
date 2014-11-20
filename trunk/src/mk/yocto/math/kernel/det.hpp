@@ -18,13 +18,14 @@ namespace yocto
              T is a floating point value: float, double, complex<float/double>
              */
             template <typename T>
-            inline T f_determinant_of( matrix<T> &M ) throw()
+            inline T fp_det( matrix<T> &M ) throw()
             {
                 assert(M.is_square());
                 assert(M.rows>0);
                 
                 bool         s = false;
                 const size_t n = M.rows;
+                T            d(1);
                 for(size_t i=1,i1=i+1;i<=n;++i,++i1)
                 {
                     //__________________________________________________________
@@ -57,7 +58,14 @@ namespace yocto
                         s = !s;
                         M.swap_rows(ipv,i);
                     }
-                    const T pivot(M[i][i]);
+                    const array<T> &Mi = M[i];
+                    const T pivot(Mi[i]);
+                    d *= pivot;
+                    
+                    
+                    const typename real_of<T>::type XX = *(typename real_of<T>::type *)&d;
+                    std::cerr.flush();
+                    fprintf(stderr, "\t%.10f\n", double(XX) ); fflush(stderr);
                     for(size_t k=i1;k<=n;++k)
                     {
                         array<T> &Mk = M[k];
@@ -65,100 +73,23 @@ namespace yocto
                         Mk[i] = T(0);
                         for(size_t j=i1;j<=n;++j)
                         {
-                            Mk[j] -= (M[i][j]*coef)/pivot;
+                            Mk[j] = (pivot*Mk[j] - coef*Mi[j])/pivot;
                         }
                     }
                 }
                 
-                //__________________________________________________________________
+                //______________________________________________________________
                 //
                 // Compute determinant
-                //__________________________________________________________________
-                T d(1);
-                for(size_t i=n;i>0;--i)
-                {
-                    d *= M[i][i];
-                }
-                
-                return s ? -d : d;
+                //______________________________________________________________
+                const T D = s ? -d : d;
+                std::cerr << "D=" << D << std::endl;
+                return D;
             }
             
-           
             
-            ptrdiff_t i_determinant_of( matrix<ptrdiff_t> &M ) throw();
-            
-            
-           
             
         }
-        
-        //! M is destroyed on ouput
-        /**
-         T: float, double, complex<>
-         */
-        template <typename T>
-        inline T __determinant_of( matrix<T> &M ) throw()
-        {
-            assert(M.is_square());
-            assert(M.rows>0);
-            
-            T       s(1);
-            const size_t n = M.rows;
-            for(size_t i=1,i1=i+1;i<=n;++i,++i1)
-            {
-                //______________________________________________________________
-                //
-                // find max pivot
-                // if i==n, just check no singular matrix
-                //______________________________________________________________
-                typename real_of<T>::type piv = Fabs(M[i][i]);
-                size_t                    ipv = i;
-                for(size_t k=i1;k<=n;++k)
-                {
-                    const typename real_of<T>::type tmp = Fabs(M[k][i]);
-                    if( tmp > piv )
-                    {
-                        piv = tmp;
-                        ipv = k;
-                    }
-                }
-                if(piv<=0)
-                    return 0; // singular matrix
-                
-                //______________________________________________________________
-                //
-                // set the pivot row
-                //______________________________________________________________
-                if(ipv!=i)
-                {
-                    s=-s;
-                    M.swap_rows(ipv,i);
-                }
-                const T pivot(M[i][i]);
-                for(size_t k=i1;k<=n;++k)
-                {
-                    const T coef(M[k][i]);
-                    M[k][i] = T(0);
-                    for(size_t j=i1;j<=n;++j)
-                    {
-                        M[k][j] -= (M[i][j]*coef)/pivot;
-                    }
-                }
-            }
-            
-            //__________________________________________________________________
-            //
-            // Compute determinant
-            //__________________________________________________________________
-            T d(1);
-            for(size_t i=n;i>0;--i)
-            {
-                d *= M[i][i];
-            }
-            
-            return s*d;
-        }
-        
         
         
         //! M is not destroyed on output
@@ -166,12 +97,14 @@ namespace yocto
         inline T determinant_of( const matrix<T> &M )
         {
             matrix<T> MM(M);
-            return __determinant_of(MM);
+            return kernel::fp_det(MM);
         }
         
+        //! M is not destroyed on output
         template <>
         inline ptrdiff_t determinant_of<ptrdiff_t>( const matrix<ptrdiff_t> &M )
         {
+            std::cerr << "IDET" << std::endl;
             matrix<double> MM(M.rows,M.cols);
             for(size_t i=M.rows;i>0;--i)
             {
@@ -180,10 +113,8 @@ namespace yocto
                     MM[i][j] = M[i][j];
                 }
             }
-            std::cerr << "ideterminant" << std::endl;
-            return Rint( __determinant_of(MM) );
+            return RInt( kernel::fp_det(MM) );
         }
-        
         
         template <typename T,typename U>
         inline T cofactor_of(const matrix<T> &M,
@@ -197,7 +128,7 @@ namespace yocto
             if(M.rows>1)
             {
                 m.template minor_of(M,I,J);
-                const T ddet(__determinant_of(m));
+                const T ddet = kernel::fp_det<U>(m);
                 const T mdet = ( ((I+J)&1) != 0 ) ? -ddet : ddet;
                 return mdet;
             }
@@ -206,7 +137,7 @@ namespace yocto
                 return M[1][1];
             }
         }
-        
+       
         template <>
         inline ptrdiff_t cofactor_of(const matrix<ptrdiff_t> &M,
                                      const size_t             I,
@@ -219,7 +150,7 @@ namespace yocto
             if(M.rows>1)
             {
                 m.template minor_of(M,I,J);
-                const ptrdiff_t ddet(RInt(__determinant_of(m)));
+                const ptrdiff_t ddet = RInt( kernel::fp_det<double>(m) );
                 const ptrdiff_t mdet = ( ((I+J)&1) != 0 ) ? -ddet : ddet;
                 return mdet;
             }
@@ -228,7 +159,6 @@ namespace yocto
                 return M[1][1];
             }
         }
-        
         
         
         
@@ -266,7 +196,6 @@ namespace yocto
         template <>
         inline void adjoint<ptrdiff_t>( matrix<ptrdiff_t> &A, const matrix<ptrdiff_t> &M )
         {
-            std::cerr << "iadjoint" << std::endl;
             assert(M.is_square());
             assert(A.is_square());
             assert(M.rows==A.rows);
@@ -298,7 +227,7 @@ namespace yocto
         
         
         
-        
+#if 0
         //! linear improvement
         /**
          assuming that
@@ -394,7 +323,7 @@ namespace yocto
                 
             }
         }
-        
+#endif
         
     }
 }
