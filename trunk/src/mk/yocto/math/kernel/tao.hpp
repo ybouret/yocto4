@@ -6,6 +6,7 @@
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/code/unroll.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/code/arith.hpp"
 
 namespace yocto
 {

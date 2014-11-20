@@ -83,7 +83,7 @@ void perform_i_det()
 {
     std::cerr << std::endl;
     std::cerr << "-- performing for T=" << typeid(ptrdiff_t).name() << " --" << std::endl;
-    for(size_t n=3;n<=5;++n)
+    for(size_t n=3;n<=10;++n)
     {
         matrix<ptrdiff_t> M(n,n);
         for(size_t i=1;i<=n;++i)
