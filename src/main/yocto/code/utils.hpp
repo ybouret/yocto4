@@ -55,38 +55,6 @@ namespace yocto
 	}
     
     
-    
-	
-	template <typename T>
-	inline T gcd_of( T x , T y )
-	{
-		if( x > 0 && y > 0 )
-		{
-			T a = x;
-			T b = y;
-			if( b > a )
-			{
-				a = y;
-				b = x;
-			}
-			while( b > 0 )
-			{
-				const T t = b;
-				b = a % b;
-				a = t;
-			}
-			return a;
-		}
-		else
-			return 1;
-	}
-	
-	template <typename T>
-	inline T lcm_of( T x , T y )
-	{
-		return ( x * y ) / gcd_of<T>( x, y );
-	}
-	
-}
+   }
 
 #endif

@@ -1,4 +1,7 @@
 #include "yocto/math/kernel/det.hpp"
+#include "yocto/code/arith.hpp"
+#include "yocto/sequence/lw-array.hpp"
+#include "yocto/math/kernel/tao.hpp"
 
 namespace yocto
 {
@@ -18,6 +21,13 @@ namespace yocto
                 
                 bool         s = false;
                 const size_t n = M.rows;
+                
+                //ptrdiff_t P = 1;
+                //ptrdiff_t D = 1;
+                
+                lw_array<ptrdiff_t> P( M.get_aux<ptrdiff_t>(), n );
+                lw_array<ptrdiff_t> D( M.get_aux<ptrdiff_t>(), n );
+                
                 for(size_t i=1,i1=i+1;i<=n;++i,++i1)
                 {
                     //__________________________________________________________
@@ -53,40 +63,38 @@ namespace yocto
                     const array<ptrdiff_t> &Mi    = M[i];
                     const ptrdiff_t         pivot = Mi[i];
                     
+                    D[i] = pivot;
+                    P[i] = 1;
                     for(size_t k=i1;k<=n;++k)
                     {
                         array<ptrdiff_t> &Mk    = M[k];
                         const ptrdiff_t   coeff = Mk[i];
                         
-                        std::cerr << "M[" << i << "]=" << Mi << std::endl;
-                        std::cerr << "pivot=" << pivot << std::endl;
-                        std::cerr << "Mk=" << Mk << std::endl;
-                        std::cerr << "coeff=" << coeff << std::endl;
-                        
                         Mk[i] = 0;
-                        // first pass
                         for(size_t j=i1;j<=n;++j)
                         {
                             //Mk[j] -= (Mi[j]*coeff)/pivot;
                             Mk[j] = pivot * Mk[j] - coeff * Mi[j];
                         }
-                        std::cerr << "Mnew=" << Mk << " / " << pivot << std::endl;
-                        exit(0);
-
+                        const ptrdiff_t g = tao::simplify(Mk);
+                        //std::cerr << "g=" << g << std::endl;
+                        D[i] *= g;
+                        P[i] *= pivot;
                     }
+                    std::cerr << "\tD=" << D << std::endl;
+                    std::cerr << "\tP=" << P << std::endl;
                 }
                 
                 //__________________________________________________________________
                 //
                 // Compute determinant
                 //__________________________________________________________________
-                ptrdiff_t d = 1;
-                for(size_t i=n;i>0;--i)
-                {
-                    d *= M[i][i];
-                }
-                
-                return s ? -d : d;
+                std::cerr << "D=" << D << std::endl;
+                std::cerr << "P=" << P << std::endl;
+                std::cerr << "Mout=" << M << std::endl;
+                //D /= P;
+                //return s ? -D : D;
+                return 0;
             }
             
         }
