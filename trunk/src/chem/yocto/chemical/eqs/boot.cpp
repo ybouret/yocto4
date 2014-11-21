@@ -8,6 +8,8 @@
 #include "yocto/exception.hpp"
 #include "yocto/code/rand.hpp"
 
+#include <cstdlib>
+
 namespace yocto
 {
     namespace chemical

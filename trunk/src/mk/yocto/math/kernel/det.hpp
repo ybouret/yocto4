@@ -146,7 +146,7 @@ namespace yocto
             assert(m.rows==M.rows-1);
             if(M.rows>1)
             {
-                m.template minor_of(M,I,J);
+                m.minor_of(M,I,J);
                 const ptrdiff_t ddet = RInt( kernel::fp_det<double>(m) );
                 const ptrdiff_t mdet = ( ((I+J)&1) != 0 ) ? -ddet : ddet;
                 return mdet;
