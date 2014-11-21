@@ -73,6 +73,8 @@ namespace yocto
                 vector_t          &dC;
                 const array<bool> &active;
                 ivector_t         &beta;
+                vector_t          &alpha;
+                uvector_t         &aindx;
                 vector_t           Cfixed;
                 uvector_t          Jfixed;
                 const size_t       Mfixed;
@@ -101,6 +103,8 @@ namespace yocto
                 dC(cs.dC),
                 active(cs.active),
                 beta(cs.beta),
+                alpha(cs.alpha),
+                aindx(cs.aindx),
                 Cfixed(M,0),
                 Jfixed(M,0),
                 Mfixed(0),
@@ -273,7 +277,7 @@ namespace yocto
                     return bad;
                 }
                 
-                void rebalance();
+                bool rebalance();
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(BootMgr);
@@ -363,17 +367,98 @@ namespace yocto
             // Balancing C
             //
             //__________________________________________________________________
-            void BootMgr:: rebalance()
+            bool BootMgr:: rebalance()
             {
+                size_t count = 0;
                 while( has_bad() )
                 {
+                    if(++count>M)
+                    {
+                        std::cerr << "-- too many trials in boot.rebalance" << std::endl;
+                        return false;
+                    }
                     std::cerr << "beta=" << beta << std::endl;
                     tao::mul(xip,Q,beta);
                     std::cerr << "xip=" << xip << std::endl;
                     tao::mul_trn(dCp, Q, xip);
                     std::cerr << "dCp=" << dCp << std::endl;
-                    break;
+#ifndef NDEBUG
+                    for(size_t j=Mfixed;j>0;--j)
+                    {
+                        assert( dCp[ Jfixed[j] ] == 0);
+                    }
+#endif
+                    // how far can we go
+                    alpha.free();
+                    aindx.free();
+                    for(size_t j=M;j>0;--j)
+                    {
+                        const double    Cj = C[j];
+                        const ptrdiff_t Dj = dCp[j];
+                        if(Dj<0)
+                        {
+                            if(Cj<=0)
+                            {
+                                std::cerr << "-- negative step for a negative concentration" << std::endl;
+                                return false;
+                            }
+                            else
+                            {
+                                alpha.push_back(Cj/(-Dj));
+                                aindx.push_back(j);
+                            }
+                        }
+                        else
+                        {
+                            
+                            if(Dj>0)
+                            {
+                                if(Cj<0)
+                                {
+                                    alpha.push_back((-Cj)/Dj); // minimal step
+                                    aindx.push_back(j);
+                                }
+                            }
+                            else
+                            {
+                                // do nothing
+                            }
+                        }
+                        
+                    }
+                    
+                    co_qsort(alpha, aindx);
+                    std::cerr << "alpha=" << alpha << std::endl;
+                    std::cerr << "aindx=" << aindx << std::endl;
+                    
+                    if(alpha.size()<=0)
+                    {
+                        std::cerr << "-- blocked boot.rebalance" << std::endl;
+                        return false;
+                    }
+                    
+                    const double factor=alpha[1];
+                    if(factor<=0)
+                    {
+                        std::cerr << "-- blocked boot.rebalance" << std::endl;
+                        return false;
+                    }
+                    for(size_t j=M;j>0;--j)
+                    {
+                        const double Dj = dCp[j] * factor;
+                        const double Cj = C[j];
+                        C[j] += Dj;
+                        if(Cj>=0&&C[j]<=0)
+                        {
+                            C[j]=0;
+                        }
+                    }
+                    C[aindx[1]]=0;
+                    set_Cfixed();
+                    std::cerr << "C=" << C << std::endl;
+                    
                 }
+                return true;
             }
             
             //__________________________________________________________________
@@ -386,8 +471,14 @@ namespace yocto
             {
                 std::cerr << "--solving " << std::endl;
                 std::cerr << "K=" << eqs.K << std::endl;
+                vector_t &Cs = eqs.Cs;
                 
-                //-- generate random C
+                size_t iter = 0;
+            GENERATE_C:
+                //______________________________________________________________
+                //
+                // generate random C
+                //______________________________________________________________
                 for(size_t j=M;j>0;--j)
                 {
                     C[j] = alea<double>();
@@ -396,20 +487,24 @@ namespace yocto
                 
                 std::cerr << "C=" << C << std::endl;
                 
+            OPTIMIZE:
+                //______________________________________________________________
+                //
                 //-- compute status: Gamma and Phi
+                //______________________________________________________________
+                tao::set(Cs,C);
                 eqs.updateGammaAndPhi();
                 std::cerr << "Gamma=" << Gamma << std::endl;
-                std::cerr << "Phi0="  << Phi   << std::endl;
                 clear_Phi();
-                std::cerr << "Phi ="  << Phi   << std::endl;
                 
+                //______________________________________________________________
+                //
                 //-- compute U and update C
+                //______________________________________________________________
                 compute_U_and_update_C();
-                std::cerr << "Cu=" << C << std::endl;
                 
                 //-- compute W=Phi*Q'
                 tao::mmul_rtrn(W,Phi,Q);
-                std::cerr << "W=" << W << std::endl;
                 if( !crout<double>::build(W) )
                 {
                     // WHAT DO I DO ?
@@ -417,25 +512,50 @@ namespace yocto
                     exit(1);
                 }
                 
+                //______________________________________________________________
+                //
                 //-- compute xi = -(Gamma+Phi*U)
+                //______________________________________________________________
                 tao::mul(xi, Phi, U);
                 for(size_t i=N;i>0;--i)
                 {
                     xi[i] = -(detJ*Gamma[i]+xi[i])/detJ;
                 }
                 crout<double>::solve(W, xi);
-                std::cerr << "xi=" << xi << std::endl;
                 
+                //______________________________________________________________
+                //
                 //-- compute dC = Q'*xi and add to C
+                //______________________________________________________________
                 tao::mul_trn(dC, Q, xi);
-                std::cerr << "dC=" << dC << std::endl;
                 tao::add(C,dC);
                 set_Cfixed();
                 
-                std::cerr << "C=" << C << std::endl;
                 
+                //______________________________________________________________
+                //
                 //-- rebalance
-                rebalance();
+                //______________________________________________________________
+                if(!rebalance())
+                {
+                    goto GENERATE_C;
+                }
+                
+                //______________________________________________________________
+                //
+                // convergence
+                //______________________________________________________________
+                
+                for(size_t j=M;j>0;--j)
+                {
+                    dC[j] = fabs(C[j]-Cs[j]);
+                }
+                std::cerr << "dC_boot=" << dC << std::endl;
+                if(++iter<=12)
+                goto OPTIMIZE;
+                std::cerr << "P="   << P   << std::endl;
+                std::cerr << "Lam=" << Lam << std::endl;
+                std::cerr << "C="   << C   << std::endl;
             }
             
         }
