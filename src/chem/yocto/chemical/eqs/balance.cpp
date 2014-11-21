@@ -25,32 +25,6 @@ namespace yocto
             }
         }
         
-        
-#if 0
-        size_t equilibria:: count_negative() throw()
-        {
-            size_t ans=0;
-            assert(M==C.size());
-            
-            Jneg.free();
-            for(size_t i=1;i<=M;++i)
-            {
-                if(active[i])
-                {
-                    const double Ci = C[i];
-                    if(Ci<0)
-                    {
-                        ++ans;
-                        Jneg.push_back(i);
-                    }
-                }
-            }
-            assert(Jneg.size()==ans);
-            return ans;
-        }
-#endif
-        
-        
         double equilibria:: computeE( array<ptrdiff_t> &dEdC )
         {
             assert(M==dEdC.size());

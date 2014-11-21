@@ -76,6 +76,8 @@ namespace yocto
                 vector_t           Cfixed;
                 uvector_t          Jfixed;
                 const size_t       Mfixed;
+                ivector_t          &xip;
+                ivector_t          &dCp;
                 vector_t           U;
                 imatrix_t          P;
                 imatrix_t          Q;
@@ -102,6 +104,8 @@ namespace yocto
                 Cfixed(M,0),
                 Jfixed(M,0),
                 Mfixed(0),
+                xip(cs.xip),
+                dCp(cs.dCp),
                 U(M,0),
                 P(Nc,M),
                 Q(N,M),
@@ -253,6 +257,7 @@ namespace yocto
                 
                 void solve();
                 
+                
                 inline bool has_bad() throw()
                 {
                     bool bad = false;
@@ -363,6 +368,10 @@ namespace yocto
                 while( has_bad() )
                 {
                     std::cerr << "beta=" << beta << std::endl;
+                    tao::mul(xip,Q,beta);
+                    std::cerr << "xip=" << xip << std::endl;
+                    tao::mul_trn(dCp, Q, xip);
+                    std::cerr << "dCp=" << dCp << std::endl;
                     break;
                 }
             }
