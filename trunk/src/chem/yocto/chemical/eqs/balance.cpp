@@ -45,7 +45,7 @@ namespace yocto
                 }
                 
             }
-            return 0.5*ans;
+            return ans;
         }
         
         

@@ -110,6 +110,8 @@ namespace yocto
             
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );
+            bool   rebalance_with(const imatrix_t &Q, const bvector_t &local_active);
+            
             
         public:
             uniform_generator<double> ran;

@@ -5,6 +5,7 @@
 
 #include "yocto/math/kernel/tao.hpp"
 #include "yocto/math/kernel/det.hpp"
+#include "yocto/math/kernel/crout.hpp"
 
 
 namespace yocto
@@ -34,7 +35,7 @@ namespace yocto
                 }
                 return ans;
             }
-
+            
             static inline
             void rewrite_constraints(imatrix_t       &P,
                                      vector_t        &Lam,
@@ -163,7 +164,7 @@ namespace yocto
                 }
                 return true;
             }
-
+            
             //__________________________________________________________________
             //
             // Compute the Q-space
@@ -203,7 +204,7 @@ namespace yocto
                     }
                 }
             }
-
+            
             //------------------------------------------------------------------
             //
             // helper
@@ -226,14 +227,14 @@ namespace yocto
         
         void equilibria:: load(const boot &loader, const double t)
         {
-         
+            
             //__________________________________________________________________
             //
             //
             // Sanity check
             //
             //__________________________________________________________________
-
+            
             if(N>M)
                 throw exception("equilibria: not enough species!");
             
@@ -267,7 +268,7 @@ namespace yocto
             //__________________________________________________________________
             imatrix_t P(Nc,M);
             vector_t  Lam(Nc,0);
-
+            
             //__________________________________________________________________
             //
             // create data from boot loader
@@ -292,10 +293,16 @@ namespace yocto
             ivector_t Jfixed(M,as_capacity);
             vector_t  Cfixed(M,as_capacity);
             rewrite_constraints(P,Lam,Jfixed,Cfixed,active);
-            
             std::cerr << "Lam=" << Lam << std::endl;
             std::cerr << "P="   << P   << std::endl;
-            
+            bvector_t local_active(M,false);
+            tao::set(local_active,active);
+            for(size_t j=Jfixed.size();j>0;--j)
+            {
+                local_active[ Jfixed[j] ] = false;
+            }
+            std::cerr << "active=" << active << std::endl;
+            std::cerr << "localA=" << local_active << std::endl;
             //__________________________________________________________________
             //
             // check constraints rank and compute helper matrix
@@ -313,7 +320,7 @@ namespace yocto
             std::cerr << "Q=" << Q << std::endl;
             
             
-           
+            
             
             
             //__________________________________________________________________
@@ -324,6 +331,9 @@ namespace yocto
             //__________________________________________________________________
             computeK(t);
             
+            vector_t U(M,0.0);
+            vector_t dL(Nc,0.0);
+        GENERATE_C:
             //__________________________________________________________________
             //
             // Generate C
@@ -331,9 +341,240 @@ namespace yocto
             for(size_t j=M;j>0;--j)
             {
                 C[j] = ran();
+                //C[j] = 0;
             }
             set_fixedC(C, Jfixed, Cfixed);
+            std::cerr << "C0=" << C << std::endl;
             
+            //__________________________________________________________________
+            //
+            // Starting Point
+            //__________________________________________________________________
+            tao::set(Cs,C);
+            updateGammaAndPhi();
+            
+            //__________________________________________________________________
+            //
+            // component to be removed to match P*C=Lam
+            //__________________________________________________________________
+            tao::mul(dL,P,C);
+            tao::subp(dL, Lam);
+            tao::mul(U,MU,dL);
+            std::cerr << "U=" << U << "/" << detJ << std::endl;
+            
+#if !defined(NDEBUG)
+            for(size_t j=Jfixed.size();j>0;--j)
+            {
+                assert( fabs(U[Jfixed[j]]) <= 0 );
+            }
+#endif
+            
+            //__________________________________________________________________
+            //
+            // update C in place
+            //__________________________________________________________________
+            for(size_t j=M;j>0;--j)
+            {
+                C[j] = (detJ*C[j]+U[j])/detJ;
+            }
+            std::cerr << "CU=" << C << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // compute Gamma,Phi and update Phi
+            //__________________________________________________________________
+            std::cerr << "Gamma=" << Gamma << std::endl;
+            std::cerr << "Phi0 =" << Phi   << std::endl;
+            for(size_t j=Jfixed.size();j>0;--j)
+            {
+                const size_t jj = Jfixed[j];
+                for(size_t i=N;i>0;--i)
+                {
+                    Phi[i][jj] = 0;
+                }
+            }
+            std::cerr << "Phi  =" << Phi << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // compute W = Phi*Q'
+            //__________________________________________________________________
+            tao::mmul_rtrn(W, Phi, Q);
+            std::cerr << "W=" << W << std::endl;
+            if( ! crout<double>::build(W) )
+            {
+                // TODO: What do I do ?
+                std::cerr << "-- invalid system..." << std::endl;
+                exit(1);
+            }
+            
+            //__________________________________________________________________
+            //
+            // compute xi = inv(Phi*Q')*(PU+Gamma)
+            //__________________________________________________________________
+            tao::mul(xi,Phi,U);
+            for(size_t i=N;i>0;--i)
+            {
+                xi[i] = -(detJ*Gamma[i]+xi[i])/detJ;
+            }
+            crout<double>::solve(W, xi);
+            tao::mul_trn(dC, Q, xi);
+            std::cerr << "dC=" << dC << std::endl;
+            tao::add(C,dC);
+            std::cerr << "C1=" << C << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // rebalance
+            //__________________________________________________________________
+            if(!rebalance_with(Q,local_active))
+            {
+                goto GENERATE_C;
+            }
+            
+        }
+        
+        
+        bool equilibria:: rebalance_with(const imatrix_t &Q, const bvector_t &local_active)
+        {
+            
+            size_t count = 0;
+            std::cerr << "\tCb0=" << C << std::endl;;
+            while(true)
+            {
+                ++count;
+                if(count>M)
+                {
+                    std::cerr << "-- too many steps to rebalance" << std::endl;
+                    return false;
+                }
+                //______________________________________________________________
+                //
+                // detect invalid concentrations
+                //______________________________________________________________
+                bool has_bad = false;
+                for(size_t j=M;j>0;--j)
+                {
+                    beta[j] = 0;
+                    if(local_active[j]&&C[j]<0)
+                    {
+                        beta[j] = 1;
+                        has_bad = true;
+                    }
+                    
+                }
+                if(!has_bad)
+                {
+                    std::cerr << "-- rebalanced" << std::endl;
+                    return true;
+                }
+                
+                //______________________________________________________________
+                //
+                // compute integer step
+                //______________________________________________________________
+                //std::cerr << "beta=" << beta << std::endl;
+                tao::mul(xip,Q,beta);
+                //std::cerr << "xip=" << xip << std::endl;
+                tao::mul_trn(dCp, Q, xip);
+                //std::cerr << "dCp=" << dCp << std::endl;
+                
+                //______________________________________________________________
+                //
+                // find max step
+                //______________________________________________________________
+                alpha.free();
+                aindx.free();
+                for(size_t j=M;j>0;--j)
+                {
+                    if(local_active[j])
+                    {
+                        const double    Cj = C[j];
+                        const ptrdiff_t Dj = dCp[j];
+                        if(Dj<0)
+                        {
+                            if(Cj<=0)
+                            {
+                                std::cerr << "-- negative step for a negative concentration" << std::endl;
+                                return false;
+                            }
+                            else
+                            {
+                                alpha.push_back(Cj/(-Dj));
+                                aindx.push_back(j);
+                            }
+                        }
+                        else
+                        {
+                            
+                            if(Dj>0)
+                            {
+                                if(Cj<0)
+                                {
+                                    alpha.push_back((-Cj)/Dj); // minimal step
+                                    aindx.push_back(j);
+                                }
+                            }
+                            else
+                            {
+                                // do nothing
+                            }
+                        }
+                    }
+                    
+                }
+                
+                if(alpha.size()<=0)
+                {
+                    std::cerr << "-- no d.o.f. to rebalance" << std::endl;
+                    return false;
+                }
+                co_qsort(alpha, aindx);
+                //std::cerr << "alpha=" << alpha << std::endl;
+                //std::cerr << "aindx=" << aindx << std::endl;
+                const double factor = alpha[1];
+
+                if(factor<=0)
+                {
+                    std::cerr << "-- blocked rebalance" << std::endl;
+                    return false;
+                }
+               
+
+                //______________________________________________________________
+                //
+                // carefull addition
+                //______________________________________________________________
+                for(size_t j=M;j>0;--j)
+                {
+                    if(local_active[j])
+                    {
+                        const ptrdiff_t Dj = dCp[j];
+                        const double    Cj = C[j];
+                        C[j] += factor * Dj;
+                        if(Dj>0)
+                        {
+                            if(Cj<0&&C[j]>=0)
+                            {
+                                C[j] = 0;
+                            }
+                        }
+                        else
+                        {
+                            if(Dj<0)
+                            {
+                                if(Cj>=0&&C[j]<=0)
+                                {
+                                    C[j] = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+                C[aindx[1]] = 0;
+                std::cerr << "\tCb" << count << "=" << C << std::endl;
+                
+            }
             
         }
         
