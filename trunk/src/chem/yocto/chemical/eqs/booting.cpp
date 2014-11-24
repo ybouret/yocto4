@@ -39,7 +39,7 @@ namespace yocto
             static inline
             void rewrite_constraints(imatrix_t       &P,
                                      vector_t        &Lam,
-                                     ivector_t       &Jfixed,
+                                     uvector_t       &Jfixed,
                                      vector_t        &Cfixed,
                                      const bvector_t &active
                                      )
@@ -99,28 +99,6 @@ namespace yocto
                 std::cerr << "Cfixed=" << Cfixed << std::endl;
             }
             
-            //------------------------------------------------------------------
-            //
-            // helper matrix to project on right constraints
-            //
-            //------------------------------------------------------------------
-            static inline
-            ptrdiff_t compute_detJ_and_MU( imatrix_t &MU, const imatrix_t &P )
-            {
-                const size_t Nc = P.rows;
-                imatrix_t J(Nc,Nc);
-                tao::mmul_rtrn(J, P, P);
-                std::cerr << "J=" << J << std::endl;
-                const ptrdiff_t detJ = determinant_of(J);
-                std::cerr << "detJ=" << detJ << std::endl;
-                if(!detJ)
-                    throw exception("singular set of chemical constraints!");
-                imatrix_t AJ(Nc,Nc);
-                adjoint(AJ, J);
-                std::cerr << "AJ=" << AJ << std::endl;
-                tao::mmul_ltrn(MU, P, AJ);
-                return detJ;
-            }
             
             //------------------------------------------------------------------
             //
@@ -205,24 +183,56 @@ namespace yocto
                 }
             }
             
-            //------------------------------------------------------------------
-            //
-            // helper
-            //
-            //------------------------------------------------------------------
+            
             static inline
-            void set_fixedC(vector_t        &C,
-                            const ivector_t &Jfixed,
-                            const vector_t  &Cfixed) throw()
+            ptrdiff_t compute_Xstar(vector_t        &Xstar,
+                                    const imatrix_t &P,
+                                    const vector_t  &Lam)
             {
+                const size_t Nc = P.rows;
+                imatrix_t    J(Nc,Nc);
+                tao::mmul_rtrn(J, P, P);
+                const ptrdiff_t detJ = determinant_of(J);
+                if(!detJ)
+                {
+                    throw exception("singular constraints");
+                }
+                imatrix_t AJ(Nc,Nc);
+                adjoint(AJ, J);
+                vector_t AJL(Nc,0);
+                tao::mul(AJL,AJ,Lam);
+                tao::mul_trn(Xstar,P,AJL);
+                
+                return detJ;
+            }
+            
+            
+            static inline
+            void compute_C(vector_t        &C,
+                           const vector_t  &Xstar,
+                           const imatrix_t &Q,
+                           const vector_t  &xi,
+                           const ptrdiff_t  detJ,
+                           const uvector_t &Jfixed,
+                           const vector_t  &Cfixed
+                           )
+            {
+                tao::mul_trn(C, Q, xi);
+                for(size_t j=C.size();j>0;--j)
+                {
+                    C[j] = (C[j]+Xstar[j])/detJ;
+                }
+                
                 for(size_t j=Jfixed.size();j>0;--j)
                 {
-                    C[Jfixed[j]] = Cfixed[j];
+                    C[ Jfixed[j] ] = Cfixed[j];
                 }
             }
             
             
         }
+        
+        
         
         
         void equilibria:: load(const boot &loader, const double t)
@@ -288,7 +298,7 @@ namespace yocto
             //
             // factorize data: get constant and check structure
             //__________________________________________________________________
-            ivector_t Jfixed(M,as_capacity);
+            uvector_t Jfixed(M,as_capacity);
             vector_t  Cfixed(M,as_capacity);
             rewrite_constraints(P,Lam,Jfixed,Cfixed,active);
             std::cerr << "Lam=" << Lam << std::endl;
@@ -299,12 +309,13 @@ namespace yocto
             {
                 local_active[ Jfixed[j] ] = false;
             }
-            //__________________________________________________________________
-            //
-            // check constraints rank and compute helper matrix
-            //__________________________________________________________________
-            imatrix_t       MU(M,Nc);
-            const ptrdiff_t detJ = compute_detJ_and_MU(MU,P);
+            std::cerr << "active=" << active << std::endl;
+            std::cerr << "localA=" << local_active << std::endl;
+            
+            vector_t Xstar(M,0);
+            const ptrdiff_t detJ = compute_Xstar( Xstar, P, Lam);
+            std::cerr << "Xstar=" << Xstar << std::endl;
+            std::cerr << "detJ =" << detJ  << std::endl;
             
             //__________________________________________________________________
             //
@@ -316,8 +327,6 @@ namespace yocto
             
             
             
-            
-            
             //__________________________________________________________________
             //
             //
@@ -326,129 +335,16 @@ namespace yocto
             //__________________________________________________________________
             computeK(t);
             
-            vector_t U(M,0.0);
-            vector_t dL(Nc,0.0);
-            size_t iter = 0;
-        GENERATE_C:
-            //__________________________________________________________________
-            //
-            // Generate C
-            //__________________________________________________________________
-            for(size_t j=M;j>0;--j)
-            {
-                C[j] = ran();
-                //C[j] = 0;
-            }
-            set_fixedC(C, Jfixed, Cfixed);
-            
-        BOOT_STEP: ++iter;
-            //__________________________________________________________________
-            //
-            // Starting Point
-            //__________________________________________________________________
-            tao::set(Cs,C);
-            updateGammaAndPhi();
-            
-            //__________________________________________________________________
-            //
-            // component to be removed to match P*C=Lam
-            //__________________________________________________________________
-            tao::mul(dL,P,C);
-            tao::subp(dL, Lam);
-            tao::mul(U,MU,dL);
-            
-#if !defined(NDEBUG)
-            for(size_t j=Jfixed.size();j>0;--j)
-            {
-                assert( fabs(U[Jfixed[j]]) <= 0 );
-            }
-#endif
-            
-            //__________________________________________________________________
-            //
-            // update C in place
-            //__________________________________________________________________
-            for(size_t j=M;j>0;--j)
-            {
-                C[j] = (detJ*C[j]+U[j])/detJ;
-            }
-            
-            //__________________________________________________________________
-            //
-            // compute Gamma,Phi and update Phi
-            //__________________________________________________________________
-            std::cerr << "Gamma=" << Gamma << std::endl;
-            for(size_t j=Jfixed.size();j>0;--j)
-            {
-                const size_t jj = Jfixed[j];
-                for(size_t i=N;i>0;--i)
-                {
-                    Phi[i][jj] = 0;
-                }
-            }
-            
-            //__________________________________________________________________
-            //
-            // compute W = Phi*Q'
-            //__________________________________________________________________
-            tao::mmul_rtrn(W, Phi, Q);
-            if( ! crout<double>::build(W) )
-            {
-                // TODO: What do I do ?
-                std::cerr << "-- invalid system..." << std::endl;
-                exit(1);
-            }
-            
-            //__________________________________________________________________
-            //
-            // compute xi = inv(Phi*Q')*(PU+Gamma)
-            // warning: U is to be divided by detJ
-            //__________________________________________________________________
-            tao::mul(xi,Phi,U);
             for(size_t i=N;i>0;--i)
             {
-                xi[i] = -(detJ*Gamma[i]+xi[i])/detJ;
+                xi[i] = ran();
+                xi[i] = 0;
             }
-            crout<double>::solve(W, xi);
-            tao::mul_trn(dC, Q, xi);
-            tao::add(C,dC);
+            compute_C(C,Xstar,Q,xi,detJ,Jfixed,Cfixed);
+            std::cerr << "C0=" << C << std::endl;
             
-            //__________________________________________________________________
-            //
-            // rebalance
-            //__________________________________________________________________
-            if(!rebalance_with(Q,local_active))
-            {
-                goto GENERATE_C;
-            }
+            rebalance_with(Q,local_active);
             
-            //__________________________________________________________________
-            //
-            // test convergence
-            //__________________________________________________________________
-            bool converged = true;
-            for(size_t j=M;j>0;--j)
-            {
-                if(local_active[j])
-                {
-                    const double Cj = C[j];
-                    const double Dj = dC[j] = fabs(Cs[j]-Cj);
-                    if( Dj > numeric<double>::ftol * Cj )
-                    {
-                        converged = false;
-                    }
-                }
-                else
-                {
-                    dC[j] = 0;
-                }
-            }
-            
-            if(!converged)
-            {
-                goto BOOT_STEP;
-            }
-            std::cerr << "CONVERGED in " << iter << " trials" << std::endl;
         }
         
         
@@ -592,6 +488,7 @@ namespace yocto
             }
             
         }
+        
         
     }
     
