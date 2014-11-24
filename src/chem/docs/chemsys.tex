@@ -111,9 +111,29 @@ Let us assume that we deal only with linear constraints (electroneutrality, mass
 This may be written in terms of an integer matrix $\mymat{P}$
 such that
 $$
-	\mymat{P}\vec{C} = \vec{\Lambda}
+	\mymat{P}\vec{C} = \vec{\Lambda}.
 $$
-
+To be able to find a solution, the matrix $\mymat{P}\oplus\mymat{\nu}$ must
+be not singular, with allows the computation of an orthogonal (integer) matrix
+$$
+	\mymat{Q},\;\mytrn{\mymat{P}}\cdot\mymat{Q} = \mymat{0},\;Q\in\mathcal{M}_{N,M}.
+$$
+Hence, starting from a valid concentration $\vec{C}_k$, we want to compute
+$$
+	\vec{\Gamma}
+	\left(
+		\vec{C}_k+\mytrn{\mymat{P}}\delta\vec{U}_k + \mytrn{\mymat{Q}}\vec{\xi}_k
+		\right) = \vec{0}.
+$$
+We compute $\vec{\Gamma}_k$ and $\mymat{\Phi}_k$. Then we
+compute
+$$
+	\vec{C}_k' = \vec{C}_k + \mytrn{\mymat{P}}\left(\mymat{P}\mytrn{\mymat{P}}\right)^{-1}\left(\vec{\Lambda}-\mymat{P}\vec{C}_k\right)
+$$
+and we deduce
+$$
+	\vec{\xi}_k = -\left(\mymat{\Phi}\mytrn{\mymat{Q}}\right)^{-1}\left(\vec{\Gamma}_k+\mymat{\Phi}_k \vec{C}_k'\right)
+$$
 
 
 \end{document}
