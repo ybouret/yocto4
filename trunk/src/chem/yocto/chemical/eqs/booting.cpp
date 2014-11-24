@@ -283,8 +283,6 @@ namespace yocto
                     P[i][m.sp->indx] = m.weight;
                 }
             }
-            std::cerr << "Lam0=" << Lam << std::endl;
-            std::cerr << "P0="   << P   << std::endl;
             
             //__________________________________________________________________
             //
@@ -301,15 +299,12 @@ namespace yocto
             {
                 local_active[ Jfixed[j] ] = false;
             }
-            std::cerr << "active=" << active << std::endl;
-            std::cerr << "localA=" << local_active << std::endl;
             //__________________________________________________________________
             //
             // check constraints rank and compute helper matrix
             //__________________________________________________________________
             imatrix_t       MU(M,Nc);
             const ptrdiff_t detJ = compute_detJ_and_MU(MU,P);
-            std::cerr << "MU=" << MU << std::endl;
             
             //__________________________________________________________________
             //
@@ -333,6 +328,7 @@ namespace yocto
             
             vector_t U(M,0.0);
             vector_t dL(Nc,0.0);
+            size_t iter = 0;
         GENERATE_C:
             //__________________________________________________________________
             //
@@ -344,8 +340,8 @@ namespace yocto
                 //C[j] = 0;
             }
             set_fixedC(C, Jfixed, Cfixed);
-            std::cerr << "C0=" << C << std::endl;
             
+        BOOT_STEP: ++iter;
             //__________________________________________________________________
             //
             // Starting Point
@@ -360,7 +356,6 @@ namespace yocto
             tao::mul(dL,P,C);
             tao::subp(dL, Lam);
             tao::mul(U,MU,dL);
-            std::cerr << "U=" << U << "/" << detJ << std::endl;
             
 #if !defined(NDEBUG)
             for(size_t j=Jfixed.size();j>0;--j)
@@ -377,14 +372,12 @@ namespace yocto
             {
                 C[j] = (detJ*C[j]+U[j])/detJ;
             }
-            std::cerr << "CU=" << C << std::endl;
             
             //__________________________________________________________________
             //
             // compute Gamma,Phi and update Phi
             //__________________________________________________________________
             std::cerr << "Gamma=" << Gamma << std::endl;
-            std::cerr << "Phi0 =" << Phi   << std::endl;
             for(size_t j=Jfixed.size();j>0;--j)
             {
                 const size_t jj = Jfixed[j];
@@ -393,14 +386,12 @@ namespace yocto
                     Phi[i][jj] = 0;
                 }
             }
-            std::cerr << "Phi  =" << Phi << std::endl;
             
             //__________________________________________________________________
             //
             // compute W = Phi*Q'
             //__________________________________________________________________
             tao::mmul_rtrn(W, Phi, Q);
-            std::cerr << "W=" << W << std::endl;
             if( ! crout<double>::build(W) )
             {
                 // TODO: What do I do ?
@@ -411,6 +402,7 @@ namespace yocto
             //__________________________________________________________________
             //
             // compute xi = inv(Phi*Q')*(PU+Gamma)
+            // warning: U is to be divided by detJ
             //__________________________________________________________________
             tao::mul(xi,Phi,U);
             for(size_t i=N;i>0;--i)
@@ -419,9 +411,7 @@ namespace yocto
             }
             crout<double>::solve(W, xi);
             tao::mul_trn(dC, Q, xi);
-            std::cerr << "dC=" << dC << std::endl;
             tao::add(C,dC);
-            std::cerr << "C1=" << C << std::endl;
             
             //__________________________________________________________________
             //
@@ -432,14 +422,41 @@ namespace yocto
                 goto GENERATE_C;
             }
             
+            //__________________________________________________________________
+            //
+            // test convergence
+            //__________________________________________________________________
+            bool converged = true;
+            for(size_t j=M;j>0;--j)
+            {
+                if(local_active[j])
+                {
+                    const double Cj = C[j];
+                    const double Dj = dC[j] = fabs(Cs[j]-Cj);
+                    if( Dj > numeric<double>::ftol * Cj )
+                    {
+                        converged = false;
+                    }
+                }
+                else
+                {
+                    dC[j] = 0;
+                }
+            }
+            
+            if(!converged)
+            {
+                goto BOOT_STEP;
+            }
+            std::cerr << "CONVERGED in " << iter << " trials" << std::endl;
         }
         
         
         bool equilibria:: rebalance_with(const imatrix_t &Q, const bvector_t &local_active)
         {
             
+            std::cerr << "\tCb0=" << C << std::endl;
             size_t count = 0;
-            std::cerr << "\tCb0=" << C << std::endl;;
             while(true)
             {
                 ++count;
@@ -463,9 +480,10 @@ namespace yocto
                     }
                     
                 }
+                
                 if(!has_bad)
                 {
-                    std::cerr << "-- rebalanced" << std::endl;
+                    std::cerr << "CB=" << C << std::endl;
                     return true;
                 }
                 
@@ -473,11 +491,11 @@ namespace yocto
                 //
                 // compute integer step
                 //______________________________________________________________
-                //std::cerr << "beta=" << beta << std::endl;
                 tao::mul(xip,Q,beta);
-                //std::cerr << "xip=" << xip << std::endl;
                 tao::mul_trn(dCp, Q, xip);
-                //std::cerr << "dCp=" << dCp << std::endl;
+                
+                std::cerr << "beta=" << beta << std::endl;
+                std::cerr << "dCp =" << dCp  << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -529,18 +547,17 @@ namespace yocto
                     std::cerr << "-- no d.o.f. to rebalance" << std::endl;
                     return false;
                 }
+                
                 co_qsort(alpha, aindx);
-                //std::cerr << "alpha=" << alpha << std::endl;
-                //std::cerr << "aindx=" << aindx << std::endl;
                 const double factor = alpha[1];
-
+                
                 if(factor<=0)
                 {
                     std::cerr << "-- blocked rebalance" << std::endl;
                     return false;
                 }
-               
-
+                
+                
                 //______________________________________________________________
                 //
                 // carefull addition
@@ -572,8 +589,6 @@ namespace yocto
                     }
                 }
                 C[aindx[1]] = 0;
-                std::cerr << "\tCb" << count << "=" << C << std::endl;
-                
             }
             
         }
