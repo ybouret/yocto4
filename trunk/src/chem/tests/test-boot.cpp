@@ -40,10 +40,10 @@ YOCTO_UNIT_TEST_IMPL(boot)
         
         std::cerr << loader << std::endl;
         
-        eqs.solve(loader,0.0);
+        eqs.load(loader,0.0);
     }
     
-    //return 0;
+    return 0;
     
     {
         boot loader;

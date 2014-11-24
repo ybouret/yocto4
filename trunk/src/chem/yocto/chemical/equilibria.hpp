@@ -7,6 +7,7 @@
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
+#include "yocto/code/rand32.hpp"
 
 namespace yocto
 {
@@ -98,6 +99,9 @@ namespace yocto
             
             void solve( const boot &loader, const double t);
             
+            void load( const boot &loader, const double t );
+            
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
@@ -107,7 +111,8 @@ namespace yocto
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );
             
-            
+        public:
+            uniform_generator<double> ran;
             
             
         };
