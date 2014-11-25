@@ -365,7 +365,6 @@ namespace yocto
             compute_Qv2(Q, P, Nu);
             std::cerr << "Qv2=" << Q << std::endl;
             std::cerr << "Nu="  << Nu << std::endl;
-            return;
             
             
             
@@ -377,10 +376,10 @@ namespace yocto
             //__________________________________________________________________
             computeK(t);
             
+            
             for(size_t i=N;i>0;--i)
             {
                 xi[i] = ran();
-                xi[i] = 0;
             }
             compute_C(C,Xstar,Q,xi,detJ,Jfixed,Cfixed);
             std::cerr << "C0=" << C << std::endl;
