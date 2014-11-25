@@ -48,7 +48,6 @@ namespace yocto
             
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
-            vector_t     GamSF;  //!< [N] Gamma Scaling Factor
             vector_t     xi;     //!< [N] extents
             imatrix_t    Nu;     //!< [NxM] current topology
             matrix_t     Phi;    //!< [NxM] dGamma/dC
@@ -84,7 +83,6 @@ namespace yocto
             
             //! compute all constantes
             void computeK(double t);
-            void computeGammaScaling();
             void computeGammaAndPhi(double t);
             void updateGammaAndPhi();
             void updateGamma();
