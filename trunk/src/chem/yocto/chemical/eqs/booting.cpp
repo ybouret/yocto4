@@ -183,6 +183,43 @@ namespace yocto
                 }
             }
             
+            //__________________________________________________________________
+            //
+            // Compute the chemical Q-space
+            //__________________________________________________________________
+            static inline
+            void compute_Qv2(imatrix_t &Q, const imatrix_t &P, const imatrix_t &Nu)
+            {
+                const size_t N  = Q.rows;
+                const size_t Nc = P.rows;
+                const size_t M  = Q.cols;
+                
+                imatrix_t F(P);
+                if(!IGS(F))
+                    throw exception("unexpected failure in P normalization");
+                
+                std::cerr << "F=" << F << std::endl;
+                
+                for(size_t i=N;i>0;--i)
+                {
+                    array<integer_t> &Qi =Q[i];
+                    tao::set(Qi, Nu[i]);
+                    for(size_t k=Nc;k>0;--k)
+                    {
+                        const array<integer_t> &Pk = F[k];
+                        const integer_t qp = tao::dot(Qi,Pk);
+                        const integer_t p2 = tao::dot(Pk,Pk);
+                        for(size_t j=M;j>0;--j)
+                        {
+                            Qi[j] = p2 * Qi[j] - qp * Pk[j];
+                        }
+                        tao::simplify(Qi);
+                    }
+                    
+                }
+            }
+            
+            
             
             static inline
             ptrdiff_t compute_Xstar(vector_t        &Xstar,
@@ -324,6 +361,11 @@ namespace yocto
             imatrix_t Q(N,M);
             compute_Q(Q,P,Nu);
             std::cerr << "Q=" << Q << std::endl;
+            
+            compute_Qv2(Q, P, Nu);
+            std::cerr << "Qv2=" << Q << std::endl;
+            std::cerr << "Nu="  << Nu << std::endl;
+            return;
             
             
             
