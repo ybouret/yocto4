@@ -216,6 +216,50 @@ namespace yocto
                 return g;
             }
             
+            static inline
+            ptrdiff_t i_simplify( array<ptrdiff_t> &w ) throw()
+            {
+                register ptrdiff_t    g = 0;
+                const register size_t n = w.size();
+                for(register size_t i=n;i>0;--i)
+                {
+                    const ptrdiff_t wi = w[i];
+                    const ptrdiff_t ai = wi < 0 ? -wi : wi;
+                    if(0==ai)
+                    {
+                        continue;
+                    }
+                    
+                    for(register size_t j=i;j>0;--j)
+                    {
+                        const ptrdiff_t wj = w[j];
+                        const ptrdiff_t aj = wj < 0 ? -wj : wj;
+                        if(0==aj)
+                        {
+                            continue;
+                        }
+                        
+                        if(g<=0)
+                        {
+                            g = aj;
+                        }
+                        else
+                        {
+                            g = min_of(g, gcd_of(ai,aj) );
+                        }
+                    }
+                }
+                
+                if(g>1)
+                {
+                    for(register size_t i=n;i>0;--i)
+                    {
+                        w[i] /= g;
+                    }
+                }
+                return g;
+            }
+            
             //------------------------------------------------------------------
             //
             // Level 2: matrix/vector operations

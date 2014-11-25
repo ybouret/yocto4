@@ -130,7 +130,7 @@ namespace yocto
                         {
                             w[j] = u2* v[j] - uv * u[j];
                         }
-                        tao::simplify(w);
+                        (void)tao::i_simplify(w);
                         for(size_t j=dim;j>0;--j)
                         {
                             v[j] = w[j];
@@ -213,7 +213,7 @@ namespace yocto
                         {
                             Qi[j] = p2 * Qi[j] - qp * Pk[j];
                         }
-                        tao::simplify(Qi);
+                        (void)tao::i_simplify(Qi);
                     }
                     
                 }
@@ -266,6 +266,90 @@ namespace yocto
                 }
             }
             
+#if 1
+            static inline
+            bool are_opposite( const array<integer_t> &u, const array<integer_t> &v) throw()
+            {
+                for(size_t i=u.size();i>0;--i)
+                {
+                    if( u[i] != -v[i] )
+                        return false;
+                }
+                return true;
+            }
+
+            static inline
+            void process_Y( imatrix_t &Y )
+            {
+                const size_t M = Y.rows;
+                const size_t N = Y.cols;
+                for(size_t i=M;i>0;--i)
+                {
+                    tao::i_simplify(Y[i]);
+                }
+                std::cerr << "Yin=" << Y << std::endl;
+                size_t Mok = M;
+                {
+                    size_t i=1;
+                    while(i<Mok)
+                    {
+                        if( tao::norm_sq(Y[i]) <= 0)
+                        {
+                            Y.swap_rows(i, Mok);
+                            --Mok;
+                        }
+                        ++i;
+                    }
+                }
+                std::cerr << "Yok="  << Y   << std::endl;
+                std::cerr << "Mok=" << Mok << std::endl;
+                std::cerr << "M  =" << M   << std::endl;
+                
+                if(Mok<N)
+                {
+                    throw exception("unexpected low rank for Q");
+                }
+                
+                uvector_t Idof(M,as_capacity);
+                uvector_t Ipin(M,as_capacity);
+                for(size_t i=1;i<=Mok;++i)
+                {
+                    bool is_dof = true;
+                    for(size_t k=Ipin.size();k>0;--k)
+                    {
+                        if( i == Ipin[k] )
+                        {
+                            is_dof = false;
+                            break;
+                        }
+                    }
+                    if(!is_dof)
+                        continue;
+                    
+                    const array<integer_t> &Yi = Y[i];
+                    for(size_t j=i+1;j<=Mok;++j)
+                    {
+                        const array<integer_t> &Yj = Y[j];
+                        if( are_opposite(Yi,Yj) )
+                        {
+                            std::cerr << "Y" << i << "=" << Yi << " and Y" << j << "=" << Yj << " are opposite" << std::endl;
+                            is_dof = false;
+                            Ipin.push_back(i);
+                            Ipin.push_back(j);
+                            break;
+                        }
+                    }
+                    
+                    if(is_dof)
+                    {
+                        Idof.push_back(i);
+                    }
+                }
+                std::cerr << "Ipin=" << Ipin << std::endl;
+                std::cerr << "Idof=" << Idof << std::endl;
+                
+            }
+#endif
             
         }
         
@@ -359,13 +443,15 @@ namespace yocto
             // compute orthogonal space
             //__________________________________________________________________
             imatrix_t Q(N,M);
-            compute_Q(Q,P,Nu);
-            std::cerr << "Q=" << Q << std::endl;
+            //compute_Q(Q,P,Nu);
+            //std::cerr << "Q=" << Q << std::endl;
             
             compute_Qv2(Q, P, Nu);
-            std::cerr << "Qv2=" << Q << std::endl;
+            std::cerr << "Q=" << Q << std::endl;
             std::cerr << "Nu="  << Nu << std::endl;
             
+            imatrix_t Y(Q,matrix_transpose);
+            process_Y(Y);
             
             
             //__________________________________________________________________
