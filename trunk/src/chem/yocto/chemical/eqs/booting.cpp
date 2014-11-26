@@ -283,6 +283,7 @@ namespace yocto
             {
                 const size_t M = Y.rows;
                 const size_t N = Y.cols;
+#if 0
                 for(size_t i=M;i>0;--i)
                 {
                     tao::i_simplify(Y[i]);
@@ -310,10 +311,34 @@ namespace yocto
                     throw exception("unexpected low rank for Q");
                 }
                 
+#endif
+      
+                std::cerr << "Y=" << Y << std::endl;
+                
                 uvector_t Idof(M,as_capacity);
                 uvector_t Ipin(M,as_capacity);
-                for(size_t i=1;i<=Mok;++i)
+                uvector_t Inul(M,as_capacity);
+                
+                for(size_t i=1;i<=M;++i)
                 {
+                    const array<integer_t> &Yi = Y[i];
+
+                    bool is_nul = true;
+                    for(size_t j=N;j>0;--j)
+                    {
+                        if(Yi[j]!=0)
+                        {
+                            is_nul = false;
+                            break;
+                        }
+                    }
+                    if(is_nul)
+                    {
+                        Inul.push_back(i);
+                        continue;
+                    }
+                    
+                    
                     bool is_dof = true;
                     for(size_t k=Ipin.size();k>0;--k)
                     {
@@ -326,13 +351,12 @@ namespace yocto
                     if(!is_dof)
                         continue;
                     
-                    const array<integer_t> &Yi = Y[i];
-                    for(size_t j=i+1;j<=Mok;++j)
+                    for(size_t j=i+1;j<=M;++j)
                     {
                         const array<integer_t> &Yj = Y[j];
                         if( are_opposite(Yi,Yj) )
                         {
-                            std::cerr << "Y" << i << "=" << Yi << " and Y" << j << "=" << Yj << " are opposite" << std::endl;
+                            //std::cerr << "Y" << i << "=" << Yi << " and Y" << j << "=" << Yj << " are opposite" << std::endl;
                             is_dof = false;
                             Ipin.push_back(i);
                             Ipin.push_back(j);
@@ -345,6 +369,7 @@ namespace yocto
                         Idof.push_back(i);
                     }
                 }
+                std::cerr << "Inul=" << Inul << std::endl;
                 std::cerr << "Ipin=" << Ipin << std::endl;
                 std::cerr << "Idof=" << Idof << std::endl;
                 
