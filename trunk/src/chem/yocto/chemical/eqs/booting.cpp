@@ -220,7 +220,7 @@ namespace yocto
             }
             
             
-            
+#if 0
             static inline
             ptrdiff_t compute_Xstar(vector_t        &Xstar,
                                     const imatrix_t &P,
@@ -240,9 +240,12 @@ namespace yocto
                 tao::mul(AJL,AJ,Lam);
                 tao::mul_trn(Xstar,P,AJL);
                 
+                imatrix_t Y(Xstar.size(),Nc);
+                tao::mmul_ltrn(Y,P, AJ);
+                std::cerr << "Y=" << Y << std::endl;
                 return detJ;
             }
-            
+#endif
             
             static inline
             void compute_C(vector_t        &C,
@@ -376,8 +379,91 @@ namespace yocto
             }
 #endif
             
+#if 0
+            static inline
+            size_t remake( imatrix_t &B )
+            {
+                const size_t M = B.rows;
+                const size_t N = B.cols;
+                uvector_t    idx(M,0);
+                for(size_t i=M;i>0;--i)
+                {
+                    (void)tao::i_simplify(B[i]);
+                    idx[i] = i;
+                }
+                std::cerr << "Bin=" << B << std::endl;
+                
+                // Phase 1: reject 0 values
+                size_t Mok = M;
+                {
+                    size_t i=1;
+                    while(i<Mok)
+                    {
+                        if( tao::norm_sq(B[i]) <= 0)
+                        {
+                            B.swap_rows(i, Mok);
+                            cswap(idx[i],idx[Mok]);
+                            --Mok;
+                        }
+                        ++i;
+                    }
+                }
+                std::cerr << "Bok="  << B   << std::endl;
+                std::cerr << "Mok=" << Mok << std::endl;
+                std::cerr << "M  =" << M   << std::endl;
+                std::cerr << "idx=" << idx << std::endl;
+                if(Mok<N)
+                {
+                    throw exception("unexpected low rank for B");
+                }
+                
+                // Phase 2: ortho
+                {
+                    size_t i = 1;
+                    while(i<=Mok)
+                    {
+                        array<integer_t> &v = B[i];
+                        for(size_t j=1;j<i;++j)
+                        {
+                            const array<integer_t> &u  = B[j];
+                            const integer_t         uu = tao::dot(u,u);
+                            const integer_t         uv = tao::dot(u,v);
+                            for(size_t k=N;k>0;--k)
+                            {
+                                v[k] = uu*v[k] - uv*u[k];
+                            }
+                            assert( 0 == tao::dot(u,v) );
+                            (void)tao::i_simplify(v);
+                        }
+                        if(tao::norm_sq(v)<=0)
+                        {
+                            B.swap_rows(i, Mok);
+                            cswap(idx[i],idx[Mok]);
+                            --Mok;
+                        }
+                        else
+                            ++i;
+                    }
+                }
+                std::cerr << "Bor=" << B   << std::endl;
+                std::cerr << "Mok=" << Mok << std::endl;
+                std::cerr << "idx=" << idx << std::endl;
+                
+                imatrix_t tmp(M,N);
+                for(size_t i=M;i>0;--i)
+                {
+                    const array<integer_t> &src = B[ idx[i] ];
+                    array<integer_t>       &dst = tmp[i];
+                    for(size_t j=N;j>0;--j) dst[j] = src[j];
+                }
+                B.assign(tmp);
+                std::cerr << "Bnew=" << B << std::endl;
+                return Mok;
+            }
+
+#endif
+            
         }
-        
         
         
         
@@ -458,10 +544,25 @@ namespace yocto
             std::cerr << "active=" << active << std::endl;
             std::cerr << "localA=" << local_active << std::endl;
             
-            vector_t Xstar(M,0);
-            const ptrdiff_t detJ = compute_Xstar( Xstar, P, Lam);
+            imatrix_t Y(M,Nc);
+            ptrdiff_t Delta = 0;
+            {
+                imatrix_t P2(Nc,Nc);
+                tao::mmul_rtrn(P2, P, P);
+                std::cerr << "P2=" << P2 << std::endl;
+                Delta = determinant_of(P2);
+                std::cerr << "Delta=" << Delta << std::endl;
+                if(Delta<=0)
+                    throw exception("unexpected singular set of constraints");
+                imatrix_t J(Nc,Nc);
+                adjoint(J, P2);
+                std::cerr << "J=" << J << std::endl;
+                tao::mmul_ltrn(Y, P, J);
+            }
+            std::cerr << "Y=" << Y << std::endl;
+            vector_t  Xstar(M,0);
+            tao::mul(Xstar,Y,Lam);
             std::cerr << "Xstar=" << Xstar << std::endl;
-            std::cerr << "detJ =" << detJ  << std::endl;
             
             //__________________________________________________________________
             //
@@ -474,37 +575,6 @@ namespace yocto
             compute_Qv2(Q, P, Nu);
             std::cerr << "Q=" << Q << std::endl;
             std::cerr << "Nu="  << Nu << std::endl;
-            
-            imatrix_t Y(Q,matrix_transpose);
-            process_Y(Y);
-            
-            
-            vector_t Xp(M,0);
-            vector_t Xm(M,0);
-            for(size_t j=M;j>0;--j)
-            {
-                Xp[j] = Xm[j] = 0;
-                if( local_active[j] )
-                {
-                    const double Xj = Xstar[j];
-                    if(Xj<0)
-                    {
-                        Xm[j] = -Xj;
-                    }
-                    else
-                    {
-                        Xp[j] = Xj;
-                    }
-                }
-                else
-                {
-                    Xp[j] = Xstar[j];
-                }
-            }
-            
-            std::cerr << "Xp=" << Xp << std::endl;
-            std::cerr << "Xm=" << Xm << std::endl;
-            
             
             
             //__________________________________________________________________
@@ -520,10 +590,10 @@ namespace yocto
             {
                 xi[i] = ran();
             }
-            compute_C(C,Xstar,Q,xi,detJ,Jfixed,Cfixed);
-            std::cerr << "C0=" << C << std::endl;
+            //compute_C(C,Xstar,Q,xi,detJ,Jfixed,Cfixed);
+            //std::cerr << "C0=" << C << std::endl;
             
-            rebalance_with(Q,local_active);
+            //rebalance_with(Q,local_active);
             
         }
         
