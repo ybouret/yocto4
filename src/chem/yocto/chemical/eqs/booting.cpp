@@ -479,6 +479,34 @@ namespace yocto
             process_Y(Y);
             
             
+            vector_t Xp(M,0);
+            vector_t Xm(M,0);
+            for(size_t j=M;j>0;--j)
+            {
+                Xp[j] = Xm[j] = 0;
+                if( local_active[j] )
+                {
+                    const double Xj = Xstar[j];
+                    if(Xj<0)
+                    {
+                        Xm[j] = -Xj;
+                    }
+                    else
+                    {
+                        Xp[j] = Xj;
+                    }
+                }
+                else
+                {
+                    Xp[j] = Xstar[j];
+                }
+            }
+            
+            std::cerr << "Xp=" << Xp << std::endl;
+            std::cerr << "Xm=" << Xm << std::endl;
+            
+            
+            
             //__________________________________________________________________
             //
             //
@@ -543,6 +571,7 @@ namespace yocto
                 tao::mul_trn(dCp, Q, xip);
                 
                 std::cerr << "beta=" << beta << std::endl;
+                std::cerr << "xip =" << xip  << std::endl;
                 std::cerr << "dCp =" << dCp  << std::endl;
                 
                 //______________________________________________________________
@@ -566,6 +595,7 @@ namespace yocto
                             }
                             else
                             {
+                                // Cj > 0
                                 alpha.push_back(Cj/(-Dj));
                                 aindx.push_back(j);
                             }
@@ -612,6 +642,7 @@ namespace yocto
                 //______________________________________________________________
                 for(size_t j=M;j>0;--j)
                 {
+                    
                     if(local_active[j])
                     {
                         const ptrdiff_t Dj = dCp[j];
@@ -635,7 +666,12 @@ namespace yocto
                             }
                         }
                     }
+                    else
+                    {
+                        C[j] += factor * dCp[j];
+                    }
                 }
+                std::cerr << "C" << count << " = " << C << std::endl;
                 C[aindx[1]] = 0;
             }
             
