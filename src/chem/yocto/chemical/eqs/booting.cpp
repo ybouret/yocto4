@@ -8,6 +8,7 @@
 #include "yocto/math/kernel/crout.hpp"
 
 #include "yocto/code/utils.hpp"
+#include "yocto/math/opt/cgrad.hpp"
 
 namespace yocto
 {
@@ -251,7 +252,7 @@ namespace yocto
             tao::mul_trn(C,Q,V);
             for(size_t j=M;j>0;--j)
             {
-                C[j] = (Xstar[j]+C[j])/Delta;
+                C[j] = (Xstar[j]+Delta*C[j])/Delta;
             }
             for(size_t j=fixedJ.size();j>0;--j)
             {
@@ -277,7 +278,7 @@ namespace yocto
             }
             return H*0.5;
         }
-
+        
         void equilibria:: computeG(array<double> &G, const array<double> &V)
         {
             assert(V.size()==N);
@@ -285,17 +286,34 @@ namespace yocto
             compute_C(V);
             for(size_t j=M;j>0;--j)
             {
-                G[j] = 0;
+                dC[j] = 0;
                 if(aboot[j])
                 {
                     const double Cj = C[j];
                     if(Cj<0)
                     {
-                        G[j] = Cj;
+                        dC[j] = Cj;
                     }
                 }
             }
+            //std::cerr << "dHdC=" << dC << std::endl;
+            tao::mul(G,Q,dC);
+            
         }
+        
+        void equilibria:: optimize(math::numeric<double>::scalar_field &F,
+                                   math::numeric<double>::vector_field &G)
+        {
+            
+            cgrad<double>::optimize(F, G, xi, 0, NULL);
+            compute_C(xi);
+            return;
+            for(size_t j=M;j>0;--j)
+            {
+                if(aboot[j] && C[j]<=0 ) C[j] = 0;
+            }
+        }
+        
         
         
         void equilibria:: load(const boot &loader, const double t)
@@ -415,6 +433,63 @@ namespace yocto
             computeK(t);
             numeric<double>::scalar_field F(this, &equilibria::computeH);
             numeric<double>::vector_field G(this, &equilibria::computeG);
+            vector_t U(N,0);
+            
+            size_t count = 0;
+            for(size_t j=N;j>0;--j)
+            {
+                xi[j] = ran() - 0.5;
+            }
+            optimize(F,G);
+            std::cerr << "xi=" << xi << std::endl;
+            std::cerr << "C=" << C << std::endl;
+            
+        LOOP: ++count;
+            tao::set(Cs,C);
+            std::cerr << "C=" << C << std::endl;
+            updateGammaAndPhi();
+            for(size_t j=fixedJ.size();j>0;--j)
+            {
+                const size_t jj = fixedJ[j];
+                for(size_t i=N;i>0;--i)
+                {
+                    Phi[i][jj] = 0;
+                }
+            }
+            std::cerr << "Gamma=" << Gamma << std::endl;
+            tao::mmul_rtrn(W, Phi, Q);
+            if( !crout<double>::build(W) )
+            {
+                std::cerr << "Singular..." << std::endl;
+                exit(1);
+            }
+            tao::neg(U,Gamma);
+            crout<double>::solve(W,U);
+            std::cerr << "U=" << U << std::endl;
+            tao::add(xi,U);
+            compute_C(xi);
+            std::cerr << "Craw=" << C << std::endl;
+            optimize(F,G);
+            std::cerr << "Cfin=" << C << std::endl;
+            
+            bool converged = true;
+            for(size_t j=M;j>0;--j)
+            {
+                const double cc = C[j];
+                const double dd = dC[j] = fabs(cc - Cs[j]);
+                if( dd > numeric<double>::ftol * fabs(cc) )
+                {
+                    converged = false;
+                }
+            }
+            std::cerr << "err=" << dC << std::endl;
+            if(converged)
+            {
+                std::cerr << "#converged" << std::endl;
+            }
+            else
+                goto LOOP;
+            
             
         }
         
