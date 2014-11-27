@@ -59,7 +59,7 @@ namespace yocto
             evector_t    online; //!< [0..N] balancing: online eqs for balancing
             ivector_t    xip;    //!< [N]    balancing: integer descent extent
             imatrix_t    Q;      //!< [NxM]  booting
-            integer_t    Delta;  //!< C=(Xstar+Q'*V)/Delta
+            integer_t    Delta;  //!< C=Xstar/Delta + Q'*V
             
             
             equilibrium &add( equilibrium *pEq );
@@ -105,7 +105,7 @@ namespace yocto
             void load( const boot &loader, const double t );
             
             
-            //! C = (Xstar+Q'*V)/Delta
+            //! C = Xstar/Delta + Q'*V
             void compute_C( const array<double> &V );
             
         private:
@@ -122,9 +122,11 @@ namespace yocto
             double computeH( const array<double> &V );
             void   computeG( array<double> &G, const array<double> &V);
             
+            void   optimize(math::numeric<double>::scalar_field &,math::numeric<double>::vector_field&);
             
         public:
             uniform_generator<double> ran;
+            
             
             
         };

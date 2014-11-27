@@ -22,6 +22,11 @@ YOCTO_UNIT_TEST_IMPL(boot)
         Lua::Config::DoFile(L,argv[1]);
     }
     
+    const char *ini_name = "ini";
+    if(argc>2)
+    {
+        ini_name = argv[2];
+    }
     
     __lua::load(L, lib, "species");
     std::cerr << "lib=" << lib << std::endl;
@@ -36,26 +41,14 @@ YOCTO_UNIT_TEST_IMPL(boot)
         boot loader;
         
         loader.electroneutrality(lib);
-        __lua::load(L,loader, "ini", lib);
+        __lua::load(L,loader, ini_name, lib);
         
         std::cerr << loader << std::endl;
         
         eqs.load(loader,0.0);
     }
     
-    //return 0;
     
-    {
-        boot loader;
-        
-        loader.electroneutrality(lib);
-        __lua::load(L,loader, "ini2", lib);
-        
-        std::cerr << loader << std::endl;
-        
-        eqs.load(loader,0.0);
-    }
-
     
 }
 YOCTO_UNIT_TEST_DONE()
