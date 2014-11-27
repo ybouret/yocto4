@@ -7,6 +7,7 @@
 #include "yocto/math/kernel/det.hpp"
 #include "yocto/math/kernel/crout.hpp"
 
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -143,6 +144,7 @@ namespace yocto
                 return true;
             }
             
+#if 0
             //__________________________________________________________________
             //
             // Compute the Q-space
@@ -182,6 +184,8 @@ namespace yocto
                     }
                 }
             }
+#endif
+            
             
             //__________________________________________________________________
             //
@@ -220,251 +224,78 @@ namespace yocto
             }
             
             
-#if 0
-            static inline
-            ptrdiff_t compute_Xstar(vector_t        &Xstar,
-                                    const imatrix_t &P,
-                                    const vector_t  &Lam)
-            {
-                const size_t Nc = P.rows;
-                imatrix_t    J(Nc,Nc);
-                tao::mmul_rtrn(J, P, P);
-                const ptrdiff_t detJ = determinant_of(J);
-                if(!detJ)
-                {
-                    throw exception("singular constraints");
-                }
-                imatrix_t AJ(Nc,Nc);
-                adjoint(AJ, J);
-                vector_t AJL(Nc,0);
-                tao::mul(AJL,AJ,Lam);
-                tao::mul_trn(Xstar,P,AJL);
-                
-                imatrix_t Y(Xstar.size(),Nc);
-                tao::mmul_ltrn(Y,P, AJ);
-                std::cerr << "Y=" << Y << std::endl;
-                return detJ;
-            }
-#endif
+            
+            
+            
             
             static inline
-            void compute_C(vector_t        &C,
-                           const vector_t  &Xstar,
-                           const imatrix_t &Q,
-                           const vector_t  &xi,
-                           const ptrdiff_t  detJ,
-                           const uvector_t &Jfixed,
-                           const vector_t  &Cfixed
-                           )
+            size_t count_active( const bvector_t &flag, uvector_t &Jactive) throw()
             {
-                tao::mul_trn(C, Q, xi);
-                for(size_t j=C.size();j>0;--j)
+                Jactive.free();
+                for(size_t j=flag.size();j>0;--j)
                 {
-                    C[j] = (C[j]+Xstar[j])/detJ;
+                    if(flag[j])
+                    {
+                        Jactive.push_back(j);
+                    }
                 }
-                
-                for(size_t j=Jfixed.size();j>0;--j)
-                {
-                    C[ Jfixed[j] ] = Cfixed[j];
-                }
+                Jactive.reverse();
+                return Jactive.size();
             }
-            
-#if 1
-            static inline
-            bool are_opposite( const array<integer_t> &u, const array<integer_t> &v) throw()
-            {
-                for(size_t i=u.size();i>0;--i)
-                {
-                    if( u[i] != -v[i] )
-                        return false;
-                }
-                return true;
-            }
-
-            static inline
-            void process_Y( imatrix_t &Y )
-            {
-                const size_t M = Y.rows;
-                const size_t N = Y.cols;
-#if 0
-                for(size_t i=M;i>0;--i)
-                {
-                    tao::i_simplify(Y[i]);
-                }
-                std::cerr << "Yin=" << Y << std::endl;
-                size_t Mok = M;
-                {
-                    size_t i=1;
-                    while(i<Mok)
-                    {
-                        if( tao::norm_sq(Y[i]) <= 0)
-                        {
-                            Y.swap_rows(i, Mok);
-                            --Mok;
-                        }
-                        ++i;
-                    }
-                }
-                std::cerr << "Yok="  << Y   << std::endl;
-                std::cerr << "Mok=" << Mok << std::endl;
-                std::cerr << "M  =" << M   << std::endl;
-                
-                if(Mok<N)
-                {
-                    throw exception("unexpected low rank for Q");
-                }
-                
-#endif
-      
-                std::cerr << "Y=" << Y << std::endl;
-                
-                uvector_t Idof(M,as_capacity);
-                uvector_t Ipin(M,as_capacity);
-                uvector_t Inul(M,as_capacity);
-                
-                for(size_t i=1;i<=M;++i)
-                {
-                    const array<integer_t> &Yi = Y[i];
-
-                    bool is_nul = true;
-                    for(size_t j=N;j>0;--j)
-                    {
-                        if(Yi[j]!=0)
-                        {
-                            is_nul = false;
-                            break;
-                        }
-                    }
-                    if(is_nul)
-                    {
-                        Inul.push_back(i);
-                        continue;
-                    }
-                    
-                    
-                    bool is_dof = true;
-                    for(size_t k=Ipin.size();k>0;--k)
-                    {
-                        if( i == Ipin[k] )
-                        {
-                            is_dof = false;
-                            break;
-                        }
-                    }
-                    if(!is_dof)
-                        continue;
-                    
-                    for(size_t j=i+1;j<=M;++j)
-                    {
-                        const array<integer_t> &Yj = Y[j];
-                        if( are_opposite(Yi,Yj) )
-                        {
-                            //std::cerr << "Y" << i << "=" << Yi << " and Y" << j << "=" << Yj << " are opposite" << std::endl;
-                            is_dof = false;
-                            Ipin.push_back(i);
-                            Ipin.push_back(j);
-                            break;
-                        }
-                    }
-                    
-                    if(is_dof)
-                    {
-                        Idof.push_back(i);
-                    }
-                }
-                std::cerr << "Inul=" << Inul << std::endl;
-                std::cerr << "Ipin=" << Ipin << std::endl;
-                std::cerr << "Idof=" << Idof << std::endl;
-                
-            }
-#endif
-            
-#if 0
-            static inline
-            size_t remake( imatrix_t &B )
-            {
-                const size_t M = B.rows;
-                const size_t N = B.cols;
-                uvector_t    idx(M,0);
-                for(size_t i=M;i>0;--i)
-                {
-                    (void)tao::i_simplify(B[i]);
-                    idx[i] = i;
-                }
-                std::cerr << "Bin=" << B << std::endl;
-                
-                // Phase 1: reject 0 values
-                size_t Mok = M;
-                {
-                    size_t i=1;
-                    while(i<Mok)
-                    {
-                        if( tao::norm_sq(B[i]) <= 0)
-                        {
-                            B.swap_rows(i, Mok);
-                            cswap(idx[i],idx[Mok]);
-                            --Mok;
-                        }
-                        ++i;
-                    }
-                }
-                std::cerr << "Bok="  << B   << std::endl;
-                std::cerr << "Mok=" << Mok << std::endl;
-                std::cerr << "M  =" << M   << std::endl;
-                std::cerr << "idx=" << idx << std::endl;
-                if(Mok<N)
-                {
-                    throw exception("unexpected low rank for B");
-                }
-                
-                // Phase 2: ortho
-                {
-                    size_t i = 1;
-                    while(i<=Mok)
-                    {
-                        array<integer_t> &v = B[i];
-                        for(size_t j=1;j<i;++j)
-                        {
-                            const array<integer_t> &u  = B[j];
-                            const integer_t         uu = tao::dot(u,u);
-                            const integer_t         uv = tao::dot(u,v);
-                            for(size_t k=N;k>0;--k)
-                            {
-                                v[k] = uu*v[k] - uv*u[k];
-                            }
-                            assert( 0 == tao::dot(u,v) );
-                            (void)tao::i_simplify(v);
-                        }
-                        if(tao::norm_sq(v)<=0)
-                        {
-                            B.swap_rows(i, Mok);
-                            cswap(idx[i],idx[Mok]);
-                            --Mok;
-                        }
-                        else
-                            ++i;
-                    }
-                }
-                std::cerr << "Bor=" << B   << std::endl;
-                std::cerr << "Mok=" << Mok << std::endl;
-                std::cerr << "idx=" << idx << std::endl;
-                
-                imatrix_t tmp(M,N);
-                for(size_t i=M;i>0;--i)
-                {
-                    const array<integer_t> &src = B[ idx[i] ];
-                    array<integer_t>       &dst = tmp[i];
-                    for(size_t j=N;j>0;--j) dst[j] = src[j];
-                }
-                B.assign(tmp);
-                std::cerr << "Bnew=" << B << std::endl;
-                return Mok;
-            }
-
-#endif
-            
         }
         
+        void equilibria:: compute_C(const array<double> &V)
+        {
+            assert(V.size()==N);
+            assert(Delta!=0);
+            tao::mul_trn(C,Q,V);
+            for(size_t j=M;j>0;--j)
+            {
+                C[j] = (Xstar[j]+C[j])/Delta;
+            }
+            for(size_t j=fixedJ.size();j>0;--j)
+            {
+                C[ fixedJ[j] ] =  fixedC[j];
+            }
+        }
+        
+        double equilibria:: computeH( const array<double> &V )
+        {
+            assert(V.size()==N);
+            compute_C(V);
+            double H = 0;
+            for(size_t j=M;j>0;--j)
+            {
+                if(aboot[j])
+                {
+                    const double Cj = C[j];
+                    if(Cj<0)
+                    {
+                        H += Cj*Cj;
+                    }
+                }
+            }
+            return H*0.5;
+        }
+
+        void equilibria:: computeG(array<double> &G, const array<double> &V)
+        {
+            assert(V.size()==N);
+            assert(G.size()==N);
+            compute_C(V);
+            for(size_t j=M;j>0;--j)
+            {
+                G[j] = 0;
+                if(aboot[j])
+                {
+                    const double Cj = C[j];
+                    if(Cj<0)
+                    {
+                        G[j] = Cj;
+                    }
+                }
+            }
+        }
         
         
         void equilibria:: load(const boot &loader, const double t)
@@ -476,7 +307,6 @@ namespace yocto
             // Sanity check
             //
             //__________________________________________________________________
-            
             if(N>M)
                 throw exception("equilibria: not enough species!");
             
@@ -530,29 +360,34 @@ namespace yocto
             //
             // factorize data: get constant and check structure
             //__________________________________________________________________
-            uvector_t Jfixed(M,as_capacity);
-            vector_t  Cfixed(M,as_capacity);
-            rewrite_constraints(P,Lam,Jfixed,Cfixed,active);
+            fixedJ.free();
+            fixedC.free();
+            rewrite_constraints(P,Lam,fixedJ,fixedC,active);
             std::cerr << "Lam=" << Lam << std::endl;
             std::cerr << "P="   << P   << std::endl;
-            bvector_t local_active(M,false);
-            tao::set(local_active,active);
-            for(size_t j=Jfixed.size();j>0;--j)
+            tao::set(aboot,active);
+            for(size_t j=fixedJ.size();j>0;--j)
             {
-                local_active[ Jfixed[j] ] = false;
+                aboot[ fixedJ[j] ] = false;
             }
+            uvector_t    Jactive(M,as_capacity);
+            const size_t Mactive = count_active(aboot,Jactive);
+            
+            
+            
             std::cerr << "active=" << active << std::endl;
-            std::cerr << "localA=" << local_active << std::endl;
+            std::cerr << "localA=" << aboot  << std::endl;
+            std::cerr << "Mactive=" << Mactive << std::endl;
+            std::cerr << "Jactive=" << Jactive << std::endl;
             
             imatrix_t Y(M,Nc);
-            ptrdiff_t Delta = 0;
             {
                 imatrix_t P2(Nc,Nc);
                 tao::mmul_rtrn(P2, P, P);
                 std::cerr << "P2=" << P2 << std::endl;
                 Delta = determinant_of(P2);
                 std::cerr << "Delta=" << Delta << std::endl;
-                if(Delta<=0)
+                if(Delta==0)
                     throw exception("unexpected singular set of constraints");
                 imatrix_t J(Nc,Nc);
                 adjoint(J, P2);
@@ -560,7 +395,6 @@ namespace yocto
                 tao::mmul_ltrn(Y, P, J);
             }
             std::cerr << "Y=" << Y << std::endl;
-            vector_t  Xstar(M,0);
             tao::mul(Xstar,Y,Lam);
             std::cerr << "Xstar=" << Xstar << std::endl;
             
@@ -568,14 +402,9 @@ namespace yocto
             //
             // compute orthogonal space
             //__________________________________________________________________
-            imatrix_t Q(N,M);
-            //compute_Q(Q,P,Nu);
-            //std::cerr << "Q=" << Q << std::endl;
-            
             compute_Qv2(Q, P, Nu);
             std::cerr << "Q=" << Q << std::endl;
             std::cerr << "Nu="  << Nu << std::endl;
-            
             
             //__________________________________________________________________
             //
@@ -584,27 +413,9 @@ namespace yocto
             //
             //__________________________________________________________________
             computeK(t);
+            numeric<double>::scalar_field F(this, &equilibria::computeH);
+            numeric<double>::vector_field G(this, &equilibria::computeG);
             
-            
-            for(size_t i=N;i>0;--i)
-            {
-                xi[i] = ran()-0.5;
-            }
-            std::cerr << "xi=" << xi << std::endl;
-            tao::mul_trn(C, Q, xi);
-            tao::add(C,Xstar);
-            for(size_t j=M;j>0;--j)
-            {
-                C[j] /= Delta;
-            }
-            for(size_t j=Jfixed.size();j>0;--j)
-            {
-                C[ Jfixed[j] ] = Cfixed[j];
-            }
-            
-            std::cerr << "Cstar=" << C << std::endl;
-            
-            rebalance_with(Q,local_active);
         }
         
         
@@ -624,16 +435,24 @@ namespace yocto
                 for(size_t j=M;j>0;--j)
                 {
                     beta[j] = 0;
-                    if(local_active[j] && C[j]<0)
+                    if(local_active[j])
                     {
-                        has_bad = true;
-                        beta[j] = 1;
+                        const double Cj = C[j];
+                        if(Cj<=0)
+                        {
+                            beta[j] = 1;
+                            if(Cj<0)
+                            {
+                                has_bad = true;
+                            }
+                        }
                     }
                 }
                 if(!has_bad)
                 {
                     return true;
                 }
+                
                 std::cerr << "beta=" << beta << std::endl;
                 
                 tao::mul(xip, Q, beta);
@@ -730,8 +549,9 @@ namespace yocto
                 std::cerr << "Cb" << count << "=" << C << std::endl;
             }
             
-            return false;
+            return true;
         }
+        
         
         
     }
