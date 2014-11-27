@@ -448,6 +448,7 @@ namespace yocto
             tao::set(Cs,C);
             std::cerr << "C=" << C << std::endl;
             updateGammaAndPhi();
+            const double G0 = tao::norm(Gamma);
             for(size_t j=fixedJ.size();j>0;--j)
             {
                 const size_t jj = fixedJ[j];
@@ -465,10 +466,7 @@ namespace yocto
             }
             tao::neg(U,Gamma);
             crout<double>::solve(W,U);
-            std::cerr << "U=" << U << std::endl;
             tao::add(xi,U);
-            compute_C(xi);
-            std::cerr << "Craw=" << C << std::endl;
             optimize(F,G);
             std::cerr << "Cfin=" << C << std::endl;
             
@@ -476,20 +474,28 @@ namespace yocto
             for(size_t j=M;j>0;--j)
             {
                 const double cc = C[j];
-                const double dd = dC[j] = fabs(cc - Cs[j]);
+                const double dd =  fabs( (dC[j] = cc - Cs[j]) );
                 if( dd > numeric<double>::ftol * fabs(cc) )
                 {
                     converged = false;
                 }
             }
-            std::cerr << "err=" << dC << std::endl;
+            std::cerr << "dC=" << dC << std::endl;
+            updateGamma();
+            const double G1 = tao::norm(Gamma);
+            std::cerr << "\tG0=" << G0 << std::endl;
+            std::cerr << "\tG1=" << G1 << std::endl;
+            
+            
             if(converged)
             {
-                std::cerr << "#converged" << std::endl;
+                std::cerr << "#variables have converged" << std::endl;
             }
             else
+            {
+                if(count<25)
                 goto LOOP;
-            
+            }
             
         }
         

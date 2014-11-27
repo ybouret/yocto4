@@ -91,7 +91,7 @@ namespace yocto
             void computeGammaAndPhi(double t);
             void updateGammaAndPhi();
             void updateGamma();
-            
+            bool GammaHasConverged() const;
             
             //!  normalize AFTER a balancing was done..
             bool normalize( array<double> &C0, double t, bool recomputeK );

@@ -176,7 +176,16 @@ namespace yocto
             return *eqs[i];
         }
 
-        
+        bool equilibria:: GammaHasConverged() const
+        {
+            for(size_t i=N;i>0;--i)
+            {
+                //if(false == eqs[i]->cvg) return false;
+            }
+            //return true;
+            return false;
+        }
+
     
     }
     

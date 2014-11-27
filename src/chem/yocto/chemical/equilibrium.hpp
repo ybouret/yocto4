@@ -109,10 +109,12 @@ namespace yocto
             typedef core::list_of_cpp<actor> actors;
             actors reac;
             actors prod;
+            static  bool HasConverged(const double lhs, const double rhs) throw();
             
         public:
-            const int     SumNuP;   //!< sum of products coefficients
-            const int     DeltaNu;  //!< created #mols
+            const int      SumNuP;   //!< sum of products coefficients
+            const int      DeltaNu;  //!< created #mols
+            //mutable bool   cvg;      //!< from expression
         };
         
         class const_equilibrium : public equilibrium

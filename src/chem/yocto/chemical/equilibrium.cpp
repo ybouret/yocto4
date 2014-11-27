@@ -32,6 +32,8 @@ namespace yocto
     namespace chemical
     {
         
+        using namespace math;
+        
         equilibrium::equilibrium(const string &id ):
         name(id),
         K(this,&equilibrium::callK),
@@ -205,6 +207,10 @@ namespace yocto
             return updateGamma(C, (Kt=callK(t)) );
         }
         
+        bool equilibrium:: HasConverged(const double lhs, const double rhs) throw()
+        {
+            return fabs(lhs-rhs) <= numeric<double>::ftol * ( fabs(lhs) + fabs(rhs) );
+        }
         
         double equilibrium:: updateGamma( const array<double> &C, const double Kt ) const
         {
@@ -227,7 +233,7 @@ namespace yocto
                 p_prod *= ipower(C[a->sp->indx],a->nu);
             }
             
-            
+            //cvg = HasConverged(r_prod, p_prod);
             return r_prod - p_prod;
         }
         
@@ -293,6 +299,7 @@ namespace yocto
             }
             
             const double g = r_prod - p_prod;
+            //cvg = HasConverged(r_prod, p_prod);
             return g;
         }
         
@@ -462,7 +469,7 @@ namespace yocto
                         }
                     }
                 }
-            }            
+            }
         }
         
         
