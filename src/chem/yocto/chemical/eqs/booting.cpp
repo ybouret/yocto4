@@ -725,6 +725,7 @@ namespace yocto
                         }
                     }
                 }
+                C[aindx[1]] = 0;
                 
                 std::cerr << "Cb" << count << "=" << C << std::endl;
             }
