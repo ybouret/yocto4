@@ -149,6 +149,13 @@ namespace yocto
                 return Sqrt( Fabs( norm_sq(a) ) );
             }
             
+            template <typename ARR>
+            static inline typename ARR::type RMS( const ARR &a ) throw()
+            {
+                assert(a.size()>0);
+                return Sqrt( Fabs(norm_sq(a))/ a.size() );
+            }
+            
             
             //! a*b for scalar type, a is the leading type
             template<typename ARR, typename BRR>
