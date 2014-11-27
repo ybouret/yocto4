@@ -102,6 +102,7 @@ which must be clamped to deduce the modified Newton's step
 $$
 	\delta{\vec{C_k}} = \mytrn{\mymat{\nu}} \vec{\xi}_k^\star
 $$
+and a careful addition is then performed, avoiding the roundoff errors.
 
 \section{Booting Algorithm}
 We have $M$ species, $N$ equilibria, 
@@ -135,5 +136,32 @@ $$
 	\vec{\xi}_k = -\left(\mymat{\Phi}\mytrn{\mymat{Q}}\right)^{-1}\left(\vec{\Gamma}_k+\mymat{\Phi}_k \vec{C}_k'\right)
 $$
 
+\section{Generic Balancing Algorithm}
+We define an objective function
+$$
+	\mathcal{E}(\vec{C}) = \sum_{j\in\mathrm{active}} -C_j \mathbbm{1}_{C_j<0}
+$$
+which is positive if an active species has an invalid concentration.
+The integer descent direction is
+$$
+	\vec{\beta} = - \vec{\nabla}_{\vec{C}} \mathcal{E} = 
+	\begin{bmatrix}
+		\vdots\\
+		\mathbbm{1}_{C_{j\in\mathrm{active}}<0}\\
+		\vdots
+	\end{bmatrix}
+$$
+Let us assume that we want to minimise this function using an integer matrix $\mymat{Q}$
+$$
+	\vec{C}_{k+1} = \vec{C}_k + \mytrn{\mymat{Q}}\vec{V}_k
+$$
+then the descent direction $\vec{\xi}_k'$ for $\vec{V}$ is
+$$
+		\vec{\xi}'_k = \mymat{Q} \vec{\beta}_k
+$$
+and the integer descent direction for $\vec{C}_k$ is
+$$
+	\vec{U}_k = \mytrn{\mymat{Q}} \vec{\xi}'_k = \mytrn{\mymat{Q}} \mymat{Q} \vec{\beta}_k
+$$
 
 \end{document}

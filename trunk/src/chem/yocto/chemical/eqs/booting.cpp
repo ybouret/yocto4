@@ -588,65 +588,62 @@ namespace yocto
             
             for(size_t i=N;i>0;--i)
             {
-                xi[i] = ran();
+                xi[i] = ran()-0.5;
             }
-            //compute_C(C,Xstar,Q,xi,detJ,Jfixed,Cfixed);
-            //std::cerr << "C0=" << C << std::endl;
+            std::cerr << "xi=" << xi << std::endl;
+            tao::mul_trn(C, Q, xi);
+            tao::add(C,Xstar);
+            for(size_t j=M;j>0;--j)
+            {
+                C[j] /= Delta;
+            }
+            for(size_t j=Jfixed.size();j>0;--j)
+            {
+                C[ Jfixed[j] ] = Cfixed[j];
+            }
             
-            //rebalance_with(Q,local_active);
+            std::cerr << "Cstar=" << C << std::endl;
             
+            rebalance_with(Q,local_active);
         }
         
         
         bool equilibria:: rebalance_with(const imatrix_t &Q, const bvector_t &local_active)
         {
             
-            std::cerr << "\tCb0=" << C << std::endl;
+            ivector_t &U = dCp;
             size_t count = 0;
             while(true)
             {
                 ++count;
-                if(count>M)
-                {
-                    std::cerr << "-- too many steps to rebalance" << std::endl;
-                    return false;
-                }
                 //______________________________________________________________
                 //
-                // detect invalid concentrations
+                // Detect invalid concentrations and build descent direction
                 //______________________________________________________________
                 bool has_bad = false;
                 for(size_t j=M;j>0;--j)
                 {
                     beta[j] = 0;
-                    if(local_active[j]&&C[j]<0)
+                    if(local_active[j] && C[j]<0)
                     {
-                        beta[j] = 1;
                         has_bad = true;
+                        beta[j] = 1;
                     }
-                    
                 }
-                
                 if(!has_bad)
                 {
-                    std::cerr << "CB=" << C << std::endl;
                     return true;
                 }
-                
-                //______________________________________________________________
-                //
-                // compute integer step
-                //______________________________________________________________
-                tao::mul(xip,Q,beta);
-                tao::mul_trn(dCp, Q, xip);
-                
                 std::cerr << "beta=" << beta << std::endl;
-                std::cerr << "xip =" << xip  << std::endl;
-                std::cerr << "dCp =" << dCp  << std::endl;
+                
+                tao::mul(xip, Q, beta);
+                std::cerr << "xip=" << xip << std::endl;
+                tao::mul_trn(U,Q,xip);
+                std::cerr << "U=" << U << std::endl;
                 
                 //______________________________________________________________
                 //
-                // find max step
+                // analyze poles
                 //______________________________________________________________
                 alpha.free();
                 aindx.free();
@@ -654,30 +651,24 @@ namespace yocto
                 {
                     if(local_active[j])
                     {
-                        const double    Cj = C[j];
-                        const ptrdiff_t Dj = dCp[j];
-                        if(Dj<0)
+                        const integer_t Uj = U[j];
+                        if(Uj>0)
                         {
-                            if(Cj<=0)
+                            if(C[j]<0)
                             {
-                                std::cerr << "-- negative step for a negative concentration" << std::endl;
-                                return false;
-                            }
-                            else
-                            {
-                                // Cj > 0
-                                alpha.push_back(Cj/(-Dj));
+                                // slope will change @0
+                                alpha.push_back( -C[j]/Uj);
                                 aindx.push_back(j);
                             }
                         }
                         else
                         {
-                            
-                            if(Dj>0)
+                            if(Uj<0)
                             {
-                                if(Cj<0)
+                                if(C[j]>=0)
                                 {
-                                    alpha.push_back((-Cj)/Dj); // minimal step
+                                    //slope will change @0
+                                    alpha.push_back( C[j]/(-Uj));
                                     aindx.push_back(j);
                                 }
                             }
@@ -686,65 +677,59 @@ namespace yocto
                                 // do nothing
                             }
                         }
+                        
                     }
                     
                 }
                 
                 if(alpha.size()<=0)
                 {
-                    std::cerr << "-- no d.o.f. to rebalance" << std::endl;
+                    std::cerr << "unexpected no limitations in rebalance" << std::endl;
                     return false;
                 }
                 
                 co_qsort(alpha, aindx);
+                std::cerr << "alpha=" << alpha << std::endl;
+                std::cerr << "aindx=" << aindx << std::endl;
                 const double factor = alpha[1];
-                
                 if(factor<=0)
                 {
-                    std::cerr << "-- blocked rebalance" << std::endl;
+                    std::cerr << "blocked rebalanced..." << std::endl;
                     return false;
                 }
                 
-                
-                //______________________________________________________________
-                //
-                // carefull addition
-                //______________________________________________________________
+                // carefull update
                 for(size_t j=M;j>0;--j)
                 {
-                    
+                    const double    Cj = C[j];
+                    const integer_t Uj = U[j];
+                    C[j] += factor * Uj;
                     if(local_active[j])
                     {
-                        const ptrdiff_t Dj = dCp[j];
-                        const double    Cj = C[j];
-                        C[j] += factor * Dj;
-                        if(Dj>0)
+                        if(Uj>0)
                         {
-                            if(Cj<0&&C[j]>=0)
+                            if(Cj<0)
                             {
-                                C[j] = 0;
+                                if(C[j]>=0) C[j] = 0;
                             }
                         }
                         else
                         {
-                            if(Dj<0)
+                            if(Uj<0)
                             {
-                                if(Cj>=0&&C[j]<=0)
+                                if(Cj>0)
                                 {
-                                    C[j] = 0;
+                                    if(C[j]<=0) C[j] = 0;
                                 }
                             }
                         }
                     }
-                    else
-                    {
-                        C[j] += factor * dCp[j];
-                    }
                 }
-                std::cerr << "C" << count << " = " << C << std::endl;
-                C[aindx[1]] = 0;
+                
+                std::cerr << "Cb" << count << "=" << C << std::endl;
             }
             
+            return false;
         }
         
         
