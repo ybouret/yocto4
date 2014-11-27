@@ -45,6 +45,10 @@ namespace yocto
             ivector_t    dCp;    //!< [M]    balancing: integer descent direction
             vector_t     alpha;  //!< [0..M] balancing: max scaling
             uvector_t    aindx;  //!< [0..M] balancing: associated #species
+            vector_t     Xstar;  //!< [M] for booting
+            bvector_t    aboot;  //!< [M] active for booting
+            uvector_t    fixedJ; //!< [0..M] booting: fixed indices
+            vector_t     fixedC; //!< [0..M] booting: fixed concentrations
             
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
@@ -54,7 +58,8 @@ namespace yocto
             matrix_t     W;      //!< [NxN]
             evector_t    online; //!< [0..N] balancing: online eqs for balancing
             ivector_t    xip;    //!< [N]    balancing: integer descent extent
-            
+            imatrix_t    Q;      //!< [NxM]  booting
+            integer_t    Delta;  //!< C=(Xstar+Q'*V)/Delta
             
             
             equilibrium &add( equilibrium *pEq );
@@ -100,6 +105,8 @@ namespace yocto
             void load( const boot &loader, const double t );
             
             
+            //! C = (Xstar+Q'*V)/Delta
+            void compute_C( const array<double> &V );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
@@ -109,7 +116,13 @@ namespace yocto
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );
             bool rebalance_with(const imatrix_t &Q, const bvector_t &local_active);
-
+            
+            bool rebalance_v2( const imatrix_t &Q, const bvector_t &local_active);
+            
+            double computeH( const array<double> &V );
+            void   computeG( array<double> &G, const array<double> &V);
+            
+            
         public:
             uniform_generator<double> ran;
             

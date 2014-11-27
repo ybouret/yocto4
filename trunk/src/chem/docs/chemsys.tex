@@ -139,7 +139,7 @@ $$
 \section{Generic Balancing Algorithm}
 We define an objective function
 $$
-	\mathcal{E}(\vec{C}) = \sum_{j\in\mathrm{active}} -C_j \mathbbm{1}_{C_j<0}
+	\mathcal{E}(\vec{C}) = \sum_{j\in\mathrm{active}} -C_j \mathbbm{1}_{C_j\leq0}
 $$
 which is positive if an active species has an invalid concentration.
 The integer descent direction is
@@ -147,10 +147,13 @@ $$
 	\vec{\beta} = - \vec{\nabla}_{\vec{C}} \mathcal{E} = 
 	\begin{bmatrix}
 		\vdots\\
-		\mathbbm{1}_{C_{j\in\mathrm{active}}<0}\\
+		\mathbbm{1}_{C_{j\in\mathrm{active}}\leq0}\\
 		\vdots
 	\end{bmatrix}
 $$
+It is very important to take into account the zero concentration for they
+represent a stopping point or a cancellation for the evolution.
+
 Let us assume that we want to minimise this function using an integer matrix $\mymat{Q}$
 $$
 	\vec{C}_{k+1} = \vec{C}_k + \mytrn{\mymat{Q}}\vec{V}_k

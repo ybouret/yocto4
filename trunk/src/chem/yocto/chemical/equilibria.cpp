@@ -73,8 +73,9 @@ namespace yocto
         void equilibria:: clear() throw()
         {
             (size_t &)M = 0;
+            Delta = 0;
             
-            
+            Q.      release();
             xip.    release();
             online. release();
             W.      release();
@@ -84,6 +85,10 @@ namespace yocto
             Gamma.  release();
             K.      release();
             
+            fixedC. release();
+            fixedJ. release();
+            aboot.  release();
+            Xstar.  release();
             aindx.  release();
             alpha.  release();
             dCp.    release();
@@ -121,6 +126,10 @@ namespace yocto
                 dCp.    make(M,0);
                 alpha.  make(M,0);
                 aindx.  make(M,0);
+                Xstar.  make(M,0);
+                aboot.  make(M,0);
+                fixedJ. make(M,0);
+                fixedC. make(M,0);
                 
                 if(N>0)
                 {
@@ -132,6 +141,7 @@ namespace yocto
                     W.      make(N,N);
                     online. ensure(N);
                     xip.    make(N,0);
+                    Q.      make(N,M);
                 }
                 
                 restore_topology();
