@@ -114,6 +114,7 @@ namespace yocto
             vector<equilibrium::pointer>        eqs;
             math::numeric<double>::scalar_field optH;
             math::numeric<double>::vector_field optG;
+            math::numeric<double>::function     optF;
             
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );

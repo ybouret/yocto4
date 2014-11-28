@@ -459,8 +459,8 @@ namespace yocto
             // We have a would be solution:
             // Newton for 0 =  Gamma + Phi*Q'*U
             //__________________________________________________________________
-            tao::set(Cs,C);
-            tao::set(xis,xi);
+            tao::set(Cs,C);   //-- save C
+            tao::set(xis,xi); //-- save xi
             std::cerr << "C=" << C << std::endl;
             const double G0 = tao::norm(Gamma);
             for(size_t j=fixedJ.size();j>0;--j)
@@ -484,17 +484,31 @@ namespace yocto
                 std::cerr << "Singular..." << std::endl;
                 exit(1);
             }
+            
+            //__________________________________________________________________
+            //
+            // get the best U = - inv(Phi*Q') * Gamma
+            //__________________________________________________________________
             tao::neg(U,Gamma);
             tao::set(V,U);
             crout<double>::solve(W,U);
             std::cerr << "U0=" << U << std::endl;
             crout<double>::improve(U, A, W, V);
             std::cerr << "U=" << U << std::endl;
-            tao::set(V,xi);
+            
+            //__________________________________________________________________
+            //
+            // deduce the new xi = xi+U, optimized
+            //__________________________________________________________________
             tao::add(xi,U);
             optimize();
             std::cerr << "Cfin=" << C << std::endl;
             
+            
+            //__________________________________________________________________
+            //
+            // where are we now ?
+            //__________________________________________________________________
             updateGammaAndPhi();
             const double G1 = tao::norm(Gamma);
             std::cerr << "\tG0=" << G0 << " / " << computeF(0) << std::endl;
@@ -505,7 +519,6 @@ namespace yocto
                 std::cerr << "Need to backtrack..." << std::endl;
                 triplet<double> XX = { 0, 1, 1};
                 triplet<double> FF = { G0, G1, G1};
-                numeric<double>::function optF(this, & equilibria::computeF );
                 bracket<double>::expand(optF, XX, FF);
                 minimize<double>(optF, XX, FF, 0);
                 std::cerr << "XX=" << XX << std::endl;

@@ -14,7 +14,8 @@ namespace yocto
         M(0),
         N(0),
         optH(this, & equilibria::computeH),
-        optG(this, & equilibria::computeG)
+        optG(this, & equilibria::computeG),
+        optF(this, & equilibria::computeF)
         {
         }
         
