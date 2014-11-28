@@ -12,7 +12,9 @@ namespace yocto
         
         equilibria:: equilibria() throw() :
         M(0),
-        N(0)
+        N(0),
+        optH(this, & equilibria::computeH),
+        optG(this, & equilibria::computeG)
         {
         }
         
@@ -75,6 +77,8 @@ namespace yocto
             (size_t &)M = 0;
             Delta = 0;
             
+            U.      release();
+            xis.    release();
             Q.      release();
             xip.    release();
             online. release();
@@ -142,6 +146,8 @@ namespace yocto
                     online. ensure(N);
                     xip.    make(N,0);
                     Q.      make(N,M);
+                    xis.    make(N,0);
+                    U.      make(N,0);
                 }
                 
                 restore_topology();

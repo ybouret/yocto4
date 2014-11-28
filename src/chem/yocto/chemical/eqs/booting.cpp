@@ -9,6 +9,8 @@
 
 #include "yocto/code/utils.hpp"
 #include "yocto/math/opt/cgrad.hpp"
+#include "yocto/math/opt/bracket.hpp"
+#include "yocto/math/opt/minimize.hpp"
 
 namespace yocto
 {
@@ -301,17 +303,18 @@ namespace yocto
             
         }
         
-        void equilibria:: optimize(math::numeric<double>::scalar_field &F,
-                                   math::numeric<double>::vector_field &G)
+        void equilibria:: optimize()
         {
-            
-            cgrad<double>::optimize(F, G, xi, 0, NULL);
+            cgrad<double>::optimize(optH,optG, xi, 0, NULL);
             compute_C(xi);
-            return;
-            for(size_t j=M;j>0;--j)
-            {
-                if(aboot[j] && C[j]<=0 ) C[j] = 0;
-            }
+        }
+        
+        double equilibria:: computeF(double ratio)
+        {
+            tao::setprobe(xi, xis, ratio, U);
+            optimize();
+            updateGamma();
+            return tao::norm(Gamma);
         }
         
         
@@ -433,21 +436,32 @@ namespace yocto
             computeK(t);
             numeric<double>::scalar_field F(this, &equilibria::computeH);
             numeric<double>::vector_field G(this, &equilibria::computeG);
-            vector_t U(N,0);
+            matrix_t A(N,N);
+            vector_t V(N,0);
             
+            //__________________________________________________________________
+            //
+            // Starting point
+            //__________________________________________________________________
             size_t count = 0;
             for(size_t j=N;j>0;--j)
             {
                 xi[j] = ran() - 0.5;
             }
-            optimize(F,G);
+            optimize();
             std::cerr << "xi=" << xi << std::endl;
             std::cerr << "C=" << C << std::endl;
+            updateGammaAndPhi();
             
         LOOP: ++count;
+            //__________________________________________________________________
+            //
+            // We have a would be solution:
+            // Newton for 0 =  Gamma + Phi*Q'*U
+            //__________________________________________________________________
             tao::set(Cs,C);
+            tao::set(xis,xi);
             std::cerr << "C=" << C << std::endl;
-            updateGammaAndPhi();
             const double G0 = tao::norm(Gamma);
             for(size_t j=fixedJ.size();j>0;--j)
             {
@@ -458,17 +472,47 @@ namespace yocto
                 }
             }
             std::cerr << "Gamma=" << Gamma << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // W = Phi * Q'
+            //__________________________________________________________________
             tao::mmul_rtrn(W, Phi, Q);
+            A.assign(W);
             if( !crout<double>::build(W) )
             {
                 std::cerr << "Singular..." << std::endl;
                 exit(1);
             }
             tao::neg(U,Gamma);
+            tao::set(V,U);
             crout<double>::solve(W,U);
+            std::cerr << "U0=" << U << std::endl;
+            crout<double>::improve(U, A, W, V);
+            std::cerr << "U=" << U << std::endl;
+            tao::set(V,xi);
             tao::add(xi,U);
-            optimize(F,G);
+            optimize();
             std::cerr << "Cfin=" << C << std::endl;
+            
+            updateGammaAndPhi();
+            const double G1 = tao::norm(Gamma);
+            std::cerr << "\tG0=" << G0 << " / " << computeF(0) << std::endl;
+            std::cerr << "\tG1=" << G1 << " / " << computeF(1) << std::endl;
+            
+            if(G1>=G0)
+            {
+                std::cerr << "Need to backtrack..." << std::endl;
+                triplet<double> XX = { 0, 1, 1};
+                triplet<double> FF = { G0, G1, G1};
+                numeric<double>::function optF(this, & equilibria::computeF );
+                bracket<double>::expand(optF, XX, FF);
+                minimize<double>(optF, XX, FF, 0);
+                std::cerr << "XX=" << XX << std::endl;
+                std::cerr << "FF=" << FF << std::endl;
+                (void) computeF(XX.b);
+            }
+            
             
             bool converged = true;
             for(size_t j=M;j>0;--j)
@@ -481,11 +525,6 @@ namespace yocto
                 }
             }
             std::cerr << "dC=" << dC << std::endl;
-            updateGamma();
-            const double G1 = tao::norm(Gamma);
-            std::cerr << "\tG0=" << G0 << std::endl;
-            std::cerr << "\tG1=" << G1 << std::endl;
-            
             
             if(converged)
             {
@@ -494,7 +533,7 @@ namespace yocto
             else
             {
                 if(count<25)
-                goto LOOP;
+                    goto LOOP;
             }
             
         }

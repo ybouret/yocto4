@@ -60,7 +60,8 @@ namespace yocto
             ivector_t    xip;    //!< [N]    balancing: integer descent extent
             imatrix_t    Q;      //!< [NxM]  booting
             integer_t    Delta;  //!< C=Xstar/Delta + Q'*V
-            
+            vector_t     xis;    //!< [N], xi start...
+            vector_t     U;      //!< [N] xi increment for booting
             
             equilibrium &add( equilibrium *pEq );
             void         remove(const string &name);
@@ -110,8 +111,9 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
-            vector<equilibrium::pointer> eqs;
-            
+            vector<equilibrium::pointer>        eqs;
+            math::numeric<double>::scalar_field optH;
+            math::numeric<double>::vector_field optG;
             
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );
@@ -122,7 +124,11 @@ namespace yocto
             double computeH( const array<double> &V );
             void   computeG( array<double> &G, const array<double> &V);
             
-            void   optimize(math::numeric<double>::scalar_field &,math::numeric<double>::vector_field&);
+            //! optimize a given xi
+            void   optimize();
+            
+            //! xi = xis + ratio * u, optimize xi, update Gamma, return |Gamma|
+            double   computeF(double ratio);
             
         public:
             uniform_generator<double> ran;
