@@ -52,6 +52,7 @@ namespace yocto
             
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
+            vector_t     GamSF;  //!< [N] Gamma Scaling Factor
             vector_t     xi;     //!< [N] extents
             imatrix_t    Nu;     //!< [NxM] current topology
             matrix_t     Phi;    //!< [NxM] dGamma/dC
@@ -87,8 +88,8 @@ namespace yocto
             equilibrium       & operator[](size_t i) throw();
             const equilibrium & operator[](size_t i) const throw();
             
-            //! compute all constantes
-            void computeK(double t);
+            void computeK(double t);            //!< compute all constantes
+            void updateScaling();               //!< update all scaling factors
             void computeGammaAndPhi(double t);
             void updateGammaAndPhi();
             void updateGamma();
@@ -127,6 +128,9 @@ namespace yocto
             
             //! optimize a given xi
             void   optimize();
+            
+            //! |Gamma/GamSF|
+            double scaledGamma() const throw();
             
             //! xi = xis + ratio * u, optimize xi, update Gamma, return |Gamma|
             double   computeF(double ratio);

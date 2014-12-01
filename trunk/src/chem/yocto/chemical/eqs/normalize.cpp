@@ -47,6 +47,14 @@ namespace yocto
             }
         }
         
+        void equilibria:: updateScaling()
+        {
+            for(size_t i=N;i>0;--i)
+            {
+                GamSF[i] = eqs[i]->compute_scaling(K[i]);
+            }
+        }
+        
         void equilibria:: clip_extents()
         {
             for(size_t i=N;i>0;--i)
