@@ -152,7 +152,7 @@ namespace yocto
 
                 if(converged)
                 {
-                    std::cerr << "// CONVERGED in " << count << " Loops" << std::endl;
+                    //std::cerr << "// CONVERGED in " << count << " Loops" << std::endl;
                     break;
                 }
                 updateGammaAndPhi();
