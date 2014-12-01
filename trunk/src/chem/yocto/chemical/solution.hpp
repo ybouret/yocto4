@@ -44,9 +44,12 @@ namespace yocto
             
             solution & operator=( const solution & ); //!< checking compatible
             solution & operator=( const array<double> &) throw();
-            double     charge() const throw();
+            double     charge() const throw();          //!< sum zC
+            double     osm() const throw();             //!< sum C
+            double     ionic_strength() const throw();  //!< sum z^2C
+            double     pH() const;                      //!< "H+" must exists...
+       
             
-            double pH() const; //!< "H+" must exists...
             
             
         private:

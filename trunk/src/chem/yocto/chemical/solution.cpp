@@ -167,6 +167,30 @@ namespace yocto
             return ans;
         }
         
+        double solution:: osm() const throw()
+        {
+            double ans = 0;
+            for(size_t i=n;i>0;--i)
+            {
+                ans += C[i];
+            }
+            return ans;
+        }
+
+        double solution:: ionic_strength() const throw()
+        {
+            double ans = 0;
+            library::iterator j=lib.begin();
+            for(size_t i=1;i<=n;++i,++j)
+            {
+                const int z =(**j).z;
+                ans += C[i] * (z*z);
+            }
+            return ans;
+        }
+
+        
+        
         
     }
 }
