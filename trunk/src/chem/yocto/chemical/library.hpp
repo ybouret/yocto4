@@ -56,6 +56,7 @@ namespace yocto
             species::database db;
             size_t            max_name_length;
             void   find_max_name_length() throw();
+            friend class solution;
             
         };
         
