@@ -114,7 +114,7 @@ namespace yocto
         public:
             const int      SumNuP;   //!< sum of products coefficients
             const int      DeltaNu;  //!< created #mols
-            //mutable bool   cvg;      //!< from expression
+            double compute_scaling(const double Kt) const throw();
         };
         
         class const_equilibrium : public equilibrium

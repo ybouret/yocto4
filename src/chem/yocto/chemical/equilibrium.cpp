@@ -518,6 +518,20 @@ namespace yocto
         }
         
         
+        double equilibrium:: compute_scaling(const double Kt) const throw()
+        {
+            assert(Kt>0);
+            if( DeltaNu != 0 )
+            {
+                const double Cs = pow(Kt,1.0/DeltaNu);
+                return ipower(Cs, SumNuP);
+            }
+            else
+            {
+                return Hypotenuse(1.0, Kt);
+            }
+        }
+        
     }
     
 }

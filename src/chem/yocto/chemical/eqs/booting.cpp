@@ -314,7 +314,7 @@ namespace yocto
             tao::setprobe(xi, xis, ratio, U);
             optimize();
             updateGamma();
-            return tao::norm(Gamma);
+            return scaledGamma();
         }
         
         
@@ -430,12 +430,14 @@ namespace yocto
             //__________________________________________________________________
             //
             //
+            //
             // Algorithm
+            //
             //
             //__________________________________________________________________
             computeK(t);
-            numeric<double>::scalar_field F(this, &equilibria::computeH);
-            numeric<double>::vector_field G(this, &equilibria::computeG);
+            updateScaling();
+            std::cerr << "scaling=" << GamSF << std::endl;
             matrix_t A(N,N);
             vector_t V(N,0);
             
@@ -444,13 +446,15 @@ namespace yocto
             // Starting point
             //__________________________________________________________________
             size_t count = 0;
+            
+        GENERATE_C:
             for(size_t j=N;j>0;--j)
             {
                 xi[j] = ran() - 0.5;
             }
             optimize();
             std::cerr << "xi=" << xi << std::endl;
-            std::cerr << "C=" << C << std::endl;
+            std::cerr << "C="  << C << std::endl;
             updateGammaAndPhi();
             
         LOOP: ++count;
@@ -458,11 +462,11 @@ namespace yocto
             //
             // We have a would be solution:
             // Newton for 0 =  Gamma + Phi*Q'*U
+            // compute Gamma and Modified Phi
             //__________________________________________________________________
             tao::set(Cs,C);   //-- save C
             tao::set(xis,xi); //-- save xi
-            std::cerr << "C=" << C << std::endl;
-            const double G0 = tao::norm(Gamma);
+            const double G0 = scaledGamma();
             for(size_t j=fixedJ.size();j>0;--j)
             {
                 const size_t jj = fixedJ[j];
@@ -471,6 +475,7 @@ namespace yocto
                     Phi[i][jj] = 0;
                 }
             }
+            std::cerr << "C=" << C << std::endl;
             std::cerr << "Gamma=" << Gamma << std::endl;
             
             //__________________________________________________________________
@@ -492,13 +497,12 @@ namespace yocto
             tao::neg(U,Gamma);
             tao::set(V,U);
             crout<double>::solve(W,U);
-            std::cerr << "U0=" << U << std::endl;
             crout<double>::improve(U, A, W, V);
             std::cerr << "U=" << U << std::endl;
             
             //__________________________________________________________________
             //
-            // deduce the new xi = xi+U, optimized
+            // deduce the new xi = xis+U, optimized
             //__________________________________________________________________
             tao::add(xi,U);
             optimize();
@@ -510,14 +514,14 @@ namespace yocto
             // where are we now ?
             //__________________________________________________________________
             updateGammaAndPhi();
-            const double G1 = tao::norm(Gamma);
+            const double G1 = scaledGamma();
             std::cerr << "\tG0=" << G0 << " / " << computeF(0) << std::endl;
             std::cerr << "\tG1=" << G1 << " / " << computeF(1) << std::endl;
             
             if(G1>=G0)
             {
                 std::cerr << "Need to backtrack..." << std::endl;
-                triplet<double> XX = { 0, 1, 1};
+                triplet<double> XX = { 0,   1,  1};
                 triplet<double> FF = { G0, G1, G1};
                 bracket<double>::expand(optF, XX, FF);
                 minimize<double>(optF, XX, FF, 0);
@@ -545,8 +549,7 @@ namespace yocto
             }
             else
             {
-                if(count<25)
-                    goto LOOP;
+                goto LOOP;
             }
             
         }

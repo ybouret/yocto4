@@ -87,6 +87,7 @@ namespace yocto
             Phi.    release();
             Nu.     release();
             xi.     release();
+            GamSF.  release(); 
             Gamma.  release();
             K.      release();
             
@@ -140,6 +141,7 @@ namespace yocto
                 {
                     K.      make(N,0.0);
                     Gamma.  make(N,0.0);
+                    GamSF.  make(N,0.0);
                     xi.     make(N,0.0);
                     Nu.     make(N,M);
                     Phi.    make(N,M);
@@ -192,6 +194,18 @@ namespace yocto
             //return true;
             return false;
         }
+       
+        double equilibria:: scaledGamma() const throw()
+        {
+            double ans = 0;
+            for(size_t i=N;i>0;--i)
+            {
+                const double dG = Gamma[i] / GamSF[i];
+                ans += dG*dG;
+            }
+            return Sqrt(ans/N);
+        }
+        
 
     
     }
