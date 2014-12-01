@@ -2,7 +2,7 @@
 #define YOCTO_CHEMICAL_EQUILIBRIA_INCLUDED 1
 
 #include "yocto/chemical/equilibrium.hpp"
-#include "yocto/chemical/library.hpp"
+#include "yocto/chemical/solution.hpp"
 
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/sequence/vector.hpp"
@@ -109,6 +109,14 @@ namespace yocto
             
             //! C = Xstar/Delta + Q'*V
             void compute_C( const array<double> &V );
+            
+            //! mix
+            void mix(array<double>         &C,
+                     const array<solution> &solutions,
+                     const array<double>   &weights,
+                     const double           t);
+
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);

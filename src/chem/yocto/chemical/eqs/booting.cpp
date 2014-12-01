@@ -298,7 +298,6 @@ namespace yocto
                     }
                 }
             }
-            //std::cerr << "dHdC=" << dC << std::endl;
             tao::mul(G,Q,dC);
             
         }
@@ -391,41 +390,41 @@ namespace yocto
             {
                 aboot[ fixedJ[j] ] = false;
             }
-            uvector_t    Jactive(M,as_capacity);
-            const size_t Mactive = count_active(aboot,Jactive);
+            //uvector_t    Jactive(M,as_capacity);
+            //const size_t Mactive = count_active(aboot,Jactive);
             
             
             
             std::cerr << "active=" << active << std::endl;
             std::cerr << "localA=" << aboot  << std::endl;
-            std::cerr << "Mactive=" << Mactive << std::endl;
-            std::cerr << "Jactive=" << Jactive << std::endl;
+            //std::cerr << "Mactive=" << Mactive << std::endl;
+            //std::cerr << "Jactive=" << Jactive << std::endl;
             
             imatrix_t Y(M,Nc);
             {
                 imatrix_t P2(Nc,Nc);
                 tao::mmul_rtrn(P2, P, P);
-                std::cerr << "P2=" << P2 << std::endl;
+                //std::cerr << "P2=" << P2 << std::endl;
                 Delta = determinant_of(P2);
-                std::cerr << "Delta=" << Delta << std::endl;
+                //std::cerr << "Delta=" << Delta << std::endl;
                 if(Delta==0)
                     throw exception("unexpected singular set of constraints");
                 imatrix_t J(Nc,Nc);
                 adjoint(J, P2);
-                std::cerr << "J=" << J << std::endl;
+                //std::cerr << "J=" << J << std::endl;
                 tao::mmul_ltrn(Y, P, J);
             }
-            std::cerr << "Y=" << Y << std::endl;
+            //std::cerr << "Y=" << Y << std::endl;
             tao::mul(Xstar,Y,Lam);
-            std::cerr << "Xstar=" << Xstar << std::endl;
+            //std::cerr << "Xstar=" << Xstar << std::endl;
             
             //__________________________________________________________________
             //
             // compute orthogonal space
             //__________________________________________________________________
             compute_Qv2(Q, P, Nu);
-            std::cerr << "Q=" << Q << std::endl;
-            std::cerr << "Nu="  << Nu << std::endl;
+            //std::cerr << "Q=" << Q << std::endl;
+            //std::cerr << "Nu="  << Nu << std::endl;
             
             //__________________________________________________________________
             //
@@ -437,7 +436,7 @@ namespace yocto
             //__________________________________________________________________
             computeK(t);
             updateScaling();
-            std::cerr << "scaling=" << GamSF << std::endl;
+            //std::cerr << "scaling=" << GamSF << std::endl;
             matrix_t A(N,N);
             vector_t V(N,0);
             
@@ -453,8 +452,8 @@ namespace yocto
                 xi[j] = ran() - 0.5;
             }
             optimize();
-            std::cerr << "xi=" << xi << std::endl;
-            std::cerr << "C="  << C << std::endl;
+            //std::cerr << "xi=" << xi << std::endl;
+            //std::cerr << "C="  << C << std::endl;
             updateGammaAndPhi();
             
         LOOP: ++count;
@@ -476,7 +475,7 @@ namespace yocto
                 }
             }
             std::cerr << "C=" << C << std::endl;
-            std::cerr << "Gamma=" << Gamma << std::endl;
+            //std::cerr << "Gamma=" << Gamma << std::endl;
             
             //__________________________________________________________________
             //
@@ -487,7 +486,7 @@ namespace yocto
             if( !crout<double>::build(W) )
             {
                 std::cerr << "Singular..." << std::endl;
-                exit(1);
+                goto GENERATE_C;
             }
             
             //__________________________________________________________________
@@ -498,7 +497,7 @@ namespace yocto
             tao::set(V,U);
             crout<double>::solve(W,U);
             crout<double>::improve(U, A, W, V);
-            std::cerr << "U=" << U << std::endl;
+            //std::cerr << "U=" << U << std::endl;
             
             //__________________________________________________________________
             //
@@ -506,7 +505,7 @@ namespace yocto
             //__________________________________________________________________
             tao::add(xi,U);
             optimize();
-            std::cerr << "Cfin=" << C << std::endl;
+            //std::cerr << "Cfin=" << C << std::endl;
             
             
             //__________________________________________________________________
@@ -515,8 +514,8 @@ namespace yocto
             //__________________________________________________________________
             updateGammaAndPhi();
             const double G1 = scaledGamma();
-            std::cerr << "\tG0=" << G0 << " / " << computeF(0) << std::endl;
-            std::cerr << "\tG1=" << G1 << " / " << computeF(1) << std::endl;
+            //std::cerr << "\tG0=" << G0 << " / " << computeF(0) << std::endl;
+            //std::cerr << "\tG1=" << G1 << " / " << computeF(1) << std::endl;
             
             if(G1>=G0)
             {
@@ -525,8 +524,8 @@ namespace yocto
                 triplet<double> FF = { G0, G1, G1};
                 bracket<double>::expand(optF, XX, FF);
                 minimize<double>(optF, XX, FF, 0);
-                std::cerr << "XX=" << XX << std::endl;
-                std::cerr << "FF=" << FF << std::endl;
+                //std::cerr << "XX=" << XX << std::endl;
+                //std::cerr << "FF=" << FF << std::endl;
                 (void) computeF(XX.b);
             }
             
