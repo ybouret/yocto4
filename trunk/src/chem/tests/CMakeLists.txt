@@ -3,6 +3,7 @@ ADD_EXECUTABLE(test-chem main.cpp ${test_srcs}
 sample.lua
 acetic.lua
 oxalic.lua
+ammonium.lua
 )
 TARGET_LINK_YOCTO( test-chem chem mk lua++ lua)
 
@@ -13,6 +14,8 @@ ADD_TEST(Library     test-chemical lib ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua)
 ADD_TEST(Equilibria  test-chemical eqs ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua)
 ADD_TEST(Acetic      test-chemical dosage ${CMAKE_CURRENT_SOURCE_DIR}/acetic.lua)
 ADD_TEST(Oxalic      test-chemical dosage ${CMAKE_CURRENT_SOURCE_DIR}/oxalic.lua)
+ADD_TEST(Ammonium    test-chemical dosage ${CMAKE_CURRENT_SOURCE_DIR}/ammonium.lua)
+
 
 #ADD_TEST(Mix         test-chemical mix ${CMAKE_CURRENT_SOURCE_DIR}/mix.lua)
 #ADD_TEST(Effectors   test-chemical effector ${CMAKE_CURRENT_SOURCE_DIR}/eff.lua)
