@@ -87,7 +87,7 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         {
             S[j] = (S0[j] * V0 + S1[j] * Vadd)/Vnew;
         }
-        std::cerr << "S[" << i <<"]=" << S << std::endl;
+        //std::cerr << "S[" << i <<"]=" << S << std::endl;
         if(!eqs.balance(S))
         {
             throw exception("Cannot balance solution!");
@@ -98,9 +98,10 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         }
         ios::ocstream fp(output,true);
         fp("%g %g\n", Vadd, S.pH());
+        std::cerr << "."; std::cerr.flush();
     }
     
-    std::cerr << "saved in " << output << std::endl;
+    std::cerr << std::endl << "saved in " << output << std::endl;
     
     
     
