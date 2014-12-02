@@ -2,19 +2,25 @@
 #define YOCTO_CHEMICAL_EQUILIBRIUM_INCLUDED 1
 
 #include "yocto/chemical/species.hpp"
-#include "yocto/math/types.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/ptr/arc.hpp"
 #include "yocto/container/tuple.hpp"
 #include "yocto/sequence/vector.hpp"
+
+#include "yocto/math/types.hpp"
+#include "yocto/math/fcn/drvs.hpp"
+
 
 namespace yocto
 {
     namespace chemical
     {
         typedef math::numeric<double>::function func_type;
-        typedef ptrdiff_t integer_t;
+        typedef math::derivative<double>        drvs_type;
+        typedef ptrdiff_t                       integer_t;
 
+        
+        
         class equilibrium : public counted_object
         {
         public:
@@ -54,12 +60,14 @@ namespace yocto
             //! default dtor
             virtual ~equilibrium() throw();
             
-            const string name;    //!< the name
-            func_type    K;       //!< a functor, calling callK(), which calls the virtual getK()
-            xi_ctrl      forward; //!< status
-            xi_ctrl      reverse; //!< status
-            bool         blocked; //!< fully blocked !
-            const size_t indx;    //!< in equilibria
+            const string   name;        //!< the name
+            func_type      K;           //!< a functor, calling callK(), which calls the virtual getK()
+            mutable double reac_weight; //!< last value
+            mutable double prod_weight; //!< last value
+            xi_ctrl        forward;     //!< status
+            xi_ctrl        reverse;     //!< status
+            bool           blocked;     //!< fully blocked !
+            const size_t   indx;        //!< index in equilibria
             
             void add( const species::pointer &sp, const int nu);
             void output( std::ostream &os ) const;
@@ -86,6 +94,7 @@ namespace yocto
             
             //! update Gamma and Phi from a previous K(t)
             double updateGammaAndPhi( const array<double> &C, const double Kt, array<double> &Phi ) const;
+            
             
             //! max extents
             void compute_limits( const array<double> &C )  throw();

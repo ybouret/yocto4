@@ -215,7 +215,7 @@ namespace yocto
         double equilibrium:: updateGamma( const array<double> &C, const double Kt ) const
         {
             double p_prod = 1;
-            double r_prod = Kt;
+            double r_prod = 1;
             
             for(const actor *a=reac.head;a;a=a->next)
             {
@@ -233,8 +233,9 @@ namespace yocto
                 p_prod *= ipower(C[a->sp->indx],a->nu);
             }
             
-            //cvg = HasConverged(r_prod, p_prod);
-            return r_prod - p_prod;
+            reac_weight = r_prod;
+            prod_weight = p_prod;
+            return Kt*r_prod - p_prod;
         }
         
         double equilibrium:: computeGammaAndPhi( double t, const array<double> &C, double &Kt, array<double> &Phi ) const
@@ -242,10 +243,12 @@ namespace yocto
             return updateGammaAndPhi(C, (Kt=callK(t)), Phi);
         }
         
-        double equilibrium:: updateGammaAndPhi(const array<double> &C, const double Kt, array<double> &Phi) const
+        double equilibrium:: updateGammaAndPhi(const array<double> &C,
+                                               const double         Kt,
+                                               array<double>       &Phi) const
         {
             assert(C.size()>=Phi.size());
-            double r_prod = Kt;
+            double r_prod = 1;
             double p_prod = 1;
             const size_t M = Phi.size();
             for(size_t i=M;i>0;--i)
@@ -298,10 +301,11 @@ namespace yocto
                 Phi[i] -= phi;
             }
             
-            const double g = r_prod - p_prod;
-            //cvg = HasConverged(r_prod, p_prod);
-            return g;
+            reac_weight = r_prod;
+            prod_weight = p_prod;
+            return Kt * r_prod - p_prod;
         }
+        
         
         
         static inline
