@@ -31,6 +31,7 @@ namespace yocto
                  \param h    guess step
                  \param y    initial values @x
                  \param dydx initial derivatives @x
+                 \param cb   called BEFORE the equation on a trial point/time
                  */
                 virtual  void operator()(array<T>        &yout,
                                          array<T>        &yerr,
