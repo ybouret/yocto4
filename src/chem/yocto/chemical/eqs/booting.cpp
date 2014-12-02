@@ -387,8 +387,9 @@ namespace yocto
             // Starting point
             //__________________________________________________________________
             size_t count = 0;
+            size_t cycle = 0;
             
-        GENERATE_C:
+        GENERATE_C: ++cycle;
             for(size_t j=N;j>0;--j)
             {
                 xi[j] = ran() - 0.5;

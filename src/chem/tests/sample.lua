@@ -12,7 +12,7 @@ species = {
 
 
 function KNH3(t)
-return 10^(-9.2)
+return 10^(-9.2)*(2+math.sin(t));
 end
 
 eqs =

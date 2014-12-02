@@ -15,7 +15,10 @@ namespace yocto
         N(0),
         optH(this, & equilibria::computeH),
         optG(this, & equilibria::computeG),
-        optF(this, & equilibria::computeF)
+        optF(this, & equilibria::computeF),
+        ran(),
+        drvs(),
+        dt_drvs(1e-4)
         {
         }
         

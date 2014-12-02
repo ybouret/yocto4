@@ -63,6 +63,16 @@ YOCTO_UNIT_TEST_IMPL(sol)
     
     std::cerr << "C=" << C << std::endl;
     std::cerr << "S=" << S << std::endl;
+    
+    for(size_t i=C.size();i>0;--i)
+    {
+        C[i] = eqs.ran() - 0.5;
+    }
+    
+    std::cerr << "rho0=" << C << std::endl;
+    eqs.absorb(0.0, C, S);
+    
+    std::cerr << "rho1=" << C << std::endl;
 
 }
 YOCTO_UNIT_TEST_DONE()

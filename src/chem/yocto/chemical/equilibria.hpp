@@ -65,6 +65,11 @@ namespace yocto
             vector_t     xis;    //!< [N], xi start...
             vector_t     U;      //!< [N] xi increment for booting
             
+            //__________________________________________________________________
+            //
+            // Building API
+            //__________________________________________________________________
+
             equilibrium &add( equilibrium *pEq );
             void         remove(const string &name);
             
@@ -79,6 +84,11 @@ namespace yocto
                 eqs.output(os);
                 return os;
             }
+            
+            //__________________________________________________________________
+            //
+            // Chemistry API
+            //__________________________________________________________________
             
             //! compute all limits for equilibria
             void compute_limits() throw();
@@ -115,6 +125,15 @@ namespace yocto
                      const array<double>   &weights,
                      const double           t);
 
+            //__________________________________________________________________
+            //
+            // Kinetics API
+            //__________________________________________________________________
+            
+            //! absorb a part of rho assuming that C0 is normalized !
+            void absorb(const double         t,
+                        array<double>       &rho,
+                        const array<double> &C0);
             
             
         private:
@@ -146,8 +165,7 @@ namespace yocto
         public:
             uniform_generator<double> ran;
             math::derivative<double>  drvs;
-            
-            
+            double                    dt_drvs; //!< default 1e-4, to be set
         };
         
     }
