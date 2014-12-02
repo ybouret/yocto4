@@ -6,11 +6,14 @@
 #include "yocto/math/kernel/tao.hpp"
 #include "yocto/math/kernel/det.hpp"
 #include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/round.hpp"
 
 #include "yocto/code/utils.hpp"
 #include "yocto/math/opt/cgrad.hpp"
+
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
+
 
 namespace yocto
 {
@@ -61,11 +64,10 @@ namespace yocto
                     switch(ns)
                     {
                         case 0:
-                            throw exception("boot: deduced an empty constraint");
+                            throw exception("equilibria.boot: deduced an empty constraint");
                             
                         case 1:
                         {
-                            std::cerr << "Fixed species #" << jfixed << std::endl;
                             //-- re order matrix
                             ++ifixed;
                             P.swap_rows(ifixed,i);
@@ -77,7 +79,7 @@ namespace yocto
                             
                             //-- check possible
                             if( (cfixed<0) && active[jfixed])
-                                throw exception("Fixed species #%u set to a negative value", unsigned(jfixed));
+                                throw exception("equilibria.boot: active species #%u set to a negative value", unsigned(jfixed));
                             
                             //-- propagate information below
                             for(size_t k=ifixed+1;k<=Nc;++k)
@@ -147,47 +149,6 @@ namespace yocto
                 return true;
             }
             
-#if 0
-            //__________________________________________________________________
-            //
-            // Compute the Q-space
-            //__________________________________________________________________
-            static inline
-            void compute_Q( imatrix_t &Q, const imatrix_t &P, const imatrix_t &Nu)
-            {
-                const size_t M  = P.cols;
-                const size_t Nc = P.rows;
-                const size_t N  = Q.rows;
-                imatrix_t F(M,M);
-                
-                for(size_t i=1;i<=Nc;++i)
-                {
-                    for(size_t j=M;j>0;--j)
-                    {
-                        F[i][j] = P[i][j];
-                    }
-                }
-                
-                for(size_t i=1;i<=N;++i)
-                {
-                    for(size_t j=M;j>0;--j)
-                    {
-                        F[i+Nc][j] = Nu[i][j];
-                    }
-                }
-                if(!IGS(F))
-                {
-                    throw exception("singular set of chemical constraints+topology");
-                }
-                for(size_t i=1;i<=N;++i)
-                {
-                    for(size_t j=M;j>0;--j)
-                    {
-                        Q[i][j] = F[i+Nc][j];
-                    }
-                }
-            }
-#endif
             
             
             //__________________________________________________________________
@@ -228,24 +189,9 @@ namespace yocto
             
             
             
-            
-            
-            
-            static inline
-            size_t count_active( const bvector_t &flag, uvector_t &Jactive) throw()
-            {
-                Jactive.free();
-                for(size_t j=flag.size();j>0;--j)
-                {
-                    if(flag[j])
-                    {
-                        Jactive.push_back(j);
-                    }
-                }
-                Jactive.reverse();
-                return Jactive.size();
-            }
         }
+        
+        
         
         void equilibria:: compute_C(const array<double> &V)
         {
@@ -261,6 +207,7 @@ namespace yocto
                 C[ fixedJ[j] ] =  fixedC[j];
             }
         }
+        
         
         double equilibria:: computeH( const array<double> &V )
         {
@@ -299,7 +246,6 @@ namespace yocto
                 }
             }
             tao::mul(G,Q,dC);
-            
         }
         
         void equilibria:: optimize()
@@ -390,17 +336,12 @@ namespace yocto
             {
                 aboot[ fixedJ[j] ] = false;
             }
-            //uvector_t    Jactive(M,as_capacity);
-            //const size_t Mactive = count_active(aboot,Jactive);
             
             
             
             std::cerr << "active=" << active << std::endl;
             std::cerr << "localA=" << aboot  << std::endl;
-            //std::cerr << "Mactive=" << Mactive << std::endl;
-            //std::cerr << "Jactive=" << Jactive << std::endl;
             
-            imatrix_t Y(M,Nc);
             {
                 imatrix_t P2(Nc,Nc);
                 tao::mmul_rtrn(P2, P, P);
@@ -412,10 +353,11 @@ namespace yocto
                 imatrix_t J(Nc,Nc);
                 adjoint(J, P2);
                 //std::cerr << "J=" << J << std::endl;
+                imatrix_t Y(M,Nc);
                 tao::mmul_ltrn(Y, P, J);
+                tao::mul(Xstar,Y,Lam);
             }
             //std::cerr << "Y=" << Y << std::endl;
-            tao::mul(Xstar,Y,Lam);
             //std::cerr << "Xstar=" << Xstar << std::endl;
             
             //__________________________________________________________________
@@ -436,7 +378,6 @@ namespace yocto
             //__________________________________________________________________
             computeK(t);
             updateScaling();
-            //std::cerr << "scaling=" << GamSF << std::endl;
             matrix_t A(N,N);
             vector_t V(N,0);
             
@@ -475,7 +416,6 @@ namespace yocto
                 }
             }
             std::cerr << "C=" << C << std::endl;
-            //std::cerr << "Gamma=" << Gamma << std::endl;
             
             //__________________________________________________________________
             //
@@ -485,7 +425,7 @@ namespace yocto
             A.assign(W);
             if( !crout<double>::build(W) )
             {
-                std::cerr << "Singular..." << std::endl;
+                std::cerr << "equilibria.booting: singular composition..." << std::endl;
                 goto GENERATE_C;
             }
             
@@ -497,7 +437,6 @@ namespace yocto
             tao::set(V,U);
             crout<double>::solve(W,U);
             crout<double>::improve(U, A, W, V);
-            //std::cerr << "U=" << U << std::endl;
             
             //__________________________________________________________________
             //
@@ -505,7 +444,6 @@ namespace yocto
             //__________________________________________________________________
             tao::add(xi,U);
             optimize();
-            //std::cerr << "Cfin=" << C << std::endl;
             
             
             //__________________________________________________________________
@@ -514,22 +452,21 @@ namespace yocto
             //__________________________________________________________________
             updateGammaAndPhi();
             const double G1 = scaledGamma();
-            //std::cerr << "\tG0=" << G0 << " / " << computeF(0) << std::endl;
-            //std::cerr << "\tG1=" << G1 << " / " << computeF(1) << std::endl;
             
             if(G1>=G0)
             {
-                std::cerr << "Need to backtrack..." << std::endl;
+                std::cerr << "equilibria.booting: need to backtrack" << std::endl;
                 triplet<double> XX = { 0,   1,  1};
                 triplet<double> FF = { G0, G1, G1};
                 bracket<double>::expand(optF, XX, FF);
                 minimize<double>(optF, XX, FF, 0);
-                //std::cerr << "XX=" << XX << std::endl;
-                //std::cerr << "FF=" << FF << std::endl;
                 (void) computeF(XX.b);
             }
             
-            
+            //__________________________________________________________________
+            //
+            // Test convergence
+            //__________________________________________________________________
             bool converged = true;
             for(size_t j=M;j>0;--j)
             {
@@ -540,152 +477,77 @@ namespace yocto
                     converged = false;
                 }
             }
-            std::cerr << "dC=" << dC << std::endl;
             
             if(converged)
             {
                 std::cerr << "#variables have converged" << std::endl;
+                goto HAS_CONVERGED;
             }
-            else
+            goto LOOP;
+            
+            
+        HAS_CONVERGED:
+            //__________________________________________________________________
+            //
+            // compute error
+            //__________________________________________________________________
+            updateGammaAndPhi();
+            tao::mmul_rtrn(W, Phi, Q);
+            if( !crout<double>::build(W) )
             {
-                goto LOOP;
+                std::cerr << "-- equilibria.booting: invalid final composition..." << std::endl;
+                goto GENERATE_C;
+            }
+            tao::neg(xi,Gamma);
+            crout<double>::solve(W,xi);
+            tao::mul_trn(dC,W,xi);
+            
+            //__________________________________________________________________
+            //
+            // compute tolerance
+            //__________________________________________________________________
+            for(size_t j=M;j>0;--j)
+            {
+                if(aboot[j])
+                {
+                    double dCj = fabs(dC[j]);
+                    if(dCj>0)
+                    {
+                        dCj = log_round_ceil(dCj);
+                    }
+                    dC[j] = dCj;
+                }
+                else
+                {
+                    dC[j] = 0;
+                }
+            }
+            for(size_t j=M;j>0;--j)
+            {
+                if(aboot[j])
+                {
+                    if( C[j] <= dC[j] ) C[j] = 0;
+                }
             }
             
+            //__________________________________________________________________
+            //
+            // then send it to chemistry
+            //__________________________________________________________________
+            if(!balance(C))
+            {
+                std::cerr << "unable to balance..." << std::endl;
+                goto GENERATE_C;
+            }
+            
+            if(!normalize(C,-1, false))
+            {
+                std::cerr << "unable to normalize a balance,booted solution!!!" << std::endl;
+                goto GENERATE_C;
+            }
         }
         
         
-        bool equilibria:: rebalance_with(const imatrix_t &Q, const bvector_t &local_active)
-        {
-            
-            ivector_t &U = dCp;
-            size_t count = 0;
-            while(true)
-            {
-                ++count;
-                //______________________________________________________________
-                //
-                // Detect invalid concentrations and build descent direction
-                //______________________________________________________________
-                bool has_bad = false;
-                for(size_t j=M;j>0;--j)
-                {
-                    beta[j] = 0;
-                    if(local_active[j])
-                    {
-                        const double Cj = C[j];
-                        if(Cj<=0)
-                        {
-                            beta[j] = 1;
-                            if(Cj<0)
-                            {
-                                has_bad = true;
-                            }
-                        }
-                    }
-                }
-                if(!has_bad)
-                {
-                    return true;
-                }
-                
-                std::cerr << "beta=" << beta << std::endl;
-                
-                tao::mul(xip, Q, beta);
-                std::cerr << "xip=" << xip << std::endl;
-                tao::mul_trn(U,Q,xip);
-                std::cerr << "U=" << U << std::endl;
-                
-                //______________________________________________________________
-                //
-                // analyze poles
-                //______________________________________________________________
-                alpha.free();
-                aindx.free();
-                for(size_t j=M;j>0;--j)
-                {
-                    if(local_active[j])
-                    {
-                        const integer_t Uj = U[j];
-                        if(Uj>0)
-                        {
-                            if(C[j]<0)
-                            {
-                                // slope will change @0
-                                alpha.push_back( -C[j]/Uj);
-                                aindx.push_back(j);
-                            }
-                        }
-                        else
-                        {
-                            if(Uj<0)
-                            {
-                                if(C[j]>=0)
-                                {
-                                    //slope will change @0
-                                    alpha.push_back( C[j]/(-Uj));
-                                    aindx.push_back(j);
-                                }
-                            }
-                            else
-                            {
-                                // do nothing
-                            }
-                        }
-                        
-                    }
-                    
-                }
-                
-                if(alpha.size()<=0)
-                {
-                    std::cerr << "unexpected no limitations in rebalance" << std::endl;
-                    return false;
-                }
-                
-                co_qsort(alpha, aindx);
-                std::cerr << "alpha=" << alpha << std::endl;
-                std::cerr << "aindx=" << aindx << std::endl;
-                const double factor = alpha[1];
-                if(factor<=0)
-                {
-                    std::cerr << "blocked rebalanced..." << std::endl;
-                    return false;
-                }
-                
-                // carefull update
-                for(size_t j=M;j>0;--j)
-                {
-                    const double    Cj = C[j];
-                    const integer_t Uj = U[j];
-                    C[j] += factor * Uj;
-                    if(local_active[j])
-                    {
-                        if(Uj>0)
-                        {
-                            if(Cj<0)
-                            {
-                                if(C[j]>=0) C[j] = 0;
-                            }
-                        }
-                        else
-                        {
-                            if(Uj<0)
-                            {
-                                if(Cj>0)
-                                {
-                                    if(C[j]<=0) C[j] = 0;
-                                }
-                            }
-                        }
-                    }
-                }
-                C[aindx[1]] = 0;
-                
-                std::cerr << "Cb" << count << "=" << C << std::endl;
-            }
-            
-            return true;
-        }
         
         
         

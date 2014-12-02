@@ -102,8 +102,6 @@ namespace yocto
             void clip_extents();
             
             
-            void solve( const boot &loader, const double t);
-            
             void load( const boot &loader, const double t );
             
             
@@ -127,11 +125,12 @@ namespace yocto
             
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );
-            bool rebalance_with(const imatrix_t &Q, const bvector_t &local_active);
             
-            bool rebalance_v2( const imatrix_t &Q, const bvector_t &local_active);
             
+            //! evaluate objective function to go to positive energies
             double computeH( const array<double> &V );
+            
+            //! evaluate the gradient
             void   computeG( array<double> &G, const array<double> &V);
             
             //! optimize a given xi
@@ -140,7 +139,7 @@ namespace yocto
             //! |Gamma/GamSF|
             double scaledGamma() const throw();
             
-            //! xi = xis + ratio * u, optimize xi, update Gamma, return |Gamma|
+            //! xi = xis + ratio * u, optimize xi, update Gamma, return scaledGamma
             double   computeF(double ratio);
             
         public:

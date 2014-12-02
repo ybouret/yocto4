@@ -189,6 +189,16 @@ namespace yocto
             return ans;
         }
 
+        bool solution:: has(const string &id) const throw()
+        {
+            return lib.has(id);
+        }
+
+        bool solution:: has(const char *id) const
+        {
+            const string ID(id);
+            return lib.has(ID);
+        }
         
         
         

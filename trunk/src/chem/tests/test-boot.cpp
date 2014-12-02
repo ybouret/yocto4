@@ -51,7 +51,8 @@ YOCTO_UNIT_TEST_IMPL(boot)
         eqs.load(loader,0.0);
         S.load(eqs.C);
         std::cerr << "S=" << S << std::endl;
-        std::cerr << "pH=" << S.pH() << std::endl;
+        if(S.has("H+"))
+            std::cerr << "pH=" << S.pH() << std::endl;
     }
     
     
