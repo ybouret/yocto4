@@ -29,7 +29,7 @@ namespace yocto
         class equilibria
         {
         public:
-            explicit equilibria() throw();
+            explicit equilibria();
             virtual ~equilibria() throw();
             
             
