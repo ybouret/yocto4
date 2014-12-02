@@ -5,6 +5,8 @@
 #include "yocto/math/kernel/tao.hpp"
 #include "yocto/sequence/vector.hpp"
 
+#include <typeinfo>
+
 using namespace yocto;
 using namespace math;
 

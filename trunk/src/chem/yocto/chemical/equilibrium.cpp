@@ -37,6 +37,8 @@ namespace yocto
         equilibrium::equilibrium(const string &id ):
         name(id),
         K(this,&equilibrium::callK),
+	reac_weight(0),
+	prod_weight(0),
         forward(false,false,-1),
         reverse(false,false,-1),
         blocked(false),
