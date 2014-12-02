@@ -53,6 +53,7 @@ namespace yocto
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
             vector_t     GamSF;  //!< [N] Gamma Scaling Factor
+            vector_t     dtGam;  //!< [N] dGamma/dt
             vector_t     xi;     //!< [N] extents
             imatrix_t    Nu;     //!< [NxM] current topology
             matrix_t     Phi;    //!< [NxM] dGamma/dC
@@ -101,7 +102,7 @@ namespace yocto
             //! clip xi according to C
             void clip_extents();
             
-            
+            //! create solution from information
             void load( const boot &loader, const double t );
             
             
@@ -144,7 +145,7 @@ namespace yocto
             
         public:
             uniform_generator<double> ran;
-            
+            math::derivative<double>  drvs;
             
             
         };

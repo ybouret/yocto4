@@ -87,7 +87,8 @@ namespace yocto
             Phi.    release();
             Nu.     release();
             xi.     release();
-            GamSF.  release(); 
+            GamSF.  release();
+            dtGam.  release();
             Gamma.  release();
             K.      release();
             
@@ -141,6 +142,7 @@ namespace yocto
                 {
                     K.      make(N,0.0);
                     Gamma.  make(N,0.0);
+                    dtGam.  make(N,0.0);
                     GamSF.  make(N,0.0);
                     xi.     make(N,0.0);
                     Nu.     make(N,M);
@@ -185,16 +187,7 @@ namespace yocto
             return *eqs[i];
         }
 
-        bool equilibria:: GammaHasConverged() const
-        {
-            for(size_t i=N;i>0;--i)
-            {
-                //if(false == eqs[i]->cvg) return false;
-            }
-            //return true;
-            return false;
-        }
-       
+        
         double equilibria:: scaledGamma() const throw()
         {
             double ans = 0;
