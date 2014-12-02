@@ -14,6 +14,7 @@
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
 
+#include <cstdlib>
 
 namespace yocto
 {

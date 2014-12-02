@@ -68,7 +68,8 @@ namespace yocto
         
         
         constraint:: constraint(const double l) throw() :
-        level(l)
+        level(l),
+	members()
         {
         }
     }
@@ -124,9 +125,9 @@ namespace yocto
                 const constraint &c = *(*this)[i];
                 os << c.level << " = ";
                 const size_t nm = c.count();
-                for(size_t i=1;i<=nm;++i)
+                for(size_t j=1;j<=nm;++j)
                 {
-                    const constraint::member &m = c[i];
+                    const constraint::member &m = c[j];
                     const int w = m.weight;
                     const int a = w<0?-w:w;
                     if(m.weight<0)
