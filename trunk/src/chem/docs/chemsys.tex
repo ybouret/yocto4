@@ -105,6 +105,7 @@ $$
 and a careful addition is then performed, avoiding the roundoff errors.
 
 \section{Booting Algorithm}
+\subsection{The problem}
 We have $M$ species, $N$ equilibria, 
 so we must have $M\geq N$ and $Nc=M-N$ other conditions
 to obtain a starting value.
@@ -115,56 +116,49 @@ $$
 	\mymat{P}\vec{C} = \vec{\Lambda}.
 $$
 To be able to find a solution, the matrix $\mymat{P}\oplus\mymat{\nu}$ must
-be not singular, with allows the computation of an orthogonal (integer) matrix
+be not singular, with allows the computation of an orthogonal (integer) matrix perpendicular to $\mymat{P}$
 $$
 	\mymat{Q},\;\mytrn{\mymat{P}}\cdot\mymat{Q} = \mymat{0},\;Q\in\mathcal{M}_{N,M}.
 $$
-Hence, starting from a valid concentration $\vec{C}_k$, we want to compute
+Any valid solution must be of the form
 $$
-	\vec{\Gamma}
+	\vec{C}_k = \vec{C}^\star + \mytrn{\mymat{Q}}\vec{\xi}_k
+$$
+with
+$$
+	\vec{C}^\star = \mytrn{\mymat{P}}\left(\mymat{P}\mytrn{\mymat{P}}\right)^{-1} \vec{\Lambda}
+$$
+\subsection{Best effort positive values}
+
+\section{Perturbation}
+Let us assume we want to add $\delta\vec{C}$ to the system during $dt$, starting
+from $\vec{C}$ with $\vec{\Gamma}(\vec{C})=\vec{0}$.
+We want to compute the extent $\delta\vec{\xi}$ such that
+$$
+	\vec{\Gamma}\left(\vec{C}+\delta\vec{C} + \mytrn{\mymat{\nu}}\delta\vec{\xi}\right)=\vec{0}
+$$
+imposing the first order relation
+$$
+	\mymat{\Phi}\delta\vec{C} + \mymat{\Phi}\mytrn{\mymat{\nu}} \delta\vec{\xi}
+	+\partial_t \vec{\Gamma} dt = \vec{0}.
+$$
+using 
+$$
+	\vec{\rho} = \partial_t \delta\vec{C}
+$$
+we find
+$$
+	\dot{\vec{\xi}} = - \left(\mymat{\Phi}\mytrn{\mymat{\nu}}\right)^{-1}
 	\left(
-		\vec{C}_k+\mytrn{\mymat{P}}\delta\vec{U}_k + \mytrn{\mymat{Q}}\vec{\xi}_k
-		\right) = \vec{0}.
+		\mymat{\Phi}\vec{\rho} + \partial_t \vec{\Gamma}
+	\right)
 $$
-We compute $\vec{\Gamma}_k$ and $\mymat{\Phi}_k$. Then we
-compute
+so that 
 $$
-	\vec{C}_k' = \vec{C}_k + \mytrn{\mymat{P}}\left(\mymat{P}\mytrn{\mymat{P}}\right)^{-1}\left(\vec{\Lambda}-\mymat{P}\vec{C}_k\right)
-$$
-and we deduce
-$$
-	\vec{\xi}_k = -\left(\mymat{\Phi}\mytrn{\mymat{Q}}\right)^{-1}\left(\vec{\Gamma}_k+\mymat{\Phi}_k \vec{C}_k'\right)
-$$
-
-\section{Generic Balancing Algorithm}
-We define an objective function
-$$
-	\mathcal{E}(\vec{C}) = \sum_{j\in\mathrm{active}} -C_j \mathbbm{1}_{C_j\leq0}
-$$
-which is positive if an active species has an invalid concentration.
-The integer descent direction is
-$$
-	\vec{\beta} = - \vec{\nabla}_{\vec{C}} \mathcal{E} = 
-	\begin{bmatrix}
-		\vdots\\
-		\mathbbm{1}_{C_{j\in\mathrm{active}}\leq0}\\
-		\vdots
-	\end{bmatrix}
-$$
-It is very important to take into account the zero concentration for they
-represent a stopping point or a cancellation for the evolution.
-
-Let us assume that we want to minimise this function using an integer matrix $\mymat{Q}$
-$$
-	\vec{C}_{k+1} = \vec{C}_k + \mytrn{\mymat{Q}}\vec{V}_k
-$$
-then the descent direction $\vec{\xi}_k'$ for $\vec{V}$ is
-$$
-		\vec{\xi}'_k = \mymat{Q} \vec{\beta}_k
-$$
-and the integer descent direction for $\vec{C}_k$ is
-$$
-	\vec{U}_k = \mytrn{\mymat{Q}} \vec{\xi}'_k = \mytrn{\mymat{Q}} \mymat{Q} \vec{\beta}_k
+	\delta\vec{\rho} = - \mytrn{\mymat{\nu}} \left(\mymat{\Phi}\mytrn{\mymat{\nu}}\right)^{-1}
+	\left(
+		\mymat{\Phi}\vec{\rho} + \partial_t \vec{\Gamma}
+	\right)
 $$
 
 \end{document}
