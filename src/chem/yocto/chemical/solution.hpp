@@ -38,6 +38,9 @@ namespace yocto
                 return os;
             }
             
+            bool has(const string &) const throw();
+            bool has(const char   *) const;
+            
             void ldz() throw();
             void load( const array<double> &X) throw();
             void save( array<double> &X) const throw();

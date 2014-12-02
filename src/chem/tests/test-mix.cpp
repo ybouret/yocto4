@@ -64,7 +64,7 @@ YOCTO_UNIT_TEST_IMPL(mix)
         eqs.load(loader,0.0);
         solution S(lib);
         S.load(eqs.C);
-        std::cerr << "S2=" << S << std::endl;
+        std::cerr << "S2="  << S      << std::endl;
         std::cerr << "pH2=" << S.pH() << std::endl;
         solutions.push_back(S);
     }

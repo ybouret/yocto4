@@ -5,6 +5,7 @@ acetic.lua
 oxalic.lua
 ammonium.lua
 mix.lua
+boot-ab.lua
 )
 TARGET_LINK_YOCTO( test-chem chem mk lua++ lua)
 
@@ -13,6 +14,8 @@ ENABLE_TESTING()
 ADD_TEST(Species     test-chemical species)
 ADD_TEST(Library     test-chemical lib ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua)
 ADD_TEST(Equilibria  test-chemical eqs ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua)
+ADD_TEST(Boot1       test-chemical boot ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua ini)
+ADD_TEST(Boot2       test-chemical boot ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua ini2)
 ADD_TEST(Acetic      test-chemical dosage ${CMAKE_CURRENT_SOURCE_DIR}/acetic.lua)
 ADD_TEST(Oxalic      test-chemical dosage ${CMAKE_CURRENT_SOURCE_DIR}/oxalic.lua)
 ADD_TEST(Ammonium    test-chemical dosage ${CMAKE_CURRENT_SOURCE_DIR}/ammonium.lua)
