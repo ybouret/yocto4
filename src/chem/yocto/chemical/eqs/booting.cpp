@@ -456,6 +456,7 @@ namespace yocto
             if(G1>=G0)
             {
                 std::cerr << "equilibria.booting: need to backtrack" << std::endl;
+                // TODO: do I need to contract it before ?
                 triplet<double> XX = { 0,   1,  1};
                 triplet<double> FF = { G0, G1, G1};
                 bracket<double>::expand(optF, XX, FF);

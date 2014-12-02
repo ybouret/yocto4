@@ -3,6 +3,7 @@
 
 #include "yocto/chemical/equilibria.hpp"
 #include "yocto/chemical/boot.hpp"
+#include "yocto/chemical/solution.hpp"
 
 #include "lua.hpp"
 #include "yocto/functor.hpp"
@@ -14,6 +15,10 @@ namespace yocto
         
         struct __lua
         {
+            //__________________________________________________________________
+            //
+            // library API
+            //__________________________________________________________________
             typedef functor<void,TL2(lua_State *,species&)> species_callback;
             
             //! append to library some species
@@ -29,15 +34,42 @@ namespace yocto
             //! wrapper
             static void load(lua_State *L, library &lib, const char   *id, species_callback *cb = 0 );
             
+            //__________________________________________________________________
+            //
+            // equilibria API
+            //__________________________________________________________________
             //! append to equilibria
             static void load(lua_State *L, equilibria &eqs,  const string &id , const library &lib);
             
             //! append to equilibria, wrapper
             static void load(lua_State *L, equilibria &eqs,  const char *id , const library &lib);
             
+            //__________________________________________________________________
+            //
+            // boot API
+            //__________________________________________________________________
             //! append to boot
             static void load(lua_State *L, boot &loader, const string &id, const library &lib);
             
+            
+            //! append to boot, wrapper
+            static void load(lua_State *L, boot &loader, const char *id, const library &lib);
+            
+            //__________________________________________________________________
+            //
+            // solution API
+            //__________________________________________________________________
+            //! push solution on stack
+            static void push( lua_State *L, const solution &S);
+            
+            //! push array as a solution
+            static void push( lua_State *L, const array<double> &S, const library &lib);
+            
+            //! read solution on stack
+            static void load( lua_State *L, solution &S);
+            
+            //! read solution on stack
+            static void load( lua_State *L, array<double> &S, const library &lib);
         };
         
     }
