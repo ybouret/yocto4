@@ -3,6 +3,7 @@
 
 #include "yocto/chemical/equilibrium.hpp"
 #include "yocto/chemical/solution.hpp"
+#include "yocto/chemical/ode.hpp"
 
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/sequence/vector.hpp"
@@ -162,10 +163,14 @@ namespace yocto
             //! xi = xis + ratio * u, optimize xi, update Gamma, return scaledGamma
             double   computeF(double ratio);
             
+            //! callback for a differential equation
+            void odecb(array<double> &Y,double t);
+            
         public:
             uniform_generator<double> ran;
             math::derivative<double>  drvs;
-            double                    dt_drvs; //!< default 1e-4, to be set
+            double                    dt_drvs;  //!< default 1e-4, to be set
+            diff_callback             callback; //!< ODE callback
         };
         
     }

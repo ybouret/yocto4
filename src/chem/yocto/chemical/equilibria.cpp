@@ -7,46 +7,47 @@ namespace yocto
 {
     namespace chemical
     {
-     
+        
         using namespace math;
         
         equilibria:: equilibria():
         M(0),
         N(0),
-	C(),
-	dC(),
-	active(),
-	Cs(),
-	Jneg(),
-	beta(),
-	dCp(),
-	alpha(),
-	aindx(),
-	Xstar(),
-	aboot(),
-	fixedJ(),
-	fixedC(),
-	K(),
-	Gamma(),
-	GamSF(),
-	dtGam(),
-	xi(),
-	Nu(),
-	Phi(),
-	W(),
-	online(),
-	xip(),
-	Q(),
-	Delta(0),
-	xis(),
-	U(),
-	eqs(),
+        C(),
+        dC(),
+        active(),
+        Cs(),
+        Jneg(),
+        beta(),
+        dCp(),
+        alpha(),
+        aindx(),
+        Xstar(),
+        aboot(),
+        fixedJ(),
+        fixedC(),
+        K(),
+        Gamma(),
+        GamSF(),
+        dtGam(),
+        xi(),
+        Nu(),
+        Phi(),
+        W(),
+        online(),
+        xip(),
+        Q(),
+        Delta(0),
+        xis(),
+        U(),
+        eqs(),
         optH(this, & equilibria::computeH),
         optG(this, & equilibria::computeG),
         optF(this, & equilibria::computeF),
         ran(),
         drvs(),
-        dt_drvs(1e-4)
+        dt_drvs(1e-4),
+        callback( this, & equilibria::odecb )
         {
         }
         
@@ -102,7 +103,7 @@ namespace yocto
             }
         }
         
-
+        
         
         void equilibria:: clear() throw()
         {
@@ -138,7 +139,7 @@ namespace yocto
             dC.     release();
             C.      release();
         }
-   
+        
         void equilibria:: compile_for( const library &lib )
         {
             clear();
@@ -151,7 +152,7 @@ namespace yocto
                 {
                     eqs[i]->validate();
                 }
-
+                
                 if(M<=0)
                     throw exception("equilibria: no species");
                 
@@ -217,7 +218,7 @@ namespace yocto
             assert(i>=1);assert(i<=eqs.size());assert(N==eqs.size());
             return *eqs[i];
         }
-
+        
         
         double equilibria:: scaledGamma() const throw()
         {
@@ -230,8 +231,21 @@ namespace yocto
             return Sqrt(ans/N);
         }
         
-
-    
+        
+        void equilibria:: odecb(array<double> &Y, double t)
+        {
+            assert(Y.size()>=M);
+            if(!balance(Y))
+            {
+                throw exception("equilibria.ode(@t=%g): can't balance concentrations",t);
+            }
+            if(!normalize(Y,t,true))
+            {
+                throw exception("equilibria.ode(@t=%g): can't normalize concentrations",t);
+            }
+        }
+        
+        
     }
     
 }
