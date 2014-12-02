@@ -101,11 +101,15 @@ namespace yocto
                 
                 lua_pop(L,1);
             }
-            
-            
-            
         }
         
+        
+        void __lua:: load(lua_State *L, boot &loader, const char *id, const library &lib)
+        {
+            const string ID(id);
+            load(L,loader,ID,lib);
+        }
+
         
     }
     

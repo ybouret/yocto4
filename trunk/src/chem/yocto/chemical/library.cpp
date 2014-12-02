@@ -141,6 +141,27 @@ namespace yocto
             return 0 != db.search(name);
         }
 
+        bool library:: has(const char *name) const
+        {
+            const string NAME(name);
+            return 0 != db.search(NAME);
+        }
+        
+        size_t library:: index_of(const string &name) const
+        {
+            const species::pointer *pp = db.search(name);
+            if(!pp)
+            {
+                throw exception("library::index_of(no '%s')", name.c_str());
+            }
+            return (**pp).indx;
+        }
+
+        size_t library:: index_of(const char *name) const
+        {
+            const string NAME(name);
+            return index_of(NAME);
+        }
         
     }
 

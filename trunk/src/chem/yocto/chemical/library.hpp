@@ -50,6 +50,9 @@ namespace yocto
             }
             
             bool has(const string &name) const throw();
+            bool has(const char   *name) const;
+            size_t index_of(const string &name) const;
+            size_t index_of(const char   *name) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(library);
