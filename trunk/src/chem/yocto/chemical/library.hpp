@@ -13,7 +13,7 @@ namespace yocto
         /**
          counted is used by solution
          */
-        class library : public counted
+        class library
         {
         public:
             typedef species::database       db_type;
@@ -54,13 +54,16 @@ namespace yocto
             size_t index_of(const string &name) const;
             size_t index_of(const char   *name) const;
             
+            void increase() const throw();
+            void decrease() const throw();
+            const size_t nref;
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(library);
             species::database db;
             size_t            max_name_length;
             void   find_max_name_length() throw();
             friend class solution;
-            
         };
         
     }
