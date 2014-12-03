@@ -15,6 +15,9 @@ namespace yocto
         
         struct __lua
         {
+            
+            static void declare_GHK_Psi(lua_State *L);
+            
             //__________________________________________________________________
             //
             // library API
