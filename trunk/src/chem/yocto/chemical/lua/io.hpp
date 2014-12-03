@@ -78,8 +78,31 @@ namespace yocto
             // effectors API
             //__________________________________________________________________
             static void load( lua_State *L, effectors &edb, const string &id);
+    
+            
+            class Library : public library
+            {
+            public:
+                explicit Library( lua_State *L, const char *id );
+                virtual ~Library() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Library);
+            };
+            
+            class Equilibria : public equilibria
+            {
+            public:
+                explicit Equilibria( lua_State *L, const library &lib, const char *id);
+                virtual ~Equilibria() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Equilibria);
+            };
             
         };
+        
+    
         
     }
 }
