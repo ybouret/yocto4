@@ -1,4 +1,4 @@
-#include "yocto/chemical/effector.hpp"
+#include "yocto/chemical/effectors.hpp"
 
 namespace yocto
 {
