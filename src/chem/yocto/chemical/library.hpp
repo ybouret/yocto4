@@ -60,9 +60,10 @@ namespace yocto
             const size_t nref;
 
             double osmolarity(    const array<double> &C) const;
-            double molar_charge(  const array<double> &C) const;
+            double charge(  const array<double> &C) const;
             double ionic_strength(const array<double> &C) const;
             double pH(const array<double> &C) const;
+            std::ostream & display(std::ostream &os, const array<double> &C) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(library);

@@ -79,7 +79,13 @@ namespace yocto
             //__________________________________________________________________
             static void load( lua_State *L, effectors &edb, const string &id);
     
+            static void load( lua_State *L, effectors &edb, const char   *id);
+
             
+            //__________________________________________________________________
+            //
+            // Classes
+            //__________________________________________________________________
             class Library : public library
             {
             public:
@@ -93,13 +99,23 @@ namespace yocto
             class Equilibria : public equilibria
             {
             public:
-                explicit Equilibria( lua_State *L, const library &lib, const char *id);
+                explicit Equilibria(lua_State *L, const char *id, const library &lib);
                 virtual ~Equilibria() throw();
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Equilibria);
             };
             
+            
+            class Effectors : public effectors
+            {
+            public:
+                explicit Effectors(lua_State *L, const char *id);
+                virtual ~Effectors() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Effectors);
+            };
         };
         
     

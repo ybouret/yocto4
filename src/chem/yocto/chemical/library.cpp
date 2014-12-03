@@ -87,7 +87,7 @@ namespace yocto
             const string NAME(name);
             return add(NAME,z);
         }
-
+        
         void library:: find_max_name_length() throw()
         {
             max_name_length = 0;
@@ -120,7 +120,7 @@ namespace yocto
             const string NAME(name);
             remove(NAME);
         }
-
+        
         void library:: output(std::ostream &os) const
         {
             
@@ -137,12 +137,12 @@ namespace yocto
             }
             os << "}";
         }
-
+        
         bool library:: has(const string &name) const throw()
         {
             return 0 != db.search(name);
         }
-
+        
         bool library:: has(const char *name) const
         {
             const string NAME(name);
@@ -158,7 +158,7 @@ namespace yocto
             }
             return (**pp).indx;
         }
-
+        
         size_t library:: index_of(const char *name) const
         {
             const string NAME(name);
@@ -168,7 +168,27 @@ namespace yocto
         void library:: increase() const throw() { ++( (size_t &)nref ); }
         void library:: decrease() const throw() { assert(nref>0); --( (size_t&)nref ); }
         
+        std::ostream & library:: display(std::ostream &os, const array<double> &C) const
+        {
+            assert(C.size()>=size());
+            os << "{" << std::endl;
+            size_t k=1;
+            for(const_iterator i=begin();i!=end();++i,++k)
+            {
+                const species &sp = **i;
+                os << '\t' << '[' << sp.name <<']';
+                for(size_t j=sp.name.size();j<max_name_length;++j)
+                {
+                    os << ' ';
+                }
+                os << " = " << C[k] << std::endl;
+            }
+            os << "}";
+            
+            return os;
+        }
+        
         
     }
-
+    
 }

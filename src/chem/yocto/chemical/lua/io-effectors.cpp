@@ -103,6 +103,13 @@ namespace yocto
                 lua_pop(L,1);
             }
         }
+        
+        void __lua:: load( lua_State *L, effectors &edb, const char *id )
+        {
+            const string ID(id);
+            __lua::load(L,edb,ID);
+        }
+
 
     }
 
