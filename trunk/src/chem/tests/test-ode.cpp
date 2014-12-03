@@ -74,10 +74,8 @@ namespace {
         {
             // get chemical rated
             edb.rate(dYdt, t, Y, Cout, params);
-            std::cerr << "rate0=" << dYdt << std::endl;
             eqs.absorb(t,dYdt,Y);
-            std::cerr << "rate1=" << dYdt << std::endl;
-
+            
         }
         
         void reset( double zeta )
@@ -157,6 +155,7 @@ YOCTO_UNIT_TEST_IMPL(ode)
     Lua::State VM;
     lua_State *L = VM();
     
+    __lua::declare_GHK_Psi(L);
     
     if(argc>1)
     {
