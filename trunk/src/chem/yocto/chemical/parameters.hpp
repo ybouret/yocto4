@@ -22,7 +22,8 @@ namespace yocto
             
             const size_t   count;
             const library &lib;
-
+            const size_t   nvar;
+            
             size_t operator[](const string &) const;
             size_t operator[](const char   *) const;
             

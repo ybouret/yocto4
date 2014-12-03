@@ -16,6 +16,7 @@ namespace yocto
                                 const size_t   num_names) :
         count(num_names),
         lib(user_lib),
+        nvar(count+lib.size()),
         db(count,as_capacity)
         {
             if(count>0)
