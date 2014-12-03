@@ -42,7 +42,7 @@ YOCTO_UNIT_TEST_IMPL(eff)
     parameters params(lib,pname,sizeof(pname)/sizeof(pname[0]));
     std::cerr << "params=" << params << std::endl;
 
-    const size_t nvar = lib.size() + params.count;
+    const size_t nvar = params.nvar;
     vector_t S(nvar,0);
     
     {
