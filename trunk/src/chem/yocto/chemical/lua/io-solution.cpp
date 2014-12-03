@@ -12,7 +12,7 @@ namespace yocto
             assert(L);
             const size_t M = S.size();
             lua_createtable(L, 0, M);
-            library::iterator j = S.lib.begin();
+            library::const_iterator j = S.lib.begin();
             for(size_t i=1;i<=M;++i,++j)
             {
                 const string    &key   = (*j)->name;

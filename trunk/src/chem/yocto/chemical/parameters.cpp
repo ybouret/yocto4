@@ -7,8 +7,16 @@ namespace yocto
     {
         parameters:: ~parameters() throw()
         {
-            (void)lib.liberate();
+            lib.decrease();
         }
+        
+        parameters:: parameters(const library &user_lib) :
+        nvar(0),
+        lib(user_lib),
+        db(8,as_capacity)
+        {
+        }
+        
         
     }
     

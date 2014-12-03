@@ -11,16 +11,16 @@ namespace yocto
         solution:: ~solution() throw()
         {
             memory::kind<memory::global>::release_as(++C,m);
-            lib.liberate();
+            lib.decrease();
         }
         
-        solution:: solution(  library &from ) :
+        solution:: solution(const library &from ) :
         lib(from),
         n( lib.size() ),
         m(n),
         C( memory::kind<memory::global>::acquire_as<double>(m) - 1 )
         {
-            lib.withhold();
+            lib.increase();
         }
         
         solution::solution(const solution &other) :
@@ -29,7 +29,7 @@ namespace yocto
         m(n),
         C( memory::kind<memory::global>::acquire_as<double>(m) - 1 )
         {
-            lib.withhold();
+            lib.increase();
             for(size_t i=n;i>0;--i) C[i] = other.C[i];
         }
         
@@ -109,7 +109,7 @@ namespace yocto
         void solution:: output(std::ostream &os) const
         {
             os << "{" << std::endl;
-            library::iterator j = lib.begin();
+            library::const_iterator j = lib.begin();
             for(size_t i=1;i<=n;++i,++j)
             {
                 const species &sp = **j;
@@ -159,7 +159,7 @@ namespace yocto
         double solution:: charge() const throw()
         {
             double ans = 0;
-            library::iterator j=lib.begin();
+            library::const_iterator j=lib.begin();
             for(size_t i=1;i<=n;++i,++j)
             {
                 ans += C[i] * (**j).z;
@@ -180,7 +180,7 @@ namespace yocto
         double solution:: ionic_strength() const throw()
         {
             double ans = 0;
-            library::iterator j=lib.begin();
+            library::const_iterator j=lib.begin();
             for(size_t i=1;i<=n;++i,++j)
             {
                 const int z =(**j).z;
