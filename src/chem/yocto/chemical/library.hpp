@@ -2,6 +2,7 @@
 #define YOCTO_CHEMICAL_LIBRARY_INCLUDED 1
 
 #include "yocto/chemical/species.hpp"
+#include "yocto/sequence/array.hpp"
 #include <iostream>
 
 namespace yocto
@@ -58,8 +59,10 @@ namespace yocto
             void decrease() const throw();
             const size_t nref;
 
-            double osmolarity( const array<double> &C ) const;
-            
+            double osmolarity(    const array<double> &C) const;
+            double molar_charge(  const array<double> &C) const;
+            double ionic_strength(const array<double> &C) const;
+            double pH(const array<double> &C) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(library);
@@ -67,6 +70,7 @@ namespace yocto
             size_t            max_name_length;
             void   find_max_name_length() throw();
             friend class solution;
+            const string _proton;
         };
         
     }

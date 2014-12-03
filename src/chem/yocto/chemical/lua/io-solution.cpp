@@ -7,6 +7,7 @@ namespace yocto
     namespace chemical
     {
         
+#if 0
         void __lua:: push(lua_State *L, const solution &S)
         {
             assert(L);
@@ -23,6 +24,7 @@ namespace yocto
                 lua_rawset(L, -3);
             }
         }
+#endif
         
         void __lua:: push( lua_State *L, const array<double> &S, const library &lib)
         {
@@ -44,7 +46,7 @@ namespace yocto
         
         
         
-        
+#if 0
         void __lua:: load(lua_State *L, solution &S )
         {
             static const char fn[] = "__lua::load(solution): ";
@@ -78,6 +80,7 @@ namespace yocto
             lua_pop(L,1);
             
         }
+#endif
         
         void __lua:: load( lua_State *L, array<double> &S, const library &lib)
         {
