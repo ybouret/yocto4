@@ -10,7 +10,9 @@ namespace yocto
         }
         
         CurvInfo:: CurvInfo(const string &id ) :
-        name(id)
+        name(id),
+	XLabel(),
+	YLabel()
         {
         }
         

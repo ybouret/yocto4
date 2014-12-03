@@ -105,7 +105,7 @@ YOCTO_UNIT_TEST_IMPL(split)
         
         coord3D    sizes;
         coord3D    ranks;
-        for(size_t size=1;size<=8;++size)
+        for(int size=1;size<=8;++size)
         {
             std::cerr << std::endl;
             std::cerr << "size=" << size << ", full=" << l3 << std::endl;
