@@ -11,29 +11,43 @@ namespace yocto
             lib.decrease();
         }
         
-        parameters:: parameters(const library &user_lib) :
+        parameters:: parameters(const library &user_lib,
+                                const char    *names[],
+                                const size_t   num_names) :
+        count(num_names),
         lib(user_lib),
-        db(8,as_capacity)
+        db(count,as_capacity)
         {
-        }
-        
-        size_t parameters:: count() const throw() { return db.size(); }
-        
-        void parameters:: append(const string &name)
-        {
-            const size_t the_index = lib.size() + db.size() + 1;
-            if( !db.insert(name, the_index) )
+            if(count>0)
             {
-                throw exception("parameters.append(multiple '%s')", name.c_str());
+                assert(names);
+                for(size_t i=0;i<count;++i)
+                {
+                    const string id = names[i];
+                    if(id.length()<=0)
+                        throw exception("parameters: empty name #%u", unsigned(i));
+                    const size_t the_index = lib.size() + db.size() + 1;
+                    if( !db.insert(id,the_index))
+                    {
+                        throw exception("parameters: multiple name '%s'", id.c_str());
+                    }
+                }
             }
+            
+            lib.increase();
         }
         
-        
-        void parameters:: append(const char *name)
+        parameters::iterator parameters:: begin() const throw()
         {
-            const string NAME(name);
-            append(NAME);
+            return db.begin();
         }
+        
+        parameters::iterator parameters:: end() const throw()
+        {
+            return db.end();
+        }
+        
+        
         
         size_t parameters:: operator[](const string &name) const
         {
@@ -47,8 +61,19 @@ namespace yocto
             const string NAME(name);
             return (*this)[NAME];
         }
-
-
+        
+        std::ostream & operator<<( std::ostream &os, const parameters &params)
+        {
+            os << "<" << std::endl;
+            for(parameters::iterator i=params.begin();i!=params.end();++i)
+            {
+                os << " " << i->key << " @ " << *i << std::endl;
+            }
+            os << ">";
+            return os;
+        }
+        
+        
     }
     
 }
