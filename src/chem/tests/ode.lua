@@ -1,3 +1,4 @@
+ftol=1e-5;
 
 species =
 {

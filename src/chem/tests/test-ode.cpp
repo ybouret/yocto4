@@ -4,9 +4,13 @@
 #include "yocto/lua/lua-config.hpp"
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/math/kernel/tao.hpp"
+
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 using namespace chemical;
+using namespace math;
 
 namespace {
     
@@ -24,6 +28,10 @@ namespace {
         const size_t      nvar;
         vector<double>    C0;
         vector<double>    Cout;
+        diff_equation     diffeq;
+        diff_solver       odeint;
+        double            diff_h;
+        vector<double>    C;
         
         explicit ChemSys( lua_State *L ) :
         lib( L, "species"),
@@ -32,8 +40,13 @@ namespace {
         params(lib,p_names,p_count),
         nvar( lib.size() + params.count ),
         C0(nvar,0),
-        Cout(nvar,0)
+        Cout(nvar,0),
+        diffeq(this, & ChemSys::rate ),
+        odeint( Lua::Config::Get<lua_Number>(L,"ftol")),
+        diff_h(1e-6),
+        C(nvar,0)
         {
+            odeint.start(nvar);
             
             {
                 boot loader;
@@ -57,6 +70,64 @@ namespace {
         {
         }
         
+        void rate( array<double> &dYdt, double t, const array<double> &Y )
+        {
+            // get chemical rated
+            edb.rate(dYdt, t, Y, Cout, params);
+        }
+        
+        void reset( double zeta )
+        {
+            tao::set(C,C0);
+            diff_h = 1e-6;
+        }
+        
+        void step(double t_ini, double t_end )
+        {
+            odeint(diffeq,C,t_ini,t_end,diff_h,NULL);
+        }
+        
+        void init_file(const string &filename) const
+        {
+            ios::ocstream fp(filename,false);
+            fp("#t");
+            for( library::const_iterator i=lib.begin();i!=lib.end();++i)
+            {
+                fp << " [" << (*i)->name << "]";
+            }
+            for( parameters::iterator i=params.begin();i!=params.end();++i)
+            {
+                fp << " " << i->key;
+            }
+            fp("\n");
+        }
+        
+        void save_file(const string &filename, const double t) const
+        {
+            ios::ocstream fp(filename,true);
+            fp("%g",t);
+            for(size_t i=1;i<=nvar;++i)
+            {
+                fp(" %g",C[i]);
+            }
+            fp("\n");
+        }
+        
+        void process(const string &filename, const double tmax, double dt)
+        {
+            reset(0);
+            init_file(filename);
+            double t = 0;
+            save_file(filename,t);
+            
+            while(t<tmax)
+            {
+                const double t1 = t + dt;
+                odeint(diffeq,C,t,t1,diff_h,NULL);
+                t = t1;
+                save_file(filename,t);
+            }
+        }
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(ChemSys);
@@ -82,7 +153,9 @@ YOCTO_UNIT_TEST_IMPL(ode)
     }
     
     
-    ChemSys cs(L);
+    ChemSys       cs(L);
+    
+    cs.process("ode-raw.dat", 1, 1e-2);
     
     
     
