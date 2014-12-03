@@ -49,6 +49,10 @@ namespace yocto
                       const array<double> &Cout,
                       const parameters    &params);
             
+            effector & operator[](const string &name );
+            effector & operator[](const char   *name );
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(effectors);
             vector<double> _rho;

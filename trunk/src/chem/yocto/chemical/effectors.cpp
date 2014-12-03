@@ -31,6 +31,7 @@ namespace yocto
     
 }
 
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -73,6 +74,21 @@ namespace yocto
                 }
             }
         }
+        
+        effector & effectors:: operator[](const string &name)
+        {
+            effector::pointer *pp = search(name);
+            if(!pp)
+                throw exception("no effector '%s'", name.c_str());
+            return **pp;
+        }
+        
+        effector & effectors:: operator[](const char *name)
+        {
+            const string NAME(name);
+            return (*this)[NAME];
+        }
+
         
     }
     

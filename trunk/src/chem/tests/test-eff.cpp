@@ -75,6 +75,8 @@ YOCTO_UNIT_TEST_IMPL(eff)
     
     edb.rate(rho, 0.0, S, Sout, params);
     std::cerr << "rho=" << rho << std::endl;
+    edb["Soude"].Vmax = 2.0;
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
