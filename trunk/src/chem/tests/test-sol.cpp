@@ -55,10 +55,11 @@ YOCTO_UNIT_TEST_IMPL(sol)
             std::cerr << "pH=" << S.pH() << std::endl;
     }
     
-    lua_settop(L,0);
-    __lua::push(L,S);
+    vector_t  C(eqs.M,0);
     
-    vector_t C(S.size(),0);
+    lua_settop(L,0);
+    __lua::push(L,C,lib);
+    
     __lua::load(L,C,lib);
     
     std::cerr << "C=" << C << std::endl;

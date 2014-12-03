@@ -9,7 +9,8 @@ namespace yocto
         library:: library() throw() :
         nref(0),
         db(),
-        max_name_length(0)
+        max_name_length(0),
+        _proton("H+")
         {
         }
         
