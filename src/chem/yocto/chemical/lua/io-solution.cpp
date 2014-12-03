@@ -35,7 +35,7 @@ namespace yocto
             library::const_iterator j = lib.begin();
             for(size_t i=1;i<=M;++i,++j)
             {
-                const species &sp = **j; assert(sp.indx==i);
+                const species &sp    = **j; assert(sp.indx==i);
                 const string  &key   = sp.name;
                 const double   value = S[i];
                 lua_pushlstring(L, key.c_str(), key.size());

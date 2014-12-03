@@ -3,6 +3,7 @@
 
 #include "yocto/chemical/equilibria.hpp"
 #include "yocto/chemical/boot.hpp"
+#include "yocto/chemical/parameters.hpp"
 
 #include "lua.hpp"
 #include "yocto/functor.hpp"
@@ -58,17 +59,20 @@ namespace yocto
             //
             // solution API
             //__________________________________________________________________
-            //! push solution on stack
-            //static void push( lua_State *L, const solution &S);
-            
             //! push array as a solution
             static void push( lua_State *L, const array<double> &S, const library &lib);
             
-            //! read solution on stack
-            //static void load( lua_State *L, solution &S);
             
             //! read solution on stack
             static void load( lua_State *L, array<double> &S, const library &lib);
+            
+            //__________________________________________________________________
+            //
+            // parameters API
+            //__________________________________________________________________
+            //! push a table of parameters from the variables
+            static void push( lua_State *L, const array<double> &variables, const parameters &parameters);
+            
         };
         
     }
