@@ -20,8 +20,9 @@ namespace yocto
                                 const size_t  num_names);
             virtual ~parameters() throw();
             
-            const size_t count;
-            
+            const size_t   count;
+            const library &lib;
+
             size_t operator[](const string &) const;
             size_t operator[](const char   *) const;
             
@@ -32,7 +33,6 @@ namespace yocto
             
             
         private:
-            const library &lib;
             YOCTO_DISABLE_COPY_AND_ASSIGN(parameters);
             index_db db;
         };
