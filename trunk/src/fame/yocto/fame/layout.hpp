@@ -136,14 +136,16 @@ namespace yocto
                 {
                     const unit_t u = top.offset_of(i);
                     assert(u>=0);
-                    assert(u<top.items);
+                    assert(u<unit_t(top.items));
                     off.store( u );
                 }
+#if !defined(NDEBUG)
                 for(size_t i=off.size();i>0;--i)
                 {
                     assert(off[i]>=0);
-                    assert(off[i]<top.items);
+                    assert(off[i]<unit_t(top.items));
                 }
+#endif
                 //std::cerr << "offsets1D=" << off << std::endl;
             }
             
@@ -158,15 +160,17 @@ namespace yocto
                     {
                         const unit_t u = top.offset_of(c);
                         assert(u>=0);
-                        assert(u<top.items);
+                        assert(u<unit_t(top.items));
                         off.store( u );
                     }
                 }
+#if !defined(NDEBUG)
                 for(size_t i=off.size();i>0;--i)
                 {
                     assert(off[i]>=0);
-                    assert(off[i]<top.items);
+                    assert(off[i]<unit_t(top.items));
                 }
+#endif
                 //std::cerr << "offsets2D=" << off << std::endl;
             }
             
@@ -183,16 +187,18 @@ namespace yocto
                         {
                             const unit_t u = top.offset_of(c);
                             assert(u>=0);
-                            assert(u<top.items);
+                            assert(u<unit_t(top.items));
                             off.store( u );
                         }
                     }
                 }
+#if !defined(NDEBUG)
                 for(size_t i=off.size();i>0;--i)
                 {
                     assert(off[i]>=0);
-                    assert(off[i]<top.items);
+                    assert(off[i]<unit_t(top.items));
                 }
+#endif
                 //std::cerr << "offsets3D=" << off << std::endl;
             }
             

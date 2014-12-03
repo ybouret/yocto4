@@ -22,6 +22,6 @@ ADD_TEST(Acetic      test-chem dosage   ${CMAKE_CURRENT_SOURCE_DIR}/acetic.lua)
 ADD_TEST(Oxalic      test-chem dosage   ${CMAKE_CURRENT_SOURCE_DIR}/oxalic.lua)
 ADD_TEST(Ammonium    test-chem dosage   ${CMAKE_CURRENT_SOURCE_DIR}/ammonium.lua)
 ADD_TEST(Mix         test-chem mix      ${CMAKE_CURRENT_SOURCE_DIR}/mix.lua)
-ADD_TEST(Effectors   test-chem effector ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua)
+ADD_TEST(Effectors   test-chem eff      ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua)
 ADD_TEST(ODE         test-chem ode      ${CMAKE_CURRENT_SOURCE_DIR}/ode.lua)
 

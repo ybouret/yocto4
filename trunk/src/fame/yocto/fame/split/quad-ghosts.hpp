@@ -147,8 +147,9 @@ namespace yocto
                     ++ (size_t &)count;
                 }
                 
-                inline quad_ghosts &operator[](size_t i) throw()
+                inline quad_ghosts &operator[](int i) throw()
                 {
+		    assert(i>=0);
                     assert(i<count);
                     assert(0!=gptr[i]);
                     return *gptr[i];
@@ -156,6 +157,7 @@ namespace yocto
                 
             private:
                 quad_ghosts *gptr[2];
+		YOCTO_DISABLE_COPY_AND_ASSIGN(pointers);
             };
             
         private:
