@@ -44,9 +44,8 @@ YOCTO_UNIT_TEST_IMPL(mix)
         
         std::cerr << loader << std::endl;
         
-        eqs.load(loader,0.0);
         vector_t S(lib.size(),0);
-        eqs.copy_to(S);
+        eqs.create(S,loader,0.0);
         std::cerr << "S1=" << S << std::endl;
         std::cerr << "pH1=" << lib.pH(S) << std::endl;
         solutions.push_back(S);
@@ -60,9 +59,8 @@ YOCTO_UNIT_TEST_IMPL(mix)
         
         std::cerr << loader << std::endl;
         
-        eqs.load(loader,0.0);
         vector_t S(lib.size(),0);
-        eqs.copy_to(S);
+        eqs.create(S,loader,0.0);
         std::cerr << "S2="  << S      << std::endl;
         std::cerr << "pH2=" << lib.pH(S) << std::endl;
         solutions.push_back(S);

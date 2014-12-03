@@ -114,7 +114,7 @@ namespace yocto
             void clip_extents();
             
             //! create solution from information
-            void load( const boot &loader, const double t );
+            void create(array<double> &C0, const boot &loader, const double t );
             
             
             //! C = Xstar/Delta + Q'*V

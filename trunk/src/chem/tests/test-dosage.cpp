@@ -43,8 +43,7 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         
         std::cerr << loader << std::endl;
         
-        eqs.load(loader,0.0);
-        eqs.copy_to(S0);
+        eqs.create(S0,loader,0.0);
         std::cerr << "S0=" << S0 << std::endl;
         std::cerr << "pH=" << lib.pH(S0) << std::endl;
     }
@@ -58,8 +57,7 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         
         std::cerr << loader << std::endl;
         
-        eqs.load(loader,0.0);
-        eqs.copy_to(S1);
+        eqs.create(S1,loader,0.0);
         std::cerr << "S1=" << S1 << std::endl;
         std::cerr << "pH=" << lib.pH(S1) << std::endl;
     }
