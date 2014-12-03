@@ -10,19 +10,18 @@ namespace yocto
     {
         
         
-        
         class parameters
         {
         public:
-            explicit parameters(library &user_lib);
+            explicit parameters(const library &user_lib);
             virtual ~parameters() throw();
             
             const  size_t  nvar;
-
+            
             size_t count() const throw();
             
         private:
-            library       &lib;
+            const library &lib;
             YOCTO_DISABLE_COPY_AND_ASSIGN(parameters);
             map<string,size_t> db;
         };

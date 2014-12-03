@@ -13,11 +13,11 @@ namespace yocto
         class solution : public array<double>
         {
         public:
-            explicit solution( library &from );
+            explicit solution(const library &from );
             solution(const solution &other);
             
             virtual ~solution() throw();
-            library &lib;
+            const library &lib;
             
             virtual const char *name() const throw();
             virtual size_t      size() const throw();
