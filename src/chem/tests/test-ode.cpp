@@ -21,7 +21,7 @@ namespace {
     
 }
 
-YOCTO_UNIT_TEST_IMPL(eff)
+YOCTO_UNIT_TEST_IMPL(ode)
 {
     library    lib;
     equilibria eqs;
