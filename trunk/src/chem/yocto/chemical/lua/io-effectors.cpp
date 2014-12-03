@@ -60,7 +60,7 @@ namespace yocto
                     
                     // read it
                     __lua::load(L, rho, params.lib);
-                    std::cerr << "rho_" << name << "=" << rho << std::endl;
+                    //std::cerr << "rho_" << name << "=" << rho << std::endl;
                 }
                 
             private:

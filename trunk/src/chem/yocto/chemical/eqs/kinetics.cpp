@@ -41,7 +41,7 @@ namespace yocto
                 dtGam[i] = drvs( eq.K, t, dt_drvs) * eq.reac_weight;
                 xi[i]   += dtGam[i];
             }
-            std::cerr << "dtGam=" << dtGam << std::endl;
+            //std::cerr << "dtGam=" << dtGam << std::endl;
             //std::cerr << "rhs=" << xi << std::endl;
             //std::cerr << "Gamma=" << Gamma << std::endl;
             //std::cerr << "Phi="   << Phi   << std::endl;
