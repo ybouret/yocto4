@@ -58,6 +58,9 @@ namespace yocto
             void decrease() const throw();
             const size_t nref;
 
+            double osmolarity( const array<double> &C ) const;
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(library);
             species::database db;

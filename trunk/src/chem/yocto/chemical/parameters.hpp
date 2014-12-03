@@ -16,9 +16,13 @@ namespace yocto
             explicit parameters(const library &user_lib);
             virtual ~parameters() throw();
             
-            const  size_t  nvar;
-            
             size_t count() const throw();
+            void append(const string &);
+            void append(const char   *);
+            
+            size_t operator[](const string &) const;
+            size_t operator[](const char   *) const;
+
             
         private:
             const library &lib;
