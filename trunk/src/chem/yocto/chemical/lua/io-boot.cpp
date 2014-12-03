@@ -31,7 +31,6 @@ namespace yocto
                 throw exception("%s[%u][1] is not a LUA_NUMBER",id,i);
             const double level = lua_tonumber(L, -1);
             lua_pop(L, 1);
-            std::cerr << "\tconstraint#" << i << ": level=" << level << std::endl;
             
             constraint::pointer p( new constraint(level) );
             
@@ -92,7 +91,6 @@ namespace yocto
                 throw exception("%s is not a LUA_TABLE",txt);
             }
             const size_t n = lua_rawlen(L, -1);
-            std::cerr << "Parsing " << n << " constraints" << std::endl;
             
             for(size_t i=1;i<=n;++i)
             {

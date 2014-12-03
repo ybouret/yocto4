@@ -19,7 +19,7 @@ namespace yocto
             return ans;
         }
         
-        double library:: molar_charge(const array<double> &C) const
+        double library:: charge(const array<double> &C) const
         {
             assert(C.size()>=db.size());
             const size_t   n = db.size();
