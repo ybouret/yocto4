@@ -42,7 +42,9 @@ out =
 
 eff =
 {
-    "NaOH"
+    "leak_K",
+    "leak_Na",
+    "leak_Cl"
 };
 
 
@@ -53,3 +55,26 @@ a["Na+"] = rho;
 a["HO-"] = rho;
 return a;
 end
+
+function leak_K(t,Cin,Cout,params)
+local a = {}
+local zeta = params["zeta"];
+a["K+"] = 4.0*Psi(zeta) * (Cout["K+"] - Cin["K+"]*math.exp(zeta));
+return a;
+end
+
+function leak_Na(t,Cin,Cout,params)
+local a = {}
+local zeta = params["zeta"];
+a["Na+"] = 1.0*Psi(zeta) * (Cout["Na+"] - Cin["Na+"]*math.exp(zeta));
+return a;
+end
+
+function leak_Cl(t,Cin,Cout,params)
+local a = {}
+local zeta = params["zeta"];
+a["Cl-"] = 1.0*Psi(-zeta) * (Cout["Cl-"] - Cin["Cl-"]*math.exp(-zeta));
+return a;
+end
+
+
