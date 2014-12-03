@@ -35,7 +35,32 @@ namespace yocto
                           const array<double> &Cout,
                           const parameters    &params)
                 {
-                    std::cerr << "Calling LuaEffector<" << name << ">" << std::endl;
+                    lua_settop(L,0);
+                    
+                    // pushing function
+                    lua_getglobal(L,name.c_str());
+                    
+                    // pushing args
+                    int nargs = 0;
+                    lua_pushnumber(L,t);             ++nargs;
+                    __lua::push(L,Cin,params.lib);   ++nargs;
+                    __lua::push(L,Cout,params.lib);  ++nargs;
+                    __lua::push(L,Cin,params);       ++nargs;
+                    
+                    if (lua_pcall(L, nargs, 1, 0) != 0)
+                    {
+                        throw exception("%s: %s",name.c_str(), lua_tostring(L, -1));
+                    }
+                    
+                    //getting res
+                    if( !lua_istable(L, -1) )
+                    {
+                        throw exception("%s does not return a LUA_TABLE", name.c_str());
+                    }
+                    
+                    // read it
+                    __lua::load(L, rho, params.lib);
+                    std::cerr << "rho_" << name << "=" << rho << std::endl;
                 }
                 
             private:

@@ -39,8 +39,13 @@ ini2 =
 }
 
 
-function Soude(Cin,Cout,params)
-a = {};
+function Soude(t,Cin,Cout,params)
+local zeta = params["zeta"];
+print( "Soude@t=" .. t .. ", zeta=" .. zeta);
+local a = {};
+local rho = 0.001;
+a["Na+"] = rho;
+a["HO-"] = rho;
 return a;
 end
 

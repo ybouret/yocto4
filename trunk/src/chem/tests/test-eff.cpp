@@ -37,7 +37,13 @@ YOCTO_UNIT_TEST_IMPL(eff)
     eqs.compile_for(lib);
     std::cerr << "Nu=" << eqs.Nu << std::endl;
     
-    vector_t S(lib.size(),0);
+    const char *pname[] = { "zeta", "V" };
+    
+    parameters params(lib,pname,sizeof(pname)/sizeof(pname[0]));
+    std::cerr << "params=" << params << std::endl;
+
+    const size_t nvar = lib.size() + params.count;
+    vector_t S(nvar,0);
     
     {
         boot loader;
@@ -55,10 +61,6 @@ YOCTO_UNIT_TEST_IMPL(eff)
     }
     
     
-    const char *pname[] = { "zeta", "V" };
-    
-    parameters params(lib,pname,sizeof(pname)/sizeof(pname[0]));
-    std::cerr << "params=" << params << std::endl;
     
     effectors edb;
     edb.reserve(4);
@@ -69,8 +71,10 @@ YOCTO_UNIT_TEST_IMPL(eff)
     
     vector_t rho(eqs.M,0);
     
-    edb.rate(rho, 0.0, S, Sout, params);
+    S[ params["zeta"] ] = -0.05;
     
+    edb.rate(rho, 0.0, S, Sout, params);
+    std::cerr << "rho=" << rho << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()
