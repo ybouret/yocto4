@@ -2,7 +2,7 @@
 #define YOCTO_CHEMICAL_EQUILIBRIA_INCLUDED 1
 
 #include "yocto/chemical/equilibrium.hpp"
-#include "yocto/chemical/solution.hpp"
+#include "yocto/chemical/library.hpp"
 #include "yocto/chemical/ode.hpp"
 
 #include "yocto/math/kernel/matrix.hpp"
@@ -96,6 +96,7 @@ namespace yocto
             
             //! balance concentration
             bool balance( array<double> &C0 );
+            void copy_to( array<double> &C0 ) const throw();
             
             equilibrium       & operator[](size_t i) throw();
             const equilibrium & operator[](size_t i) const throw();
@@ -105,7 +106,6 @@ namespace yocto
             void computeGammaAndPhi(double t);
             void updateGammaAndPhi();
             void updateGamma();
-            bool GammaHasConverged() const;
             
             //!  normalize AFTER a balancing was done..
             bool normalize( array<double> &C0, double t, bool recomputeK );
@@ -122,7 +122,7 @@ namespace yocto
             
             //! mix
             void mix(array<double>         &C,
-                     const array<solution> &solutions,
+                     const array<vector_t> &solutions,
                      const array<double>   &weights,
                      const double           t);
 

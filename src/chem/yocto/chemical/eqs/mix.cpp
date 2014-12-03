@@ -6,7 +6,7 @@ namespace yocto
     namespace chemical
     {
         void equilibria:: mix(array<double>         &C,
-                              const array<solution> &solutions,
+                              const array<vector_t> &solutions,
                               const array<double>   &weights,
                               const double           t)
         {
@@ -18,7 +18,7 @@ namespace yocto
             }
             for(size_t i=solutions.size();i>0;--i)
             {
-                const solution &S = solutions[i];
+                const vector_t &S = solutions[i];
                 assert(S.size()==M);
                 const double    w = weights[i];
                 for(size_t j=M;j>0;--j)

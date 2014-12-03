@@ -3,7 +3,6 @@
 
 #include "yocto/chemical/equilibria.hpp"
 #include "yocto/chemical/boot.hpp"
-#include "yocto/chemical/solution.hpp"
 
 #include "lua.hpp"
 #include "yocto/functor.hpp"

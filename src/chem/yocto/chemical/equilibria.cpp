@@ -245,6 +245,15 @@ namespace yocto
             }
         }
         
+        void equilibria:: copy_to( array<double> &C0 ) const throw()
+        {
+            assert(C0.size()>=M);
+            for(size_t j=M;j>0;--j)
+            {
+                C0[j] = C[j];
+            }
+        }
+
         
     }
     
