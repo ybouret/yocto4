@@ -7,6 +7,7 @@ namespace yocto
     {
         
         library:: library() throw() :
+        nref(0),
         db(),
         max_name_length(0)
         {
@@ -68,7 +69,7 @@ namespace yocto
         
         species & library:: add(const string &name, const int z)
         {
-            if( refcount() > 0 )
+            if( nref > 0 )
                 throw exception("library is locked while adding '%s',z=%d", name.c_str(), z);
             
             species::pointer p( new species(name,z) );
@@ -103,7 +104,7 @@ namespace yocto
         
         void library:: remove(const string &name)
         {
-            if( refcount() > 0 )
+            if( nref > 0 )
                 throw exception("library is locked while removind '%s'", name.c_str());
             
             if( db.remove(name) )
@@ -162,6 +163,10 @@ namespace yocto
             const string NAME(name);
             return index_of(NAME);
         }
+        
+        void library:: increase() const throw() { ++( (size_t &)nref ); }
+        void library:: decrease() const throw() { assert(nref>0); --( (size_t&)nref ); }
+        
         
     }
 
