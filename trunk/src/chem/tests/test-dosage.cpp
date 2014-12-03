@@ -4,7 +4,6 @@
 #include "yocto/lua/lua-config.hpp"
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/chemical/solution.hpp"
 
 #include "yocto/fs/vfs.hpp"
 #include "yocto/ios/ocstream.hpp"
@@ -34,7 +33,7 @@ YOCTO_UNIT_TEST_IMPL(dosage)
     
     eqs.compile_for(lib);
     
-    solution S0(lib);
+    vector_t S0(lib.size(),0);
     const double V0 = Lua::Config::Get<lua_Number>(L, "V0");
     {
         boot loader;
@@ -45,13 +44,12 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         std::cerr << loader << std::endl;
         
         eqs.load(loader,0.0);
-        S0.load(eqs.C);
+        eqs.copy_to(S0);
         std::cerr << "S0=" << S0 << std::endl;
-        std::cerr << "pH=" << S0.pH() << std::endl;
+        std::cerr << "pH=" << lib.pH(S0) << std::endl;
     }
     
-    solution S1(lib);
-
+    vector_t S1(lib.size(),0);
     {
         boot loader;
         
@@ -61,14 +59,14 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         std::cerr << loader << std::endl;
         
         eqs.load(loader,0.0);
-        S1.load(eqs.C);
+        eqs.copy_to(S1);
         std::cerr << "S1=" << S1 << std::endl;
-        std::cerr << "pH=" << S1.pH() << std::endl;
+        std::cerr << "pH=" << lib.pH(S1) << std::endl;
     }
     
     const double V1 = Lua::Config::Get<lua_Number>(L, "V1");
     
-    solution S(lib);
+    vector_t S(lib.size(),0);
     eqs.computeK(0);
     std::cerr << "K=" << eqs.K << std::endl;
     const size_t STEPS=1000;
@@ -97,7 +95,7 @@ YOCTO_UNIT_TEST_IMPL(dosage)
             throw exception("Cannot normalize solution!");
         }
         ios::ocstream fp(output,true);
-        fp("%g %g\n", Vadd, S.pH());
+        fp("%g %g\n", Vadd, lib.pH(S));
         std::cerr << "."; std::cerr.flush();
     }
     

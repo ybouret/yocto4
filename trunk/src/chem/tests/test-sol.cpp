@@ -4,7 +4,6 @@
 #include "yocto/lua/lua-config.hpp"
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/chemical/solution.hpp"
 
 using namespace yocto;
 using namespace chemical;
@@ -38,7 +37,7 @@ YOCTO_UNIT_TEST_IMPL(sol)
     eqs.compile_for(lib);
     std::cerr << "Nu=" << eqs.Nu << std::endl;
     
-    solution S(lib);
+    vector_t S(lib.size(),0);
     
     {
         boot loader;
@@ -49,10 +48,10 @@ YOCTO_UNIT_TEST_IMPL(sol)
         std::cerr << loader << std::endl;
         
         eqs.load(loader,0.0);
-        S.load(eqs.C);
+        eqs.copy_to(S);
         std::cerr << "S=" << S << std::endl;
-        if(S.has("H+"))
-            std::cerr << "pH=" << S.pH() << std::endl;
+        if(lib.has("H+"))
+            std::cerr << "pH=" << lib.pH(S) << std::endl;
     }
     
     vector_t  C(eqs.M,0);

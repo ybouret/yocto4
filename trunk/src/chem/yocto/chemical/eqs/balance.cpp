@@ -62,21 +62,6 @@ namespace yocto
             //__________________________________________________________________
             tao::set(C,C0);
             
-#if 0
-            if( rebalance_with(Nu,active) )
-            {
-                for(size_t j=M;j>0;--j)
-                {
-                    C0[j] = C[j];
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-            
-#else
             double E     = 0;
             size_t count = 0;
             
@@ -231,15 +216,8 @@ namespace yocto
                 //std::cerr << "C" << count << "=" << C << std::endl;
             }
             
-
-            for(size_t j=M;j>0;--j)
-            {
-                C0[j] = C[j];
-            }
-            
-            
+            copy_to(C0);
             return true;
-#endif
         }
         
         

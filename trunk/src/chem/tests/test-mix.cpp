@@ -4,7 +4,6 @@
 #include "yocto/lua/lua-config.hpp"
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/chemical/solution.hpp"
 #include "yocto/sort/quick.hpp"
 #include "yocto/ios/ocstream.hpp"
 
@@ -35,7 +34,7 @@ YOCTO_UNIT_TEST_IMPL(mix)
     eqs.compile_for(lib);
     std::cerr << "Nu=" << eqs.Nu << std::endl;
     
-    vector<solution> solutions(2,as_capacity);
+    vector<vector_t> solutions(2,as_capacity);
     
     {
         boot loader;
@@ -46,10 +45,10 @@ YOCTO_UNIT_TEST_IMPL(mix)
         std::cerr << loader << std::endl;
         
         eqs.load(loader,0.0);
-        solution S(lib);
-        S.load(eqs.C);
+        vector_t S(lib.size(),0);
+        eqs.copy_to(S);
         std::cerr << "S1=" << S << std::endl;
-        std::cerr << "pH1=" << S.pH() << std::endl;
+        std::cerr << "pH1=" << lib.pH(S) << std::endl;
         solutions.push_back(S);
     }
     
@@ -62,10 +61,10 @@ YOCTO_UNIT_TEST_IMPL(mix)
         std::cerr << loader << std::endl;
         
         eqs.load(loader,0.0);
-        solution S(lib);
-        S.load(eqs.C);
+        vector_t S(lib.size(),0);
+        eqs.copy_to(S);
         std::cerr << "S2="  << S      << std::endl;
-        std::cerr << "pH2=" << S.pH() << std::endl;
+        std::cerr << "pH2=" << lib.pH(S) << std::endl;
         solutions.push_back(S);
     }
     
@@ -81,7 +80,7 @@ YOCTO_UNIT_TEST_IMPL(mix)
     
     
     vector<double> weights(2,0);
-    solution       Sol(lib);
+    vector_t       Sol(lib.size(),0);
     ios::ocstream  fp("mix.dat",false);
     
     for(size_t i=1;i<=alpha.size();++i)
@@ -89,7 +88,7 @@ YOCTO_UNIT_TEST_IMPL(mix)
         weights[1] = alpha[i];
         weights[2] = 1.0 - alpha[i];
         eqs.mix(Sol, solutions, weights, 0);
-        fp("%g %g\n", alpha[i], Sol.pH());
+        fp("%g %g\n", alpha[i], lib.pH(Sol));
         std::cerr << ".";
         std::cerr.flush();
     }
