@@ -69,7 +69,7 @@ namespace yocto
         
         constraint:: constraint(const double l) throw() :
         level(l),
-	members()
+        members()
         {
         }
     }
