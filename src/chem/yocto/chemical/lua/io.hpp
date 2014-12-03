@@ -73,6 +73,12 @@ namespace yocto
             //! push a table of parameters from the variables
             static void push( lua_State *L, const array<double> &variables, const parameters &parameters);
             
+            //__________________________________________________________________
+            //
+            // effectors API
+            //__________________________________________________________________
+            static void load( lua_State *L, effectors &edb, const string &id);
+            
         };
         
     }

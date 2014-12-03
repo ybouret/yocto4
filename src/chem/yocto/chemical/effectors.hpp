@@ -22,6 +22,7 @@ namespace yocto
             
             //! compute the rate without Vmax
             virtual void rate(array<double>       &rho,
+                              const double         t,
                               const array<double> &Cin,
                               const array<double> &Cout,
                               const parameters    &params) = 0;
@@ -43,6 +44,7 @@ namespace yocto
             virtual ~effectors() throw();
             
             void rate(array<double>       &rho,
+                      const double         t,
                       const array<double> &Cin,
                       const array<double> &Cout,
                       const parameters    &params);

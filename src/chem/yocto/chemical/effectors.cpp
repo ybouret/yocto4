@@ -49,6 +49,7 @@ namespace yocto
         }
         
         void effectors::rate(array<double>       &rho,
+                             const double         t,
                              const array<double> &Cin,
                              const array<double> &Cout,
                              const parameters    &params)
@@ -64,7 +65,7 @@ namespace yocto
             for( iterator i = begin(); i != end(); ++i )
             {
                 effector &eff = **i;
-                eff.rate(_rho,Cin,Cout,params);
+                eff.rate(_rho,t,Cin,Cout,params);
                 for(size_t j=M;j>0;--j)
                 {
                     rho[j] += eff.Vmax * _rho[j];

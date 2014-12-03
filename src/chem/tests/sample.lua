@@ -37,3 +37,20 @@ ini2 =
     { 0.0,    {1, "AH2"}, {1,"A--"} },
     { 0.0,    {1, "NH3"}, {1,"NH4+"} }
 }
+
+
+function Soude(Cin,Cout,params)
+a = {};
+return a;
+end
+
+function DoNothing()
+a = {};
+return a;
+end
+
+eff =
+{
+    "Soude",
+    "DoNothing"
+};
