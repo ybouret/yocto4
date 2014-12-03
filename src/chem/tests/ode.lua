@@ -38,7 +38,18 @@ out =
     { 100e-3,    {1,"Cl-"} }
 };
 
+
+
 eff =
 {
-
+    "NaOH"
 };
+
+
+function NaOH(t,Cin,Cout,params)
+local a = {}
+local rho = 1e-5;
+a["Na+"] = rho;
+a["HO-"] = rho;
+return a;
+end

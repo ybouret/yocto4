@@ -74,6 +74,10 @@ namespace {
         {
             // get chemical rated
             edb.rate(dYdt, t, Y, Cout, params);
+            std::cerr << "rate0=" << dYdt << std::endl;
+            eqs.absorb(t,dYdt,Y);
+            std::cerr << "rate1=" << dYdt << std::endl;
+
         }
         
         void reset( double zeta )
@@ -82,10 +86,6 @@ namespace {
             diff_h = 1e-6;
         }
         
-        void step(double t_ini, double t_end )
-        {
-            odeint(diffeq,C,t_ini,t_end,diff_h,NULL);
-        }
         
         void init_file(const string &filename) const
         {
@@ -123,8 +123,19 @@ namespace {
             while(t<tmax)
             {
                 const double t1 = t + dt;
-                odeint(diffeq,C,t,t1,diff_h,NULL);
+                odeint(diffeq,C,t,t1,diff_h,&eqs.callback);
+               
                 t = t1;
+                if(!eqs.balance(C))
+                {
+                    throw exception("cannot balance @t=%g",t);
+                }
+                
+                if(!eqs.normalize(C, t, true))
+                {
+                    throw exception("cannot normalize @t=%g", t);
+                }
+                
                 save_file(filename,t);
             }
         }
@@ -155,7 +166,7 @@ YOCTO_UNIT_TEST_IMPL(ode)
     
     ChemSys       cs(L);
     
-    cs.process("ode-raw.dat", 1, 1e-2);
+    cs.process("ode-raw.dat", 1, 1e-3);
     
     
     
