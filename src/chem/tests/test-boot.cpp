@@ -47,8 +47,7 @@ YOCTO_UNIT_TEST_IMPL(boot)
         
         std::cerr << loader << std::endl;
         
-        eqs.load(loader,0.0);
-        eqs.copy_to(S);
+        eqs.create(S,loader,0.0);
         
         std::cerr << "S=" << S << std::endl;
         if(lib.has("H+"))

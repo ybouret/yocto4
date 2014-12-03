@@ -265,9 +265,10 @@ namespace yocto
         
         
         
-        void equilibria:: load(const boot &loader, const double t)
+        void equilibria:: create(array<double> &C0, const boot &loader, const double t)
         {
             
+            assert(C0.size()>=M);
             //__________________________________________________________________
             //
             //
@@ -417,7 +418,7 @@ namespace yocto
                     Phi[i][jj] = 0;
                 }
             }
-            std::cerr << "C=" << C << std::endl;
+            std::cerr << "\tC=" << C << std::endl;
             
             //__________________________________________________________________
             //
@@ -457,7 +458,7 @@ namespace yocto
             
             if(G1>=G0)
             {
-                std::cerr << "equilibria.booting: need to backtrack" << std::endl;
+                //std::cerr << "-- equilibria.booting: need to backtrack" << std::endl;
                 // TODO: do I need to contract it before ?
                 triplet<double> XX = { 0,   1,  1};
                 triplet<double> FF = { G0, G1, G1};
@@ -483,7 +484,7 @@ namespace yocto
             
             if(converged)
             {
-                std::cerr << "#variables have converged" << std::endl;
+                //std::cerr << "#variables have converged" << std::endl;
                 goto HAS_CONVERGED;
             }
             goto LOOP;
@@ -539,15 +540,21 @@ namespace yocto
             //__________________________________________________________________
             if(!balance(C))
             {
-                std::cerr << "unable to balance..." << std::endl;
+                std::cerr << "-- unable to balance..." << std::endl;
                 goto GENERATE_C;
             }
             
             if(!normalize(C,-1, false))
             {
-                std::cerr << "unable to normalize a balance,booted solution!!!" << std::endl;
+                std::cerr << "-- unable to normalize a balance,booted solution!!!" << std::endl;
                 goto GENERATE_C;
             }
+            
+            //__________________________________________________________________
+            //
+            // then send it to the user
+            //__________________________________________________________________
+            copy_to(C0);
         }
         
         
