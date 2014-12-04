@@ -36,7 +36,7 @@ namespace yocto
             
             const size_t M; //!< compiled #species
             const size_t N; //!< compiled #equilibria
-        
+            
             vector_t     C;      //!< [M] local conc
             vector_t     dC;     //!< [M] local dC
             bvector_t    active; //!< [M] reactive species
@@ -70,7 +70,7 @@ namespace yocto
             //
             // Building API
             //__________________________________________________________________
-
+            
             equilibrium &add( equilibrium *pEq );
             void         remove(const string &name);
             
@@ -125,7 +125,13 @@ namespace yocto
                      const array<vector_t> &solutions,
                      const array<double>   &weights,
                      const double           t);
-
+            
+            void mix(array<double>        &C,
+                     const matrix_t       &solutions,
+                     const array<double>  &weights,
+                     const double          t);
+            
+            
             //__________________________________________________________________
             //
             // Kinetics API
