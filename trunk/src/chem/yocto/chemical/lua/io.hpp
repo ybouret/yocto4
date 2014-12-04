@@ -58,6 +58,7 @@ namespace yocto
             //! append to boot, wrapper
             static void load(lua_State *L, boot &loader, const char *id, const library &lib);
             
+            
             //__________________________________________________________________
             //
             // solution API
