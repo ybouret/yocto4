@@ -16,7 +16,8 @@ namespace yocto
         struct __lua
         {
             
-            static void declare_GHK_Psi(lua_State *L);
+            //! register Psi, EllipsoidSurface and EllipsoidVolume
+            static void register_functions(lua_State *L);
             
             //__________________________________________________________________
             //

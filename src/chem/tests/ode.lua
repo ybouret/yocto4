@@ -1,3 +1,19 @@
+-- little test
+
+a = 1;
+b = 2;
+c = 3;
+
+S = EllipsoidSurface(a,b,c);
+print("S=" .. S );
+
+V = EllipsoidVolume(a,b,c);
+print("V=" .. V );
+
+
+
+-- let us go
+
 ftol=1e-5;
 
 species =

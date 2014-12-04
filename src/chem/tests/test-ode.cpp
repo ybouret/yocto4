@@ -146,7 +146,7 @@ YOCTO_UNIT_TEST_IMPL(ode)
     Lua::State VM;
     lua_State *L = VM();
     
-    __lua::declare_GHK_Psi(L);
+    __lua::register_functions(L);
     
     if(argc>1)
     {
