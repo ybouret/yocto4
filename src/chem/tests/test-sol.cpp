@@ -41,8 +41,6 @@ YOCTO_UNIT_TEST_IMPL(sol)
     
     {
         boot loader;
-        
-        loader.electroneutrality(lib);
         __lua::load(L,loader, ini_name, lib);
         
         std::cerr << loader << std::endl;

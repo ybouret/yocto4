@@ -41,14 +41,9 @@ YOCTO_UNIT_TEST_IMPL(boot)
     
     {
         boot loader;
-        
-        loader.electroneutrality(lib);
         __lua::load(L,loader, ini_name, lib);
-        
         std::cerr << loader << std::endl;
-        
         eqs.create(S,loader,0.0);
-        
         std::cerr << "S=" << S << std::endl;
         if(lib.has("H+"))
             std::cerr << "pH=" << lib.pH(S) << std::endl;

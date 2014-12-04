@@ -39,7 +39,6 @@ YOCTO_UNIT_TEST_IMPL(mix)
     {
         boot loader;
         
-        loader.electroneutrality(lib);
         __lua::load(L,loader, "ini1", lib);
         
         std::cerr << loader << std::endl;
@@ -53,8 +52,6 @@ YOCTO_UNIT_TEST_IMPL(mix)
     
     {
         boot loader;
-        
-        loader.electroneutrality(lib);
         __lua::load(L,loader, "ini2", lib);
         
         std::cerr << loader << std::endl;

@@ -10,8 +10,8 @@ namespace yocto
             const char *name = id.c_str();
             lua_settop(L,0);
             lua_getglobal(L,name);
-            
         }
+        
     }
     
 }
