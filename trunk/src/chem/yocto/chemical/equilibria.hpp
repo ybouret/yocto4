@@ -163,7 +163,7 @@ namespace yocto
             //! xi = xis + ratio * u, optimize xi, update Gamma, return scaledGamma
             double   computeF(double ratio);
             
-            //! callback for a differential equation
+            //! callback for a differential equation: balance and normalized trial
             void odecb(array<double> &Y,double t);
             
         public:
