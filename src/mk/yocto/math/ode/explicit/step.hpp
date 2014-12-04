@@ -32,6 +32,8 @@ namespace yocto
                  \param y    initial values @x
                  \param dydx initial derivatives @x
                  \param cb   called BEFORE the equation on a trial point/time
+                 The callback is used to modify (i.e. project or something)
+                 the trial vectors.
                  */
                 virtual  void operator()(array<T>        &yout,
                                          array<T>        &yerr,

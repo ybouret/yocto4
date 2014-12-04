@@ -124,15 +124,6 @@ namespace {
                 odeint(diffeq,C,t,t1,diff_h,&eqs.callback);
                
                 t = t1;
-                if(!eqs.balance(C))
-                {
-                    throw exception("cannot balance @t=%g",t);
-                }
-                
-                if(!eqs.normalize(C, t, true))
-                {
-                    throw exception("cannot normalize @t=%g", t);
-                }
                 
                 save_file(filename,t);
             }
