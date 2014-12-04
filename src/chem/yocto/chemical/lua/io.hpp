@@ -87,6 +87,12 @@ namespace yocto
             
             //__________________________________________________________________
             //
+            // mix API
+            //__________________________________________________________________
+            static void load(lua_State *L, matrix_t solutions, const string &id);
+            
+            //__________________________________________________________________
+            //
             // Classes
             //__________________________________________________________________
             class Library : public library
@@ -104,6 +110,7 @@ namespace yocto
             public:
                 explicit Equilibria(lua_State *L, const char *id, const library &lib);
                 virtual ~Equilibria() throw();
+                
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Equilibria);
