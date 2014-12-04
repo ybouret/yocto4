@@ -37,8 +37,6 @@ YOCTO_UNIT_TEST_IMPL(dosage)
     const double V0 = Lua::Config::Get<lua_Number>(L, "V0");
     {
         boot loader;
-        
-        loader.electroneutrality(lib);
         __lua::load(L,loader, "ini", lib);
         
         std::cerr << loader << std::endl;
@@ -52,7 +50,6 @@ YOCTO_UNIT_TEST_IMPL(dosage)
     {
         boot loader;
         
-        loader.electroneutrality(lib);
         __lua::load(L,loader, "dose", lib);
         
         std::cerr << loader << std::endl;

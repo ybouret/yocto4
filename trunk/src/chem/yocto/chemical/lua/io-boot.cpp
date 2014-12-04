@@ -16,6 +16,7 @@ namespace yocto
                                 const unsigned i
                                 )
         {
+            
             if(!lua_istable(L, -1))
             {
                 throw exception("%s[%u] is not a LUA_TABLE",id,i);
@@ -27,56 +28,75 @@ namespace yocto
             // read the constraint level
             //__________________________________________________________________
             lua_rawgeti(L,-1, 1);
-            if(!lua_isnumber(L,-1))
-                throw exception("%s[%u][1] is not a LUA_NUMBER",id,i);
-            const double level = lua_tonumber(L, -1);
-            lua_pop(L, 1);
-            
-            constraint::pointer p( new constraint(level) );
-            
-            //__________________________________________________________________
-            //
-            // read the members
-            //__________________________________________________________________
-            for(unsigned j=2;j<=n;++j)
+            if(lua_type(L,-1) == LUA_TSTRING)
             {
-                const unsigned k=j-1;
-                lua_rawgeti(L,-1, j);
-                if(!lua_istable(L, -1))
-                    throw exception("%s[%u]: member #%u is not a LUA_TABLE",id,i,k);
+                const string code = lua_tostring(L,-1);
+                lua_pop(L,1);
                 
-                //______________________________________________________________
-                //
-                // read one member
-                //______________________________________________________________
+                if(code == "E/N")
                 {
-                    lua_rawgeti(L, -1, 1);
-                    if(!lua_isnumber(L,-1))
-                    {
-                        throw exception("%s[%u]: member #%u first entry is not a LUA_NUMBER",id,i,k);
-                    }
-                    const int weight = int(lua_tonumber(L,-1));
-                    lua_pop(L, 1);
-                    
-                    lua_rawgeti(L, -1, 2);
-                    if(!lua_isstring(L,-1))
-                    {
-                        throw exception("%s[%u]: member #%u second entry is not a LUA_STRING",id,i,k);
-                    }
-                    const string name = lua_tostring(L, -1);
-                    lua_pop(L, 1);
-                    p->add(lib[name], weight);
+                    loader.electroneutrality(lib);
+                    return;
                 }
                 
+                throw exception("%s[%u] unknown code '%s'", id, i, code.c_str());
+            
+            }
+            else
+            {
+                if(!lua_isnumber(L,-1))
+                    throw exception("%s[%u][1] is not a LUA_NUMBER",id,i);
+                const double level = lua_tonumber(L, -1);
+                lua_pop(L, 1);
                 
-                lua_pop(L,1);
+                constraint::pointer p( new constraint(level) );
+                
+                //__________________________________________________________________
+                //
+                // read the members
+                //__________________________________________________________________
+                for(unsigned j=2;j<=n;++j)
+                {
+                    const unsigned k=j-1;
+                    lua_rawgeti(L,-1, j);
+                    if(!lua_istable(L, -1))
+                        throw exception("%s[%u]: member #%u is not a LUA_TABLE",id,i,k);
+                    
+                    //______________________________________________________________
+                    //
+                    // read one member
+                    //______________________________________________________________
+                    {
+                        lua_rawgeti(L, -1, 1);
+                        if(!lua_isnumber(L,-1))
+                        {
+                            throw exception("%s[%u]: member #%u first entry is not a LUA_NUMBER",id,i,k);
+                        }
+                        const int weight = int(lua_tonumber(L,-1));
+                        lua_pop(L, 1);
+                        
+                        lua_rawgeti(L, -1, 2);
+                        if(!lua_isstring(L,-1))
+                        {
+                            throw exception("%s[%u]: member #%u second entry is not a LUA_STRING",id,i,k);
+                        }
+                        const string name = lua_tostring(L, -1);
+                        lua_pop(L, 1);
+                        p->add(lib[name], weight);
+                    }
+                    
+                    lua_pop(L,1);
+                }
+                
+                if(p->count()<=0)
+                {
+                    throw exception("%s[%u] is an empty constraint",id,i);
+                }
+                loader.push_back(p);
             }
             
-            if(p->count()<=0)
-            {
-                throw exception("%s[%u] is an empty constraint",id,i);
-            }
-            loader.push_back(p);
+           
+            
         }
         
         
@@ -90,13 +110,13 @@ namespace yocto
             {
                 throw exception("%s is not a LUA_TABLE",txt);
             }
+
             const size_t n = lua_rawlen(L, -1);
-            
             for(size_t i=1;i<=n;++i)
             {
+                std::cerr << "\tparsing constraint #" << i << std::endl;
                 lua_rawgeti(L,-1, i);
                 __parse_constraint(L,loader,txt,lib,i);
-                
                 lua_pop(L,1);
             }
         }
@@ -107,7 +127,7 @@ namespace yocto
             const string ID(id);
             load(L,loader,ID,lib);
         }
-
+        
         
     }
     
