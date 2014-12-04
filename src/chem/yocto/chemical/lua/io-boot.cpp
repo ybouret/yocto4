@@ -33,9 +33,30 @@ namespace yocto
                 const string code = lua_tostring(L,-1);
                 lua_pop(L,1);
                 
+                // electroneutrality
                 if(code == "E/N")
                 {
                     loader.electroneutrality(lib);
+                    return;
+                }
+                
+                // osmolarity
+                if(code == "osmolarity" )
+                {
+                    lua_rawgeti(L, -1, 2);
+                    if(!lua_isnumber(L, -1))
+                    {
+                        throw exception("osmolarity: expecting a number");
+                    }
+                    const double osm = lua_tonumber(L, -1);
+                    lua_pop(L,1);
+                    constraint::pointer p( new constraint(osm) );
+                    
+                    for( library::const_iterator j=lib.begin();j!=lib.end();++j)
+                    {
+                        p->add(*j, 1);
+                    }
+                    loader.push_back(p);
                     return;
                 }
                 
