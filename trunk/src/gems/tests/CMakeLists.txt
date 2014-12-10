@@ -5,9 +5,9 @@ TARGET_LINK_YOCTO( test-gems gems )
 
 ENABLE_TESTING()
 
-ADD_TEST(atom test-gems atom)
+#ADD_TEST(atom test-gems atom)
 ADD_TEST(XYZ  test-gems xyz ${CMAKE_CURRENT_SOURCE_DIR}/solid.xyz)
-ADD_TEST(lib  test-gems lib)
+#ADD_TEST(lib  test-gems lib)
 
 
 #ADD_CUSTOM_TARGET(check-kr COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-kr )
