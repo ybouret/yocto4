@@ -12,7 +12,13 @@ SET( io_srcs ${io_decl} ${io_impl} )
 INSTALL( FILES ${io_decl} DESTINATION include/yocto/gems/io )
 SOURCE_GROUP( gems/io FILES ${io_srcs} )
 
-SET( gems_srcs ${srcs} ${io_srcs} )
+FILE( GLOB forces_decl yocto/gems/forces/*.hpp)
+FILE( GLOB forces_impl yocto/gems/forces/*.cpp)
+SET( forces_srcs ${forces_decl} ${forces_impl} )
+INSTALL( FILES ${forces_decl} DESTINATION include/yocto/gems/forces )
+SOURCE_GROUP( gems/forces FILES ${forces_srcs} )
+
+SET( gems_srcs ${srcs} ${io_srcs} ${forces_srcs} )
 
 INCLUDE_DIRECTORIES( . ../main )
 
