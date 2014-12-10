@@ -1,4 +1,4 @@
-\documentclass[11pt,aps,twocolumn]{revtex4}
+\documentclass[aps,twocolumn]{revtex4}
 \usepackage{graphicx}
 \usepackage{amssymb,amsfonts,amsmath}
 \usepackage{chemarr}
@@ -80,12 +80,85 @@ Then for each time step we perform the following sequence.
 	\begin{equation}
 		\dq_{n+1} = \dq_{n+\half} + \frac{1}{2} \tau \W \vec{F}_{n+\half}.
 	\end{equation}
-	The kinetic energy if available.
+	The kinetic energy is available.
 	\item Update
 	\begin{equation}
 		\vec{F}_{n+1}=\vec{F}(\q_{n+1},\dq_{n+1})
 	\end{equation}
 \end{enumerate}
+If the force depends only on position, the last step is discarded...
+
+\section{Stationary Holonomic Constraints}
+\subsection{Definitions and Notations}
+We assume that the positions $\q_n$ must satisfy a set of $M$ constraints forming
+the $M$ dimensional vector
+\begin{equation}
+\label{eq:C}
+	\C(\q_n) = \vec{0}.
+\end{equation}
+The successive time derivatives of this constraints lead to the legal velocities
+\begin{equation}
+	\label{eq:J}
+	\J_n\dq_n  = \vec{0}
+\end{equation}
+where $\J$ is the Jacobian of $\C$ with respect to $\q$ and is a $M\times3N$ matrix.
+The accelerations must verify
+\begin{equation}
+	\label{eq:accel}
+	\dJ_n\dq_n + \J_n\ddq_n = \vec{0}
+\end{equation}
+
+\subsection{Virtual Forces}
+Since the constraints are internal to the system, they doesn't work but they produce some internal
+forces $\G_n$. So
+\begin{equation}
+\forall \dq_n, \; \G_n\cdot\dq_n = 0.
+\end{equation}
+Accordingly, $\G_n$ is a combination of the rows of $\J_n$
+\begin{equation}
+	\G_n = \tJ_n \vec{\lambda}_n.
+\end{equation}
+Let us write
+\begin{equation}
+	\ddq_n = \W \left( \vec{F}_n + \G_n \right)
+\end{equation}
+we obtain
+\begin{equation}
+	\J_n \W \tJ_n \vec{\lambda}_n = -\left\lbrack \J_n\W\vec{F}_n + \dJ_n \dq_n \right\rbrack
+\end{equation}
+and
+\begin{equation}
+	\G_n = - \tJ_n \left(\J_n \W \tJ_n \right)^{-1}\left\lbrack \J_n\W\vec{F}_n + \dJ_n \dq_n \right\rbrack.
+\end{equation}
+We have the internal forces, derived from the legal accelerations, verifying Eq. \ref{eq:accel}.
+
+\subsection{Velocity Verlet Revisited}
+
+We start from $\q_n$, $\dq_n$. We compute $\vec{F}_n=\vec{F}(\q_n,\dq_n)$, 
+$\J_n$ and $\dJ_n$.
+We assume that $\C(\q_n)=\vec{0}$ and $\J_n\dq_n=\vec{0}$.
+\begin{enumerate}
+\item Compute $\G_n$ and $\ddq_n$.
+\item Evaluate $\dq_{n+\half}^p = \dq_n + \dfrac{1}{2}\tau \ddq_n$.
+\item Evaluate $\q_{n+1}^p=\q_n + \dq_{n+\half}^p.$
+\item Legalise $\q_{n+1}$ from $\q_{n+1}^p$.
+\item Compute  $\J_{n+1}$.
+\item Legalize $\dq_{n+\half}$ from $\dq_{n+\half}^p$.
+\item Compute  $\dJ_{n+\half}$
+\item Evaluate $\vec{F}(\q_{n+1},\dq_{n+\half}) = \vec{F}_{n+\half}$
+\item Evaluate 
+	$$\G_{n+\half}=
+	-\tJ_{n+1} \left(\J_{n+1} \W \tJ_{n+1} \right)^{-1}\left\lbrack \J_{n+1}\W\vec{F}_{n+\half} + \dJ_{n+\half} \dq_{n+\half} \right\rbrack$$
+\item compute $\dq_{n+1}^p = \dq_{n+\half} + 
+\dfrac{1}{2}\tau \W \left(\vec{F}_{n+\half}+\G_{n+\half}\right)$
+\item Legalise $\dq_{n+1}$ from $\dq_{n+1}^p$.
+\item compute $\dJ_{n+1}$.
+\item compute $\vec{F}_{n+1}$
+\end{enumerate}
+
+
+
+\end{document}
 
 \section{Holonomic Constraints}
 \subsection{Definitions and Notations}
