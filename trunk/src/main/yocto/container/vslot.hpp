@@ -57,7 +57,7 @@ namespace yocto
             activate<T>();
         }
         
-        //! threa arguments constructor
+        //! three arguments constructor
         template <typename T,typename U, typename V, typename W>
         inline void build(typename type_traits<U>::parameter_type u,
                           typename type_traits<V>::parameter_type v,
