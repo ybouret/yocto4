@@ -1,5 +1,5 @@
-#ifndef YOCTO_FORCES_UNARY_INCLUDED
-#define YOCTO_FORCES_UNARY_INCLUDED 1
+#ifndef YOCTO_FORCES_BINARY_INCLUDED
+#define YOCTO_FORCES_BINARY_INCLUDED 1
 
 #include "yocto/gems/atom.hpp"
 
@@ -12,6 +12,8 @@ namespace yocto
         class binary_force : public counted_object
         {
         public:
+            typedef arc_ptr<binary_force> pointer;
+
             virtual ~binary_force() throw() {}
             
             virtual T operator()( atom<T> &p, atom<T> &q ) const = 0;
@@ -21,6 +23,15 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(binary_force);
+        };
+        
+        template <typename T>
+        class spring_force : public binary_force<T>
+        {
+        public:
+            
+        private:
+            
         };
         
     }
