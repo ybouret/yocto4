@@ -16,7 +16,7 @@ namespace yocto
 
             virtual ~binary_force() throw() {}
             
-            virtual T operator()( atom<T> &p, atom<T> &q ) const = 0;
+            virtual T update( atom<T> &p, atom<T> &q ) const = 0;
             
         protected:
             explicit binary_force() throw() {}
@@ -32,7 +32,7 @@ namespace yocto
             const T k;
             const T l;
             
-            virtual T operator()( atom<T> &p, atom<T> &q ) const
+            virtual T update( atom<T> &p, atom<T> &q ) const
             {
                 const v3d<T> dr(p,q);
                 const T      pq2   = dr.norm2();
