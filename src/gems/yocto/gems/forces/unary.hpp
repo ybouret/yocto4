@@ -16,7 +16,7 @@ namespace yocto
             
             virtual ~unary_force() throw() {}
             
-            virtual T operator()( atom<T> &p ) const = 0;
+            virtual T update( atom<T> &p ) const = 0;
             
         protected:
             explicit unary_force() throw() {}
@@ -36,7 +36,7 @@ namespace yocto
             
             virtual ~gravity_force() throw() {}
             
-            virtual T operator()( atom<T> &p ) const
+            virtual T update( atom<T> &p ) const
             {
                 const v3d<T> f = p.m * g;
                 p.f += f;
@@ -61,7 +61,7 @@ namespace yocto
             {
             }
            
-            virtual T operator()( atom<T> &p ) const
+            virtual T update( atom<T> &p ) const
             {
                 p.f -= lambda * p.v;
                 return 0;
