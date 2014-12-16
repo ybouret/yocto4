@@ -12,6 +12,7 @@ namespace yocto {
 		
 		template <class T>
 		struct v3d {
+            typedef T type;
 			T x;
 			T y;
 			T z;

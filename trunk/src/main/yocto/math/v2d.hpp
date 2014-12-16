@@ -14,6 +14,7 @@ namespace yocto {
         
 		template <class T>
 		struct v2d {
+            typedef T type;
 			T x;
 			T y;
             
