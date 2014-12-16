@@ -19,34 +19,34 @@
 \title{Cubic B-Splines}
 \maketitle
 
-Let $P_1$, $P_2$, $P_3$ and $P_4$ be control points at $u_1$, $u_2$, $u_3$ and $u_4$.
-The cubic B-spline $S(x=u-u_1)$ is defined by
+Let $P_0$, $P_1$, $P_2$ and $P_3$ be control points at $u_0$, $u_1$, $u_2$ and $u_3$.
+The cubic B-spline $S(x=u-u_0)$ is defined by
 $$
-	S(x) = P_1 + \dfrac{P_2-P_1}{u_2-u_1} x + b x^2 + c x^3.
+	S(x) = P_0 + \dfrac{P_1-P_0}{u_1-u_0} x + b x^2 + c x^3.
 $$
 so that
 $$
-	(P_4-P_1) - x_4 \dfrac{P_2-P_1}{u_2-u_1} = b x_4^2 + c x_4 ^3.
+	(P_3-P_0) - x_3 \dfrac{P_1-P_0}{u_1-u_0} = b x_3^2 + c x_3 ^3.
 $$
 Since
 $$
-	S'(x) = \dfrac{P_2-P_1}{u_2-u_1} + 2 b x + 3 c x^2
+	S'(x) = \dfrac{P_1-P_0}{u_1-u_0} + 2 b x + 3 c x^2
 $$
 the other equation is
 $$
-	\frac{P_4-P_3}{u_4-u_3} - \dfrac{P_2-P_1}{u_2-u_1} = 2 b x_4 + 3 c x_4^2
+	\frac{P_3-P_2}{u_3-u_2} - \dfrac{P_1-P_0}{u_1-u_0} = 2 b x_3 + 3 c x_3^2
 $$
 Using
 $$
-	D_1 = \dfrac{P_2-P_1}{u_2-u_1}
+	D_0 = \dfrac{P_1-P_0}{u_1-u_0}
 $$
 and
 $$
- D_4 = \frac{P_4-P_3}{u_4-u_3}
+ D_3 = \frac{P_3-P_2}{u_3-u_2}
 $$	
 we obtain
 $$
-	S(x) = P_1 + D_1 x - \left[\frac{(D_4+2D_1)x_4 + 3(P_1-P_4)}{x_4^2}\right] x^2
-	+ \left[ \frac{(D_1+D_4)x_4 + 2(P_1-P_4)}{x_4^3}\right] x^3
+	S(x) = P_0 + D_0 x - \left[\frac{(D_3+2D_0)x_3 + 3(P_0-P_3)}{x_3^2}\right] x^2
+	+ \left[ \frac{(D_0+D_3)x_3 + 2(P_0-P_3)}{x_3^3}\right] x^3
 $$
 \end{document}
