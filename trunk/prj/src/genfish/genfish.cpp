@@ -4,6 +4,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/fs/vfs.hpp"
+#include "yocto/code/utils.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -15,24 +16,26 @@ class Fish
 public:
     Function     W;
     Function     H;
-    const double lambda;
+    const size_t N;    //!< internal slices
+    const double ftol;
     
     explicit Fish(const Function &userW,
                   const Function &userH,
-                  const double    userlambda ) :
+                  const size_t    userN) :
     W(userW),
     H(userH),
-    lambda(userlambda),
+    N(max_of<size_t>(userN,1)),
+    ftol(1e-7),
     drvs(),
     drvs_h( 1e-4 ),
     intg(),
-    dWs(this,& Fish::__dws ),
-    dHs(this,& Fish::__dhs ),
-    W_length( intg(0,1,dWs,1e-7) ),
-    H_length( intg(0,1,dHs,1e-7) )
+    dPerimeter(this,& Fish:: __dPerimeter),
+    __a(0),
+    __b(0),
+    Perimeter(this, & Fish:: __perimeter ),
+    Surface(this, & Fish:: __surface),
+    TotalSurface( Surface(1.0) )
     {
-        std::cerr << "W_length=" << W_length << std::endl;
-        std::cerr << "H_length=" << H_length << std::endl;
     }
     
     virtual ~Fish() throw()
@@ -46,28 +49,41 @@ private:
     derivative<double> drvs;
     const double       drvs_h;
     integrator<double> intg;
-    Function           dWs;
-    Function           dHs;
+    Function           dPerimeter;
     
-    double __dws( double z )
-    {
-        return Hypotenuse(1,drvs(W,z,drvs_h));
-    }
+    double __a;
+    double __b;
     
-    double __dhs( double z )
+    double __dPerimeter( double theta )
     {
-        return Hypotenuse(1,drvs(H,z,drvs_h));
+        return Hypotenuse( __a * cos(theta), __b * cos(theta) );
     }
     
     double __perimeter(double z)
     {
-        return 0;
+        __a = W(z);
+        __b = H(z);
+        
+        return intg(0,numeric<double>::two_pi,dPerimeter,ftol);
+    }
+    
+    double __surface(double z)
+    {
+        if(z<=0)
+            return 0;
+        else
+        {
+            return intg(0,min_of<double>(z,1.0), Perimeter, ftol);
+        }
     }
     
     YOCTO_DISABLE_COPY_AND_ASSIGN(Fish);
+    
 public:
-    const double W_length;
-    const double H_length;
+    Function     Perimeter;
+    Function     Surface; // cumulative surface
+    const double TotalSurface;
+    
 };
 
 static inline double H0(double z)
@@ -89,7 +105,14 @@ int main(int argc, char *argv[] )
         Function WW = cfunctor(W0);
         Function HH = cfunctor(H0);
         
-        Fish F(WW,HH,0.1);
+        Fish F(WW,HH,2);
+        
+        for(double z=0;z<=1;z+=0.1)
+        {
+            std::cerr << "Perimeter(" << z << ")=" << F.Perimeter(z) << std::endl;
+            std::cerr << "Surface=" << F.Surface(z) << std::endl;
+        }
+        std::cerr << "TotalSurface=" << F.TotalSurface << std::endl;
         
         return 0;
     }
