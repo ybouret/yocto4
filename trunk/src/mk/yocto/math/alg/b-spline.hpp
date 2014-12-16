@@ -47,6 +47,39 @@ namespace yocto
                 }
             }
             
+            size_t       ii[4] = {0};
+            if(l<=1)
+            {
+                ii[0] = 1;
+                ii[1] = 2;
+                ii[2] = 3;
+                ii[3] = 4;
+            }
+            else
+            {
+                const size_t lp = l+1;
+                if(lp>=n)
+                {
+                    ii[3] = n;
+                    ii[2] = n-1;
+                    ii[1] = n-2;
+                    ii[0] = n-3;
+                }
+                else
+                {
+                    ii[0] = l-1;
+                    ii[1] = l;
+                    ii[2] = lp;
+                    ii[3] = lp+1;
+                }
+            }
+            
+            const T   u[4] = { U[ii[0]], U[ii[1]], U[ii[2]], U[ii[3]] };
+            const VTX P[4] = { V[ii[0]], V[ii[1]], V[ii[2]], V[ii[3]] };
+            
+            const T   x4 = u[3] - u[0];
+            const VTX D1 = (T(1)/(u[1]-u[0])) * (P[1]-P[0]);
+            const VTX D4 = (T(1)/(u[3]-u[2])) * (P[3]-P[2]);
             
             
             return V[l];
