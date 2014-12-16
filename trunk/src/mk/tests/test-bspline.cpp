@@ -14,7 +14,7 @@ YOCTO_UNIT_TEST_IMPL(bspline)
     
     uniform_generator<double> ran;
     
-    const size_t N = 6;
+    const size_t N = 7;
     vector< double >      U;
     vector< v2d<double> > V2;
     vector< v3d<double> > V3;

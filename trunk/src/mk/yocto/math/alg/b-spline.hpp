@@ -44,6 +44,8 @@ namespace yocto
                             l = m;
                         }
                     }
+                    assert(l+1==p);
+                    assert(x>=U[l]);
                 }
             }
             
@@ -77,12 +79,16 @@ namespace yocto
             const T   u[4] = { U[ii[0]], U[ii[1]], U[ii[2]], U[ii[3]] };
             const VTX P[4] = { V[ii[0]], V[ii[1]], V[ii[2]], V[ii[3]] };
             
-            const T   x4 = u[3] - u[0];
-            const VTX D1 = (T(1)/(u[1]-u[0])) * (P[1]-P[0]);
-            const VTX D4 = (T(1)/(u[3]-u[2])) * (P[3]-P[2]);
+            const T   x3 = u[3] - u[0];
+            const VTX D0 = (T(1)/(u[1]-u[0])) * (P[1]-P[0]);
+            const VTX D3 = (T(1)/(u[3]-u[2])) * (P[3]-P[2]);
             
+            const VTX mb  = x3 * (D3+D0+D0) + T(3) * (P[0] - P[3]);
+            const VTX c   = x3 * (D0+D3)    + T(2) * (P[0] - P[3]);
+            const T   dx  = x - u[0];
+            const T   rho = dx/x3;
             
-            return V[l];
+            return P[0] + dx * D0 - (rho*rho) * mb + (rho*rho*rho) * c;
         }
         
         
