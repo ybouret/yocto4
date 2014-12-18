@@ -67,6 +67,13 @@ namespace yocto
 		inline type       * __get() throw()       { return pointee_; }
 		inline const_type * __get() const throw() { return pointee_; }
 		
+        inline void swap_with( arc_ptr &other ) throw()
+        {
+            mutable_type *tmp = other.pointee_;
+            other.pointee_    = pointee_;
+            pointee_          = tmp;
+        }
+        
 		
 	private:
 		mutable_type *pointee_;
