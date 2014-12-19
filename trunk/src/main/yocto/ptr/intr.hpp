@@ -71,6 +71,13 @@ namespace yocto
 		
 		inline const_key & key() const throw() { return pointee_->key(); }
 		
+        inline void swap_with( intr_ptr &other ) throw()
+        {
+            mutable_type *tmp = other.pointee_;
+            other.pointee_    = pointee_;
+            pointee_          = tmp;
+        }
+        
 	private:
 		mutable_type *pointee_;
 		YOCTO_DISABLE_ASSIGN(intr_ptr);

@@ -163,8 +163,8 @@ public:
         for(size_t i=1;i<=N;++i)
         {
             std::cerr << "Computing Slice #" << i << "/" << N << std::endl;
-            S0 = (i*TotalSurface)/(N+1);
-            const double  z = solve(zSurf,last_z,1);
+            //S0 = (i*TotalSurface)/(N+1);
+            const double  z = i*delta; //solve(zSurf,last_z,1);
             const double  p = Perimeter(z);
             pSlice        pS(new Slice(z,p) );
             Slices.push_back(pS);
@@ -417,6 +417,7 @@ public:
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/lua/lua-maths.hpp"
 
+#if 0
 static inline double WW(double z)
 {
     return 0.3*sqrt(z*(1-z)*(1-z));
@@ -438,6 +439,7 @@ static inline double MM(double u)
 {
     return u;
 }
+#endif
 
 
 int main(int argc, char *argv[] )
@@ -446,7 +448,7 @@ int main(int argc, char *argv[] )
     try
     {
         
-#if 0
+#if 1
         Lua::State VM;
         if(argc<=1)
         {
@@ -461,7 +463,7 @@ int main(int argc, char *argv[] )
         Lua::Function<double> Mix(L,"Mix",true);
         const size_t N = size_t(Lua::Config::Get<lua_Number>(L, "N"));
         Fish F(Width,Up,Down,Mix,N);
-#endif
+#else
         
         Function Width( cfunctor(WW) );
         Function Up(    cfunctor(UU) );
@@ -471,6 +473,7 @@ int main(int argc, char *argv[] )
         Fish F(Width,Up,Down,Mix,50);
         
         std::cerr << "TotalSurface=" << F.TotalSurface << std::endl;
+#endif
         
         F.save_vtk("fish.vtk");
         F.save_stl("fish.stl");

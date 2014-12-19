@@ -71,7 +71,8 @@ namespace yocto
 		
 		inline type       * __get() throw()       { return pointee_; }
 		inline const_type * __get() const throw() { return pointee_; }
-		
+        
+        
 	private:
 		mutable_type *pointee_;
 		size_t       *nref_;
