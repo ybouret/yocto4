@@ -141,6 +141,7 @@ YOCTO_DISABLE_ASSIGN(CLASS)
 	
 	inline bool die( const char *) throw() { return false; }
 	
+    typedef ptrdiff_t unit_t;
 }
 
 #endif
