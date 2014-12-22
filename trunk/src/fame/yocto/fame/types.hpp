@@ -13,7 +13,6 @@ namespace yocto
         //
         // definitions
         //______________________________________________________________________
-        typedef ptrdiff_t              unit_t;
         typedef memory::global         memory_kind;
         typedef memory_kind::allocator memory_allocator;
         

@@ -8,7 +8,7 @@ namespace yocto
 {
     
     
-    //! rearrange an array or ORDERED values
+    //! rearrange an array of ORDERED values
     /**
      \return the number of unique items
      */

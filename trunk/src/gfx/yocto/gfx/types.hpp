@@ -10,7 +10,6 @@ namespace yocto
     namespace gfx
     {
         
-        typedef ptrdiff_t unit_t;
         typedef uint32_t  pixel_t;
         
         struct conv
