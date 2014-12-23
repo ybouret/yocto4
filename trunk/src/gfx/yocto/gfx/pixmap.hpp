@@ -11,6 +11,7 @@ namespace yocto
     
     namespace gfx
     {
+        
         template <typename T>
         class pixmap : public bitmap
         {
