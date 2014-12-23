@@ -66,7 +66,7 @@ namespace yocto
             }
             
             //! in memory pixmap
-            pixmap(unit_t w, unit_t h) :
+            inline pixmap(unit_t w, unit_t h) :
             bitmap(sizeof(T),w,h),
             nrow(0),
             rows(0)
@@ -75,7 +75,7 @@ namespace yocto
             }
             
             //! hard copy
-            pixmap( const pixmap &px, const rectangle *rect = 0 ) :
+            inline pixmap( const pixmap &px, const rectangle *rect = 0 ) :
             bitmap( px, rect ),
             nrow(0),
             rows(0)
@@ -84,7 +84,7 @@ namespace yocto
             }
             
             //! from user
-            pixmap(unit_t w, unit_t h, void *data, unit_t data_stride ) :
+            inline pixmap(unit_t w, unit_t h, void *data, unit_t data_stride ) :
             bitmap( sizeof(T),w,h,data,data_stride),
             nrow(0),
             rows(0)
@@ -93,7 +93,7 @@ namespace yocto
             }
             
             //! from shared bitmap
-            pixmap( const bitmap::pointer &bmp, const rectangle *rect=0) :
+            inline pixmap( const bitmap::pointer &bmp, const rectangle *rect=0) :
             bitmap(bmp,rect),
             nrow(0),
             rows(0)
@@ -105,7 +105,7 @@ namespace yocto
             
             //! conversion
             template <typename U>
-            pixmap( const pixmap<U> &px, functor<T,TL1(U)> &filter ) :
+            inline pixmap( const pixmap<U> &px, functor<T,TL1(U)> &filter ) :
             bitmap(sizeof(T),px.w,px.h),
             nrow(0),
             rows(0)
