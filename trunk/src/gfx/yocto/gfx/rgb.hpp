@@ -54,6 +54,8 @@ namespace yocto
 
             inline ~rgba() throw() {}
             inline rgba( const rgba &other ) throw() : r(other.r), g(other.g), b(other.b), a(other.a) {}
+            inline rgba( const rgb<T> &other) throw() : r(other.r), g(other.g), b(other.b), a(opaque<T>::value) {}
+            
             inline rgba & operator=( const rgba &other ) throw()
             {
                 r = other.r;
@@ -62,6 +64,18 @@ namespace yocto
                 a = other.a;
                 return *this;
             }
+            
+            //! Keep the alpha channel !
+            inline rgba & operator=( const rgb<T> &other ) throw()
+            {
+                r = other.r;
+                g = other.g;
+                b = other.b;
+                return *this;
+            }
+
+            
+            
             friend inline std::ostream & operator<<( std::ostream &os, const rgba<T> &C )
             {
                 os << '[' << double(C.r) << ' ' << double(C.g) << ' ' << double(C.b) << ' ' << double(C.a) << ']';
@@ -69,6 +83,8 @@ namespace yocto
             }
         };
         
+        typedef rgba<uint8_t> rgba_t;
+
     }
 }
 
