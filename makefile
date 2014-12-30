@@ -12,7 +12,6 @@ clean:
 	@${MAKE} -s -C src/gems/docs       clean
 	@${MAKE} -s -C prj                 clean
 	@${MAKE} -s -C src/R               clean
-	@${MAKE} -s -C src/gfx/docs        clean
 
 ifdef WINDIR
 
