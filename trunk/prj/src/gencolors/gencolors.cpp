@@ -46,12 +46,14 @@ namespace {
         {
         }
         
+#if 0
         inline friend bool operator<(const color &lhs, const color &rhs ) throw()
         {
             return string::compare(lhs.name, rhs.name);
         }
+#endif
         
-        static inline bool compare(const color &lhs, const color &rhs) throw()
+        static inline int compare(const color &lhs, const color &rhs) throw()
         {
             return string::compare(lhs.name, rhs.name);
         }
@@ -85,7 +87,7 @@ int main(int argc, char *argv[])
                 tokenizer::split(words,line,is_sep);
                 if(words.size()>=4)
                 {
-                    const string name = words[1];
+                    const string  name = words[1];
                     const uint8_t r   = strconv::to_size(words[2],"r");
                     const uint8_t g   = strconv::to_size(words[3],"g");
                     const uint8_t b   = strconv::to_size(words[4],"b");
