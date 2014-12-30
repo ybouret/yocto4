@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/code/bzset.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/gfx/named-colors.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -13,17 +14,25 @@ namespace
     template <typename PIXMAP>
     static inline void fill_pixmap(PIXMAP &P ) throw()
     {
+        size_t count = 0;
         for(unit_t j=0;j<P.h;++j)
         {
             for(unit_t i=0;i<P.w;++i)
             {
                 typename PIXMAP::type &p = P[j][i];
                 bzset(p);
+                const named_color     &nc =named_color::reg[count%named_color::num];
+                const rgb_t             c(nc.r,nc.g,nc.b);
+                typename PIXMAP::type  C(c);
+                p = C;
+                ++count;
+#if 0
                 uint8_t *q = (uint8_t *) &p;
                 for(size_t k=0;k<sizeof(typename PIXMAP::type);++k)
                 {
                     q[k] = uint8_t( alea_leq(255) );
                 }
+#endif
             }
         }
 
