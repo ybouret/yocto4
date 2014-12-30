@@ -73,6 +73,8 @@ namespace yocto
             
             static void check_depths( const char *lhs_name, const int lhs, const char *rhs_name, const int rhs);
             
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(bitmap);
             union

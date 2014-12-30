@@ -17,5 +17,6 @@ namespace yocto
         template <>
         const double opaque<double>::value = 1.0;
         
+        
     }
 }
