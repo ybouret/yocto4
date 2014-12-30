@@ -349,5 +349,6 @@ namespace yocto
                 throw imported::exception("mismatch bitmap depths", "%s=%d != %s=%d", lhs_name, lhs, rhs_name, rhs);
         }
         
+              
     }
 }

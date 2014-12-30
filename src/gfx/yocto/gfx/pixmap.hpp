@@ -4,7 +4,6 @@
 #include "yocto/gfx/bitmap.hpp"
 #include "yocto/type/args.hpp"
 #include "yocto/memory/global.hpp"
-#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -12,6 +11,7 @@ namespace yocto
     namespace gfx
     {
         
+        //! a bitmap with a typed overlay
         template <typename T>
         class pixmap : public bitmap
         {
@@ -25,7 +25,8 @@ namespace yocto
                 inline  row(void *p,unit_t width) throw() :
                 w(width), addr( (mutable_type*)p ) {}
                 
-                const unit_t w;
+                const unit_t w; //!< width of this row
+                
                 inline type &operator[](unit_t x) throw()
                 {
                     assert(x>=0);
@@ -67,8 +68,8 @@ namespace yocto
             }
             
             //! in memory pixmap
-            inline pixmap(unit_t w, unit_t h) :
-            bitmap(sizeof(T),w,h),
+            inline pixmap(unit_t width, unit_t height) :
+            bitmap(sizeof(T),width,height),
             nrow(0),
             rows(0)
             {
@@ -85,8 +86,8 @@ namespace yocto
             }
             
             //! from user
-            inline pixmap(unit_t w, unit_t h, void *data, unit_t data_stride ) :
-            bitmap( sizeof(T),w,h,data,data_stride),
+            inline pixmap(unit_t width, unit_t height, void *data, unit_t data_stride ) :
+            bitmap( sizeof(T),width,height,data,data_stride),
             nrow(0),
             rows(0)
             {
@@ -105,8 +106,8 @@ namespace yocto
             
             
             //! conversion
-            template <typename U>
-            inline pixmap( const pixmap<U> &px, functor<T,TL1(U)> &filter ) :
+            template <typename U,typename FUNC>
+            inline pixmap( const pixmap<U> &px, FUNC &filter ) :
             bitmap(sizeof(T),px.w,px.h),
             nrow(0),
             rows(0)

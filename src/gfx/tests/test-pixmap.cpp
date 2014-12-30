@@ -8,18 +8,22 @@ using namespace gfx;
 
 #define SHOW(B) std::cerr << #B << "\t: " << (B).w << "x" << (B).h << "x" << (B).d << ",\tpitch=" << (B).pitch << ", stride=" << (B).stride << std::endl
 
-template <typename PIXMAP>
-static inline void clear_pixmap(PIXMAP &P)
-{
-    for(unit_t j=0;j<P.h;++j)
+namespace {
+    
+    template <typename PIXMAP>
+    static inline void clear_pixmap(PIXMAP &P)
     {
-        for(unit_t i=0;i<P.w;++i)
+        for(unit_t j=0;j<P.h;++j)
         {
-            typename PIXMAP::type &p = P[j][i];
-            bzset(p);
+            for(unit_t i=0;i<P.w;++i)
+            {
+                typename PIXMAP::type &p = P[j][i];
+                bzset(p);
+            }
         }
     }
 }
+
 
 YOCTO_UNIT_TEST_IMPL(pixmap)
 {
@@ -35,6 +39,6 @@ YOCTO_UNIT_TEST_IMPL(pixmap)
     clear_pixmap(p2);
     clear_pixmap(p3);
     clear_pixmap(p4);
-
+    
 }
 YOCTO_UNIT_TEST_DONE()
