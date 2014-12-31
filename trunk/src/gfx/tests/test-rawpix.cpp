@@ -66,8 +66,8 @@ YOCTO_UNIT_TEST_IMPL(rawpix)
     
     pixmap3 p3(200,100); SHOW(p3); fill_pixmap(p3);
     pixmap3 p4(300,150); SHOW(p4); fill_pixmap(p4);
-    pixmapf f3( p3, rgb2gs<rgb_t>  ); SHOW(f3);
-    pixmapf f4( p4, rgb2gs<rgba_t> ); SHOW(f4);
+    pixmapf f3( p3, rgb2gsf<rgb_t>  ); SHOW(f3);
+    pixmapf f4( p4, rgb2gsf<rgba_t> ); SHOW(f4);
     
     save_ppm("p3.ppm", p3 );
     save_ppm("p4.ppm", p4);

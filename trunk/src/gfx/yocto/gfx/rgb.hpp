@@ -86,7 +86,7 @@ namespace yocto
         typedef rgba<uint8_t> rgba_t;
 
         template <typename RGB_TYPE>
-        inline float rgb2gs(const RGB_TYPE &C) throw()
+        inline float rgb2gsf(const RGB_TYPE &C) throw()
         {
             return conv::greyscale_f(C.r, C.g, C.b);
         }

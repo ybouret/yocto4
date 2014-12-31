@@ -2,7 +2,8 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/gfx/image/png.hpp"
 #include "yocto/gfx/image/jpeg.hpp"
-
+#include "yocto/fs/vfs.hpp"
+#include "yocto/gfx/rawpix-io.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -33,11 +34,29 @@ YOCTO_UNIT_TEST_IMPL(image)
     
     show_format( IMG["PNG"]  );
     show_format( IMG["JPEG"] );
-
+    
     for(int i=1;i<argc;++i)
     {
-        const string     path = argv[i];
-        bitmap::pointer  bmp( IMG.load(path,4,put_rgba_dup,NULL) );
+        const string           path = argv[i];
+        const bitmap::pointer  bmp( IMG.load(path,4,put_rgba_dup,NULL) );
+        pixmap4                pxm(bmp);
+        const string           root    = vfs::get_base_name(path);
+        {
+            const string           outname = root + ".ppm";
+            save_ppm(outname,pxm);
+        }
+        
+        pixmapf                pgs(pxm,rgb2gsf<rgba_t>);
+        {
+            const string outname = root + ".gs.ppm";
+            save_ppm(outname,pgs);
+        }
+        
+        maximum_contrast(pgs);
+        {
+            const string outname = root + ".mc.ppm";
+            save_ppm(outname,pgs);
+        }
     }
     
 }
