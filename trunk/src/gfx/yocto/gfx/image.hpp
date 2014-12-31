@@ -63,6 +63,7 @@ namespace yocto
                          image::put_rgba_proc  proc,
                          const void           *args) const;
             
+            
         private:
             explicit image();
             virtual ~image() throw();
