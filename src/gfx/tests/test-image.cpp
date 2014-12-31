@@ -4,6 +4,8 @@
 #include "yocto/gfx/image/jpeg.hpp"
 #include "yocto/fs/vfs.hpp"
 #include "yocto/gfx/rawpix-io.hpp"
+#include "yocto/gfx/rawpix-mc.hpp"
+#include "yocto/gfx/rawpix-edge.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -41,6 +43,7 @@ YOCTO_UNIT_TEST_IMPL(image)
         const bitmap::pointer  bmp( IMG.load(path,4,put_rgba_dup,NULL) );
         pixmap4                pxm(bmp);
         const string           root    = vfs::get_base_name(path);
+        std::cerr << path << ": " << pxm.w << "x" << pxm.h << std::endl;
         {
             const string           outname = root + ".ppm";
             save_ppm(outname,pxm);
@@ -57,6 +60,14 @@ YOCTO_UNIT_TEST_IMPL(image)
             const string outname = root + ".mc.ppm";
             save_ppm(outname,pgs);
         }
+        
+        pixmapf edge(pgs.w,pgs.h);
+        compute_edge(edge,pgs);
+        {
+            const string outname = root + ".edge.ppm";
+            save_ppm(outname,edge);
+        }
+        
     }
     
 }
