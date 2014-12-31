@@ -1,5 +1,5 @@
-#ifndef YOCTO_GFX_IMAGE_PNG_INCLUDED
-#define YOCTO_GFX_IMAGE_PNG_INCLUDED 1
+#ifndef YOCTO_GFX_IMAGE_JPEG_INCLUDED
+#define YOCTO_GFX_IMAGE_JPEG_INCLUDED 1
 
 #include "yocto/gfx/image.hpp"
 
@@ -7,11 +7,11 @@ namespace yocto
 {
     namespace gfx
     {
-        class png_format : public image::format
+        class jpeg_format : public image::format
         {
         public:
-            explicit png_format();
-            virtual ~png_format() throw();
+            explicit jpeg_format();
+            virtual ~jpeg_format() throw();
             
             virtual bool     lossless() const throw();
             virtual bitmap  *load(const string          &filename,
@@ -27,7 +27,7 @@ namespace yocto
             
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(png_format);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(jpeg_format);
             virtual const char **extensions() const throw();
         };
     }
