@@ -19,9 +19,9 @@ namespace yocto
             fp("%u %u\n", w,h );
             fp << "255\n";
             const ptrdiff_t d = bmp.d;
-            for(unsigned y=0;y<h;++y)
+            for(unsigned y=1;y<=h;++y)
             {
-                const uint8_t *addr = (const uint8_t *)(bmp.get_line(y));
+                const uint8_t *addr = (const uint8_t *)(bmp.get_line(h-y));
                 for(unsigned x=0;x<w;++x,addr+=d)
                 {
                     const rgb_t C = proc(addr);
