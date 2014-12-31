@@ -7,6 +7,7 @@ ENABLE_TESTING()
 
 ADD_TEST(Bitmap test-gfx bitmap)
 ADD_TEST(Pixmap test-gfx pixmap)
+ADD_TEST(Rawpix test-gfx rawpix)
 
 
 
