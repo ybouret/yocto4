@@ -27,6 +27,13 @@ static inline void put_rgba_dup(void *addr, const rgba_t &C, const void *)
     *(rgba_t *)addr = C;
 }
 
+static inline rgba_t get_rgba_dup(const void *addr, const void *)
+{
+    const float   f = *(const float *)addr;
+    const uint8_t u = conv::to_byte(f);
+    return rgba_t(u,u,u);
+}
+
 YOCTO_UNIT_TEST_IMPL(image)
 {
     image &IMG = image::instance();
@@ -63,9 +70,15 @@ YOCTO_UNIT_TEST_IMPL(image)
         
         pixmapf edge(pgs.w,pgs.h);
         compute_edge(edge,pgs);
+        if(false)
         {
             const string outname = root + ".edge.ppm";
             save_ppm(outname,edge);
+        }
+        
+        {
+            const string outname = root + ".edge.png";
+            IMG["PNG"].save(outname, edge, get_rgba_dup, NULL,NULL);
         }
         
     }
