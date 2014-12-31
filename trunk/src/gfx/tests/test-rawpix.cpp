@@ -1,4 +1,4 @@
-#include "yocto/gfx/rawpix.hpp"
+#include "yocto/gfx/rawpix-io.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/bzset.hpp"
 #include "yocto/code/rand.hpp"
@@ -75,6 +75,11 @@ YOCTO_UNIT_TEST_IMPL(rawpix)
     save_ppm("f3.ppm", f3);
     save_ppm("f4.ppm", f4);
     
+    maximum_contrast(f3);
+    maximum_contrast(f4);
     
+    save_ppm("m3.ppm", f3);
+    save_ppm("m4.ppm", f4);
+
 }
 YOCTO_UNIT_TEST_DONE()
