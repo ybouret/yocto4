@@ -15,13 +15,21 @@ namespace
     static inline void fill_pixmap(PIXMAP &P ) throw()
     {
         size_t count = 0;
+        size_t a     = alea_lt(named_color::num);
+        size_t b     = alea_lt(named_color::num);
+        if(b<a)
+        {
+            cswap(a,b);
+        }
+        assert(b>=a);
+        const size_t n = b+1-a;
         for(unit_t j=0;j<P.h;++j)
         {
             for(unit_t i=0;i<P.w;++i)
             {
                 typename PIXMAP::type &p = P[j][i];
                 bzset(p);
-                const named_color     &nc =named_color::reg[count%named_color::num];
+                const named_color     &nc =named_color::reg[a+(count%n)];
                 const rgb_t             c(nc.r,nc.g,nc.b);
                 typename PIXMAP::type  C(c);
                 p = C;
@@ -35,7 +43,7 @@ namespace
 #endif
             }
         }
-
+        
     }
     
     template <typename PIXMAP>
@@ -61,12 +69,12 @@ YOCTO_UNIT_TEST_IMPL(rawpix)
     pixmapf f3( p3, rgb2gs<rgb_t>  ); SHOW(f3);
     pixmapf f4( p4, rgb2gs<rgba_t> ); SHOW(f4);
     
-    save_ppm("p3.ppm", p3, addr2rgb3 );
-    save_ppm("p4.ppm", p4, addr2rgb4 );
-
-    save_ppm("f3.ppm", f3, addr2rgbf );
-    save_ppm("f4.ppm", f4, addr2rgbf );
-
+    save_ppm("p3.ppm", p3 );
+    save_ppm("p4.ppm", p4);
+    
+    save_ppm("f3.ppm", f3);
+    save_ppm("f4.ppm", f4);
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
