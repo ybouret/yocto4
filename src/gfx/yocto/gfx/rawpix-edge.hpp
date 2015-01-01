@@ -11,8 +11,8 @@ namespace yocto
     namespace gfx
     {
         
-        template <typename T>
-        inline void compute_edge( pixmap<T> &tgt, const pixmap<T> &src ) throw()
+        template <typename T, typename U>
+        inline void compute_edge( pixmap<T> &tgt, const pixmap<U> &src ) throw()
         {
             assert(tgt.w==src.w);
             assert(tgt.h==src.h);
@@ -41,14 +41,14 @@ namespace yocto
             for(unit_t j=1,jm=0,jp=2;j<h1;++j,++jm,++jp)
             {
                 typename       pixmap<T>::row &tgt_j  = tgt[j];
-                const typename pixmap<T>::row &src_j  = src[j];
-                const typename pixmap<T>::row &src_jp = src[jp];
-                const typename pixmap<T>::row &src_jm = src[jm];
+                const typename pixmap<U>::row &src_j  = src[j];
+                const typename pixmap<U>::row &src_jp = src[jp];
+                const typename pixmap<U>::row &src_jm = src[jm];
                 
                 for(unit_t i=1,im=0,ip=2;i<w1;++i,++im,++ip)
                 {
-                    const T gx = src_j[ip] - src_j[im];
-                    const T gy = src_jp[i] - src_jm[i];
+                    const T gx = T(src_j[ip]) - T(src_j[im]);
+                    const T gy = T(src_jp[i]) - T(src_jm[i]);
                     const T g  = math::Hypotenuse(gx,gy);
                     tgt_j[i]   = g;
                     if(g>gmax)

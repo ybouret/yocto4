@@ -10,6 +10,12 @@ namespace yocto
         
         
         
+        template <typename T>
+        inline void build_hist()
+        {
+            
+        }
+        
     }
 }
 
