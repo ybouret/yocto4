@@ -90,6 +90,29 @@ namespace yocto
         {
             return conv::greyscale_f(C.r, C.g, C.b);
         }
+        
+        template <typename T>
+        T invert_color(const T &) throw();
+        
+        template <>
+        inline float invert_color<float>(const float &f) throw() { return 1.0f - f; }
+        
+        template <>
+        inline double invert_color<double>(const double &f) throw() { return 1.0 - f; }
+        
+        template <>
+        inline rgb_t invert_color<rgb_t>(const rgb_t &c ) throw()
+        {
+            return rgb_t(0xff-c.r,0xff-c.g,0xff-c.b);
+        }
+        
+        template <>
+        inline rgba_t invert_color<rgba_t>(const rgba_t &c ) throw()
+        {
+            return rgba_t(0xff-c.r,0xff-c.g,0xff-c.b,c.a);
+        }
+        
+        
     }
 }
 
