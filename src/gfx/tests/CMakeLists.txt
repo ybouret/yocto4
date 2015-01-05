@@ -1,7 +1,7 @@
 
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(test-gfx main.cpp ${test_srcs})
-TARGET_LINK_YOCTO(test-gfx gfx z png jpeg)
+TARGET_LINK_YOCTO(test-gfx gfx png z jpeg)
 
 ENABLE_TESTING()
 
