@@ -82,5 +82,12 @@ YOCTO_UNIT_TEST_IMPL(rawpix)
     save_ppm("m3.ppm", f3);
     save_ppm("m4.ppm", f4);
 
+    pixmapf f3b(p3, rgb2gsf<rgb_t> ); SHOW(f3b);
+    pixmapd d3(f3b.w,f3b.h);          SHOW(d3);
+    
+    maximum_contrast(d3,f3b);
+    save_ppm("d3.ppm",d3);
+    
+               
 }
 YOCTO_UNIT_TEST_DONE()
