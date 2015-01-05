@@ -68,8 +68,15 @@ namespace yocto
             bool  owns(const rectangle &rect) const throw();
             void *get_line(unit_t y) const throw();      //!< \warning no check
             void *get(unit_t x, unit_t y) const throw(); //!< \warning no check
+            
+            //__________________________________________________________________
+            //
+            // basic ops
+            //__________________________________________________________________
             void  flip_horz() throw();
             void  flip_vert() throw();
+            void  clear() throw();
+            void  clear_borders() throw();
             
             static void check_depths( const char *lhs_name, const int lhs, const char *rhs_name, const int rhs);
             

@@ -53,23 +53,28 @@ YOCTO_UNIT_TEST_IMPL(image)
         pixmap4                pxm(bmp);
         const string           root    = vfs::get_base_name(path);
         std::cerr << path << ": " << pxm.w << "x" << pxm.h << std::endl;
+        
+        std::cerr << "-- saving as ppm" << std::endl;
         {
             const string           outname = root + ".ppm";
             save_ppm(outname,pxm);
         }
         
+        std::cerr << "-- building gray scale" << std::endl;
         pixmapf                pgs(pxm,rgb2gsf<rgba_t>);
         {
             const string outname = root + ".gs.ppm";
             save_ppm(outname,pgs);
         }
         
+        std::cerr << "-- maximum constrast v1" << std::endl;
         maximum_contrast(pgs);
         {
             const string outname = root + ".mc.ppm";
             save_ppm(outname,pgs);
         }
         
+        std::cerr << "-- computing edges" << std::endl;
         pixmapf edge(pgs.w,pgs.h);
         compute_edge(edge,pgs);
         
@@ -78,6 +83,7 @@ YOCTO_UNIT_TEST_IMPL(image)
             IMG["PNG"].save(outname, edge, get_rgba_dup, NULL,NULL);
         }
         
+        std::cerr << "-- building histogram" << std::endl;
         histogram H;
         compute_histogram(H,pgs);
         {

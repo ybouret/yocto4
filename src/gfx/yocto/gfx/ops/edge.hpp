@@ -13,31 +13,27 @@ namespace yocto
         
         template <typename T, typename U>
         inline void compute_edge(pixmap<T>       &tgt,
-                                 const pixmap<U> &src ) throw()
+                                 const pixmap<U> &src,
+                                 pixmap<T>       *angle = NULL) throw()
         {
             assert(tgt.w==src.w);
             assert(tgt.h==src.h);
             const unit_t w1 = src.w-1;
             const unit_t h1 = src.h-1;
             
+            //__________________________________________________________________
+            //
             // set border to 0
+            //__________________________________________________________________
+            tgt.clear_borders();
+            if(angle)
             {
-                typename pixmap<T>::row &r_ini = tgt[ 0];
-                typename pixmap<T>::row &r_end = tgt[h1];
-                for(unit_t i=0;i<=w1;++i)
-                {
-                    bzset(r_ini[i]);
-                    bzset(r_end[i]);
-                }
+                angle->clear_borders();
             }
-            
-            for(unit_t j=0;j<=h1;++j)
-            {
-                bzset(tgt[j][0]);
-                bzset(tgt[j][w1]);
-            }
-            
+            //__________________________________________________________________
+            //
             // go inside
+            //__________________________________________________________________
             T gmax = 0;
             for(unit_t j=1,jm=0,jp=2;j<h1;++j,++jm,++jp)
             {
@@ -55,6 +51,11 @@ namespace yocto
                     if(g>gmax)
                     {
                         gmax = g;
+                    }
+                    if(angle)
+                    {
+                        const T theta  = math::Atan2(gx,gy);
+                        (*angle)[j][i] = theta;
                     }
                 }
             }
