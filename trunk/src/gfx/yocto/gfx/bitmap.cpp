@@ -238,7 +238,7 @@ namespace yocto
         w( rect ? __check_bmp_w(rect->w) : bmp.w ),
         h( rect ? __check_bmp_h(rect->h) : bmp.h ),
         pitch( w*d ),
-        stride(pitch ),
+        stride(pitch),
         entry(0),
         peek(bmp.peek),
         swap(bmp.swap),
@@ -250,7 +250,7 @@ namespace yocto
                 {
                     throw imported::exception("bitmap(bitmap,rect)", "invalid rectangle");
                 }
-              
+                
                 allocated = pitch * h;
                 entry     = memory::kind<memory::global>::acquire(allocated);
                 
@@ -338,6 +338,31 @@ namespace yocto
             }
         }
         
+        void bitmap:: clear() throw()
+        {
+            uint8_t *p = (uint8_t *)entry;
+            for(unit_t j=h;j>0;--j,p+=stride)
+            {
+                memset(p,0,pitch);
+            }
+        }
+        
+        void  bitmap:: clear_borders() throw()
+        {
+            const unit_t h1 = h-1;
+            memset(get_line( 0),0,pitch);
+            memset(get_line(h1),0,pitch);
+            const size_t bs    = d;
+            const unit_t shift = pitch - bs;
+            for(unit_t j=1;j<h1;++j)
+            {
+                uint8_t *p = (uint8_t *) get_line(j);
+                memset(p,      0,bs);
+                memset(p+shift,0,bs);
+            }
+        }
+        
+        
         void bitmap:: check_depths(const char *lhs_name,
                                    const int   lhs,
                                    const char *rhs_name,
@@ -349,6 +374,6 @@ namespace yocto
                 throw imported::exception("mismatch bitmap depths", "%s=%d != %s=%d", lhs_name, lhs, rhs_name, rhs);
         }
         
-              
+        
     }
 }
