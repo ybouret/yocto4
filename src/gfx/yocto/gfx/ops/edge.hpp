@@ -12,7 +12,8 @@ namespace yocto
     {
         
         template <typename T, typename U>
-        inline void compute_edge( pixmap<T> &tgt, const pixmap<U> &src ) throw()
+        inline void compute_edge(pixmap<T>       &tgt,
+                                 const pixmap<U> &src ) throw()
         {
             assert(tgt.w==src.w);
             assert(tgt.h==src.h);

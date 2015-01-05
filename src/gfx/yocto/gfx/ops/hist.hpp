@@ -36,7 +36,7 @@ namespace yocto
         
         
         template <typename T>
-        inline void build_hist(histogram &H, const pixmap<T> &pxm)
+        inline void compute_histogram(histogram &H, const pixmap<T> &pxm)
         {
             H.clear();
             const unit_t w = pxm.w;

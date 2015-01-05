@@ -4,9 +4,9 @@
 #include "yocto/gfx/image/jpeg.hpp"
 #include "yocto/fs/vfs.hpp"
 #include "yocto/gfx/rawpix-io.hpp"
-#include "yocto/gfx/rawpix-mc.hpp"
-#include "yocto/gfx/rawpix-edge.hpp"
-#include "yocto/gfx/rawpix-hist.hpp"
+#include "yocto/gfx/ops/contrast.hpp"
+#include "yocto/gfx/ops/edge.hpp"
+#include "yocto/gfx/ops/hist.hpp"
 #include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
@@ -79,7 +79,7 @@ YOCTO_UNIT_TEST_IMPL(image)
         }
         
         histogram H;
-        build_hist(H,pgs);
+        compute_histogram(H,pgs);
         {
             const string outname = root + ".hist.dat";
             ios::ocstream fp(outname,false);

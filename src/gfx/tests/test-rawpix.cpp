@@ -1,5 +1,5 @@
 #include "yocto/gfx/rawpix-io.hpp"
-#include "yocto/gfx/rawpix-mc.hpp"
+#include "yocto/gfx/ops/contrast.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/bzset.hpp"
 #include "yocto/code/rand.hpp"
