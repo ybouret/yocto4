@@ -85,7 +85,7 @@ YOCTO_UNIT_TEST_IMPL(image)
         
         std::cerr << "-- building histogram" << std::endl;
         histogram H;
-        compute_histogram(H,pgs);
+        H.compute_from(pgs);
         {
             const string outname = root + ".hist.dat";
             ios::ocstream fp(outname,false);
@@ -94,6 +94,15 @@ YOCTO_UNIT_TEST_IMPL(image)
                 fp("%u %g\n", i, H[i] );
             }
         }
+        const size_t t = H.threshold();
+        std::cerr << "threshold at #" << t << std::endl;
+        
+        threshold::apply(pgs,t,pgs, threshold::keep_black);
+        {
+            const string outname = root + ".cut.jpg";
+            IMG["JPEG"].save(outname, pgs, get_rgba_dup, NULL,NULL);
+        }
+        
         
         
     }
