@@ -6,6 +6,8 @@
 #include "yocto/gfx/rawpix-io.hpp"
 #include "yocto/gfx/rawpix-mc.hpp"
 #include "yocto/gfx/rawpix-edge.hpp"
+#include "yocto/gfx/rawpix-hist.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -70,16 +72,23 @@ YOCTO_UNIT_TEST_IMPL(image)
         
         pixmapf edge(pgs.w,pgs.h);
         compute_edge(edge,pgs);
-        if(false)
-        {
-            const string outname = root + ".edge.ppm";
-            save_ppm(outname,edge);
-        }
         
         {
             const string outname = root + ".edge.png";
             IMG["PNG"].save(outname, edge, get_rgba_dup, NULL,NULL);
         }
+        
+        histogram H;
+        build_hist(H,pgs);
+        {
+            const string outname = root + ".hist.dat";
+            ios::ocstream fp(outname,false);
+            for(unsigned i=0;i<256;++i)
+            {
+                fp("%u %g\n", i, H[i] );
+            }
+        }
+        
         
     }
     
