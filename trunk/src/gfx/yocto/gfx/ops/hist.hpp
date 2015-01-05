@@ -2,6 +2,7 @@
 #define YOCTO_GFX_RAWPIX_HIST_INCLUDED 1
 
 #include "yocto/gfx/rawpix.hpp"
+#include "yocto/gfx/coords.hpp"
 
 namespace yocto
 {
