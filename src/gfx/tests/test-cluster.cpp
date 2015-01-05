@@ -3,9 +3,7 @@
 #include "yocto/gfx/image/png.hpp"
 #include "yocto/gfx/image/jpeg.hpp"
 #include "yocto/fs/vfs.hpp"
-#include "yocto/gfx/rawpix-io.hpp"
 #include "yocto/gfx/ops/contrast.hpp"
-#include "yocto/gfx/ops/edge.hpp"
 #include "yocto/gfx/ops/hist.hpp"
 #include "yocto/ios/ocstream.hpp"
 
@@ -19,12 +17,12 @@ static inline void put_rgba_dup(void *addr, const rgba_t &C, const void *)
 
 static inline rgba_t get_rgba_dup(const void *addr, const void *)
 {
-#if 0
+#if 1
     const float   f = *(const float *)addr;
     const uint8_t u = conv::to_byte(f);
     return rgba_t(u,u,u);
 #endif
-    return *(const rgba_t *)addr;
+    //return *(const rgba_t *)addr;
 }
 
 YOCTO_UNIT_TEST_IMPL(cluster)
@@ -42,16 +40,19 @@ YOCTO_UNIT_TEST_IMPL(cluster)
         const string           root    = vfs::get_base_name(path);
         std::cerr << path << ": " << pxm.w << "x" << pxm.h << std::endl;
         
+        pixmapf                pgs(pxm,rgb2gsf<rgba_t>);
+        maximum_contrast(pgs);
+        
         histogram H;
-        H.compute_from(pxm);
+        H.compute_from(pgs);
         const size_t t = H.threshold();
         std::cerr << "threshold=" << t << std::endl;
-        pixmap4 bw(pxm.w,pxm.h);
-        threshold::apply(bw,t,pxm, threshold::keep_black);
+        pixmapf mask(pgs.w,pgs.h);
+        threshold::apply(mask,t,pgs, threshold::keep_black);
         
         {
             const string outname = root + ".thr.png";
-            IMG["PNG"].save(outname,bw, get_rgba_dup,NULL,NULL);
+            IMG["PNG"].save(outname,mask, get_rgba_dup,NULL,NULL);
         }
         
         

@@ -21,6 +21,7 @@ namespace yocto
             
             inline bool is_adjacent( const coord &other ) const throw()
             {
+#if 0
                 if(i==other.i)
                 {
                     return (other.j == j-1) || (other.j == j+1);
@@ -32,6 +33,8 @@ namespace yocto
                 }
                 
                 return false;
+#endif
+                return (abs(i-other.i) <= 1) && (abs(j-other.j) <= 1);
             }
             
             
@@ -62,41 +65,56 @@ namespace yocto
                 }
             };
             
+            typedef sorted_vector<coord,coord::comparator> collection;
+            
+            class cluster : public collection
+            {
+            public:
+                cluster *next;
+                cluster *prev;
+                
+                bool accept( const coord &c ) const throw()
+                {
+                    const collection &self = *this;
+                    for(size_t i=self.size();i>0;--i)
+                    {
+                        const coord &mine = self[i];
+                        if(c.is_adjacent(mine))
+                            return true;
+                    }
+                    return false;
+                }
+                
+                explicit cluster() throw() : collection(), next(0), prev(0)
+                {
+                }
+                
+                virtual ~cluster() throw()
+                {
+                }
+                
+                
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(cluster);
+            };
+
+            class clusters : public core::list_of_cpp<cluster>
+            {
+            public:
+                explicit clusters() throw() {}
+                virtual ~clusters() throw() {}
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(clusters);
+            };
+
         private:
             YOCTO_DISABLE_ASSIGN(coord);
         };
         
-        typedef sorted_vector<coord,coord::comparator> coordinates;
         
-        class cluster : public coordinates
-        {
-        public:
-            cluster *next;
-            cluster *prev;
-            
-            explicit cluster() throw() : coordinates(), next(0), prev(0)
-            {
-            }
-            
-            virtual ~cluster() throw()
-            {
-            }
-            
-            
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(cluster);
-        };
         
-        class clusters : public core::list_of_cpp<cluster>
-        {
-        public:
-            explicit clusters() throw() {}
-            virtual ~clusters() throw() {}
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(clusters);
-        };
         
     }
     
