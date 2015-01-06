@@ -6,6 +6,8 @@
 #include "yocto/core/list.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
 #include "yocto/sort/remove-if.hpp"
+#include "yocto/sort/merge.hpp"
+#include <cstdlib>
 
 namespace yocto
 {
@@ -387,7 +389,8 @@ namespace yocto
                 std::cerr << "final..." << std::endl;
                 merge_clusters();
                 
-                core::merging<cluster>::sort(*this,cluster::compare,NULL);
+		core::list_of_cpp<cluster> &self = *this;
+                core::merging<cluster>::sort(self,cluster::compare,NULL);
 
             }
             
