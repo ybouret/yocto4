@@ -120,25 +120,42 @@ namespace yocto
             {
                 const unit_t dx = X - x;
                 const unit_t dy = Y - y;
-                int ans = __inside;
                 switch(dx)
                 {
-                    case  1: ans |= __right; break;
-                    case -1: ans |= __left;  break;
-                    case  0: break;
+                    case  1:
+                        switch(dy)
+                    {
+                        case -1: return __right | __top;
+                        case  0: return __right;
+                        case  1: return __right | __bottom;
+                        default:
+                            return 0;
+                    }
                         
-                    default:
-                        return ans;
-                }
-                
-                switch(dy)
-                {
-                    case  1: ans |= __bottom; break;
-                    case -1: ans |= __top;    break;
+                    case -1:
+                        switch(dy)
+                    {
+                        case -1: return __left | __top;
+                        case  0: return __left;
+                        case  1: return __left | __bottom;
+                        default:
+                            return 0;
+                    }
+                        
+                        
+                    case  0:
+                        switch(dy)
+                    {
+                        case -1: return __top;
+                        case  1: return __bottom;
+                        default:
+                            return 0;
+                    }
+                        
                     default:
                         break;
                 }
-                return ans;
+                return 0;
             }
             
             void disable(const int pos)
@@ -154,7 +171,7 @@ namespace yocto
             
             static bool is_inside(const coord *C ) throw()
             {
-                return C->remaining <= 0;
+                return (C->remaining <= 0);
             }
             
         private:
@@ -191,7 +208,7 @@ namespace yocto
             }
             
             bool accept(const unit_t  X,
-                        const unit_t  Y)
+                        const unit_t  Y) const
             {
                 //______________________________________________________________
                 //
@@ -204,6 +221,8 @@ namespace yocto
                     if( p->adjacent_pos(X,Y) > 0)
                     {
                         //std::cerr << "coord (" << p->x << "," << p->y <<") accepts (" << X << "," << Y << ")" << std::endl;
+                        assert(abs(p->x-X)<=1);
+                        assert(abs(p->y-Y)<=1);
                         return true;
                     }
                 }
@@ -287,6 +306,12 @@ namespace yocto
                 
             }
             
+            static inline int compare(const cluster *lhs, const cluster *rhs, void *) throw()
+            {
+                return __compare(rhs->coords.size, lhs->coords.size );
+            }
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(cluster);
             
@@ -317,8 +342,10 @@ namespace yocto
                     }
                 }
                 
+                bool created = false;
                 if(!cl)
                 {
+                    created = true;
                     cl = new cluster();
                     push_back(cl);
                 }
@@ -329,7 +356,10 @@ namespace yocto
                 //______________________________________________________________
                 cl->insert(x,y,from);
                 
-                merge_clusters();
+                if(created)
+                {
+                    merge_clusters();
+                }
             }
             
             
@@ -341,6 +371,8 @@ namespace yocto
                 const unit_t h = img.h;
                 for(unit_t j=0;j<h;++j)
                 {
+                    std::cerr << j+1 << "/" << h  << "\r";
+                    std::cerr.flush();
                     const typename pixmap<T>::row &img_j = img[j];
                     for(unit_t i=0;i<w;++i)
                     {
@@ -350,6 +382,13 @@ namespace yocto
                         }
                     }
                 }
+                std::cerr << std::endl;
+                
+                std::cerr << "final..." << std::endl;
+                merge_clusters();
+                
+                core::merging<cluster>::sort(*this,cluster::compare,NULL);
+
             }
             
         private:
@@ -375,38 +414,47 @@ namespace yocto
             
             void merge_clusters()
             {
-                if(size>0)
+                while( try_merge_clusters() )
+                    ;
+            }
+            
+            bool try_merge_clusters()
+            {
+                bool ans = false;
+                if(size>1)
                 {
                     core::list_of<cluster> stk;
                     stk.push_back( pop_back() );
                     while(size>0)
                     {
-                        cluster *a    = tail;
-                        bool     done = false;
+                        cluster *source  = tail;
+                        bool     done    = false;
                         
-                        for(cluster *b=stk.head;b;b=b->next)
+                        for(cluster *target=stk.head;target;target=target->next)
                         {
-                            if(should_merge(a,b))
+                            if(should_merge(target,source))
                             {
-                                merge_cluster(b,a);
+                                merge_cluster(target,source);
                                 done = true;
+                                ans  = true;
                                 break;
                             }
                         }
                         
-                        a = pop_back();
+                        source = pop_back();
                         if(!done)
                         {
-                            stk.push_back( a );
+                            stk.push_back( source );
                         }
                         else
                         {
-                            delete a;
+                            delete source;
                         }
                     }
                     
                     swap_with(stk);
                 }
+                return ans;
             }
             
             void merge_cluster(cluster *target,
@@ -416,8 +464,30 @@ namespace yocto
                 target->coords.merge_back(source->coords); assert(0==source->coords.size);
                 
                 // merge borders
-                
-                
+                const size_t nt = target->border.size();
+                const size_t ns = source->border.size();
+                bool  contact = false;
+                for(size_t i=ns;i>0;--i)
+                {
+                    coord_ptr p = source->border[i];
+                    target->border.push_back(p);
+                    for(size_t j=nt;j>0;--j)
+                    {
+                        coord_ptr q   = target->border[j];
+                        const int pos = p->adjacent_pos(q->x, q->y);
+                        if(pos>0)
+                        {
+                            contact = true;
+                            p->disable(pos);
+                            q->disable( coord::mirror_pos(pos) );
+                        }
+                    }
+                }
+                if(!contact)
+                {
+                    throw exception("no contact during merge");
+                }
+                remove_if(target->border, coord::is_inside);
             }
             
             
