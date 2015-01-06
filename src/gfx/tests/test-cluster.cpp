@@ -47,19 +47,20 @@ YOCTO_UNIT_TEST_IMPL(cluster)
     IMG.declare( new png_format()  );
     IMG.declare( new jpeg_format() );
     
-    vector<int> flags(8,as_capacity);
-    SHOW_FLAG(coord::__top);
-    SHOW_FLAG(coord::__bottom);
-    SHOW_FLAG(coord::__left);
-    SHOW_FLAG(coord::__right);
-    SHOW_FLAG(coord::__top|coord::__left);
-    SHOW_FLAG(coord::__top|coord::__right);
-    SHOW_FLAG(coord::__bottom|coord::__left);
-    SHOW_FLAG(coord::__bottom|coord::__right);
-    
-    quicksort(flags);
-    std::cerr << "flags=" << flags << std::endl;
-    
+    {
+        vector<int> flags(8,as_capacity);
+        SHOW_FLAG(coord::__top);
+        SHOW_FLAG(coord::__bottom);
+        SHOW_FLAG(coord::__left);
+        SHOW_FLAG(coord::__right);
+        SHOW_FLAG(coord::__top|coord::__left);
+        SHOW_FLAG(coord::__top|coord::__right);
+        SHOW_FLAG(coord::__bottom|coord::__left);
+        SHOW_FLAG(coord::__bottom|coord::__right);
+        
+        quicksort(flags);
+        std::cerr << "flags=" << flags << std::endl;
+    }
     
     for(int i=1;i<argc;++i)
     {
@@ -92,7 +93,7 @@ YOCTO_UNIT_TEST_IMPL(cluster)
         std::cerr << "#cluster=" << cls.size << std::endl;
         pixmap3 Q(mask.w,mask.h);
         
-
+        
         for(const cluster *cl=cls.head;cl;cl=cl->next)
         {
             std::cerr << "\t size=" << cl->coords.size << " / #border=" << cl->border.size() << std::endl;
@@ -115,49 +116,6 @@ YOCTO_UNIT_TEST_IMPL(cluster)
             IMG["PNG"].save(outname,Q, get_rgba_from_rgb,NULL,NULL);
         }
         
-#if 0
-        for(unit_t j=0;j<mask.h;++j)
-        {
-            for(unit_t i=0;i<mask.w;++i)
-            {
-                if(mask[j][i]>0.0f)
-                {
-                    mask[j][i] = 1.0f;
-                }
-            }
-        }
-        
-        {
-            const string outname = root + ".sat.png";
-            IMG["PNG"].save(outname,mask, get_rgba_dup,NULL,NULL);
-        }
-        
-        coord::clusters cl;
-        cl.build_from(mask);
-        
-        std::cerr << "#cluster=" << cl.size << std::endl;
-        pixmap3 Q(mask.w,mask.h);
-        for(const coord::cluster *cc=cl.head;cc;cc=cc->next)
-        {
-            const coord::cluster &m = *cc;
-            std::cerr << "\t " << m.size() << std::endl;
-            
-            const named_color &nc = named_color::reg[ alea_lt(named_color::num) ];
-            const rgb_t        C(nc.r,nc.g,nc.b);
-            for(size_t k=m.size();k>0;--k)
-            {
-                const coord c = m[k];
-                Q[c.y][c.x] = C;
-            }
-            
-        }
-        
-        
-        {
-            const string outname = root + ".main.png";
-            IMG["PNG"].save(outname,Q, get_rgba_from_rgb,NULL,NULL);
-        }
-#endif
         
         
         

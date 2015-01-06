@@ -203,7 +203,7 @@ namespace yocto
                     assert(p);
                     if( p->adjacent_pos(X,Y) > 0)
                     {
-                        std::cerr << "coord (" << p->x << "," << p->y <<") accepts (" << X << "," << Y << ")" << std::endl;
+                        //std::cerr << "coord (" << p->x << "," << p->y <<") accepts (" << X << "," << Y << ")" << std::endl;
                         return true;
                     }
                 }
@@ -219,7 +219,11 @@ namespace yocto
                 assert(Y>=0);
                 assert(X<from.w);
                 assert(Y<from.h);
+                
+                //______________________________________________________________
+                //
                 // create and save coord
+                //______________________________________________________________
                 coord *C = new coord(X,Y);
                 coords.push_back(C);
                 
@@ -291,6 +295,8 @@ namespace yocto
         class clusters : public core::list_of_cpp<cluster>
         {
         public:
+            typedef cluster::coord_ptr coord_ptr;
+            
             explicit clusters() throw() {}
             virtual ~clusters() throw() {}
             
@@ -317,8 +323,13 @@ namespace yocto
                     push_back(cl);
                 }
                 
+                //______________________________________________________________
+                //
+                // insert point
+                //______________________________________________________________
                 cl->insert(x,y,from);
                 
+                merge_clusters();
             }
             
             
@@ -343,6 +354,74 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(clusters);
+            static inline bool should_merge( const cluster *a, const cluster *b ) throw()
+            {
+                const array<coord_ptr> &A = a->border;
+                const array<coord_ptr> &B = b->border;
+                for(size_t i=A.size();i>0;--i)
+                {
+                    const coord_ptr p = A[i];
+                    for(size_t j=B.size();j>0;--j)
+                    {
+                        const coord_ptr q = B[j];
+                        if(p->adjacent_pos(q->x,q->y)>0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            
+            void merge_clusters()
+            {
+                if(size>0)
+                {
+                    core::list_of<cluster> stk;
+                    stk.push_back( pop_back() );
+                    while(size>0)
+                    {
+                        cluster *a    = tail;
+                        bool     done = false;
+                        
+                        for(cluster *b=stk.head;b;b=b->next)
+                        {
+                            if(should_merge(a,b))
+                            {
+                                merge_cluster(b,a);
+                                done = true;
+                                break;
+                            }
+                        }
+                        
+                        a = pop_back();
+                        if(!done)
+                        {
+                            stk.push_back( a );
+                        }
+                        else
+                        {
+                            delete a;
+                        }
+                    }
+                    
+                    swap_with(stk);
+                }
+            }
+            
+            void merge_cluster(cluster *target,
+                               cluster *source )
+            {
+                // steal all coordinates
+                target->coords.merge_back(source->coords); assert(0==source->coords.size);
+                
+                // merge borders
+                
+                
+            }
+            
+            
+            
         };
         
         
