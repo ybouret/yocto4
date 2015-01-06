@@ -356,7 +356,7 @@ namespace yocto
                 //______________________________________________________________
                 cl->insert(x,y,from);
                 
-                if(created)
+                if(created && size>=16)
                 {
                     merge_clusters();
                 }
