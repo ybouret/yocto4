@@ -5,7 +5,10 @@
 #include "yocto/fs/vfs.hpp"
 #include "yocto/gfx/ops/contrast.hpp"
 #include "yocto/gfx/ops/hist.hpp"
+#include "yocto/gfx/coords.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/gfx/named-colors.hpp"
+#include "yocto/code/rand.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -25,13 +28,19 @@ static inline rgba_t get_rgba_dup(const void *addr, const void *)
     //return *(const rgba_t *)addr;
 }
 
+static inline rgba_t get_rgba_from_rgb(const void *addr, const void *)
+{
+    const rgb_t &c = *(const rgb_t *)addr;
+    return rgba_t(c.r,c.g,c.b);
+}
+
 YOCTO_UNIT_TEST_IMPL(cluster)
 {
     image &IMG = image::instance();
     
-    IMG.declare( new png_format() );
+    IMG.declare( new png_format()  );
     IMG.declare( new jpeg_format() );
-
+    
     for(int i=1;i<argc;++i)
     {
         const string path = argv[i];
@@ -55,9 +64,34 @@ YOCTO_UNIT_TEST_IMPL(cluster)
             IMG["PNG"].save(outname,mask, get_rgba_dup,NULL,NULL);
         }
         
+        coord::clusters cl;
+        cl.build_from(mask);
+        
+        std::cerr << "#cluster=" << cl.size << std::endl;
+        pixmap3 Q(mask.w,mask.h);
+        for(const coord::cluster *cc=cl.head;cc;cc=cc->next)
+        {
+            const coord::cluster &m = *cc;
+            std::cerr << "\t " << m.size() << std::endl;
+            
+            const named_color &nc = named_color::reg[ alea_lt(named_color::num) ];
+            const rgb_t        C(nc.r,nc.g,nc.b);
+            for(size_t k=m.size();k>0;--k)
+            {
+                const coord c = m[k];
+                Q[c.j][c.i] = C;
+            }
+            
+        }
+        
+        
+        {
+            const string outname = root + ".main.png";
+            IMG["PNG"].save(outname,Q, get_rgba_from_rgb,NULL,NULL);
+        }
         
     }
-
+    
 }
 YOCTO_UNIT_TEST_DONE()
 

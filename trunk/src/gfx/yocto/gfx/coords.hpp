@@ -4,11 +4,50 @@
 #include "yocto/ordered/sorted-vector.hpp"
 #include "yocto/gfx/types.hpp"
 #include "yocto/core/list.hpp"
+#include "yocto/exception.hpp"
+#include "yocto/sort/merge.hpp"
 
 namespace yocto
 {
     namespace gfx
     {
+        
+        template <typename T>
+        bool is_zero_pixel(const T &) throw();
+        
+        template <>
+        inline bool is_zero_pixel<uint8_t>(const uint8_t &u) throw()
+        {
+            return (u <= 0);
+        }
+        
+        template <>
+        inline bool is_zero_pixel<float>(const float &u) throw()
+        {
+            return fabsf(u) <= 0.0f;
+        }
+        
+        template <>
+        inline bool is_zero_pixel<double>(const double &u) throw()
+        {
+            return fabs(u) <= 0.0;
+        }
+        
+        template <>
+        inline bool is_zero_pixel<rgb_t>(const rgb_t &c) throw()
+        {
+            return (c.r<=0) && (c.g<=0) && (c.b<=0);
+        }
+        
+        template <>
+        inline bool is_zero_pixel<rgba_t>(const rgba_t &c) throw()
+        {
+            return (c.r<=0) && (c.g<=0) && (c.b<=0);
+        }
+        
+        
+        
+        
         
         class coord
         {
@@ -21,19 +60,6 @@ namespace yocto
             
             inline bool is_adjacent( const coord &other ) const throw()
             {
-#if 0
-                if(i==other.i)
-                {
-                    return (other.j == j-1) || (other.j == j+1);
-                }
-                
-                if(j==other.j)
-                {
-                    return (other.i == i-1) || (other.i == i+1);
-                }
-                
-                return false;
-#endif
                 return (abs(i-other.i) <= 1) && (abs(j-other.j) <= 1);
             }
             
@@ -93,22 +119,72 @@ namespace yocto
                 {
                 }
                 
+                static inline int compare(const cluster *lhs, const cluster *rhs, void *) throw()
+                {
+                    return __compare(rhs->size(), lhs->size());
+                }
                 
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(cluster);
             };
-
+            
             class clusters : public core::list_of_cpp<cluster>
             {
             public:
                 explicit clusters() throw() {}
                 virtual ~clusters() throw() {}
                 
+                inline void insert( const coord &c )
+                {
+                    cluster *cl = head;
+                    for(;cl;cl=cl->next)
+                    {
+                        if(cl->accept(c))
+                        {
+                            break;
+                        }
+                    }
+                    
+                    if(!cl)
+                    {
+                        cl = new cluster();
+                        push_back(cl);
+                    }
+                    
+                    if(!cl->insert(c))
+                    {
+                        throw exception("multiple point in cluster");
+                    }
+                }
+                
+                template <typename T>
+                inline void build_from( const pixmap<T> &source )
+                {
+                    this->clear();
+                    for(unit_t j=0;j<source.h;++j)
+                    {
+                        const typename pixmap<T>::row &Sj  = source[j];
+                        for(unit_t i=0;i<source.w;++i)
+                        {
+                            if(!is_zero_pixel(Sj[i]))
+                            {
+                                const coord c(i,j);
+                                this->insert(c);
+                            }
+                        }
+                    }
+                    core::merging<cluster>::sort(*this,cluster::compare,NULL);
+                }
+                
+                
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(clusters);
             };
-
+            
+            
+            
         private:
             YOCTO_DISABLE_ASSIGN(coord);
         };
