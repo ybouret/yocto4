@@ -5,10 +5,12 @@
 #include "yocto/fs/vfs.hpp"
 #include "yocto/gfx/ops/contrast.hpp"
 #include "yocto/gfx/ops/hist.hpp"
-#include "yocto/gfx/coords.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/gfx/named-colors.hpp"
 #include "yocto/code/rand.hpp"
+
+
+#include "yocto/gfx/cluster.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -34,12 +36,30 @@ static inline rgba_t get_rgba_from_rgb(const void *addr, const void *)
     return rgba_t(c.r,c.g,c.b);
 }
 
+#include "yocto/sort/quick.hpp"
+
+#define SHOW_FLAG(FLAG) std::cerr << #FLAG << "\t=\t" << (FLAG) << std::endl; flags.push_back(FLAG)
+
 YOCTO_UNIT_TEST_IMPL(cluster)
 {
     image &IMG = image::instance();
     
     IMG.declare( new png_format()  );
     IMG.declare( new jpeg_format() );
+    
+    vector<int> flags(8,as_capacity);
+    SHOW_FLAG(coord::__top);
+    SHOW_FLAG(coord::__bottom);
+    SHOW_FLAG(coord::__left);
+    SHOW_FLAG(coord::__right);
+    SHOW_FLAG(coord::__top|coord::__left);
+    SHOW_FLAG(coord::__top|coord::__right);
+    SHOW_FLAG(coord::__bottom|coord::__left);
+    SHOW_FLAG(coord::__bottom|coord::__right);
+    
+    quicksort(flags);
+    std::cerr << "flags=" << flags << std::endl;
+    
     
     for(int i=1;i<argc;++i)
     {
@@ -59,8 +79,38 @@ YOCTO_UNIT_TEST_IMPL(cluster)
         pixmapf mask(pgs.w,pgs.h);
         threshold::apply(mask,t,pgs, threshold::keep_black);
         
+        
+        
         {
             const string outname = root + ".thr.png";
+            IMG["PNG"].save(outname,mask, get_rgba_dup,NULL,NULL);
+        }
+        
+        
+        clusters cls;
+        cls.build_from(mask);
+        std::cerr << "#cluster=" << cls.size << std::endl;
+        for(const cluster *cl=cls.head;cl;cl=cl->next)
+        {
+            
+            std::cerr << "\t size=" << cl->coords.size << " / #border=" << cl->border.size() << std::endl;
+            
+        }
+        
+#if 0
+        for(unit_t j=0;j<mask.h;++j)
+        {
+            for(unit_t i=0;i<mask.w;++i)
+            {
+                if(mask[j][i]>0.0f)
+                {
+                    mask[j][i] = 1.0f;
+                }
+            }
+        }
+        
+        {
+            const string outname = root + ".sat.png";
             IMG["PNG"].save(outname,mask, get_rgba_dup,NULL,NULL);
         }
         
@@ -79,7 +129,7 @@ YOCTO_UNIT_TEST_IMPL(cluster)
             for(size_t k=m.size();k>0;--k)
             {
                 const coord c = m[k];
-                Q[c.j][c.i] = C;
+                Q[c.y][c.x] = C;
             }
             
         }
@@ -89,6 +139,9 @@ YOCTO_UNIT_TEST_IMPL(cluster)
             const string outname = root + ".main.png";
             IMG["PNG"].save(outname,Q, get_rgba_from_rgb,NULL,NULL);
         }
+#endif
+        
+        
         
     }
     

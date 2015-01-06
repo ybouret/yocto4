@@ -112,6 +112,40 @@ namespace yocto
             return rgba_t(0xff-c.r,0xff-c.g,0xff-c.b,c.a);
         }
         
+        template <typename T>
+        bool is_zero_pixel(const T &) throw();
+        
+        template <>
+        inline bool is_zero_pixel<uint8_t>(const uint8_t &u) throw()
+        {
+            return (u <= 0);
+        }
+        
+        template <>
+        inline bool is_zero_pixel<float>(const float &u) throw()
+        {
+            return fabsf(u) <= 0.0f;
+        }
+        
+        template <>
+        inline bool is_zero_pixel<double>(const double &u) throw()
+        {
+            return fabs(u) <= 0.0;
+        }
+        
+        template <>
+        inline bool is_zero_pixel<rgb_t>(const rgb_t &c) throw()
+        {
+            return (c.r<=0) && (c.g<=0) && (c.b<=0);
+        }
+        
+        template <>
+        inline bool is_zero_pixel<rgba_t>(const rgba_t &c) throw()
+        {
+            return (c.r<=0) && (c.g<=0) && (c.b<=0);
+        }
+        
+
         
     }
 }
