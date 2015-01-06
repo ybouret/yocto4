@@ -125,12 +125,18 @@ namespace yocto
                 {
                     case  1: ans |= __right; break;
                     case -1: ans |= __left;  break;
-                    default:break;
+                    case  0: break;
+                        
+                    default:
+                        return ans;
                 }
+                
                 switch(dy)
                 {
                     case  1: ans |= __bottom; break;
                     case -1: ans |= __top;    break;
+                    default:
+                        break;
                 }
                 return ans;
             }
@@ -197,10 +203,10 @@ namespace yocto
                     assert(p);
                     if( p->adjacent_pos(X,Y) > 0)
                     {
+                        std::cerr << "coord (" << p->x << "," << p->y <<") accepts (" << X << "," << Y << ")" << std::endl;
                         return true;
                     }
                 }
-                
                 
                 return false;
             }
@@ -225,7 +231,6 @@ namespace yocto
                 const size_t nb = border.size();
                 try
                 {
-                    //std::cerr << "cluster " << coords.size << "/" << nb << std::endl;
                     //__________________________________________________________
                     //
                     // update borders
