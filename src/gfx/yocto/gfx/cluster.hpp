@@ -5,6 +5,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
+#include "yocto/sort/remove-if.hpp"
 
 namespace yocto
 {
@@ -145,6 +146,11 @@ namespace yocto
                 }
             }
             
+            static bool is_inside(const coord *C ) throw()
+            {
+                return C->remaining <= 0;
+            }
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(coord);
         };
@@ -156,7 +162,7 @@ namespace yocto
             typedef coord *coord_ptr;
             
             core::list_of_cpp<coord> coords;
-            sorted_vector<coord_ptr> border;
+            vector<coord_ptr>        border;
             cluster *next;
             cluster *prev;
             
@@ -219,23 +225,50 @@ namespace yocto
                 const size_t nb = border.size();
                 try
                 {
+                    //std::cerr << "cluster " << coords.size << "/" << nb << std::endl;
+                    //__________________________________________________________
+                    //
+                    // update borders
+                    //__________________________________________________________
                     if(nb<=0)
                     {
-                        
-                        if( (C->remaining>0) && !border.insert(C))
+                        if(coords.size>1)
                         {
-                            throw exception("unexpected multiple coord address");
+                            throw exception("unexpected coord without border");
                         }
                     }
                     else
                     {
                         bool contact = false;
                         
+                        for(size_t i=nb;i>0;--i)
+                        {
+                            coord_ptr B    = border[i]; assert(B!=0);
+                            const int Bpos = B->adjacent_pos(C->x, C->y);
+                            if(Bpos>0)
+                            {
+                                contact = true;
+                                B->disable(Bpos);
+                                C->disable( coord::mirror_pos(Bpos) );
+                            }
+                        }
+                        
+                        
                         if(!contact)
                         {
                             throw exception("couldn't find adjacent border");
                         }
                     }
+                    
+                    
+                    border.push_back(C);
+                    
+                    //__________________________________________________________
+                    //
+                    // cleanup borders
+                    //__________________________________________________________
+                    remove_if(border, coord::is_inside);
+                    
                 }
                 catch(...)
                 {
@@ -298,7 +331,6 @@ namespace yocto
                         if( !is_zero_pixel(img_j[i]) )
                         {
                             insert(i,j,img);
-                            return;
                         }
                     }
                 }
