@@ -17,6 +17,9 @@ namespace yocto
             static rgb_t get(const char   *id);
             static rgb_t get(const string &id);
             
+            static rgb_t fetch(size_t i) throw();
+            
+            
         };
         
         
