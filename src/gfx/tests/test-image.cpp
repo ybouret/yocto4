@@ -60,6 +60,13 @@ YOCTO_UNIT_TEST_IMPL(image)
             save_ppm(outname,pxm);
         }
         
+        pixmap3 px3(pxm.w,pxm.h);
+        enhance<uint8_t,uint8_t,3>(px3,pxm);
+        {
+            const string           outname = root + ".enhanced.ppm";
+            save_ppm(outname,px3);
+        }
+        
         std::cerr << "-- building gray scale" << std::endl;
         pixmapf                pgs(pxm,rgb2gsf<rgba_t>);
         {
