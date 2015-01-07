@@ -7,6 +7,7 @@
 #include "yocto/ordered/sorted-vector.hpp"
 #include "yocto/sort/remove-if.hpp"
 #include "yocto/sort/merge.hpp"
+#include "yocto/sequence/vector.hpp"
 #include <cstdlib>
 
 namespace yocto
@@ -222,7 +223,6 @@ namespace yocto
                     assert(p);
                     if( p->adjacent_pos(X,Y) > 0)
                     {
-                        //std::cerr << "coord (" << p->x << "," << p->y <<") accepts (" << X << "," << Y << ")" << std::endl;
                         assert(abs(p->x-X)<=1);
                         assert(abs(p->y-Y)<=1);
                         return true;
@@ -389,9 +389,9 @@ namespace yocto
                 std::cerr << "final..." << std::endl;
                 merge_clusters();
                 
-		core::list_of_cpp<cluster> &self = *this;
+                core::list_of_cpp<cluster> &self = *this;
                 core::merging<cluster>::sort(self,cluster::compare,NULL);
-
+                
             }
             
         private:
