@@ -100,7 +100,9 @@ YOCTO_UNIT_TEST_IMPL(cluster)
             IMG["PNG"].save(outname,mask, get_rgba_dup,NULL,NULL);
         }
         
-        blob B8(mask,true);
+        clusters cls;
+        
+        blob B8(mask,cls,true);
         std::cerr << "max blobs8=" << B8.count << std::endl;
         
         {
@@ -108,45 +110,6 @@ YOCTO_UNIT_TEST_IMPL(cluster)
             IMG["PNG"].save(outname,B8, get_rgba_from_blob,&B8.count,NULL);
         }
         
-#if 0
-        blob B4(mask,false);
-        std::cerr << "max blobs4=" << B4.count << std::endl;
-        
-        {
-            const string outname = root + ".blob4.png";
-            IMG["PNG"].save(outname,B4, get_rgba_from_blob,&B4.count,NULL);
-        }
-#endif
-        
-#if 0
-        clusters cls;
-        cls.build_from(mask);
-        std::cerr << "#cluster=" << cls.size << std::endl;
-        pixmap3 Q(mask.w,mask.h);
-        
-        
-        for(const cluster *cl=cls.head;cl;cl=cl->next)
-        {
-            std::cerr << "\t size=" << cl->coords.size << " / #border=" << cl->border.size() << std::endl;
-            const named_color &nc = named_color::reg[ alea_lt(named_color::num) ];
-            const rgb_t        C(nc.r/2,nc.g/2,nc.b/2);
-            const rgb_t        B(nc.r,nc.g,nc.b);
-            for(const coord *cc = cl->coords.head;cc;cc=cc->next)
-            {
-                Q[cc->y][cc->x] = C;
-            }
-            for(size_t i=cl->border.size();i>0;--i)
-            {
-                const coord *cc = cl->border[i];
-                Q[cc->y][cc->x] = B;
-            }
-        }
-        
-        {
-            const string outname = root + ".main.png";
-            IMG["PNG"].save(outname,Q, get_rgba_from_rgb,NULL,NULL);
-        }
-#endif
         
         
         
