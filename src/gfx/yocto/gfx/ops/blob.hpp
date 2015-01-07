@@ -2,12 +2,67 @@
 #define YOCTO_GFX_BLOB_INCLUDED 1
 
 #include "yocto/gfx/rawpix.hpp"
+#include "yocto/code/utils.hpp"
+#include "yocto/core/list.hpp"
+#include "yocto/ptr/intr.hpp"
+#include "yocto/associative/set.hpp"
 
 namespace yocto
 {
     namespace gfx
     {
         typedef pixmap<size_t> blob_type;
+        
+        class coord
+        {
+        public:
+            YOCTO_MAKE_OBJECT
+            const unit_t x;
+            const unit_t y;
+            coord       *next;
+            coord       *prev;
+            
+            coord(unit_t X,unit_t Y) throw() : x(X), y(Y), next(0), prev(0) {}
+            ~coord() throw() {}
+            
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(coord);
+        };
+        
+        class cluster : public counted_object, public core::list_of_cpp<coord>
+        {
+        public:
+            typedef blob_type::type word_t;
+            
+            const word_t uuid;
+            const word_t &key() const throw() { return uuid; }
+            
+            explicit cluster(const word_t id) throw() : uuid(id) {}
+            virtual ~cluster() throw() {}
+            
+            typedef intr_ptr<word_t,cluster> ptr;
+            typedef set<word_t,ptr>          db;
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(cluster);
+        };
+        
+        class clusters : public cluster::db
+        {
+        public:
+            explicit clusters() throw() : cluster::db()
+            {
+            }
+            
+            virtual ~clusters() throw()
+            {
+            }
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(clusters);
+        };
+        
         
         class blob : public blob_type
         {
@@ -17,24 +72,90 @@ namespace yocto
             typedef blob_type::type word_t;
             word_t                  count;
             template <typename T>
-            blob( const pixmap<T> &src, bool detect8 = true) :
+            blob(const pixmap<T> &src,
+                 clusters        &cls,
+                 bool             detect8 = true) :
             blob_type(src.w,src.h),
             count(0)
             {
-                const unit_t H  = h;
+                cls.free();
+                const unit_t W     = w;
+                const unit_t H     = h;
+                blob_type   &B     = *this;
+                const unit_t probe = detect8 ? 1 : 0;
                 
-                // first pass
-                for(unit_t j=0,jp=1,jm=-1;j<H;++j,++jp,++jm)
+                // First pass: scan lines
+                for(unit_t j=0,jm=-1;j<H;++j,++jm)
                 {
-                    if( !(j&1) )
+                    const typename pixmap<T>::row &Sj = src[j];
+                    row                           &Bj = B[j];
+                    unit_t i=0;
+                    while(i<W)
                     {
-                        scan_increase(src, j, jm, jp, detect8);
-                    }
-                    else
-                    {
-                        scan_decrease(src, j, jm, jp, detect8);
+                        // find a new segment
+                        if(!has_start<T>(i,W,Sj))
+                        {
+                            continue;
+                        }
+                        unit_t k=i;
+                        unit_t kp=k+1;
+                        while(kp<W&& !is_zero_pixel(Sj[kp]))
+                        {
+                            ++k;
+                            ++kp;
+                        }
+                        
+                        // process segment
+                        word_t id = 0;
+                        if(j>0)
+                        {
+                            //find parent ?
+                            const unit_t lo  = max_of<unit_t>(0,i-probe);
+                            const unit_t hi  = min_of<unit_t>(W,kp+probe);
+                            const row   &Bjm = B[jm];
+                            for(unit_t q=lo;q<hi;++q)
+                            {
+                                const word_t parent = Bjm[q];
+                                if(parent>0)
+                                {
+                                    id = Bjm[q];
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        
+                        if(id<=0)
+                        {
+                            id = ++count;
+                            const cluster::ptr cl( new cluster(id) );
+                            if( !cls.insert(cl) )
+                            {
+                                throw exception("unexpected new cluster failure");
+                            }
+                        }
+                        
+                        assert(id>0);
+                        cluster::ptr *pp = cls.search(id);
+                        if(!pp)
+                        {
+                            throw exception("unexpected get cluster failure");
+                        }
+                        
+                        cluster &cc = **pp;
+                        for(size_t b=i;b<=k;++b)
+                        {
+                            Bj[b] = id;
+                            cc.push_back( new coord(b,j) );
+                        }
+                        
+                        // done
+                        i=kp;
                     }
                 }
+                
+                // Second pass: fusion
+                (void)fusion(cls,detect8);
             }
             
             
@@ -45,169 +166,108 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
-            
-            template <typename T> inline
-            void scan_increase(const pixmap<T> &src,
-                               const unit_t j,
-                               const unit_t jm,
-                               const unit_t jp,
-                               const bool   detect8)
+            template <typename T>
+            inline bool has_start(unit_t                        &i,
+                                  const unit_t                   W,
+                                  const typename pixmap<T>::row &Sj ) const throw()
             {
-                const typename pixmap<T>::row &Sj         = src[j];
-                blob_type::row                &Bj         = (*this)[j];
-                const unit_t W          = w;
-                const bool   has_bottom = jp<h;
-                for(unit_t i=0,ip=1,im=-1;i<W;++i,++ip,++im)
+                assert(i<W);
+                while(i<W)
                 {
                     if(!is_zero_pixel(Sj[i]))
                     {
+                        return true;
+                    }
+                    ++i;
+                }
+                return false;
+            }
+            
+            bool fusion( cluster::db &cls, bool detect8)
+            {
+                bool performed = false;
+                const unit_t H = h;
+                const unit_t W = w;
+                blob        &B = *this;
+                for(unit_t j=0,jm=-1,jp=1;jp<H;++j,++jm,++jp)
+                {
+                    row &Bj  = B[j];
+                    row &Bjp = B[jp];
+                    for(unit_t i=0,im=-1,ip=1;i<W;++i,++im,++ip)
+                    {
+                        const word_t here = Bj[i];
+                        if(!here)
+                            continue;
                         
-                        //__________________________________________________
-                        //
-                        // check status
-                        //__________________________________________________
-                        word_t &b = Bj[i];
-                        if(b<=0)
+                        // scan above
                         {
-                            //not visited
-                            b = ++count;
-                        }
-                        const word_t id = b;
-                        
-                        //__________________________________________________
-                        //
-                        // propagate right
-                        //__________________________________________________
-                        const bool has_right = ip<W;
-                        if(has_right)
-                        {
-                            if(!is_zero_pixel(Sj[ip]))
+                            const word_t link = Bjp[i];
+                            if(link>0 && link!=here)
                             {
-                                Bj[ip] = id;
+                                replace(link,here,cls);
+                                performed = true;
                             }
                         }
                         
-                        const bool has_left = i>0;
-                        //__________________________________________________
-                        //
-                        // propagate bottom
-                        //__________________________________________________
-                        if(has_bottom)
+                        if(detect8)
                         {
-                            check_bottom(id, jp, i, im, ip, src, detect8, has_left, has_right);
-                        }
-                        
-                    }
-                }
-            }
-            
-            template <typename T> inline
-            void scan_decrease(const pixmap<T> &src,
-                               const unit_t     j,
-                               const unit_t     jm,
-                               const unit_t     jp,
-                               const bool       detect8)
-            {
-                const typename pixmap<T>::row &Sj         = src[j];
-                blob_type::row                &Bj         = (*this)[j];
-                const unit_t W          = w;
-                const bool   has_bottom = jp<h;
-                
-                for(unit_t i=W-1,ip=W,im=W-2;i>=0;--i,--ip,--im)
-                {
-                    if(!is_zero_pixel(Sj[i]))
-                    {
-                        
-                        //__________________________________________________
-                        //
-                        // check status
-                        //__________________________________________________
-                        word_t &b = Bj[i];
-                        if(b<=0)
-                        {
-                            //not visited
-                            b = ++count;
-                        }
-                        const word_t id = b;
-                        
-                        //__________________________________________________
-                        //
-                        // propagate left
-                        //__________________________________________________
-                        
-                        const bool has_left = i>0;
-                        if(has_left)
-                        {
-                            if(!is_zero_pixel(Sj[im]))
+                            if(i>0)
                             {
-                                Bj[im] = id;
+                                const word_t link = Bjp[im];
+                                if(link>0 && link!=here)
+                                {
+                                    replace(link,here,cls);
+                                    performed = true;
+                                }
+                            }
+                            
+                            if(ip<W)
+                            {
+                                const word_t link = Bjp[ip];
+                                if(link>0 && link!=here)
+                                {
+                                    replace(link,here,cls);
+                                    performed = true;
+                                }
                             }
                         }
-                        
-                        const bool has_right = ip<W;
-                        
-                        //__________________________________________________
-                        //
-                        // propagate bottom
-                        //__________________________________________________
-                        if(has_bottom)
-                        {
-                            check_bottom(id, jp, i, im, ip, src, detect8, has_left, has_right);
-                        }
-                        
                     }
                 }
+                
+                return performed;
             }
             
             
-            template <typename T> inline
-            void check_bottom(const size_t     id,
-                              const unit_t     jp,
-                              const unit_t     i,
-                              const unit_t     im,
-                              const unit_t     ip,
-                              const pixmap<T> &src,
-                              const bool       detect8,
-                              const bool       has_left,
-                              const bool       has_right)
+            void replace( const unit_t link, const unit_t here, cluster::db &cls )
             {
-                const typename pixmap<T>::row &Sjp = src[jp];
-                blob_type::row                &Bjp = (*this)[jp];
+                blob        &B = *this;
                 
-                if(!is_zero_pixel(Sjp[i]))
+                // replace link with here
+                cluster::ptr *source = cls.search(link);
+                if(!source) throw exception("can't find source cluster");
+                
+                cluster::ptr *target = cls.search(here);
+                if(!target) throw exception("can't find target cluster");
+                
+                cluster &src = **source;
+                cluster &tgt = **target;
+                
+                // rewrite values
+                while(src.size)
                 {
-                    Bjp[i] = id;
+                    coord *c = src.pop_back();
+                    assert(link==B[c->y][c->x]);
+                    B[c->y][c->x] = here;
+                    tgt.push_back(c);
                 }
                 
-                if(detect8)
+                if(!cls.remove(link))
                 {
-                    //__________________________________________
-                    //
-                    //propagate bottom/right
-                    //__________________________________________
-                    if(has_right)
-                    {
-                        if(!is_zero_pixel(Sjp[ip]))
-                        {
-                            Bjp[ip] = id;
-                        }
-                    }
-                    
-                    //__________________________________________
-                    //
-                    //propagate bottom/left
-                    //__________________________________________
-                    if(has_left)
-                    {
-                        if(!is_zero_pixel(Sjp[im]))
-                        {
-                            Bjp[im] = id;
-                        }
-                    }
-                    
+                    throw exception("unexpected cluster remove failure");
                 }
-                
+                --count;
             }
+            
         };
     }
     
