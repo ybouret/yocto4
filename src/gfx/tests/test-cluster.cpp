@@ -11,6 +11,7 @@
 
 
 #include "yocto/gfx/cluster.hpp"
+#include "yocto/gfx/ops/blob.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -32,8 +33,26 @@ static inline rgba_t get_rgba_dup(const void *addr, const void *)
 
 static inline rgba_t get_rgba_from_rgb(const void *addr, const void *)
 {
-    const rgb_t &c = *(const rgb_t *)addr;
+    const  rgb_t &c = *(const rgb_t *)addr;
     return rgba_t(c.r,c.g,c.b);
+}
+
+static rgba_t LOCAL_COLORS[8];
+
+static inline rgba_t get_rgba_from_blob(const void *addr, const void *args)
+{
+    const size_t  value = *(const size_t *)addr;
+    if(value<=0)
+    {
+        return rgba_t(0,0,0);
+    }
+    else
+    {
+        //const size_t  count = *(const size_t *)args;
+        //const named_color &nc = named_color::reg[ (value-1) % named_color::num ];
+        //return rgba_t(nc.r,nc.g,nc.b);
+        return LOCAL_COLORS[(value-1)%8];
+    }
 }
 
 #include "yocto/sort/quick.hpp"
@@ -47,21 +66,15 @@ YOCTO_UNIT_TEST_IMPL(cluster)
     IMG.declare( new png_format()  );
     IMG.declare( new jpeg_format() );
     
-    {
-        vector<int> flags(8,as_capacity);
-        SHOW_FLAG(coord::__top);
-        SHOW_FLAG(coord::__bottom);
-        SHOW_FLAG(coord::__left);
-        SHOW_FLAG(coord::__right);
-        SHOW_FLAG(coord::__top|coord::__left);
-        SHOW_FLAG(coord::__top|coord::__right);
-        SHOW_FLAG(coord::__bottom|coord::__left);
-        SHOW_FLAG(coord::__bottom|coord::__right);
-        
-        quicksort(flags);
-        std::cerr << "flags=" << flags << std::endl;
-    }
-    
+    LOCAL_COLORS[0] = named_color::get("white");
+    LOCAL_COLORS[1] = named_color::get("red");
+    LOCAL_COLORS[2] = named_color::get("green");
+    LOCAL_COLORS[3] = named_color::get("blue");
+    LOCAL_COLORS[4] = named_color::get("yellow");
+    LOCAL_COLORS[5] = named_color::get("cyan");
+    LOCAL_COLORS[6] = named_color::get("magenta");
+    LOCAL_COLORS[7] = named_color::get("grey");
+
     for(int i=1;i<argc;++i)
     {
         const string path = argv[i];
@@ -87,7 +100,25 @@ YOCTO_UNIT_TEST_IMPL(cluster)
             IMG["PNG"].save(outname,mask, get_rgba_dup,NULL,NULL);
         }
         
+        blob B8(mask,true);
+        std::cerr << "max blobs8=" << B8.count << std::endl;
         
+        {
+            const string outname = root + ".blob8.png";
+            IMG["PNG"].save(outname,B8, get_rgba_from_blob,&B8.count,NULL);
+        }
+        
+#if 0
+        blob B4(mask,false);
+        std::cerr << "max blobs4=" << B4.count << std::endl;
+        
+        {
+            const string outname = root + ".blob4.png";
+            IMG["PNG"].save(outname,B4, get_rgba_from_blob,&B4.count,NULL);
+        }
+#endif
+        
+#if 0
         clusters cls;
         cls.build_from(mask);
         std::cerr << "#cluster=" << cls.size << std::endl;
@@ -115,7 +146,7 @@ YOCTO_UNIT_TEST_IMPL(cluster)
             const string outname = root + ".main.png";
             IMG["PNG"].save(outname,Q, get_rgba_from_rgb,NULL,NULL);
         }
-        
+#endif
         
         
         

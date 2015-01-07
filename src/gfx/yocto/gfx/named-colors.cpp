@@ -49,6 +49,11 @@ namespace yocto
             return get( id.c_str() );
         }
         
+        rgb_t named_color:: fetch(size_t i) throw()
+        {
+            const named_color &c = reg[i%num];
+            return rgb_t(c.r,c.g,c.b);
+        }
     }
     
 }
