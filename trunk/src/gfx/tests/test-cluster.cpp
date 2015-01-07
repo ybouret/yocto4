@@ -10,7 +10,6 @@
 #include "yocto/code/rand.hpp"
 
 
-#include "yocto/gfx/cluster.hpp"
 #include "yocto/gfx/ops/blob.hpp"
 
 using namespace yocto;
@@ -90,26 +89,45 @@ YOCTO_UNIT_TEST_IMPL(cluster)
         H.compute_from(pgs);
         const size_t t = H.threshold();
         std::cerr << "threshold=" << t << std::endl;
-        pixmapf mask(pgs.w,pgs.h);
-        threshold::apply(mask,t,pgs, threshold::keep_black);
         
+        pixmapf mask0(pgs.w,pgs.h);
+        threshold::apply(mask0,t,pgs, threshold::keep_black);
         
         
         {
-            const string outname = root + ".thr.png";
-            IMG["PNG"].save(outname,mask, get_rgba_dup,NULL,NULL);
+            const string outname = root + ".mask0.png";
+            IMG["PNG"].save(outname,mask0, get_rgba_dup,NULL,NULL);
         }
+        
+        pixmapf mask1(pgs.w,pgs.h);
+        threshold::apply(mask1,t,pgs, threshold::keep_white);
+        
+        
+        {
+            const string outname = root + ".mask1.png";
+            IMG["PNG"].save(outname,mask1, get_rgba_dup,NULL,NULL);
+        }
+        
+        
         
         clusters cls;
         
-        blob B8(mask,cls,true);
-        std::cerr << "max blobs8=" << B8.count << std::endl;
+        blob B0(mask0,cls,true);
+        std::cerr << "#blobs0=" << B0.count << std::endl;
         
         {
-            const string outname = root + ".blob8.png";
-            IMG["PNG"].save(outname,B8, get_rgba_from_blob,&B8.count,NULL);
+            const string outname = root + ".blob0.png";
+            IMG["PNG"].save(outname,B0, get_rgba_from_blob,&B0.count,NULL);
         }
         
+        blob B1(mask1,cls,true);
+        std::cerr << "#blobs1=" << B1.count << std::endl;
+        
+        {
+            const string outname = root + ".blob1.png";
+            IMG["PNG"].save(outname,B1, get_rgba_from_blob,&B1.count,NULL);
+        }
+
         
         
         
