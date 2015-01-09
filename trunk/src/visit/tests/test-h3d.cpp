@@ -27,7 +27,8 @@ namespace
                       const int     sim_rank,
                       const int     sim_size) :
         arrays(),
-        MeshType( *this, "mesh",full,the_pbc,sim_rank,sim_size,1)
+        MeshType( *this, "mesh",full,the_pbc,sim_rank,sim_size,1),
+	ran()
         {
             std::cerr << "Allocating Arrays with " << outline.items << " items" << std::endl;
             store( new array3D<double>("T",outline) );

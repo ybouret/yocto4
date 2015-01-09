@@ -27,7 +27,8 @@ namespace
                       const int     sim_rank,
                       const int     sim_size) :
         arrays(),
-        MeshType( *this, "mesh",full,the_pbc,sim_rank,sim_size,1)
+        MeshType( *this, "mesh",full,the_pbc,sim_rank,sim_size,1),
+	ran()
         {
             store( new array2D<double>("T",outline) );
             store( new array2D<double>("L",outline) );
