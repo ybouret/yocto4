@@ -10,6 +10,7 @@
 #include "yocto/memory/slab.hpp"
 #include "yocto/container/iter-linked.hpp"
 #include "yocto/type/key.hpp"
+#include "yocto/sort/merge.hpp"
 
 namespace yocto
 {
@@ -271,6 +272,23 @@ namespace yocto
                 H.run_type(knode->hkey);
             }
             return H.key<size_t>();
+        }
+        
+        typedef int (*data_compare)(const_type &lhs, const_type &rhs);
+        
+        static inline int node_compare( const KNode *lhs, const KNode *rhs, void *args ) throw()
+        {
+            assert(lhs);
+            assert(rhs);
+            assert(args);
+            
+            data_compare proc  = (data_compare)args;
+            return proc(lhs->data,rhs->data);
+        }
+        
+        inline void sort_by( data_compare proc )
+        {
+            core::merging<KNode>::sort(klist,node_compare,(void*)proc);
         }
         
     private:
