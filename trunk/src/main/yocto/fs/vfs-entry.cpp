@@ -41,7 +41,7 @@ namespace yocto {
     path( vfs_path ),
     cstr( path.c_str()  ),
     base_name( vfs::get_base_name( path ) ),
-    extension( vfs::get_extension( path )  ),
+    extension( vfs::get_extension( path ) ),
     link( false ),
     attr( vfs_from.query_attribute( path,  *(bool *)&link ) )
     {

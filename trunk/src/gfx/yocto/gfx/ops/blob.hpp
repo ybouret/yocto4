@@ -6,6 +6,7 @@
 #include "yocto/core/list.hpp"
 #include "yocto/ptr/intr.hpp"
 #include "yocto/associative/set.hpp"
+#include "yocto/comparator.hpp"
 
 namespace yocto
 {
@@ -44,6 +45,11 @@ namespace yocto
             typedef intr_ptr<word_t,cluster> ptr;
             typedef set<word_t,ptr>          db;
             
+            static int compare( const cluster::ptr &lhs, const cluster::ptr &rhs ) throw()
+            {
+                return __compare(rhs->size, lhs->size);
+            }
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(cluster);
         };
@@ -57,6 +63,11 @@ namespace yocto
             
             virtual ~clusters() throw()
             {
+            }
+            
+            inline void sort()
+            {
+                sort_by(cluster::compare);
             }
             
         private:
