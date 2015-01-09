@@ -144,7 +144,7 @@ namespace yocto
                     assert(count<2);
                     assert(g);
                     gptr[count] = g;
-                    ++ (size_t &)count;
+                    ++(int &)count;
                 }
                 
                 inline quad_ghosts &operator[](int i) throw()

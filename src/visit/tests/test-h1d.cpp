@@ -26,7 +26,8 @@ namespace
                       const int     sim_size) :
         arrays(),
         MeshType( *this, "mesh",full,the_pbc,sim_rank,sim_size,1),
-        curv("T")
+        curv("T"),
+	ran()
         {
             store( new array1D<double>("T",outline) );
             store( new array1D<double>("L",outline) );
