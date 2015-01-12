@@ -4,16 +4,14 @@ FIND_PACKAGE(TIFF)
 
 IF(TIFF_FOUND)
 	MESSAGE( STATUS "Found Tiff...")
-	FILE( GLOB decl yocto/tiff++/*.hpp)
-	FILE( GLOB impl yocto/tiff++/*.cpp)
-	SET( srcs ${decl} ${impl} )
-	INSTALL( FILES ${decl} DESTINATION include/yocto/tiff++ )
-	SOURCE_GROUP( tiff++ FILES ${srcs} )
-
 	INCLUDE_DIRECTORIES( . ../main  ${TIFF_INCLUDE_DIR})
 
-	ADD_LIBRARY( y-tiff++ STATIC ${srcs} )
-	INSTALL( TARGETS y-tiff++ ARCHIVE DESTINATION lib )
+	ADD_LIBRARY(y-tiff MODULE 
+	yocto/tiff++/interface.hpp
+	yocto/tiff++/plugin.hpp 
+	yocto/tiff++/interface.cpp)
+	TARGET_LINK_LIBRARIES(y-tiff ${TIFF_LIBRARIES})
+	INSTALL( TARGETS y-tiff LIBRARY DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
 
