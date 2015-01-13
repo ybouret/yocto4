@@ -12,6 +12,7 @@ namespace yocto
         {
             void * (*Open)(const char *filename, const char *mode);
             void   (*Close)(void *);
+            int    (*ReadDirectory)(void*);
         };
     }
 }
