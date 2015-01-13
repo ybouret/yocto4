@@ -17,4 +17,7 @@
 #define YOCTO_EXPORT extern "C"
 #endif
 
+#define YOCTO_RTLD_LOADER yloader
+
+
 #endif

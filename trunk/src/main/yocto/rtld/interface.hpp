@@ -4,7 +4,7 @@
 #include "yocto/rtld/module.hpp"
 #include "yocto/rtld/export.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/counted.hpp"
+#include "yocto/counted-object.hpp"
 
 #include <typeinfo>
 #include <cstring>
@@ -13,19 +13,26 @@ namespace yocto
 {
 
 
-    class rtld_interface
+
+    class rtld_content : public counted_object
     {
     public:
         static const char loader_name[];
 
-        
-    protected:
+        virtual ~rtld_content() throw();
 
+        const char *uid;
+
+    protected:
+        explicit rtld_content( const string &soname, const char *api_name);
+
+        const module dll;
 
 
     private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(rtld_interface);
+        YOCTO_DISABLE_COPY_AND_ASSIGN(rtld_content);
     };
+
     //! interface to a C-API
     /**
 
@@ -34,66 +41,60 @@ namespace yocto
     class interface
     {
     public:
-        
-        
+
+
         //! holds information: API/DLL
-        class content : public object, public counted
+        class content : public rtld_content
         {
         public:
-            
+
             virtual ~content() throw() { clear(); }
-            
+
             const C_API api;
-            const char *uid;
-            
+
             static inline
-            content * create( const module &m, const string &ldname )
+            content * create( const string &soname )
             {
-                return new content(m,ldname);
+                return new content(soname);
             }
-            
+
             static inline
-            content * create( const module &m, const char *ldname )
+            content * create( const char *soname )
             {
-                const string tmp(ldname);
-                return new content(m,tmp);
+                const string tmp(soname);
+                return new content(tmp);
             }
-            
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(content);
-            module       dll;
             
-            explicit content( const module &m, const string &ldname ) :
-            api(),
-            uid(0),
-            dll(m)
+            explicit content( const string &soname ) :
+            rtld_content(soname,typeid(C_API).name()),
+            api()
             {
-                uid = typeid(C_API).name();
                 clear();
                 void (YOCTO_API *ld)(const C_API *) = 0; // loading function
-                dll.link(ld,ldname);                     // fetch it in the dll
+                dll.link(ld,loader_name);                     // fetch it in the dll
                 if( !ld )
-                    throw exception("plugin<%s>(no loader '%s')", uid, ldname.c_str() );
-                ld( &api );                              // populate API                
+                    throw exception("plugin<%s>(no loader '%s')", uid, loader_name );
+                ld( &api );                              // populate API
             }
-            
+
             inline void clear() throw() { memset( (void*)&api,0,sizeof(C_API)); }
         };
-        
-        
+
+
         //! dedicated reference counted smart pointer
         class pointer
         {
         public:
-            inline pointer(const module &m, const string &ldname) :
-            ld( content::create(m,ldname) ) { ld->withhold(); }
-            
-            inline pointer(const module &m, const char *ldname) :
-            ld( content::create(m,ldname) ) { ld->withhold(); }
-            
+            inline pointer(content *c) :
+            ld( c ) { ld->withhold(); }
+
+
             inline pointer( const pointer &other ) throw() :
             ld( other.ld ) { ld->withhold(); }
-            
+
             virtual ~pointer() throw()
             {
                 assert(ld);
@@ -103,28 +104,30 @@ namespace yocto
                     ld = 0;
                 }
             }
-            
+
             inline const C_API   * operator->() const throw() { return &(ld->api); }
             inline const content & operator*()  const throw() { return *ld; }
-            
+
         private:
             YOCTO_DISABLE_ASSIGN(pointer);
             content *ld;
-            
+
         };
-        
+
         const pointer handle;
-        
-        explicit interface( const module &m, const string &ldname) :
-        handle( m, ldname )
+
+        explicit interface( const string &soname ) :
+        handle(  content::create(soname) )
         {
         }
-        
-        explicit interface( const module &m, const char *ldname ) :
-        handle( m, ldname )
+
+        explicit interface( char *soname ) :
+        handle( content::create(soname)  )
         {
             
         }
+
+        interface(const interface &I) throw() : handle( I.handle ) {}
         
         virtual ~interface() throw() {}
         
@@ -132,7 +135,7 @@ namespace yocto
         const C_API * operator->() const throw() { return &( (*handle).api ); }
         
     private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(interface);
+        YOCTO_DISABLE_ASSIGN(interface);
         
     };
     

@@ -30,9 +30,10 @@ int main( int argc, char *argv[] )
         
         std::cerr << "-- Loading it a second time" << std::endl;
         const module m2( dll );
-        
+
+        std::cerr << "loader name: " << rtld_content::loader_name << std::endl;
         std::cerr << "-- Loading plugin" << std::endl; std::cerr.flush();
-        interface<ops> I( m2, "load_ops" );
+        interface<ops> I(soname);
         std::cerr << "-- Plugin is Loaded" << std::endl;
 		std::cerr.flush();
 		
