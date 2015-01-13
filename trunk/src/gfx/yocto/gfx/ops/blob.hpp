@@ -154,7 +154,7 @@ namespace yocto
                         }
                         
                         cluster &cc = **pp;
-                        for(size_t b=i;b<=k;++b)
+                        for(unit_t b=i;b<=k;++b)
                         {
                             Bj[b] = id;
                             cc.push_back( new coord(b,j) );
