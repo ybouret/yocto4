@@ -68,7 +68,9 @@ namespace yocto
             bool  owns(const rectangle &rect) const throw();
             void *get_line(unit_t y) const throw();      //!< \warning no check
             void *get(unit_t x, unit_t y) const throw(); //!< \warning no check
-            
+
+            void  safe_copy(void *, unit_t x, unit_t y) const throw(); //!< copy if within, 0 otherwise
+
             //__________________________________________________________________
             //
             // basic ops

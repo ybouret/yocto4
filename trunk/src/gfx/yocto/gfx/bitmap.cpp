@@ -302,7 +302,21 @@ namespace yocto
             assert(peek);
             return peek( ( (uint8_t *) entry ) + y*stride, x);
         }
-        
+
+        void  bitmap:: safe_copy(void *addr, unit_t x, unit_t y) const throw()
+        {
+            assert(addr);
+            if( (y>=0) && (y<h) && (x>=0) && (x<w) )
+            {
+                memcpy( addr,get(x,y), d);
+            }
+            else
+            {
+                memset(addr, 0, d);
+            }
+        }
+
+
         void  bitmap:: flip_horz() throw()
         {
             uint8_t     *line = (uint8_t *)entry;

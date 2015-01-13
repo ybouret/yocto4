@@ -6,6 +6,41 @@ namespace yocto
     namespace gfx
     {
 
+        struct io_conv
+        {
+            //! loading a bitmap with depth 4
+            static inline void put_rgba(void *addr, const rgba_t &C, const void *) throw()
+            {
+                assert(addr);
+                *(rgba_t *)addr = C;
+            }
+
+            //! loading a bitmap with depth 3
+            static inline void put_rgb(void *addr, const rgba_t &C, const void *) throw()
+            {
+                assert(addr);
+                rgb_t &X = *(rgb_t*)addr;
+                X.r = C.r;
+                X.g = C.g;
+                X.b = C.b;
+            }
+
+            //! loading a bitmap with depth 4, greyscale
+            static inline void put_gsf(void *addr, const rgba_t &C, const void *) throw()
+            {
+                assert(addr);
+                *(float *)addr = conv::greyscale_f(C.r, C.g, C.b);
+            }
+
+            //! loading a bitmap with depth 1, greyscale
+            static inline void put_gsu(void *addr, const rgba_t &C, const void *) throw()
+            {
+                assert(addr);
+                *(uint8_t *)addr = conv::greyscale(C.r, C.g, C.b);
+            }
+
+        };
+
         typedef rgb_t        (*addr2rgb)(const void *);
         void save_ppm(ios::ostream &fp, const bitmap &bmp, addr2rgb proc,  const char *comment  = 0);
         void save_ppm(const string &fn, const bitmap &bmp, addr2rgb proc,  const char *comment  = 0);
