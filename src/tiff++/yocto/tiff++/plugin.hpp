@@ -2,7 +2,7 @@
 #define YOCTO_TIFF_PLUGIN_INCLUDED 1
 
 #include "yocto/tiff++/interface.hpp"
-#include "yocto/rtld/plugin.hpp"
+#include "yocto/rtld/interface.hpp"
 
 
 namespace yocto
