@@ -62,7 +62,7 @@ static int add( int a, int b ) throw() { return a+b; }
 static int mul( int a, int b ) throw() { return a*b; }
 
 YOCTO_EXPORT 
-void YOCTO_API load_ops( ops *api )
+void YOCTO_API YOCTO_RTLD_LOADER( ops *api )
 {
     assert(api!=0);
     api->add = add;
