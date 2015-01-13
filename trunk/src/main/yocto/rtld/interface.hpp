@@ -13,7 +13,7 @@ namespace yocto
 {
 
 
-
+    // common shared content of an interface
     class rtld_content : public counted_object
     {
     public:
@@ -34,9 +34,6 @@ namespace yocto
     };
 
     //! interface to a C-API
-    /**
-
-     */
     template <typename C_API>
     class interface
     {
@@ -48,7 +45,7 @@ namespace yocto
         {
         public:
 
-            virtual ~content() throw() { clear(); }
+            inline virtual ~content() throw() { clear(); }
 
             const C_API api;
 
@@ -68,13 +65,13 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(content);
             
-            explicit content( const string &soname ) :
+            inline content( const string &soname ) :
             rtld_content(soname,typeid(C_API).name()),
             api()
             {
                 clear();
                 void (YOCTO_API *ld)(const C_API *) = 0; // loading function
-                dll.link(ld,loader_name);                     // fetch it in the dll
+                dll.link(ld,loader_name);                // fetch it in the dll
                 if( !ld )
                     throw exception("plugin<%s>(no loader '%s')", uid, loader_name );
                 ld( &api );                              // populate API
@@ -88,8 +85,8 @@ namespace yocto
         class pointer
         {
         public:
-            inline pointer(content *c) :
-            ld( c ) { ld->withhold(); }
+            inline pointer(content *c) throw():
+            ld( c ) { assert(ld); ld->withhold(); }
 
 
             inline pointer( const pointer &other ) throw() :
@@ -116,18 +113,18 @@ namespace yocto
 
         const pointer handle;
 
-        explicit interface( const string &soname ) :
+        inline interface( const string &soname ) :
         handle(  content::create(soname) )
         {
         }
 
-        explicit interface( char *soname ) :
+        inline interface( char *soname ) :
         handle( content::create(soname)  )
         {
             
         }
 
-        interface(const interface &I) throw() : handle( I.handle ) {}
+        inline interface(const interface &I) throw() : handle( I.handle ) {}
         
         virtual ~interface() throw() {}
         
