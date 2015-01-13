@@ -2,6 +2,8 @@
 #define YOCTO_GFX_RAWPIX_FILTER_INCLUDED 1
 
 #include "yocto/gfx/rawpix.hpp"
+#include <cstdlib>
+#include <cstring>
 
 namespace yocto
 {
@@ -35,8 +37,8 @@ namespace yocto
         {
             assert(source.w==target.w);
             assert(source.h==target.h);
-            assert(source.d>=sizeof(S)*N);
-            assert(target.d>=sizeof(T)*N);
+            assert(source.d>=unit_t(sizeof(S)*N));
+            assert(target.d>=unit_t(sizeof(T)*N));
 
             const unit_t w = source.w;
             const unit_t h = source.h;
