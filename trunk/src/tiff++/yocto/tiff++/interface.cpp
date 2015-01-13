@@ -21,13 +21,21 @@ namespace yocto
             TIFFClose((TIFF*)handle);
         }
         
+        static inline int __ReadDirectory(void *handle) throw()
+        {
+            assert(handle);
+            return TIFFReadDirectory((TIFF*)handle);
+        }
+        
+#define LINK(FUNCTION) api->FUNCTION = __##FUNCTION
         
         YOCTO_EXPORT void YOCTO_API load_tiff(I_TIFF *api) throw()
         {
             //std::cerr << "Loading TIFF API" << std::endl;
             assert(api);
-            api->Open  = __Open;
-            api->Close = __Close;
+            LINK(Open);
+            LINK(Close);
+            LINK(ReadDirectory);
         }
     }
 }
