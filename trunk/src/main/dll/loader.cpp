@@ -1,5 +1,5 @@
 #include "./module.hpp"
-#include "yocto/rtld/plugin.hpp"
+#include "yocto/rtld/interface.hpp"
 
 #include "yocto/exception.hpp"
 #include <iostream>
@@ -39,7 +39,7 @@ int main( int argc, char *argv[] )
         assert(I->add);
         assert(I->mul);
         
-        const interface<ops>::plugin p = I.handle;
+        const interface<ops>::pointer p = I.handle;
         
         std::cerr << "add: " << p->add(2,3) << std::endl;
         std::cerr << "mul: " << p->mul(2,3) << std::endl;

@@ -17,6 +17,8 @@ namespace yocto
     class interface
     {
     public:
+        
+        
         //! holds information: API/DLL
         class content : public object, public counted
         {
@@ -63,19 +65,19 @@ namespace yocto
         
         
         //! dedicated reference counted smart pointer
-        class plugin
+        class pointer
         {
         public:
-            inline plugin(const module &m, const string &ldname) :
+            inline pointer(const module &m, const string &ldname) :
             ld( content::create(m,ldname) ) { ld->withhold(); }
             
-            inline plugin(const module &m, const char *ldname) :
+            inline pointer(const module &m, const char *ldname) :
             ld( content::create(m,ldname) ) { ld->withhold(); }
             
-            inline plugin( const plugin &other ) throw() :
+            inline pointer( const pointer &other ) throw() :
             ld( other.ld ) { ld->withhold(); }
             
-            virtual ~plugin() throw()
+            virtual ~pointer() throw()
             {
                 assert(ld);
                 if( ld->liberate() )
@@ -89,12 +91,12 @@ namespace yocto
             inline const content & operator*()  const throw() { return *ld; }
             
         private:
-            YOCTO_DISABLE_ASSIGN(plugin);
+            YOCTO_DISABLE_ASSIGN(pointer);
             content *ld;
             
         };
         
-        const plugin handle;
+        const pointer handle;
         
         explicit interface( const module &m, const string &ldname) :
         handle( m, ldname )
