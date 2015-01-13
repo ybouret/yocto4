@@ -1,5 +1,5 @@
-#ifndef YOCTO_RTLD_PLUGIN_INCLUDED
-#define YOCTO_RTLD_PLUGIN_INCLUDED 1
+#ifndef YOCTO_RTLD_INTERFACE_INCLUDED
+#define YOCTO_RTLD_INTERFACE_INCLUDED 1
 
 #include "yocto/rtld/module.hpp"
 #include "yocto/rtld/export.hpp"
@@ -11,8 +11,25 @@
 
 namespace yocto
 {
-    
+
+
+    class rtld_interface
+    {
+    public:
+        static const char loader_name[];
+
+        
+    protected:
+
+
+
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(rtld_interface);
+    };
     //! interface to a C-API
+    /**
+
+     */
     template <typename C_API>
     class interface
     {
