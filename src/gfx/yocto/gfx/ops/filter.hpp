@@ -37,6 +37,7 @@ namespace yocto
         {
         public:
             T value[9*N];
+
             inline  NDfilter() throw() : value() { memset(value,0,sizeof(value)); }
             inline ~NDfilter() throw() {}
 
@@ -47,6 +48,7 @@ namespace yocto
                 const int offset = N*(3*(y+1)+(x+1));
                 return &value[offset];
             }
+            
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(NDfilter);
 
@@ -71,19 +73,21 @@ namespace yocto
             {
                 for(unit_t im=-1,i=0,ip=1;i<w;++im,++i,++ip)
                 {
-                    source.safe_copy( s(-1,-1), im, jm );
-                    source.safe_copy( s(-1, 0), im, j  );
-                    source.safe_copy( s(-1, 1), im, jp );
+                    // collect data
+                    source.safe_copy( s(-1,-1), im, jm, N);
+                    source.safe_copy( s(-1, 0), im, j , N);
+                    source.safe_copy( s(-1, 1), im, jp, N);
 
-                    source.safe_copy( s(0,-1), i, jm );
-                    source.safe_copy( s(0, 0), i, j  );
-                    source.safe_copy( s(0, 1), i, jp );
+                    source.safe_copy( s(0,-1), i, jm, N);
+                    source.safe_copy( s(0, 0), i, j , N);
+                    source.safe_copy( s(0, 1), i, jp, N);
 
-                    source.safe_copy( s(1,-1), ip, jm );
-                    source.safe_copy( s(1, 0), ip, j  );
-                    source.safe_copy( s(1, 1), ip, jp );
+                    source.safe_copy( s(1,-1), ip, jm,N);
+                    source.safe_copy( s(1, 0), ip, j ,N);
+                    source.safe_copy( s(1, 1), ip, jp,N);
+                    
+
                 }
-                //break;
             }
 
 #if 0
@@ -102,7 +106,7 @@ namespace yocto
                 std::cerr << std::endl;
             }
 #endif
-            
+
         }
         
         
