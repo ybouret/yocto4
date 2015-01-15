@@ -36,7 +36,7 @@ YOCTO_UNIT_TEST_IMPL(filter)
 
         filter f;
         //f(0,0) = 1;
-        f.fill_with(1.0/3);
+        f.fill_with(1.0/9);
 
         apply_filter<uint8_t,uint8_t,3>(out,pxm,f);
 
