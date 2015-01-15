@@ -34,9 +34,17 @@ YOCTO_UNIT_TEST_IMPL(filter)
 
         pixmap3 out(pxm.w,pxm.h);
 
-        filter<float> f;
+        filter f;
+        //f(0,0) = 1;
+        f.fill_with(1.0/3);
 
-        apply_filter<uint8_t,uint8_t,float,3>(out,pxm,f);
+        apply_filter<uint8_t,uint8_t,3>(out,pxm,f);
+
+        {
+            const string outname = root + ".filt.png";
+            IMG["PNG"].save(outname,out, io_conv::get_rgb,NULL,NULL);
+        }
+
 
     }
 

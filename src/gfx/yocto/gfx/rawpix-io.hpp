@@ -39,6 +39,21 @@ namespace yocto
                 *(uint8_t *)addr = conv::greyscale(C.r, C.g, C.b);
             }
 
+            //! saving a bitmap with depth 4
+            static inline rgba_t get_rgba(const void *addr, const void *) throw()
+            {
+                assert(addr);
+                return *(const rgba_t*)addr;
+            }
+
+            //! saving a bitmap with depth 4
+            static inline rgba_t get_rgb(const void *addr, const void *) throw()
+            {
+                assert(addr);
+                const rgb_t c = *(const rgb_t *)addr;
+                return rgba_t(c.r,c.g,c.b);
+            }
+
         };
 
         typedef rgb_t        (*addr2rgb)(const void *);
