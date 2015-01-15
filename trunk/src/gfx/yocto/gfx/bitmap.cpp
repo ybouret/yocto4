@@ -303,16 +303,17 @@ namespace yocto
             return peek( ( (uint8_t *) entry ) + y*stride, x);
         }
 
-        void  bitmap:: safe_copy(void *addr, unit_t x, unit_t y) const throw()
+        void  bitmap:: safe_copy(void *addr, unit_t x, unit_t y, unit_t bytes) const throw()
         {
             assert(addr);
+            assert(bytes<=d);
             if( (y>=0) && (y<h) && (x>=0) && (x<w) )
             {
-                memcpy( addr,get(x,y), d);
+                memcpy( addr,get(x,y), bytes);
             }
             else
             {
-                memset(addr, 0, d);
+                memset(addr, 0, bytes);
             }
         }
 
