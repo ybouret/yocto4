@@ -11,28 +11,28 @@ namespace yocto
     namespace gfx
     {
 
-        template <typename T>
+
         class filter
         {
         public:
-            T value[9];
+            double value[9];
 
             inline filter() throw() : value() { memset(value,0,sizeof(value)); }
             inline virtual ~filter() throw() {}
             
-            inline T & operator()(int x, int y) throw()
+            inline double & operator()(int x, int y) throw()
             {
                 assert( abs(x)<=1 );
                 assert( abs(y)<=1 );
                 return value[3*(y+1)+(x+1)];
             }
 
-            inline void fill_with( const T a ) throw() { for(size_t i=0;i<9;++i) value[i] = a; }
+            inline void fill_with( const double a ) throw() { for(size_t i=0;i<9;++i) value[i] = a; }
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(filter);
         };
 
-        template <typename T, size_t N>
+        template <typename T,size_t N>
         class NDfilter
         {
         public:
@@ -48,15 +48,44 @@ namespace yocto
                 const int offset = N*(3*(y+1)+(x+1));
                 return &value[offset];
             }
-            
+
+            //! N channels for U
+            template <typename U>
+            inline void compute( U *results, const filter &f ) const throw()
+            {
+
+                assert(NULL!=results);
+
+                // accumulator
+                double sum[N] = { 0 };
+                for(size_t k=0;k<N;++k) sum[k] = 0;
+
+                // apply
+                for(size_t i=0;i<9;++i)
+                {
+                    const T     *p = &value[N*i];
+                    const double w =  f.value[i];
+                    for(size_t k=0;k<N;++k)
+                    {
+                        sum[k] += double(p[k]) * w;
+                    }
+                }
+
+                // store
+                for(size_t k=0;k<N;++k)
+                {
+                    results[k] = U(sum[k]);
+                }
+
+            }
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(NDfilter);
 
         };
 
-        template <typename T,typename S,typename V,size_t N>
+        template <typename T,typename S,size_t N>
         inline
-        void apply_filter( bitmap &target, const bitmap &source, const filter<V> &f)
+        void apply_filter( bitmap &target, const bitmap &source, const filter &f)
         {
             assert(source.w==target.w);
             assert(source.h==target.h);
@@ -85,28 +114,15 @@ namespace yocto
                     source.safe_copy( s(1,-1), ip, jm,N);
                     source.safe_copy( s(1, 0), ip, j ,N);
                     source.safe_copy( s(1, 1), ip, jp,N);
-                    
+
+                    s.template compute<T>( (T*)(target.get(i,j)),f );
 
                 }
+
             }
 
-#if 0
-            for(int j=1;j>=-1;--j)
-            {
-                for(int i=-1;i<=1;++i)
-                {
-                    const T *p = s(i,j);
-                    std::cerr << " [";
-                    for(size_t k=0;k<N;++k)
-                    {
-                        std::cerr << ' ' << double(p[k]);
-                    }
-                    std::cerr << "]";
-                }
-                std::cerr << std::endl;
-            }
-#endif
 
+            
         }
         
         
