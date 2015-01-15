@@ -83,7 +83,25 @@ namespace yocto
                     source.safe_copy( s(1, 0), ip, j  );
                     source.safe_copy( s(1, 1), ip, jp );
                 }
+                //break;
             }
+
+#if 0
+            for(int j=1;j>=-1;--j)
+            {
+                for(int i=-1;i<=1;++i)
+                {
+                    const T *p = s(i,j);
+                    std::cerr << " [";
+                    for(size_t k=0;k<N;++k)
+                    {
+                        std::cerr << ' ' << double(p[k]);
+                    }
+                    std::cerr << "]";
+                }
+                std::cerr << std::endl;
+            }
+#endif
             
         }
         
