@@ -15,6 +15,7 @@ SET(pyck_srcs
 	thread.hpp	thread.cpp
 	runnable.hpp	runnable.cpp
 	file.hpp	file.cpp
+	erfc.hpp	erfc.cpp
 	team.hpp
 	c_array.hpp
 	c_matrix.hpp
