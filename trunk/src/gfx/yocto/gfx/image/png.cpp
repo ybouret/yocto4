@@ -331,7 +331,10 @@ namespace yocto
                          PNG_FILTER_TYPE_BASE);
             
             png_write_info(png_ptr, info_ptr);
+
+            png_set_compression_level(png_ptr, 6);
             
+
             PNG_Mem mem;
             try
             {
