@@ -16,18 +16,31 @@ YOCTO_UNIT_TEST_IMPL(ihist)
     {
         data.push_back( int(alea_leq(100)) - 50 );
     }
-
+    
     list<int>      bins;
     vector<size_t> H;
-
+    
     math::i_histogram(bins, H, data);
-
-    ios::ocstream fp("ihist.dat",false);
-
-    size_t j=1;
-    for( list<int>::iterator i=bins.begin();i!=bins.end();++i,++j)
+    
     {
-        fp("%d %u\n", *i, unsigned(H[j]));
+        ios::ocstream fp("ihist.dat",false);
+        
+        size_t j=1;
+        for( list<int>::iterator i=bins.begin();i!=bins.end();++i,++j)
+        {
+            fp("%d %u\n", *i, unsigned(H[j]));
+        }
+    }
+    
+    
+    {
+        ios::ocstream fp("otsu.dat",false);
+        const size_t np = bins.size()+1;
+        for(size_t t=0;t<=np;++t)
+        {
+            const double score = math::kernel::OtsuScore(bins,H,t);
+            fp("%u %g\n", unsigned(t), score);
+        }
     }
 }
 YOCTO_UNIT_TEST_DONE()
