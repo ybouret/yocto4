@@ -141,6 +141,7 @@ namespace yocto
                 if(tmp_score<min_score)
                 {
                     threshold = t;
+                    min_score = tmp_score;
                 }
             }
             return threshold;
