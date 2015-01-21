@@ -42,5 +42,8 @@ YOCTO_UNIT_TEST_IMPL(ihist)
             fp("%u %g\n", unsigned(t), score);
         }
     }
+
+    std::cerr << "Threshold=" << math::OtsuThreshold(bins, H) << std::endl;
+
 }
 YOCTO_UNIT_TEST_DONE()
