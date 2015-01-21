@@ -9,6 +9,7 @@ namespace yocto
     namespace math
     {
 
+        // Build an histogram of integer values
         template <typename SEQ_DATA>
         inline void i_histogram(sequence<typename SEQ_DATA::type> &bins,
                                 sequence<size_t>                  &H,
@@ -45,7 +46,42 @@ namespace yocto
                 }
                 H.push_back(count);
             }
+        }
 
+        namespace kernel
+        {
+            template <typename ITER_B, typename ITER_H>
+            inline double ThresholdVar( size_t n, const ITER_B b, const ITER_H h, size_t &count)
+            {
+                assert(0==count);
+
+                // first pass
+                double mu = 0;
+                {
+                    ITER_B i = b;
+                    ITER_H j = h;
+                    for(size_t k=n;k>0;--k,++i,++j)
+                    {
+                        const size_t num = *j;
+                        count += num;
+                        mu += double(num) * double(*i);
+                    }
+                    mu /= count;
+                }
+
+
+
+            }
+
+            template <typename SEQ_B,typename SEQ_H>
+            inline double OtsuScore( const SEQ_B &bins, const SEQ_H &H, size_t t ) throw()
+            {
+                assert(bins.size()==H.size());
+                const size_t n = bins.size();
+                assert(t<=n+1);
+                
+            }
+            
         }
     }
 }
