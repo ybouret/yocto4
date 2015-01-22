@@ -41,6 +41,15 @@ namespace yocto
             return TIFFGetField( (TIFF *)handle, TIFFTAG_IMAGELENGTH, h);
         }
 
+        static inline
+        int    __ReadRGBAImage(void *handle, const uint32_t w, const uint32_t h, uint32_t *raster) throw()
+        {
+            assert(handle);
+            assert(raster);
+            return TIFFReadRGBAImage((TIFF *)handle, w, h, raster,0);
+        }
+
+
 #define LINK(FUNCTION) api->FUNCTION = __##FUNCTION
         
         YOCTO_EXPORT void YOCTO_API YOCTO_RTLD_LOADER(I_TIFF *api) throw()
@@ -51,6 +60,7 @@ namespace yocto
             LINK(ReadDirectory);
             LINK(GetWidth);
             LINK(GetHeight);
+            LINK(ReadRGBAImage);
         }
     }
 }

@@ -15,6 +15,7 @@ namespace yocto
             int    (*ReadDirectory)(void*);
             int    (*GetWidth)(void *, uint32_t *w);
             int    (*GetHeight)(void *, uint32_t *h);
+            int    (*ReadRGBAImage)(void *, const uint32_t w, const uint32_t h, uint32_t *raster);
         };
     }
 }
