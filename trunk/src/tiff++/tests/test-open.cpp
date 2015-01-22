@@ -29,6 +29,10 @@ YOCTO_UNIT_TEST_IMPL(open)
                     I->GetWidth(tiff,&w);
                     I->GetHeight(tiff,&h);
                     std::cerr << w << "x" << h << std::endl;
+                    const size_t npx = w*h;
+                    uint32_t *raster = new uint32_t[npx];
+                    I->ReadRGBAImage(tiff,w,h,raster);
+                    delete raster;
                 }
                 while( I->ReadDirectory(tiff) );
                 std::cerr << "Found " << count << " entry(ies)" << std::endl;
