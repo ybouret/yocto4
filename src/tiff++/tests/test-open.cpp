@@ -1,4 +1,6 @@
-#include "yocto/tiff++/plugin.hpp"
+#include "yocto/tiff++/interface.hpp"
+#include "yocto/rtld/interface.hpp"
+
 #include "yocto/utest/run.hpp"
 
 using namespace yocto;
@@ -8,7 +10,7 @@ YOCTO_UNIT_TEST_IMPL(open)
     if(argc>1)
     {
         const string path = argv[1];
-        gfx::TIFF_Interface I(path);
+        interface<gfx::I_TIFF> I(path);
         
         if(argc>2)
         {
