@@ -26,16 +26,31 @@ namespace yocto
             assert(handle);
             return TIFFReadDirectory((TIFF*)handle);
         }
-        
+
+        static inline int __GetWidth(void *handle, uint32_t *w ) throw()
+        {
+            assert(handle);
+            assert(w);
+            return TIFFGetField( (TIFF *)handle, TIFFTAG_IMAGEWIDTH, w);
+        }
+
+        static inline int __GetHeight(void *handle, uint32_t *h ) throw()
+        {
+            assert(handle);
+            assert(h);
+            return TIFFGetField( (TIFF *)handle, TIFFTAG_IMAGELENGTH, h);
+        }
+
 #define LINK(FUNCTION) api->FUNCTION = __##FUNCTION
         
         YOCTO_EXPORT void YOCTO_API YOCTO_RTLD_LOADER(I_TIFF *api) throw()
         {
-            //std::cerr << "Loading TIFF API" << std::endl;
             assert(api);
             LINK(Open);
             LINK(Close);
             LINK(ReadDirectory);
+            LINK(GetWidth);
+            LINK(GetHeight);
         }
     }
 }

@@ -24,6 +24,11 @@ YOCTO_UNIT_TEST_IMPL(open)
                 int count = 0;
                 do {
                     ++count;
+                    uint32_t w = 0;
+                    uint32_t h = 0;
+                    I->GetWidth(tiff,&w);
+                    I->GetHeight(tiff,&h);
+                    std::cerr << w << "x" << h << std::endl;
                 }
                 while( I->ReadDirectory(tiff) );
                 std::cerr << "Found " << count << " entry(ies)" << std::endl;

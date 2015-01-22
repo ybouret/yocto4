@@ -13,6 +13,8 @@ namespace yocto
             void * (*Open)(const char *filename, const char *mode);
             void   (*Close)(void *);
             int    (*ReadDirectory)(void*);
+            int    (*GetWidth)(void *, uint32_t *w);
+            int    (*GetHeight)(void *, uint32_t *h);
         };
     }
 }
