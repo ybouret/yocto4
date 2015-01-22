@@ -11,8 +11,7 @@ namespace yocto
     {
         
         typedef interface<I_TIFF> TIFF_Interface;
-        
-        
+
     }
 }
 

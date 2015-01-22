@@ -17,6 +17,7 @@ namespace yocto
     
     //! only memory exception is raised, may return NULL
     dylib      *dylib_load( const char *soname, dylib_flag flag, char *errbuf, size_t errlen);
+
     
 	//! exception in case of error
 	dylib      *dylib_load(const char *soname, dylib_flag flag);
