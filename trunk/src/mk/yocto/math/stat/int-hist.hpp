@@ -106,11 +106,11 @@ namespace yocto
                 {
                     // "background"
                     size_t nb = 0;
-                    size_t vb = ThresholdVar(t,bins.begin(),H.begin(), nb);
+                    double vb = ThresholdVar(t,bins.begin(),H.begin(), nb);
                     
                     // "foreground"
                     size_t nf = 0;
-                    size_t vf = ThresholdVar(n-t, bins.begin()+t, H.begin()+t, nf);
+                    double vf = ThresholdVar(n-t, bins.begin()+t, H.begin()+t, nf);
                     
                     const size_t ntot = nb+nf;
                     if(ntot<=0)

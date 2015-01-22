@@ -77,7 +77,7 @@ namespace yocto
             }
             
             //! hard copy
-            inline pixmap( const pixmap &px, const rectangle *rect = 0 ) :
+            inline pixmap( const pixmap &px, const rectangle *rect) :
             bitmap( px, rect ),
             nrow(0),
             rows(0)
