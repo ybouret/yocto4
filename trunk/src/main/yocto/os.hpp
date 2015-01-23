@@ -6,6 +6,8 @@
 #include <cassert>
 #include <cstddef>
 
+#define YOCTO_SO_EXT "so"
+
 #if defined(_WIN32)
 #	define YOCTO_PLATFORM "Windows"
 #	define YOCTO_WIN		1
@@ -13,6 +15,8 @@
 #     undef  _WIN32_WINNT
 #	  define _WIN32_WINNT    0x0501
 #   endif
+#   undef  YOCTO_SO_EXT
+#   define YOCTO_SO_EXT "dll"
 #endif
 
 #if defined(__MACH__) && ( defined(__APPLE__) || defined(__APPLE_CC__) )

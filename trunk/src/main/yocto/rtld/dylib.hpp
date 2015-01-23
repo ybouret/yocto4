@@ -20,8 +20,8 @@ namespace yocto
 
     
 	//! exception in case of error
-	dylib      *dylib_load(const char *soname, dylib_flag flag);
-    
+    dylib      *dylib_load(const char *soname, dylib_flag flag);
+
     //! increase reference count
     void        dylib_incr(dylib *dll) throw();
     

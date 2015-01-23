@@ -86,7 +86,8 @@ namespace yocto
         bitmap  *png_format:: load(const string          &filename,
                                    unit_t                 depth,
                                    image::put_rgba_proc   proc,
-                                   const void            *args) const
+                                   const void            *args,
+                                   const char            *) const
         {
             static const char fn[] = "png::load";
             assert(proc);

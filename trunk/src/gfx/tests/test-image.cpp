@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/gfx/image/png.hpp"
 #include "yocto/gfx/image/jpeg.hpp"
+#include "yocto/gfx/image/tiff.hpp"
 #include "yocto/fs/vfs.hpp"
 #include "yocto/gfx/rawpix-io.hpp"
 #include "yocto/gfx/ops/contrast.hpp"
@@ -42,14 +43,16 @@ YOCTO_UNIT_TEST_IMPL(image)
     
     IMG.declare( new png_format() );
     IMG.declare( new jpeg_format() );
-    
+    IMG.declare( new tiff_format() );
+
     show_format( IMG["PNG"]  );
     show_format( IMG["JPEG"] );
+    show_format( IMG["TIFF"] );
     
     for(int i=1;i<argc;++i)
     {
         const string           path = argv[i];
-        const bitmap::pointer  bmp( IMG.load(path,4,put_rgba_dup,NULL) );
+        const bitmap::pointer  bmp( IMG.load(path,4,put_rgba_dup,NULL,NULL) );
         pixmap4                pxm(bmp);
         const string           root    = vfs::get_base_name(path);
         std::cerr << path << ": " << pxm.w << "x" << pxm.h << std::endl;

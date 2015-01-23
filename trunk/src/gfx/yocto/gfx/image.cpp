@@ -91,10 +91,11 @@ namespace yocto
         bitmap *image::load(const string         &path,
                             unit_t                depth,
                             image::put_rgba_proc  proc,
-                            const void           *args) const
+                            const void           *args,
+                            const char           *options) const
         {
             const format &fmt = get_format_for(path);
-            return fmt.load(path, depth, proc, args);
+            return fmt.load(path, depth, proc, args, options);
         }
         
     }
