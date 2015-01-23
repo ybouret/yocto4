@@ -27,7 +27,7 @@ YOCTO_UNIT_TEST_IMPL(filter)
     for(int i=1;i<argc;++i)
     {
         const string path = argv[i];
-        const bitmap::pointer  bmp( IMG.load(path,4,io_conv::put_rgba,NULL) );
+        const bitmap::pointer  bmp( IMG.load(path,4,io_conv::put_rgba,NULL,NULL) );
         pixmap4                pxm(bmp);
         const string           root    = vfs::get_base_name(path);
         std::cerr << path << ": " << pxm.w << "x" << pxm.h << std::endl;

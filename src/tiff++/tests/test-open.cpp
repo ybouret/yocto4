@@ -1,5 +1,5 @@
 #include "yocto/tiff++/interface.hpp"
-#include "yocto/rtld/interface.hpp"
+#include "yocto/rtld/plugin.hpp"
 
 #include "yocto/utest/run.hpp"
 
@@ -7,10 +7,8 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(open)
 {
-    if(argc>1)
-    {
-        const string path = argv[1];
-        interface<gfx::I_TIFF> I(path);
+
+        plugin<gfx::I_TIFF> I("y-tiff");
         
         if(argc>2)
         {
@@ -41,7 +39,6 @@ YOCTO_UNIT_TEST_IMPL(open)
                 I->Close(tiff);
             }
             
-        }
     }
     
 }
