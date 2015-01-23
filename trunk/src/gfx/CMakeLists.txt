@@ -24,7 +24,7 @@ INSTALL( FILES ${ops_decl} DESTINATION include/yocto/gfx/ops )
 SOURCE_GROUP( gfx/ops FILES ${ops_srcs} )
 
 
-INCLUDE_DIRECTORIES( . ../main ../third_party/png ../third_party/jpeg)
+INCLUDE_DIRECTORIES( . ../main ../third_party/png ../third_party/jpeg ../tiff++)
 
 ########################################################################
 ##
