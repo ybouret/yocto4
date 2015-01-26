@@ -74,7 +74,7 @@ namespace yocto
                                      unit_t                depth,
                                      image::put_rgba_proc  proc,
                                      const void           *args,
-                                     const char           *) const
+                                     const void           *) const
         {
             static const char fn[] = "jpeg::load";
             assert(proc);
@@ -202,7 +202,7 @@ namespace yocto
                                 const bitmap        &bmp,
                                 image::get_rgba_proc proc,
                                 const void          *args,
-                                const char          *options) const
+                                const void          *options) const
         {
             static const char fn[] = "jpeg::save";
             assert(proc);

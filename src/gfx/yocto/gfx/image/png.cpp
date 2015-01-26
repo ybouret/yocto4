@@ -87,7 +87,7 @@ namespace yocto
                                    unit_t                 depth,
                                    image::put_rgba_proc   proc,
                                    const void            *args,
-                                   const char            *) const
+                                   const void            *) const
         {
             static const char fn[] = "png::load";
             assert(proc);
@@ -258,7 +258,7 @@ namespace yocto
                                const bitmap        &bmp,
                                image::get_rgba_proc proc,
                                const void          *args,
-                               const char          *options) const
+                               const void          *options) const
         {
             static const char fn[] = "png::save";
             
@@ -272,7 +272,7 @@ namespace yocto
             //
             // parse options
             //__________________________________________________________________
-            const string opt(options);
+            const string opt((const char*)options);
             bool use_alpha = false;
             if( options )
             {
