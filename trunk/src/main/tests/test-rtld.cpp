@@ -9,8 +9,8 @@ YOCTO_UNIT_TEST_IMPL(module)
 	{
 		dylib *dll = dylib_load( argv[1], dylib_full );
 		const module M( dll );
-		dylib *dll2 = dylib_load( argv[1], dylib_lazy );
-        const module M2( dll2 );
+		//dylib *dll2 = dylib_load( argv[1], dylib_lazy );
+        //const module M2( dll2 );
         for( int i=2; i < argc; ++i )
 		{
 			std::cerr << argv[i] << ": ";
