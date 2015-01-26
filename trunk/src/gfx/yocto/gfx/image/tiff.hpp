@@ -30,8 +30,15 @@ namespace yocto
                                   const void          *args,
                                   const void          *options) const;
 
-            
-            
+
+            uint32_t count(const string &filename) const;
+
+            bitmap *load_bitmap(const string          &filename,
+                                unit_t                 depth,
+                                image::put_rgba_proc   proc,
+                                const void            *args,
+                                const uint32_t         indx) const;
+
         private:
             plugin<I_TIFF> api;
             YOCTO_DISABLE_COPY_AND_ASSIGN(tiff_format);

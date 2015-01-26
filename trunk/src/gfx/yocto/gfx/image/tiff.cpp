@@ -49,7 +49,7 @@ namespace yocto
             const char *fn = filename.c_str();
             if(!api.is_loaded())
             {
-                throw exception("TIFF plugin is not loaded");
+                throw exception("tiff_format.load: TIFF plugin is not loaded");
             }
             void *tiff = api->Open(fn,"r");
 
@@ -113,6 +113,45 @@ namespace yocto
             }
         }
 
+        uint32_t tiff_format:: count(const string &filename) const
+        {
+            const char *fn = filename.c_str();
+            if(!api.is_loaded())
+            {
+                throw exception("tiff_format.load: TIFF plugin is not loaded");
+            }
+            void *tiff = api->Open(fn,"r");
+            if(!tiff)
+            {
+                throw exception("TIFF: cannot open '%s'", fn);
+            }
+            try
+            {
+                const uint32_t nd = api->CountDirectories(tiff);
+                api->Close(tiff);
+                return nd;
+            }
+            catch(...)
+            {
+                api->Close(tiff);
+                throw;
+            }
+
+        }
+
+
+        bitmap *tiff_format:: load_bitmap(const string          &filename,
+                                          unit_t                 depth,
+                                          image::put_rgba_proc   proc,
+                                          const void            *args,
+                                          const uint32_t         indx) const
+
+        {
+            return load(filename,depth,proc,args,&indx);
+        }
+
+
+
         void tiff_format:: save(const string        &filename,
                                 const bitmap        &bmp,
                                 image::get_rgba_proc proc,
@@ -121,6 +160,9 @@ namespace yocto
         {
             
         }
+        
+        
+        
         
     }
 }
