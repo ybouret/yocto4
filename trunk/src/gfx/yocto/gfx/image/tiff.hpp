@@ -29,6 +29,7 @@ namespace yocto
                                   image::get_rgba_proc proc,
                                   const void          *args,
                                   const void          *options) const;
+
             
             
         private:
