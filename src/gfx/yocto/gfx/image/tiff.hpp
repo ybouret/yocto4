@@ -31,7 +31,7 @@ namespace yocto
                                   const void          *options) const;
 
 
-            uint32_t count(const string &filename) const;
+            uint32_t count_directories(const string &filename) const;
 
             bitmap *load_bitmap(const string          &filename,
                                 unit_t                 depth,
