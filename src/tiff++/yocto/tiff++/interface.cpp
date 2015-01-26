@@ -49,6 +49,14 @@ namespace yocto
             return TIFFReadRGBAImage((TIFF *)handle, w, h, raster,0);
         }
 
+        static inline
+        int __SetDirectory(void *handle, uint32_t n)
+        {
+            assert(handle);
+            return TIFFSetDirectory((TIFF*)handle, n);
+        }
+        
+
 
 #define LINK(FUNCTION) api->FUNCTION = __##FUNCTION
         
@@ -61,6 +69,7 @@ namespace yocto
             LINK(GetWidth);
             LINK(GetHeight);
             LINK(ReadRGBAImage);
+            LINK(SetDirectory);
         }
     }
 }
