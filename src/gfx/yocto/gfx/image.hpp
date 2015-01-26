@@ -59,6 +59,7 @@ namespace yocto
             const format & operator[](const string &) const;
             const format & operator[](const char   *) const;
 
+            // find someone for the extension
             bitmap *load(const string         &path,
                          unit_t                depth,
                          image::put_rgba_proc  proc,
