@@ -44,7 +44,7 @@ namespace yocto
                                     unit_t                 depth,
                                     image::put_rgba_proc   proc,
                                     const void            *args,
-                                    const char            *options) const
+                                    const void            *options) const
         {
             const char *fn = filename.c_str();
             if(!api.is_loaded())
@@ -96,7 +96,7 @@ namespace yocto
                                 const bitmap        &bmp,
                                 image::get_rgba_proc proc,
                                 const void          *args,
-                                const char          *options) const
+                                const void          *options) const
         {
             
         }

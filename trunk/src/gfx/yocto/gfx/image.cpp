@@ -92,7 +92,7 @@ namespace yocto
                             unit_t                depth,
                             image::put_rgba_proc  proc,
                             const void           *args,
-                            const char           *options) const
+                            const void           *options) const
         {
             const format &fmt = get_format_for(path);
             return fmt.load(path, depth, proc, args, options);
