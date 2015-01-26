@@ -21,6 +21,7 @@ namespace yocto
                 YOCTO_INTERFACE_CHECK(api,GetWidth);
                 YOCTO_INTERFACE_CHECK(api,GetHeight);
                 YOCTO_INTERFACE_CHECK(api,ReadRGBAImage);
+                YOCTO_INTERFACE_CHECK(api,SetDirectory);
             }
         }
 
