@@ -5,6 +5,8 @@
 #include "yocto/rtld/export.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/counted-object.hpp"
+#include "yocto/memory/buffers.hpp"
+#include "yocto/memory/pooled.hpp"
 
 #include <typeinfo>
 #include <cstring>
@@ -17,20 +19,25 @@ namespace yocto
     class rtld_content : public counted_object
     {
     public:
-        static const char loader_name[];
+        static const char   loader_name[];
+        static const size_t max_message_length = 80;
+        typedef memory::buffer_of<char,memory::pooled> message_type;
 
         virtual ~rtld_content() throw();
 
-        const char *uid;
+        const char  *uid;  //!< api name from types
+        message_type msg;  //!< to get i/o error
 
+        bool is_loaded() const throw();
+        
     protected:
         explicit rtld_content( const string &soname, const char *api_name);
-
-        const module dll;
-
+        dylib   *dll;
 
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(rtld_content);
+
+
     };
 
     //! interface to a C-API
@@ -38,7 +45,7 @@ namespace yocto
     class interface
     {
     public:
-
+        static const size_t num_entries = sizeof(C_API)/sizeof(void*);
 
         //! holds information: API/DLL
         class content : public rtld_content
@@ -64,78 +71,67 @@ namespace yocto
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(content);
-            
+
             inline content( const string &soname ) :
             rtld_content(soname,typeid(C_API).name()),
             api()
             {
                 clear();
-                void (YOCTO_API *ld)(const C_API *) = 0; // loading function
-                dll.link(ld,loader_name);                // fetch it in the dll
-                if( !ld )
-                    throw exception("plugin<%s>(no loader '%s')", uid, loader_name );
-                ld( &api );                              // populate API
+                if(dll)
+                {
+                    void (YOCTO_API *ld)(const C_API *) = 0; // loading function
+                    const module M(dll);
+                    M.link(ld,loader_name);                // fetch it in the dll
+                    if( !ld )
+                        throw exception("plugin<%s>(no loader '%s')", uid, loader_name );
+                    ld( &api );                              // populate API
+                }
             }
 
             inline void clear() throw() { memset( (void*)&api,0,sizeof(C_API)); }
         };
 
 
-        //! dedicated reference counted smart pointer
-        class pointer
-        {
-        public:
-            inline pointer(content *c) throw():
-            ld( c ) { assert(ld); ld->withhold(); }
-
-
-            inline pointer( const pointer &other ) throw() :
-            ld( other.ld ) { ld->withhold(); }
-
-            virtual ~pointer() throw()
-            {
-                assert(ld);
-                if( ld->liberate() )
-                {
-                    delete ld;
-                    ld = 0;
-                }
-            }
-
-            inline const C_API   * operator->() const throw() { return &(ld->api); }
-            inline const content & operator*()  const throw() { return *ld; }
-
-        private:
-            YOCTO_DISABLE_ASSIGN(pointer);
-            content *ld;
-
-        };
-
-        const pointer handle;
 
         inline interface( const string &soname ) :
         handle(  content::create(soname) )
         {
+            handle->withhold();
         }
 
         inline interface( char *soname ) :
         handle( content::create(soname)  )
         {
-            
+            handle->withhold();
         }
 
-        inline interface(const interface &I) throw() : handle( I.handle ) {}
+        inline interface(const interface &I) throw() : handle( I.handle )
+        {
+            handle->withhold();
+        }
         
-        virtual ~interface() throw() {}
-        
-        //! use "->" transitivity
-        const C_API * operator->() const throw() { return &( (*handle).api ); }
+        virtual ~interface() throw()
+        {
+            if( handle->liberate() )
+            {
+                delete handle;
+            }
+            handle = 0;
+        }
+
+        inline bool          is_loaded()  const throw() { return handle->is_loaded(); }
+        inline const char *  when()       const throw() { return handle->msg();       }
+        inline const C_API * operator->() const throw() { return & (handle->api);     }
+        inline const char  * name()       const throw() { return handle->uid;         }
         
     private:
+        content *handle;
         YOCTO_DISABLE_ASSIGN(interface);
         
     };
-    
+
+#define YOCTO_INTERFACE_CHECK(I,ENTRY) do { if(0==I->ENTRY) throw exception("'%s': missing '%s'", I.name(), #ENTRY); } while(false)
+
 }
 
 

@@ -14,6 +14,14 @@ namespace yocto
         image::format("TIFF"),
         api("y-tiff")
         {
+            if(api.is_loaded())
+            {
+                YOCTO_INTERFACE_CHECK(api,Open);
+                YOCTO_INTERFACE_CHECK(api,Close);
+                YOCTO_INTERFACE_CHECK(api,GetWidth);
+                YOCTO_INTERFACE_CHECK(api,GetHeight);
+                YOCTO_INTERFACE_CHECK(api,ReadRGBAImage);
+            }
         }
 
         bool tiff_format:: lossless() const throw()
@@ -26,10 +34,11 @@ namespace yocto
             static const char *__ext[] = { "tif", "tiff", 0 };
             return __ext;
         }
-#define TIFFGetR(abgr) ((abgr) & 0xff)
-#define TIFFGetG(abgr) (((abgr) >> 8) & 0xff)
+#define TIFFGetR(abgr) ( (abgr)        & 0xff)
+#define TIFFGetG(abgr) (((abgr) >> 8)  & 0xff)
 #define TIFFGetB(abgr) (((abgr) >> 16) & 0xff)
 #define TIFFGetA(abgr) (((abgr) >> 24) & 0xff)
+
         bitmap  *tiff_format:: load(const string          &filename,
                                     unit_t                 depth,
                                     image::put_rgba_proc   proc,
@@ -37,6 +46,10 @@ namespace yocto
                                     const char            *options) const
         {
             const char *fn = filename.c_str();
+            if(!api.is_loaded())
+            {
+                throw exception("TIFF plugin is not loaded");
+            }
             void *tiff = api->Open(fn,"r");
             if(!tiff)
             {
@@ -48,7 +61,7 @@ namespace yocto
                 throw exception("no width for '%s'",fn);
             }
             uint32_t h = 0;
-            if(!api->GetWidth(tiff,&h))
+            if(!api->GetHeight(tiff,&h))
             {
                 throw exception("no height for '%s'",fn);
             }
