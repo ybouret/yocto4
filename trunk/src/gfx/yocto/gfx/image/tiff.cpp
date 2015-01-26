@@ -113,7 +113,7 @@ namespace yocto
             }
         }
 
-        uint32_t tiff_format:: count(const string &filename) const
+        uint32_t tiff_format:: count_directories(const string &filename) const
         {
             const char *fn = filename.c_str();
             if(!api.is_loaded())

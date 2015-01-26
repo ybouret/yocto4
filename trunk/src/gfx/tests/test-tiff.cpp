@@ -16,7 +16,7 @@ YOCTO_UNIT_TEST_IMPL(tiff)
     if(argc>1)
     {
         const string   filename = argv[1];
-        const uint32_t nd = fmt->count(filename);
+        const uint32_t nd = fmt->count_directories(filename);
         std::cerr << "Found #image=" << nd << std::endl;
         for(uint32_t i=0;i<nd;++i)
         {
