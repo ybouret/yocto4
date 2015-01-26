@@ -13,14 +13,14 @@ namespace yocto
             TIFF *tiff = TIFFOpen(filename,mode);
             return tiff;
         }
-        
+
         static inline
         void __Close(void *handle) throw()
         {
             assert(handle);
             TIFFClose((TIFF*)handle);
         }
-        
+
         static inline int __ReadDirectory(void *handle) throw()
         {
             assert(handle);
@@ -50,16 +50,29 @@ namespace yocto
         }
 
         static inline
-        int __SetDirectory(void *handle, uint32_t n)
+        int __SetDirectory(void *handle, uint32_t n) throw()
         {
             assert(handle);
             return TIFFSetDirectory((TIFF*)handle, n);
         }
-        
+
+        static inline
+        uint32_t __CountDirectories(void *handle)
+        {
+            assert(handle);
+            TIFF *tiff = (TIFF *)handle;
+            uint32_t count = 0;
+            do
+            {
+                ++count;
+            }
+            while( TIFFReadDirectory(tiff) );
+            return count;
+        }
 
 
 #define LINK(FUNCTION) api->FUNCTION = __##FUNCTION
-        
+
         YOCTO_EXPORT void YOCTO_API YOCTO_RTLD_LOADER(I_TIFF *api) throw()
         {
             assert(api);
@@ -70,6 +83,7 @@ namespace yocto
             LINK(GetHeight);
             LINK(ReadRGBAImage);
             LINK(SetDirectory);
+            LINK(CountDirectories);
         }
     }
 }
