@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(tiff)
         std::cerr << "Found #image=" << nd << std::endl;
         for(uint32_t i=0;i<nd;++i)
         {
-            arc_ptr<bitmap> bmp( fmt->load_bitmap(filename, 3, io_conv::put_rgb,NULL,i) );
+            arc_ptr<bitmap> bmp( fmt->load_bitmap(filename, 3,  io_conv::put_rgb, NULL,i) );
             png->save( vformat("img%u.png", unsigned(i)), *bmp, io_conv::get_rgb, NULL, NULL);
         }
     }
