@@ -1,6 +1,15 @@
 PROJECT(tiff++)
 
-FIND_PACKAGE(TIFF)
+MESSAGE( STATUS "Looking for installed TIFF" )
+
+IF(MINGW OR MSYS)
+	MESSAGE( STATUS "mingw" )
+	SET(TIFF_DIR "C:/MinGW")
+	SET(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};c:/MinGW")
+	FIND_PACKAGE(TIFF)
+ELSE()
+	FIND_PACKAGE(TIFF)
+ENDIF()
 
 IF(TIFF_FOUND)
 	MESSAGE( STATUS "Found Tiff...")
@@ -10,6 +19,9 @@ IF(TIFF_FOUND)
 	yocto/tiff++/interface.hpp
 	yocto/tiff++/interface.cpp)
 	TARGET_LINK_LIBRARIES(y-tiff ${TIFF_LIBRARIES})
+	IF(MINGW OR MSYS)
+		TARGET_LINK_LIBRARIES(y-tiff lzma z jpeg)
+	ENDIF()
 	INSTALL( TARGETS y-tiff LIBRARY DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
