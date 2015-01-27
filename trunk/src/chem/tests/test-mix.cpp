@@ -63,6 +63,13 @@ YOCTO_UNIT_TEST_IMPL(mix)
         solutions.push_back(S);
     }
     
+    std::cerr << "Loading matrix of solutions..." << std::endl;
+    {
+        matrix_t solutions;
+        __lua::load(L,solutions, "mix", lib, eqs, 0.0);
+        std::cerr << "solutions=" << std::endl << solutions << std::endl;
+    }
+
 
     vector<double> alpha(1000,0);
     for(size_t i=alpha.size();i>0;--i)
@@ -88,7 +95,8 @@ YOCTO_UNIT_TEST_IMPL(mix)
         std::cerr.flush();
     }
     std::cerr << std::endl;
-    
+
+
     
     
     
