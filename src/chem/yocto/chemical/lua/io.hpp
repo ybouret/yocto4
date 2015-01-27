@@ -5,7 +5,7 @@
 #include "yocto/chemical/boot.hpp"
 #include "yocto/chemical/effectors.hpp"
 
-#include "lua.hpp"
+#include "yocto/lua/lua.hpp"
 #include "yocto/functor.hpp"
 
 namespace yocto
@@ -91,25 +91,36 @@ namespace yocto
             //
             // mix API
             //__________________________________________________________________
-            static void load(lua_State *L, matrix_t solutions, const string &id);
+            static void load(lua_State     *L,
+                             matrix_t      &solutions,
+                             const string  &id,
+                             const library &lib,
+                             equilibria    &eqs,
+                             const double   t);
             
             //__________________________________________________________________
             //
-            // Classes
+            // Classes to help
             //__________________________________________________________________
+
+            //! Load the library with the given ID
             class Library : public library
             {
             public:
+                // update the lua_State then load library
                 explicit Library( lua_State *L, const char *id );
                 virtual ~Library() throw();
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Library);
             };
-            
+
+
+            //! load the equilibria from the table with the given ID
             class Equilibria : public equilibria
             {
             public:
+                // load and compile
                 explicit Equilibria(lua_State *L, const char *id, const library &lib);
                 virtual ~Equilibria() throw();
                 
@@ -118,7 +129,7 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Equilibria);
             };
             
-            
+            //! load the effectors from the table with the given ID
             class Effectors : public effectors
             {
             public:
