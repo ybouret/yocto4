@@ -135,7 +135,7 @@ namespace yocto
             const size_t n = lua_rawlen(L, -1);
             for(size_t i=1;i<=n;++i)
             {
-                std::cerr << "\tparsing constraint #" << i << std::endl;
+                //std::cerr << "\tparsing constraint #" << i << std::endl;
                 lua_rawgeti(L,-1, i);
                 __parse_constraint(L,loader,txt,lib,i);
                 lua_pop(L,1);
