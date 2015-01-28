@@ -107,7 +107,7 @@ namespace yocto
             class Library : public library
             {
             public:
-                // update the lua_State then load library
+                // update the lua_State (function, R, F), then load library
                 explicit Library( lua_State *L, const char *id );
                 virtual ~Library() throw();
                 
