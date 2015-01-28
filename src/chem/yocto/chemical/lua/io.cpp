@@ -1,5 +1,6 @@
 #include "yocto/chemical/lua/io.hpp"
 #include "yocto/math/types.hpp"
+#include "yocto/physics/constants.hpp"
 
 namespace yocto
 {
@@ -45,7 +46,7 @@ namespace yocto
             lua_pushnumber(L,V);
             return 1;
         }
-        
+
 
         
         
@@ -61,6 +62,13 @@ namespace yocto
             
             lua_pushcfunction(L, Lua_EllipsoidVolume);
             lua_setglobal(L, "EllipsoidVolume");
+
+            lua_pushnumber(L, Y_R);
+            lua_setglobal(L, "R");
+
+            lua_pushnumber(L, Y_FARADAY);
+            lua_setglobal(L, "F");
+
             
         }
         
