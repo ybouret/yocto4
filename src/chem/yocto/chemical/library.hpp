@@ -59,8 +59,8 @@ namespace yocto
             void decrease() const throw();
             const size_t nref;
 
-            double osmolarity(    const array<double> &C) const;
-            double charge(  const array<double> &C) const;
+            double osmolarity( const array<double> &C) const;
+            double charge(const array<double> &C) const;
             double ionic_strength(const array<double> &C) const;
             double pH(const array<double> &C) const;
             std::ostream & display(std::ostream &os, const array<double> &C) const;

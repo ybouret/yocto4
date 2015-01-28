@@ -102,8 +102,8 @@ namespace yocto
                     }
                 }
                 co_qsort(Jfixed,Cfixed);
-                std::cerr << "Jfixed=" << Jfixed << std::endl;
-                std::cerr << "Cfixed=" << Cfixed << std::endl;
+                //std::cerr << "Jfixed=" << Jfixed << std::endl;
+                //std::cerr << "Cfixed=" << Cfixed << std::endl;
             }
             
             
@@ -167,7 +167,7 @@ namespace yocto
                 if(!IGS(F))
                     throw exception("unexpected failure in P normalization");
                 
-                std::cerr << "F=" << F << std::endl;
+                //std::cerr << "F=" << F << std::endl;
                 
                 for(size_t i=N;i>0;--i)
                 {
@@ -331,8 +331,8 @@ namespace yocto
             fixedJ.free();
             fixedC.free();
             rewrite_constraints(P,Lam,fixedJ,fixedC,active);
-            std::cerr << "Lam=" << Lam << std::endl;
-            std::cerr << "P="   << P   << std::endl;
+            //std::cerr << "Lam=" << Lam << std::endl;
+            //std::cerr << "P="   << P   << std::endl;
             tao::set(aboot,active);
             for(size_t j=fixedJ.size();j>0;--j)
             {
@@ -341,8 +341,8 @@ namespace yocto
             
             
             
-            std::cerr << "active=" << active << std::endl;
-            std::cerr << "localA=" << aboot  << std::endl;
+            //std::cerr << "active=" << active << std::endl;
+            //std::cerr << "localA=" << aboot  << std::endl;
             
             {
                 imatrix_t P2(Nc,Nc);
