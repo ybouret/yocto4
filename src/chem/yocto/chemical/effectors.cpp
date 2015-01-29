@@ -11,7 +11,7 @@ namespace yocto
         
         effector:: effector(const string &id) :
         name(id),
-        Vmax(1.0)
+        pace(1.0)
         {
         }
         
@@ -22,7 +22,7 @@ namespace yocto
             assert(rho.size()>=params.lib.size());
             for(size_t j=params.lib.size();j>0;--j)
             {
-                rho[j] *= Vmax;
+                rho[j] *= pace;
             }
         }
         
@@ -70,7 +70,7 @@ namespace yocto
                 eff.rate(_rho,t,Cin,Cout,params);
                 for(size_t j=M;j>0;--j)
                 {
-                    rho[j] += eff.Vmax * _rho[j];
+                    rho[j] += eff.pace * _rho[j];
                 }
             }
         }

@@ -8,7 +8,7 @@ namespace yocto
         __lua::Library:: Library( lua_State *L, const char *id ) :
         library()
         {
-            __lua::register_functions(L);
+            //__lua::register_functions(L);
             __lua::load(L,*this,id);
         }
         

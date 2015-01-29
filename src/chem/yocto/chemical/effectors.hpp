@@ -15,7 +15,7 @@ namespace yocto
             typedef intr_ptr<string,effector> pointer;
             typedef set<string,pointer>       db;
             const string name;
-            double       Vmax; //!< initially 1.0
+            double       pace; //!< initially 1.0
             
             virtual ~effector() throw();
             const string & key() const throw();
