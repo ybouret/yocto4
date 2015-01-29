@@ -20,7 +20,7 @@ namespace yocto
         {
             
             assert(C0.size()>=M);
-            assert(rho.size()==C0.size());
+            assert(rho.size()>=M);
             tao::set(C,C0);
             tao::set(dC,rho);
             
