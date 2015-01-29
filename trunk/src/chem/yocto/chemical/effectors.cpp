@@ -67,7 +67,9 @@ namespace yocto
             {
                 effector &eff = **i;
                 for(size_t j=M;j>0;--j) _rho[j] = 0;
+
                 eff.rate(_rho,t,Cin,Cout,params);
+                std::cerr << "rho_" << eff.name << "=" << _rho << std::endl;
                 for(size_t j=M;j>0;--j)
                 {
                     rho[j] += eff.pace * _rho[j];
