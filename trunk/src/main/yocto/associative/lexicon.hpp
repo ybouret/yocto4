@@ -48,7 +48,7 @@ namespace yocto
             Node        *prev;
             const size_t hkey;
             type         data;
-            inline  Node(const size_t k, param_type &args) :
+            inline  Node(const size_t k, param_type args) :
             next(0),
             prev(0),
             hkey(k),
