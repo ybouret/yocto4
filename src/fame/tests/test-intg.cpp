@@ -30,3 +30,4 @@ YOCTO_UNIT_TEST_IMPL(intg)
     std::cerr << "ans=" << ans << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
+
