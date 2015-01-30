@@ -69,11 +69,12 @@ namespace yocto
                 for(size_t j=M;j>0;--j) _rho[j] = 0;
 
                 eff.rate(_rho,t,Cin,Cout,params);
-                std::cerr << "rho_" << eff.name << "=" << _rho << std::endl;
                 for(size_t j=M;j>0;--j)
                 {
-                    rho[j] += eff.pace * _rho[j];
+                    _rho[j] *= eff.pace;
+                    rho[j]  +=  _rho[j];
                 }
+                std::cerr << "rho_" << eff.name << "=" << _rho << std::endl;
             }
         }
         
