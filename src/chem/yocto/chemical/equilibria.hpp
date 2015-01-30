@@ -138,6 +138,9 @@ namespace yocto
             //__________________________________________________________________
             
             //! absorb a part of rho assuming that C0 is normalized !
+            /**
+             Append the derivatives of Gamma
+             */
             void absorb(const double         t,
                         array<double>       &rho,
                         const array<double> &C0);
