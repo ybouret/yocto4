@@ -145,7 +145,8 @@ namespace yocto
             inline T & append()
             {
                 push( Value::TypeFor( typeid(T) ) );
-                return values.back().as<T>();
+		Value &v = values.back();
+                return v.as<T>();
             }
             
             
@@ -214,7 +215,9 @@ namespace yocto
             inline T &insert( const String &key )
             {
                 insert(key, Value::TypeFor(typeid(T)));
-                return pairs.back().value.as<T>();
+		Pair  &p = pairs.back();
+		Value &v = p.value;
+                return v.as<T>();
             }
             
             //! Array/Object/String/Number
@@ -222,7 +225,9 @@ namespace yocto
             inline T &insert( const char *key )
             {
                 insert(key, Value::TypeFor(typeid(T)));
-                return pairs.back().value.as<T>();
+		Pair  &p = pairs.back();
+		Value &v = p.value;
+                return v.as<T>();
             }
             
         private:

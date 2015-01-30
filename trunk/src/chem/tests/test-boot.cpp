@@ -53,3 +53,4 @@ YOCTO_UNIT_TEST_IMPL(boot)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
