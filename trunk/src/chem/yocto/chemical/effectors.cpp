@@ -74,7 +74,7 @@ namespace yocto
                     _rho[j] *= eff.pace;
                     rho[j]  +=  _rho[j];
                 }
-                std::cerr << "rho_" << eff.name << "=" << _rho << std::endl;
+                //std::cerr << "rho_" << eff.name << "=" << _rho << std::endl;
             }
         }
         
