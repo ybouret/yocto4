@@ -1,4 +1,5 @@
 #include "yocto/mpa/word2mpz.hpp"
+#include "yocto/error.hpp"
 
 namespace yocto
 {
@@ -50,6 +51,8 @@ namespace yocto
                 }
                     
             }
+            critical_error(error_invalid_data,"mpa.integer.compare: unexpected sign");
+            return __zero;
         }
         
         int integer:: compare( const integer &lhs, const int64_t rhs ) throw()
