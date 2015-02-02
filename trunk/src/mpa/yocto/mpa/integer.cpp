@@ -1,5 +1,6 @@
 #include "yocto/mpa/integer.hpp"
 #include "yocto/code/bswap.hpp"
+#include "yocto/error.hpp"
 
 #include <iostream>
 
@@ -60,6 +61,8 @@ namespace yocto
                 case __zero:     return __zero;
                 case __positive: return __negative;
             }
+            critical_error(error_invalid_data,"mpa.sign_neg: unexpected sign");
+            return __zero;
         }
         
         sign_type sign_mul(const sign_type lhs,const sign_type rhs) throw()
@@ -83,6 +86,8 @@ namespace yocto
                         case __positive: return __positive;
                     }
             }
+            critical_error(error_invalid_data,"mpa.sign_mul: unexpected sign");
+            return __zero;
         }
         
         
