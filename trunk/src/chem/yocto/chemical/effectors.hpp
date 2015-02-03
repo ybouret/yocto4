@@ -51,7 +51,8 @@ namespace yocto
             
             effector & operator[](const string &name );
             effector & operator[](const char   *name );
-            
+
+            void rescale_pace( const double speedup ) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(effectors);

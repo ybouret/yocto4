@@ -92,7 +92,14 @@ namespace yocto
             return (*this)[NAME];
         }
 
-        
+        void effectors:: rescale_pace( const double speedup ) throw()
+        {
+            for( iterator i = begin(); i != end(); ++i )
+            {
+                (**i).pace *= speedup;
+            }
+        }
+
     }
     
 }
