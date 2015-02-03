@@ -26,17 +26,19 @@ namespace yocto
         }
         
         
+
         template <typename T>
-        inline void simulation_times( T &dt, T &dt_save, size_t &every )
+        inline size_t simulation_save_every( T &dt, T &dt_save )
         {
             assert(dt>0);
-            dt = log_round_floor(dt);
+            dt = log_round_ceil(dt);
             if(dt_save<=dt) dt_save = dt;
-            every   = size_t(Floor(dt_save/dt));
+            size_t every = size_t(Floor(dt_save/dt));
             if(every<1) every=1;
-            dt_save = every * dt;
+            dt_save = every*dt;
+            return every;
         }
-        
+
         template <typename T>
         inline size_t simulation_iter( const T t_run, const T dt, const size_t every )
         {
