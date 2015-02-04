@@ -1,4 +1,5 @@
 #include "yocto/mpa/word2mpz.hpp"
+#include "yocto/error.hpp"
 
 namespace yocto
 {
@@ -12,6 +13,8 @@ namespace yocto
                 case __zero: return integer();
                 case __positive: { const natural p = lhs.n * rhs.n; return integer( __positive, p); }
             }
+	    critical_error(error_invalid_data,"integer.mul invalid sign");
+	    return integer();
         }
         
         integer integer:: mul(const int64_t  lhs, const integer &rhs)
