@@ -112,9 +112,9 @@ namespace yocto
             static int compare( const int64_t  lhs, const integer &rhs ) throw();
 
 #define YOCTO_COMPARE_MPZ(OP) \
-inline friend bool operator OP (const integer &lhs, const integer &rhs) throw() { return compare(lhs,rhs) OP 0; } \
-inline friend bool operator OP (const integer &lhs, const int64_t  rhs) throw() { return compare(lhs,rhs) OP 0; } \
-inline friend bool operator OP (const int64_t  lhs, const integer &rhs) throw() { return compare(lhs,rhs) OP 0; }
+inline friend bool operator OP (const integer &lhs, const integer &rhs) throw() { return integer::compare(lhs,rhs) OP 0; } \
+inline friend bool operator OP (const integer &lhs, const int64_t  rhs) throw() { return integer::compare(lhs,rhs) OP 0; } \
+inline friend bool operator OP (const int64_t  lhs, const integer &rhs) throw() { return integer::compare(lhs,rhs) OP 0; }
             
             YOCTO_COMPARE_MPZ(==)
             YOCTO_COMPARE_MPZ(!=)

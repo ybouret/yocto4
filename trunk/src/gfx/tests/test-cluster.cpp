@@ -30,11 +30,13 @@ static inline rgba_t get_rgba_dup(const void *addr, const void *)
     //return *(const rgba_t *)addr;
 }
 
+#if 0
 static inline rgba_t get_rgba_from_rgb(const void *addr, const void *)
 {
     const  rgb_t &c = *(const rgb_t *)addr;
     return rgba_t(c.r,c.g,c.b);
 }
+#endif
 
 static rgba_t LOCAL_COLORS[8];
 
