@@ -327,7 +327,9 @@ namespace yocto
             SEXP list_names = 0;
             PROTECT(list_names = allocVector(STRSXP,size));
             for(size_t i = 0; i < size; i++)
+            {
                 SET_STRING_ELT(list_names,i,mkChar(names[i]));
+            }
             setAttrib(L, R_NamesSymbol, list_names);
             UNPROTECT(1); //-- list_name
             
