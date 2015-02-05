@@ -1,0 +1,39 @@
+\documentclass[aps,twocolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+%\usepackage{mathptmx}
+\usepackage{xfrac}
+
+\newcommand{\mymat}[1]{\boldsymbol{#1}}
+\newcommand{\mytrn}[1]{{\!\!~^{\mathsf{t}}{#1}}}
+\newcommand{\myvec}[1]{\overrightarrow{#1}}
+\newcommand{\half}{\sfrac{1}{2}}
+\newcommand{\q}{\vec{q}}
+\newcommand{\dq}{\dot{\q}}
+\newcommand{\ddq}{\ddot{\q}}
+\newcommand{\C}{\vec{C}}
+\newcommand{\J}{\mymat{J}}
+\newcommand{\dJ}{\dot{\J}}
+\newcommand{\tJ}{\mytrn{\J}}
+\newcommand{\G}{\vec{G}}
+\newcommand{\W}{\mymat{W}}
+\newcommand{\A}{\mymat{A}}
+\newcommand{\JW}{\hat{\mymat{J}}}
+\newcommand{\tJW}{\mytrn{\JW}}
+
+\begin{document}
+
+\title{Some particles dynamics}
+\maketitle
+
+Let us assume that we have a set of $N$ particles with positions $\q$.
+Those particles are submitted to some forces $\vec{F}$ such that
+\begin{equation}
+	\ddq = \W \vec{F}
+\end{equation}
+
+\end{document}
+
