@@ -28,65 +28,96 @@
 
 \begin{document}
 
-\title{Some particles dynamics}
+\title{Some particles dynamics, with constraints}
 \maketitle
-
 \section{Setup}
-
-Let us assume that we have a set of $N$ particles with positions $\q$.
-Those particles are submitted to some forces $\vec{F}$ such that
+Let $N$ be the number of particles with coordinates $\q$.	
+we assume that those particles have a set of external forces $\vec{F}$.
+We also assume that there is a set of $M$ holonomic, stationary constraints
 \begin{equation}
-	\ddq = \W \vec{F}
+	\C\left(\q\right) = \vec{0}
+\end{equation}
+which define the legal coordinates.
+We also define the legal velocities by
+\begin{equation}
+	\J \dq = \vec{0}.
+\end{equation}
+We assume that those internal constraints yields internal forces which are
+a combination of the Jacobian lines (or of the rows of the Jacobian transpose).
+Let us devise the velocity Verlet algorithm for this system, during a time step $\tau$.
+
+\section{Algorithm}
+
+\subsection{Initial phase space and forces}
+We avec $\q_n$ and $\dq_n$ such that
+\begin{equation}
+	\C(\q_n) = \vec{0}
+\end{equation}
+and
+\begin{equation}
+	\J_n \dq_n = \vec{0}.
+\end{equation}
+We also compute
+\begin{equation}
+	\vec{F}_n = \vec{F}\left(\q_n,\dq_n\right) 
 \end{equation}
 
-\section{Velocity Verlet}
-We start from $\q_n$, $\dq_n$ and $\ddq_n         = \W \vec{F}\left(\q_n,\dq_n\right)$.
-
-\begin{enumerate}
-\item Evaluate $\dq_{n+\half}  = \dq_n + \dfrac{1}{2}\tau \ddq_n$
-\item Evaluate $\q_{n+1} = \q_{n} + \tau \dq_{n+\half}$
-\item Evaluate $\ddq_{n+\half} = \W \vec{F}\left(\q_{n+1},\dq_{n+\half}\right)$
-\item Update   $\dq_{n+1}      = \dq_{n+\half} + \dfrac{1}{2} \tau \ddq_{n+\half}$
-\item Evaluate $\ddq_{n+1}     = \W \vec{F}\left(\q_{n+1},\dq_{n+1}\right)$
-\end{enumerate}
-
-\section{Adding constraints}
-We have to deal with a set of $M$ constraints 
+\subsection{Predicted Position}
+The predicted position is
 \begin{equation}
-	\C\left(\q\right) = \vec{0}.
+	\q_{n+\half} = \q_{n} + \tau \dq_n + \dfrac{1}{2} \tau^2 \W \vec{F}_n
 \end{equation}
-This also defines the legal velocities since
+
+\subsection{Corrected Position}
+We have to come back to the legal position using a set of Lagrange multipliers so that
 \begin{equation}
-\dfrac{d \C}{dt} = \vec{0} = \J \dq
+	\C\left( \q_{n+\half} + \W\tJ_n \lambda_n \right) = \vec{0}
 \end{equation}
-where $\J$ is the Jacobian of $\C$ w.r.t. $\q$.
-Let us assume that we start from $\q_n$ and $\dq_n$ that match the two previous relations.
-Since we have a discrete algorithm, we assume that
-an extra force is acting along a combination of $\mytrn{\J}$.
-
-We can modify the Velocity Verlet algorithm.
-
-We start from $\q_n$, $\dq_n$ and $\ddq_n = \W \vec{F}\left(\q_n,\dq_n\right)$,
-assuming $\C\left(\q_n\right) = \vec{0}$ and $\J_n \dq_n =\vec{0}$.
-\begin{enumerate}
-\item We compute $\q_{n+\half} = \q_{n} + \tau \dq_n + \dfrac{1}{2} \tau^2 \ddq_n$.
-\item We solve for $\vec{\lambda}$ such that
-\begin{equation}
-	\C\left(\q_{n+\half}+\W\mytrn{\J}_n\vec{\lambda}\right) = \vec{0} 
-\end{equation}
-using ONLY $\J_n$ as the Jacobian of $\C$.
-
-\item We compute $\delta\q_n=\W\mytrn{\J}_n\vec{\lambda}$ and $\q_{n+1} = \q_{n+\half} + \delta\q_n$.
-\item We evaluate $\J_{n+1}$.
-\item We evaluate the half step velocity increase
-	$$
-		\dq_{n+\onethird} = \dq_n + \dfrac{1}{2} \tau \ddq_n + \dfrac{1}{\tau} \delta\q_n
-	$$
-\item We compute $\dq_{n+\twothirds}$ such that
+We use a PseudoNewton approach using
 $$
-	\J_{n+1} \dq_{n+\twothirds} = \vec{0}
+	\C\left( \q_k + \W\tJ_n \lambda_k \right) \simeq \C\left( \q_k \right) + \J_n\W\tJ_n \lambda_k.
 $$
-\end{enumerate}
+We define $\A_n = \J_n\W\tJ_n$ which must be positive and symmetric, otherwise the phase space is singular.\\
+
+We end up with
+\begin{equation}
+	\q_{n+1} = \q_{n+\half} + \W\tJ_n \lambda_n = \q_{n+\half} + \delta\q_n.
+\end{equation}
+An estimate of the internal forces is
+$$
+	\vec{G}_n = \dfrac{2}{\tau^2} \delta\q_n
+$$
+
+\subsection{Predicted half-velocities}
+The first contribution to the velocities is
+\begin{equation}
+	\dq_{n+\sfrac{1}{4}} = \dq_n + \frac{1}{2}\tau\W \vec{F}_n+ \dfrac{1}{\tau}\delta\q_n
+\end{equation}
+
+\subsection{Half Velocities Legalisations}
+We can compute $J_{n+1}$.
+\begin{equation}
+	\dq_{n+\half} = \dq_{n+\sfrac{1}{4}} + \W\tJ_{n+1} \vec{\mu}_n
+\end{equation}
+and
+\begin{equation}
+	\vec{0} = \J_{n+1}\dq_{n+\sfrac{1}{4}} + \underbrace{\J_{n+1}\W\tJ_{n+1}}_{A_{n+1}} \vec{\mu}_n
+\end{equation}
+
+\subsection{Velocities Correction}
+We can now compute
+\begin{equation}
+	\vec{F}_{n+\half} = \vec{F}(\q_{n+1},\dq_{n+\half})
+\end{equation}
+and compute
+\begin{equation}
+	\dq_{n+\sfrac{3}{4}} = \dq_{n+\half} + \dfrac{1}{2}\tau \W\vec{F}_{n+\half}
+\end{equation}
+\subsection{Final Velocities Correction}
+We do the same than for the half-velocities correction.
+
+\end{document}
+
 
 \end{document}
 
