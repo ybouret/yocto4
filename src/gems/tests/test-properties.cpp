@@ -7,7 +7,7 @@ using namespace gems;
 YOCTO_UNIT_TEST_IMPL(lib)
 {
     library lib;
-    lib.insert("H+", 1.0);
+    lib.insert("H", 1.0);
     
 }
 YOCTO_UNIT_TEST_DONE()
