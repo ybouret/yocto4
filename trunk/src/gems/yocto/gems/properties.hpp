@@ -34,20 +34,10 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(properties);
         };
-
         
-        class library
-        {
-        public:
-            explicit library();
-            virtual ~library() throw();
-
-        private:
-            properties::database db;
-            YOCTO_DISABLE_COPY_AND_ASSIGN(library);
-        };
+        
     }
-
+    
 }
 
 
