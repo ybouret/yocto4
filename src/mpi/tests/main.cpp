@@ -12,6 +12,7 @@ YOCTO_UNIT_TEST_INIT(16)
     YOCTO_UNIT_TEST_DECL(async);
     YOCTO_UNIT_TEST_DECL(ops);
     YOCTO_UNIT_TEST_DECL(ios);
+    YOCTO_UNIT_TEST_DECL(serialize);
 
 }
 
