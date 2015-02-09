@@ -1,83 +1,142 @@
 #ifndef YOCTO_GEMS_ATOM_INCLUDED
 #define YOCTO_GEMS_ATOM_INCLUDED 1
 
-#include "yocto/math/v3d.hpp"
-#include "yocto/gems/identifier.hpp"
-#include "yocto/gems/properties.hpp"
-#include "yocto/ordered/sorted-vector.hpp"
+#include "yocto/gems/types.hpp"
+#include "yocto/counted-object.hpp"
+#include "yocto/ptr/arc.hpp"
 #include "yocto/ptr/intr.hpp"
-#include "yocto/ptr/nosy.hpp"
+
+#include "yocto/math/v3d.hpp"
+#include "yocto/sequence/vector.hpp"
+
+#include "yocto/string.hpp"
+#include "yocto/associative/set.hpp"
+#include "yocto/container/vslot.hpp"
+
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
     namespace gems
     {
-        template <typename>
-        class residue;
-        
         using namespace math;
         
-        //! a shared atom
         template <typename T>
-        class atom : public identifier
+        class properties : public counted_object
         {
         public:
-            typedef intr_ptr<word_t,atom> pointer;
+            typedef intr_ptr<string,properties> pointer;
+            typedef set<string,pointer>         db;
             
-            class pointer_comparator
+            const string name;
+            const word_t type;
+            const T      mass;
+            vslot        data;
+            
+            explicit properties(const string &n, const word_t t, const T m) :
+            name(n),
+            type(t),
+            mass(m),
+            data()
             {
-            public:
-                inline  pointer_comparator() throw() {}
-                inline ~pointer_comparator() throw() {}
-                inline  int operator()( const pointer &lhs, const pointer &rhs) const throw()
-                {
-                    return __compare<word_t>(lhs->uuid,rhs->uuid);
-                }
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(pointer_comparator);
-            };
-
-            typedef sorted_vector<pointer,pointer_comparator,allocator>  group;
+            }
             
-            v3d<T>                r;
-            v3d<T>                v;
-            v3d<T>                a;
-            const T               m; //!< mass
-            const T               w; //!< 1/mass
-            
-            explicit atom( const residue<T> &from, word_t u, word_t t) throw();
-            virtual ~atom() throw();
-            void     set_mass(T mass) throw();
-            
-            //! atom properties for library
-            class properties : public gems::properties
+            virtual ~properties() throw()
             {
-            public:
-                const T mass;
-                
-                typedef nosy_ptr<word_t,string,properties>  pointer;
-                typedef gems::properties::table<properties> table;
-                
-                explicit properties( word_t t, const string &n, T m );
-                virtual ~properties() throw();
-                
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(properties);
-            };
+            }
             
-                       
+            inline const string & key() const throw() { return name; }
+            
         private:
-            const residue<T> *pp;
+            YOCTO_DISABLE_COPY_AND_ASSIGN(properties);
+        };
+        
+        template <typename T>
+        class library : public properties<T>::db
+        {
+        public:
+            typedef typename properties<T>::pointer ppty_t;
+            explicit library() :  properties<T>::db(8,as_capacity) {}
+            virtual ~library() throw() {}
             
-            atom& operator=(const atom &);
-            atom(const atom &other) throw();
+            inline void append( const string &name, const word_t type, const T mass )
+            {
+                ppty_t p( new properties<T>(name,type,mass) );
+                if(!this->insert(p))
+                    throw exception("multiple properties '%s'", name.c_str());
+            }
             
+            inline const ppty_t & operator[](const string &name) const
+            {
+                const ppty_t *pp = this->search(name);
+                if(!pp) throw exception("no properties '%s'", name.c_str());
+                return *pp;
+            }
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(library);
         };
         
         
+        template <typename T>
+        class atom : public counted_object
+        {
+        public:
+            typedef arc_ptr<atom>                   pointer;
+            typedef vector<pointer>                 db;
+            typedef typename properties<T>::pointer ppty_t;
+
+            const word_t uuid; //!< unique ID
+            T            m;    //!< mass
+            T            w;    //!< 1/mass
+            v3d<T>       r;    //!< position
+            v3d<T>       v;    //!< velocity
+            v3d<T>       f;    //!< force accumulator
+            ppty_t       ppty; //!< for force fields
+            
+            inline atom(word_t u,const ppty_t &p) throw() :
+            uuid(u),
+            m(1),
+            w(1),
+            r(),
+            v(),
+            f(),
+            ppty(p)
+            {
+                set_mass(ppty->mass);
+            }
+            
+            inline void set_mass(T mass) throw()
+            {
+                m = mass;
+                w = 1/m;
+            }
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(atom);
+        };
+        
+        template <typename T>
+        class atoms : public atom<T>::db
+        {
+        public:
+            typedef typename properties<T>::pointer ppty_t;
+            explicit atoms() throw() : atom<T>::db() {}
+            virtual ~atoms() throw() {}
+            explicit atoms(size_t n) : atom<T>::db(n,as_capacity) {}
+            
+            void append(word_t u,const ppty_t &p)
+            {
+                typename atom<T>::pointer pa( new atom<T>(u,p) );
+            }
+            
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(atoms);
+        };
         
     }
-    
 }
 
 #endif
+
