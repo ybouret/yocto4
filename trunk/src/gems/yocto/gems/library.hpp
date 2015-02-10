@@ -45,6 +45,11 @@ namespace yocto
 
             void display() const;
 
+            //! garbage collector
+            /**
+             delete single reference atoms
+             */
+            void GC() throw();
 
         private:
             properties::database       db;
