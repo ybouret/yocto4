@@ -15,7 +15,10 @@ namespace yocto
     namespace gems
     {
 
+        //______________________________________________________________________
+        //
         //! a node for one atom
+        //______________________________________________________________________
         template <typename T>
         class atom_node
         {
@@ -48,6 +51,10 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(atom_node);
         };
 
+        //______________________________________________________________________
+        //
+        //! a dynamic set of atoms
+        //______________________________________________________________________
         template <typename T>
         class atoms
         {
@@ -59,9 +66,13 @@ namespace yocto
             typedef core::list_of<hook_type>     slot_type;
             typedef core::pool_of<hook_type>     pool_type;
 
+            //! default ctor
             explicit atoms() : atm(), nslot(0), smask(0), slots(0), hpool() {}
+
+            //! default dtor
             virtual ~atoms() throw() { release(); }
 
+            //! free atoms, keep slots and hooks
             inline void free() throw()
             {
                 atm.clear();
@@ -75,6 +86,7 @@ namespace yocto
                 }
             }
 
+            //! release all resources
             inline void release() throw()
             {
                 free();
@@ -86,12 +98,16 @@ namespace yocto
                 smask = 0;
             }
 
+            //! check memory for load factor
             inline void expand_slots()
             {
-                
+
                 const size_t nmin = max_of<size_t>(1,(atm.size+1)/4);
 
+                //______________________________________________________________
+                //
                 // allocate new global memory
+                //______________________________________________________________
                 size_t new_nslot = max_of<size_t>(8,next_power_of_two(nmin));
                 if(new_nslot<=nslot)
                 {
@@ -103,7 +119,10 @@ namespace yocto
                 slot_type   *new_slots = memory::kind<memory::global>::acquire_as<slot_type>(new_nslot);
                 const size_t new_smask = new_nslot - 1;
 
+                //______________________________________________________________
+                //
                 //transfert hooks
+                //______________________________________________________________
                 for(size_t i=0;i<nslot;++i)
                 {
                     slot_type &slot = slots[i];
@@ -114,14 +133,17 @@ namespace yocto
                     }
                 }
 
+                //______________________________________________________________
+                //
                 //update memory
+                //______________________________________________________________
                 memory::kind<memory::global>::release_as(slots,nslot);
                 slots = new_slots;
                 nslot = new_nslot;
                 smask = new_smask;
-                std::cerr << "-- expanded" << std::endl;
             }
 
+            //! insert an atom ptr
             inline void insert( const atom_ptr &ptr )
             {
                 expand_slots();
@@ -132,24 +154,36 @@ namespace yocto
                     throw exception("multiple atom %u",unsigned(ptr->uuid));
                 }
 
+                //______________________________________________________________
+                //
                 // create node for list
+                //______________________________________________________________
                 node = new node_type(ptr);
 
 
+                //______________________________________________________________
+                //
                 // create hook for slots: node is taken care of in case of failure
+                //______________________________________________________________
                 hook_type *hook = create_hook(node);
 
+                //______________________________________________________________
+                //
                 // dual insertion
+                //______________________________________________________________
                 slot->push_front(hook);
                 atm.push_back(node);
 
             }
 
+            //! helper
             inline void insert( atom<T> *a )
             {
                 const atom_ptr ptr(a);
                 insert(ptr);
             }
+
+
 
         private:
             list_type          atm;
@@ -158,7 +192,9 @@ namespace yocto
             mutable slot_type *slots;
             pool_type          hpool;
 
-            inline hook_type *create_hook(node_type *node)
+            //! use the pool
+            inline
+            hook_type *create_hook(node_type *node)
             {
                 assert(node);
                 if(hpool.size>0)
@@ -177,7 +213,10 @@ namespace yocto
 
             }
 
-            inline node_type *lookup_node(const word_t uuid, slot_type **ppSlot) const throw()
+
+            inline
+            node_type *lookup_node(const word_t uuid,
+                                   slot_type  **ppSlot) const throw()
             {
                 assert(ppSlot);
                 assert(0== *ppSlot);
@@ -189,20 +228,21 @@ namespace yocto
                     assert(slots!=0);
 
                     slot_type *slot = (slot_type *) & slots[ uuid & smask ];
-                    *ppSlot = slot;
+                    *ppSlot =  slot;
                     for(hook_type *hook = slot->head;hook;hook=hook->next)
                     {
                         node_type *node = hook->addr;
                         if(uuid == node->a->uuid)
                         {
+                            slot->move_to_front(hook);
                             return node;
                         }
                     }
                 }
                 return 0;
             }
-
-
+            
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(atoms);
         };
         
