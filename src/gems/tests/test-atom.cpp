@@ -19,12 +19,19 @@ YOCTO_UNIT_TEST_IMPL(atom)
     lib.display();
 
     atoms<double> aa;
+    aa.insert(a2);
 
     std::cerr << "insertion" << std::endl;
 
     for(size_t i=2;i<=100;++i)
     {
         aa.insert( lib.create<double>(i,"H") );
+    }
+
+    atoms<double> tmp;
+    for(size_t i=1;i<=50;++i)
+    {
+        aa.transfer_to(tmp,i);
     }
 
     std::cerr << "cleanup" << std::endl;
