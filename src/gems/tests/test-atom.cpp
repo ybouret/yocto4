@@ -1,4 +1,5 @@
 #include "yocto/gems/library.hpp"
+#include "yocto/gems/atoms.hpp"
 #include "yocto/utest/run.hpp"
 
 using namespace yocto;
@@ -10,12 +11,16 @@ YOCTO_UNIT_TEST_IMPL(atom)
     lib.insert("H", 1.0);
     lib.insert("He",2.0);
 
-    atom<float> *a1( lib.create<float>(0,"H")   );
+    atom<float>          *a1( lib.create<float> (0,"H" ) );
     atom<double>::pointer a2( lib.create<double>(1,"He") );
     std::cerr << "a1->uuid=" << a1->uuid << std::endl;
     std::cerr << "a2->uuid=" << a2->uuid << std::endl;
 
     lib.display();
+
+    atoms<double> aa;
+
+    aa.free();
 
 }
 YOCTO_UNIT_TEST_DONE()

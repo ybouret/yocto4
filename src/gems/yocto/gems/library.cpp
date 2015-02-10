@@ -19,8 +19,6 @@ namespace yocto
 
         properties & library::insert(const string &name, const double mass)
         {
-
-
             properties::pointer p( new properties(name,mass) );
             if(!db.insert(p))
             {
@@ -63,7 +61,7 @@ namespace yocto
         {
             for(atom_info::table::const_iterator i=atoms.begin();i!=atoms.end();++i)
             {
-                std::cerr << " " << (*i)->uuid << " " << std::endl;
+                std::cerr << " " << (*i)->uuid << "\t#ref=" << (*i)->refcount() << std::endl;
             }
         }
 
