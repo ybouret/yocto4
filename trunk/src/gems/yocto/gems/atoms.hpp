@@ -3,7 +3,6 @@
 
 #include "yocto/gems/atom.hpp"
 #include "yocto/sequence/addr-list.hpp"
-#include "yocto/core/pool.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/ptr/auto.hpp"
@@ -26,14 +25,14 @@ namespace yocto
             typedef typename atom<T>::pointer atom_ptr;
 
             inline atom_node( const atom_ptr &p) throw() :
-            a(p),
+            pAtom(p),
             next(0),
             prev(0)
             {
             }
 
             inline atom_node( const atom<T> *p ) throw() :
-            a(p),
+            pAtom(p),
             next(0),
             prev(0)
             {
@@ -41,7 +40,7 @@ namespace yocto
 
             inline ~atom_node() throw() {}
 
-            atom_ptr   a;
+            atom_ptr   pAtom;
             atom_node *next;
             atom_node *prev;
 
@@ -63,11 +62,14 @@ namespace yocto
             typedef atom_node<T>                 node_type;
             typedef core::list_of_cpp<node_type> list_type;
             typedef addr_node<node_type>         hook_type;
-            typedef core::list_of<hook_type>     slot_type;
-            typedef core::pool_of<hook_type>     pool_type;
+            typedef core::list_of_cpp<hook_type> slot_type;
 
             //! default ctor
-            explicit atoms() : atm(), nslot(0), smask(0), slots(0), hpool() {}
+            explicit atoms() : alist(), nslot(0), smask(0), slots(0)
+            {
+                std::cerr << "sizeof(node_type)=" << sizeof(node_type) << std::endl;
+                std::cerr << "sizeof(hook_type)=" << sizeof(hook_type) << std::endl;
+            }
 
             //! default dtor
             virtual ~atoms() throw() { release(); }
@@ -75,14 +77,10 @@ namespace yocto
             //! free atoms, keep slots and hooks
             inline void free() throw()
             {
-                atm.clear();
+                alist.clear();
                 for(size_t i=0;i<nslot;++i)
                 {
-                    slot_type &slot = slots[i];
-                    while(slot.size)
-                    {
-                        hpool.store( slot.pop_back() );
-                    }
+                    slots[i].clear();
                 }
             }
 
@@ -90,10 +88,6 @@ namespace yocto
             inline void release() throw()
             {
                 free();
-                while(hpool.size)
-                {
-                    delete hpool.query();
-                }
                 memory::kind<memory::global>::release_as(slots,nslot);
                 smask = 0;
             }
@@ -102,7 +96,7 @@ namespace yocto
             inline void expand_slots()
             {
 
-                const size_t nmin = max_of<size_t>(1,(atm.size+1)/4);
+                const size_t nmin = max_of<size_t>(1,(alist.size+1)/4);
 
                 //______________________________________________________________
                 //
@@ -129,7 +123,7 @@ namespace yocto
                     while(slot.size)
                     {
                         hook_type *hook = slot.pop_back();
-                        new_slots[ hook->addr->a->uuid & new_smask ].push_back(hook);
+                        new_slots[ hook->addr->pAtom->uuid & new_smask ].push_back(hook);
                     }
                 }
 
@@ -172,7 +166,7 @@ namespace yocto
                 // dual insertion
                 //______________________________________________________________
                 slot->push_front(hook);
-                atm.push_back(node);
+                alist.push_back(node);
 
             }
 
@@ -183,34 +177,45 @@ namespace yocto
                 insert(ptr);
             }
 
-            
+            inline void transfer_to( atoms &other, const word_t uuid )
+            {
+                if(nslot>0)
+                {
+                    slot_type &slot = slots[ uuid & smask ];
+                    for(hook_type *hook = slot.head;hook;hook=hook->next)
+                    {
+                        node_type *node = hook->addr;
+                        if( uuid == node->pAtom->uuid)
+                        {
+                            other.expand_slots();
+                            other.slots[ uuid & other.smask ].push_front( slot.unlink(hook) );
+                            other.alist.push_back( alist.unlink(node) );
+                            return;
+                        }
+                    }
+                }
+                throw exception("atoms.tranfer: no uuid %u", unsigned(uuid) );
+            }
+
+            inline size_t size() const throw() { return alist.size; }
 
 
         private:
-            list_type          atm;
+            list_type          alist;
             size_t             nslot; //!< a power of two
             size_t             smask; //!< nslot-1
             mutable slot_type *slots;
-            pool_type          hpool;
 
             //! use the pool
             inline
             hook_type *create_hook(node_type *node)
             {
                 assert(node);
-                if(hpool.size>0)
-                {
-                    hook_type *hook = hpool.query();
-                    hook->addr = node;
-                    return hook;
-                }
-                else
-                {
-                    auto_ptr<node_type> guard(node);
-                    hook_type *hook = new hook_type(node);
-                    guard.forget();
-                    return hook;
-                }
+
+                auto_ptr<node_type> guard(node);
+                hook_type *hook = new hook_type(node);
+                guard.forget();
+                return hook;
 
             }
 
@@ -233,7 +238,7 @@ namespace yocto
                     for(hook_type *hook = slot->head;hook;hook=hook->next)
                     {
                         node_type *node = hook->addr;
-                        if(uuid == node->a->uuid)
+                        if(uuid == node->pAtom->uuid)
                         {
                             slot->move_to_front(hook);
                             return node;
