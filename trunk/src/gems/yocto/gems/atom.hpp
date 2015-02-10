@@ -48,6 +48,7 @@ namespace yocto
             v3d<T>                r;
 
             typedef intr_ptr<word_t,atom> pointer;
+            typedef set<word_t,pointer>   database;
 
         private:
             friend class library;
