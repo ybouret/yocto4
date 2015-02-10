@@ -15,6 +15,8 @@ YOCTO_UNIT_TEST_IMPL(atom)
     std::cerr << "a1->uuid=" << a1->uuid << std::endl;
     std::cerr << "a2->uuid=" << a2->uuid << std::endl;
 
+    lib.display();
+
 }
 YOCTO_UNIT_TEST_DONE()
 

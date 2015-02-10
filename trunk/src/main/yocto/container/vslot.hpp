@@ -33,18 +33,18 @@ namespace yocto
         template <typename T>
         inline void make( typename type_traits<T>::parameter_type args )
         {
-            prepare_for(sizeof(T));  // get memory
-            new (slot_.data) T(args);     // try to construct, may throw
-            activate<T>();           // activate the object
+            prepare_for(sizeof(T));    // get memory
+            new (slot_.data) T(args);  // try to construct, may throw
+            activate<T>();             // activate the object
         }
         
         //! one argument constructor
         template <typename T,typename U>
         inline void build(typename type_traits<U>::parameter_type args)
         {
-            prepare_for(sizeof(T)); // get memory
-            new (slot_.data) T(args);    // try to construct, may throw
-            activate<T>();          // activate the object
+            prepare_for(sizeof(T));    // get memory
+            new (slot_.data) T(args);  // try to construct, may throw
+            activate<T>();             // activate the object
         }
         
         //! two arguments constructor
