@@ -65,6 +65,12 @@ namespace yocto
             }
         }
 
+        void library:: GC() throw()
+        {
+            atoms.remove_if( atom_info::is_orphan );
+        }
+
+
     }
 
 }

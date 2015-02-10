@@ -273,7 +273,10 @@ namespace yocto
             }
             return H.key<size_t>();
         }
-        
+
+        //======================================================================
+        // ordering
+        //======================================================================
         typedef int (*data_compare)(const_type &lhs, const_type &rhs);
         
         static inline int node_compare( const KNode *lhs, const KNode *rhs, void *args ) throw()
@@ -290,7 +293,49 @@ namespace yocto
         {
             core::merging<KNode>::sort(klist,node_compare,(void*)proc);
         }
-        
+
+        //======================================================================
+        // in place removing
+        //======================================================================
+        template <typename FUNC>
+        inline void remove_if( FUNC &is_bad ) throw()
+        {
+            HSlot bad;
+
+            // collect bad
+            for(size_t i=0;i<slots;++i)
+            {
+                HSlot  tmp;
+                HSlot &s = hslot[i];
+                while(s.size>0)
+                {
+                    HNode *node = s.pop_back();
+                    T     &data = node->knode->data;
+                    if(is_bad(data))
+                    {
+                        bad.push_back(node);
+                    }
+                    else
+                    {
+                        tmp.push_front(node);
+                    }
+                }
+                s.swap_with(tmp);
+            }
+
+            // get rid of bad
+            while(bad.size>0)
+            {
+                HNode *node  = bad.pop_back();
+                KNode *knode = node->knode;
+                destruct(node);
+                hpool.store(node);
+
+                destruct(klist.unlink(knode));
+                kpool.store(knode);
+            }
+        }
+
     private:
         //----------------------------------------------------------------------
         // metrics

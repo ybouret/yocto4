@@ -11,31 +11,45 @@ YOCTO_UNIT_TEST_IMPL(atom)
     lib.insert("H", 1.0);
     lib.insert("He",2.0);
 
-    atom<float>          *a1( lib.create<float> (0,"H" ) );
-    atom<double>::pointer a2( lib.create<double>(1,"He") );
-    std::cerr << "a1->uuid=" << a1->uuid << std::endl;
-    std::cerr << "a2->uuid=" << a2->uuid << std::endl;
 
+    std::cerr << std::endl << "initial lib" << std::endl;
     lib.display();
 
     atoms<double> aa;
-    aa.insert(a2);
 
     std::cerr << "insertion" << std::endl;
 
-    for(size_t i=2;i<=100;++i)
+    for(size_t i=1;i<=10;++i)
     {
         aa.insert( lib.create<double>(i,"H") );
     }
 
     atoms<double> tmp;
-    for(size_t i=1;i<=50;++i)
+    for(size_t i=1;i<=5;++i)
     {
         aa.transfer_to(tmp,i);
     }
 
-    std::cerr << "cleanup" << std::endl;
-    aa.free();
+    binary_atoms<double> iodata;
+    tmp.store_into(iodata);
+
+    std::cerr << std::endl << "current lib" << std::endl;
+    lib.display();
+
+    tmp.release();
+
+    std::cerr << std::endl << "cleanup lib" << std::endl;
+    lib.display();
+
+    lib.GC();
+
+    std::cerr << std::endl << "updated lib" << std::endl;
+    lib.display();
+
+    std::cerr << "sizeof(atom<double>)=" << sizeof(atom<double>) << std::endl;
+    std::cerr << "sizeof(atom<float> )=" << sizeof(atom<float>)  << std::endl;
+    std::cerr << "atom<double>::io_bytes=" << atom<double>::io_bytes << std::endl;
+    std::cerr << "atom<float>: :io_bytes=" << atom<float>::io_bytes << std::endl;
 
 }
 YOCTO_UNIT_TEST_DONE()
