@@ -20,6 +20,14 @@ YOCTO_UNIT_TEST_IMPL(atom)
 
     atoms<double> aa;
 
+    std::cerr << "insertion" << std::endl;
+
+    for(size_t i=2;i<=100;++i)
+    {
+        aa.insert( lib.create<double>(i,"H") );
+    }
+
+    std::cerr << "cleanup" << std::endl;
     aa.free();
 
 }

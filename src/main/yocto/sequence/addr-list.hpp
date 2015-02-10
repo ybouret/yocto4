@@ -17,7 +17,7 @@ namespace yocto
         addr_node *prev; //!< for list
         T         *addr; //!< for object
         inline addr_node( T *ptr ) throw() : next(0), prev(0), addr(ptr) {}
-        inline ~addr_node() throw() {}
+        inline ~addr_node() throw() { addr=0; }
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(addr_node);
