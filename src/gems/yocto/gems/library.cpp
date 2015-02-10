@@ -1,13 +1,15 @@
 #include "yocto/gems/library.hpp"
 #include "yocto/exception.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
     namespace gems
     {
         library:: library() :
         db(16,as_capacity),
-        locked(false)
+        atoms()
         {
         }
 
@@ -17,10 +19,7 @@ namespace yocto
 
         properties & library::insert(const string &name, const double mass)
         {
-            if(locked)
-            {
-                throw exception("library is locked!");
-            }
+
 
             properties::pointer p( new properties(name,mass) );
             if(!db.insert(p))
@@ -60,6 +59,13 @@ namespace yocto
             throw exception("library: multiple atom uuid %u", unsigned(uuid));
         }
 
+        void library:: display() const
+        {
+            for(atom_info::table::const_iterator i=atoms.begin();i!=atoms.end();++i)
+            {
+                std::cerr << " " << (*i)->uuid << " " << std::endl;
+            }
+        }
 
     }
 

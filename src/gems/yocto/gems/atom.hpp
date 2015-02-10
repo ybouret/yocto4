@@ -4,6 +4,7 @@
 #include "yocto/gems/properties.hpp"
 #include "yocto/ptr/intr.hpp"
 #include "yocto/math/v3d.hpp"
+#include "yocto/associative/set.hpp"
 
 namespace yocto
 {
@@ -21,10 +22,12 @@ namespace yocto
 
             virtual ~atom_info() throw();
 
-            typedef intr_ptr<word_t,atom_info> tag;
 
             const word_t & key() const throw();
-            
+
+            typedef intr_ptr<word_t,atom_info> handle;
+            typedef set<word_t,handle>         table;
+
         protected:
             explicit atom_info(const word_t u, const properties &p ) throw();
             

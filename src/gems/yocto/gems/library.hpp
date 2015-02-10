@@ -29,12 +29,11 @@ namespace yocto
             inline atom<T> *create( const word_t uuid, const properties &ppty )
             {
                 atom<T> *ptr =  new atom<T>(uuid,ppty);
-                const atom_info::tag tag(ptr);
-                if(!atom_tags.insert(tag))
+                const atom_info::handle h(ptr);
+                if(!atoms.insert(h))
                 {
                     __throw_multiple_uuid(uuid);
                 }
-                locked = true;
                 return ptr;
             }
 
@@ -44,13 +43,12 @@ namespace yocto
                 return create<T>(uuid,(*this)[name]);
             }
 
-            
+            void display() const;
 
 
         private:
             properties::database       db;
-            set<word_t,atom_info::tag> atom_tags;
-            bool                       locked;
+            atom_info::table           atoms;
             void __throw_multiple_uuid(word_t uuid) const;
             YOCTO_DISABLE_COPY_AND_ASSIGN(library);
         };
