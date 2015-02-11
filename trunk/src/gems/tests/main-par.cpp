@@ -1,26 +1,35 @@
 #include "yocto/gems/mpi.hpp"
+#include "yocto/program.hpp"
 
 using namespace yocto;
 using namespace gems;
 
-int main(int argc, char *argv[])
-{
-    try
-    {
-        YOCTO_MPI_ENV();
-        MPI.CloseStdIO();
+typedef atom<double> Atom;
+typedef atoms<double> Atoms;
 
-        return 0;
-    }
-    catch( const exception &e )
+YOCTO_PROGRAM_START()
+{
+    YOCTO_MPI_ENV();
+    MPI.CloseStdIO();
+
+    MPI.Printf(stderr, "Ready...\n" );
+
+    library lib;
+    lib.insert("H", 1.0);
+    lib.insert("He",2.0);
+
+    Atoms aa;
+    if(MPI.IsFirst)
     {
-        std::cerr << e.what() << std::endl;
-        std::cerr << e.when() << std::endl;
+        for(size_t i=1;i<=10;)
+        {
+            aa.insert( lib.create<double>(++i,"H") );
+            aa.insert( lib.create<double>(++i,"He") );
+        }
     }
-    catch(...)
-    {
-        std::cerr << "Something Bad Happened!" << std::endl;
-    }
-    return 1;
-    
+
+    MPI.Printf(stderr, "#atoms=%u\n", unsigned(aa.size()));
+
+
 }
+YOCTO_PROGRAM_END()
