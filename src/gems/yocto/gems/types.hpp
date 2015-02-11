@@ -11,7 +11,6 @@ namespace yocto
         
         typedef uint32_t                  word_t;
         typedef memory::global::allocator allocator;
-        
     }
     
 }

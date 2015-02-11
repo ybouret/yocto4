@@ -11,7 +11,33 @@ namespace yocto
 
         struct mpi_io
         {
-            
+            static const int tag = 8;
+
+            template <typename T>
+            static inline void send( const mpi &MPI, const binary_atoms<T> &data, int rank )
+            {
+                assert(MPI.CommWorldRank!=rank);
+                const size_t n = data.size;
+                MPI.Send<uint64_t>(n, rank, tag, MPI_COMM_WORLD);
+                if(n>0)
+                {
+                    MPI.Send(data.ro(), data.length(), MPI_BYTE, rank, tag, MPI_COMM_WORLD);
+                }
+            }
+
+            template <typename T>
+            static inline void recv( const mpi &MPI,  binary_atoms<T> &data, int rank )
+            {
+                assert(MPI.CommWorldRank!=rank);
+                MPI_Status status;
+                const size_t n = size_t(MPI.Recv<uint64_t>(0, tag, MPI_COMM_WORLD, status));
+                if(n>0)
+                {
+                    data.build(n);  // ensure memory
+                    data.assume(n); // set active memory
+                    MPI.Recv(data.rw(),data.length(),MPI_BYTE,rank,tag,MPI_COMM_WORLD,status);
+                }
+            }
         };
 
     }
