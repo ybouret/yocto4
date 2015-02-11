@@ -19,13 +19,13 @@ YOCTO_UNIT_TEST_IMPL(atom)
 
     std::cerr << "insertion" << std::endl;
 
-    for(size_t i=1;i<=10;++i)
+    for(size_t i=1;i<=100;++i)
     {
         aa.insert( lib.create<double>(i,"H") );
     }
 
     atoms<double> tmp;
-    for(size_t i=1;i<=5;++i)
+    for(size_t i=1;i<=43;++i)
     {
         aa.transfer_to(tmp,i);
     }

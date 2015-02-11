@@ -109,7 +109,6 @@ namespace yocto
                 }
 
                 assert(is_a_power_of_two(new_nslot));
-                std::cerr << "-- expand " << nslot << " ==> " << new_nslot << std::endl;
                 slot_type   *new_slots = memory::kind<memory::global>::acquire_as<slot_type>(new_nslot);
                 const size_t new_smask = new_nslot - 1;
 
@@ -123,7 +122,7 @@ namespace yocto
                     while(slot.size)
                     {
                         hook_type *hook = slot.pop_back();
-                        new_slots[ hook->addr->pAtom->uuid & new_smask ].push_back(hook);
+                        new_slots[ ihash32(hook->addr->pAtom->uuid) & new_smask ].push_back(hook);
                     }
                 }
 
@@ -182,14 +181,14 @@ namespace yocto
             {
                 if(nslot>0)
                 {
-                    slot_type &slot = slots[ uuid & smask ];
-                    for(hook_type *hook = slot.head;hook;hook=hook->next)
+                    slot_type *slot = slot_for(uuid);
+                    for(hook_type *hook = slot->head;hook;hook=hook->next)
                     {
                         node_type *node = hook->addr;
                         if( uuid == node->pAtom->uuid)
                         {
                             other.expand_slots();
-                            other.slots[ uuid & other.smask ].push_front( slot.unlink(hook) );
+                            other.slot_for(uuid)->push_front( slot->unlink(hook) );
                             other.alist.push_back( alist.unlink(node) );
                             return;
                         }
@@ -220,6 +219,14 @@ namespace yocto
             size_t             smask; //!< nslot-1
             mutable slot_type *slots;
 
+            inline slot_type *slot_for( const word_t uuid ) const throw()
+            {
+                assert(nslot>0);
+                assert(slots!=0);
+                assert(nslot-1==smask);
+                return (slot_type *)&slots[ ihash32(uuid) & smask ];
+            }
+
             //! safely create a hook node
             inline
             hook_type *create_hook(node_type *node)
@@ -247,7 +254,7 @@ namespace yocto
                     assert(nslot-1==smask);
                     assert(slots!=0);
 
-                    slot_type *slot = (slot_type *) & slots[ uuid & smask ];
+                    slot_type *slot = slot_for(uuid);
                     *ppSlot =  slot;
                     for(hook_type *hook = slot->head;hook;hook=hook->next)
                     {
