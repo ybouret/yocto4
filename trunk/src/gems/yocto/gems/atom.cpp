@@ -21,7 +21,7 @@ namespace yocto
             const bool ans = (1==p->refcount());
             if(ans)
             {
-                std::cerr << "atom$" << p->uuid << " is orphan..." <<std::endl;
+                //std::cerr << "atom$" << p->uuid << " is orphan..." <<std::endl;
             }
             return ans;
         }

@@ -6,6 +6,7 @@
 #include "yocto/math/v3d.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/code/endian.hpp"
+#include "yocto/code/round.hpp"
 
 namespace yocto
 {
@@ -30,10 +31,10 @@ namespace yocto
             typedef set<word_t,handle>         table;
 
             static bool is_orphan( const handle &p ) throw();
-           
+
         protected:
             explicit atom_info(const word_t u, const properties &p ) throw();
-            
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(atom_info);
@@ -69,6 +70,7 @@ namespace yocto
                 append_to(p,a);
             }
 
+
         private:
             friend class library;
 
@@ -89,12 +91,12 @@ namespace yocto
                 store_be(u.z,p); p += sizeof(T);
             }
 
-            
+
             YOCTO_DISABLE_COPY_AND_ASSIGN(atom);
         };
 
         template <typename T>
-        class binary_atoms
+        class binary_atoms : public memory::rw_buffer
         {
         public:
             explicit binary_atoms() throw() :
@@ -103,8 +105,8 @@ namespace yocto
             inline void release() throw()
             {
                 memory::kind<memory::global>::release(wksp, wlen);
-                maxi=0;
-                size=0;
+                (size_t&)maxi=0;
+                (size_t&)size=0;
                 curr=0;
             }
 
@@ -115,36 +117,47 @@ namespace yocto
 
             inline void build(size_t nmin)
             {
-                size=0;
+                (size_t&)size=0;
                 if(nmin>maxi)
                 {
+                    nmin = YOCTO_ROUND256(nmin);
                     memory::kind<memory::global>::release(wksp, wlen);
-                    maxi=0;
+                    (size_t&)maxi=0;
 
                     wlen = nmin * atom<T>::io_bytes;
                     wksp = memory::kind<memory::global>::acquire(wlen);
-                    maxi = wlen/atom<T>::io_bytes;
+                    (size_t&)maxi = wlen/atom<T>::io_bytes;
                 }
                 curr = (uint8_t *)wksp;
             }
 
             inline void reset() throw() { size=0; curr = (uint8_t *)wksp; }
+
             inline void store( const atom<T> &a ) throw()
             {
                 assert(size<maxi);
                 a.append_to(curr);
-                ++size;
+                ++(size_t&)size;
             }
 
-            
+            virtual size_t length() const throw() { return size *atom<T>::io_bytes; }
+
+            inline void assume( size_t n ) throw()
+            {
+                assert(n<=maxi);
+                (size_t&)size=n;
+            }
+
+            const size_t size;
+            const size_t maxi;
+
 
         private:
-		YOCTO_DISABLE_COPY_AND_ASSIGN(binary_atoms);
-            size_t   size;
-            size_t   maxi;
+            YOCTO_DISABLE_COPY_AND_ASSIGN(binary_atoms);
             uint8_t *curr;
             size_t   wlen;
             void    *wksp;
+            const void *get_address() const throw() { return wksp; }
         };
     }
 }
