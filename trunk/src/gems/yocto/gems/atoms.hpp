@@ -177,6 +177,7 @@ namespace yocto
                 insert(ptr);
             }
 
+            //! 'slow' transfer
             inline void transfer_to( atoms &other, const word_t uuid )
             {
                 if(nslot>0)
@@ -197,7 +198,11 @@ namespace yocto
                 throw exception("atoms.tranfer: no uuid %u", unsigned(uuid) );
             }
 
-            inline size_t size() const throw() { return alist.size; }
+            //! fast transfer
+            
+
+            inline
+            size_t size() const throw() { return alist.size; }
 
             inline
             void store_into( binary_atoms<T> &data ) const
@@ -207,7 +212,6 @@ namespace yocto
                 {
                     data.store( *(node->pAtom) );
                 }
-
             }
 
         private:
@@ -216,7 +220,7 @@ namespace yocto
             size_t             smask; //!< nslot-1
             mutable slot_type *slots;
 
-            //! use the pool
+            //! safely create a hook node
             inline
             hook_type *create_hook(node_type *node)
             {
