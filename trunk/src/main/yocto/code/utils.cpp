@@ -31,7 +31,7 @@ namespace yocto
     };
     
 	
-	uint32_t ihash32( uint32_t a)
+	uint32_t ihash32( uint32_t a) throw()
 	{
 		a = (a+0x7ed55d16) + (a<<12);
 		a = (a^0xc761c23c) ^ (a>>19);

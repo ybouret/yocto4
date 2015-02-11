@@ -31,7 +31,7 @@ namespace yocto
 	}
 	
 	//! integer hash
-	uint32_t ihash32( uint32_t );
+	uint32_t ihash32( uint32_t ) throw();
 	
 	extern const char  hexa_char[16];
     extern const char *hexa_text[256];
