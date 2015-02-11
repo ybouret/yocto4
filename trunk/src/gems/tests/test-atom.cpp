@@ -42,7 +42,7 @@ YOCTO_UNIT_TEST_IMPL(atom)
     }
 
     binary_atoms<double> iodata;
-    tmp.store_into(iodata);
+    tmp.encode(iodata);
 
     std::cerr << std::endl << "current lib" << std::endl;
     lib.display();
