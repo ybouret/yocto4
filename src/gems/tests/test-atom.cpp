@@ -5,6 +5,17 @@
 using namespace yocto;
 using namespace gems;
 
+namespace
+{
+    static inline bool atom_is_matching( const atom<double> &a ) throw()
+    {
+        if(a.uuid<=60)
+            return true;
+
+        return false;
+    }
+}
+
 YOCTO_UNIT_TEST_IMPL(atom)
 {
     library lib;
@@ -43,6 +54,15 @@ YOCTO_UNIT_TEST_IMPL(atom)
 
     lib.GC();
 
+    std::cerr << std::endl << "updated lib" << std::endl;
+    lib.display();
+
+    std::cerr << std::endl << "new transfer..." << std::endl;
+    aa.transfer_if(atom_is_matching,tmp);
+    tmp.free();
+    lib.display();
+
+    lib.GC();
     std::cerr << std::endl << "updated lib" << std::endl;
     lib.display();
 
