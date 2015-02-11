@@ -50,7 +50,7 @@ YOCTO_PROGRAM_START()
                 {
                     aa.transfer_to(dispatch, offset++);
                 }
-                dispatch.store_into(data);
+                dispatch.encode(data);
                 MPI.Printf0(stderr, "Ready To send %u bytes to rank %d\n\n", unsigned(data.length()),rank);
                 mpi_io::send(MPI,data,rank);
             }

@@ -263,7 +263,7 @@ namespace yocto
             size_t size() const throw() { return alist.size; }
 
             inline
-            void store_into( binary_atoms<T> &data ) const
+            void encode( binary_atoms<T> &data ) const
             {
                 data.build(alist.size);
                 for(const node_type *node=alist.head;node;node=node->next)
