@@ -1,7 +1,7 @@
 #ifndef YOCTO_GEMS_ATOMS_INCLUDED
 #define YOCTO_GEMS_ATOMS_INCLUDED 1
 
-#include "yocto/gems/atom.hpp"
+#include "yocto/gems/library.hpp"
 #include "yocto/sequence/addr-list.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
@@ -200,7 +200,10 @@ namespace yocto
             {
                 if(nslot>0)
                 {
+                    //__________________________________________________________
+                    //
                     // first pass: extracting matching, no throw
+                    //__________________________________________________________
                     slot_type matching;
                     for(size_t i=0;i<nslot;++i)
                     {
@@ -225,8 +228,10 @@ namespace yocto
                     }
                     std::cerr << "Found #" << matching.size << " matching..." << std::endl;
 
-
+                    //__________________________________________________________
+                    //
                     // second pass: effective transfer
+                    //__________________________________________________________
                     try
                     {
                         while(matching.size>0)
