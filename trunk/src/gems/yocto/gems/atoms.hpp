@@ -67,8 +67,6 @@ namespace yocto
             //! default ctor
             explicit atoms() : alist(), nslot(0), smask(0), slots(0)
             {
-                std::cerr << "sizeof(node_type)=" << sizeof(node_type) << std::endl;
-                std::cerr << "sizeof(hook_type)=" << sizeof(hook_type) << std::endl;
             }
 
             //! default dtor
@@ -153,10 +151,9 @@ namespace yocto
                 //______________________________________________________________
                 node = new node_type(ptr);
 
-
                 //______________________________________________________________
                 //
-                // create hook for slots: node is taken care of in case of failure
+                // create hook : node is taken care of in case of failure
                 //______________________________________________________________
                 hook_type *hook = create_hook(node);
 
@@ -197,8 +194,65 @@ namespace yocto
                 throw exception("atoms.tranfer: no uuid %u", unsigned(uuid) );
             }
 
-            //! fast transfer
-            
+            //! fast transfer, action on atoms
+            template <typename FUNC>
+            inline void transfer_if( FUNC &is_matching, atoms &destination )
+            {
+                if(nslot>0)
+                {
+                    // first pass: extracting matching, no throw
+                    slot_type matching;
+                    for(size_t i=0;i<nslot;++i)
+                    {
+                        slot_type  stk;
+                        slot_type *slot = &slots[i];
+                        while(slot->size>0)
+                        {
+                            hook_type     *hook = slot->pop_back();
+                            node_type     *node = hook->addr;
+                            const atom<T> &a    = *(node->pAtom);
+                            if( is_matching(a) )
+                            {
+                                matching.push_back(hook);
+                                (void) alist.unlink(node);
+                            }
+                            else
+                            {
+                                stk.push_front( hook );
+                            }
+                        }
+                        slot->swap_with(stk);
+                    }
+                    std::cerr << "Found #" << matching.size << " matching..." << std::endl;
+
+
+                    // second pass: effective transfer
+                    try
+                    {
+                        while(matching.size>0)
+                        {
+                            destination.expand_slots();
+                            hook_type   *hook = matching.pop_back();
+                            node_type   *node = hook->addr;
+                            const word_t uuid = node->pAtom->uuid;
+                            destination.slot_for(uuid)->push_back(hook);
+                            destination.alist.push_back(node);
+                        }
+                    }
+                    catch(...)
+                    {
+                        while(matching.size)
+                        {
+                            hook_type *hook = matching.pop_back();
+                            delete hook->addr;
+                            delete hook;
+                        }
+                        throw;
+                    }
+
+                }
+            }
+
 
             inline
             size_t size() const throw() { return alist.size; }
