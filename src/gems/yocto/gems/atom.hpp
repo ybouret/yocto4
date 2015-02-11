@@ -139,6 +139,7 @@ namespace yocto
             
 
         private:
+		YOCTO_DISABLE_COPY_AND_ASSIGN(binary_atoms);
             size_t   size;
             size_t   maxi;
             uint8_t *curr;
