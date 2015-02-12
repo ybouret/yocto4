@@ -2,7 +2,7 @@
 #define YOCTO_MK_STAT_IHIST_INCLUDED 1
 
 #include "yocto/container/sequence.hpp"
-
+//#include <iostream>
 
 namespace yocto
 {
@@ -32,6 +32,7 @@ namespace yocto
                 if(hi<tmp) hi = tmp;
             }
             const size_t n = hi+1-lo;
+            //std::cerr << "lo=" << lo << ", hi=" << hi << std::endl;
             bins.ensure(n);
             H.ensure(n);
             
@@ -42,7 +43,10 @@ namespace yocto
                 for(d=data.begin();d!=d_end;++d)
                 {
                     typename SEQ_DATA::const_type tmp = *d;
-                    if(tmp==i) ++count;
+                    if(tmp==i)
+                    {
+                        ++count;
+                    }
                 }
                 H.push_back(count);
             }
