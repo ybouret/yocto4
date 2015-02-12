@@ -48,15 +48,7 @@ YOCTO_PROGRAM_START()
 
         crystal::build_fcc(aa,cr,box);
         ios::ocstream fp("fcc.xyz",false);
-        fp("%u\n",unsigned(n));
-        fp("full fcc\n");
-        for(const atom_node<double> *node = aa.head();node;node=node->next)
-        {
-            const Atom       &a = *(node->pAtom);
-            const string     &s = a.ppty.name;
-            fp("%s %g %g %g\n", s.c_str(), a.r.x, a.r.y, a.r.z);
-        }
-
+        aa.save_xyz(fp, "full fcc");
     }
 
     MPI.Printf(stderr, "#atoms=%u\n", unsigned(aa.size()));
@@ -96,14 +88,7 @@ YOCTO_PROGRAM_START()
     MPI.Printf(stderr, "#atoms=%u\n", unsigned(aa.size()));
     {
         ios::ocstream fp( vformat("fcc%d.%d.xyz", MPI.CommWorldSize, MPI.CommWorldRank),false);
-        fp("%u\n",unsigned(aa.size()));
-        fp("full fcc\n");
-        for(const atom_node<double> *node = aa.head();node;node=node->next)
-        {
-            const Atom       &a = *(node->pAtom);
-            const string     &s = a.ppty.name;
-            fp("%s %g %g %g\n", s.c_str(), a.r.x, a.r.y, a.r.z);
-        }
+        aa.save_xyz(fp, "partial fcc");
     }
     
 }
