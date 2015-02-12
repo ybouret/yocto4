@@ -16,10 +16,12 @@ YOCTO_PROGRAM_START()
 
     MPI.Printf(stderr, "Ready...\n" );
 
+    // common library
     library lib;
     lib.insert("H", 1.0);
     lib.insert("He",2.0);
 
+    // atom for this node
     Atoms aa;
     if(MPI.IsFirst)
     {
@@ -36,7 +38,7 @@ YOCTO_PROGRAM_START()
     BinaryAtoms  data;
     if(MPI.IsFirst)
     {
-        // get all the atom
+        // get all the atoms
         const size_t Ntot = aa.size();
         for(int rank=1;rank<MPI.CommWorldSize;++rank)
         {
@@ -62,6 +64,7 @@ YOCTO_PROGRAM_START()
     else
     {
         mpi_io::recv(MPI,data,0);
+        aa.decode(data, lib);
     }
 
     MPI.Printf(stderr,"Last Data Size:%u\n", unsigned(data.size));

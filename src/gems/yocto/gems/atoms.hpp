@@ -2,6 +2,7 @@
 #define YOCTO_GEMS_ATOMS_INCLUDED 1
 
 #include "yocto/gems/library.hpp"
+#include "yocto/gems/binary.hpp"
 #include "yocto/sequence/addr-list.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
@@ -272,9 +273,26 @@ namespace yocto
                 }
             }
 
-            inline void decode(const binary_atoms<T> &data )
+            inline void decode(const binary_atoms<T> &data, library &lib)
             {
-                
+                for(size_t i=0;i<data.size;++i)
+                {
+                    const uint8_t    *p    = data.query(i);
+
+                    // create an atom
+                    const word_t      uuid = query_be<word_t>(p); p+=sizeof(uuid);
+                    const word_t      puid = query_be<word_t>(p); p+=sizeof(puid);
+                    const properties &ppty = lib(puid);
+                    atom<T>          *Atom = lib.create<T>(uuid,ppty);
+                    insert(Atom);
+
+                    // fill data
+                    (T&)(Atom->mass) = query_be<T>(p); p+=sizeof(T);
+                    (T&)(Atom->invm) = query_be<T>(p); p+=sizeof(T);
+                    fill_v3d(Atom->r,p);
+                    fill_v3d(Atom->v,p);
+                    fill_v3d(Atom->a,p);
+                }
             }
 
         private:
@@ -332,7 +350,13 @@ namespace yocto
                 }
                 return 0;
             }
-            
+
+            static inline void fill_v3d( v3d<T> &v, const uint8_t * &p ) throw()
+            {
+                v.x = query_be<T>(p); p+=sizeof(T);
+                v.y = query_be<T>(p); p+=sizeof(T);
+                v.z = query_be<T>(p); p+=sizeof(T);
+            }
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(atoms);
         };

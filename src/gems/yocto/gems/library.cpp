@@ -70,6 +70,16 @@ namespace yocto
             atoms.remove_if( atom_info::is_orphan );
         }
 
+        const properties & library:: operator()( const word_t puid) const
+        {
+            const properties::pointer *pp = db.sub_search(puid);
+            if(!pp)
+            {
+                throw exception("library: no property with ID=%u", unsigned(puid));
+            }
+            return **pp;
+        }
+
 
     }
 
