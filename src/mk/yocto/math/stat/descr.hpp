@@ -206,9 +206,9 @@ namespace yocto {
 			assert( hst.size() == bin.size() );
 			for( typename SEQ_VAL::const_iterator i = val.begin(); i != val.end(); ++i )
 			{
-				const typename SEQ_VAL::mutable_type  x = *i;
-				typename       SEQ_HST::iterator      h = hst.begin();
-				for( typename SEQ_BIN::const_iterator j = bin.begin(); j != bin.end(); ++j, ++h )
+				const typename SEQ_VAL::mutable_type   x = *i;
+				typename       SEQ_HST::iterator       h = hst.begin();
+				for( typename  SEQ_BIN::const_iterator j = bin.begin(); j != bin.end(); ++j, ++h )
 				{
 					if( x <= *j )
 					{
