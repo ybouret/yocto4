@@ -23,7 +23,7 @@ namespace yocto
 
             properties       & operator[](const string &name);
             const properties & operator[](const string &name) const;
-
+            const properties & operator()( const word_t puid) const;
 
             template <typename T>
             inline atom<T> *create( const word_t uuid, const properties &ppty )
