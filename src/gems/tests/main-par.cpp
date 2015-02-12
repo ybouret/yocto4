@@ -36,9 +36,11 @@ YOCTO_PROGRAM_START()
     BinaryAtoms  data;
     if(MPI.IsFirst)
     {
+        // get all the atom
         const size_t Ntot = aa.size();
         for(int rank=1;rank<MPI.CommWorldSize;++rank)
         {
+            // find which atoms to send to a given rank
             size_t offset = 1;
             size_t length = Ntot;
             core::mpi_split(rank, MPI.CommWorldSize, offset, length);

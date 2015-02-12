@@ -13,6 +13,7 @@ namespace yocto
         {
             static const int tag = 8;
 
+            //! send an encoded bunch of atoms
             template <typename T>
             static inline void send( const mpi &MPI, const binary_atoms<T> &data, int rank )
             {

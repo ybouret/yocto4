@@ -13,6 +13,7 @@ namespace yocto
     namespace gems
     {
 
+        //! information about a given kind of atom
         class properties : public counted_object
         {
         public:

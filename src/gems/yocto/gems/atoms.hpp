@@ -272,6 +272,11 @@ namespace yocto
                 }
             }
 
+            inline void decode(const binary_atoms<T> &data )
+            {
+                
+            }
+
         private:
             list_type          alist;
             size_t             nslot; //!< a power of two
