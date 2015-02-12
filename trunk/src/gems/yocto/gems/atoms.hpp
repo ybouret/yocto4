@@ -7,8 +7,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/ptr/auto.hpp"
-
-#include <iostream>
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
@@ -227,7 +226,6 @@ namespace yocto
                         }
                         slot->swap_with(stk);
                     }
-                    std::cerr << "Found #" << matching.size << " matching..." << std::endl;
 
                     //__________________________________________________________
                     //
@@ -306,6 +304,18 @@ namespace yocto
             node_type *tail() throw() { return alist.tail; }
             const node_type *head() const throw() { return alist.head; }
             const node_type *tail() const throw() { return alist.tail; }
+
+            void save_xyz( ios::ostream &fp, const string &title ) const
+            {
+                fp("%lu\n", (unsigned long)alist.size);
+                fp << title << "\n";
+                for(const node_type *node=alist.head;node;node=node->next)
+                {
+                    const atom<T>  &a = *(node->pAtom);
+                    const v3d<T>   &r = a.r;
+                    fp("%s %g %g %g\n", a.ppty.name.c_str(),r.x,r.y,r.z);
+                }
+            }
 
         private:
             list_type          alist;
