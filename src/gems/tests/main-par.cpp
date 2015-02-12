@@ -26,7 +26,7 @@ YOCTO_PROGRAM_START()
 
     coord_t      cr;
     v3d<double>  box(12,13,14);
-    const size_t n = crystal::close_packed_count(cr, 100, box);
+    const size_t n = crystal::close_packed_count(cr, 200, box);
 
     // atom for this node
     Atoms aa;
