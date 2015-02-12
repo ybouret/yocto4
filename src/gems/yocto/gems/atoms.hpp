@@ -263,6 +263,13 @@ namespace yocto
             inline
             size_t size() const throw() { return alist.size; }
 
+            //! get atom in 0..size-1
+            inline atom<T> & operator[](size_t indx) throw()
+            {
+                assert(indx<size());
+                return *(alist.fetch(indx)->pAtom);
+            }
+
             inline
             void encode( binary_atoms<T> &data ) const
             {
@@ -294,6 +301,11 @@ namespace yocto
                     fill_v3d(Atom->a,p);
                 }
             }
+
+            node_type *head() throw() { return alist.head; }
+            node_type *tail() throw() { return alist.tail; }
+            const node_type *head() const throw() { return alist.head; }
+            const node_type *tail() const throw() { return alist.tail; }
 
         private:
             list_type          alist;
