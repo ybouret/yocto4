@@ -84,6 +84,12 @@ SET( fft_srcs ${fft_decl} ${fft_impl} )
 INSTALL( FILES ${fft_decl} DESTINATION include/yocto/math/fft )
 SOURCE_GROUP( math/fft FILES ${fft_srcs} )
 
+FILE( GLOB wavelet_decl yocto/math/wavelet/*.hpp)
+FILE( GLOB wavelet_impl yocto/math/wavelet/*.cpp)
+SET( wavelet_srcs ${wavelet_decl} ${wavelet_impl} )
+INSTALL( FILES ${wavelet_decl} DESTINATION include/yocto/math/wavelet )
+SOURCE_GROUP( math/wavelet FILES ${wavelet_srcs} )
+
 SET( srcs
 ${kernel_srcs}
 ${sparse_srcs}
@@ -98,7 +104,8 @@ ${ode_implicit_srcs}
 ${fit_srcs}
 ${stat_srcs}
 ${alg_srcs}
-${fft_srcs})
+${fft_srcs}
+${wavelet_srcs})
 
 INCLUDE_DIRECTORIES( . ../main )
 
