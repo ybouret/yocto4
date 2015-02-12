@@ -2,6 +2,7 @@
 #include "yocto/program.hpp"
 #include "yocto/core/mpi-split.hpp"
 #include "yocto/gems/io/crystal.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 using namespace gems;
@@ -9,6 +10,7 @@ using namespace gems;
 typedef atom<double> Atom;
 typedef atoms<double> Atoms;
 typedef binary_atoms<double> BinaryAtoms;
+
 
 YOCTO_PROGRAM_START()
 {
@@ -19,11 +21,11 @@ YOCTO_PROGRAM_START()
 
     // common library
     library lib;
-    lib.insert("H", 1.0);
-    lib.insert("He",2.0);
+    lib.insert("Na", 23);
+    lib.insert("Cl", 35);
 
-    coord_t     cr;
-    v3d<double> box(6,7,8);
+    coord_t      cr;
+    v3d<double>  box(12,13,14);
     const size_t n = crystal::close_packed_count(cr, 100, box);
 
     // atom for this node
@@ -31,11 +33,30 @@ YOCTO_PROGRAM_START()
     if(MPI.IsFirst)
     {
 
-        for(size_t i=1;i<=100;)
+
+        for(size_t i=1;i<=n;++i)
         {
-            aa.insert( lib.create<double>(++i,"H") );
-            aa.insert( lib.create<double>(++i,"He") );
+            if(i&1)
+            {
+                aa.insert( lib.create<double>(i,"Na") );
+            }
+            else
+            {
+                aa.insert( lib.create<double>(i,"Cl"));
+            }
         }
+
+        crystal::build_fcc(aa,cr,box);
+        ios::ocstream fp("fcc.xyz",false);
+        fp("%u\n",unsigned(n));
+        fp("full fcc\n");
+        for(const atom_node<double> *node = aa.head();node;node=node->next)
+        {
+            const Atom       &a = *(node->pAtom);
+            const string     &s = a.ppty.name;
+            fp("%s %g %g %g\n", s.c_str(), a.r.x, a.r.y, a.r.z);
+        }
+
     }
 
     MPI.Printf(stderr, "#atoms=%u\n", unsigned(aa.size()));
@@ -72,9 +93,18 @@ YOCTO_PROGRAM_START()
         aa.decode(data, lib);
     }
 
-    MPI.Printf(stderr,"Last Data Size:%u\n", unsigned(data.size));
     MPI.Printf(stderr, "#atoms=%u\n", unsigned(aa.size()));
-    
+    {
+        ios::ocstream fp( vformat("fcc%d.%d.xyz", MPI.CommWorldSize, MPI.CommWorldRank),false);
+        fp("%u\n",unsigned(aa.size()));
+        fp("full fcc\n");
+        for(const atom_node<double> *node = aa.head();node;node=node->next)
+        {
+            const Atom       &a = *(node->pAtom);
+            const string     &s = a.ppty.name;
+            fp("%s %g %g %g\n", s.c_str(), a.r.x, a.r.y, a.r.z);
+        }
+    }
     
 }
 YOCTO_PROGRAM_END()
