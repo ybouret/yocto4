@@ -1,6 +1,7 @@
 #include "yocto/gems/mpi.hpp"
 #include "yocto/program.hpp"
 #include "yocto/core/mpi-split.hpp"
+#include "yocto/gems/io/crystal.hpp"
 
 using namespace yocto;
 using namespace gems;
@@ -20,6 +21,10 @@ YOCTO_PROGRAM_START()
     library lib;
     lib.insert("H", 1.0);
     lib.insert("He",2.0);
+
+    coord_t     cr;
+    v3d<double> box(6,7,8);
+    const size_t n = crystal::close_packed_count(cr, 100, box);
 
     // atom for this node
     Atoms aa;
