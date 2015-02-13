@@ -13,7 +13,9 @@ namespace yocto
         struct wavelet
         {
 
+
             typedef typename numeric<T>::function function;
+
 
             //!
             /**
@@ -73,6 +75,19 @@ namespace yocto
                     }
                     
                 }
+            }
+
+            //! Mexican Hat
+            static inline T Ricker( T x )
+            {
+                T x2 = x*x;
+                return (T(1)-x2) * Exp(-x2/2);
+            }
+
+            //! Gaussian
+            static inline T Gaussian(T x)
+            {
+                return Exp(-(x*x)/2);
             }
             
         };
