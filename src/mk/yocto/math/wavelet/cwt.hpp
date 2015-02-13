@@ -3,7 +3,7 @@
 
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/math/types.hpp"
-
+#include "yocto/sequence/vector.hpp"
 namespace yocto
 {
     namespace math
@@ -39,6 +39,7 @@ namespace yocto
                 const T      width    = x[n] - x[1]; assert(width>0);
                 W.make(n,n);
 
+                vector<T> p(n,0);
                 // precompute scales
                 for(size_t j=1;j<=n;++j)
                 {
@@ -46,26 +47,26 @@ namespace yocto
                 }
 
                 // run
-                for(size_t i=1;i<=n;++i)
+                for(size_t i=n;i>0;--i)
                 {
                     // shift
                     const T shift = x[i]-x[1];
                     shifts[i]     = shift;
                     
-                    for(size_t j=1;j<=n;++j)
+                    for(size_t j=n;j>0;--j)
                     {
                         const T scale = scales[j];
+                        for(size_t k=n;k>0;--k)
+                        {
+                            p[k] = Psi((x[k]-shift)/scale);
+                        }
                         T sum(0);
-
                         for(size_t k=1,kp=2;k<n;++k,++kp)
                         {
                             const T xk  = x[k];
                             const T xkp = x[kp];
                             const T dx  = xkp - xk;
-                            const T yk  = y[k];
-                            const T ykp = y[kp];
-
-                            sum += dx*(yk*Psi((xk-shift)/scale)+ykp*Psi((xkp-shift)/scale));
+                            sum += dx*(y[k]*p[k]+y[kp]*p[kp]);
                         }
 
                         const T factor = Sqrt(scale);

@@ -16,7 +16,7 @@ namespace yocto
         {
         public:
             explicit SIMD(); //!< use layout
-            explicit SIMD(size_t num_threads, size_t thread_offset=0); //!< use layout
+            explicit SIMD(size_t num_threads, size_t thread_offset=0); //!< manual settings
             virtual ~SIMD() throw();
             
             //! a Kernel: context dependent function
