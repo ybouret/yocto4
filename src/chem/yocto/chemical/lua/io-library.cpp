@@ -35,7 +35,7 @@ namespace yocto
             {
                 throw exception("%s['%s'] charge is not a number ", id, name.c_str());
             }
-            species &sp = lib.add(name,lua_tonumber(L,-1));
+            species &sp = lib.add(name,int(lua_tonumber(L,-1)));
             lua_pop(L,1);
             
             
