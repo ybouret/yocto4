@@ -48,7 +48,8 @@ namespace yocto
                 {
                     // shift
                     const T shift = x[i]-x[1];
-                    shifts[i]  = shift;
+                    shifts[i]     = shift;
+                    
                     for(size_t j=1;j<=n;++j)
                     {
                         const T scale = scales[j];

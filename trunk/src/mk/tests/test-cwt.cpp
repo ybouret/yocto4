@@ -15,6 +15,37 @@ double MexicanHat( double u )
     return (1.0-u2)*exp(-u2/2.0);
 }
 
+static inline
+double Gaussian( double u )
+{
+    return exp(-u*u);
+}
+
+static inline double __sinc(double x)
+{
+    if(fabs(x)>1e-3)
+    {
+        return sin(x)/x;
+    }
+    else
+    {
+        const double x2 = x*x;
+        const double x4 = x2*x2;
+        return (1.0-x2/6.0 + x4/120.0);
+    }
+}
+
+static inline double sinc(double x)
+{
+    return __sinc( numeric<double>::pi * x);
+}
+
+static inline
+double Shannon(double x)
+{
+    return 2*sinc(2*x-1)-sinc(x);
+}
+
 YOCTO_UNIT_TEST_IMPL(cwt)
 {
     const size_t N = 100;
@@ -26,7 +57,9 @@ YOCTO_UNIT_TEST_IMPL(cwt)
     for(size_t i=1;i<=N;++i)
     {
         const double xx = alea<double>() * width;
-        const double yy = 0.4 + sin(xx);// + 1.2 * sin(2.1*xx);
+        //const double yy = //0.4 + sin(xx);// + 1.2 * sin(2.1*xx);
+        const double dx = (xx-2);
+        const double yy = 0.1 *exp(-1.5*dx*dx);
         x.push_back(xx);
         y.push_back(yy);
     }
@@ -44,8 +77,11 @@ YOCTO_UNIT_TEST_IMPL(cwt)
     vector<double> scales(N,0);
 
     matrix<double> W;
-    numeric<double>::function Psi( cfunctor(MexicanHat) );
-    wavelet<double>::cwt(x, y, Psi,shifts,scales, W);
+    numeric<double>::function Psi(  cfunctor(MexicanHat) );
+    numeric<double>::function Psi2( cfunctor(Gaussian)   );
+    numeric<double>::function Psi3( cfunctor(Shannon)   );
+
+    wavelet<double>::cwt(x, y, Psi2,shifts,scales, W);
 
     {
         ios::ocstream fp("cw.dat",false);
