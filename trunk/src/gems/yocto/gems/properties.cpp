@@ -18,12 +18,12 @@ namespace yocto
         properties:: properties(const string &id, const double m) :
         name(id),
         uuid( compute_uuid(name) ),
-        mass(m)
+        mass(m),
+	data()
         {
         }
-
-
 
     }
 
 }
+

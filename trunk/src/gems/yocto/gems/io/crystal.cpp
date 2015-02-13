@@ -57,13 +57,13 @@ namespace yocto
             size_t m = 0;
 
             // Repeat sublattices
-            for(size_t k=0; k < cr.z; ++k )
+            for(unit_t k=0; k < cr.z; ++k )
             {
                 const double z = k * dz;
-                for( size_t j=0; j < cr.y; ++j )
+                for( unit_t j=0; j < cr.y; ++j )
                 {
                     const double y = j * dy;
-                    for(size_t i=0; i < cr.x;  ++i )
+                    for(unit_t i=0; i < cr.x;  ++i )
                     {
                         const double x = i * dx;
                         for(size_t iref=0; iref < 4; ++ iref )
