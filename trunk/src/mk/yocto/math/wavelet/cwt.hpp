@@ -2,7 +2,6 @@
 #define YOCTO_MATH_WAVELET_CWT_INCLUDED 1
 
 #include "yocto/math/kernel/matrix.hpp"
-#include "yocto/math/fcn/intg.hpp"
 #include "yocto/math/types.hpp"
 
 namespace yocto
@@ -30,7 +29,6 @@ namespace yocto
                      matrix<T>      &W
                      )
             {
-                integrator<T> intg;
                 assert(x.size()==y.size());
                 assert(x.size()==shifts.size());
                 assert(x.size()==scales.size());
