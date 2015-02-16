@@ -130,7 +130,7 @@ namespace yocto
                 //______________________________________________________________
                 for(size_t j=1,jp=2;j<n;++j,++jp)
                 {
-                    scales[j] = (j*width)/n;
+                    scales[j]  = (j*width)/n;
                     const T xj = x[j];
                     ddx[j]     = x[jp]-xj;
                     shifts[j]  = xj-x1;
@@ -156,7 +156,7 @@ namespace yocto
                         const T scale   = scales[j];
                         array<T> &psi_j = psi[j];
                         T sum_psi(0), sum_wav(0);
-                        T psi_k = Psi( (x1-shift)/scale );
+                        T psi_k  = Psi( (x1-shift)/scale );
                         psi_j[1] = psi_k;
                         for(size_t k=1,kp=2;k<n;++k,++kp)
                         {
