@@ -1,0 +1,32 @@
+\documentclass{revtex4}
+
+\usepackage{graphicx}
+\usepackage{amssymb,amsmath}
+\usepackage{epstopdf}
+\usepackage{bm}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+
+\newcommand{\trn}{\!\!~^t}
+\newcommand{\grad}{\vec{\nabla}}
+
+\begin{document}
+	\title{Continuous Wavelet Transform}
+	\maketitle
+
+\section{Definition}
+Let $f(x)$ be a $\mathcal{L}_2$ function. Let $\Psi(u)$ be a $\mathcal{L}_2$ function.
+Then we define the continuous wavelet transform
+\begin{equation}
+	\tilde{f}(s,w) = \dfrac{1}{\sqrt{w}}
+	\int_{-\infty}^{\infty} f(x)\Psi\left(\dfrac{x-s}{w}\right) \, \mathrm{d}x
+\end{equation}
+
+\section{Finite size effect}
+Usually, $f$ is restricted to an interval $[a,b]$ and we have
+\begin{equation}
+	\tilde{f}(s,w) \simeq \dfrac{1}{\sqrt{w}}
+	\int_{a}^{b} f(x)\Psi\left(\dfrac{x-s}{w}\right) \, \mathrm{d}x
+\end{equation}
+
+\end{document}
