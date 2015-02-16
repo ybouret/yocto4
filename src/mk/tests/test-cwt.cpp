@@ -154,8 +154,28 @@ YOCTO_UNIT_TEST_IMPL(cwt)
             fp("\n");
         }
     }
-    
-    
+
+
+    std::cerr << "Fullly Optimized Transform..." << std::endl;
+    t_ini = chrono.query();
+    wavelet<double>::cwt_full(x, y, Psi,shifts,scales, W);
+    const double t_ful = chrono.query() - t_ini;
+    std::cerr << "t_ful=" << t_ful << std::endl;
+    {
+        ios::ocstream fp("cwt_ful.dat",false);
+        for(size_t i=1;i<=N;++i)
+        {
+            const double xx = shifts[i];
+            for(size_t j=1;j<=N;++j)
+            {
+                const double yy = scales[j];
+                const double ww = W[i][j];
+                fp("%g %g %g\n",xx,yy,ww*ww);
+            }
+            fp("\n");
+        }
+    }
+
     
 }
 YOCTO_UNIT_TEST_DONE()

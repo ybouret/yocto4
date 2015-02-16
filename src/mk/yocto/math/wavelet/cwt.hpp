@@ -197,6 +197,131 @@ namespace yocto
                             sum += ddx[k]*(z[k]*psi_k+z[kp]*psi_kp);
                             psi_k = psi_kp;
                         }
+
+                        {
+                            const T factor = Sqrt(scale);
+                            sum /= factor+factor;
+                        }
+
+                        Wi[j] = sum;
+                    }
+
+
+                }
+            }
+
+            //!
+            /**
+             \param x must be sorted
+             \param y signal values @x
+             */
+            inline static
+            void cwt_full(const array<T> &x,
+                          const array<T> &y,
+                          function       &Psi,
+                          array<T>       &shifts,
+                          array<T>       &scales,
+                          matrix<T>      &W
+                          )
+            {
+                assert(x.size()==y.size());
+                assert(x.size()==shifts.size());
+                assert(x.size()==scales.size());
+                assert(x.size()>1);
+                const size_t n        = x.size();
+                const T      x1       = x[1];
+                const T      width    = x[n] - x1; assert(width>0);
+                W.make(n,n);
+
+                // local memory
+                vector<T> ddx(n-1,0);
+                vector<T> z(n,0);
+
+                //______________________________________________________________
+                //
+                // precompute scales, shifts and ddx
+                //______________________________________________________________
+                for(size_t j=1,jp=2;j<n;++j,++jp)
+                {
+                    scales[j]  = (j*width)/n;
+                    const T xj = x[j];
+                    ddx[j]     = x[jp]-xj;
+                    shifts[j]  = xj-x1;
+                }
+                scales[n] = width;
+                shifts[n] = width;
+
+                //______________________________________________________________
+                //
+                // Compute global baseline coefficient
+                //______________________________________________________________
+                T Ifull(0), Jfull(0);
+
+                {
+                    //__________________________________________________________
+                    //
+                    // Loop on shifts
+                    //__________________________________________________________
+                    for(size_t i=n;i>0;--i)
+                    {
+                        const T shift = shifts[i];
+
+                        //______________________________________________________
+                        //
+                        // compute normalizing coef, store Psi values
+                        //______________________________________________________
+                        T I(0), J(0);
+                        for(size_t j=n;j>0;--j)
+                        {
+                            const T scale   = scales[j];
+                            T sum_psi(0), sum_wav(0);
+                            T psi_k  = Psi( (x1-shift)/scale );
+                            for(size_t k=1,kp=2;k<n;++k,++kp)
+                            {
+                                const T psi_kp = Psi( (x[kp]-shift)/scale );
+                                const T dx     = ddx[k];
+
+                                sum_psi += dx * (psi_k+psi_kp);
+                                sum_wav += dx * (psi_k*y[k]+psi_kp*y[kp]);
+
+                                psi_k = psi_kp;
+                            }
+
+                            I += sum_psi * sum_psi;
+                            J += sum_psi * sum_wav;
+                            Ifull += I/scale;
+                            Jfull += J/scale;
+                        }
+                    }
+                }
+                const double alpha = -Jfull/Ifull;
+                std::cerr << "alpha_full=" << alpha << std::endl;
+
+                //______________________________________________________________
+                //
+                // Generate global data
+                //______________________________________________________________
+                for(size_t i=n;i>0;--i)
+                {
+                    z[i] = y[i] + alpha;
+                }
+
+                for(size_t i=n;i>0;--i)
+                {
+                    const T   shift = shifts[i];
+                    array<T> &Wi    = W[i];
+
+                    for(size_t j=n;j>0;--j)
+                    {
+                        const T         scale = scales[j];
+                        T sum(0);
+                        T psi_k  = Psi( (x1-shift)/scale );
+                        for(size_t k=1,kp=2;k<n;++k,++kp)
+                        {
+                            const T psi_kp = Psi( (x[kp]-shift)/scale );
+                            sum += ddx[k]*(z[k]*psi_k+z[kp]*psi_kp);
+                            psi_k = psi_kp;
+                        }
                         
                         {
                             const T factor = Sqrt(scale);
@@ -205,9 +330,8 @@ namespace yocto
                         
                         Wi[j] = sum;
                     }
-                    
-                    
                 }
+                
             }
             
         private:
