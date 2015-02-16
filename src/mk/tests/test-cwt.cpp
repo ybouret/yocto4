@@ -77,11 +77,11 @@ YOCTO_UNIT_TEST_IMPL(cwt)
     vector<double> scales(N,0);
 
     matrix<double> W;
-    numeric<double>::function Psi(  cfunctor(MexicanHat) );
-    numeric<double>::function Psi2( cfunctor(Gaussian)   );
-    numeric<double>::function Psi3( cfunctor(Shannon)   );
+    //numeric<double>::function Psi(  cfunctor(MexicanHat) );
+    numeric<double>::function   Psi( cfunctor(Gaussian)   );
+    //numeric<double>::function Psi3( cfunctor(Shannon)   );
 
-    wavelet<double>::cwt(x, y, Psi2,shifts,scales, W);
+    wavelet<double>::cwt(x, y, Psi,shifts,scales, W);
 
     {
         ios::ocstream fp("cw.dat",false);
@@ -98,7 +98,21 @@ YOCTO_UNIT_TEST_IMPL(cwt)
         }
     }
 
-    wavelet<double>::cwt_opt(x, y, Psi2,shifts,scales, W);
+    wavelet<double>::cwt_opt(x, y, Psi,shifts,scales, W);
+    {
+        ios::ocstream fp("cw2.dat",false);
+        for(size_t i=1;i<=N;++i)
+        {
+            const double xx = shifts[i];
+            for(size_t j=1;j<=N;++j)
+            {
+                const double yy = scales[j];
+                const double ww = W[i][j];
+                fp("%g %g %g\n",xx,yy,ww*ww);
+            }
+            fp("\n");
+        }
+    }
 
 
 

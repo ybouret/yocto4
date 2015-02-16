@@ -14,7 +14,7 @@ namespace yocto {
         
         //! (x.a <= x.b <= x.c) || (x.a>=x.b>=x.c) and f.b <= f.a and f.b <= f.c
         /**
-         ftol wil be internally checked
+         ftol will be internally checked
          */
         template <typename T>
         void minimize(typename numeric<T>::function &func,
