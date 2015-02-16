@@ -2,10 +2,8 @@
 #define YOCTO_MATH_WAVELET_CWT_INCLUDED 1
 
 #include "yocto/math/kernel/matrix.hpp"
-#include "yocto/math/types.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/math/opt/bracket.hpp"
-#include "yocto/math/opt/minimize.hpp"
+#include "yocto/math/types.hpp"
 
 namespace yocto
 {
@@ -26,13 +24,13 @@ namespace yocto
              \param y signal values @x
              */
             inline static
-            void cwt(const array<T> &x,
-                     const array<T> &y,
-                     function       &Psi,
-                     array<T>       &shifts,
-                     array<T>       &scales,
-                     matrix<T>      &W
-                     )
+            void cwt_raw(const array<T> &x,
+                         const array<T> &y,
+                         function       &Psi,
+                         array<T>       &shifts,
+                         array<T>       &scales,
+                         matrix<T>      &W
+                         )
             {
                 assert(x.size()==y.size());
                 assert(x.size()==shifts.size());
@@ -97,22 +95,6 @@ namespace yocto
 
 
 
-            struct cwt_opt_wrapper
-            {
-                const array<T> &x;
-                const array<T> &y;
-                array<T>       &z;
-                function       &Psi;
-                T               shift;  //!< the changing parameter
-                const array<T> &scales;
-                array<T>       &psi;
-                const array<T> &ddx;
-
-                inline T eval( T alpha )
-                {
-                    return cwt_power(x,y,z,Psi,shift,scales,alpha,psi,ddx);
-                }
-            };
 
             //!
             /**
@@ -120,177 +102,115 @@ namespace yocto
              \param y signal values @x
              */
             inline static
-            void cwt_opt(const array<T> &x,
-                         const array<T> &y,
-                         function       &Psi,
-                         array<T>       &shifts,
-                         array<T>       &scales,
-                         matrix<T>      &W
-                         )
+            void cwt(const array<T> &x,
+                     const array<T> &y,
+                     function       &Psi,
+                     array<T>       &shifts,
+                     array<T>       &scales,
+                     matrix<T>      &W
+                     )
             {
                 assert(x.size()==y.size());
                 assert(x.size()==shifts.size());
                 assert(x.size()==scales.size());
                 assert(x.size()>1);
                 const size_t n        = x.size();
-                const T      width    = x[n] - x[1]; assert(width>0);
+                const T      x1       = x[1];
+                const T      width    = x[n] - x1; assert(width>0);
                 W.make(n,n);
 
-                vector<T> psi(n,0);
+                // local memory
                 vector<T> ddx(n-1,0);
                 vector<T> z(n,0);
+                matrix<T> psi(n,n);
 
                 //______________________________________________________________
                 //
-                // precompute scales and ddx
+                // precompute scales, shifts and ddx
                 //______________________________________________________________
                 for(size_t j=1,jp=2;j<n;++j,++jp)
                 {
                     scales[j] = (j*width)/n;
-                    ddx[j]    = x[jp]-x[j];
+                    const T xj = x[j];
+                    ddx[j]     = x[jp]-xj;
+                    shifts[j]  = xj-x1;
                 }
                 scales[n] = width;
+                shifts[n] = width;
 
                 //______________________________________________________________
                 //
-                // prepare approximated power estimator
-                //______________________________________________________________
-                cwt_opt_wrapper wrapper = { x, y, z, Psi, T(0), scales, psi, ddx };
-                function        F( &wrapper, &cwt_opt_wrapper::eval );
-
-
-                //______________________________________________________________
-                //
-                // First time estimator: use rms as scaling
-                //______________________________________________________________
-                const T r = rms_of(x, y, ddx);
-                triplet<T> alpha = { -r, 0, r };
-
-                //______________________________________________________________
-                //
-                // run: for each shift
+                // Loop on shifts
                 //______________________________________________________________
                 for(size_t i=1;i<=n;++i)
                 {
+                    const T shift = shifts[i];
 
                     //__________________________________________________________
                     //
-                    // get shift
+                    // compute normalizing coef, store Psi values
                     //__________________________________________________________
-                    const T shift = x[i]-x[1];
-                    shifts[i]     = shift;
-                    wrapper.shift = shift;
+                    T I(0), J(0);
+                    for(size_t j=n;j>0;--j)
+                    {
+                        const T scale   = scales[j];
+                        array<T> &psi_j = psi[j];
+                        T sum_psi(0), sum_wav(0);
+                        T psi_k = Psi( (x1-shift)/scale );
+                        psi_j[1] = psi_k;
+                        for(size_t k=1,kp=2;k<n;++k,++kp)
+                        {
+                            const T psi_kp = Psi( (x[kp]-shift)/scale );
+                            const T dx     = ddx[k];
+
+                            psi_j[kp]      = psi_kp;
+                            sum_psi += dx * (psi_k+psi_kp);
+                            sum_wav += dx * (psi_k*y[k]+psi_kp*y[kp]);
+
+                            psi_k = psi_kp;
+                        }
+
+                        I += sum_psi * sum_psi;
+                        J += sum_psi * sum_wav;
+                    }
+                    const T alpha = -J/I;
 
                     //__________________________________________________________
                     //
-                    // initialize look up
-                    //__________________________________________________________
-                    triplet<T> FF = { F(alpha.a), F(alpha.b), F(alpha.c) };
-                    bracket<T>::expand(F,alpha,FF);
-                    minimize<T>(F, alpha, FF, 0);
-                    
-                    //__________________________________________________________
-                    //
-                    // compute transform for the given shift
+                    // compute optimized transform
                     //__________________________________________________________
                     for(size_t j=n;j>0;--j)
                     {
-                        z[j] = y[j] + alpha.b;
+                        z[j] = y[j] + alpha;
                     }
 
                     array<T> &Wi = W[i];
                     for(size_t j=n;j>0;--j)
                     {
-                        const T scale = scales[j];
-                        for(size_t k=n;k>0;--k)
-                        {
-                            psi[k] = Psi((x[k]-shift)/scale);
-                        }
-
+                        const T         scale = scales[j];
+                        const array<T> &psi_j = psi[j];
                         T sum(0);
+                        T psi_k  = psi_j[1];
                         for(size_t k=1,kp=2;k<n;++k,++kp)
                         {
-                            sum += ddx[k]*(z[k]*psi[k]+z[kp]*psi[kp]);
+                            const T psi_kp = psi_j[kp];
+                            sum += ddx[k]*(z[k]*psi_k+z[kp]*psi_kp);
+                            psi_k = psi_kp;
                         }
-
+                        
                         {
                             const T factor = Sqrt(scale);
                             sum /= factor+factor;
                         }
-
+                        
                         Wi[j] = sum;
                     }
+                    
+                    
                 }
-
             }
-
+            
         private:
-            static inline
-            T rms_of( const array<T> &x, const array<T> &y, const array<T> &ddx ) throw()
-            {
-                assert(x.size()==y.size());
-                assert(x.size()>=ddx.size());
-                assert(x.size()>1);
-
-                const size_t n = x.size();
-                T r = 0;
-                for(size_t i=1,ip=2;i<n;++i,++ip)
-                {
-                    r += ddx[i] * ( Square(y[i]) + Square(y[ip]));
-                }
-                const T width = x[n] - x[1];
-                r /= width+width;
-                return Sqrt(r);
-            }
-
-            static inline
-            T cwt_power(const array<T> &x,
-                        const array<T> &y,
-                        array<T>       &z,
-                        function       &Psi,
-                        const T         shift,
-                        const array<T> &scales,
-                        const T         alpha,
-                        array<T>       &psi,
-                        const array<T> &ddx)
-            {
-                assert(x.size()==y.size());
-                assert(x.size()==scales.size());
-                assert(x.size()==psi.size());
-                assert(x.size()>=ddx.size());
-                assert(x.size()>1);
-
-                const size_t n = x.size();
-                T            F = 0;
-
-                for(size_t i=n;i>0;--i)
-                {
-                    z[i] = y[i] + alpha;
-                }
-
-                for(size_t j=n;j>0;--j)
-                {
-                    const T scale = scales[j];
-                    for(size_t k=n;k>0;--k)
-                    {
-                        psi[k] = Psi((x[k]-shift)/scale);
-                    }
-                    T sum(0);
-                    for(size_t k=1,kp=2;k<n;++k,++kp)
-                    {
-                        const T dx  = ddx[k];
-                        sum += dx*(z[k]*psi[k]+z[kp]*psi[kp]);
-                    }
-                    
-                    {
-                        const T factor = Sqrt(scale);
-                        sum /= factor+factor;
-                    }
-                    
-                    F += sum*sum;
-                }
-                return F;
-            }
             
         };
         
