@@ -59,7 +59,7 @@ YOCTO_UNIT_TEST_IMPL(cwt)
         const double xx = alea<double>() * width;
         //const double yy = //0.4 + sin(xx);// + 1.2 * sin(2.1*xx);
         const double dx = (xx-2);
-        const double yy = 0.1 *exp(-1.5*dx*dx);
+        const double yy = 0.3 + 0.1 *exp(-1.5*dx*dx);
         x.push_back(xx);
         y.push_back(yy);
     }
@@ -97,5 +97,10 @@ YOCTO_UNIT_TEST_IMPL(cwt)
             fp("\n");
         }
     }
+
+    wavelet<double>::cwt_opt(x, y, Psi2,shifts,scales, W);
+
+
+
 }
 YOCTO_UNIT_TEST_DONE()
