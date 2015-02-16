@@ -8,12 +8,6 @@
 using namespace yocto;
 using namespace math;
 
-static inline
-double MexicanHat( double u )
-{
-    const double u2 = u*u;
-    return (1.0-u2)*exp(-u2/2.0);
-}
 
 static inline
 double Gaussian( double u )
@@ -77,9 +71,22 @@ YOCTO_UNIT_TEST_IMPL(cwt)
     vector<double> scales(N,0);
 
     matrix<double> W;
-    //numeric<double>::function Psi(  cfunctor(MexicanHat) );
-    numeric<double>::function   Psi( cfunctor(Gaussian)   );
-    //numeric<double>::function Psi3( cfunctor(Shannon)   );
+    double (*Kernel)(double) = Gaussian;
+    if(argc>1)
+    {
+        const string id = argv[1];
+        if(id=="MexicanHat")
+        {
+            Kernel = wavelet<double>::Ricker;
+        }
+
+        if(id=="Shannon")
+        {
+            Kernel = Shannon;
+        }
+    }
+
+    numeric<double>::function   Psi(Kernel);
 
     wavelet<double>::cwt(x, y, Psi,shifts,scales, W);
 

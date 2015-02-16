@@ -144,10 +144,10 @@ namespace yocto
                 //
                 // precompute scales and ddx
                 //______________________________________________________________
-                for(size_t j=1;j<n;++j)
+                for(size_t j=1,jp=2;j<n;++j,++jp)
                 {
-                    scales[j] =(j*width)/n;
-                    ddx[j] = x[j+1]-x[j];
+                    scales[j] = (j*width)/n;
+                    ddx[j]    = x[jp]-x[j];
                 }
                 scales[n] = width;
 
@@ -155,13 +155,13 @@ namespace yocto
                 //
                 // prepare approximated power estimator
                 //______________________________________________________________
-                cwt_opt_wrapper wrapper = { x, y, z, Psi, 0, scales, psi, ddx };
+                cwt_opt_wrapper wrapper = { x, y, z, Psi, T(0), scales, psi, ddx };
                 function        F( &wrapper, &cwt_opt_wrapper::eval );
 
-                
+
                 //______________________________________________________________
                 //
-                // First time estimator
+                // First time estimator: use rms as scaling
                 //______________________________________________________________
                 const T r = rms_of(x, y, ddx);
                 triplet<T> alpha = { -r, 0, r };
@@ -188,17 +188,16 @@ namespace yocto
                     triplet<T> FF = { F(alpha.a), F(alpha.b), F(alpha.c) };
                     bracket<T>::expand(F,alpha,FF);
                     minimize<T>(F, alpha, FF, 0);
-
-                    std::cerr << "shift=" << shift << "\t:\t@" << alpha.b << std::endl;
-
+                    
                     //__________________________________________________________
                     //
                     // compute transform for the given shift
                     //__________________________________________________________
-                    for(size_t i=n;i>0;--i)
+                    for(size_t j=n;j>0;--j)
                     {
-                        z[i] = y[i] + alpha.b;
+                        z[j] = y[j] + alpha.b;
                     }
+
                     array<T> &Wi = W[i];
                     for(size_t j=n;j>0;--j)
                     {
@@ -211,12 +210,13 @@ namespace yocto
                         T sum(0);
                         for(size_t k=1,kp=2;k<n;++k,++kp)
                         {
-                            const T dx  = ddx[k];
-                            sum += dx*(z[k]*psi[k]+z[kp]*psi[kp]);
+                            sum += ddx[k]*(z[k]*psi[k]+z[kp]*psi[kp]);
                         }
 
-                        const T factor = Sqrt(scale);
-                        sum /= factor+factor;
+                        {
+                            const T factor = Sqrt(scale);
+                            sum /= factor+factor;
+                        }
 
                         Wi[j] = sum;
                     }
@@ -234,9 +234,9 @@ namespace yocto
 
                 const size_t n = x.size();
                 T r = 0;
-                for(size_t i=1;i<n;++i)
+                for(size_t i=1,ip=2;i<n;++i,++ip)
                 {
-                    r += ddx[i] * ( Square(y[i]) + Square(y[i+1]));
+                    r += ddx[i] * ( Square(y[i]) + Square(y[ip]));
                 }
                 const T width = x[n] - x[1];
                 r /= width+width;
@@ -281,15 +281,17 @@ namespace yocto
                         const T dx  = ddx[k];
                         sum += dx*(z[k]*psi[k]+z[kp]*psi[kp]);
                     }
-
-                    const T factor = Sqrt(scale);
-                    sum /= factor+factor;
-
+                    
+                    {
+                        const T factor = Sqrt(scale);
+                        sum /= factor+factor;
+                    }
+                    
                     F += sum*sum;
                 }
                 return F;
             }
-
+            
         };
         
     }
