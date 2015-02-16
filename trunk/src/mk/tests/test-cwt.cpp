@@ -40,25 +40,49 @@ double Shannon(double x)
     return 2*sinc(2*x-1)-sinc(x);
 }
 
+#include "yocto/string/conv.hpp"
+#include "yocto/sys/wtime.hpp"
+
 YOCTO_UNIT_TEST_IMPL(cwt)
 {
-    const size_t N = 100;
+    size_t N = 200;
+    if(argc>1)
+    {
+        const string num = argv[1];
+        N = strconv::to<size_t>(num,"N");
+    }
     vector<double> x(N,as_capacity);
     vector<double> y(N,as_capacity);
 
     const double width = 10;
     alea_init();
+
+    x.push_back(0);
+    for(size_t i=1;i<N;++i)
+    {
+        x.push_back( x.back() + 0.1 + alea<double>() );
+    }
+    {
+        assert(x.size()==N);
+        const double x_end = x[N];
+        for(size_t i=1;i<=N;++i)
+        {
+            x[i] *= width;
+            x[i] /= x_end;
+        }
+    }
+
     for(size_t i=1;i<=N;++i)
     {
-        const double xx = alea<double>() * width;
+        const double xx = x[i];
         //const double yy = //0.4 + sin(xx);// + 1.2 * sin(2.1*xx);
-        const double dx = (xx-2);
-        const double yy = 0.3 + 0.1 *exp(-1.5*dx*dx);
-        x.push_back(xx);
+        const double dx = (xx-4);
+        const double yy = 0.3 + 0.1 *exp(-1.1*dx*dx) + 0.02 * ( 0.5 - alea<double>());
         y.push_back(yy);
     }
 
-    co_qsort(x,y);
+
+    //co_qsort(x,y);
     {
         ios::ocstream fp("wdat.dat",false);
         for(size_t i=1;i<=N;++i)
@@ -72,9 +96,9 @@ YOCTO_UNIT_TEST_IMPL(cwt)
 
     matrix<double> W;
     double (*Kernel)(double) = Gaussian;
-    if(argc>1)
+    if(argc>2)
     {
-        const string id = argv[1];
+        const string id = argv[2];
         if(id=="MexicanHat")
         {
             Kernel = wavelet<double>::Ricker;
@@ -87,11 +111,37 @@ YOCTO_UNIT_TEST_IMPL(cwt)
     }
 
     numeric<double>::function   Psi(Kernel);
+    wtime chrono;
+    chrono.start();
 
+
+    std::cerr << "Raw Transform..." << std::endl;
+    double t_ini = chrono.query();
+    wavelet<double>::cwt_raw(x, y, Psi,shifts,scales, W);
+    const double t_raw = chrono.query() - t_ini;
+    std::cerr << "t_raw=" << t_raw << std::endl;
+    {
+        ios::ocstream fp("cwt_raw.dat",false);
+        for(size_t i=1;i<=N;++i)
+        {
+            const double xx = shifts[i];
+            for(size_t j=1;j<=N;++j)
+            {
+                const double yy = scales[j];
+                const double ww = W[i][j];
+                fp("%g %g %g\n",xx,yy,ww*ww);
+            }
+            fp("\n");
+        }
+    }
+
+    std::cerr << "Optimized Transform..." << std::endl;
+    t_ini = chrono.query();
     wavelet<double>::cwt(x, y, Psi,shifts,scales, W);
-
+    const double t_opt = chrono.query() - t_ini;
+    std::cerr << "t_opt=" << t_opt << std::endl;
     {
-        ios::ocstream fp("cw.dat",false);
+        ios::ocstream fp("cwt.dat",false);
         for(size_t i=1;i<=N;++i)
         {
             const double xx = shifts[i];
@@ -104,24 +154,8 @@ YOCTO_UNIT_TEST_IMPL(cwt)
             fp("\n");
         }
     }
-
-    wavelet<double>::cwt_opt(x, y, Psi,shifts,scales, W);
-    {
-        ios::ocstream fp("cw2.dat",false);
-        for(size_t i=1;i<=N;++i)
-        {
-            const double xx = shifts[i];
-            for(size_t j=1;j<=N;++j)
-            {
-                const double yy = scales[j];
-                const double ww = W[i][j];
-                fp("%g %g %g\n",xx,yy,ww*ww);
-            }
-            fp("\n");
-        }
-    }
-
-
-
+    
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()

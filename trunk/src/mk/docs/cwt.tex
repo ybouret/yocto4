@@ -19,14 +19,32 @@ Let $f(x)$ be a $\mathcal{L}_2$ function. Let $\Psi(u)$ be a $\mathcal{L}_2$ fun
 Then we define the continuous wavelet transform
 \begin{equation}
 	\tilde{f}(s,w) = \dfrac{1}{\sqrt{w}}
-	\int_{-\infty}^{\infty} f(x)\Psi\left(\dfrac{x-s}{w}\right) \, \mathrm{d}x
+	\int_{-\infty}^{+\infty} f(x)\Psi\left(\dfrac{x-s}{w}\right) \, \mathrm{d}x
 \end{equation}
 
-\section{Finite size effect}
-Usually, $f$ is restricted to an interval $[a,b]$ and we have
+\section{Energy Minimisation}
+There can be a baseline in the computation. Let us define, for a given shift $s$,
 \begin{equation}
-	\tilde{f}(s,w) \simeq \dfrac{1}{\sqrt{w}}
-	\int_{a}^{b} f(x)\Psi\left(\dfrac{x-s}{w}\right) \, \mathrm{d}x
+	\tilde{g}_s(w,\alpha) = \dfrac{1}{\sqrt{w}}
+	\int_{-\infty}^{+\infty} \left[\alpha + f(x) \right]\Psi\left(\dfrac{x-s}{w}\right) \, \mathrm{d}x
+	= \alpha \Phi_s(w) + \tilde{f}(s,w) 
+\end{equation}
+with
+\begin{equation}
+	\Phi_s(w) = \dfrac{1}{\sqrt{w}} \int_{-\infty}^{\infty} \Psi\left(\dfrac{x-s}{w}\right) \mathrm{d}x
+\end{equation}
+We want to minimize
+\begin{equation}
+	\mathcal{E}_s(\alpha) = \int_w \tilde{g}_s(w,\alpha)^2 \,\mathrm{d}w 
+	= \int_w  \left[\alpha \Phi_s(w) + \tilde{f}(s,w)\right]^2 \,\mathrm{d}w.
+\end{equation}
+Using 
+\begin{equation}
+	\partial_\alpha \mathcal{E}_s(\alpha) = 2 \int_w \Phi_s(w) \left[ \alpha \Phi_s(w) + \tilde{f}(s,w) \right]\,\mathrm{d}w
+\end{equation}
+we get the condition defined by
+\begin{equation}
+		0 = \alpha \int_w \Phi_s(w)^2 \,\mathrm{d}w + \int_w \Phi_s(w) \tilde{f}(s,w) \,\mathrm{d}w
 \end{equation}
 
 \end{document}
