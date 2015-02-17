@@ -132,5 +132,21 @@ namespace yocto
         }
 
 
+        void   image:: put_rgba_dup(void *addr, const rgba_t &C, const void *args) throw()
+        {
+            assert(addr);
+            *(rgba_t *)addr = C;
+        }
+
+        void image::put_rgb_dup(void *addr, const rgba_t &C, const void *args) throw()
+        {
+            assert(addr);
+            rgb_t &target = *(rgb_t *)addr;
+            target.r = C.r;
+            target.g = C.g;
+            target.b = C.b;
+        }
+
+
     }
 }

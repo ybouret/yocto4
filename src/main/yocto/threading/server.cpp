@@ -180,7 +180,7 @@ namespace yocto
         {
             {
                 YOCTO_LOCK(access);
-                std::cerr << "[serverd] launching thread!" << std::endl;
+                std::cerr << "[server] launching thread!" << std::endl;
             }
             
             access.lock();
