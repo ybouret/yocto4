@@ -170,7 +170,7 @@ namespace yocto
                 return alpha;
             }
 
-
+            // normalize the matrix with its squared values...
             static inline void compact( matrix<T> &W ) throw()
             {
                 const size_t n=W.rows;
