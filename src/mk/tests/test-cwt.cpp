@@ -115,9 +115,9 @@ YOCTO_UNIT_TEST_IMPL(cwt)
     chrono.start();
 
 
-    std::cerr << "Raw Transform..." << std::endl;
+    std::cerr << "Raw Transform..., N=" << N << std::endl;
     double t_ini = chrono.query();
-    wavelet<double>::cwt_raw(x, y, Psi,shifts,scales, W);
+    (void)wavelet<double>::cwt(x, y, Psi,shifts,scales, W, false);
     const double t_raw = chrono.query() - t_ini;
     std::cerr << "t_raw=" << t_raw << std::endl;
     {
@@ -135,11 +135,12 @@ YOCTO_UNIT_TEST_IMPL(cwt)
         }
     }
 
-    std::cerr << "Optimized Transform..." << std::endl;
+    std::cerr << "Optimized Transform..., N=" << N << std::endl;
     t_ini = chrono.query();
-    wavelet<double>::cwt(x, y, Psi,shifts,scales, W);
+    const double alpha = wavelet<double>::cwt(x, y, Psi,shifts,scales, W);
     const double t_opt = chrono.query() - t_ini;
     std::cerr << "t_opt=" << t_opt << std::endl;
+    std::cerr << "alpha=" << alpha << std::endl;
     {
         ios::ocstream fp("cwt.dat",false);
         for(size_t i=1;i<=N;++i)
@@ -155,27 +156,7 @@ YOCTO_UNIT_TEST_IMPL(cwt)
         }
     }
 
-
-    std::cerr << "Fullly Optimized Transform..." << std::endl;
-    t_ini = chrono.query();
-    wavelet<double>::cwt_full(x, y, Psi,shifts,scales, W);
-    const double t_ful = chrono.query() - t_ini;
-    std::cerr << "t_ful=" << t_ful << std::endl;
-    {
-        ios::ocstream fp("cwt_ful.dat",false);
-        for(size_t i=1;i<=N;++i)
-        {
-            const double xx = shifts[i];
-            for(size_t j=1;j<=N;++j)
-            {
-                const double yy = scales[j];
-                const double ww = W[i][j];
-                fp("%g %g %g\n",xx,yy,ww*ww);
-            }
-            fp("\n");
-        }
-    }
-
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

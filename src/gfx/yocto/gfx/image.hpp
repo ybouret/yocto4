@@ -66,7 +66,19 @@ namespace yocto
                          const void           *args,
                          const void           *options) const;
             
-            
+            //! pixmap if based on rgba_t
+            static rgba_t get_rgba_dup(const void *,const void*) throw();
+
+            //! pixmap if based on rgb_t
+            static rgba_t get_rgb_dup(const void *,const void*) throw();
+
+            //! pixmap is based on float, return greyscale
+            static rgba_t get_gsf(const void *,const void*) throw();
+
+            //! pixmpa is based on float, return ramp
+            static rgba_t get_rampf(const void *,const void *) throw();
+
+
         private:
             explicit image();
             virtual ~image() throw();
