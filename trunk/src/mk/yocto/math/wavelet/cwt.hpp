@@ -162,12 +162,46 @@ namespace yocto
                             const T factor = Sqrt(scale);
                             sum /= factor+factor;
                         }
-                        
+
                         Wi[j] = sum;
                     }
                 }
 
                 return alpha;
+            }
+
+
+            static inline void compact( matrix<T> &W ) throw()
+            {
+                const size_t n=W.rows;
+                const size_t m=W.cols;
+                if(n<=0) return;
+                T lo = Square(W[1][1]);
+                T hi = lo;
+                for(size_t i=n;i>0;--i)
+                {
+                    const array<T> &Wi = W[i];
+                    for(size_t j=m;j>0;--j)
+                    {
+                        const T tmp = Square(Wi[j]);
+                        if(tmp<lo) lo=tmp;
+                        if(tmp>hi) hi=tmp;
+                    }
+                }
+
+                if(lo<hi)
+                {
+                    const T den = hi-lo;
+                    for(size_t i=n;i>0;--i)
+                    {
+                        array<T> &Wi = W[i];
+                        for(size_t j=m;j>0;--j)
+                        {
+                            const T w = Square(Wi[j]);
+                            Wi[j] = (w-lo)/den;
+                        }
+                    }
+                }
             }
             
         private:

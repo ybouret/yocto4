@@ -78,7 +78,12 @@ namespace yocto
             //! pixmpa is based on float, return ramp
             static rgba_t get_rampf(const void *,const void *) throw();
 
+            //! pixmap is based on rgba_t
+            static void   put_rgba_dup(void *addr, const rgba_t &C, const void *) throw();
 
+            //! pixmap is based on rgb_t
+            static void   put_rgb_dup(void *addr, const rgba_t &C, const void *) throw();
+            
         private:
             explicit image();
             virtual ~image() throw();
