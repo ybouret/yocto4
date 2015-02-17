@@ -101,3 +101,36 @@ namespace yocto
     }
     
 }
+
+namespace yocto
+{
+    namespace gfx
+    {
+        rgba_t image::get_rgba_dup(const void *addr,const void*) throw()
+        {
+            assert(addr);
+            return *(const rgba_t *)addr;
+        }
+
+        rgba_t image::get_rgb_dup(const void *addr,const void*) throw()
+        {
+            assert(addr);
+            return rgba_t(*(const rgb_t *)addr);
+        }
+
+        rgba_t image:: get_gsf(const void *addr,const void*) throw()
+        {
+            assert(addr);
+            const uint8_t u = conv::to_byte( *(const float *)addr );
+            return rgba_t(u,u,u);
+        }
+
+        rgba_t image::get_rampf(const void *addr,const void *) throw()
+        {
+            assert(addr);
+            return rgba_t::rampf(*(const float*)addr );
+        }
+
+
+    }
+}
