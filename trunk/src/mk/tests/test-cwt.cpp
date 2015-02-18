@@ -150,11 +150,28 @@ YOCTO_UNIT_TEST_IMPL(cwt)
             {
                 const double yy = scales[j];
                 const double ww = W[i][j];
-                fp("%g %g %g\n",xx,yy,ww*ww);
+                fp("%g %g %g\n",xx,yy,ww);
             }
             fp("\n");
         }
     }
+
+    wavelet<double>::rescale(W);
+    {
+        ios::ocstream fp("cwt2.dat",false);
+        for(size_t i=1;i<=N;++i)
+        {
+            const double xx = shifts[i];
+            for(size_t j=1;j<=N;++j)
+            {
+                const double yy = scales[j];
+                const double ww = W[i][j];
+                fp("%g %g %g\n",xx,yy,ww);
+            }
+            fp("\n");
+        }
+    }
+    
 
     
     

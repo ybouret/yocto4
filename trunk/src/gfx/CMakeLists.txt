@@ -23,6 +23,12 @@ SET( ops_srcs ${ops_decl} ${ops_impl} )
 INSTALL( FILES ${ops_decl} DESTINATION include/yocto/gfx/ops )
 SOURCE_GROUP( gfx/ops FILES ${ops_srcs} )
 
+FILE( GLOB ramp_decl yocto/gfx/ramp/*.hpp )
+FILE( GLOB ramp_impl yocto/gfx/ramp/*.cpp )
+
+SET( ramp_srcs ${ramp_decl} ${ramp_impl} )
+INSTALL( FILES ${ramp_decl} DESTINATION include/yocto/gfx/ramp )
+SOURCE_GROUP( gfx/ramp FILES ${ramp_srcs} )
 
 INCLUDE_DIRECTORIES( . ../main ../third_party/png ../third_party/jpeg ../tiff++)
 
@@ -31,7 +37,7 @@ INCLUDE_DIRECTORIES( . ../main ../third_party/png ../third_party/jpeg ../tiff++)
 ## Generating the library 
 ##
 ########################################################################
-ADD_LIBRARY( y-gfx STATIC ${srcs} ${img_srcs} ${ops_srcs}
+ADD_LIBRARY( y-gfx STATIC ${srcs} ${img_srcs} ${ops_srcs} ${ramp_srcs}
 )
 INSTALL( TARGETS y-gfx ARCHIVE DESTINATION lib )
 
