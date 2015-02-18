@@ -4,6 +4,7 @@
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/types.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -208,7 +209,7 @@ namespace yocto
                         array<T> &Wi = W[i];
                         for(size_t j=m;j>0;--j)
                         {
-                            const T w = Wi[j]/den;
+                            const T w = clamp<T>(-1,Wi[j]/den,1);
                             Wi[j] = w;
                         }
                     }
