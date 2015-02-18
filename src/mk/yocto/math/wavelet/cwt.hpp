@@ -170,38 +170,51 @@ namespace yocto
                 return alpha;
             }
 
-            // normalize the matrix with its squared values...
-            static inline void compact( matrix<T> &W ) throw()
+            //! normalize the matrix/amplitude
+            /**
+             - rescale by the shifted amplitude
+             */
+            static inline void rescale( matrix<T> &W ) throw()
             {
                 const size_t n=W.rows;
                 const size_t m=W.cols;
                 if(n<=0) return;
-                T lo = Square(W[1][1]);
+                T lo = W[1][1];
                 T hi = lo;
                 for(size_t i=n;i>0;--i)
                 {
                     const array<T> &Wi = W[i];
                     for(size_t j=m;j>0;--j)
                     {
-                        const T tmp = Square(Wi[j]);
-                        if(tmp<lo) lo=tmp;
-                        if(tmp>hi) hi=tmp;
+                        const T tmp = Wi[j];
+                        if(tmp<lo)
+                        {
+                            lo=tmp;
+                        }
+                        if(tmp>hi)
+                        {
+                            hi=tmp;
+                        }
                     }
                 }
 
-                if(lo<hi)
+                const T amplitude = hi-lo;
+
+                if(amplitude>0)
                 {
-                    const T den = hi-lo;
+                    const T den = (hi>=lo ? hi : -lo);
                     for(size_t i=n;i>0;--i)
                     {
                         array<T> &Wi = W[i];
                         for(size_t j=m;j>0;--j)
                         {
-                            const T w = Square(Wi[j]);
-                            Wi[j] = (w-lo)/den;
+                            const T w = Wi[j]/den;
+                            Wi[j] = w;
                         }
                     }
                 }
+
+
             }
             
         private:
