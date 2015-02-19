@@ -89,7 +89,15 @@ namespace yocto
                 YOCTO_TAO_LOOP(a.size(),NEG);
 #undef  Y_TAO_NEG
             }
-            
+
+            template <typename ARR, typename U>
+            static inline void shift( ARR &a, U alpha) throw()
+            {
+                const typename ARR::type value(alpha);
+#define Y_TAO_SHIFT(I) a[I] += value
+                YOCTO_TAO_LOOP(a.size(),SHIFT);
+#undef  Y_TAO_SHIFT
+            }
             
             //! a = x*b
             template<typename ARR, typename BRR>

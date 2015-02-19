@@ -5,6 +5,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/code/unroll.hpp"
 
 namespace yocto
 {
@@ -90,6 +91,7 @@ namespace yocto
                 T alpha(0);
                 if(optimize)
                 {
+
                     //__________________________________________________________
                     //
                     // Compute global baseline coefficient
@@ -135,13 +137,17 @@ namespace yocto
 
                 //______________________________________________________________
                 //
-                // Generate global data
+                // Generate Data
                 //______________________________________________________________
-                for(size_t i=n;i>0;--i)
-                {
-                    z[i] = y[i] + alpha;
-                }
+#define Y_CWT_MAKE_Z(I) z[I] = y[I] + alpha
+                YOCTO_LOOP_FUNC_(n,Y_CWT_MAKE_Z,1);
+#undef  Y_CWT_MAKE_Z
 
+
+                //______________________________________________________________
+                //
+                // Loop...
+                //______________________________________________________________
                 for(size_t i=n;i>0;--i)
                 {
                     const T   shift = shifts[i];
@@ -152,6 +158,7 @@ namespace yocto
                         const T         scale = scales[j];
                         T sum(0);
                         T psi_k  = Psi( (x1-shift)/scale );
+                        
                         for(size_t k=1,kp=2;k<n;++k,++kp)
                         {
                             const T psi_kp = Psi( (x[kp]-shift)/scale );
@@ -173,7 +180,7 @@ namespace yocto
 
             //! normalize the matrix/amplitude
             /**
-             - rescale by the shifted amplitude
+             - rescale by the the max of |negative| or |positive| value
              */
             static inline void rescale( matrix<T> &W ) throw()
             {
@@ -214,8 +221,8 @@ namespace yocto
                         }
                     }
                 }
-
-
+                
+                
             }
             
         private:
