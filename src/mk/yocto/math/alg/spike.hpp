@@ -8,6 +8,9 @@
 #include "yocto/counted-object.hpp"
 #include "yocto/code/utils.hpp"
 
+#include "yocto/sequence/vector.hpp"
+#include <iostream>
+
 namespace yocto
 {
     namespace math
@@ -28,6 +31,7 @@ namespace yocto
                 YOCTO_MAKE_OBJECT
                 ~index_node() throw();
                 index_node(size_t) throw();
+                static int compare( const index_node *lhs, const index_node *rhs) throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(index_node);
@@ -49,6 +53,7 @@ namespace yocto
             static inline void detect( ITERATOR iter, const COORD imin, const COORD imax, FUNC &func)
             {
                 detector<T,COORD> dd(iter,imin,imax,func);
+                dd.run();
             }
 
         private:
@@ -62,6 +67,12 @@ namespace yocto
                 const COORD               imax;
                 const size_t              size;
                 core::pool_of<index_node> pool;
+
+                inline index_node *new_index_node(size_t j) throw()
+                {
+                    assert(pool.size>0);
+                    return ::new ( pool.query() ) index_node(j);
+                }
 
                 template <typename ITERATOR,typename FUNC>
                 explicit detector(ITERATOR    iter,
@@ -80,11 +91,13 @@ namespace yocto
                 {
                     try
                     {
+                        // prepare indices nodes
                         for(size_t i=size;i>0;--i)
                         {
                             pool.store( object::acquire1<index_node>() );
                         }
 
+                        // memory for transformed data + flag + indx
                         wksp = memory::kind<memory::global>::acquire(wlen);
                         indx = static_cast<size_t *>(wksp);
                         flag = indx + size;
@@ -123,13 +136,86 @@ namespace yocto
                     }
                 }
 
+
                 size_t  wlen;
                 void   *wksp;
                 size_t *indx;
                 size_t *flag;
                 T      *data;
+
+                void run()
+                {
+                    vector<spike::pointer> spikes;
+
+                    for(size_t i=1;i<=size;++i)
+                    {
+                        // next position to process
+                        const size_t j=indx[i];
+
+                        // is is the neighbor of a former spike ?
+                        for(size_t k=spikes.size();k>0;--k)
+                        {
+                            spike      &spk = *spikes[k];
+                            index_list &idx = spk.indices;
+                            assert(idx.size>0);
+
+                            // is it before ?
+                            {
+                                const size_t before = idx.head->value-1;
+                                if(before==j)
+                                {
+                                    if(data[j]<=data[before])
+                                    {
+                                        // expand spike @before
+                                        assert(pool.size>0);
+                                        idx.push_front( new_index_node(j) );
+                                        goto NEXT_DATA;
+                                    }
+                                    else
+                                    {
+                                        goto NEW_SPIKE;
+                                    }
+                                }
+
+                            }
+
+                            // is it after ?
+                            {
+                                const size_t after = idx.tail->value+1;
+                                if(after==j)
+                                {
+                                    if(data[j]<=data[after])
+                                    {
+                                        // expand spike @after
+                                        assert(pool.size>0);
+                                        idx.push_back( new_index_node(j) );
+                                        goto NEXT_DATA;
+                                    }
+                                    else
+                                    {
+                                        goto NEW_SPIKE;
+                                    }
+                                }
+                            }
+                        }
+
+                    NEW_SPIKE:
+                        {
+                            spike::pointer pS( new spike(j) );
+                            pS->indices.push_back( new_index_node(j) );
+                            spikes.push_back(pS);
+                        }
+                        //continue;
+                        
+                    NEXT_DATA:;
+                    }
+
+                    std::cerr << "#spikes=" << spikes.size() << std::endl;
+                }
                 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(detector);
+                
+                
             };
             
         };
