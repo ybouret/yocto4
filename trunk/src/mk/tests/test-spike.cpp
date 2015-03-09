@@ -8,8 +8,8 @@
 using namespace yocto;
 using namespace math;
 
-static inline double ident(double x) throw() { return x; }
-typedef double (*proc_t)(double);
+static  double ident(double x) throw() { return x; }
+typedef double     (*proc_t)(double);
 
 YOCTO_UNIT_TEST_IMPL(spike)
 {
@@ -31,7 +31,8 @@ YOCTO_UNIT_TEST_IMPL(spike)
         }
     }
 
-    spike::detect<double,size_t,vector<double>::iterator,proc_t>(y.begin(), 1, N, ident);
+    proc_t transform = ident;
+    spike::detect<double,size_t,vector<double>::iterator,proc_t>(y.begin(), 1, N, transform);
     
 
 }

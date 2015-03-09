@@ -117,6 +117,10 @@ namespace yocto
                 virtual ~detector() throw()
                 {
                     memory::kind<memory::global>::release(wksp, wlen);
+                    while( pool.size )
+                    {
+                        object::release1<index_node>( pool.query() );
+                    }
                 }
 
                 size_t  wlen;
