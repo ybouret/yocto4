@@ -23,8 +23,8 @@ namespace yocto
             typedef arc_ptr<spike> pointer;
                         
             const size_t position;  //!< index of position
-            const size_t lower;
-            const size_t upper;
+            const size_t lower;     //!< lower index, included
+            const size_t upper;     //!< upper index, included
             
             explicit spike(size_t pos) throw();
             virtual ~spike() throw();
@@ -165,7 +165,7 @@ namespace yocto
                             spike::pointer pS( new spike(j) );
                             spikes.push_back(pS);
                         }
-                        
+
                     NEXT_DATA:;
                     }
                     
