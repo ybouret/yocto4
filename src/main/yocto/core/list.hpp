@@ -239,6 +239,25 @@ namespace yocto
 				}
 			}
 			
+            inline const NODE *fetch( size_t index ) const throw()
+            {
+                assert( index < size );
+                if( index > (size>>1) )
+                {
+                    const NODE *node = tail;
+                    size_t m = size - ++index;
+                    while( m-- > 0 ) node=node->prev;
+                    return node;
+                }
+                else
+                {
+                    const NODE *node = head;
+                    while( index-- > 0 ) node=node->next;
+                    return node;
+                }
+            }
+
+            
 			inline void move_to_front( NODE *node ) throw()
 			{
 				assert( owns( node ) );

@@ -153,6 +153,13 @@ namespace yocto
 		size_t        maxi_;
 		mutable_type *item_; //! [1..size_]
 		
+        virtual const type &get_data(size_t indx) const throw()
+        {
+            assert(indx>0);
+            assert(indx<=size());
+            return item_[indx];
+        }
+        
 		//----------------------------------------------------------------------
 		// _duplicate
 		//----------------------------------------------------------------------

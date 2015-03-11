@@ -31,8 +31,23 @@ YOCTO_UNIT_TEST_IMPL(spike)
         }
     }
 
+    vector<spike::pointer> spikes;
     proc_t transform = ident;
-    spike::detect<double,size_t,vector<double>::iterator,proc_t>(y.begin(), 1, N, transform);
+    spike::detect<double,size_t,vector<double>::iterator,proc_t>(spikes,y.begin(), 1, N, transform);
+    
+    for(size_t k=1;k<=spikes.size();++k)
+    {
+        const spike &s = *spikes[k];
+        const string filename = vformat("spike%u.dat",unsigned(k));
+        ios::ocstream fp(filename,false);
+        for(size_t i=s.lower;i<=s.upper;++i)
+        {
+             fp("%g %g\n", x[i], y[i]);
+        }
+        
+    }
+    
+    
     
 
 }

@@ -26,6 +26,10 @@ namespace yocto
 		inline type       & back() throw()       { return *(type *) &get_back(); }
 		inline const_type & back() const throw() { return            get_back(); }
 		
+        inline type       & at(size_t indx) throw()       { return (type &)get_data(indx); }
+        inline const_type & at(size_t indx) const throw() { return (type &)get_data(indx); }
+
+        
         virtual void reverse() throw() = 0;
         
 	protected:
@@ -35,6 +39,7 @@ namespace yocto
 		YOCTO_DISABLE_COPY_AND_ASSIGN(sequence);
 		virtual const_type &get_front() const throw() = 0;
 		virtual const_type &get_back()  const throw() = 0;
+        virtual const type &get_data(size_t indx) const throw() = 0;
 	};
 	
 }

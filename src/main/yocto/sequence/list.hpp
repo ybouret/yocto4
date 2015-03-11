@@ -205,6 +205,13 @@ namespace yocto
             FUNC &cmp = *(FUNC *)args;
             return cmp(lhs->data,rhs->data);
         }
+        
+        virtual const type &get_data(size_t indx) const throw()
+        {
+            assert(indx>0);
+            assert(indx<=size());
+            return list_.fetch(--indx)->data;
+        }
 	};
 	
 }
