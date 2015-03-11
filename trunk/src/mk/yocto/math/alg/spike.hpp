@@ -46,7 +46,13 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(spike);
-            
+            template <typename T>
+            static inline
+            int compare_data( const T &lhs, const T &rhs ) throw()
+            {
+                return lhs < rhs ? 1 : ( rhs < lhs ? -1 : 0 );
+            }
+
             template <typename T, typename COORD>
             class detector
             {
@@ -88,8 +94,7 @@ namespace yocto
                     }
                     c_array<const T> ra(  data+1, size );
                     c_array<size_t>  idx( indx+1, size );
-                    make_index( ra, idx, __compare<T>);
-                    
+                    make_index( ra, idx, compare_data<T>);
                 }
                 
                 virtual ~detector() throw()
@@ -160,7 +165,6 @@ namespace yocto
                             spike::pointer pS( new spike(j) );
                             spikes.push_back(pS);
                         }
-                        //continue;
                         
                     NEXT_DATA:;
                     }
