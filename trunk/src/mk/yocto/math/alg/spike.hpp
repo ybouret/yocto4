@@ -21,12 +21,14 @@ namespace yocto
         {
         public:
             typedef arc_ptr<spike> pointer;
-                        
+
+
             const size_t position;  //!< index of position
             const size_t lower;     //!< lower index, included
             const size_t upper;     //!< upper index, included
-            
-            explicit spike(size_t pos) throw();
+            const double value;     //!< the value, casted to double
+
+            explicit spike(size_t pos, double val) throw();
             virtual ~spike() throw();
             
             template <
@@ -43,7 +45,18 @@ namespace yocto
                 detector<T,COORD> dd(iter,imin,imax,func);
                 dd.run(spikes);
             }
-            
+
+            static inline int compare_by_position( const spike::pointer &lhs, const spike::pointer &rhs) throw()
+            {
+                return __compare<size_t>(lhs->position,rhs->position);
+            }
+
+
+            static inline int compare_by_value( const spike::pointer &lhs, const spike::pointer &rhs) throw()
+            {
+                return __compare<double>(rhs->value,lhs->value);
+            }
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(spike);
             template <typename T>
@@ -116,7 +129,7 @@ namespace yocto
                     {
                         // next position to process
                         const size_t j=indx[i];
-                        
+                        const T      v=data[j];
                         // is is the neighbor of a former spike ?
                         for(size_t k=spikes.size();k>0;--k)
                         {
@@ -127,7 +140,7 @@ namespace yocto
                                 const size_t before = spk.lower-1;
                                 if(before==j)
                                 {
-                                    if(data[j]<=data[before])
+                                    if(v<=data[before])
                                     {
                                         // expand spike @before
                                         --(size_t &)(spk.lower);
@@ -146,7 +159,7 @@ namespace yocto
                                 const size_t after =spk.upper+1;
                                 if(after==j)
                                 {
-                                    if(data[j]<=data[after])
+                                    if(v<=data[after])
                                     {
                                         // expand spike @after
                                         ++(size_t&)(spk.upper);
@@ -162,7 +175,7 @@ namespace yocto
                         
                     NEW_SPIKE:
                         {
-                            spike::pointer pS( new spike(j) );
+                            spike::pointer pS( new spike(j,v) );
                             spikes.push_back(pS);
                         }
 
