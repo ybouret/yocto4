@@ -5,10 +5,11 @@ namespace yocto
 {
     namespace math
     {
-        spike:: spike( size_t pos ) throw() :
+        spike:: spike( size_t pos, double val ) throw() :
         position(pos),
         lower(pos),
-        upper(pos)
+        upper(pos),
+        value(val)
         {
 
         }
