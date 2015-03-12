@@ -118,7 +118,7 @@ namespace {
 		std::cerr << "...done" << std::endl;
 		seq2.free();
 		
-		for( size_t i=0; i < 8; ++i )
+		for( size_t i=0; i < 16; ++i )
 		{
 			const T obj = gen<T>::get();
 			if( alea<float>() < 0.5f )
@@ -142,7 +142,12 @@ namespace {
 			std::cerr << " '" << *i << "'";
 		}
 		std::cerr << std::endl;
-		
+
+        for( size_t i=1; i <= seq.size(); ++i)
+        {
+            const T &obj = seq.at(i);
+            std::cerr << "#" << i << ": " << obj << std::endl;
+        }
 		
 	}
 }
