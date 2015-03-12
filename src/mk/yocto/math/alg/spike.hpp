@@ -32,7 +32,6 @@ namespace yocto
             virtual ~spike() throw();
             
             template <
-            typename T,
             typename COORD,
             typename ITERATOR,
             typename FUNC>
@@ -42,31 +41,26 @@ namespace yocto
                                       const COORD              imax,
                                       FUNC                    &func)
             {
-                detector<T,COORD> dd(iter,imin,imax,func);
+                detector<COORD> dd(iter,imin,imax,func);
                 dd.run(spikes);
             }
 
-            static inline int compare_by_position( const spike::pointer &lhs, const spike::pointer &rhs) throw()
+            static inline
+            int compare_by_position( const spike::pointer &lhs, const spike::pointer &rhs) throw()
             {
                 return __compare<size_t>(lhs->position,rhs->position);
             }
 
 
-            static inline int compare_by_value( const spike::pointer &lhs, const spike::pointer &rhs) throw()
+            static inline
+            int compare_by_value( const spike::pointer &lhs, const spike::pointer &rhs) throw()
             {
-                return __compare<double>(rhs->value,lhs->value);
+                return __compare_decreasing<double>(lhs->value,rhs->value);
             }
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(spike);
-            template <typename T>
-            static inline
-            int compare_data( const T &lhs, const T &rhs ) throw()
-            {
-                return lhs < rhs ? 1 : ( rhs < lhs ? -1 : 0 );
-            }
-
-            template <typename T, typename COORD>
+            template <typename COORD>
             class detector
             {
             public:
@@ -82,32 +76,31 @@ namespace yocto
                 imin( min_of(index_min,index_max) ),
                 imax( max_of(index_min,index_max) ),
                 size(imax+1-imin),
-                wlen( size * (2*sizeof(size_t)+sizeof(T) )),
+                wlen( size * (sizeof(size_t)+sizeof(double) )),
                 wksp( NULL ),
                 indx( NULL ),
-                flag( NULL ),
                 data( NULL )
                 {
                     
-                    // memory for transformed data + flag + indx
+                    // memory for transformed data + indx
                     wksp = memory::kind<memory::global>::acquire(wlen);
                     indx = static_cast<size_t *>(wksp);
-                    flag = indx + size;
-                    size_t *tmp = flag + size;
-                    data = (T *)&tmp[0];
+                    size_t *tmp = indx + size;
+                    data = (double *)&tmp[0];
                     --indx;
-                    --flag;
                     --data;
-                    
+
+                    // build internal data
                     for(size_t i=1;i<=size;++i,++iter)
                     {
                         data[i] = func(*iter);
-                        flag[i] = 0;
                         indx[i] = i;
                     }
-                    c_array<const T> ra(  data+1, size );
+
+                    // create the index
+                    c_array<const double> ra(  data+1, size );
                     c_array<size_t>  idx( indx+1, size );
-                    make_index( ra, idx, compare_data<T>);
+                    make_index( ra, idx, __compare_decreasing<double>);
                 }
                 
                 virtual ~detector() throw()
@@ -116,26 +109,36 @@ namespace yocto
                 }
                 
                 
-                size_t  wlen;
-                void   *wksp;
-                size_t *indx;
-                size_t *flag;
-                T      *data;
+                size_t   wlen;
+                void    *wksp;
+                size_t  *indx;
+                double  *data;
                 
-                void run(sequence<spike::pointer> &spikes)
+                inline void run(sequence<spike::pointer> &spikes)
                 {
                     
                     for(size_t i=1;i<=size;++i)
                     {
+                        //______________________________________________________
+                        //
                         // next position to process
-                        const size_t j=indx[i];
-                        const T      v=data[j];
+                        //______________________________________________________
+
+                        const size_t  j=indx[i];
+                        const double  v=data[j];
+
+                        //______________________________________________________
+                        //
                         // is is the neighbor of a former spike ?
+                        //______________________________________________________
                         for(size_t k=spikes.size();k>0;--k)
                         {
                             spike      &spk = *spikes.at(k);
-                            
+
+                            //__________________________________________________
+                            //
                             // is it before ?
+                            //__________________________________________________
                             {
                                 const size_t before = spk.lower-1;
                                 if(before==j)
@@ -153,8 +156,11 @@ namespace yocto
                                 }
                                 
                             }
-                            
+
+                            //__________________________________________________
+                            //
                             // is it after ?
+                            //__________________________________________________
                             {
                                 const size_t after =spk.upper+1;
                                 if(after==j)
@@ -182,7 +188,6 @@ namespace yocto
                     NEXT_DATA:;
                     }
                     
-                    std::cerr << "#spikes=" << spikes.size() << std::endl;
                 }
                 
                 

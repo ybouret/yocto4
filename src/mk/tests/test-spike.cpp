@@ -34,7 +34,7 @@ YOCTO_UNIT_TEST_IMPL(spike)
 
     vector<spike::pointer> spikes;
     proc_t transform = ident;
-    spike::detect<double,size_t,vector<double>::iterator,proc_t>(spikes,y.begin(), 1, N, transform);
+    spike::detect<size_t,vector<double>::iterator,proc_t>(spikes,y.begin(), 1, N, transform);
 
     quicksort(spikes,spike::compare_by_value);
 
