@@ -45,6 +45,18 @@ namespace yocto
                 dd.run(spikes);
             }
 
+            template <
+            typename SEQ,
+            typename FUNC>
+            static inline void detect(sequence<spike::pointer> &spikes,
+                                      const SEQ                &data,
+                                      FUNC                     &func )
+            {
+                detect<size_t,typename SEQ::const_iterator,FUNC>(spikes,1,data.size(),func);
+            }
+            
+            
+            //! compare by increasing position
             static inline
             int compare_by_position( const spike::pointer &lhs, const spike::pointer &rhs) throw()
             {
@@ -52,6 +64,7 @@ namespace yocto
             }
 
 
+            //! compare by decreasing amplitude
             static inline
             int compare_by_value( const spike::pointer &lhs, const spike::pointer &rhs) throw()
             {
