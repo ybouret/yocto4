@@ -33,26 +33,21 @@ namespace yocto
             
             template <
             typename COORD,
-            typename ITERATOR,
-            typename FUNC>
+            typename ITERATOR>
             static inline void detect(sequence<spike::pointer> &spikes,
                                       ITERATOR                 iter,
                                       const COORD              imin,
-                                      const COORD              imax,
-                                      FUNC                    &func)
+                                      const COORD              imax)
             {
-                detector<COORD> dd(iter,imin,imax,func);
+                detector<COORD> dd(iter,imin,imax);
                 dd.run(spikes);
             }
 
-            template <
-            typename SEQ,
-            typename FUNC>
+            template <typename SEQ>
             static inline void detect(sequence<spike::pointer> &spikes,
-                                      const SEQ                &data,
-                                      FUNC                     &func )
+                                      const SEQ                &data )
             {
-                detect<size_t,typename SEQ::const_iterator,FUNC>(spikes,1,data.size(),func);
+                detect<size_t,typename SEQ::const_iterator>(spikes,data.begin(),1,data.size());
             }
             
             
@@ -81,11 +76,10 @@ namespace yocto
                 const COORD               imax;
                 const size_t              size;
                 
-                template <typename ITERATOR,typename FUNC>
+                template <typename ITERATOR>
                 explicit detector(ITERATOR    iter,
                                   const COORD index_min,
-                                  const COORD index_max,
-                                  FUNC       &func) :
+                                  const COORD index_max) :
                 imin( min_of(index_min,index_max) ),
                 imax( max_of(index_min,index_max) ),
                 size(imax+1-imin),
@@ -106,7 +100,7 @@ namespace yocto
                     // build internal data
                     for(size_t i=1;i<=size;++i,++iter)
                     {
-                        data[i] = func(*iter);
+                        data[i] = double(*iter);
                         indx[i] = i;
                     }
 

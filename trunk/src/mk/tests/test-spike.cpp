@@ -9,8 +9,6 @@
 using namespace yocto;
 using namespace math;
 
-static  double ident(double x) throw() { return x; }
-typedef double     (*proc_t)(double);
 
 YOCTO_UNIT_TEST_IMPL(spike)
 {
@@ -33,9 +31,8 @@ YOCTO_UNIT_TEST_IMPL(spike)
     }
 
     vector<spike::pointer> spikes;
-    proc_t transform = ident;
-    spike::detect<size_t,vector<double>::iterator,proc_t>(spikes,y.begin(), 1, N, transform);
-
+    spike::detect(spikes,y.begin(),size_t(1),N);
+    
     quicksort(spikes,spike::compare_by_value);
 
 
@@ -52,7 +49,7 @@ YOCTO_UNIT_TEST_IMPL(spike)
     }
     
     
-    //spike::detect(spikes,y,transform);
+    spike::detect(spikes,y);
     
     
 
