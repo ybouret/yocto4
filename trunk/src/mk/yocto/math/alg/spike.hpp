@@ -130,6 +130,7 @@ namespace yocto
                 inline void run(sequence<spike::pointer> &spikes)
                 {
                     
+                    spikes.free();
                     for(size_t i=1;i<=size;++i)
                     {
                         //______________________________________________________

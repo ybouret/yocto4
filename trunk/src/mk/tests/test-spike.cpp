@@ -52,6 +52,8 @@ YOCTO_UNIT_TEST_IMPL(spike)
     }
     
     
+    //spike::detect(spikes,y,transform);
+    
     
 
 }
