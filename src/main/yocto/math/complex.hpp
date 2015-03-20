@@ -93,20 +93,25 @@ namespace yocto
 			
 			complex   operator/( const complex &rhs ) const throw();
 			complex   operator/( const T rhs ) const throw();
+            
 			friend inline 
 			complex operator/( const T lhs, const complex &rhs ) throw()
 			{
 				return complex(lhs)/rhs;
 			}
 			
-			friend std::ostream & operator<<( std::ostream &_os, const complex &C )
+            //------------------------------------------------------------------
+            // std::io
+            //------------------------------------------------------------------
+			friend
+            std::ostream & operator<<( std::ostream &_os, const complex &C )
 			{
 				_os << '(' << C.re << ',' << C.im << ')';
 				return _os;
 			}
 			
-			friend 
-			inline  bool operator != ( const complex &lhs, const complex &rhs ) throw()
+			friend inline
+            bool operator != ( const complex &lhs, const complex &rhs ) throw()
 			{
 				return (lhs.re != rhs.re) || (lhs.im != rhs.im);
 			}

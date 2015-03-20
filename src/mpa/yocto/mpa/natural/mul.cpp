@@ -67,13 +67,12 @@ namespace yocto
                     real_t wr          = 1.0;
                     real_t wi          = 0.0;
                     
-                    for (size_t m=1; m<mmax; m+=2)
+                    for(register size_t m=1; m<mmax; m+=2)
                     {
-                        for (size_t i=m; i<=n; i+=istep)
+                        for(register size_t i=m; i<=n; i+=istep)
                         {
                             const size_t       j     = i+mmax;
-                            
-                            {
+                                                        {
                                 real_t      *d_i   = data+i;
                                 real_t      *d_j   = data+j;
                                 const real_t tempr = wr*d_j[0]-wi*d_j[1];
@@ -358,7 +357,6 @@ namespace yocto
                 //--------------------------------------------------------------
                 //-- multiply in place, in L
                 //--------------------------------------------------------------
-                //for(size_t i=0;i<nN;++i) L[i] *= L[i];
                 for(size_t i=0;i<nN;++i) L[i].in_place_squared();
                 
                 //--------------------------------------------------------------
@@ -366,7 +364,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 _ifft( & L[0].re, nN );
                 
-                real_t       carry = 0;
+                real_t       carry = 0.0;
                 uint8_t     *prod  = P.byte;
                 const size_t top   = nP - 1;
                 for( size_t i=0; i < top; ++i )
@@ -375,7 +373,7 @@ namespace yocto
                     const real_t q = floor( carry / 256.0 );
                     const real_t r = carry - 256.0 * q;
                     prod[i]   = uint8_t(r);
-                    carry = q;
+                    carry     = q;
                 }
                 prod[top] = uint8_t(carry);
                 
