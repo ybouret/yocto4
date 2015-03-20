@@ -111,6 +111,13 @@ namespace yocto
 				return (lhs.re != rhs.re) || (lhs.im != rhs.im);
 			}
 			
+            inline void in_place_squared() throw()
+            {
+                const T a = re * re - im * im;
+                const T b = re * im;
+                re = a;
+                im = b+b;
+            }
 		};
 		
 		

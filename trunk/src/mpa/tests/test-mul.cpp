@@ -26,13 +26,16 @@ YOCTO_UNIT_TEST_IMPL(mul)
     }
     
     mpn x = 1;
-    std::cerr << x << std::endl;
+    std::cerr << x << " => " << mpn::sqr(x) << std::endl;
     x = x * 3;
-    std::cerr << x << std::endl;
+    std::cerr << x << " => " << mpn::sqr(x) << std::endl;
     x = 2 * x;
-    std::cerr << x << std::endl;
+    std::cerr << x << " => " << mpn::sqr(x) << std::endl;
     x *= 4;
-    std::cerr << x << std::endl;
+    std::cerr << x << " => " << mpn::sqr(x) << std::endl;
+    x *= x;
+    std::cerr << x << " => " << mpn::sqr(x) << std::endl;
+
     
 }
 YOCTO_UNIT_TEST_DONE()
