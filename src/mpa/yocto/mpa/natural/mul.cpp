@@ -302,11 +302,10 @@ namespace yocto
                 uint8_t     *prod  = P.byte;
                 const size_t top   = nP - 1;
                 
-                static const real_t half = 0.5;
-                for( size_t i=0; i < top; ++i )
+                for( register size_t i=0; i < top; ++i )
                 {
-                    carry         +=  L[i].re/nN + half;
-                    const real_t q = size_t( carry / 256.0 );
+                    carry         +=  L[i].re/nN + 0.5;
+                    const real_t q = floor( carry / 256.0 );
                     const real_t r = carry - 256.0 * q;
                     prod[i]        = uint8_t(r);
                     carry          = q;
@@ -359,7 +358,8 @@ namespace yocto
                 //--------------------------------------------------------------
                 //-- multiply in place, in L
                 //--------------------------------------------------------------
-                for(size_t i=0;i<nN;++i) L[i] *= L[i];
+                //for(size_t i=0;i<nN;++i) L[i] *= L[i];
+                for(size_t i=0;i<nN;++i) L[i].in_place_squared();
                 
                 //--------------------------------------------------------------
                 //-- reverse
@@ -372,7 +372,7 @@ namespace yocto
                 for( size_t i=0; i < top; ++i )
                 {
                     carry         +=  L[i].re/nN + 0.5;
-                    const real_t q = size_t( carry / 256.0 );
+                    const real_t q = floor( carry / 256.0 );
                     const real_t r = carry - 256.0 * q;
                     prod[i]   = uint8_t(r);
                     carry = q;

@@ -95,25 +95,6 @@ void perform_psd( const size_t p, const size_t q, const size_t K)
         }
     }
     
-#if 0
-    vector< spike_info<T> > spikes;
-    const size_t spk = spike_finder<T>::detect( spikes, 5, frq, psd[1] );
-    std::cerr << "detected " << spk << " spikes" << std::endl;
-    for(size_t i=1; i <= spikes.size(); ++i)
-    {
-        std::cerr << "Spike #" << i << "@idx=" << spikes[i].idx << ": pos=" << spikes[i].pos << ", val=" << spikes[i].val << std::endl;
-    }
-    
-    hsort(spikes, spike_info<T>::compare_by_pos);
-    {
-        ios::ocstream fp("spikes.dat",false);
-        for(size_t i=1; i <= spikes.size(); ++i)
-        {
-            fp("%g %g\n", spikes[i].pos, spikes[i].val);
-        }
-    }
-#endif
-    
 }
 
 
