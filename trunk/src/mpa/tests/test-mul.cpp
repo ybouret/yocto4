@@ -61,7 +61,7 @@ YOCTO_UNIT_TEST_IMPL(mul_perf)
     vector<mpn> Y(N,as_capacity);
     wtime       chrono;
     const size_t ITER = 32;
-    const size_t Bmax = 16;
+    const size_t Bmax = 32;
     volatile mpn z;
     double sum = 0;
     for(size_t i=1;i<=Bmax;++i)

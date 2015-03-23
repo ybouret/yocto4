@@ -54,7 +54,7 @@ void compute_swaps(const size_t    p,
 
 YOCTO_PROGRAM_START()
 {
-    size_t pmax = 5;
+    size_t pmax = 13;
     if(argc>1)
     {
         pmax = strconv::to<size_t>(argv[1],"pmax");
@@ -127,7 +127,7 @@ YOCTO_PROGRAM_START()
 
     }
 
-    // generic code
+    // generic code, one array
     hdr << "\n\t\ttemplate <typename T> static inline void run_safe( T arr[], const size_t size) throw() {\n";
     hdr << "\t\t\t const    size_t n = size << 1;\n";
     hdr << "\t\t\t register size_t j = 1;\n";
@@ -147,6 +147,29 @@ YOCTO_PROGRAM_START()
     hdr << "\t\t\t }\n";
     hdr << "\t\t}\n\n";
 
+    // generic code, two arrays
+    hdr << "\n\t\ttemplate <typename T> static inline void run_safe( T arr[], T brr[], const size_t size) throw() {\n";
+    hdr << "\t\t\t const    size_t n = size << 1;\n";
+    hdr << "\t\t\t register size_t j = 1;\n";
+    hdr << "\t\t\t for(register size_t i=1; i<n; i+=2)\n";
+    hdr << "\t\t\t {\n";
+    hdr << "\t\t\t     if(j>i)\n";
+    hdr << "\t\t\t     {\n";
+    hdr << "\t\t\t         core::bswap<2*sizeof(T)>( &arr[i], &arr[j] );\n";
+    hdr << "\t\t\t         core::bswap<2*sizeof(T)>( &brr[i], &brr[j] );\n";
+    hdr << "\t\t\t     }\n";
+    hdr << "\t\t\t     register size_t m = size;\n";
+    hdr << "\t\t\t     while( (m>=2) && (j>m) )\n";
+    hdr << "\t\t\t     {\n";
+    hdr << "\t\t\t        j -=  m;\n";
+    hdr << "\t\t\t        m >>= 1;\n";
+    hdr << "\t\t\t     }\n";
+    hdr << "\t\t\t     j += m;\n";
+    hdr << "\t\t\t }\n";
+    hdr << "\t\t}\n\n";
+
+
+    // optimized, one array
     hdr << "\n\t\ttemplate <typename T> static inline void run( T arr[], const size_t size) throw() {\n";
     hdr << "\t\t\t\tswitch(size) {\n";
 
@@ -165,8 +188,30 @@ YOCTO_PROGRAM_START()
     hdr << "\t\t\t\t};\n";
     hdr << "\t\t}\n\n";
     
+    //hdr << "\t};\n";
+
+    // optimized, two arrays
+    hdr << "\n\t\ttemplate <typename T> static inline void run( T arr[], T brr[], const size_t size) throw() {\n";
+    hdr << "\t\t\t\tswitch(size) {\n";
+
+    for(size_t i=1;i<=sizes.size();++i)
+    {
+        const size_t sz = sizes[i];
+        const size_t nw = words[i];
+        hdr("\t\t\t\t case %4u:\n", unsigned(sz));
+        if(nw>0)
+        {
+            hdr("\t\t\t\t\tfor(register size_t k=0;k<%4u;++k) { const size_t i=indx%04u[k],j=jndx%04u[k]; core::bswap<2*sizeof(T)>( &arr[i], &arr[j] ); core::bswap<2*sizeof(T)>( &brr[i], &brr[j] );}\n", unsigned(nw), unsigned(sz), unsigned(sz) );
+        }
+        hdr << "\t\t\t\t\t  break;\n";
+    }
+    hdr << "\t\t\t\t default: run_safe(arr,brr,size);\n";
+    hdr << "\t\t\t\t};\n";
+    hdr << "\t\t}\n\n";
+
     hdr << "\t};\n";
-    
+
+
     hdr << "\n} }\n";
     src << "\n} }\n";
     hdr << "#endif\n";
