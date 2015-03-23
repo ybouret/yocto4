@@ -1,6 +1,6 @@
 #include "yocto/mpa/word2mpn.hpp"
 #include "yocto/math/types.hpp"
-#include "yocto/code/bswap.hpp"
+#include "yocto/code/xbitrev.hpp"
 #include "yocto/code/utils.hpp"
 
 namespace yocto
@@ -12,7 +12,9 @@ namespace yocto
         typedef double          real_t;
         typedef complex<real_t> cplx_t;
         
-        
+
+#define YOCTO_USE_XBITREV 1
+
         //! simultaneous FFTs
         static inline
         void _xfft(real_t      *data,
@@ -31,6 +33,7 @@ namespace yocto
             // bit reversal algorithm
             //==================================================================
             const size_t n    = size << 1;
+#if !defined(YOCTO_USE_XBITREV)
             {
                 register size_t j=1;
                 for(register size_t i=1; i<n; i+=2)
@@ -49,7 +52,9 @@ namespace yocto
                     j += m;
                 }
             }
-            
+#else
+            xbitrev::run(data, other, size);
+#endif
             //==================================================================
             // Lanczos-Algorithm
             //==================================================================
@@ -121,6 +126,7 @@ namespace yocto
             // bit reversal algorithm
             //==================================================================
             const size_t n = size << 1;
+#if !defined(YOCTO_USE_XBITREV)
             {
                 register size_t j=1;
                 for (size_t i=1; i<n; i+=2) {
@@ -136,7 +142,10 @@ namespace yocto
                     j += m;
                 }
             }
-            
+#else 
+            xbitrev::run(data,size);
+#endif
+
             //==================================================================
             // Lanczos-Algorithm
             //==================================================================
@@ -193,6 +202,7 @@ namespace yocto
             // bit reversal algorithm
             //==================================================================
             const size_t n = size << 1;
+#if !defined(YOCTO_USE_XBITREV)
             {
                 size_t j=1;
                 for (size_t i=1; i<n; i+=2) {
@@ -208,6 +218,9 @@ namespace yocto
                     j += m;
                 }
             }
+#else
+            xbitrev::run(data, size);
+#endif
             
             //==================================================================
             // Lanczos-Algorithm
