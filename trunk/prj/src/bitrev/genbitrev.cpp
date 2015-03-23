@@ -7,61 +7,21 @@
 using namespace yocto;
 using namespace math;
 
-#define ITER_MAX (64*1024)
-
-
-template <typename T>
-static inline
-double perf( const size_t p )
-{
-    wtime chrono;
-    chrono.start();
-    const size_t size = 1 << p;
-    const size_t n    = size << 1;
-    vector<T> arr(n, numeric<T>::zero );
-    uint64_t t64 = 0;
-    for( size_t iter=0; iter < ITER_MAX; ++iter)
-    {
-        const uint64_t stamp = wtime::ticks();
-        size_t j=1;
-        for (size_t i=1; i<n; i+=2)
-        {
-            if (j > i)
-            {
-                core::bswap<2*sizeof(T)>( &arr[i], &arr[j] );
-            }
-            size_t m = size; // m=  n / 2;
-            while (m >= 2 && j > m)
-            {
-                j -=  m;
-                m >>= 1;
-            }
-            j += m;
-        }
-        t64 += wtime::ticks() - stamp;
-    }
-
-    const double ell = chrono(t64);
-    const double fac = double(ITER_MAX) * double(size) * 1e-6;
-    const double speed = fac/ell;
-    std::cerr.flush();
-    fprintf( stderr, "type=%-8s | speed%-5u = %10.5f M/s\n", typeid(T).name(), unsigned(size), speed);
-    fflush(stderr);
-    return speed;
-}
 
 #include "yocto/sort/quick.hpp"
 
 static inline
-void compute_swaps( const size_t p, sequence<size_t> &swaps )
+void compute_swaps(const size_t    p,
+                   vector<size_t> &indx,
+                   vector<size_t> &jndx
+
+                   )
 {
     const size_t size = 1 << p;
     const size_t n    = size << 1;
 
-    swaps.free();
-
-    vector<size_t> indx(n,as_capacity);
-    vector<size_t> jndx(n,as_capacity);
+    indx.free();
+    jndx.free();
 
     size_t nops = 0;
 
@@ -71,7 +31,6 @@ void compute_swaps( const size_t p, sequence<size_t> &swaps )
         if (j > i)
         {
             //core::bswap<2*sizeof(T)>( &arr[i], &arr[j] );
-            //std::cerr << i  << ", " << j << std::endl;
             indx.push_back(i);
             jndx.push_back(j);
             ++nops;
@@ -88,15 +47,6 @@ void compute_swaps( const size_t p, sequence<size_t> &swaps )
     assert(jndx.size()==nops);
     co_qsort(indx, jndx);
     std::cerr << " nops" << size << " = " << nops << std::endl;
-    std::cerr << "words" << size << " = " << nops * 2 << std::endl;
-    //std::cerr << indx << std::endl;
-    //std::cerr << jndx << std::endl;
-    //return nops;
-    for(size_t i=1;i<=nops;++i)
-    {
-        swaps.push_back(indx[i]);
-        swaps.push_back(jndx[i]);
-    }
 }
 
 #include <cstring>
@@ -110,21 +60,7 @@ YOCTO_PROGRAM_START()
         pmax = strconv::to<size_t>(argv[1],"pmax");
     }
 
-    if(argc>2&& !strcmp(argv[2],"perf"))
-    {
-        for(size_t p=0;p<=pmax;++p)
-        {
-            (void) perf<float>(p);
-        }
-        std::cerr << std::endl;
-        for(size_t p=0;p<=pmax;++p)
-        {
-            (void) perf<double>(p);
-        }
-        std::cerr << std::endl;
-    }
 
-    vector<size_t> swaps(65536,as_capacity);
     ios::ocstream hdr("xbitrev.hpp",false);
     ios::ocstream src("xbitrev.cpp",false);
 
@@ -138,33 +74,61 @@ YOCTO_PROGRAM_START()
 
     hdr << "\tstruct xbitrev {\n";
 
+
+    vector<size_t> sizes;
+    vector<size_t> words;
+    vector<size_t> indx;
+    vector<size_t> jndx;
+
     for(size_t p=0;p<=pmax;++p)
     {
         const size_t sz = 1 << p;
-        compute_swaps(p,swaps);
-        const size_t nw = swaps.size();
-        //const size_t ns = nw/2;
-        hdr("\t\tstatic const size_t indx%04u[%4u];\n",unsigned(sz),unsigned(nw));
-        src("\tconst size_t xbitrev::indx%04u[%4u]= {",unsigned(sz),unsigned(nw) );
-        for(size_t i=1;i<=nw;++i)
+        compute_swaps(p,indx,jndx);
+        const size_t nw = indx.size();
+        sizes.push_back(sz);
+        words.push_back(nw);
+        if(nw>0)
         {
-            if( 0 == ((i-1)&15) )
-            {
-                src << "\n\t";
-            }
-            src("%4u", unsigned(swaps[i]));
-            if(i<nw)
-            {
-                src << ',';
-            }
-        }
+            hdr("\t\tstatic const size_t indx%04u[%4u];\n",unsigned(sz),unsigned(nw));
+            hdr("\t\tstatic const size_t jndx%04u[%4u];\n",unsigned(sz),unsigned(nw));
 
-        src("\t};\n\n");
+            src("\tconst size_t xbitrev::indx%04u[%4u]= {",unsigned(sz),unsigned(nw) );
+            for(size_t i=1;i<=nw;++i)
+            {
+                if( 0 == ((i-1)&15) )
+                {
+                    src << "\n\t";
+                }
+                src("%4u", unsigned(indx[i]));
+                if(i<nw)
+                {
+                    src << ',';
+                }
+            }
+
+            src("\t};\n\n");
+
+            src("\tconst size_t xbitrev::jndx%04u[%4u]= {",unsigned(sz),unsigned(nw) );
+            for(size_t i=1;i<=nw;++i)
+            {
+                if( 0 == ((i-1)&15) )
+                {
+                    src << "\n\t";
+                }
+                src("%4u", unsigned(jndx[i]));
+                if(i<nw)
+                {
+                    src << ',';
+                }
+            }
+
+            src("\t};\n\n");
+        }
 
     }
 
     // generic code
-    hdr << "\n\t\ttemplate <typename T> inline void run_safe( T arr[], const size_t size) throw() {\n";
+    hdr << "\n\t\ttemplate <typename T> static inline void run_safe( T arr[], const size_t size) throw() {\n";
     hdr << "\t\t\t const    size_t n = size << 1;\n";
     hdr << "\t\t\t register size_t j = 1;\n";
     hdr << "\t\t\t for(register size_t i=1; i<n; i+=2)\n";
@@ -173,19 +137,36 @@ YOCTO_PROGRAM_START()
     hdr << "\t\t\t     {\n";
     hdr << "\t\t\t         core::bswap<2*sizeof(T)>( &arr[i], &arr[j] );\n";
     hdr << "\t\t\t     }\n";
-    hdr << "\t\t\t    register size_t m = size;\n";
-    hdr << "\t\t\t    while( (m>=2) && (j>m) )\n";
-    hdr << "\t\t\t    {\n";
-    hdr << "\t\t\t       j -=  m;\n";
-    hdr << "\t\t\t       m >>= 1;\n";
-    hdr << "\t\t\t    }\n";
-    hdr << "\t\t\t    j += m;\n";
+    hdr << "\t\t\t     register size_t m = size;\n";
+    hdr << "\t\t\t     while( (m>=2) && (j>m) )\n";
+    hdr << "\t\t\t     {\n";
+    hdr << "\t\t\t        j -=  m;\n";
+    hdr << "\t\t\t        m >>= 1;\n";
+    hdr << "\t\t\t     }\n";
+    hdr << "\t\t\t     j += m;\n";
     hdr << "\t\t\t }\n";
-
     hdr << "\t\t}\n\n";
 
-    hdr << "\t};\n";
+    hdr << "\n\t\ttemplate <typename T> static inline void run( T arr[], const size_t size) throw() {\n";
+    hdr << "\t\t\t\tswitch(size) {\n";
 
+    for(size_t i=1;i<=sizes.size();++i)
+    {
+        const size_t sz = sizes[i];
+        const size_t nw = words[i];
+        hdr("\t\t\t\t case %4u:\n", unsigned(sz));
+        if(nw>0)
+        {
+            hdr("\t\t\t\t\tfor(register size_t k=0;k<%4u;++k) { core::bswap<2*sizeof(T)>( &arr[indx%04u[k]], &arr[jndx%04u[k]] ); }\n", unsigned(nw), unsigned(sz), unsigned(sz) );
+        }
+        hdr << "\t\t\t\t\t  break;\n";
+    }
+    hdr << "\t\t\t\t default: run_safe(arr,size);\n";
+    hdr << "\t\t\t\t};\n";
+    hdr << "\t\t}\n\n";
+    
+    hdr << "\t};\n";
+    
     hdr << "\n} }\n";
     src << "\n} }\n";
     hdr << "#endif\n";
