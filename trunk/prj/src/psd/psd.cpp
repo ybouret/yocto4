@@ -10,7 +10,7 @@
 #include "yocto/sort/heap.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/math/dat/spline.hpp"
-#include "yocto/math/sig/spike-finder.hpp"
+#include "yocto/math/alg/spike.hpp"
 
 #include <iostream>
 
@@ -201,15 +201,17 @@ int main( int argc, char *argv[] )
         // Find main spikes
         //
         ////////////////////////////////////////////////////////////////////////
-        vector< spike_info<double> > spikes;
-        const size_t ns = spike_finder<double>::detect(spikes, 5, frq, psd);
-        hsort(spikes, spike_info<double>::compare_by_pos);
+        vector< spike::pointer > spikes;
+        spike::detect(spikes,psd);
+        const size_t ns = spikes.size();
+        hsort(spikes, spike::compare_by_position);
         {
             ios::ocstream fp("spikes.dat",false);
             for(size_t i=1; i <= ns; ++i )
             {
-                std::cerr << "Spike #" << i << "@idx=" << spikes[i].idx << ": pos=" << spikes[i].pos << ", val=" << spikes[i].val << std::endl;
-                fp("%g %g\n", spikes[i].pos, spikes[i].val);
+                std::cerr << "Spike #" << i << "@idx=" << spikes[i]->position
+                << ": pos=" << frq[spikes[i]->position] << ", val=" << spikes[i]->value << std::endl;
+                fp("%g %g\n", frq[spikes[i]->position], spikes[i]->value);
             }
         }
         return 0;
