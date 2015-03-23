@@ -3,7 +3,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/code/unroll.hpp"
-#include "yocto/code/bswap.hpp"
+#include "yocto/code/xbitrev.hpp"
 
 namespace yocto
 {
@@ -27,7 +27,9 @@ namespace yocto
 			//==================================================================
 			const size_t n    = size << 1; 
 			const real_t coef = REAL(1.0)/ Sqrt(  real_t(size) ); 
-			{
+
+#if 0
+            {
 				size_t j=1;
 				for (size_t i=1;i<n;i+=2) 
 				{ 
@@ -44,6 +46,9 @@ namespace yocto
 					j += m;
 				}
 			}
+#else
+            xbitrev::run(data,size);
+#endif
 			
 			//==================================================================
 			// Lanczos-Algorithm
