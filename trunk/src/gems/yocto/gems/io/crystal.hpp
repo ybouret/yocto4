@@ -21,10 +21,10 @@ namespace yocto
              \return 4 * cr.x * cr.y * cr.z
              */
             static size_t close_packed_count(coord_t     &cr,
-                                              size_t       n,
-                                              const double bx,
-                                              const double by,
-                                              const double bz) throw();
+                                             size_t       n,
+                                             const double bx,
+                                             const double by,
+                                             const double bz) throw();
 
             //! count how many particles, closed packed in a box
             /**
@@ -56,8 +56,8 @@ namespace yocto
 
             template <typename T>
             static inline void build_fcc(atoms<T>      &Atoms,
-                                  const coord_t &cr,
-                                  const v3d<T>  &box) throw()
+                                         const coord_t &cr,
+                                         const v3d<T>  &box) throw()
             {
                 build_fcc(cr, box.x, box.y, box.z, build_atom<T>,&Atoms);
             }
