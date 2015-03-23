@@ -4,6 +4,7 @@
 #include "yocto/math/types.hpp"
 #include "yocto/sys/wtime.hpp"
 #include "yocto/sequence/vector.hpp"
+#include <cstdio>
 
 using namespace yocto;
 using namespace math;
