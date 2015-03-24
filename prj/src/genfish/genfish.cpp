@@ -55,125 +55,236 @@ private:
 
 typedef arc_ptr<Slice> pSlice;
 
+class Triangle
+{
+public:
+    pPoint a,b,c;
+    vtx_t  n;
+    
+    Triangle(const pPoint &A,
+             const pPoint &B,
+             const pPoint &C) throw():
+    a(A),b(B),c(C),
+    n()
+    {
+        assert(a->i!=b->i);
+        assert(a->i!=c->i);
+        assert(b->i!=c->i);
+        {
+            const vtx_t G = (1.0/3) * (a->r+b->r+c->r);
+            const vtx_t AB(a->r,b->r);
+            const vtx_t AC(a->r,c->r);
+            const vtx_t NN = vtx_t::cross_(AB, AC);
+            const vtx_t middle(0,0,0.5);
+            const vtx_t Q(middle,G);
+            if( (NN*Q) <= 0 )
+            {
+                b.swap_with(c);
+            }
+        }
+        
+        {
+            const vtx_t AB(a->r,b->r);
+            const vtx_t AC(a->r,c->r);
+            n = vtx_t::cross_(AB, AC);
+            n.normalize();
+        }
+    }
+    
+    Triangle(const Triangle &other) throw() :
+    a(other.a), b(other.b), c(other.c), n(other.n)
+    {
+    }
+    
+    inline ~Triangle() throw() {}
+    
+    
+private:
+    YOCTO_DISABLE_ASSIGN(Triangle);
+};
+
+
 class Fish
 {
 public:
-    Function       W;
-    Function       H;
-    const size_t   N;    //!< internal slices
-    vector<pPoint> Points;
-    vector<pSlice> Slices;
-    const double   ftol;
-    const double   delta;
+    Function         Width;     //!< x axis
+    Function         Up;        //!< y axis top radius (positive)
+    Function         Down;      //!< y axis bottom radius (positive)
+    Function         Mix;       //!< in [0:1] -> [0:1]
+    const size_t     N;         //!< number of internal slices
+    Function         Perimeter; //!<
+    Function         Surface;   //!< cumulative surface
+    vector<pSlice>   Slices;
+    vector<pPoint>   Points;
+    vector<Triangle> Triangles;
+    
+    derivative<double> drvs;
+    double             drvs_h;
+    integrator<double> intg;
+    const double       delta; //!< 1.0/(N+1)
+    double             w;  //!< temporary width
+    double             u;  //!< temporary top
+    double             d;  //!< temporary bottom
+    double             z0; //!< temporary z
+    double             S0; //!< temporary surface
     
     explicit Fish(const Function &userW,
-                  const Function &userH,
+                  const Function &userU,
+                  const Function &userD,
+                  const Function &userM,
                   const size_t    userN) :
-    W(userW),
-    H(userH),
+    Width(userW),
+    Up(userU),
+    Down(userD),
+    Mix(userM),
     N(max_of<size_t>(userN,1)),
-    Points(),
-    Slices(),
-    ftol(1e-4),
-    delta(1.0/(N+1)),
+    Perimeter(this, & Fish:: __Perimeter),
+    Surface(this,   & Fish:: __Surface  ),
+    Slices(N+2,as_capacity),
     drvs(),
-    drvs_h( 1e-4 ),
+    drvs_h(1e-4),
     intg(),
-    dPerimeter(this,& Fish:: __dPerimeter),
-    __a(0),
-    __b(0),
-    __s(0),
-    Perimeter(this, & Fish:: __perimeter ),
-    Surface(this, & Fish:: __surface),
-    TotalSurface( Surface(1.0) ),
-    DeltaSurface(TotalSurface*delta)
+    delta(1.0/(N+1)),
+    XX0(this, & Fish:: __getX0),
+    YY0(this, & Fish:: __getY0),
+    dPerim0(this, & Fish:: __dPerimeter),
+    TotalSurface( Surface(1.0) )
     {
+        std::cerr << "TotalSurface=" << TotalSurface << std::endl;
         
+        pPoint p0( new Point() );
+        Points.push_back(p0);
         
-        //-- make slice 0
+        //______________________________________________________________________
+        //
+        // pass 1: find the internal slices
+        //______________________________________________________________________
         
-        //-- find locations
+        Function zSurf(this, & Fish::__zSurf);
         zfind<double> solve(1e-4);
-        Function zS(this,&Fish::zSurface);
         double max_perimeter = 0;
+        double last_z        = 0;
         for(size_t i=1;i<=N;++i)
         {
-            __s = i*DeltaSurface;
-            const double z = solve(zS,0,1);
-            std::cerr << "slice #" << i << "@" << z << std::endl;
-            const double pr = Perimeter(z);
-            std::cerr << "\tperimeter=" << pr << std::endl;
-            pSlice ps( new Slice(z,pr) );
-            Slices.push_back(ps);
-            if(pr>max_perimeter) max_perimeter = pr;
-#if 0
+            std::cerr << "Computing Slice #" << i << "/" << N << std::endl;
+            //S0 = (i*TotalSurface)/(N+1);
+            const double  z = i*delta; //solve(zSurf,last_z,1);
+            const double  p = Perimeter(z);
+            pSlice        pS(new Slice(z,p) );
+            Slices.push_back(pS);
+            if(p>max_perimeter) max_perimeter = p;
+            last_z = z;
+            std::cerr << "\t@z=" << z << std::endl;
+        }
+        
+        //______________________________________________________________________
+        //
+        // pass 2: compute how many points per slices M = 2+2*n
+        //______________________________________________________________________
+        const size_t n = max_of<size_t>(2,ceil(max_perimeter/delta))-2;
+        const size_t M = 2+2*n;
+        std::cerr << "n=" << n << ", M=" << M << std::endl;
+        
+        for(size_t i=1;i<=N;++i)
+        {
+            Slice &slice = *Slices[i];
+            
             for(size_t j=0;j<M;++j)
             {
-                const double theta = (j * 6.28) / double(M);
-                __a   = W(z);
-                __b   = H(z);
-                const double ct = cos(theta);
-                const double st = sin(theta);
-                const double x =   __a * ct + __b * st;
-                const double y = - __a * st + __b * ct;
+                const double theta = (j*numeric<double>::two_pi)/M;
                 pPoint pp( new Point() );
-                pp->r.x = x;
-                pp->r.y = y;
-                pp->r.z = z;
-                Points.push_back(pp);
-                ps->points.push_back(pp);
-            }
-#endif
-        }
-        
-        //-- make slice N+1
-        
-        
-        std::cerr << "#Slices=" << Slices.size() << std::endl;
-        
-        //-- compute 2+2*n points per internal slices
-        const size_t n = (max_of<size_t>(2,ceil(max_perimeter/delta))-2)/2;
-        std::cerr << "n=" << n << std::endl;
-        const size_t M = 2 + 2*n;
-        std::cerr << "M=" << M << " points per slices" << std::endl;
-        
-        const size_t NS = Slices.size();
-        for(size_t j=1;j<=NS;++j)
-        {
-            Slice &slice = *Slices[j];
-            const double z = slice.z;
-            __a   = W(z);
-            __b   = H(z);
-            
-            for(size_t i=0;i<M;++i)
-            {
-                const double theta = (i * numeric<double>::two_pi) / double(M);
-                const double ct = cos(theta);
-                const double st = sin(theta);
-                const double x =   __a * ct;
-                const double y =   __b * st;
-                pPoint pp( new Point() );
-                pp->r.x = x;
-                pp->r.y = y;
-                pp->r.z = z;
-                Points.push_back(pp);
+                pp->r = pos(theta,slice.z);
                 slice.points.push_back(pp);
+                Points.push_back(pp);
             }
+            
         }
+        
+        pPoint pN( new Point() );
+        Points.push_back(pN);
+        pN->r.z = 1;
+        
         std::cerr << "#Points=" << Points.size() << std::endl;
         
+        //______________________________________________________________________
+        //
+        // pass 3: compute triangles
+        //______________________________________________________________________
+        
+        // head
+        {
+            const Slice &slice = *Slices[1];
+            for(size_t i=1;i<=M;++i)
+            {
+                size_t   ip = i+1;
+                if(ip>M) ip = 1;
+                const Triangle tr(p0,slice.points[i],slice.points[ip]);
+                Triangles.push_back(tr);
+            }
+        }
+        
+        // inside
+        for(size_t j=1;j<N;++j)
+        {
+            const array<pPoint> &P0 = Slices[j]->points;
+            const array<pPoint> &P1 = Slices[j+1]->points;
+            
+            // loop over quads
+            for(size_t i=1;i<=M;++i)
+            {
+                size_t   ip = i+1;
+                if(ip>M) ip = 1;
+                const pPoint  &P00 = P0[i];
+                const pPoint  &P01 = P0[ip];
+                const pPoint  &P10 = P1[i];
+                const pPoint  &P11 = P1[ip];
+                
+                {
+                    const Triangle tr(P00,P01,P11);
+                    Triangles.push_back(tr);
+                }
+                
+                {
+                    const Triangle tr(P00,P10,P11);
+                    Triangles.push_back(tr);
+                }
+                
+                
+            }
+        }
+        
+        
+        // tail
+        {
+            const Slice &slice = *Slices[N];
+            for(size_t i=1;i<=M;++i)
+            {
+                size_t   ip = i+1;
+                if(ip>M) ip = 1;
+                const Triangle tr(pN,slice.points[i],slice.points[ip]);
+                Triangles.push_back(tr);
+            }
+        }
+        
+        
+        std::cerr << "#Triangles=" << Triangles.size() << std::endl;
     }
     
-    virtual ~Fish() throw()
+    vtx_t pos(const double theta, const double z)
     {
-        
+        z0=z;
+        return vtx_t(__getX0(theta),__getY0(theta),z);
+    }
+    
+    static inline double g(double theta) throw()
+    {
+        return 0.5*(1+sin(theta));
     }
     
     
     void save_vtk( const string &filename ) const
     {
         const size_t NP = Points.size();
-        const size_t NS = Slices.size();
         ios::ocstream fp(filename,false);
         fp << "# vtk DataFile Version 3.0\n";
         fp << "Fish\n";
@@ -186,6 +297,8 @@ public:
             fp("%g %g %g\n",r.x,r.y,r.z);
         }
         
+#if 0
+        const size_t NS = Slices.size();
         size_t NL = 0;
         for(size_t i=1;i<=NS;++i)
         {
@@ -204,67 +317,119 @@ public:
                 fp("2 %u %u\n", unsigned(points[j]->i), unsigned(points[jp]->i) );
             }
         }
+#endif
+        
+        const size_t NT = Triangles.size();
+        
+        fp("POLYGONS %u %u\n", unsigned(NT), unsigned(4*NT) );
+        for(size_t i=1;i<=NT;++i)
+        {
+            const Triangle &tr = Triangles[i];
+            fp("3 %u %u %u\n", unsigned(tr.a->i), unsigned(tr.b->i), unsigned(tr.c->i) );
+        }
         
     }
+    
+    
+    inline void __stl( ios::ostream &fp, const Point &p ) const
+    {
+        fp("   vertex %.6g %.6g %.6g\n", p.r.x, p.r.y,p.r.z);
+    }
+    
+    void save_stl( const string &filename ) const
+    {
+        ios::ocstream fp(filename,false);
+        
+        fp("solid fish\n");
+        
+        const size_t NT = Triangles.size();
+        for(size_t i=1;i<=NT;++i)
+        {
+            const Triangle &tr = Triangles[i];
+            fp(" facet normal %.6g %.6g %.6g\n",tr.n.x,tr.n.y,tr.n.z);
+            fp("  outer loop\n");
+            __stl(fp, *tr.a);
+            __stl(fp, *tr.b);
+            __stl(fp, *tr.c);
+            fp("  end loop\n");
+            fp(" end facet\n");
+        }
+        fp("endsolid\n");
+    }
+    
     
     
 private:
-    derivative<double> drvs;
-    const double       drvs_h;
-    integrator<double> intg;
-    Function           dPerimeter;
+    YOCTO_DISABLE_COPY_AND_ASSIGN(Fish);
+    Function XX0;
+    Function YY0;
+    Function dPerim0;
     
-    double __a;
-    double __b;
-    double __s;
-    
-    double __dPerimeter( double theta )
+    double __getX0(double theta)
     {
-        return Hypotenuse( __a * cos(theta), __b * sin(theta) );
+        return Width(z0) * cos(theta);
     }
     
-    double __perimeter(double z)
+    double __getY0(double theta)
     {
-        __a = W(z);
-        __b = H(z);
-        
-        return intg(0,numeric<double>::two_pi,dPerimeter,ftol);
+        u = Up(z0);
+        d = Down(z0);
+        const double ratio = g(theta);
+        const double m     = Mix(ratio);
+        return (u*m+d*(1-m))*sin(theta);
     }
     
-    double __surface(double z)
+    double __dPerimeter(double theta)
     {
-        if(z<=0)
+        const double dXdt = drvs(XX0,theta,drvs_h);
+        const double dYdt = drvs(YY0,theta,drvs_h);
+        return Hypotenuse(dXdt, dYdt);
+    }
+    
+    double __Perimeter(double z)
+    {
+        if(z<=0||z>=1)
+        {
             return 0;
+        }
         else
         {
-            return intg(0,min_of<double>(z,1.0), Perimeter, ftol);
+            z0=z;
+            return intg(0,numeric<double>::two_pi, dPerim0, 1e-4);
         }
     }
     
-    double zSurface( double z )
+    double __Surface(double z)
     {
-        return __surface(z) - __s;
+        if(z<=0)
+        {
+            return 0;
+        }
+        else
+        {
+            if(z>=1)
+            {
+                z=1;
+            }
+            return intg(0,z,Perimeter,1e-4);
+        }
     }
     
-    
-    YOCTO_DISABLE_COPY_AND_ASSIGN(Fish);
+    double __zSurf(double z)
+    {
+        return S0 - __Surface(z);
+    }
     
 public:
-    Function     Perimeter;
-    Function     Surface; // cumulative surface
     const double TotalSurface;
-    const double DeltaSurface;
+    
+    
 };
 
-static inline double H0(double z)
-{
-    return 0.3*sqrt(z*(1-z)*(1-z)*(1-z));
-}
+#include "yocto/lua/lua-config.hpp"
+#include "yocto/lua/lua-state.hpp"
+#include "yocto/lua/lua-maths.hpp"
 
-static inline double W0(double z)
-{
-    return 0.4*sqrt(z*(1-z)*(1-z));
-}
 
 
 int main(int argc, char *argv[] )
@@ -272,15 +437,43 @@ int main(int argc, char *argv[] )
     static const char *program = vfs::get_base_name(argv[0]);
     try
     {
-        Function WW = cfunctor(W0);
-        Function HH = cfunctor(H0);
         
-        Fish F(WW,HH,50);
+#if 1
+        Lua::State VM;
+        if(argc<=1)
+        {
+            throw exception("need a config.lua");
+        }
+        
+        lua_State *L = VM();
+        Lua::Config::DoFile(L,argv[1]);
+        Lua::Function<double> Width(L,"Width",true);
+        Lua::Function<double> Up(L,"Up",true);
+        Lua::Function<double> Down(L,"Down",true);
+        Lua::Function<double> Mix(L,"Mix",true);
+        const size_t N = size_t(Lua::Config::Get<lua_Number>(L, "N"));
+        Fish F(Width,Up,Down,Mix,N);
+#else
+        
+        Function Width( cfunctor(WW) );
+        Function Up(    cfunctor(UU) );
+        Function Down(  cfunctor(DD) );
+        Function Mix(   cfunctor(MM) );
+        
+        Fish F(Width,Up,Down,Mix,50);
         
         std::cerr << "TotalSurface=" << F.TotalSurface << std::endl;
+#endif
         
         F.save_vtk("fish.vtk");
+        F.save_stl("fish.stl");
+        
         return 0;
+    }
+    catch(const exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+        std::cerr << e.when() << std::endl;
     }
     catch(...)
     {
