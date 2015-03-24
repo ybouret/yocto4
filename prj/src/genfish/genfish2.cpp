@@ -155,7 +155,11 @@ public:
         pPoint p0( new Point() );
         Points.push_back(p0);
         
+        //______________________________________________________________________
+        //
         // pass 1: find the internal slices
+        //______________________________________________________________________
+        
         Function zSurf(this, & Fish::__zSurf);
         zfind<double> solve(1e-4);
         double max_perimeter = 0;
@@ -173,7 +177,10 @@ public:
             std::cerr << "\t@z=" << z << std::endl;
         }
         
+        //______________________________________________________________________
+        //
         // pass 2: compute how many points per slices M = 2+2*n
+        //______________________________________________________________________
         const size_t n = max_of<size_t>(2,ceil(max_perimeter/delta))-2;
         const size_t M = 2+2*n;
         std::cerr << "n=" << n << ", M=" << M << std::endl;
@@ -199,7 +206,10 @@ public:
         
         std::cerr << "#Points=" << Points.size() << std::endl;
         
+        //______________________________________________________________________
+        //
         // pass 3: compute triangles
+        //______________________________________________________________________
         
         // head
         {
@@ -397,7 +407,10 @@ private:
         }
         else
         {
-            if(z>=1) z=1;
+            if(z>=1)
+            {
+                z=1;
+            }
             return intg(0,z,Perimeter,1e-4);
         }
     }
@@ -417,29 +430,6 @@ public:
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/lua/lua-maths.hpp"
 
-#if 0
-static inline double WW(double z)
-{
-    return 0.3*sqrt(z*(1-z)*(1-z));
-    //return 2*sqrt(z*(1-z)*(0.01+1.2*(z-0.7)*(z-0.7)));
-}
-
-static inline double UU(double z)
-{
-    return 2*WW(z);
-}
-
-static inline double DD(double z)
-{
-    return 1.5*WW(z);
-}
-
-
-static inline double MM(double u)
-{
-    return u;
-}
-#endif
 
 
 int main(int argc, char *argv[] )
