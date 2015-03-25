@@ -148,9 +148,9 @@ public:
     XX0(this, & Fish:: __getX0),
     YY0(this, & Fish:: __getY0),
     dPerim0(this, & Fish:: __dPerimeter),
-    TotalSurface( Surface(1.0) )
+    TotalSurface( ComputeTotalSurface() )
     {
-        std::cerr << "TotalSurface=" << TotalSurface << std::endl;
+        std::cerr << "\t\tTotalSurface=" << TotalSurface << std::endl;
         
         pPoint p0( new Point() );
         Points.push_back(p0);
@@ -159,32 +159,40 @@ public:
         //
         // pass 1: find the internal slices
         //______________________________________________________________________
-        
+        std::cerr << "\t*** Finding Internal Slices" << std::endl;
         Function zSurf(this, & Fish::__zSurf);
         zfind<double> solve(1e-4);
         double max_perimeter = 0;
         double last_z        = 0;
         for(size_t i=1;i<=N;++i)
         {
-            std::cerr << "Computing Slice #" << i << "/" << N << std::endl;
-            //S0 = (i*TotalSurface)/(N+1);
-            const double  z = i*delta; //solve(zSurf,last_z,1);
+            std::cerr << "\t\tComputing Slice #" << i << "/" << N << std::endl;
+#if 1
+            const double  z = i*delta;
+#else 
+            S0 = (i*TotalSurface)/(N+1);
+            const double z  = solve(zSurf,last_z,1);
+#endif
+
             const double  p = Perimeter(z);
             pSlice        pS(new Slice(z,p) );
             Slices.push_back(pS);
             if(p>max_perimeter) max_perimeter = p;
             last_z = z;
-            std::cerr << "\t@z=" << z << std::endl;
+            //std::cerr << "\t@z=" << z << std::endl;
         }
-        
+
+
         //______________________________________________________________________
         //
         // pass 2: compute how many points per slices M = 2+2*n
         //______________________________________________________________________
+        std::cerr << "\t*** Finding Radial Slicing..." << std::endl;
         const size_t n = max_of<size_t>(2,ceil(max_perimeter/delta))-2;
         const size_t M = 2+2*n;
-        std::cerr << "n=" << n << ", M=" << M << std::endl;
-        
+        std::cerr << "\t\tn=" << n << ", M=" << M << std::endl;
+
+        std::cerr << "\t*** Computing Points..." << std::endl;
         for(size_t i=1;i<=N;++i)
         {
             Slice &slice = *Slices[i];
@@ -204,13 +212,13 @@ public:
         Points.push_back(pN);
         pN->r.z = 1;
         
-        std::cerr << "#Points=" << Points.size() << std::endl;
+        std::cerr << "\t\t#Points=" << Points.size() << std::endl;
         
         //______________________________________________________________________
         //
         // pass 3: compute triangles
         //______________________________________________________________________
-        
+        std::cerr << "\t*** Computing Triangles" << std::endl;
         // head
         {
             const Slice &slice = *Slices[1];
@@ -272,9 +280,10 @@ public:
         //______________________________________________________________________
 
         
-        std::cerr << "#Triangles=" << Triangles.size() << std::endl;
-        std::cerr << "#Points   =" << Points.size()    << std::endl;
+        std::cerr << "\t\t#Triangles=" << Triangles.size() << std::endl;
+        std::cerr << "\t\t#Points   =" << Points.size()    << std::endl;
 
+        std::cerr << "\t*** Rescaling" << std::endl;
         for(size_t i=1; i <= Points.size();++i)
         {
             Point &p = *Points[i];
@@ -282,7 +291,13 @@ public:
         }
 
     }
-    
+
+    double ComputeTotalSurface()
+    {
+        std::cerr << "\t*** Computing Total Surface" << std::endl;
+        return Surface(1.0);
+    }
+
     vtx_t pos(const double theta, const double z)
     {
         z0=z;
