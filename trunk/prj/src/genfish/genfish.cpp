@@ -265,9 +265,22 @@ public:
                 Triangles.push_back(tr);
             }
         }
-        
+
+        //______________________________________________________________________
+        //
+        // pass 4: rescale
+        //______________________________________________________________________
+
         
         std::cerr << "#Triangles=" << Triangles.size() << std::endl;
+        std::cerr << "#Points   =" << Points.size()    << std::endl;
+
+        for(size_t i=1; i <= Points.size();++i)
+        {
+            Point &p = *Points[i];
+            p.r.z -= 0.5;
+        }
+
     }
     
     vtx_t pos(const double theta, const double z)
