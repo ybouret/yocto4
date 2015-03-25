@@ -26,6 +26,7 @@ YOCTO_UNIT_TEST_IMPL(spike2d)
         }
     }
 
+    spike2d::detect(M, size_t(1), n, size_t(1), m);
 
 }
 YOCTO_UNIT_TEST_DONE()
