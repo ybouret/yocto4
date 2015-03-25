@@ -8,6 +8,7 @@
 #include "yocto/sort/quick.hpp"
 #include "yocto/math/v2d.hpp"
 #include "yocto/math/kernel/matrix.hpp"
+#include "yocto/code/utils.hpp"
 
 
 #include <iostream>
@@ -30,10 +31,9 @@ namespace yocto
                 coord *next;
                 coord *prev;
                 const unit_t x,y;
-                const double value;
                 YOCTO_MAKE_OBJECT
-                inline coord(const unit_t X, const unit_t Y, const double V) throw():
-                x(X), y(Y), value(V)
+                inline coord(const unit_t X, const unit_t Y) throw():
+                x(X), y(Y)
                 {
                 };
 
@@ -55,11 +55,11 @@ namespace yocto
             template <
             typename FIELD,
             typename COORD >
-            void detect(const FIELD &field,
-                        const COORD  xlo,
-                        const COORD  xhi,
-                        const COORD  ylo,
-                        const COORD  yhi)
+            static void detect(const FIELD &field,
+                               const COORD  xlo,
+                               const COORD  xhi,
+                               const COORD  ylo,
+                               const COORD  yhi)
             {
                 detector<FIELD,COORD> scan(field,xlo,xhi,ylo,yhi);
 
@@ -82,6 +82,8 @@ namespace yocto
                 const unit_t   q;
                 matrix<unit_t> flag;
                 vector<size_t> indx;
+                vector<double> val;
+                vector<vtx>    pos;
                 unit_t         uuid;
 
                 inline detector(const FIELD &field,
@@ -96,16 +98,31 @@ namespace yocto
                 q(n*m),
                 flag(n,m),
                 indx(q,as_capacity),
+                val(q,as_capacity),
+                pos(q,as_capacity),
                 uuid(0)
                 {
                     // flag is initialized to 0
 
+                    // initialize values, positions
+                    vtx v;
+                    for(v.x=lo.x;v.x<=hi.x;++v.x)
+                    {
+                        for(v.y=lo.y;v.y<=hi.y;++v.y)
+                        {
+                            val.push_back( field[v.x][v.y] );
+                            pos.push_back( v );
+                        }
+                    }
+
+                    co_qsort(val, pos, __compare_decreasing<double>);
+
                 }
-
-
+                
+                
             };
         };
-
+        
     }
 }
 
