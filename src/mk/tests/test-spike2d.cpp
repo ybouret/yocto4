@@ -7,19 +7,15 @@
 using namespace yocto;
 using namespace math;
 
-static inline double get_id(double x) { return x; }
 
 YOCTO_UNIT_TEST_IMPL(spike2d)
 {
 
-    typedef spike2D<double,size_t> spike_t;
-    typedef spike_t::pointer       spike_p;
 
-    const size_t    n=30;
-    const size_t    m=40;
-    matrix<double>  M(n,m);
-    vector<spike_p> spikes;
+    const size_t n = 70;
+    const size_t m = 90;
 
+    matrix<double> M(n,m);
     for(size_t i=1;i<=n;++i)
     {
         const double x = (i*6.3)/n;
@@ -30,8 +26,6 @@ YOCTO_UNIT_TEST_IMPL(spike2d)
         }
     }
 
-
-    spike_t::detect(spikes, M, 1, n, 1, m, get_id);
 
 }
 YOCTO_UNIT_TEST_DONE()
