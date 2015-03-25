@@ -4,6 +4,8 @@
 #include "yocto/math/types.hpp"
 #include "yocto/ios/ocstream.hpp"
 
+#include "yocto/code/xbitrev.hpp"
+
 using namespace yocto;
 using namespace math;
 
@@ -59,9 +61,24 @@ namespace {
     
 }
 
+#define SHOW(TOTO) std::cerr << "sizeof(" #TOTO ") = " << sizeof(TOTO) << std::endl
+
 YOCTO_UNIT_TEST_IMPL(fft1)
 {
-	
+    SHOW(xbitrev::indx0004);
+    SHOW(xbitrev::indx0008);
+    SHOW(xbitrev::indx0016);
+    SHOW(xbitrev::indx0032);
+    SHOW(xbitrev::indx0064);
+    SHOW(xbitrev::indx0128);
+    SHOW(xbitrev::indx0256);
+    SHOW(xbitrev::indx0512);
+    SHOW(xbitrev::indx1024);
+    SHOW(xbitrev::indx2048);
+    SHOW(xbitrev::indx4096);
+    SHOW(xbitrev::indx8192);
+
+
 	perform<float>();
 	perform<double>();
 }
