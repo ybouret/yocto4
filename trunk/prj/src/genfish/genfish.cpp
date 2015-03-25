@@ -10,6 +10,7 @@
 #include "yocto/ptr/arc.hpp"
 #include "yocto/counted-object.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/math/dat/linear.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -24,7 +25,7 @@ public:
     vtx_t        r;
     inline  Point() : i(Index++), r() {}
     virtual ~Point() throw() {}
-    
+
 private:
     static size_t Index;
 };
@@ -46,9 +47,9 @@ public:
     points()
     {
     }
-    
+
     virtual ~Slice() throw() {}
-    
+
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Slice);
 };
@@ -60,7 +61,7 @@ class Triangle
 public:
     pPoint a,b,c;
     vtx_t  n;
-    
+
     Triangle(const pPoint &A,
              const pPoint &B,
              const pPoint &C) throw():
@@ -82,7 +83,7 @@ public:
                 b.swap_with(c);
             }
         }
-        
+
         {
             const vtx_t AB(a->r,b->r);
             const vtx_t AC(a->r,c->r);
@@ -90,15 +91,15 @@ public:
             n.normalize();
         }
     }
-    
+
     Triangle(const Triangle &other) throw() :
     a(other.a), b(other.b), c(other.c), n(other.n)
     {
     }
-    
+
     inline ~Triangle() throw() {}
-    
-    
+
+
 private:
     YOCTO_DISABLE_ASSIGN(Triangle);
 };
@@ -117,17 +118,19 @@ public:
     vector<pSlice>   Slices;
     vector<pPoint>   Points;
     vector<Triangle> Triangles;
-    
+
     derivative<double> drvs;
     double             drvs_h;
-    integrator<double> intg;
+    integrator<double> intp;
+    integrator<double> ints;
     const double       delta; //!< 1.0/(N+1)
     double             w;  //!< temporary width
     double             u;  //!< temporary top
     double             d;  //!< temporary bottom
     double             z0; //!< temporary z
     double             S0; //!< temporary surface
-    
+
+
     explicit Fish(const Function &userW,
                   const Function &userU,
                   const Function &userD,
@@ -143,7 +146,8 @@ public:
     Slices(N+2,as_capacity),
     drvs(),
     drvs_h(1e-4),
-    intg(),
+    intp(),
+    ints(),
     delta(1.0/(N+1)),
     XX0(this, & Fish:: __getX0),
     YY0(this, & Fish:: __getY0),
@@ -151,37 +155,86 @@ public:
     TotalSurface( ComputeTotalSurface() )
     {
         std::cerr << "\t\tTotalSurface=" << TotalSurface << std::endl;
-        
+
         pPoint p0( new Point() );
         Points.push_back(p0);
-        
+
         //______________________________________________________________________
         //
         // pass 1: find the internal slices
         //______________________________________________________________________
         std::cerr << "\t*** Finding Internal Slices" << std::endl;
-        Function zSurf(this, & Fish::__zSurf);
-        zfind<double> solve(1e-4);
-        double max_perimeter = 0;
-        double last_z        = 0;
-        for(size_t i=1;i<=N;++i)
-        {
-            std::cerr << "\t\tComputing Slice #" << i << "/" << N << std::endl;
-#if 1
-            const double  z = i*delta;
-#else 
-            S0 = (i*TotalSurface)/(N+1);
-            const double z  = solve(zSurf,last_z,1);
-#endif
 
-            const double  p = Perimeter(z);
-            pSlice        pS(new Slice(z,p) );
-            Slices.push_back(pS);
-            if(p>max_perimeter) max_perimeter = p;
-            last_z = z;
-            //std::cerr << "\t@z=" << z << std::endl;
+        /*
+         Function zSurf(this, & Fish::__zSurf);
+         zfind<double> solve(1e-4);
+         double max_perimeter = 0;
+         double last_z        = 0;
+         for(size_t i=1;i<=N;++i)
+         {
+         std::cerr << "\t\tComputing Slice #" << i << "/" << N << std::endl;
+         #if 1
+         const double  z = i*delta;
+         #else
+         S0 = (i*TotalSurface)/(N+1);
+         const double z  = solve(zSurf,last_z,1);
+         #endif
+
+         const double  p = Perimeter(z);
+         pSlice        pS(new Slice(z,p) );
+         Slices.push_back(pS);
+         if(p>max_perimeter) max_perimeter = p;
+         last_z = z;
+         }
+
+         */
+
+        std::cerr << "\t*** Building Surface Approximation..." << std::endl;
+        double max_perimeter = 0;
+        {
+            // First Pass: building approximate surface
+            vector<double> zs(N+2,as_capacity);
+            vector<double> vs(N+2,as_capacity);
+            zs.push_back(0);
+            vs.push_back(0);
+            for(size_t i=1;i<=N;++i)
+            {
+                std::cerr << "\t\t\t" << i << "/" << N << "            \r"; std::cerr.flush();
+                const double z = i*delta;
+                const double s = vs.back() + ints(zs.back(),z,Perimeter,1e-4);
+                zs.push_back(z);
+                vs.push_back(s);
+            }
+            zs.push_back(1.0);
+            vs.push_back(TotalSurface);
+            {
+                ios::ocstream fp("surface.dat",false);
+                for(size_t i=1;i<=zs.size();++i)
+                {
+                    fp("%g %g\n", zs[i],vs[i]);
+                }
+            }
+
+            std::cerr << std::endl;
+            // Second Pass:
+            vector<double> theZ(1,as_capacity);
+
+            for(size_t i=1;i<=N;++i)
+            {
+                S0 = (i*TotalSurface)/(N+1);
+                linear_find(S0, theZ, zs, vs,1);
+                if(theZ.size()!=1)
+                    throw exception("Cannot find S=%g",S0);
+                const double z = theZ[1];
+                const double p = Perimeter(z);
+                pSlice       pS(new Slice(z,p) );
+                Slices.push_back(pS);
+                if(p>max_perimeter) max_perimeter = p;
+            }
+
         }
 
+        exit(1);
 
         //______________________________________________________________________
         //
@@ -196,7 +249,7 @@ public:
         for(size_t i=1;i<=N;++i)
         {
             Slice &slice = *Slices[i];
-            
+
             for(size_t j=0;j<M;++j)
             {
                 const double theta = (j*numeric<double>::two_pi)/M;
@@ -205,15 +258,15 @@ public:
                 slice.points.push_back(pp);
                 Points.push_back(pp);
             }
-            
+
         }
-        
+
         pPoint pN( new Point() );
         Points.push_back(pN);
         pN->r.z = 1;
-        
+
         std::cerr << "\t\t#Points=" << Points.size() << std::endl;
-        
+
         //______________________________________________________________________
         //
         // pass 3: compute triangles
@@ -230,13 +283,13 @@ public:
                 Triangles.push_back(tr);
             }
         }
-        
+
         // inside
         for(size_t j=1;j<N;++j)
         {
             const array<pPoint> &P0 = Slices[j]->points;
             const array<pPoint> &P1 = Slices[j+1]->points;
-            
+
             // loop over quads
             for(size_t i=1;i<=M;++i)
             {
@@ -246,22 +299,22 @@ public:
                 const pPoint  &P01 = P0[ip];
                 const pPoint  &P10 = P1[i];
                 const pPoint  &P11 = P1[ip];
-                
+
                 {
                     const Triangle tr(P00,P01,P11);
                     Triangles.push_back(tr);
                 }
-                
+
                 {
                     const Triangle tr(P00,P10,P11);
                     Triangles.push_back(tr);
                 }
-                
-                
+
+
             }
         }
-        
-        
+
+
         // tail
         {
             const Slice &slice = *Slices[N];
@@ -279,7 +332,7 @@ public:
         // pass 4: rescale
         //______________________________________________________________________
 
-        
+
         std::cerr << "\t\t#Triangles=" << Triangles.size() << std::endl;
         std::cerr << "\t\t#Points   =" << Points.size()    << std::endl;
 
@@ -303,13 +356,13 @@ public:
         z0=z;
         return vtx_t(__getX0(theta),__getY0(theta),z);
     }
-    
+
     static inline double g(double theta) throw()
     {
         return 0.5*(1+sin(theta));
     }
-    
-    
+
+
     void save_vtk( const string &filename ) const
     {
         const size_t NP = Points.size();
@@ -324,7 +377,7 @@ public:
             const vtx_t &r = Points[i]->r;
             fp("%g %g %g\n",r.x,r.y,r.z);
         }
-        
+
 #if 0
         const size_t NS = Slices.size();
         size_t NL = 0;
@@ -332,7 +385,7 @@ public:
         {
             NL += Slices[i]->points.size();
         }
-        
+
         fp("LINES %u %u\n", unsigned(NL), unsigned(3*NL) );
         for(size_t i=1;i<=NS;++i)
         {
@@ -346,30 +399,30 @@ public:
             }
         }
 #endif
-        
+
         const size_t NT = Triangles.size();
-        
+
         fp("POLYGONS %u %u\n", unsigned(NT), unsigned(4*NT) );
         for(size_t i=1;i<=NT;++i)
         {
             const Triangle &tr = Triangles[i];
             fp("3 %u %u %u\n", unsigned(tr.a->i), unsigned(tr.b->i), unsigned(tr.c->i) );
         }
-        
+
     }
-    
-    
+
+
     inline void __stl( ios::ostream &fp, const Point &p ) const
     {
         fp("   vertex %.6g %.6g %.6g\n", p.r.x, p.r.y,p.r.z);
     }
-    
+
     void save_stl( const string &filename ) const
     {
         ios::ocstream fp(filename,false);
-        
+
         fp("solid fish\n");
-        
+
         const size_t NT = Triangles.size();
         for(size_t i=1;i<=NT;++i)
         {
@@ -384,20 +437,20 @@ public:
         }
         fp("endsolid\n");
     }
-    
-    
-    
+
+
+
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Fish);
     Function XX0;
     Function YY0;
     Function dPerim0;
-    
+
     double __getX0(double theta)
     {
         return Width(z0) * cos(theta);
     }
-    
+
     double __getY0(double theta)
     {
         u = Up(z0);
@@ -406,14 +459,14 @@ private:
         const double m     = Mix(ratio);
         return (u*m+d*(1-m))*sin(theta);
     }
-    
+
     double __dPerimeter(double theta)
     {
         const double dXdt = drvs(XX0,theta,drvs_h);
         const double dYdt = drvs(YY0,theta,drvs_h);
         return Hypotenuse(dXdt, dYdt);
     }
-    
+
     double __Perimeter(double z)
     {
         if(z<=0||z>=1)
@@ -423,10 +476,10 @@ private:
         else
         {
             z0=z;
-            return intg(0,numeric<double>::two_pi, dPerim0, 1e-4);
+            return intp(0,numeric<double>::two_pi, dPerim0, 1e-4);
         }
     }
-    
+
     double __Surface(double z)
     {
         if(z<=0)
@@ -439,19 +492,19 @@ private:
             {
                 z=1;
             }
-            return intg(0,z,Perimeter,1e-4);
+            return ints(0,z,Perimeter,1e-4);
         }
     }
-    
+
     double __zSurf(double z)
     {
         return S0 - __Surface(z);
     }
-    
+
 public:
     const double TotalSurface;
-    
-    
+
+
 };
 
 #include "yocto/lua/lua-config.hpp"
@@ -465,14 +518,14 @@ int main(int argc, char *argv[] )
     static const char *program = vfs::get_base_name(argv[0]);
     try
     {
-        
+
 #if 1
         Lua::State VM;
         if(argc<=1)
         {
             throw exception("need a config.lua");
         }
-        
+
         lua_State *L = VM();
         Lua::Config::DoFile(L,argv[1]);
         Lua::Function<double> Width(L,"Width",true);
@@ -482,20 +535,20 @@ int main(int argc, char *argv[] )
         const size_t N = size_t(Lua::Config::Get<lua_Number>(L, "N"));
         Fish F(Width,Up,Down,Mix,N);
 #else
-        
+
         Function Width( cfunctor(WW) );
         Function Up(    cfunctor(UU) );
         Function Down(  cfunctor(DD) );
         Function Mix(   cfunctor(MM) );
-        
+
         Fish F(Width,Up,Down,Mix,50);
-        
+
         std::cerr << "TotalSurface=" << F.TotalSurface << std::endl;
 #endif
-        
+
         F.save_vtk("fish.vtk");
         F.save_stl("fish.stl");
-        
+
         return 0;
     }
     catch(const exception &e)
