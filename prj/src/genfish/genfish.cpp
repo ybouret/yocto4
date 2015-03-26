@@ -11,6 +11,7 @@
 #include "yocto/counted-object.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/math/dat/linear.hpp"
+#include "yocto/math/dat/spline.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -216,7 +217,19 @@ public:
             }
 
             std::cerr << std::endl;
-            // Second Pass:
+
+            spline_function<double> spl(spline_tangent_both,zs,vs,0,0);
+            {
+                ios::ocstream fp("splines.dat",false);
+                for(size_t i=0;i<=1000;++i)
+                {
+                    const double zz = i*0.001;
+                    fp("%g %g\n", zz, spl.call(zz) );
+                }
+            }
+            
+            
+            // Second Pass: approximated inversion
             vector<double> theZ(1,as_capacity);
 
             for(size_t i=1;i<=N;++i)
@@ -234,8 +247,7 @@ public:
 
         }
 
-        exit(1);
-
+        
         //______________________________________________________________________
         //
         // pass 2: compute how many points per slices M = 2+2*n
@@ -331,7 +343,6 @@ public:
         //
         // pass 4: rescale
         //______________________________________________________________________
-
 
         std::cerr << "\t\t#Triangles=" << Triangles.size() << std::endl;
         std::cerr << "\t\t#Points   =" << Points.size()    << std::endl;
