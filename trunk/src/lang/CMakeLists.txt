@@ -32,5 +32,8 @@ SOURCE_GROUP(lang/syntax FILES ${syntax_srcs})
 INCLUDE_DIRECTORIES(../main .)
 ADD_LIBRARY(y-lang STATIC ${lang_srcs} ${pattern_srcs} ${lexical_srcs} ${plugin_srcs} ${syntax_srcs})
 
+INSTALL( TARGETS y-lang ARCHIVE DESTINATION lib )
+
+
 ADD_SUBDIRECTORY(tests)
 
