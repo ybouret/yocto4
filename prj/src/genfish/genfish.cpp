@@ -166,30 +166,7 @@ public:
         //______________________________________________________________________
         std::cerr << "\t*** Finding Internal Slices" << std::endl;
 
-        /*
-         Function zSurf(this, & Fish::__zSurf);
-         zfind<double> solve(1e-4);
-         double max_perimeter = 0;
-         double last_z        = 0;
-         for(size_t i=1;i<=N;++i)
-         {
-         std::cerr << "\t\tComputing Slice #" << i << "/" << N << std::endl;
-         #if 1
-         const double  z = i*delta;
-         #else
-         S0 = (i*TotalSurface)/(N+1);
-         const double z  = solve(zSurf,last_z,1);
-         #endif
-
-         const double  p = Perimeter(z);
-         pSlice        pS(new Slice(z,p) );
-         Slices.push_back(pS);
-         if(p>max_perimeter) max_perimeter = p;
-         last_z = z;
-         }
-
-         */
-
+        
         std::cerr << "\t*** Building Surface Approximation..." << std::endl;
         double max_perimeter = 0;
         {
@@ -218,17 +195,19 @@ public:
 
             std::cerr << std::endl;
 
-            spline_function<double> spl(spline_tangent_both,zs,vs,0,0);
+            spline1D<double>  spl(spline_tangent_both,zs,vs,0,0);
+            zfunction<double> zfcn( &spl, & spline1D<double>::get, 0 );
+
             {
                 ios::ocstream fp("splines.dat",false);
                 for(size_t i=0;i<=1000;++i)
                 {
                     const double zz = i*0.001;
-                    fp("%g %g\n", zz, spl.call(zz) );
+                    fp("%g %g\n", zz, spl(zz) );
                 }
             }
-            
-            
+
+
             // Second Pass: approximated inversion
             vector<double> theZ(1,as_capacity);
 
@@ -247,7 +226,7 @@ public:
 
         }
 
-        
+
         //______________________________________________________________________
         //
         // pass 2: compute how many points per slices M = 2+2*n
@@ -551,15 +530,15 @@ int main(int argc, char *argv[] )
         Function Up(    cfunctor(UU) );
         Function Down(  cfunctor(DD) );
         Function Mix(   cfunctor(MM) );
-
+        
         Fish F(Width,Up,Down,Mix,50);
-
+        
         std::cerr << "TotalSurface=" << F.TotalSurface << std::endl;
 #endif
-
+        
         F.save_vtk("fish.vtk");
         F.save_stl("fish.stl");
-
+        
         return 0;
     }
     catch(const exception &e)
