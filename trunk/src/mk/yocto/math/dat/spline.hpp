@@ -4,10 +4,11 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/v2d.hpp"
 #include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/types.hpp"
 
 namespace yocto {
     
-	namespace math {
+    namespace math {
         
         enum spline_type
         {
@@ -184,7 +185,7 @@ namespace yocto {
                 const array<T> *y2[2] = { &Q[1], &Q[2] };
                 spline<T>:: derivs(y1, t, y, y2, 2);
             }
-        
+            
         protected:
             explicit spline() throw();
             
@@ -216,9 +217,44 @@ namespace yocto {
             vector<T>         y2; //!< own y2
             const T           w;     //!< width
             const T          *width; //!< &w if is_periodic
+        public:
             const spline_type type;
             YOCTO_DISABLE_COPY_AND_ASSIGN(spline1D);
         };
+        
+        template <typename T>
+        class spline_function : public spline1D<T>
+        {
+        public:
+            T                             shift;
+            typename numeric<T>::function call0;
+            typename numeric<T>::function call;
+
+            inline spline_function(spline_type     t,
+                                   const array<T> &X,
+                                   const array<T> &Y,
+                                   const T        ls=0,
+                                   const T        rs=0) :
+            spline1D<T>(t,X,Y,ls,rs),
+            shift(0),
+            call0(this,& spline1D<T>::get ),
+            call( this,& spline_function::compute_with_shift)
+            {
+            }
+            
+            virtual ~spline_function() throw()
+            {
+            }
+            
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(spline_function);
+            inline T compute_with_shift( const T X ) const throw()
+            {
+                return shift + this->get(X);
+            }
+        };
+        
         
         template <typename T>
         class spline2D : public spline<T>
@@ -267,7 +303,7 @@ namespace yocto {
             YOCTO_DISABLE_COPY_AND_ASSIGN(spline2D);
         };
         
-	}
+    }
     
 }
 
