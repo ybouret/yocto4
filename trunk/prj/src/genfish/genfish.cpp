@@ -166,7 +166,7 @@ public:
         //______________________________________________________________________
         std::cerr << "\t*** Finding Internal Slices" << std::endl;
 
-        
+
         std::cerr << "\t*** Building Surface Approximation..." << std::endl;
         double max_perimeter = 0;
         {
