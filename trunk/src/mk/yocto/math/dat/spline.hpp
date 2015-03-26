@@ -221,41 +221,7 @@ namespace yocto {
             const spline_type type;
             YOCTO_DISABLE_COPY_AND_ASSIGN(spline1D);
         };
-        
-        template <typename T>
-        class spline_function : public spline1D<T>
-        {
-        public:
-            T                             shift;
-            typename numeric<T>::function call0;
-            typename numeric<T>::function call;
 
-            inline spline_function(spline_type     t,
-                                   const array<T> &X,
-                                   const array<T> &Y,
-                                   const T        ls=0,
-                                   const T        rs=0) :
-            spline1D<T>(t,X,Y,ls,rs),
-            shift(0),
-            call0(this,& spline1D<T>::get ),
-            call( this,& spline_function::compute_with_shift)
-            {
-            }
-            
-            virtual ~spline_function() throw()
-            {
-            }
-            
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(spline_function);
-            inline T compute_with_shift( const T X ) const throw()
-            {
-                return shift + this->get(X);
-            }
-        };
-        
-        
         template <typename T>
         class spline2D : public spline<T>
         {

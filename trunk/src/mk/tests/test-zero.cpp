@@ -24,6 +24,8 @@ YOCTO_UNIT_TEST_IMPL(zero)
     {
         zfind<double> solve(1e-5);
         numeric<double>::function func( cfunctor(F<double>) );
+        numeric<double>::function f2 = func;
+        
         triplet<double> x = { 0.0, 0, 0.5 };
         triplet<double> f = { 0, 0, 0 };
         if( !solve.lookup(func, x, f))
