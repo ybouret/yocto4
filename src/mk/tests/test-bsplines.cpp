@@ -1,4 +1,4 @@
-#include "yocto/math/dat/b-spline.hpp"
+#include "yocto/math/dat/b-splines.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand32.hpp"
 #include "yocto/sequence/vector.hpp"
