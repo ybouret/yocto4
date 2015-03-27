@@ -60,19 +60,22 @@ class Triangle
 {
 public:
     pPoint a,b,c;
+    vtx_t  G;
     vtx_t  n;
-
+    double S;
     Triangle(const pPoint &A,
              const pPoint &B,
              const pPoint &C) throw():
     a(A),b(B),c(C),
-    n()
+    G( (1.0/3) * (a->r+b->r+c->r) ),
+    n(),
+    S(0)
     {
         assert(a->i!=b->i);
         assert(a->i!=c->i);
         assert(b->i!=c->i);
         {
-            const vtx_t G = (1.0/3) * (a->r+b->r+c->r);
+            //const vtx_t G = (1.0/3) * (a->r+b->r+c->r);
             const vtx_t AB(a->r,b->r);
             const vtx_t AC(a->r,c->r);
             const vtx_t NN = vtx_t::cross_(AB, AC);
@@ -88,17 +91,30 @@ public:
             const vtx_t AB(a->r,b->r);
             const vtx_t AC(a->r,c->r);
             n = vtx_t::cross_(AB, AC);
+            S = n.norm();
             n.normalize();
         }
     }
 
     Triangle(const Triangle &other) throw() :
-    a(other.a), b(other.b), c(other.c), n(other.n)
+    a(other.a), b(other.b), c(other.c),
+    G(other.G),
+    n(other.n),
+    S(other.S)
     {
     }
 
     inline ~Triangle() throw() {}
 
+    void recompute() throw()
+    {
+        G = (1.0/3) * (a->r+b->r+c->r);
+        const vtx_t AB(a->r,b->r);
+        const vtx_t AC(a->r,c->r);
+        n = vtx_t::cross_(AB, AC);
+        S = n.norm();
+        n.normalize();
+    }
 
 private:
     YOCTO_DISABLE_ASSIGN(Triangle);
@@ -347,6 +363,19 @@ public:
         }
         G *= 1.0/NP;
         std::cerr << "G=" << G << std::endl;
+
+        double volume  = 0 ;
+        double surface = 0;
+        for(size_t i=Triangles.size();i>0;--i)
+        {
+            Triangle &tr = Triangles[i];
+            tr.recompute();
+            surface += tr.S;
+            volume  += (tr.G*tr.n) * tr.S;
+        }
+        volume /= 3;
+        std::cerr << "Approx Surface: " << surface << std::endl;
+        std::cerr << "Approx Volume : " << volume  << std::endl;
     }
 
     inline ~Fish() throw()
