@@ -409,28 +409,6 @@ public:
             fp("%g %g %g\n",r.x,r.y,r.z);
         }
 
-#if 0
-        const size_t NS = Slices.size();
-        size_t NL = 0;
-        for(size_t i=1;i<=NS;++i)
-        {
-            NL += Slices[i]->points.size();
-        }
-
-        fp("LINES %u %u\n", unsigned(NL), unsigned(3*NL) );
-        for(size_t i=1;i<=NS;++i)
-        {
-            const array<pPoint> &points = Slices[i]->points;
-            const size_t np=points.size();
-            for(size_t j=1;j<=np;++j)
-            {
-                size_t jp = j+1;
-                if(jp>np) jp = 1;
-                fp("2 %u %u\n", unsigned(points[j]->i), unsigned(points[jp]->i) );
-            }
-        }
-#endif
-
         const size_t NT = Triangles.size();
 
         fp("POLYGONS %u %u\n", unsigned(NT), unsigned(4*NT) );
