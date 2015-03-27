@@ -20,8 +20,8 @@ namespace yocto
         template <>
         uint32_t opaque<uint32_t>::scale(double x) throw()
         {
-            static const double __max(value);
-            return uint32_t( floor(__max*x+0.5 ) );
+            static const double __the_max(value);
+            return uint32_t( floor(__the_max*x+0.5 ) );
         }
 
         template <>
