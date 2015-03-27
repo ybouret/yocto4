@@ -116,12 +116,12 @@ public:
     Function         Up;
     Function         Down;
     Function         Mix;
-    Function         dLength;
     Function         X;          //!< for ztmp
     Function         Y;          //!< for ztmp
     Function         dPerimeter; //!< for ztmp
     Function         Perimeter;  //!< function of z
     const size_t     N;          //!< internal slices
+    const double     Length;
     vector<pSlice>   Slices;
     vector<pPoint>   Points;
     vector<Triangle> Triangles;
@@ -136,18 +136,19 @@ public:
                 const Function &userUp,
                 const Function &userDown,
                 const Function &userMix,
-                const size_t   userN
+                const size_t   userN,
+                const double   userL
                 ) :
     Width( userWidth ),
     Up(userUp),
     Down(userDown),
     Mix(userMix),
-    dLength( this, & Fish:: __dLength),
     X( this, & Fish:: __X ),
     Y( this, & Fish:: __Y ),
     dPerimeter(this, & Fish::__dPerimeter),
     Perimeter(this,  & Fish::__Perimeter),
     N( max_of<size_t>(1,userN) ),
+    Length(userL),
     Slices(N+2,as_capacity),
     Points(),
     Triangles(),
@@ -208,7 +209,7 @@ public:
         {
             zfn.target = (arc_length * i)/(N+1);
             const double zs = solve(zfn.call,0,1);
-            std::cerr << "\tz[" << i << "]=" << zs << std::endl;
+            //std::cerr << "\tz[" << i << "]=" << zs << std::endl;
             const double p = Perimeter(zs);
             if(p>max_perimeter) max_perimeter = p;
             pSlice       pS(new Slice(zs,p) );
@@ -221,13 +222,13 @@ public:
         //
         // pass 2: compute how many points per slices M = 2+2*n
         //______________________________________________________________________
-        std::cerr << "\t*** Finding Radial Slicing..." << std::endl;
+        std::cerr << "-- Finding Radial Slicing..." << std::endl;
         const double delta = 1.0/(N+1);
         const size_t n = max_of<size_t>(2,ceil(max_perimeter/delta))-2;
         const size_t M = 2+2*n;
-        std::cerr << "\t\tn=" << n << ", M=" << M << std::endl;
+        std::cerr << "\tn=" << n << ", M=" << M << std::endl;
 
-        std::cerr << "\t*** Computing Points..." << std::endl;
+        std::cerr << "-- Computing Points..." << std::endl;
         pPoint p0( new Point() );
         Points.push_back(p0);
         for(size_t i=1;i<=N;++i)
@@ -251,7 +252,7 @@ public:
         Points.push_back(pN);
         pN->r.z = 1;
 
-        std::cerr << "\t\t#Points=" << Points.size() << std::endl;
+        std::cerr << "\t#Points=" << Points.size() << std::endl;
 
         //______________________________________________________________________
         //
@@ -320,17 +321,32 @@ public:
         // pass 4: rescale
         //______________________________________________________________________
 
-        std::cerr << "\t\t#Triangles=" << Triangles.size() << std::endl;
-        std::cerr << "\t\t#Points   =" << Points.size()    << std::endl;
+        std::cerr << "\t#Triangles=" << Triangles.size() << std::endl;
+        std::cerr << "\t#Points   =" << Points.size()    << std::endl;
 
-        std::cerr << "\t*** Rescaling" << std::endl;
-        for(size_t i=1; i <= Points.size();++i)
+        std::cerr << "-- Rescaling" << std::endl;
+        const size_t NP = Points.size();
+        for(size_t i=1; i <= NP;++i)
         {
             Point &p = *Points[i];
             p.r.z -= 0.5;
+            p.r.x *= Length;
+            p.r.y *= Length;
+            p.r.z *= Length;
+
         }
 
-
+        //______________________________________________________________________
+        //
+        // pass 5: Other Geometry
+        //______________________________________________________________________
+        vtx_t G;
+        for(size_t i=1;i<=NP;++i)
+        {
+            G += Points[i]->r;
+        }
+        G *= 1.0/NP;
+        std::cerr << "G=" << G << std::endl;
     }
 
     inline ~Fish() throw()
@@ -450,10 +466,6 @@ private:
         return Hypotenuse(dX,dY);
     }
 
-    inline double __dLength(double z)
-    {
-        return Hypotenuse(1.0, drvs(Width,z,FTOL) );
-    }
 
     inline double __Perimeter( double z )
     {
@@ -481,9 +493,10 @@ YOCTO_PROGRAM_START()
     Lua::Function<double> Down(L,"Down",true);
     Lua::Function<double> Mix(L,"Mix",true);
     const size_t N = size_t(Lua::Config::Get<lua_Number>(L, "N"));
+    const double Length = size_t(Lua::Config::Get<lua_Number>(L, "Length"));
 
 
-    Fish fish(Width,Up,Down,Mix,N);
+    Fish fish(Width,Up,Down,Mix,N,Length);
 
     fish.save_vtk("fish.vtk");
     fish.save_stl("fish.stl");
