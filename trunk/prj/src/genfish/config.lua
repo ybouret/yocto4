@@ -1,7 +1,7 @@
 
 local sqrt = math.sqrt
 
-t=0.2;
+t=0.1;
 
 function Width(z)
 -- return sqrt(z*(1-z)^2);
@@ -22,5 +22,5 @@ return u^2;
 end
 
 
---N = 100;
-N = 20;
+N = 200;
+--N = 20;
