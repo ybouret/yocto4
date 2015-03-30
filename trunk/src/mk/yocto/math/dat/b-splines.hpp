@@ -74,11 +74,15 @@ namespace yocto {
                 //______________________________________________________________
                 const size_t np1 = 1+n;
                 const size_t l    = max_of(jlo,np1);
+                const size_t lmn  = l-n;
                 std::cerr << "\tl=" << l << std::endl;
 
                 const U tmp;
-                Tableau2D<U>(0,n,l-n,n,tmp);
-
+                Tableau2D<U> d(0,n,lmn,n,tmp);
+                for(size_t i=lmn;i<=n;++i)
+                {
+                    d[0][i] = P[i];
+                }
 
                 return 0;
             }
