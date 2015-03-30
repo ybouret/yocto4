@@ -75,13 +75,33 @@ namespace yocto {
                 const size_t np1 = 1+n;
                 const size_t l    = max_of(jlo,np1);
                 const size_t lmn  = l-n;
-                std::cerr << "\tl=" << l << std::endl;
+                assert(l<m);
+                assert(lmn>0);
+                std::cerr << "\tl=" << l << " / m=" << m << ", n=" << n << std::endl;
 
                 const U tmp;
                 Tableau2D<U> d(0,n,lmn,n,tmp);
                 for(size_t i=lmn;i<=n;++i)
                 {
                     d[0][i] = P[i];
+                }
+
+
+                for(size_t k=1;k<=n;++k)
+                {
+                    std::cerr << "\tk=" << k << std::endl;
+                    for(size_t i=lmn+k;i<=l;++i)
+                    {
+                        std::cerr << "\t\ti=" << i << std::endl;
+                        typename Tableau2D<U>::Row &d_k = d[k];
+                        const typename Tableau2D<U>::Row &d_km = d[k-1];
+                        std::cerr << "\t\ti+" << np1 << "-k=" << i+np1-k << std::endl;
+                        const T t_i   = t[i];
+                        //const T t_k   = t[(i+np1)-k];
+                        //const T alpha = (x-t_i)/( t[(i+np1)-k]-t_i );
+                        //const T alpha=1;
+                        //d_k[i] = (T(1)-alpha) * d[k-1][i-1];
+                    }
                 }
 
                 return 0;
