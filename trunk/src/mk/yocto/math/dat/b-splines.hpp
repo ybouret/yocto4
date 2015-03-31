@@ -2,7 +2,7 @@
 #define YOCTO_MK_DATA_BSPLINES_INCLUDED 1
 
 #include "yocto/math/types.hpp"
-#include "yocto/sequence/array.hpp"
+#include "yocto/sequence/vector.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/container/tab2d.hpp"
 
@@ -18,93 +18,114 @@ namespace yocto {
 
             //!
             /**
-             \param t assume increasingly ordered
+             \param x the value where to be computed
+             \param t assume increasingly ordered knots
+             \param P the control points
+             \param degree the degree of the B-splines
              */
-            static T compute( const T x, const array<T> &t, const array<U> &P, const size_t n )
+            static U compute( const T x, const array<T> &t, const array<U> &P, const size_t n )
             {
                 assert(t.size()>=2);
                 assert(t.size()==P.size());
-                assert(n<=t.size());
+                assert(n<t.size());
 
                 const size_t m = t.size();
 
-                //______________________________________________________________
-                //
-                //-- find the localisation
-                //______________________________________________________________
-                size_t jlo = 1;
+                if(x<=t[1])
                 {
-                    size_t jhi = m;
-                    if(x<=t[1])
+                    //__________________________________________________________
+                    //
+                    // first point
+                    //__________________________________________________________
+                    return P[1];
+                }
+                else
+                {
+                    if(x>=t[m])
                     {
-                        jhi = 2;
+                        //______________________________________________________
+                        //
+                        // last point
+                        //______________________________________________________
+                        return P[m];
                     }
                     else
                     {
-                        if(x>=t[n])
+                        const size_t ntot = 2*(n)+m;
+                        vector<T> u(ntot,as_capacity);
+                        vector<U> p(ntot,as_capacity);
+
+                        for(size_t i=1;i<=n;++i)
                         {
-                            jlo = m-1;
-                            jhi = m;
+                            u.push_back( t[1] );
+                            p.push_back( P[1] );
                         }
-                        else
+
+                        for(size_t i=1;i<=m;++i)
                         {
-                            while(jhi-jlo>1)
+                            u.push_back(t[i]);
+                            p.push_back(P[i]);
+                        }
+
+                        for(size_t i=1;i<=n;++i)
+                        {
+                            u.push_back( t[m] );
+                            p.push_back( P[m] );
+                        }
+
+                        //assert(u.size()==ntot);
+                        //assert(p.size()==ntot);
+
+                        //______________________________________________________
+                        //
+                        // bracket it
+                        //______________________________________________________
+                        size_t jlo = 1+n; // =n
+                        size_t jhi = m+n;
+
+                        while(jhi-jlo>1)
+                        {
+                            const size_t jmid = (jlo+jhi)>>1;
+                            const T      tmid = u[jmid];
+                            if(x>tmid)
                             {
-                                const size_t jmid = (jhi+jlo)>>1;
-                                const T      tmid = t[jmid];
-                                if(x>tmid)
-                                {
-                                    jlo = jmid;
-                                }
-                                else
-                                {
-                                    jhi = jmid;
-                                }
+                                jlo = jmid;
+                            }
+                            else
+                            {
+                                jhi = jmid;
+                            }
+                        }
+
+                        const size_t l = jlo;
+                        assert(l>=n);
+                        const U tmp;
+                        Tableau2D<U> d(0,n,l-n,l,tmp);
+                        for(size_t i=l-n;i<=l;++i)
+                        {
+                            d[0][i] = p[i];
+                        }
+
+                        for(size_t k=1;k<=n;++k)
+                        {
+                            for(size_t i=l-n+k;i<=l;++i)
+                            {
+                                const T u_i   = u[i];
+                                //const T alpha = (x-u_i)/(u[(i+n+k)-1]-u_i);
+                                const size_t j= (i+n+1) - k;
+                                //std::cerr << "j=" << j << " / " << ntot << std::endl;
+                                const T alpha = (x-u_i)/(u[j]-u_i);
+                                d[k][i] = (T(1)-alpha)* d[k-1][i-1] + alpha * d[k-1][i];
                             }
 
                         }
+
+                        return d[n][l];
                     }
-
-                    std::cerr << t[jlo] << " <= " << x << " <= " << t[jhi] << std::endl;
+                    
+                    
                 }
-
-                //______________________________________________________________
-                //
-                //-- algorithm
-                //______________________________________________________________
-                const size_t np1 = 1+n;
-                const size_t l    = max_of(jlo,np1);
-                const size_t lmn  = l-n;
-                assert(l<m);
-                assert(lmn>0);
-                std::cerr << "\tl=" << l << " / m=" << m << ", n=" << n << std::endl;
-
-                const U tmp;
-                Tableau2D<U> d(0,n,lmn,n,tmp);
-                for(size_t i=lmn;i<=n;++i)
-                {
-                    d[0][i] = P[i];
-                }
-
-
-                for(size_t k=1;k<=n;++k)
-                {
-                    std::cerr << "\tk=" << k << std::endl;
-                    for(size_t i=lmn+k;i<=l;++i)
-                    {
-                        std::cerr << "\t\ti=" << i << std::endl;
-                        typename Tableau2D<U>::Row &d_k = d[k];
-                        const typename Tableau2D<U>::Row &d_km = d[k-1];
-                        std::cerr << "\t\ti+" << np1 << "-k=" << i+np1-k << std::endl;
-                        const T t_i   = t[i];
-                        //const T t_k   = t[(i+np1)-k];
-                        //const T alpha = (x-t_i)/( t[(i+np1)-k]-t_i );
-                        //const T alpha=1;
-                        //d_k[i] = (T(1)-alpha) * d[k-1][i-1];
-                    }
-                }
-
-                return 0;
+                
             }
             
             
