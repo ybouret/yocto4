@@ -111,9 +111,7 @@ namespace yocto {
                             for(size_t i=l-n+k;i<=l;++i)
                             {
                                 const T u_i   = u[i];
-                                //const T alpha = (x-u_i)/(u[(i+n+k)-1]-u_i);
                                 const size_t j= (i+n+1) - k;
-                                //std::cerr << "j=" << j << " / " << ntot << std::endl;
                                 const T alpha = (x-u_i)/(u[j]-u_i);
                                 d[k][i] = (T(1)-alpha)* d[k-1][i-1] + alpha * d[k-1][i];
                             }
