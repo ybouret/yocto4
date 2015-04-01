@@ -7,12 +7,55 @@
 #include "yocto/container/tab2d.hpp"
 
 namespace yocto {
-
+    
     namespace math
     {
-
+        
+        inline size_t Cubic_Bspline_Index( const size_t i, const size_t j, const size_t m )
+        {
+            assert(i<=3);
+            assert(j>0);
+            assert(j<=m);
+            
+            if(j<=1)
+            {
+                // start points
+                switch(i)
+                {
+                    case 0:
+                    case 1:
+                    case 2:
+                        return 1;
+                    default:
+                        break;
+                }
+                return 2;
+            }
+            else
+            {
+                const size_t mm1 = m-1;
+                if(j>=mm1)
+                {
+                    // End points
+                    switch(i)
+                    {
+                        case 0:
+                            return mm1;
+                        default:
+                            break;
+                    }
+                    return m;
+                }
+                else
+                {
+                    
+                }
+            }
+            return j;
+        }
+        
         template <typename T,typename U>
-        U Cubic_Bsplines( const T tt, const array<T> &t, const array<U> &u )
+        inline U Cubic_Bsplines( const T tt, const array<T> &t, const array<U> &u )
         {
             assert(t.size()==u.size());
             const size_t m = t.size();
@@ -49,134 +92,30 @@ namespace yocto {
                             jhi = jmid;
                         }
                     }
-
+                    
+                    const T x  = (tt-t[jlo])/(t[jhi]-t[jlo]);
+                    const T x2 = x * x;
+                    const T ix = T(1)-x;
+                    const T x3 = x2*x;
+                    
+                    const T b0 = ix*ix*ix/6;
+                    const T b1 = (3*x3 - 6*x2 +4)/6;
+                    const T b2 = (-3*x3 +3*x2 + 3*x + 1)/6;
+                    const T b3 =  x3/6;
+                    
+                    const U P[4] = {
+                        u[Cubic_Bspline_Index(0,jlo,m)],
+                        u[Cubic_Bspline_Index(1,jlo,m)],
+                        u[Cubic_Bspline_Index(2,jlo,m)],
+                        u[Cubic_Bspline_Index(3,jlo,m)] };
+                    
+                    return b0 * P[0] + b1 * P[1] + b2 * P[2] + b3 * P[3];
+                    
                 }
             }
             
-            return U();
         }
         
-        template <typename T, typename U>
-        class Bsplines
-        {
-        public:
-
-            //!
-            /**
-             \param x the value where to be computed
-             \param t assume increasingly ordered knots
-             \param P the control points
-             \param degree the degree of the B-splines
-             */
-            static U compute( const T x, const array<T> &t, const array<U> &P, const size_t n )
-            {
-                assert(t.size()>=2);
-                assert(t.size()==P.size());
-                assert(n<t.size());
-
-                const size_t m = t.size();
-
-                if(x<=t[1])
-                {
-                    //__________________________________________________________
-                    //
-                    // first point
-                    //__________________________________________________________
-                    return P[1];
-                }
-                else
-                {
-                    if(x>=t[m])
-                    {
-                        //______________________________________________________
-                        //
-                        // last point
-                        //______________________________________________________
-                        return P[m];
-                    }
-                    else
-                    {
-                        const size_t ntot = 2*(n)+m;
-                        vector<T> u(ntot,as_capacity);
-                        vector<U> p(ntot,as_capacity);
-
-                        for(size_t i=1;i<=n;++i)
-                        {
-                            u.push_back( t[1] );
-                            p.push_back( P[1] );
-                        }
-
-                        for(size_t i=1;i<=m;++i)
-                        {
-                            u.push_back(t[i]);
-                            p.push_back(P[i]);
-                        }
-
-                        for(size_t i=1;i<=n;++i)
-                        {
-                            u.push_back( t[m] );
-                            p.push_back( P[m] );
-                        }
-
-                        //assert(u.size()==ntot);
-                        //assert(p.size()==ntot);
-
-                        //______________________________________________________
-                        //
-                        // bracket it
-                        //______________________________________________________
-                        size_t jlo = 1+n; // =n
-                        size_t jhi = m+n;
-
-                        while(jhi-jlo>1)
-                        {
-                            const size_t jmid = (jlo+jhi)>>1;
-                            const T      tmid = u[jmid];
-                            if(x>tmid)
-                            {
-                                jlo = jmid;
-                            }
-                            else
-                            {
-                                jhi = jmid;
-                            }
-                        }
-
-                        const size_t l = jlo;
-                        //const size_t l = jhi;
-                        assert(l>=n);
-                        const U tmp;
-                        Tableau2D<U> d(0,n,l-n,l,tmp);
-                        for(size_t i=l-n;i<=l;++i)
-                        {
-                            d[0][i] = p[i];
-                        }
-
-                        for(size_t k=1;k<=n;++k)
-                        {
-                            for(size_t i=l-n+k;i<=l;++i)
-                            {
-                                const T u_i   = u[i];
-                                const size_t j= (i+n+1) - k;
-                                const T alpha = (x-u_i)/(u[j]-u_i);
-                                d[k][i] = (T(1)-alpha)* d[k-1][i-1] + alpha * d[k-1][i];
-                            }
-
-                        }
-
-                        return d[n][l];
-                    }
-                    
-                    
-                }
-                
-            }
-            
-            
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(Bsplines);
-        };
         
     }
 }

@@ -16,7 +16,7 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
 
     typedef v2d<double> vtx_t;
 
-    size_t m=9;
+    size_t m=4;
     vector<vtx_t>  P(m,as_capacity);
     vector<double> t(m,as_capacity);
 
@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
         ios::ocstream fp("data.dat",false);
         for(size_t i=1;i<=t.size();++i)
         {
-            fp("%g %g %g\n", t[i], P[i].x, P[i].y);
+            fp("%g %g\n", P[i].x, P[i].y);
         }
     }
 
@@ -51,8 +51,8 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
         for(size_t i=0;i<=N;++i)
         {
             const double tt = (tmax*i)/N;
-            const vtx_t v = Bsplines<double,vtx_t>::compute(tt, t, P, 3);
-            fp("%g %g %g\n",tt,v.x,v.y);
+            const vtx_t v = Cubic_Bsplines(tt, t, P);
+            fp("%g %g\n",v.x,v.y);
         }
     }
     
