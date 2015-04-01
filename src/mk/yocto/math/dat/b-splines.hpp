@@ -11,6 +11,51 @@ namespace yocto {
     namespace math
     {
 
+        template <typename T,typename U>
+        U Cubic_Bsplines( const T tt, const array<T> &t, const array<U> &u )
+        {
+            assert(t.size()==u.size());
+            const size_t m = t.size();
+            
+            if(tt<=t[1])
+            {
+                return u[1];
+            }
+            else
+            {
+                if(tt>=t[m])
+                {
+                    return u[m];
+                }
+                else
+                {
+                    //______________________________________________________
+                    //
+                    // bracket it
+                    //______________________________________________________
+                    size_t jlo = 1;
+                    size_t jhi = m;
+                    
+                    while(jhi-jlo>1)
+                    {
+                        const size_t jmid = (jlo+jhi)>>1;
+                        const T      tmid = t[jmid];
+                        if(tt>tmid)
+                        {
+                            jlo = jmid;
+                        }
+                        else
+                        {
+                            jhi = jmid;
+                        }
+                    }
+
+                }
+            }
+            
+            return U();
+        }
+        
         template <typename T, typename U>
         class Bsplines
         {
@@ -98,6 +143,7 @@ namespace yocto {
                         }
 
                         const size_t l = jlo;
+                        //const size_t l = jhi;
                         assert(l>=n);
                         const U tmp;
                         Tableau2D<U> d(0,n,l-n,l,tmp);
