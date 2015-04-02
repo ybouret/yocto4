@@ -10,50 +10,7 @@ namespace yocto {
     
     namespace math
     {
-        
-        inline size_t Cubic_Bspline_Index( const size_t i, const size_t j, const size_t m )
-        {
-            assert(i<=3);
-            assert(j>0);
-            assert(j<=m);
-            
-            if(j<=1)
-            {
-                // start points
-                switch(i)
-                {
-                    case 0:
-                    case 1:
-                    case 2:
-                        return 1;
-                    default:
-                        break;
-                }
-                return 2;
-            }
-            else
-            {
-                const size_t mm1 = m-1;
-                if(j>=mm1)
-                {
-                    // End points
-                    switch(i)
-                    {
-                        case 0:
-                            return mm1;
-                        default:
-                            break;
-                    }
-                    return m;
-                }
-                else
-                {
-                    
-                }
-            }
-            return j;
-        }
-        
+#if 0
         template <typename T,typename U>
         inline U Cubic_Bsplines( const T tt, const array<T> &t, const array<U> &u )
         {
@@ -115,7 +72,75 @@ namespace yocto {
             }
             
         }
-        
+#endif
+
+        template <typename U>
+        struct Cubic_Bsplines
+        {
+            static inline const U &GetPoint(  const array<U> &Points,  unit_t i ) throw()
+            {
+                assert(Points.size()>0);
+                const unit_t num_points = Points.size();
+
+                if(i<=1)
+                {
+                    i=1;
+                }
+                else
+                {
+                    if(i>=num_points)
+                    {
+                        i = num_points;
+                    }
+                    else
+                    {
+
+                    }
+                }
+                return Points[i];
+
+            }
+
+            template <typename T> static inline
+            U Get( const T x, const array<U> &Points )
+            {
+                const unit_t num_points   = Points.size();
+                const unit_t num_segments = num_points + 1;
+                unit_t start_cv = -2;
+
+
+                // x: 0 -> 1: find the segment
+                const T      xscaled = x*num_segments;
+                const unit_t segment = Floor( xscaled );
+                const T      t       = (xscaled-segment);
+                if(segment>0)
+                {
+                    //exit(1);
+                }
+                //std::cerr << "x=" << x << std::endl;
+                //std::cerr << "xscaled=" << xscaled << std::endl;
+
+                start_cv += segment;
+
+                const T t2 = t*t;
+                const T it = T(1.0)-t;
+                const T t3 = t * t2;
+
+                // calculate blending functions for cubic bspline
+                const T b0 = it*it*it/T(6.0);
+                const T b1 = (3*t3 - 6*t2 + T(4.0))/T(6.0);
+                const T b2 = (-3*t3 +3*t2 + 3*t + T(1.0))/T(6.0);
+                const T b3 =  t3/T(6.0);
+
+                return
+                b0 * GetPoint(Points,start_cv+1) +
+                b1 * GetPoint(Points,start_cv+2) +
+                b2 * GetPoint(Points,start_cv+3) +
+                b3 * GetPoint(Points,start_cv+4);
+
+            }
+
+        };
         
     }
 }

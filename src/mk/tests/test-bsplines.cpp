@@ -16,52 +16,46 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
 
     typedef v2d<double> vtx_t;
 
-    size_t m=4;
+    size_t m=7;
     vector<vtx_t>  P(m,as_capacity);
-    vector<double> t(m,as_capacity);
 
-    t.push_back(0);
     P.push_back(vtx_t(0,0));
+
 
     for(size_t i=1;i<m;++i)
     {
-        const double tt = t.back() + 1;
-        const vtx_t  pp( tt, alea<double>());
+        const vtx_t  pp( alea<double>(), alea<double>());
 
-        t.push_back(tt);
         P.push_back(pp);
     }
 
-    const double tmax = t.back();
-    std::cerr << "0 -> " << tmax << std::endl;
+
 
     {
         ios::ocstream fp("data.dat",false);
-        for(size_t i=1;i<=t.size();++i)
+        for(size_t i=1;i<=P.size();++i)
         {
             fp("%g %g\n", P[i].x, P[i].y);
         }
     }
 
-
-
     {
         ios::ocstream fp("bspl.dat",false);
-        size_t N = 300;
-        for(size_t i=0;i<=N;++i)
+        for(double x=0;x<=1;x+=0.01)
         {
-            const double tt = (tmax*i)/N;
-            const vtx_t v = Cubic_Bsplines(tt, t, P);
-            fp("%g %g\n",v.x,v.y);
+            const vtx_t Q = Cubic_Bsplines<vtx_t>::Get<double>(x,P);
+            fp("%g %g\n", Q.x, Q.y);
         }
     }
 
+
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
 
 namespace {
-#if 1
+#if 0
 
     /// the points of the curve - these are the same as the bezier curve
     /// points demonstrated in the bezier curve example.
@@ -165,7 +159,7 @@ YOCTO_UNIT_TEST_IMPL(bspl)
 
     {
         ios::ocstream fp("bspl.dat",false);
-        int LOD = 5;
+        int LOD = 10;
         for(int start_cv=-3,j=0;j!=NUM_SEGMENTS;++j,++start_cv)
         {
             //glColor3f(rand()/(double)RAND_MAX,rand()/(double)RAND_MAX,rand()/(double)RAND_MAX);
@@ -185,6 +179,7 @@ YOCTO_UNIT_TEST_IMPL(bspl)
                 float b2 = (-3*t*t*t +3*t*t + 3*t + 1)/6.0f;
                 float b3 =  t*t*t/6.0f;
 
+#if 0
                 if(0==j)
                 {
                     std::cerr << "t=" << t
@@ -195,6 +190,7 @@ YOCTO_UNIT_TEST_IMPL(bspl)
                     << std::endl;
                     std::cerr << "points #" << start_cv + 0 << " -> " << start_cv + 3 << std::endl;
                 }
+#endif
 
                 // calculate the x,y and z of the curve point
                 float x =
@@ -214,7 +210,7 @@ YOCTO_UNIT_TEST_IMPL(bspl)
                 b1 * GetPoint( start_cv + 1 )[2] +
                 b2 * GetPoint( start_cv + 2 )[2] +
                 b3 * GetPoint( start_cv + 3 )[2] ;
-                
+
                 // specify the points
                 fp("%g %g %g\n", x,y,z);
             }
