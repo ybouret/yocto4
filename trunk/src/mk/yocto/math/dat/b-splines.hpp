@@ -3,7 +3,7 @@
 
 #include "yocto/math/types.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/code/utils.hpp"
+#include "yocto/math/fcn/drvs.hpp"
 
 namespace yocto {
     
@@ -83,11 +83,13 @@ namespace yocto {
         class CubicApproximation : public vector< VTX<T> >
         {
         public:
+
             typedef VTX<T>                vtx_t;
             typedef vector<vtx_t>         vector_type;
             typedef Cubic_Bsplines<vtx_t> approx_type;
 
-            explicit CubicApproximation() throw() : vector_type() {}
+            explicit CubicApproximation() throw() :
+            vector_type() {}
             virtual ~CubicApproximation() throw()  {}
             inline   CubicApproximation(const CubicApproximation &other) : vector_type(other) {}
 
@@ -111,6 +113,7 @@ namespace yocto {
             {
                 return approx_type::template Get<T>(x,*this).z;
             }
+
 
         private:
             YOCTO_DISABLE_ASSIGN(CubicApproximation);
