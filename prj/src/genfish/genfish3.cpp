@@ -447,6 +447,58 @@ public:
         
     }
 
+    inline void __stl( ios::ostream &fp, const Point &p ) const
+    {
+        fp("   vertex %.6g %.6g %.6g\n", p.r.x, p.r.y,p.r.z);
+    }
+
+    void save_stl( const string &filename ) const
+    {
+        ios::ocstream fp(filename,false);
+
+        fp("solid fish\n");
+
+        const size_t NT = Triangles.size();
+        for(size_t i=1;i<=NT;++i)
+        {
+            const Triangle &tr = Triangles[i];
+            fp(" facet normal %.6g %.6g %.6g\n",tr.n.x,tr.n.y,tr.n.z);
+            fp("  outer loop\n");
+            __stl(fp, *tr.a);
+            __stl(fp, *tr.b);
+            __stl(fp, *tr.c);
+            fp("  end loop\n");
+            fp(" end facet\n");
+        }
+        fp("endsolid\n");
+    }
+
+
+    void save_stl_half(const string &filename ) const
+    {
+        ios::ocstream fp(filename,false);
+
+        fp("solid half_fish\n");
+
+        const size_t NT = Triangles.size();
+        for(size_t i=1;i<=NT;++i)
+        {
+            const Triangle &tr = Triangles[i];
+            if(tr.a->r.x>0||tr.b->r.x>=0||tr.c->r.x>=0)
+            {
+                continue;
+            }
+            fp(" facet normal %.6g %.6g %.6g\n",tr.n.x,tr.n.y,tr.n.z);
+            fp("  outer loop\n");
+            __stl(fp, *tr.a);
+            __stl(fp, *tr.b);
+            __stl(fp, *tr.c);
+            fp("  end loop\n");
+            fp(" end facet\n");
+        }
+        fp("endsolid\n");
+
+    }
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Fish);
@@ -467,8 +519,9 @@ YOCTO_PROGRAM_START()
     Fish fish(L);
     
     fish.save_vtk("fish.vtk");
-    
-    
-    
+    fish.save_stl("fish.stl");
+    fish.save_stl_half("half_fish.stl");
+
+
 }
 YOCTO_PROGRAM_END()
