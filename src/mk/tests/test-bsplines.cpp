@@ -165,7 +165,7 @@ YOCTO_UNIT_TEST_IMPL(bspl)
 
     {
         ios::ocstream fp("bspl.dat",false);
-        int LOD = 1;
+        int LOD = 5;
         for(int start_cv=-3,j=0;j!=NUM_SEGMENTS;++j,++start_cv)
         {
             //glColor3f(rand()/(double)RAND_MAX,rand()/(double)RAND_MAX,rand()/(double)RAND_MAX);
@@ -193,6 +193,7 @@ YOCTO_UNIT_TEST_IMPL(bspl)
                     << ", b2= " << b2
                     << ", b3= " << b3
                     << std::endl;
+                    std::cerr << "points #" << start_cv + 0 << " -> " << start_cv + 3 << std::endl;
                 }
 
                 // calculate the x,y and z of the curve point
@@ -218,6 +219,8 @@ YOCTO_UNIT_TEST_IMPL(bspl)
                 fp("%g %g %g\n", x,y,z);
             }
         }
+        // and the last point
+        fp("%g %g %g\n",Points[NUM_POINTS-1][0],Points[NUM_POINTS-1][1],Points[NUM_POINTS-1][2] );
     }
     
 }
