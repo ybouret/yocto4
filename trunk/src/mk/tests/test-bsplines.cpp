@@ -8,6 +8,9 @@
 #include "yocto/math/v2d.hpp"
 #include "yocto/code/rand.hpp"
 
+#include "yocto/math/fcn/drvs.hpp"
+
+
 using namespace yocto;
 using namespace math;
 
@@ -17,7 +20,8 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
     typedef v2d<double> vtx_t;
 
     size_t m=7;
-    vector<vtx_t>  P(m,as_capacity);
+    CubicApproximation<double,v2d>  P;
+    P.reserve(m);
 
     P.push_back(vtx_t(0,0));
 
@@ -39,13 +43,24 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
         }
     }
 
+    derivative<double> drvs;
+
     {
         ios::ocstream fp("bspl.dat",false);
+        ios::ocstream dp("drvs.dat",false);
+
+        numeric<double>::function XX( &P, & CubicApproximation<double,v2d>::X );
+        numeric<double>::function YY( &P, & CubicApproximation<double,v2d>::Y );
+
         for(double x=0;x<=1;x+=0.01)
         {
-            const vtx_t Q = Cubic_Bsplines<vtx_t>::Get<double>(x,P);
-            fp("%g %g\n", Q.x, Q.y);
+            const vtx_t Q = P.Compute(x);
+            fp("%g %g %g\n", Q.x, Q.y, x);
+            dp("%g %g %g\n", x, drvs(XX,x,1e-4), drvs(YY,x,1e-4) );
+
         }
+
+
     }
 
 
