@@ -8,7 +8,7 @@
 #include "yocto/math/v2d.hpp"
 #include "yocto/code/rand.hpp"
 
-#include "yocto/math/fcn/drvs.hpp"
+#include "yocto/math/fcn/intg.hpp"
 
 
 using namespace yocto;
@@ -17,7 +17,7 @@ using namespace math;
 YOCTO_UNIT_TEST_IMPL(bsplines)
 {
 
-    typedef v2d<double> vtx_t;
+    typedef v2d<double>                    vtx_t;
     typedef CubicApproximation<double,v2d> Approx;
     size_t m=4+alea_lt(5);
     Approx P;
@@ -43,8 +43,8 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
         }
     }
 
-    CubicDifferential< Approx > diff( &P, & Approx::X, & Approx::Y );
 
+    integrator<double> intg;
     {
         ios::ocstream fp("bspl.dat",false);
         ios::ocstream dp("drvs.dat",false);
@@ -53,12 +53,15 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
         dp("0 0\n");
         for(size_t i=0;i<=M;++i)
         {
-            const double x = double(i)/M;
-            fp("%g %g\n", P.X(x), P.Y(x));
+            const double x  = double(i)/M;
+            const vtx_t  Q  = P.Compute(x);
+            const vtx_t  dQ = P.Tangent(x);
+            //fp("%g %g\n", P.X(x), P.Y(x));
+            fp("%g %g %g %g\n", Q.x, Q.y, dQ.x, dQ.y);
             if(i<M)
             {
-                sum += diff.arc_length(x,double(i+1)/M);
-                dp("%g %g\n", x, sum );
+                sum += intg(double(i)/M,double(i+1)/M,P.dS,1e-4);
+                dp("%g %g %g\n", x,  sum, P.dS(x));
             }
         }
     }
