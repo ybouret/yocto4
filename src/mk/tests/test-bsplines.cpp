@@ -18,9 +18,9 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
 {
 
     typedef v2d<double> vtx_t;
-
-    size_t m=7;
-    CubicApproximation<double,v2d>  P;
+    typedef CubicApproximation<double,v2d> Approx;
+    size_t m=4+alea_lt(5);
+    Approx P;
     P.reserve(m);
 
     P.push_back(vtx_t(0,0));
@@ -43,25 +43,26 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
         }
     }
 
-    derivative<double> drvs;
+    CubicDifferential< Approx > diff( &P, & Approx::X, & Approx::Y );
 
     {
         ios::ocstream fp("bspl.dat",false);
         ios::ocstream dp("drvs.dat",false);
-
-        numeric<double>::function XX( &P, & CubicApproximation<double,v2d>::X );
-        numeric<double>::function YY( &P, & CubicApproximation<double,v2d>::Y );
-
-        for(double x=0;x<=1;x+=0.01)
+        const size_t M = 200;
+        double sum = 0;
+        dp("0 0\n");
+        for(size_t i=0;i<=M;++i)
         {
-            const vtx_t Q = P.Compute(x);
-            fp("%g %g %g\n", Q.x, Q.y, x);
-            dp("%g %g %g\n", x, drvs(XX,x,1e-4), drvs(YY,x,1e-4) );
-
+            const double x = double(i)/M;
+            fp("%g %g\n", P.X(x), P.Y(x));
+            if(i<M)
+            {
+                sum += diff.arc_length(x,double(i+1)/M);
+                dp("%g %g\n", x, sum );
+            }
         }
-
-
     }
+
 
 
     
