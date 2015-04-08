@@ -4,6 +4,7 @@
 #include "yocto/math/types.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/math/fcn/drvs.hpp"
 
 namespace yocto {
 
@@ -28,10 +29,9 @@ namespace yocto {
             //
             // x: 0 -> 1: find the segment
             //______________________________________________________________
-            x = clamp<T>(0,x,1);
-            const T      xscaled = x*num_segments;
+            const T      xscaled = clamp<T>(0,x,1)*num_segments;
             const unit_t segment = Floor( xscaled );
-            const T      t       = (xscaled-segment);
+            const T      t       = (x*num_segments-segment);
 
             //______________________________________________________________
             //
@@ -59,23 +59,6 @@ namespace yocto {
             b3 * Points[clamp<unit_t>(1,start_cv+4,num_points)];
         }
 
-        //______________________________________________________________________
-        //
-        // Tangent vector approximation
-        //______________________________________________________________________
-        template <typename T,typename U>
-        inline U Cubic_Bsplines_Tangent( T x, const array<U> &Points ) throw()
-        {
-            //! scaling for x=0.5
-            static const T h_opt = Pow(numeric<T>::epsilon,T(1.0)/T(3.0))*T(0.5);
-
-            volatile T tmp = x + h_opt;
-            const    T h   = tmp-x;
-            const    U lo  = Cubic_Bsplines<T,U>(x-h,Points);
-            const    U hi  = Cubic_Bsplines<T,U>(x+h,Points);
-            return (T(1.0)/(h+h)) * (hi-lo);
-        }
-
 
 
         template <
@@ -85,21 +68,30 @@ namespace yocto {
         class CubicApproximation : public vector< VTX<T> >
         {
         public:
-            typedef T                     type;
-            typedef VTX<T>                vtx_t;
-            static const size_t           DIM = sizeof(vtx_t)/sizeof(type);
-            typedef vector<vtx_t>         vector_type;
 
-            typename numeric<T>::function dS;
+            typedef T                             type;
+            typedef VTX<T>                        vtx_t;
+            typedef vector<vtx_t>                 vec_t;
+            typedef typename numeric<T>::function fcn_t;
+            static const size_t                   DIM = sizeof(vtx_t)/sizeof(type);
+
+            fcn_t                   dArc;
+            mutable derivative<T>   drvs;
 
             explicit CubicApproximation() :
-            vector_type(),
-            dS( this, & CubicApproximation:: dLength )
+            vec_t(),
+            dArc(  this, & CubicApproximation:: d_length  ),
+            coord( this, & CubicApproximation:: get_coord ),
+            indx(0)
             {}
+
             virtual ~CubicApproximation() throw()  {}
+
             inline   CubicApproximation(const CubicApproximation &other) :
-            vector_type(other),
-            dS(other.dS)
+            vec_t(other),
+            dArc(  this, & CubicApproximation:: d_length  ),
+            coord( this, & CubicApproximation:: get_coord ),
+            indx(0)
             {}
 
 
@@ -110,42 +102,46 @@ namespace yocto {
 
             inline vtx_t Tangent( const T x ) const throw()
             {
-                return Cubic_Bsplines_Tangent(x,*this);
+                // optimal step for x around 0.5
+                static const T h_opt = Pow(numeric<T>::epsilon,T(1.0)/T(3.0))*T(0.5);
+                vtx_t q;
+                type *p = (type *)&q;
+                for(indx=0;indx<DIM;++indx)
+                {
+                    p[indx] = drvs(coord,x,h_opt);
+                }
+                return q;
             }
 
-            inline T X( const T x ) const throw()
-            {
-                return Cubic_Bsplines(x,*this).x;
-            }
-
-            inline T Y( const T x ) const throw()
-            {
-                return Cubic_Bsplines(x,*this).y;
-            }
-
-            inline T Z( const T x ) const throw()
-            {
-                return Cubic_Bsplines(x,*this).z;
-            }
 
         private:
             YOCTO_DISABLE_ASSIGN(CubicApproximation);
+            mutable fcn_t  coord;
+            mutable size_t indx; //!< to get derivative
 
-            inline T dLength( const T x ) const throw()
+            inline T get_coord( const T x )
             {
-                const vtx_t Q = Cubic_Bsplines_Tangent(x,*this);
+                assert(indx<DIM);
+                const vtx_t p = Compute(x);
+                const T    *q = (const T *)&p;
+                return      q[indx];
+            }
+
+            inline T d_length( const T x ) throw()
+            {
+                const vtx_t q = Tangent(x);
                 T sum(0);
-                const T *q = (const T *)&Q;
+                const T *p = (const T*)&q;
                 for(size_t i=0;i<DIM;++i)
                 {
-                    sum += Square(q[i]);
+                    sum += Square(p[i]);
                 }
                 return Sqrt(sum);
             }
-
+            
         };
-
-
+        
+        
         
         
     }

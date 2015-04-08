@@ -60,8 +60,8 @@ YOCTO_UNIT_TEST_IMPL(bsplines)
             fp("%g %g %g %g\n", Q.x, Q.y, dQ.x, dQ.y);
             if(i<M)
             {
-                sum += intg(double(i)/M,double(i+1)/M,P.dS,1e-4);
-                dp("%g %g %g\n", x,  sum, P.dS(x));
+                sum += intg(double(i)/M,double(i+1)/M,P.dArc,1e-4);
+                dp("%g %g %g\n", x,  sum, P.dArc(x));
             }
         }
     }
