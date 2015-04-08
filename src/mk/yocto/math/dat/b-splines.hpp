@@ -100,6 +100,22 @@ namespace yocto {
                 return Cubic_Bsplines(x,*this);
             }
 
+            inline T X(const T x) const throw()
+            {
+                return Compute(x).x;
+            }
+
+            inline T Y(const T x) const throw()
+            {
+                return Compute(x).y;
+            }
+
+            inline T Z(const T x) const throw()
+            {
+                return Compute(x).z;
+            }
+
+
             inline vtx_t Tangent( const T x ) const throw()
             {
                 // optimal step for x around 0.5
