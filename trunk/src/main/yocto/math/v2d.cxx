@@ -149,7 +149,7 @@ namespace yocto {
 #else
 		template <>
 		real_t v2d<real_t>:: norm() const throw() {
-			return  abs(x) +  abs(y);
+            return  std::abs(x) +  std::abs(y);
 		}
 #endif
 		

@@ -114,7 +114,7 @@ namespace yocto {
 #else
 		template <>
 		real_t v3d<real_t>:: norm() const throw() {
-			return abs(x) + abs(y) + abs(z);
+            return std::abs(x) + std::abs(y) + std::abs(z);
 		}
 #endif
 		
