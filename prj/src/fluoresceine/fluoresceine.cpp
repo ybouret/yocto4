@@ -1,14 +1,15 @@
 #include "ui.h"
 #include "yocto/math/fcn/zfind.hpp"
 #include "yocto/string/conv.hpp"
-#include "yocto/chemical/solution.hpp"
+#include "yocto/chemical/boot.hpp"
+#include "yocto/chemical/equilibria.hpp"
 
 using namespace math;
 
 namespace
 {
     
-    class Fluoresceine : public collection
+    class Fluoresceine : public library
     {
     public:
         
@@ -41,7 +42,7 @@ namespace
             add("Na+",  1); // 5
             add("Cl-", -1); // 6
             
-            collection &lib = *this;
+            library &lib = *this;
             
             //==================================================================
             // Create the chemical system
