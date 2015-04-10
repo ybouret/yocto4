@@ -33,6 +33,7 @@ namespace yocto
                 const unit_t x,y;
                 YOCTO_MAKE_OBJECT
                 inline coord(const unit_t X, const unit_t Y) throw():
+		next(0),prev(0),
                 x(X), y(Y)
                 {
                 };
