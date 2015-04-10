@@ -30,7 +30,7 @@ namespace yocto {
             // x: 0 -> 1: find the segment
             //______________________________________________________________
             const T      xscaled = clamp<T>(0,x,1)*num_segments;
-            const unit_t segment = Floor( xscaled );
+            const unit_t segment = unit_t(Floor( xscaled ));
             const T      t       = (x*num_segments-segment);
 
             //______________________________________________________________
@@ -81,6 +81,7 @@ namespace yocto {
             explicit CubicApproximation() :
             vec_t(),
             dArc(  this, & CubicApproximation:: d_length  ),
+	    drvs(),
             coord( this, & CubicApproximation:: get_coord ),
             indx(0)
             {}
@@ -90,6 +91,7 @@ namespace yocto {
             inline   CubicApproximation(const CubicApproximation &other) :
             vec_t(other),
             dArc(  this, & CubicApproximation:: d_length  ),
+	    drvs(),
             coord( this, & CubicApproximation:: get_coord ),
             indx(0)
             {}

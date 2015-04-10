@@ -6,7 +6,7 @@
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/math/alg/spike.hpp"
-#include "yocto/sort/heap.hpp"
+#include "yocto/sort/quick.hpp"
 
 #include <cstdlib>
 
@@ -86,7 +86,8 @@ void perform_psd( const size_t p, const size_t q, const size_t K)
     vector<spike::pointer> spikes;
     spike::detect(spikes,psd[1]);
     std::cerr << "detected " << spikes.size() << " spikes" << std::endl;
-    hsort(spikes,spike::compare_by_position);
+    int (*sort_proc)(const spike::pointer &,const spike::pointer &) = spike::compare_by_position;
+    quicksort((array<spike::pointer>&)spikes,sort_proc);
     {
         ios::ocstream fp("spikes.dat",false);
         for(size_t i=1;i<=spikes.size();++i)
@@ -108,3 +109,4 @@ YOCTO_UNIT_TEST_IMPL(psd)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
