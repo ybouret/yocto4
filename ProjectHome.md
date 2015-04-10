@@ -1,0 +1,1 @@
+This is a little multithreaded cross platform library, in C++.
