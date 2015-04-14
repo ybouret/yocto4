@@ -56,11 +56,13 @@ namespace yocto {
             return true;
         }
         
-        
+
+#define __XCHECK() assert(x.c>=x.b);assert(x.b>=x.a);assert(x.c>=x.a)
+
         template <>
 		real_t zfind<real_t>::run(numeric<real_t>::function &func,
-                                triplet<real_t>           &x,
-                                triplet<real_t>           &f) const {
+                                triplet<real_t>             &x,
+                                triplet<real_t>             &f) const {
 			assert(f.a*f.c<=0.0);
 			assert(this->xerr>=0.0);
             
@@ -69,7 +71,7 @@ namespace yocto {
 			// prepare
 			//
 			//------------------------------------------------------------------
-			if( x.a >= x.c )
+			if( x.a > x.c )
 			{
 				cswap( x.a, x.c );
 				cswap( f.a, f.c );
@@ -92,7 +94,7 @@ namespace yocto {
 				const real_t w     = x.c - x.a;
 				const real_t h     = REAL(0.5) * w;
                 
-				x.b = x.a + h;
+                x.b = clamp(x.a, x.a+h, x.c); __XCHECK();
 				f.b = func( x.b );
                 
 				//--------------------------------------------------------------
@@ -101,10 +103,7 @@ namespace yocto {
 				//
 				//--------------------------------------------------------------
 				const real_t D  = Sqrt( (f.b * f.b) - (f.a*f.c) );
-				//std::cout << "[zfind: X=" << x << "]" << std::endl;
-				//std::cout << "[zfind: F=" << f << "]" << std::endl;
-				//std::cout << "[zfind: D=" << D << "]" << std::endl;
-                
+
 				real_t rho = 0;
 				if( f.b <= -D )
 				{
@@ -125,7 +124,7 @@ namespace yocto {
 				// ENTER: Ridders' step: There are 8 sub-cases
 				//
 				//--------------------------------------------------------------
-                
+                __XCHECK();
 				if( f.a <= f.c )
 				{
 					assert(f.a<=0);
@@ -136,6 +135,9 @@ namespace yocto {
 					//
 					//----------------------------------------------------------
 					const real_t xd = clamp<real_t>( x.a, x.b -  rho * h, x.c);
+                    assert(xd>=x.a);
+                    assert(xd<=x.c);
+                    
 					const real_t fd = func( xd );
 					if( f.b >= REAL(0.0) )
 					{
@@ -146,12 +148,15 @@ namespace yocto {
 						{
 							x.b = x.c = xd;
 							f.b = f.c = fd;
-						} else
+                            __XCHECK();
+						}
+                        else
 						{
 							x.c = x.b;
 							f.c = f.b;
 							x.a = xd;
 							f.a = fd;
+                            __XCHECK();
 						}
 						//------------------------------------------------------
 						//-- LEAVE: f.a <= f.c && f.b >= 0
@@ -168,11 +173,13 @@ namespace yocto {
 							f.a = f.b;
 							x.c = xd;
 							f.c = fd;
+                            __XCHECK();
 						}
 						else
 						{
 							x.a = x.b = xd;
 							f.a = f.b = fd;
+                            __XCHECK();
 						}
 						//------------------------------------------------------
 						//-- LEAVE: f.a <= f.c && f.b < 0
@@ -194,6 +201,8 @@ namespace yocto {
 					//
 					//----------------------------------------------------------
 					const real_t xd = clamp<real_t>( x.a, x.b + rho * h, x.c);
+                    assert(xd>=x.a);
+                    assert(xd<=x.c);
 					const real_t fd = func( xd );
 					if( f.b >= REAL(0.0) )
 					{
@@ -204,6 +213,7 @@ namespace yocto {
 						{
 							x.a = x.b = xd;
 							f.a = f.b = fd;
+                            __XCHECK();
 						}
 						else
 						{
@@ -211,6 +221,7 @@ namespace yocto {
 							f.a = f.b;
 							x.c = xd;
 							f.c = fd;
+                            __XCHECK();
 						}
 						//------------------------------------------------------
 						//-- LEAVE: f.a > f.c && f.b >= 0
@@ -227,11 +238,13 @@ namespace yocto {
 							f.a = fd;
 							x.c = x.b;
 							f.c = f.b;
+                            __XCHECK();
 						}
 						else
 						{
 							x.c = x.b = xd;
 							f.c = f.b = fd;
+                            __XCHECK();
 						}
 						//------------------------------------------------------
 						//-- LEAVE: f.a > f.c && f.b < 0
@@ -249,7 +262,10 @@ namespace yocto {
 				// LEAVE: Ridders' step
 				//
 				//--------------------------------------------------------------
-                
+                if(!(x.c>=x.a))
+                {
+                    std::cerr << "x.a=" << x.a << ", x.c=" << x.c << std::endl;
+                }
 				assert(x.c>=x.a);
                 const real_t new_dx = Fabs(x.c-x.a);
                 if(new_dx>=old_dx)
