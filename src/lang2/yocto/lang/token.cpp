@@ -67,14 +67,6 @@ namespace yocto
             }
         }
 
-        token:: token( const string &s ) : t_list()
-        {
-            for(size_t i=0;i<s.size();++i)
-            {
-                push_back( new t_char(s[i]) );
-            }
-        }
-
         string token:: to_string() const
         {
             string ans(size,as_capacity);

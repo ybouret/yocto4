@@ -43,8 +43,8 @@ namespace yocto
             token & operator=( const token &other);
             virtual ~token() throw();
             token(const string &);
-            token(const char   C);
-            token(const char  *s);
+            token(const char    );
+            token(const char  * );
             
 
             friend std::ostream & operator<<( std::ostream &os, const token &);
