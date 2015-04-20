@@ -18,8 +18,32 @@ namespace yocto
 
         bool NOT:: match(Y_LANG_PATTERN_MATCH_ARGS) const
         {
+
+
+            token stk;
+
+            //! does anyone match ?
+            for(const pattern *p=operands.head;p;p=p->next)
+            {
+                if(p->match(stk,src,fp))
+                {
+                    src.unget(stk);
+                    return false;
+                }
+            }
             
-            return false;
+            // nobody matched...
+            if(!src.peek(fp))
+            {
+                // EOF => false
+                return false;
+            }
+            else
+            {
+                // a not matching char...
+                tkn.push_back( src.get(fp) );
+                return true;
+            }
         }
 
         logical *NOT::create()

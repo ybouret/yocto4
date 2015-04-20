@@ -36,6 +36,12 @@ YOCTO_UNIT_TEST_IMPL(pattern)
         q->append(lang::single::create('b'));
     }
 
+    {
+        lang::logical *q = lang::NOT::create();
+        p.reset(q);
+        q->append(lang::single::create('a'));
+        q->append(lang::single::create('b'));
+    }
 
     while( src.peek(fp) )
     {
