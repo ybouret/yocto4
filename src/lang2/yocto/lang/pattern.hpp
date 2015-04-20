@@ -14,8 +14,8 @@ namespace yocto
         class pattern : public object
         {
         public:
-            pattern *next;
-            pattern *prev;
+            pattern       *next;
+            pattern       *prev;
             const uint32_t uuid;
             virtual ~pattern() throw();
 
@@ -27,8 +27,8 @@ namespace yocto
              if matching, content is append to tkn,
              must be left untouched otherwise !
              */
-            virtual bool     match( Y_LANG_PATTERN_MATCH_ARGS ) const = 0;
-
+            virtual bool        match( Y_LANG_PATTERN_MATCH_ARGS ) const = 0;
+            virtual const void *content() const throw(); //!< internal content, default is NULL
 
         protected:
             explicit pattern(uint32_t ID) throw();
@@ -45,9 +45,7 @@ namespace yocto
             explicit p_list() throw();
             virtual ~p_list() throw();
             p_list(const p_list &);
-
             p_list & operator=(const p_list &);
-
         };
 
     }

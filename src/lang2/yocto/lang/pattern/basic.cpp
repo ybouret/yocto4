@@ -86,6 +86,8 @@ namespace yocto
         {
             return new single(C);
         }
+
+        const void *single:: content() const throw() { return &code; }
     }
     
 }

@@ -17,8 +17,10 @@ namespace yocto
         pattern:: pattern(const pattern &other) throw() :
         uuid(other.uuid)
         {}
-        
-        
+
+        const void *pattern:: content() const throw() { return 0; }
+
+
     }
 }
 
@@ -46,5 +48,6 @@ namespace yocto
         }
 
     }
+
 
 }

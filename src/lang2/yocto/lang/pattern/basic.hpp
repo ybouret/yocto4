@@ -67,6 +67,7 @@ namespace yocto
 
             virtual pattern *clone() const;
             static  pattern *create(code_t C);
+            virtual const void *content() const throw();
 
         private:
             single(code_t C) throw();
