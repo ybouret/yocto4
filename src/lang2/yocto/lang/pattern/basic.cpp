@@ -72,7 +72,7 @@ namespace yocto
 
         single:: single(code_t C) throw() : one_char( single::UUID ), code(C) {}
 
-        bool single::is_valid(code_t) const throw() { return true; }
+        bool single::is_valid(code_t C) const throw() { return code==C; }
 
         single:: single(const single &other) throw(): one_char(*this), code(other.code) {}
 

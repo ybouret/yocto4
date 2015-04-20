@@ -13,6 +13,8 @@ YOCTO_UNIT_TEST_IMPL(pattern)
     lang::token   tkn;
     auto_ptr<lang::pattern> p( lang::any1::create() );
 
+    p.reset( lang::single::create('a') );
+
     while( src.peek(fp) )
     {
         if(p->match(tkn, src, fp))
