@@ -34,6 +34,18 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(pattern);
         };
 
+        //! a list of pattern
+        class p_list : public core::list_of_cpp<pattern>
+        {
+        public:
+            explicit p_list() throw();
+            virtual ~p_list() throw();
+            p_list(const p_list &);
+
+            p_list & operator=(const p_list &);
+
+        };
+
     }
 }
 
