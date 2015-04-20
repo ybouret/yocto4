@@ -4,7 +4,7 @@ namespace yocto
 {
     namespace lang
     {
-        pattern:: pattern(uint32_t ID) throw() : uuid(ID)
+        pattern:: pattern(uint32_t ID) throw() : next(0), prev(0), uuid(ID)
         {
         }
 

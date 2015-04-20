@@ -14,6 +14,8 @@ namespace yocto
         class pattern : public object
         {
         public:
+            pattern *next;
+            pattern *prev;
             const uint32_t uuid;
             virtual ~pattern() throw();
 
