@@ -11,7 +11,7 @@ namespace yocto
 
 #define Y_LANG_PATTERN_MATCH_ARGS token &tkn, source &src, ios::istream &fp
 
-        class pattern : public object
+        class pattern : public counted_object
         {
         public:
             pattern       *next;
