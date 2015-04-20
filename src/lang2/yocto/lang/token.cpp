@@ -53,7 +53,28 @@ namespace yocto
             }
             return os;
         }
-        
+
+        token:: token(const char C) : t_list()
+        {
+            push_back( new t_char(C) );
+        }
+
+        token:: token( const string &s ) : t_list()
+        {
+            for(size_t i=0;i<s.size();++i)
+            {
+                push_back( new t_char(s[i]) );
+            }
+        }
+
+        token:: token( const string &s ) : t_list()
+        {
+            for(size_t i=0;i<s.size();++i)
+            {
+                push_back( new t_char(s[i]) );
+            }
+        }
+
         string token:: to_string() const
         {
             string ans(size,as_capacity);
@@ -63,7 +84,16 @@ namespace yocto
             }
             return ans;
         }
-        
+
+        token:: token( const char *s ) : t_list()
+        {
+            const size_t n = length_of(s);
+            for(size_t i=0;i<n;++i)
+            {
+                push_back( new t_char(s[i]) );
+            }
+
+        }
     }
 
 }

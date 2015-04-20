@@ -38,11 +38,15 @@ namespace yocto
         class token : public t_list
         {
         public:
-            explicit token() throw();
+            token() throw();
             token(const token &other);
             token & operator=( const token &other);
             virtual ~token() throw();
+            token(const string &);
+            token(const char   C);
+            token(const char  *s);
             
+
             friend std::ostream & operator<<( std::ostream &os, const token &);
             
             string to_string() const;
