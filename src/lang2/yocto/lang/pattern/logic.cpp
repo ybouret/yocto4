@@ -12,6 +12,11 @@ namespace yocto
 
         logical:: logical(const logical &other) : pattern(other), operands(other.operands) {}
 
-        
+        void logical:: append( pattern *p ) throw()
+        {
+            assert(p);
+            operands.push_back(p);
+        }
+
     }
 }

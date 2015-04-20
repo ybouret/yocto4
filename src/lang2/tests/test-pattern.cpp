@@ -1,4 +1,5 @@
 #include "yocto/lang/pattern/basic.hpp"
+#include "yocto/lang/pattern/logic.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ptr/auto.hpp"
@@ -20,7 +21,14 @@ YOCTO_UNIT_TEST_IMPL(pattern)
     p.reset(m);
     m->add('a');
     m->add('b');
-    
+
+    {
+        lang::logical *q = lang::AND::create();
+        p.reset(q);
+        q->append(lang::range::create('a','z'));
+        q->append(lang::range::create('a','z'));
+    }
+
 
     while( src.peek(fp) )
     {
