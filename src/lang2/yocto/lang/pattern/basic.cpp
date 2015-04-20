@@ -89,3 +89,64 @@ namespace yocto
     }
     
 }
+
+
+namespace yocto
+{
+    namespace lang
+    {
+        range:: ~range() throw() {}
+
+        range:: range(code_t lo, code_t hi) throw() : one_char( single::UUID ), lower(lo), upper(hi) {}
+
+        bool range::is_valid(code_t C) const throw() { return (C>=lower) && (C<=upper); }
+
+        range:: range(const range &other) throw(): one_char(*this), lower(other.lower), upper(other.upper) {}
+
+
+        pattern * range:: clone() const
+        {
+            return new range(*this);
+        }
+
+        pattern *range:: create(code_t lo, code_t hi)
+        {
+            if(lo>hi)
+            {
+                cswap(lo, hi);
+            }
+            return new range(lo,hi);
+        }
+    }
+    
+}
+
+namespace yocto
+{
+    namespace lang
+    {
+        multi::~multi() throw()
+        {
+        }
+
+        multi:: multi() throw() : one_char( multi::UUID ), codes() {}
+
+
+        multi:: multi(const multi &other) : one_char(other), codes(other.codes) {}
+
+        bool multi:: is_valid(code_t C)const throw() { return codes.search(C); }
+
+        multi *multi::create() { return new multi(); }
+
+        pattern *multi:: clone() const
+        {
+            return new multi(*this);
+        }
+        
+        void multi:: add(code_t C) { (void) codes.insert(C); }
+
+    }
+
+}
+
+

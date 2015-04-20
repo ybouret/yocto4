@@ -73,9 +73,57 @@ namespace yocto
             single(const single &) throw();
             YOCTO_DISABLE_ASSIGN(single);
 
-            virtual bool is_valid(code_t) const throw(); //! true
+            virtual bool is_valid(code_t) const throw();
         };
 
+
+        //______________________________________________________________________
+        //
+        //! range of char
+        //______________________________________________________________________
+        class range : public one_char
+        {
+        public:
+            static const uint32_t UUID = YOCTO_FOURCC('R','N','G','E');
+            const        code_t   lower;
+            const        code_t   upper;
+
+            virtual ~range() throw();
+
+            virtual pattern *clone() const;
+            static  pattern *create(code_t lo, code_t hi);
+
+        private:
+            range(code_t lo, code_t hi) throw();
+            range(const range &) throw();
+            YOCTO_DISABLE_ASSIGN(range);
+
+            virtual bool is_valid(code_t) const throw();  
+        };
+
+
+        //______________________________________________________________________
+        //
+        //! multiple chars
+        //______________________________________________________________________
+        class multi : public one_char
+        {
+        public:
+            static const uint32_t UUID = YOCTO_FOURCC('M','U','L','T');
+            codes_store           codes;
+
+            void add(code_t C);
+
+            virtual ~multi() throw();
+            static   multi  *create();
+            virtual  pattern *clone() const;
+
+        private:
+            explicit multi() throw();
+            multi(const multi &);
+            YOCTO_DISABLE_ASSIGN(multi);
+            virtual bool is_valid(code_t) const throw();
+        };
 
     }
 

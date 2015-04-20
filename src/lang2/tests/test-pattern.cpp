@@ -14,6 +14,13 @@ YOCTO_UNIT_TEST_IMPL(pattern)
     auto_ptr<lang::pattern> p( lang::any1::create() );
 
     p.reset( lang::single::create('a') );
+    p.reset( lang::range::create('a','z') );
+    lang::multi *m = lang::multi::create();
+
+    p.reset(m);
+    m->add('a');
+    m->add('b');
+    
 
     while( src.peek(fp) )
     {
