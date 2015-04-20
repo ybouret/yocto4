@@ -8,8 +8,8 @@ YOCTO_UNIT_TEST_IMPL(source)
 {
     ios::icstream fp(ios::cstdin);
 
-    lang::t_char_source src;
-    lang::token tkn;
+    lang::source  src;
+    lang::token   tkn;
     lang::t_char *ch = 0;
     while( (ch=src.get(fp)) != 0 )
     {
