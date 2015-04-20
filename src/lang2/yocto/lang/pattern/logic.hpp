@@ -42,6 +42,42 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(AND);
         };
 
+        class OR : public logical
+        {
+        public:
+            static const uint32_t UUID = YOCTO_FOURCC('<', '|', '|' , '>');
+            virtual ~OR() throw();
+
+            virtual pattern *clone() const;
+            virtual bool     match(Y_LANG_PATTERN_MATCH_ARGS) const;
+            static  logical *create();
+
+        private:
+            OR() throw();
+            OR(const OR &);
+
+            YOCTO_DISABLE_ASSIGN(OR);
+        };
+
+
+        class NOT : public logical
+        {
+        public:
+            static const uint32_t UUID = YOCTO_FOURCC('<', '!', '!' , '>');
+            virtual ~NOT() throw();
+
+            virtual pattern *clone() const;
+            virtual bool     match(Y_LANG_PATTERN_MATCH_ARGS) const;
+            static  logical *create();
+
+        private:
+            NOT() throw();
+            NOT(const NOT &);
+
+            YOCTO_DISABLE_ASSIGN(NOT);
+        };
+
+
     }
 
 }

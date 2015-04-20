@@ -29,6 +29,13 @@ YOCTO_UNIT_TEST_IMPL(pattern)
         q->append(lang::range::create('a','z'));
     }
 
+    {
+        lang::logical *q = lang::OR::create();
+        p.reset(q);
+        q->append(lang::single::create('a'));
+        q->append(lang::single::create('b'));
+    }
+
 
     while( src.peek(fp) )
     {

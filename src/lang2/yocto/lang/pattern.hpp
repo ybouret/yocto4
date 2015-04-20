@@ -22,7 +22,11 @@ namespace yocto
             //! clone the behavior
             virtual pattern *clone() const = 0;
 
-            //! if matching, content is appended to tkn
+            //! matching function
+            /** 
+             if matching, content is append to tkn,
+             must be left untouched otherwise !
+             */
             virtual bool     match( Y_LANG_PATTERN_MATCH_ARGS ) const = 0;
 
 
