@@ -9,11 +9,11 @@ namespace yocto
     namespace lang
     {
 
-        class t_char_source : public token
+        class source : public token
         {
         public:
-            explicit t_char_source() throw();
-            virtual ~t_char_source() throw();
+            explicit source() throw();
+            virtual ~source() throw();
 
             //! return a new t_char
             /**
@@ -48,7 +48,7 @@ namespace yocto
 
 
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(t_char_source);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(source);
 
         };
     }

@@ -1,14 +1,14 @@
-#include "yocto/lang/tchar-source.hpp"
+#include "yocto/lang/source.hpp"
 
 namespace yocto
 {
     namespace lang
     {
 
-        t_char_source::  t_char_source() throw() : token() {}
-        t_char_source:: ~t_char_source() throw() {}
+        source::  source() throw() : token() {}
+        source:: ~source() throw() {}
 
-        t_char *t_char_source:: get( ios::istream &fp )
+        t_char *source:: get( ios::istream &fp )
         {
 
             if(size>0)
@@ -40,7 +40,7 @@ namespace yocto
             }
         }
 
-        const t_char * t_char_source:: peek( ios::istream &fp )
+        const t_char * source:: peek( ios::istream &fp )
         {
             t_char *ch = get(fp);
             if(ch)
@@ -53,7 +53,7 @@ namespace yocto
         }
 
 
-        void t_char_source:: skip(size_t n) throw()
+        void source:: skip(size_t n) throw()
         {
             assert(n<=size);
             while(n-->0)
@@ -62,13 +62,13 @@ namespace yocto
             }
         }
 
-        void t_char_source:: unget( t_char *ch ) throw()
+        void source:: unget( t_char *ch ) throw()
         {
             assert(ch);
             push_front(ch);
         }
 
-        void t_char_source:: unget( token &tkn ) throw()
+        void source:: unget( token &tkn ) throw()
         {
             while(tkn.size)
             {
@@ -76,24 +76,24 @@ namespace yocto
             }
         }
 
-        void t_char_source:: uncpy( const token &tkn )
+        void source:: uncpy( const token &tkn )
         {
             token tmp(tkn);
             unget(tmp);
         }
 
-        void t_char_source:: unget( const char C )
+        void source:: unget( const char C )
         {
             unget( new t_char(C) );
         }
 
-        void t_char_source:: unget( const string &s )
+        void source:: unget( const string &s )
         {
             token tkn(s);
             unget(tkn);
         }
 
-        void t_char_source:: unget( const char *s )
+        void source:: unget( const char *s )
         {
             token tkn(s);
             unget(tkn);
