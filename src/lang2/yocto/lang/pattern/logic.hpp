@@ -34,7 +34,8 @@ namespace yocto
             virtual pattern *clone() const;
             virtual bool     match(Y_LANG_PATTERN_MATCH_ARGS) const;
             static  logical *create();
-            
+            virtual void     viz( ios::ostream & ) const;
+
         private:
             AND() throw();
             AND(const AND &);
@@ -51,6 +52,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual bool     match(Y_LANG_PATTERN_MATCH_ARGS) const;
             static  logical *create();
+            virtual void     viz( ios::ostream & ) const;
 
         private:
             OR() throw();
@@ -69,6 +71,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual bool     match(Y_LANG_PATTERN_MATCH_ARGS) const;
             static  logical *create();
+            virtual void     viz( ios::ostream & ) const;
 
         private:
             NOT() throw();

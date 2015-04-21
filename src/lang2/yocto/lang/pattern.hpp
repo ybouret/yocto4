@@ -3,6 +3,7 @@
 
 #include "yocto/lang/source.hpp"
 #include "yocto/counted-object.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
@@ -29,7 +30,10 @@ namespace yocto
              */
             virtual bool        match( Y_LANG_PATTERN_MATCH_ARGS ) const = 0;
             virtual const void *content() const throw(); //!< internal content, default is NULL
-
+            
+            virtual void  viz( ios::ostream & ) const = 0;
+            static  void  encode( code_t code, ios::ostream &fp);
+            
         protected:
             explicit pattern(uint32_t ID) throw();
             pattern(const pattern &) throw();

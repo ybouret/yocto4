@@ -33,6 +33,7 @@ namespace yocto
             static  pattern *create(pattern *p);
             virtual pattern *clone() const;
             virtual bool     match(Y_LANG_PATTERN_MATCH_ARGS) const;
+            virtual void     viz( ios::ostream & ) const;
 
         private:
             optional(pattern *p) throw();
@@ -52,6 +53,7 @@ namespace yocto
             static  pattern *create(pattern *p, size_t n);
             virtual bool     match(Y_LANG_PATTERN_MATCH_ARGS) const;
             virtual pattern *clone() const;
+            virtual void     viz( ios::ostream & ) const;
 
         private:
             at_least(pattern *p,size_t n) throw();
@@ -68,11 +70,12 @@ namespace yocto
             static const size_t UUID = YOCTO_FOURCC('[', '-', '-', ']');
             const size_t lower;
             const size_t upper;
-
+            
             virtual ~counting() throw();
             static  pattern *create(pattern *p, size_t n, size_t m);
             virtual bool     match(Y_LANG_PATTERN_MATCH_ARGS) const;
             virtual pattern *clone() const;
+            virtual void     viz( ios::ostream & ) const;
 
         private:
             explicit counting(pattern *p, size_t n, size_t m) throw();
