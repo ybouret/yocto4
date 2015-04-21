@@ -33,5 +33,13 @@ namespace yocto
             (void) (jk->match(tkn, src, fp));
             return true;
         }
+        
+        void optional:: viz(ios::ostream &fp) const
+        {
+            fp.viz((const pattern *)this);
+            fp("[shape=egg,label=\"?\"];\n");
+            jk->viz(fp);
+            vizlink(fp,this, jk);
+        }
     }
 }

@@ -57,5 +57,14 @@ namespace yocto
                 return false;
             }
         }
+        
+        void counting:: viz( ios::ostream &fp ) const
+        {
+            fp.viz((const pattern *)this);
+            fp("[shape=egg,label=\"[%u,%u]\"];\n", unsigned(lower), unsigned(upper) );
+            jk->viz(fp);
+            vizlink(fp,this, jk);
+        }
+
     }
 }

@@ -20,7 +20,24 @@ namespace yocto
 
         const void *pattern:: content() const throw() { return 0; }
 
+        void  pattern:: encode( code_t code, ios::ostream &fp)
+        {
+            const char C(code);
+            if(C>=32&&C<127)
+            {
+                fp("'%c'",C);
+            }
+            else
+            {
+                fp("x%02x",C);
+            }
+            
+        }
 
+        void  pattern:: vizlink( ios::ostream &fp, const pattern *src, const pattern *tgt)
+        {
+            fp.viz(src); fp << " -> "; fp.viz( tgt ); fp << ";\n";
+        }
     }
 }
 

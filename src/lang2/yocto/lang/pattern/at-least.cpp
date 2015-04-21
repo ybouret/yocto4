@@ -5,12 +5,12 @@ namespace yocto
     namespace lang
     {
         at_least:: ~at_least() throw() {}
-
+        
         at_least:: at_least(pattern *p, size_t n) throw() :
         joker(UUID, p),
         count(n)
         {}
-
+        
         pattern *at_least:: create(pattern *p, size_t n)
         {
             assert(p);
@@ -23,15 +23,15 @@ namespace yocto
                 delete p;
                 throw;
             }
-
+            
         }
-
-
+        
+        
         pattern *at_least:: clone() const
         {
             return create( jk->clone(), count);
         }
-
+        
         bool at_least:: match(Y_LANG_PATTERN_MATCH_ARGS) const
         {
             token stk;
@@ -50,6 +50,14 @@ namespace yocto
                 src.unget(stk);
                 return false;
             }
+        }
+        
+        void at_least:: viz( ios::ostream &fp ) const
+        {
+            fp.viz((const pattern *)this);
+            fp("[shape=egg,label=\">=%u\"];\n", unsigned(count) );
+            jk->viz(fp);
+            vizlink(fp,this, jk);
         }
     }
 }

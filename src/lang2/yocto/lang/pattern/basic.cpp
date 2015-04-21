@@ -98,18 +98,9 @@ namespace yocto
         void single::viz(ios::ostream &fp) const
         {
             fp.viz( (const pattern *)this );
-            char out[8] = { 0 };
-            memset(out,0,sizeof(out));
-            const char C = char(code);
-            if(C>=32&&C<127)
-            {
-                out[0] = C;
-            }
-            else
-            {
-                snprintf(out, sizeof(out)-1, "x%02x", C);
-            }
-            fp("[label=\"%s\",shape=ellipse];\n",out);
+            fp("[shape=ellipse,label=\"");
+            encode(code, fp);
+            fp("\"];\n");
         }
     }
     
@@ -146,7 +137,11 @@ namespace yocto
         void range::viz(ios::ostream &fp) const
         {
             fp.viz( (const pattern *)this );
-            fp("[shape=tab,label=\"%u-%u\"];\n", unsigned(lower), unsigned(upper));
+            fp("[shape=tab,label=\"");
+            encode(lower, fp);
+            fp << "-";
+            encode(upper, fp);
+            fp << "\"];\n";
         }
     }
     
@@ -176,6 +171,14 @@ namespace yocto
         
         void multi:: add(code_t C) { (void) codes.insert(C); }
 
+        void multi:: pattern::viz(ios::ostream &fp) const
+        {
+            fp.viz( (const pattern *)this );
+            fp("[shape=folder,label=\"");
+            fp("multi");
+            fp("\"];\n");
+        }
+        
     }
 
 }
