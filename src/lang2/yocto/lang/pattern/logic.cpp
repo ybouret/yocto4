@@ -17,6 +17,15 @@ namespace yocto
             assert(p);
             operands.push_back(p);
         }
+        
+        void logical:: vizops( ios::ostream &fp ) const
+        {
+            for( const pattern *p = operands.head; p; p=p->next)
+            {
+                p->viz(fp);
+                vizlink(fp, this, p);
+            }
+        }
 
     }
 }

@@ -171,7 +171,7 @@ namespace yocto
         
         void multi:: add(code_t C) { (void) codes.insert(C); }
 
-        void multi:: pattern::viz(ios::ostream &fp) const
+        void multi:: viz(ios::ostream &fp) const
         {
             fp.viz( (const pattern *)this );
             fp("[shape=folder,label=\"");

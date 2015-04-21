@@ -42,6 +42,13 @@ namespace yocto
         {
             return new AND();
         }
+        
+        void AND:: viz(ios::ostream &fp) const
+        {
+            fp.viz((const pattern *)this);
+            fp("[shape=diamond,label=\"&&\"];\n");
+            vizops(fp);
+        }
 
     }
 }
