@@ -6,7 +6,6 @@ namespace yocto
     {
 
 
-#if 0
         static pattern *simplify_fusion( logical *p ) throw()
         {
             assert(p);
@@ -36,14 +35,39 @@ namespace yocto
 
             return p;
         }
-#endif
 
 
         pattern *logical:: simplify( logical *p ) throw()
         {
             assert(p!=NULL);
 
+            switch(p->uuid)
+            {
+                case AND::UUID:
+                case OR ::UUID:
+                    goto CHECK_FUSION;
+
+                default:
+                    break;
+            }
             return p;
+            
+        CHECK_FUSION:
+            switch(p->operands.size)
+            {
+                case 0:
+                    return p;
+                case 1: {
+                    pattern *q = p->operands.pop_back();
+                    delete p;
+                    return q;
+                }
+
+                default:
+                    break;
+            }
+            return simplify_fusion(p);
+            
         }
         
     }

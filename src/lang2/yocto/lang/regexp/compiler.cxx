@@ -59,7 +59,6 @@ namespace yocto
                         }
                         goto DONE;
 
-
                         //______________________________________________________
                         //
                         // ALTERNATION
@@ -73,6 +72,10 @@ namespace yocto
                         p->append(rhs.yield());
                     } goto DONE;
 
+                        //______________________________________________________
+                        //
+                        // default
+                        //______________________________________________________
                     default:
                         ++curr;
                         p->append( single::create(C) );
