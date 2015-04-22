@@ -65,7 +65,12 @@ namespace yocto
                         // ALTERNATION
                         //______________________________________________________
                     case '|': {
-
+                        ++curr;
+                        auto_ptr<logical> lhs( p.yield()    );
+                        auto_ptr<logical> rhs( parse_expr() );
+                        p.reset( OR::create() );
+                        p->append(lhs.yield());
+                        p->append(rhs.yield());
                     } break;
 
                     default:
