@@ -147,6 +147,7 @@ namespace yocto
     
 }
 
+#if 0
 namespace yocto
 {
     namespace lang
@@ -182,5 +183,6 @@ namespace yocto
     }
 
 }
+#endif
 
 

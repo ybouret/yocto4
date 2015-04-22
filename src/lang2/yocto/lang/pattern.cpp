@@ -24,7 +24,7 @@ namespace yocto
         void  pattern:: encode( code_t code, ios::ostream &fp)
         {
             const char C(code);
-            if(C>=32&&C<127)
+            if(C>=32 && C<127 && C!='\"' && C!='\\')
             {
                 fp("'%c'",C);
             }

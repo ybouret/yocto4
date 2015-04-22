@@ -16,11 +16,7 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 
     p.reset( lang::single::create('a') );
     p.reset( lang::range::create('a','z') );
-    lang::multi *m = lang::multi::create();
-
-    p.reset(m);
-    m->add('a');
-    m->add('b');
+    
 
     {
         lang::logical *q = lang::AND::create();

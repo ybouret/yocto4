@@ -106,6 +106,7 @@ namespace yocto
         };
 
 
+#if 0
         //______________________________________________________________________
         //
         //! multiple chars
@@ -119,7 +120,7 @@ namespace yocto
             void add(code_t C);
 
             virtual ~multi() throw();
-            static   multi  *create();
+            static   multi   *create();
             virtual  pattern *clone() const;
             virtual  void     viz( ios::ostream & ) const;
 
@@ -129,7 +130,8 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(multi);
             virtual bool is_valid(code_t) const throw();
         };
-
+#endif
+        
     }
 
 

@@ -15,15 +15,20 @@ namespace yocto
             virtual ~logical() throw();
             void     append( pattern *p ) throw();
 
+            static logical *among(const string &);
+            static logical *among(const char   *);
+
+            static logical *equal(const string &);
+            static logical *equal(const char   *);
+
         protected:
             logical(const uint32_t) throw();
             logical(const logical &other);
 
             void vizops( ios::ostream &fp ) const;
-            
+
         private:
             YOCTO_DISABLE_ASSIGN(logical);
-
         };
 
 
