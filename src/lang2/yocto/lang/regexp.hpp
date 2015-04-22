@@ -3,4 +3,15 @@
 
 #include "yocto/lang/pattern/dict.hpp"
 
+
+namespace yocto
+{
+    namespace lang
+    {
+
+        pattern *regexp( const string &expr, const p_dict *dict );
+
+    }
+}
+
 #endif

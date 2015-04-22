@@ -26,7 +26,32 @@ namespace yocto
                 throw exception("p_dict: multiple '%s'", ID.c_str());
         }
 
+        bool p_dict:: has(const string &id) const throw()
+        {
+            return 0 != search(id);
+        }
 
+
+        bool p_dict:: has(const char  *id) const
+        {
+            const string ID(id);
+            return 0 != search(ID);
+        }
+        
+        pattern  * p_dict:: operator[](const string &id) const
+        {
+            const pattern_ptr *pp = search(id);
+            if(!pp) throw exception("no pattern '%s'", id.c_str());
+            return (*pp)->clone();
+        }
+
+        pattern  * p_dict:: operator[](const char * txt) const
+        {
+            const string       id(txt);
+            const pattern_ptr *pp = search(id);
+            if(!pp) throw exception("no pattern '%s'", id.c_str());
+            return (*pp)->clone();
+        }
         
     }
 }

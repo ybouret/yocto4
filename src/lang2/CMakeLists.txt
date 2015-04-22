@@ -11,10 +11,14 @@ SET(pat_srcs ${pat_decl} ${pat_impl})
 INSTALL(FILES ${pat_decl} DESTINATION include/yocto/lang/pattern )
 SOURCE_GROUP(lang/pattern FILES ${pat_srcs})
 
-
+#private sources, not installed
+FILE(GLOB rx_decl yocto/lang/regexp/*.hxx)
+FILE(GLOB rx_impl yocto/lang/regexp/*.cxx)
+SET(rx_srcs ${rx_decl} ${rx_impl})
+SOURCE_GROUP(lang/regexp FILES ${rx_srcs})
 
 INCLUDE_DIRECTORIES(../main .)
-ADD_LIBRARY(y-lang2 STATIC ${lang_srcs} ${pat_srcs})
+ADD_LIBRARY(y-lang2 STATIC ${lang_srcs} ${pat_srcs} ${rx_srcs})
 
 #INSTALL( TARGETS y-lang ARCHIVE DESTINATION lib )
 

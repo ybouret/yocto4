@@ -34,7 +34,9 @@ namespace yocto
             virtual void  viz( ios::ostream & ) const = 0;
             static  void  encode( code_t code, ios::ostream &fp);
             static  void  vizlink( ios::ostream &fp, const pattern *src, const pattern *tgt);
-            
+            void graphviz(const string &filename) const;
+
+
         protected:
             explicit pattern(uint32_t ID) throw();
             pattern(const pattern &) throw();
