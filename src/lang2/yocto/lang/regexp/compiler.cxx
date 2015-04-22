@@ -32,7 +32,6 @@ namespace yocto
         {
 
             auto_ptr<logical> p(AND::create());
-            const char *ini = curr;
 
             while(curr<last)
             {
@@ -60,6 +59,9 @@ namespace yocto
                         }
                         goto DONE;
 
+
+
+
                     default:
                         ++curr;
                         p->append( single::create(C) );
@@ -74,7 +76,7 @@ namespace yocto
             //______________________________________________________________
             if(p->operands.size<=0)
             {
-                throw exception("empty sub-expression from '%s'", ini);
+                throw exception("empty sub-expression");
             }
             
             return p.yield();
