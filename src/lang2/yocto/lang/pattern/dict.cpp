@@ -52,6 +52,13 @@ namespace yocto
             if(!pp) throw exception("no pattern '%s'", id.c_str());
             return (*pp)->clone();
         }
-        
+
+
+
+
     }
 }
+
+
+
+

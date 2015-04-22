@@ -8,10 +8,13 @@ using namespace lang;
 
 YOCTO_UNIT_TEST_IMPL(regexp)
 {
+    p_dict dict;
+    dict.define("INT", "(0|1|2|3|4|5|6|7|8|9)+");
+    
     if(argc>1)
     {
         const string      expr = argv[1];
-        auto_ptr<pattern> p( regexp(expr,NULL) );
+        auto_ptr<pattern> p( regexp(expr,&dict) );
         p->graphviz("rx.dot");
         (void) system("dot -Tpng rx.dot -o rx.png");
     }

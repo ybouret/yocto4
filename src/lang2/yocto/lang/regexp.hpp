@@ -10,6 +10,7 @@ namespace yocto
     {
 
         pattern *regexp( const string &expr, const p_dict *dict );
+        pattern *regexp( const char   *expr, const p_dict *dict );
 
     }
 }

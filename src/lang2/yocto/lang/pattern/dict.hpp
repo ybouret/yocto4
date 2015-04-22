@@ -23,6 +23,9 @@ namespace yocto
             void define( const string &id, pattern *p );
             void define( const char   *id, pattern *p );
 
+            void define(const string &id, const string &expr);
+            void define(const char   *id, const char   *expr);
+
             pattern * create() const;
             bool      has(const string &) const throw();
             bool      has(const char   *) const;

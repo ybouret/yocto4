@@ -15,7 +15,7 @@ namespace yocto
 
         joker:: joker( uint32_t ID, pattern *p) throw() : pattern(ID), jk(p) {}
 
-
+       
       
 
     }

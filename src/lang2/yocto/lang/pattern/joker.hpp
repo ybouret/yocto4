@@ -18,7 +18,6 @@ namespace yocto
             explicit joker(uint32_t ID, pattern *p) throw();
             pattern *jk;
 
-
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(joker);
         };

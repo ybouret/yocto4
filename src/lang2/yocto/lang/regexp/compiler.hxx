@@ -23,6 +23,11 @@ namespace yocto
             //! create a new 'AND' from curr.
             pattern *parse_expr();
 
+            //! parse an escape sequence in an expression
+            pattern *parse_expr_esc();
+
+            pattern *parse_braces(logical &);
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(RegExp);
         };

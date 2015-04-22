@@ -18,8 +18,32 @@ namespace yocto
             }
             return p.yield();
         }
+
+        pattern *regexp( const char *expr, const p_dict *dict )
+        {
+            const  string s(expr);
+            return regexp(s,dict);
+        }
         
     }
     
 }
 
+namespace yocto
+{
+    namespace lang
+    {
+
+        void p_dict:: define(const string &id, const string &expr)
+        {
+            define(id, regexp(expr,this) );
+        }
+
+        void p_dict:: define(const char   *id, const char *expr)
+        {
+            define(id, regexp(expr,this) );
+        }
+        
+    }
+    
+}
