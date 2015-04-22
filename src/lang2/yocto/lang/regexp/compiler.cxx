@@ -403,6 +403,39 @@ namespace yocto
                         p->append( parse_class_esc() );
                         break;
 
+                    case '-':
+                    {
+                        if(p->operands.size<=0) throw exception("no previous character for range");
+                        if(++curr>=last)        throw exception("unfinished range in class");
+
+                        if(p->operands.tail->uuid != single::UUID) throw exception("previous item is not a char for range");
+                        auto_ptr<pattern> q(p->operands.pop_back());
+                        const code_t      lower = *(const code_t *)(q->content());
+                        code_t            upper = 0;
+
+                        q.reset(0);
+                        C  = *curr;
+                        switch(C)
+                        {
+                            case LBRACK:
+                            case RBRACK:
+                                throw exception("invalid '%c' after range", C);
+
+                            case '\\':
+                            {
+                                q.reset( parse_class_esc() );
+                                assert(q->uuid==single::UUID);
+                                upper = *(const code_t *)(q->content());
+                            } break;
+
+                            default:
+                                ++curr;
+                                upper = C;
+                        }
+                        p->append( range::create(lower, upper) );
+
+                    } break;
+
                     default:
                         ++curr;
                         p->append( single::create(C) );
