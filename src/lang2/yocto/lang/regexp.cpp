@@ -7,7 +7,9 @@ namespace yocto
 
         pattern *regexp( const string &expr, const p_dict *dict )
         {
-            return 0;
+            RegExp rx(expr.c_str(),expr.size(),dict);
+
+            return rx.parse_expr();
         }
         
     }

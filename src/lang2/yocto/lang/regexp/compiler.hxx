@@ -2,6 +2,7 @@
 #define YOCTO_REGEXP_COMPILER_INCLUDED 1
 
 #include "yocto/lang/regexp.hpp"
+#include "yocto/lang/pattern/logic.hpp"
 
 namespace yocto
 {
@@ -17,7 +18,10 @@ namespace yocto
             const char   *curr;
             const char   *last;
             const p_dict *dict;
-            
+            int           level;
+
+            //! create a new 'AND' from curr.
+            logical *parse_expr();
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(RegExp);
