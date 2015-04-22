@@ -23,6 +23,12 @@ namespace yocto
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// Parsing SubExpression
+//
+////////////////////////////////////////////////////////////////////////////////
+
 namespace yocto
 {
     namespace lang
@@ -30,6 +36,10 @@ namespace yocto
 
 #define LBRACE '{'
 #define RBRACE '}'
+
+#define LBRACK '['
+#define RBRACK ']'
+
 
         static inline
         pattern *extract_tail(p_list &ops, const char type)
@@ -93,7 +103,7 @@ namespace yocto
 
                         //______________________________________________________
                         //
-                        // single jokers
+                        //  jokers
                         //______________________________________________________
                     case '+':
                         ++curr;
@@ -112,6 +122,14 @@ namespace yocto
 
                     case LBRACE:
                         p->append( parse_braces(*p) );
+                        break;
+
+                        //______________________________________________________
+                        //
+                        //  class
+                        //______________________________________________________
+                    case LBRACK:
+                        p->append( parse_class() );
                         break;
 
                         //______________________________________________________
@@ -142,6 +160,11 @@ namespace yocto
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// Parsing SubExpression escape char
+//
+////////////////////////////////////////////////////////////////////////////////
 #include "yocto/code/utils.hpp"
 
 namespace yocto
@@ -161,11 +184,11 @@ namespace yocto
             ++curr;
             switch(C)
             {
-                case '\\':
                 case '(' :
                 case ')' :
                 case '[' :
                 case ']' :
+                case '\\':
                 case '"' :
                 case '\'':
                 case '+' :
@@ -187,7 +210,7 @@ namespace yocto
                 {
                     if(curr>=last) throw exception("missing first hexadecimal byte in sub-expression");
                     const int B1 = hex2dec(curr[0]);
-                    if(B1<0) throw exception("invalid hexadecimal char '%c'", curr[0]);
+                    if(B1<0) throw exception("invalid hexadecimal char '%c' in subexpression", curr[0]);
                     ++curr;
                     if(curr>=last) throw exception("missing second hexadecimal byte in sub-expression");
                     const int B2 = hex2dec(curr[0]);
@@ -208,9 +231,12 @@ namespace yocto
 
 }
 
-//#include "yocto/sequence/vector.hpp"
-//#include "yocto/memory/pooled.hpp"
-//#include "yocto/string/tokenizer.hpp"
+////////////////////////////////////////////////////////////////////////////////
+//
+// Parsing Braces
+//
+////////////////////////////////////////////////////////////////////////////////
+
 #include "yocto/string/conv.hpp"
 
 namespace yocto
@@ -238,30 +264,41 @@ namespace yocto
             assert(LBRACE==curr[0]);
             const char *ini = curr;
 
+            //__________________________________________________________________
+            //
             // extract content
+            //__________________________________________________________________
             string br;
             while(*(++curr)!=RBRACE)
             {
                 if(curr>=last) throw exception("unfinnished braces");
                 br.append(curr[0]);
             }
-            std::cerr << "CONTENT='" << br << "'" << std::endl;
             ++curr; // skip RBRACE
 
+            //__________________________________________________________________
+            //
             // check content
+            //__________________________________________________________________
             if(br.size()<=0)
                 throw exception("empty braces at '%s'",ini);
 
             const char ch = br[0];
             if( ch == '_' || (ch>='a' && ch <='z') || (ch>='A' && ch<='Z'))
             {
+                //______________________________________________________________
+                //
                 // assume substitution from dictionary
+                //______________________________________________________________
                 if(!dict) throw exception("not dictionary for '%s'", br.c_str());
                 return (*dict)[br];
             }
             else
             {
+                //______________________________________________________________
+                //
                 // assume n[,m] or something
+                //______________________________________________________________
                 char *coma = strchr(br.c_str(), ',');
                 if(coma)
                 {
@@ -291,13 +328,214 @@ namespace yocto
                     const size_t n = strconv::to_size(br,"counting argument");
                     return counting::create( extract_tail(p.operands, LBRACE), n, n);
                 }
-                
+
             }
-            
-            
+
+        }
+    }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Parsing Classes
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+namespace yocto
+{
+    namespace lang
+    {
+
+
+        pattern * RegExp:: parse_class()
+        {
+            assert(curr[0]==LBRACK);
+            auto_ptr<logical> p;
+            char              C=0;
+            //_____________________________________________________
+            //
+            // first char analysis
+            //_____________________________________________________
+            if(++curr>=last) goto UNFINISHED;
+
+
+            C = *curr;
+            switch(C)
+            {
+                case '-':
+                    p.reset( OR::create() );
+                    p->append( single::create('-') );
+                    ++curr;
+                    break;
+
+                case '^':
+                    p.reset( NOT::create() );
+                    ++curr;
+                    break;
+
+                case ':':
+                    return parse_posix();
+
+                default:
+                    p.reset( OR::create() );
+            }
+            assert(p.is_valid());
+
+            //_____________________________________________________
+            //
+            // loop over bracket content
+            //_____________________________________________________
+            while(curr<last)
+            {
+                C = *curr;
+                switch(C)
+                {
+                    case RBRACK:
+                        goto DONE;
+
+                    case LBRACK:
+                        p->append( parse_class() );
+                        break;
+
+                    case '\\':
+                        p->append( parse_class_esc() );
+                        break;
+
+                    default:
+                        ++curr;
+                        p->append( single::create(C) );
+                }
+            }
+            if(curr>=last) goto UNFINISHED;
+        DONE:
+            assert(RBRACK==*curr);
+            ++curr;
+            return logical::simplify(p.yield());
+
+        UNFINISHED:
+            throw exception("unfinished class");
+        }
+
+
+    }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Parsing POSIX class
+//
+////////////////////////////////////////////////////////////////////////////////
+
+#include "yocto/lang/pattern/posix.hpp"
+
+namespace yocto
+{
+    namespace lang
+    {
+
+#define Y_RX_POSIX(NAME) if(id==#NAME) return posix::NAME()
+
+        pattern *RegExp:: parse_posix()
+        {
+            assert(':'==*curr);
+            const char *ini = curr;
+            while( *(++curr) != ':' )
+            {
+                if(curr>=last) throw exception("unfinished POSIX name");
+            }
+            assert(curr<last);
+            assert(curr>ini);
+            assert(':'==*curr);
+            const string id(ini+1,(curr-ini)-1);
+            ++curr;
+            if(curr>=last) throw exception("unfinished POSIX format");
+            if(RBRACK!=*curr)
+                throw exception("expecting RBRACK after POSIX name");
+            ++curr;
+
+            Y_RX_POSIX(lower);
+            Y_RX_POSIX(upper);
+            Y_RX_POSIX(digit);
+            Y_RX_POSIX(alpha);
+            Y_RX_POSIX(alnum);
+            Y_RX_POSIX(xdigit);
+            Y_RX_POSIX(blank);
+            Y_RX_POSIX(space);
+            Y_RX_POSIX(punct);
+
+            Y_RX_POSIX(word);
+            Y_RX_POSIX(endl);
+            Y_RX_POSIX(dot);
+            Y_RX_POSIX(cstring);
+
+            throw exception("unknown POSIX '%s'", id.c_str());
+        }
+    }
+
+}
+////////////////////////////////////////////////////////////////////////////////
+//
+// Parsing Class Escape sequence
+//
+////////////////////////////////////////////////////////////////////////////////
+
+#include "yocto/lang/pattern/posix.hpp"
+
+namespace yocto
+{
+    namespace lang
+    {
+
+        pattern * RegExp:: parse_class_esc()
+        {
+            assert('\\'==*curr);
+            if(++curr>=last) throw exception("unfinished class escape sequence");
+            const char C=curr[0];
+            ++curr;
+            switch(C)
+            {
+                case '[':
+                case ']':
+                case '-':
+                case '^':
+                case '\\':
+                case '"' :
+                case '\'':
+                    return single::create(C);
+
+                case 'a': return single::create('\a');
+                case 'b': return single::create('\b');
+                case 'f': return single::create('\f');
+                case 'n': return single::create('\n');
+                case 'r': return single::create('\r');
+                case 't': return single::create('\t');
+                case 'v': return single::create('\v');
+                    
+                case 'x':
+                {
+                    if(curr>=last) throw exception("missing first hexadecimal byte in class");
+                    const int B1 = hex2dec(curr[0]);
+                    if(B1<0) throw exception("invalid hexadecimal char '%c' in class", curr[0]);
+                    ++curr;
+                    if(curr>=last) throw exception("missing second hexadecimal byte in class");
+                    const int B2 = hex2dec(curr[0]);
+                    if(B2<0) throw exception("invalid hexademical char '%c' in class", curr[0]);
+                    ++curr;
+                    return single::create( B1 * 16 + B2 );
+                }
+                    
+                    
+                default:
+                    break;
+            };
+            throw exception("unknown class escape sequence '%c'", C);
         }
     }
     
 }
+
 
 

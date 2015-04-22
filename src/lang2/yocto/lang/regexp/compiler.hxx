@@ -26,7 +26,18 @@ namespace yocto
             //! parse an escape sequence in an expression
             pattern *parse_expr_esc();
 
+            //! parce braces
             pattern *parse_braces(logical &);
+
+
+            //! parse classes
+            pattern *parse_class();
+
+            //! parse posix
+            pattern *parse_posix();
+
+            //! parse class escape sequence
+            pattern *parse_class_esc();
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(RegExp);

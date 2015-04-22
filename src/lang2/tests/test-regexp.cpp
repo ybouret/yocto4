@@ -3,13 +3,15 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ptr/auto.hpp"
 
+#include <cstdlib>
+
 using namespace yocto;
 using namespace lang;
 
 YOCTO_UNIT_TEST_IMPL(regexp)
 {
     p_dict dict;
-    dict.define("INT", "(0|1|2|3|4|5|6|7|8|9)+");
+    dict.define("INT", regexp("(0|1|2|3|4|5|6|7|8|9)+",NULL) );
     
     if(argc>1)
     {
