@@ -21,7 +21,7 @@ namespace yocto
             int           level;
 
             //! create a new 'AND' from curr.
-            logical *parse_expr();
+            pattern *parse_expr();
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(RegExp);

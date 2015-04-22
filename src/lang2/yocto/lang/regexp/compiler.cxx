@@ -28,7 +28,7 @@ namespace yocto
     namespace lang
     {
 
-        logical *RegExp:: parse_expr()
+        pattern *RegExp:: parse_expr()
         {
 
             auto_ptr<logical> p(AND::create());
@@ -66,12 +66,12 @@ namespace yocto
                         //______________________________________________________
                     case '|': {
                         ++curr;
-                        auto_ptr<logical> lhs( p.yield()    );
-                        auto_ptr<logical> rhs( parse_expr() );
+                        auto_ptr<pattern> lhs( logical::simplify(p.yield())    );
+                        auto_ptr<pattern> rhs( parse_expr() );
                         p.reset( OR::create() );
                         p->append(lhs.yield());
                         p->append(rhs.yield());
-                    } break;
+                    } goto DONE;
 
                     default:
                         ++curr;
@@ -90,7 +90,7 @@ namespace yocto
                 throw exception("empty sub-expression");
             }
             
-            return p.yield();
+            return logical::simplify(p.yield());
         }
         
     }

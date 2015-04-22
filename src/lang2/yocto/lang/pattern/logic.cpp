@@ -27,6 +27,11 @@ namespace yocto
             }
         }
 
+        const void * logical:: content() const throw()
+        {
+            return &operands;
+        }
+
     }
 }
 

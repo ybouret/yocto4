@@ -21,6 +21,10 @@ namespace yocto
             static logical *equal(const string &);
             static logical *equal(const char   *);
 
+            static pattern *simplify( logical *p ) throw();
+
+            virtual const void *content() const throw(); //!< return &operands
+
         protected:
             logical(const uint32_t) throw();
             logical(const logical &other);
