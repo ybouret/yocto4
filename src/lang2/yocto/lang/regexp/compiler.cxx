@@ -50,7 +50,7 @@ namespace yocto
                         p->append( parse_expr() );
                         break;
 
-                        case ')':
+                    case ')':
                         ++curr;
                         --level;
                         if(level<0)
@@ -60,7 +60,13 @@ namespace yocto
                         goto DONE;
 
 
+                        //______________________________________________________
+                        //
+                        // ALTERNATION
+                        //______________________________________________________
+                    case '|': {
 
+                    } break;
 
                     default:
                         ++curr;
