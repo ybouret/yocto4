@@ -37,23 +37,49 @@ namespace yocto
             while(curr<last)
             {
                 char C = curr[0];
+
                 switch(C)
                 {
-                    default:
+
+                        //______________________________________________________
+                        //
+                        // PARENS
+                        //______________________________________________________
+                    case '(':
+                        ++curr;  // skip parenthesis
+                        ++level; // increase nesting
+                        p->append( parse_expr() );
                         break;
+
+                        case ')':
+                        ++curr;
+                        --level;
+                        if(level<0)
+                        {
+                            throw exception("unexpected end of sub-expression");
+                        }
+                        goto DONE;
+
+                    default:
+                        ++curr;
+                        p->append( single::create(C) );
                 }
-                p->append( single::create(C) );
-                ++curr;
+
             }
 
+        DONE:
+            //______________________________________________________________
+            //
+            // Consistency check
+            //______________________________________________________________
             if(p->operands.size<=0)
             {
                 throw exception("empty sub-expression from '%s'", ini);
             }
-
+            
             return p.yield();
         }
-
+        
     }
-
+    
 }

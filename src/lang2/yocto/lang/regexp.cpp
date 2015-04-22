@@ -1,4 +1,6 @@
 #include "yocto/lang/regexp/compiler.hxx"
+#include "yocto/ptr/auto.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -9,7 +11,12 @@ namespace yocto
         {
             RegExp rx(expr.c_str(),expr.size(),dict);
 
-            return rx.parse_expr();
+            auto_ptr<pattern> p(rx.parse_expr());
+            if(rx.level>0)
+            {
+                throw exception("unfinished expression '%s'", expr.c_str());
+            }
+            return p.yield();
         }
         
     }
