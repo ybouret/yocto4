@@ -15,7 +15,8 @@ namespace yocto
             name(id),
             iline(ir),
             rules(),
-            cache()
+            cache(),
+            echo(false)
             {
             }
 
@@ -30,6 +31,32 @@ namespace yocto
                 }
             }
 
+            bool scanner:: forward(const token &tkn)
+            {
+                if(echo)
+                {
+                    std::cerr << iline << ":<%s> => " << tkn << std::endl;
+                }
+                return true;
+            }
+
+            bool scanner:: discard(const token &)
+            {
+
+                return false;
+            }
+
+            bool scanner:: newline(const token &)
+            {
+                if(echo)
+                {
+                    std::cerr << "<%s> ENDL #" << iline << std::endl;
+                }
+                ++iline;
+                return false;
+            }
+
+            
         }
     }
 

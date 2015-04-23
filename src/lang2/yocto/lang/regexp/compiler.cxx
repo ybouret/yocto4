@@ -28,6 +28,7 @@ namespace yocto
 // Parsing SubExpression
 //
 ////////////////////////////////////////////////////////////////////////////////
+#include "yocto/lang/pattern/posix.hpp"
 
 namespace yocto
 {
@@ -124,6 +125,11 @@ namespace yocto
                         p->append( parse_braces(*p) );
                         break;
 
+                        case '.':
+                        ++curr;
+                        p->append( posix::dot() );
+                        break;
+
                         //______________________________________________________
                         //
                         //  class
@@ -196,6 +202,7 @@ namespace yocto
                 case '?' :
                 case '{' :
                 case '}' :
+                case '.' :
                     return single::create(C);
 
                 case 'a': return single::create('\a');
@@ -472,7 +479,6 @@ namespace yocto
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "yocto/lang/pattern/posix.hpp"
 
 namespace yocto
 {
