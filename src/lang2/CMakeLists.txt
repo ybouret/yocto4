@@ -17,8 +17,14 @@ FILE(GLOB rx_impl yocto/lang/regexp/*.cxx)
 SET(rx_srcs ${rx_decl} ${rx_impl})
 SOURCE_GROUP(lang/regexp FILES ${rx_srcs})
 
+FILE(GLOB lex_decl yocto/lang/lexical/*.hpp)
+FILE(GLOB lex_impl yocto/lang/lexical/*.cpp)
+SET(lex_srcs ${lex_decl} ${lex_impl})
+INSTALL(FILES ${lex_decl} DESTINATION include/yocto/lang/lexical )
+SOURCE_GROUP(lang/lexical FILES ${lex_srcs})
+
 INCLUDE_DIRECTORIES(../main .)
-ADD_LIBRARY(y-lang2 STATIC ${lang_srcs} ${pat_srcs} ${rx_srcs})
+ADD_LIBRARY(y-lang2 STATIC ${lang_srcs} ${pat_srcs} ${rx_srcs} ${lex_srcs})
 
 #INSTALL( TARGETS y-lang ARCHIVE DESTINATION lib )
 
