@@ -353,9 +353,26 @@ namespace yocto
             {
                 clear();
             }
-            
+
+            //! valid only if a copy ctor is defined for NODE
+            list_of_cpp( const list_of_cpp &other ) : list_of<NODE> ()
+            {
+                try
+                {
+                    for(const NODE *node=other.head;node;node=node->next)
+                    {
+                        this->push_back( new NODE( *node ) );
+                    }
+                }
+                catch(...)
+                {
+                    clear();
+                    throw;
+                }
+            }
+
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(list_of_cpp);
+            YOCTO_DISABLE_ASSIGN(list_of_cpp);
             
         };
 		
