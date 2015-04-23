@@ -23,6 +23,8 @@ namespace yocto
             //! create a new 'AND' from curr.
             pattern *parse_expr();
 
+        private:
+
             //! parse an escape sequence in an expression
             pattern *parse_expr_esc();
 
@@ -39,7 +41,9 @@ namespace yocto
             //! parse class escape sequence
             pattern *parse_class_esc();
 
-        private:
+            pattern *parse_esc_hexa(const char *where);
+
+
             YOCTO_DISABLE_COPY_AND_ASSIGN(RegExp);
         };
     }

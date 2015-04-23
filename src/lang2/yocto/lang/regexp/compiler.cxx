@@ -207,17 +207,7 @@ namespace yocto
                 case 'v': return single::create('\v');
 
                 case 'x':
-                {
-                    if(curr>=last) throw exception("missing first hexadecimal byte in sub-expression");
-                    const int B1 = hex2dec(curr[0]);
-                    if(B1<0) throw exception("invalid hexadecimal char '%c' in subexpression", curr[0]);
-                    ++curr;
-                    if(curr>=last) throw exception("missing second hexadecimal byte in sub-expression");
-                    const int B2 = hex2dec(curr[0]);
-                    if(B2<0) throw exception("invalid hexademical char '%c' in sub-expression", curr[0]);
-                    ++curr;
-                    return single::create( B1 * 16 + B2 );
-                }
+                    return parse_esc_hexa("sub-expression");
 
                 default:
                     break;
@@ -354,10 +344,10 @@ namespace yocto
             assert(curr[0]==LBRACK);
             auto_ptr<logical> p;
             char              C=0;
-            //_____________________________________________________
+            //__________________________________________________________________
             //
             // first char analysis
-            //_____________________________________________________
+            //__________________________________________________________________
             if(++curr>=last) goto UNFINISHED;
 
 
@@ -383,32 +373,51 @@ namespace yocto
             }
             assert(p.is_valid());
 
-            //_____________________________________________________
+            //__________________________________________________________________
             //
             // loop over bracket content
-            //_____________________________________________________
+            //__________________________________________________________________
             while(curr<last)
             {
                 C = *curr;
                 switch(C)
                 {
+
+                        //______________________________________________________
+                        //
+                        // are we done ?
+                        //______________________________________________________
                     case RBRACK:
                         goto DONE;
 
+                        //______________________________________________________
+                        //
+                        // recursivity
+                        //______________________________________________________
                     case LBRACK:
                         p->append( parse_class() );
                         break;
 
+                        //______________________________________________________
+                        //
+                        // escape sequence
+                        //______________________________________________________
                     case '\\':
                         p->append( parse_class_esc() );
                         break;
 
+                        //______________________________________________________
+                        //
+                        // building a range
+                        //______________________________________________________
                     case '-':
                     {
-                        if(p->operands.size<=0) throw exception("no previous character for range");
-                        if(++curr>=last)        throw exception("unfinished range in class");
-
+                        // do we have a previous single char ?
+                        if(p->operands.size<=0)                    throw exception("no previous character for range");
                         if(p->operands.tail->uuid != single::UUID) throw exception("previous item is not a char for range");
+
+                        // do we have a next single char ?
+                        if(++curr>=last)                           throw exception("unfinished range in class");
                         auto_ptr<pattern> q(p->operands.pop_back());
                         const code_t      lower = *(const code_t *)(q->content());
                         code_t            upper = 0;
@@ -442,6 +451,7 @@ namespace yocto
                 }
             }
             if(curr>=last) goto UNFINISHED;
+            
         DONE:
             assert(RBRACK==*curr);
             ++curr;
@@ -548,19 +558,8 @@ namespace yocto
                 case 'v': return single::create('\v');
                     
                 case 'x':
-                {
-                    if(curr>=last) throw exception("missing first hexadecimal byte in class");
-                    const int B1 = hex2dec(curr[0]);
-                    if(B1<0) throw exception("invalid hexadecimal char '%c' in class", curr[0]);
-                    ++curr;
-                    if(curr>=last) throw exception("missing second hexadecimal byte in class");
-                    const int B2 = hex2dec(curr[0]);
-                    if(B2<0) throw exception("invalid hexademical char '%c' in class", curr[0]);
-                    ++curr;
-                    return single::create( B1 * 16 + B2 );
-                }
-                    
-                    
+                    return parse_esc_hexa("class");
+
                 default:
                     break;
             };
@@ -570,5 +569,29 @@ namespace yocto
     
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// Parsing an hexa decimal escape sequence
+//
+////////////////////////////////////////////////////////////////////////////////
+namespace yocto
+{
+    namespace lang
+    {
+        pattern * RegExp:: parse_esc_hexa(const char *where)
+        {
+            assert(where!=0);
+            if(curr>=last) throw exception("missing first hexadecimal byte in %s",where);
+            const int B1 = hex2dec(curr[0]);
+            if(B1<0) throw exception("invalid hexadecimal char '%c' in %s", curr[0], where);
+            ++curr;
+            if(curr>=last) throw exception("missing second hexadecimal byte in %s",where);
+            const int B2 = hex2dec(curr[0]);
+            if(B2<0) throw exception("invalid hexademical char '%c' in %s", curr[0], where);
+            ++curr;
+            return single::create( 16*B1 + B2 );
+        }
 
+    }
 
+}
