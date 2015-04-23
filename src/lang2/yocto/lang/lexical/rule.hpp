@@ -35,7 +35,6 @@ namespace yocto
 
                 static rule *create(const string &l, pattern *p, const action &a);
 
-
             private:
                 explicit rule(const string &l, pattern *p, const action &a);
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);

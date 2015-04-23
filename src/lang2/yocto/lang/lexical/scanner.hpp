@@ -35,11 +35,20 @@ namespace yocto
                     make(label,expr,a,dict);
                 }
 
+                void emit(const char *label, const char *expr,const p_dict *dict=NULL);
+                void drop(const char *label, const char *expr,const p_dict *dict=NULL);
+                void endl(const char *label);
+
 
                 bool forward( const token & ); //!< return true
                 bool discard( const token & ); //!< return false
                 bool newline( const token & ); //!< return false, increase iline
+
+
+
+                lexeme *get( source &src, ios::istream &fp);
                 
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 r_list       rules;

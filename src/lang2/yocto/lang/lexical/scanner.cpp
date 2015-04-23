@@ -35,14 +35,17 @@ namespace yocto
             {
                 if(echo)
                 {
-                    std::cerr << iline << ":<%s> => " << tkn << std::endl;
+                    std::cerr << iline << ":<" << name << " > => +" << tkn << std::endl;
                 }
                 return true;
             }
 
             bool scanner:: discard(const token &)
             {
+                if(echo)
+                {
 
+                }
                 return false;
             }
 
@@ -50,7 +53,7 @@ namespace yocto
             {
                 if(echo)
                 {
-                    std::cerr << "<%s> ENDL #" << iline << std::endl;
+                    std::cerr << "<" << name << ">" << " ENDL #" << iline << std::endl;
                 }
                 ++iline;
                 return false;
@@ -83,6 +86,22 @@ namespace yocto
                 const string label(l);
                 make(label, regexp(expr,dict), a);
             }
+
+            void scanner:: emit(const char *label, const char *expr,const p_dict *dict)
+            {
+                make(label,expr,this, & scanner::forward, dict);
+            }
+
+            void scanner:: drop(const char *label, const char *expr,const p_dict *dict)
+            {
+                make(label,expr,this, & scanner::discard, dict);
+            }
+
+            void scanner:: endl(const char *label)
+            {
+                make(label,"[:endl:]", this, &scanner::newline, NULL);
+            }
+
         }
 
     }
