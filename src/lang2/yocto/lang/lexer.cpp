@@ -27,7 +27,7 @@ scanners(2,as_capacity)
             Root = new lexical::scanner(root_scanner,line);
             const p_scanner q(Root);
             if(!scanners.insert(q))
-                throw exception("lexer[%s] unexpected scanner<%s> database failure !", name.c_str(), Root->name.c_str());
+                throw exception("{%s} unexpected scanner<%s> database failure !", name.c_str(), Root->name.c_str());
             scan = Root;
             Root->link_to(*this);
         }
@@ -54,7 +54,7 @@ scanners(2,as_capacity)
                 p_scanner q( new lexical::scanner(id,line) );
                 if(! scanners.insert(q) )
                 {
-                    throw exception("[%s][<%s>]: unexpected creation failure", name.c_str(), id.c_str());
+                    throw exception("{%s}[<%s>]: unexpected creation failure", name.c_str(), id.c_str());
                 }
                 q->link_to(*this);
                 return *q;
@@ -93,7 +93,7 @@ namespace yocto
             p_scanner *pp = scanners.search(id);
             if(!pp)
             {
-                throw exception("[%s]: no <%s> to JUMP", name.c_str(), id.c_str());
+                throw exception("{%s}: no <%s> to JUMP", name.c_str(), id.c_str());
             }
             lexical::scanner &s = **pp;
             scan = &s;
@@ -105,7 +105,7 @@ namespace yocto
             p_scanner *pp = scanners.search(id);
             if(!pp)
             {
-                throw exception("[%s]: no <%s> to JUMP", name.c_str(), id.c_str());
+                throw exception("{%s}: no <%s> to JUMP", name.c_str(), id.c_str());
             }
             lexical::scanner &s = **pp;
             history.append(scan);
@@ -115,7 +115,7 @@ namespace yocto
 
         void lexer:: back()
         {
-            if(history.size<=0) throw exception("[%s]: no previous CALL to be BACK...", name.c_str());
+            if(history.size<=0) throw exception("{%s}: no previous CALL to be BACK...", name.c_str());
             assert(0!=history.tail->addr);
             scan = history.tail->addr;
             history.remove();
@@ -132,8 +132,7 @@ namespace yocto
 {
     namespace lang
     {
-
-        lexeme * lexer:: get( source &src, ios::istream &fp)
+        lexeme *lexer:: read_from(source &src, ios::istream &fp)
         {
             assert(scan);
             for(;;)
@@ -154,6 +153,48 @@ namespace yocto
                     }
                 }
                 return lx;
+            }
+
+        }
+
+
+        lexeme * lexer:: get( source &src, ios::istream &fp )
+        {
+            assert(scan);
+            if(size>0)
+            {
+                return pop_front();
+            }
+            else
+            {
+                return read_from(src,fp);
+            }
+        }
+
+        void   lexer:: unget( lexeme *lx ) throw()
+        {
+            assert(lx);
+            push_front(lx);
+        }
+
+        void    lexer:: uncpy( const lexeme *lx )
+        {
+            assert(lx);
+            push_front( new lexeme(*lx) );
+        }
+
+
+        const lexeme * lexer:: peek(source &src, ios::istream &fp)
+        {
+            if(size>0)
+            {
+                return head;
+            }
+            else
+            {
+                lexeme *lx = read_from(src, fp);
+                if(lx) { push_front(lx); assert(1==size); }
+                return head;
             }
         }
 

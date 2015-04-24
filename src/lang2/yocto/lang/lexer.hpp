@@ -11,7 +11,7 @@ namespace yocto
     {
 
         //! lexer
-        class lexer : public object
+        class lexer : public object, public l_list
         {
         public:
             explicit lexer(const string &id, const string &root_scanner);
@@ -40,8 +40,17 @@ namespace yocto
             //! back from another scanner
             void back();
 
-            lexeme *get( source &src, ios::istream &fp);
-            
+            //! from cache or new
+            lexeme *get(source &src, ios::istream &fp);
+
+            //! restore a lexeme
+            void    unget( lexeme * ) throw();
+
+            //! restore a copy of a lexeme
+            void    uncpy( const lexeme *);
+
+            //! is there anyone left ?
+            const lexeme *peek(source &src, ios::istream &fp);
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
@@ -55,6 +64,8 @@ namespace yocto
             historyDB         history;
 
             void initialize(const string &root_scanner);
+
+            lexeme *read_from(source &src, ios::istream &fp);
         };
 
     }
