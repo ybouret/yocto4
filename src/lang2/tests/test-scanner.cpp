@@ -28,7 +28,8 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     ios::icstream fp(ios::cstdin);
     lang::source  src;
 
-    while( NULL !=(lx=scan.get(src,fp) ) )
+    bool ctrl=false;
+    while( NULL !=(lx=scan.get(src,fp,ctrl) ) )
     {
         lexemes.push_back(lx);
     }

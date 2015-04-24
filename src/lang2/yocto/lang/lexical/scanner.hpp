@@ -45,8 +45,17 @@ namespace yocto
                 bool newline( const token & ); //!< return false, increase iline
 
 
-
-                lexeme *get( source &src, ios::istream &fp);
+                //______________________________________________________________
+                //
+                //! Get a new lexeme
+                //______________________________________________________________
+                /**
+                 Longest First Come, First Saved algorithm.
+                 When a rule is selected, its action is performed.
+                 If the rule is a control rule, the token is discarded
+                 and the action MUST return false.
+                 */
+                lexeme *get( source &src, ios::istream &fp, bool &ctrl);
                 
 
             private:

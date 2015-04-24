@@ -8,7 +8,7 @@ namespace yocto
 
         namespace lexical
         {
-            lexeme * scanner:: get(source &src, ios::istream &fp)
+            lexeme * scanner:: get(source &src, ios::istream &fp, bool &ctrl)
             {
             TRY_PRODUCE:
                 if(cache.size)
@@ -25,7 +25,8 @@ namespace yocto
                     {
                         //______________________________________________________
                         //
-                        // There are some chars ahead !
+                        // There are some chars ahead: find a fisrt matching
+                        // rule
                         //______________________________________________________
                         rule   *best_rule = 0;
                         token   best_token;
@@ -50,6 +51,10 @@ namespace yocto
                             throw imported::exception("syntax error", "%d:<%s> unexpected char '%c'", iline, name.c_str(), char(C) );
                         }
 
+                        //______________________________________________________
+                        //
+                        // Check other rules
+                        //______________________________________________________
                         for(rule *r = best_rule->next; r; r=r->next)
                         {
                             token tkn;
@@ -71,10 +76,16 @@ namespace yocto
                             assert(0==tkn.size);
                         }
 
-                        //! done
+                        //______________________________________________________
+                        //
+                        // Done
+                        //______________________________________________________
+                        assert(src.size>=best_token.size);
                         src.skip(best_token.size);
+                        ctrl = best_rule->ctrl;
                         if( best_rule->apply(best_token) )
                         {
+                            if(ctrl) throw exception("control rule '%s' MUST return FALSE", best_rule->label.c_str());
                             std::cerr << "<" << name << ">[" << best_rule->label << "]='" << best_token << "' @" << iline << std::endl;
                             lexeme *lx = new lexeme(best_rule->label,iline);
                             lx->swap_with(best_token);
@@ -82,7 +93,11 @@ namespace yocto
                         }
                         else
                         {
-
+                            if(ctrl)
+                            {
+                                // something has changed, return to lexer...
+                                return 0;
+                            }
                         }
                         goto TRY_PRODUCE;
                     }

@@ -46,7 +46,7 @@ namespace yocto
             //! unget a C string
             void unget( const char *s );
 
-
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(source);
 

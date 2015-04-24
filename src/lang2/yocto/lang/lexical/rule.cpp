@@ -8,13 +8,14 @@ namespace yocto
         namespace lexical
         {
 
-            rule:: rule( const string &l, pattern *p, const action &a ) :
+            rule:: rule( const string &l, pattern *p, const action &a , const bool is_ctrl) :
             next(0),
             prev(0),
 
             label(l),
             motif(p),
-            apply(a)
+            apply(a),
+            ctrl(is_ctrl)
             {
                 assert(motif!=0);
             }
@@ -27,12 +28,12 @@ namespace yocto
             }
 
 
-            rule * rule::create(const string &l, pattern *p, const action &a)
+            rule * rule::create(const string &l, pattern *p, const action &a, const bool is_ctrl)
             {
                 assert(p);
                 try
                 {
-                    return new rule(l,p,a);
+                    return new rule(l,p,a,is_ctrl);
                 }
                 catch(...)
                 {

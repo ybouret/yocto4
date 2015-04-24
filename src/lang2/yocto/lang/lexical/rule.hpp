@@ -30,13 +30,14 @@ namespace yocto
                 const string label; //!< hard coded label, for lexemes
                 pattern     *motif; //!< the matching pattern
                 action       apply; //!< what to do in case of success
-                
+                const bool   ctrl;  //!< true is control rule
+
                 virtual ~rule() throw();
 
-                static rule *create(const string &l, pattern *p, const action &a);
+                static rule *create(const string &l, pattern *p, const action &a, const bool is_control=false);
 
             private:
-                explicit rule(const string &l, pattern *p, const action &a);
+                explicit rule(const string &l, pattern *p, const action &a, const bool is_ctrl);
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
             };
 
