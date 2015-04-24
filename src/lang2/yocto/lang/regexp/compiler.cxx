@@ -296,7 +296,7 @@ namespace yocto
                 //
                 // assume n[,m] or something
                 //______________________________________________________________
-                char *coma = strchr(br.c_str(), ',');
+                char *coma = (char *)strchr(br.c_str(), ',');
                 if(coma)
                 {
                     *coma = 0;
