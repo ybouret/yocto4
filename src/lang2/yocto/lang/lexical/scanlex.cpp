@@ -48,7 +48,7 @@ namespace yocto
                         {
                             assert(src.peek(fp));
                             const code_t C = src.peek(fp)->code;
-                            throw imported::exception("syntax error", "%d:<%s> unexpected char '%c'", iline, name.c_str(), char(C) );
+                            throw imported::exception("syntax error", "%d:<%s> unexpected char '%c'", line, name.c_str(), char(C) );
                         }
 
                         //______________________________________________________
@@ -86,8 +86,8 @@ namespace yocto
                         if( best_rule->apply(best_token) )
                         {
                             if(ctrl) throw exception("control rule '%s' MUST return FALSE", best_rule->label.c_str());
-                            std::cerr << "<" << name << ">[" << best_rule->label << "]='" << best_token << "' @" << iline << std::endl;
-                            lexeme *lx = new lexeme(best_rule->label,iline);
+                            std::cerr << "<" << name << ">[" << best_rule->label << "]='" << best_token << "' @" << line << std::endl;
+                            lexeme *lx = new lexeme(best_rule->label,line);
                             lx->swap_with(best_token);
                             return lx;
                         }

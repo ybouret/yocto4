@@ -11,14 +11,23 @@ namespace yocto
 
             scanner:: ~scanner() throw() {}
 
+#define Y_LANG_SCANNER_CTOR() \
+name(id),   \
+line(ir),   \
+rules(),    \
+cache(),    \
+echo(false)
+
             scanner:: scanner(const string &id , int &ir) :
-            name(id),
-            iline(ir),
-            rules(),
-            cache(),
-            echo(false)
+            Y_LANG_SCANNER_CTOR()
             {
             }
+
+            scanner:: scanner(const char *id , int &ir) :
+            Y_LANG_SCANNER_CTOR()
+            {
+            }
+
 
             void scanner:: check_label(const string &label)
             {
@@ -35,7 +44,7 @@ namespace yocto
             {
                 if(echo)
                 {
-                    std::cerr << iline << ":<" << name << " > => +" << tkn << std::endl;
+                    std::cerr << line << ":<" << name << " > => +" << tkn << std::endl;
                 }
                 return true;
             }
@@ -53,13 +62,13 @@ namespace yocto
             {
                 if(echo)
                 {
-                    std::cerr << "<" << name << ">" << " ENDL #" << iline << std::endl;
+                    std::cerr << "<" << name << ">" << " ENDL #" << line << std::endl;
                 }
-                ++iline;
+                ++line;
                 return false;
             }
 
-            
+            const string & scanner:: key() const throw() { return name; }
         }
     }
 
@@ -96,13 +105,13 @@ namespace yocto
             {
                 make(label,expr,this, & scanner::discard, dict);
             }
-
+            
             void scanner:: endl(const char *label)
             {
                 make(label,"[:endl:]", this, &scanner::newline, NULL);
             }
-
+            
         }
-
+        
     }
 }

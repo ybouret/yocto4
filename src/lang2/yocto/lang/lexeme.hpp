@@ -14,7 +14,7 @@ namespace yocto
             lexeme *       next;
             lexeme *       prev;
             const string & label; //!< reference to the producing rule
-            const int      iline;  //!< creation line
+            const int      line;  //!< creation line
 
             virtual ~lexeme() throw();
             explicit lexeme(const string &l, const int i) throw();

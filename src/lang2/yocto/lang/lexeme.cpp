@@ -12,7 +12,7 @@ namespace yocto
         next(0),
         prev(0),
         label(l),
-        iline(i)
+        line(i)
         {
 
         }
@@ -22,7 +22,7 @@ namespace yocto
         next(0),
         prev(0),
         label(other.label),
-        iline(other.iline)
+        line(other.line)
         {
         }
 

@@ -4,6 +4,7 @@
 #include "yocto/lang/lexeme.hpp"
 #include "yocto/lang/lexical/rule.hpp"
 #include "yocto/lang/regexp.hpp"
+#include "yocto/ptr/intr.hpp"
 
 namespace yocto
 {
@@ -12,14 +13,22 @@ namespace yocto
 
         namespace lexical
         {
+            //! a simple scanner
+            /**
+             Transform a source of t_char into a source of lexemes.
+             */
             class scanner : public counted_object
             {
             public:
+                typedef intr_ptr<string,scanner> ptr;
                 virtual ~scanner() throw();
                 explicit scanner(const string &id, int &ir);
+                explicit scanner(const char   *id, int &ir);
 
+                const string &key() const throw();
+                
                 const string name;  //!< identifier
-                int         &iline; //!< line index reference
+                int         &line;  //!< line index reference
 
                 //! action upon pattern
                 void  make(const string &label, pattern *p, const action &a);
