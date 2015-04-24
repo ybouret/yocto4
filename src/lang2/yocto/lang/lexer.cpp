@@ -29,9 +29,10 @@ scanners(2,as_capacity)
             if(!scanners.insert(q))
                 throw exception("lexer[%s] unexpected scanner<%s> database failure !", name.c_str(), Root->name.c_str());
             scan = Root;
+            Root->link_to(*this);
         }
 
-        lexer:: lexer(const char   *id, const char   *root_scanner) :
+        lexer:: lexer(const char   *id, const char *root_scanner) :
         Y_LANG_LEXER_CTOR()
         {
             const string rs(root_scanner);
@@ -55,6 +56,7 @@ scanners(2,as_capacity)
                 {
                     throw exception("[%s][<%s>]: unexpected creation failure", name.c_str(), id.c_str());
                 }
+                q->link_to(*this);
                 return *q;
             }
             else

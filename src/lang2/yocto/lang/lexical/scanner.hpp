@@ -16,6 +16,10 @@ namespace yocto
         namespace lexical
         {
 
+            //! a callback for control rules
+            typedef functor<void,TL1(const token&)> callback;
+            
+
             //! a simple scanner
             /**
              Transform a source of t_char into a source of lexemes.
@@ -75,6 +79,8 @@ namespace yocto
                 // rule: jump to another scanner
                 //
                 //--------------------------------------------------------------
+                void jump(const string &id, pattern *p, const callback &on_jump);
+
 
                 //______________________________________________________________
                 //

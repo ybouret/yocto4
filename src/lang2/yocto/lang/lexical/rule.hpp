@@ -18,7 +18,7 @@ namespace yocto
              - if it returns true,  the lexeme is emitted
              - if it returns false, the token is dicarded
              */
-            typedef functor<bool,TL1(token)> action;
+            typedef functor<bool,TL1(const token &)> action;
 
             //! a simple lexical rule
             class rule : public object
