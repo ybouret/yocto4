@@ -14,8 +14,8 @@ namespace yocto
                 motif=0;
             }
 
-            comment:: comment( lexer &LX, const char *marker) :
-            plugin("commment",LX),
+            comment:: comment( const char *id, lexer &LX, const char *marker) :
+            plugin(id,LX),
             motif( regexp(marker,dict) )
             {
                 try

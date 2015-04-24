@@ -15,15 +15,16 @@ namespace yocto
             {
             public:
                 virtual ~comment() throw();
-                explicit comment(lexer &, const char *marker);
+                explicit comment(const char *id, lexer &, const char *marker);
 
                 virtual pattern *trigger() const;
                 virtual void     onEnter(const token &);
-
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(comment);
                 pattern *motif;
             };
+
 
         }
     }

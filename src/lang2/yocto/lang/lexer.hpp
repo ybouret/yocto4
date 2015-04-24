@@ -59,17 +59,25 @@ namespace yocto
 
 
             template <typename PLUGIN> inline
-            lexical::plugin & load()
+            lexical::plugin & load(const char *id)
             {
-                lexical::plugin *plg = new PLUGIN(*this);
+                lexical::plugin *plg = new PLUGIN(id,*this);
                 declare_plugin(plg);
                 return *plg;
             }
 
             template <typename PLUGIN> inline
-            lexical::plugin & load(const char *expr)
+            lexical::plugin & load(const char *id, const char *expr)
             {
-                lexical::plugin *plg = new PLUGIN(*this,expr);
+                lexical::plugin *plg = new PLUGIN(id,*this,expr);
+                declare_plugin(plg);
+                return *plg;
+            }
+
+            template <typename PLUGIN> inline
+            lexical::plugin & load(const char *id, const char *ini_expr, const char *end_expr)
+            {
+                lexical::plugin *plg = new PLUGIN(id,*this,ini_expr,end_expr);
                 declare_plugin(plg);
                 return *plg;
             }

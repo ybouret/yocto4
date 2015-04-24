@@ -3,6 +3,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/lang/lexical/plugin/comment.hpp"
+#include "yocto/lang/lexical/plugin/ccomment.hpp"
 
 #include <cstdlib>
 
@@ -37,8 +38,11 @@ namespace{
             com2.endl("ENDL");
             com2.drop("CHAR",".");
 
-            lexical::plugin &bash_com = load<lexical::comment>("#");
+            lexical::plugin &bash_com = load<lexical::comment>("BashComment","#");
             bash_com.enhance(root);
+
+            lexical::plugin &xml_com = load<lexical::ccomment>("XmlComment","<!--","-->");
+            xml_com.enhance(root);
 
             root.drop("WS", "[:blank:]");
             root.endl("ENDL");
