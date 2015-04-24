@@ -3,7 +3,7 @@
 
 #include "yocto/lang/lexical/scanner.hpp"
 #include "yocto/associative/set.hpp"
-
+#include "yocto/sequence/addr-list.hpp"
 
 namespace yocto
 {
@@ -21,26 +21,38 @@ namespace yocto
             const string name;
             int          line;
 
-            lexical::scanner & root() throw();
+            void reset() throw();
+
+            lexical::scanner & get_root() throw();
 
             //! get/create-on-the-fly scanner
-            lexical::scanner & operator[](const string &id);
+            lexical::scanner & declare(const string &id);
 
             //! get/create scanner, wrapper
-            lexical::scanner & operator[](const char   *id);
-
-
-            //! jump to new scanner
+            lexical::scanner & declare(const char   *id);
+            
+            //! jump to another scanner
             void jump(const string &id);
+
+            //! call another scanner
+            void call(const string &id);
+
+            //! back from another scanner
+            void back();
+
+            lexeme *get( source &src, ios::istream &fp);
+            
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
-            typedef lexical::scanner::ptr p_scanner;
-            typedef set<string,p_scanner> scannerDB;
+            typedef lexical::scanner::ptr       p_scanner;
+            typedef set<string,p_scanner>       scannerDB;
+            typedef addr_list<lexical::scanner> historyDB;
 
             lexical::scanner *scan;     //!< active scanner
             lexical::scanner *Root;     //!< root scanner
             scannerDB         scanners;
+            historyDB         history;
 
             void initialize(const string &root_scanner);
         };

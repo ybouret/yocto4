@@ -1,0 +1,63 @@
+#include "yocto/lang/lexer.hpp"
+#include "yocto/utest/run.hpp"
+#include "yocto/ios/icstream.hpp"
+#include "yocto/ptr/auto.hpp"
+
+#include <cstdlib>
+
+using namespace yocto;
+using namespace lang;
+
+namespace{
+
+
+    class Lexer : public lexer
+    {
+    public:
+        virtual ~Lexer() throw() {}
+
+        inline Lexer() : lexer("Lexer","root")
+        {
+
+            lexical::scanner &root = get_root();
+
+            root.emit("ID","[_[:alpha:]][:word:]*");
+            root.emit("INT", "[:digit:]+");
+            root.drop("WS", "[:blank:]");
+            root.endl("ENDL");
+            root.emit("SNGL", ".");
+            root.call("COM", "//", &root, &lexical::scanner::discard_cb);
+
+            lexical::scanner &com = declare("COM");
+            com.drop("CHAR",".");
+            com.back("[:endl:]", &com, &lexical::scanner::newline_cb);
+
+        }
+
+
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(Lexer);
+    };
+
+}
+
+YOCTO_UNIT_TEST_IMPL(lexer)
+{
+
+    Lexer LX;
+
+    ios::icstream fp(ios::cstdin);
+    lang::source  src;
+
+    lexeme *lx = 0;
+    l_list  lexemes;
+
+    while( NULL !=(lx=LX.get(src,fp) ) )
+    {
+        std::cerr << lx->label << "='" << *lx << "'" << std::endl;
+        lexemes.push_back(lx);
+    }
+
+}
+YOCTO_UNIT_TEST_DONE()
+

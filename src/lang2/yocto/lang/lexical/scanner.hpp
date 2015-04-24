@@ -18,7 +18,7 @@ namespace yocto
 
             //! a callback for control rules
             typedef functor<void,TL1(const token&)> callback;
-            
+
 
             //! a simple scanner
             /**
@@ -33,7 +33,7 @@ namespace yocto
                 explicit scanner(const char   *id, int &ir);
 
                 const string &key() const throw();
-                
+
                 const string name;  //!< identifier
                 int         &line;  //!< line index reference
 
@@ -73,14 +73,52 @@ namespace yocto
                 bool discard( const token & ); //!< return false
                 bool newline( const token & ); //!< return false, increase iline
 
+                void discard_cb( const token & );
+                void newline_cb( const token & );
+
 
                 //--------------------------------------------------------------
                 //
                 // rule: jump to another scanner
                 //
                 //--------------------------------------------------------------
-                void jump(const string &id, pattern *p, const callback &on_jump);
+                void jump(const string &scanner_id, pattern *p, const callback &on_jump);
 
+                template <typename HOST_POINTER, typename METHOD_POINTER>
+                inline void jump(const char *scanner_id, const char *expr, HOST_POINTER h, METHOD_POINTER m, const p_dict *dict=NULL)
+                {
+                    const string   ID(scanner_id);
+                    const callback CB(h,m);
+                    jump( ID, regexp(expr,dict), CB);
+                }
+
+                //--------------------------------------------------------------
+                //
+                // rule: call another scanner
+                //
+                //--------------------------------------------------------------
+                void call(const string &scanner_id, pattern *p, const callback &on_call);
+
+                template <typename HOST_POINTER, typename METHOD_POINTER>
+                inline void call(const char *scanner_id, const char *expr, HOST_POINTER h, METHOD_POINTER m, const p_dict *dict=NULL)
+                {
+                    const string   ID(scanner_id);
+                    const callback CB(h,m);
+                    call( ID, regexp(expr,dict), CB);
+                }
+
+                //--------------------------------------------------------------
+                //
+                // rule: back from another scanner
+                //
+                //--------------------------------------------------------------
+                void back(pattern *p, const callback &on_back);
+                template <typename HOST_POINTER, typename METHOD_POINTER>
+                inline void back(const char *expr, HOST_POINTER h, METHOD_POINTER m, const p_dict *dict=NULL)
+                {
+                    const callback CB(h,m);
+                    back( regexp(expr,dict), CB);
+                }
 
                 //______________________________________________________________
                 //
@@ -93,13 +131,14 @@ namespace yocto
                  and the action MUST return false.
                  */
                 lexeme *get( source &src, ios::istream &fp, bool &ctrl);
-                
+
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 r_list       rules;
                 l_list       cache;
                 lexer       *lex;
+                unsigned     bidx;
                 
                 void check_label(const string &label);
                 

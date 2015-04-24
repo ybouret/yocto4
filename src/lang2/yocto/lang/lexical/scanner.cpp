@@ -17,6 +17,7 @@ line(ir),   \
 rules(),    \
 cache(),    \
 lex(0),     \
+bidx(0),    \
 echo(false)
 
             scanner:: scanner(const string &id , int &ir) :
@@ -59,22 +60,28 @@ echo(false)
                 return false;
             }
 
-            bool scanner:: newline(const token &)
+            bool scanner:: newline(const token &t)
+            {
+                newline_cb(t);
+                return false;
+            }
+
+            const string & scanner:: key() const throw() { return name; }
+
+            void scanner:: discard_cb( const token & )
+            {
+
+            }
+
+            void scanner:: newline_cb(const token &)
             {
                 if(echo)
                 {
                     std::cerr << "<" << name << ">" << " ENDL #" << line << std::endl;
                 }
                 ++line;
-                return false;
             }
 
-            const string & scanner:: key() const throw() { return name; }
-
-            void scanner:: link_to( lexer &parent )
-            {
-
-            }
 
         }
     }

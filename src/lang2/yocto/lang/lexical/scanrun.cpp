@@ -25,7 +25,7 @@ namespace yocto
                     {
                         //______________________________________________________
                         //
-                        // There are some chars ahead: find a fisrt matching
+                        // There are some chars ahead: find a first matching
                         // rule
                         //______________________________________________________
                         rule   *best_rule = 0;
@@ -81,8 +81,9 @@ namespace yocto
                         // Done
                         //______________________________________________________
                         assert(src.size>=best_token.size);
-                        src.skip(best_token.size);
-                        ctrl = best_rule->ctrl;
+
+                        src.skip(best_token.size); // forward
+                        ctrl = best_rule->ctrl;    // set if control rule
                         if( best_rule->apply(best_token) )
                         {
                             if(ctrl) throw exception("control rule '%s' MUST return FALSE", best_rule->label.c_str());
@@ -98,6 +99,7 @@ namespace yocto
                                 // something has changed, return to lexer...
                                 return 0;
                             }
+                            // else it was discarded
                         }
                         goto TRY_PRODUCE;
                     }
