@@ -21,14 +21,14 @@ namespace yocto
             const string name;
             int          line;
 
-            void reset() throw();
+            void restart() throw();
 
             lexical::scanner & get_root() throw();
 
-            //! get/create-on-the-fly scanner
+            //! create a new scanner
             lexical::scanner & declare(const string &id);
 
-            //! get/create scanner, wrapper
+            //! create a new scanner, wrapper
             lexical::scanner & declare(const char   *id);
             
             //! jump to another scanner
@@ -52,6 +52,7 @@ namespace yocto
             //! is there anyone left ?
             const lexeme *peek(source &src, ios::istream &fp);
 
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             typedef lexical::scanner::ptr       p_scanner;
@@ -66,6 +67,9 @@ namespace yocto
             void initialize(const string &root_scanner);
 
             lexeme *read_from(source &src, ios::istream &fp);
+
+        public:
+            p_dict dict;
         };
 
     }

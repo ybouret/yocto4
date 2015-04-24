@@ -50,7 +50,7 @@ namespace yocto
 
                 //! action upon pattern, wrapper
                 template <typename HOST_POINTER, typename METHOD_POINTER>
-                inline void make(const char *label, const char *expr, HOST_POINTER h, METHOD_POINTER m, const p_dict *dict=NULL)
+                inline void make(const char *label, const char *expr, HOST_POINTER h, METHOD_POINTER m)
                 {
                     const string l(label);
                     const action a(h,m);
@@ -58,10 +58,10 @@ namespace yocto
                 }
 
                 //! action= forward
-                void emit(const char *label, const char *expr,const p_dict *dict=NULL);
+                void emit(const char *label, const char *expr);
 
                 //! action= discard
-                void drop(const char *label, const char *expr,const p_dict *dict=NULL);
+                void drop(const char *label, const char *expr);
 
                 //! action= newline
                 void endl(const char *label);
@@ -81,10 +81,10 @@ namespace yocto
                 //
                 //--------------------------------------------------------------
                 void jump(const string &scanner_id, pattern *p, const callback &on_jump);
-                void jump(const char   *scanner_id, const char *expr, const p_dict *dict=NULL); //!< jump and do nothing else
+                void jump(const char   *scanner_id, const char *expr); //!< jump and do nothing else
 
                 template <typename HOST_POINTER, typename METHOD_POINTER>
-                inline void jump(const char *scanner_id, const char *expr, HOST_POINTER h, METHOD_POINTER m, const p_dict *dict=NULL)
+                inline void jump(const char *scanner_id, const char *expr, HOST_POINTER h, METHOD_POINTER m)
                 {
                     const string   ID(scanner_id);
                     const callback CB(h,m);
@@ -97,10 +97,10 @@ namespace yocto
                 //
                 //--------------------------------------------------------------
                 void call(const string &scanner_id, pattern *p, const callback &on_call);
-                void call(const char   *scanner_id, const char *expr, const p_dict *dict=NULL); //!< call and do nothing else
+                void call(const char   *scanner_id, const char *expr); //!< call and do nothing else
 
                 template <typename HOST_POINTER, typename METHOD_POINTER>
-                inline void call(const char *scanner_id, const char *expr, HOST_POINTER h, METHOD_POINTER m, const p_dict *dict=NULL)
+                inline void call(const char *scanner_id, const char *expr, HOST_POINTER h, METHOD_POINTER m)
                 {
                     const string   ID(scanner_id);
                     const callback CB(h,m);
@@ -114,7 +114,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 void back(pattern *p, const callback &on_back);
                 template <typename HOST_POINTER, typename METHOD_POINTER>
-                inline void back(const char *expr, HOST_POINTER h, METHOD_POINTER m, const p_dict *dict=NULL)
+                inline void back(const char *expr, HOST_POINTER h, METHOD_POINTER m)
                 {
                     const callback CB(h,m);
                     back( regexp(expr,dict), CB);
@@ -138,6 +138,7 @@ namespace yocto
                 r_list       rules;
                 l_list       cache;
                 lexer       *lex;
+                p_dict      *dict;
                 unsigned     bidx;
                 
                 void check_label(const string &label);

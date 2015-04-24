@@ -13,7 +13,9 @@ name(id),                   \
 line(1),                    \
 scan(0),                    \
 Root(0),                    \
-scanners(2,as_capacity)
+scanners(2,as_capacity),    \
+history(),                  \
+dict()
 
 
         lexer:: lexer(const string &id, const string &root_scanner) :
@@ -49,20 +51,17 @@ scanners(2,as_capacity)
         lexical::scanner & lexer:: declare(const string &id)
         {
             p_scanner *pp = scanners.search(id);
-            if(!pp)
+            if(pp)
+                throw exception("{%s}: multiple scanned <%s>", name.c_str(), id.c_str());
+
+            p_scanner q( new lexical::scanner(id,line) );
+            if(! scanners.insert(q) )
             {
-                p_scanner q( new lexical::scanner(id,line) );
-                if(! scanners.insert(q) )
-                {
-                    throw exception("{%s}[<%s>]: unexpected creation failure", name.c_str(), id.c_str());
-                }
-                q->link_to(*this);
-                return *q;
+                throw exception("{%s}[<%s>]: unexpected creation failure", name.c_str(), id.c_str());
             }
-            else
-            {
-                return **pp;
-            }
+            
+            q->link_to(*this);
+            return *q;
         }
 
         lexical::scanner & lexer:: declare(const char *txt)
@@ -72,7 +71,7 @@ scanners(2,as_capacity)
         }
 
 
-        void lexer:: reset() throw()
+        void lexer:: restart() throw()
         {
             scan = Root;
             line = 1;
@@ -197,9 +196,9 @@ namespace yocto
                 return head;
             }
         }
-
-
-
+        
+        
+        
     }
 }
 

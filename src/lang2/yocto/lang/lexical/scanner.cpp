@@ -17,6 +17,7 @@ line(ir),   \
 rules(),    \
 cache(),    \
 lex(0),     \
+dict(0),    \
 bidx(0),    \
 echo(false)
 
@@ -104,19 +105,19 @@ namespace yocto
                 rules.push_back( rule::create(label,q.yield(),a) );
             }
             
-            void scanner:: emit(const char *label, const char *expr,const p_dict *dict)
+            void scanner:: emit(const char *label, const char *expr)
             {
-                make(label,expr,this, & scanner::forward, dict);
+                make(label,expr,this, & scanner::forward);
             }
 
-            void scanner:: drop(const char *label, const char *expr,const p_dict *dict)
+            void scanner:: drop(const char *label, const char *expr)
             {
-                make(label,expr,this, & scanner::discard, dict);
+                make(label,expr,this, & scanner::discard);
             }
             
             void scanner:: endl(const char *label)
             {
-                make(label,"[:endl:]", this, &scanner::newline, NULL);
+                make(label,"[:endl:]", this, &scanner::newline);
             }
             
         }
