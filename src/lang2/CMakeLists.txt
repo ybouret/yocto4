@@ -23,8 +23,14 @@ SET(lex_srcs ${lex_decl} ${lex_impl})
 INSTALL(FILES ${lex_decl} DESTINATION include/yocto/lang/lexical )
 SOURCE_GROUP(lang/lexical FILES ${lex_srcs})
 
+FILE(GLOB plug_lex_decl yocto/lang/lexical/plugin/*.hpp)
+FILE(GLOB plug_lex_impl yocto/lang/lexical/plugin/*.cpp)
+SET(plug_lex_srcs ${plug_lex_decl} ${plug_lex_impl})
+INSTALL(FILES ${plug_lex_decl} DESTINATION include/yocto/lang/lexical/plugin )
+SOURCE_GROUP(lang/lexical/plugin FILES ${plug_lex_srcs})
+
 INCLUDE_DIRECTORIES(../main .)
-ADD_LIBRARY(y-lang2 STATIC ${lang_srcs} ${pat_srcs} ${rx_srcs} ${lex_srcs})
+ADD_LIBRARY(y-lang2 STATIC ${lang_srcs} ${pat_srcs} ${rx_srcs} ${lex_srcs} ${plug_lex_srcs})
 
 #INSTALL( TARGETS y-lang ARCHIVE DESTINATION lib )
 

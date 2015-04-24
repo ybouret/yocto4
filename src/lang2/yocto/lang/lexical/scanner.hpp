@@ -136,9 +136,10 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 r_list       rules;
-                l_list       cache;
                 lexer       *lex;
-                p_dict      *dict;
+            protected:
+                p_dict      *dict; //!< available when linked to lexer
+            private:
                 unsigned     bidx;
                 
                 void check_label(const string &label);

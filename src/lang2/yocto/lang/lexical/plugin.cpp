@@ -1,0 +1,26 @@
+#include "yocto/lang/lexer.hpp"
+
+namespace yocto
+{
+    namespace lang
+    {
+        namespace lexical
+        {
+            plugin:: ~plugin() throw() {}
+
+            plugin:: plugin( const string &id, lexer &parent) :
+            scanner(id,parent.line)
+            {
+                link_to(parent);
+            }
+
+            plugin:: plugin( const char  *id, lexer &parent) :
+            scanner(id,parent.line)
+            {
+                link_to(parent);
+            }
+
+            
+        }
+    }
+}

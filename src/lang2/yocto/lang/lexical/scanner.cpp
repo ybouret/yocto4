@@ -15,7 +15,6 @@ namespace yocto
 name(id),   \
 line(ir),   \
 rules(),    \
-cache(),    \
 lex(0),     \
 dict(0),    \
 bidx(0),    \

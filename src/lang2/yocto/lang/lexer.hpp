@@ -1,7 +1,7 @@
 #ifndef YOCTO_LANG_LEXER_INCLUDED
 #define YOCTO_LANG_LEXER_INCLUDED 1
 
-#include "yocto/lang/lexical/scanner.hpp"
+#include "yocto/lang/lexical/plugin.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/sequence/addr-list.hpp"
 
@@ -30,7 +30,9 @@ namespace yocto
 
             //! create a new scanner, wrapper
             lexical::scanner & declare(const char   *id);
-            
+
+
+
             //! jump to another scanner
             void jump(const string &id);
 
@@ -49,8 +51,31 @@ namespace yocto
             //! restore a copy of a lexeme
             void    uncpy( const lexeme *);
 
+            //! mimic a lexeme unget
+            void    unget(const lexical::plugin &, const string &content);
+
             //! is there anyone left ?
             const lexeme *peek(source &src, ios::istream &fp);
+
+
+            template <typename PLUGIN> inline
+            lexical::plugin & use()
+            {
+                lexical::plugin *plg = new PLUGIN(*this);
+                load(plg);
+                return *plg;
+            }
+
+            template <typename PLUGIN> inline
+            lexical::plugin & use(const char *expr)
+            {
+                lexical::plugin *plg = new PLUGIN(*this,expr);
+                load(plg);
+                return *plg;
+            }
+
+
+
 
 
         private:
@@ -67,6 +92,9 @@ namespace yocto
             void initialize(const string &root_scanner);
 
             lexeme *read_from(source &src, ios::istream &fp);
+            
+            friend class lexical::plugin;
+            void   load( lexical::plugin *plg);
 
         public:
             p_dict dict;

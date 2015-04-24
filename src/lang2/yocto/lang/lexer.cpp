@@ -197,8 +197,25 @@ namespace yocto
             }
         }
         
-        
-        
+        void lexer:: unget(const lexical::plugin &plg, const string &content)
+        {
+            token   tkn(content);
+            lexeme *lx = new lexeme(plg.name,line);
+            lx->swap_with(tkn);
+            push_front(lx);
+        }
+
+        void lexer:: load( lexical::plugin *plg )
+        {
+            assert(plg);
+            const lexical::scanner::ptr P(plg);
+            if(!scanners.insert(P))
+            {
+                throw exception("{%s}: plugin<%s>  already in use", name.c_str(), plg->name.c_str() );
+            }
+        }
+
+
     }
 }
 

@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ptr/auto.hpp"
+#include "yocto/lang/lexical/plugin/comment.hpp"
 
 #include <cstdlib>
 
@@ -23,9 +24,7 @@ namespace{
 
             root.emit("ID","[_[:alpha:]][:word:]*");
             root.emit("INT", "[:digit:]+");
-            root.drop("WS", "[:blank:]");
-            root.endl("ENDL");
-            root.emit("SNGL", ".");
+
             root.call("COM", "//");
             root.call("COM2", "/\\*");
 
@@ -38,6 +37,12 @@ namespace{
             com2.endl("ENDL");
             com2.drop("CHAR",".");
 
+            lexical::plugin &bash_com = use<lexical::comment>("#");
+            bash_com.enhance(root);
+
+            root.drop("WS", "[:blank:]");
+            root.endl("ENDL");
+            root.emit("SNGL", ".");
         }
 
 
