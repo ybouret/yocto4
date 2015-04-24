@@ -205,7 +205,7 @@ namespace yocto
             push_front(lx);
         }
 
-        void lexer:: load( lexical::plugin *plg )
+        void lexer:: declare_plugin( lexical::plugin *plg )
         {
             assert(plg);
             const lexical::scanner::ptr P(plg);

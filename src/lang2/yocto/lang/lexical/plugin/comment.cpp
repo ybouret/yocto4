@@ -21,7 +21,7 @@ namespace yocto
                 try
                 {
                     drop("CHAR", ".");
-                    back("[:endl:]", this, & scanner::newline_cb);
+                    back_newline();
                 }
                 catch(...)
                 {

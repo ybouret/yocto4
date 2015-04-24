@@ -20,7 +20,6 @@ namespace yocto
                 virtual pattern *trigger() const;
                 virtual void     onEnter(const token &);
 
-                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(comment);
                 pattern *motif;

@@ -59,18 +59,18 @@ namespace yocto
 
 
             template <typename PLUGIN> inline
-            lexical::plugin & use()
+            lexical::plugin & load()
             {
                 lexical::plugin *plg = new PLUGIN(*this);
-                load(plg);
+                declare_plugin(plg);
                 return *plg;
             }
 
             template <typename PLUGIN> inline
-            lexical::plugin & use(const char *expr)
+            lexical::plugin & load(const char *expr)
             {
                 lexical::plugin *plg = new PLUGIN(*this,expr);
-                load(plg);
+                declare_plugin(plg);
                 return *plg;
             }
 
@@ -93,8 +93,8 @@ namespace yocto
 
             lexeme *read_from(source &src, ios::istream &fp);
             
-            friend class lexical::plugin;
-            void   load( lexical::plugin *plg);
+            //friend class lexical::plugin;
+            void   declare_plugin( lexical::plugin *plg);
 
         public:
             p_dict dict;

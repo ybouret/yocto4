@@ -37,7 +37,7 @@ namespace{
             com2.endl("ENDL");
             com2.drop("CHAR",".");
 
-            lexical::plugin &bash_com = use<lexical::comment>("#");
+            lexical::plugin &bash_com = load<lexical::comment>("#");
             bash_com.enhance(root);
 
             root.drop("WS", "[:blank:]");

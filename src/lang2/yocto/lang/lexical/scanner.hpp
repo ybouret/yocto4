@@ -57,13 +57,13 @@ namespace yocto
                     make(l, regexp(expr,dict), a);
                 }
 
-                //! action= forward
+                //! action = forward
                 void emit(const char *label, const char *expr);
 
                 //! action= discard
                 void drop(const char *label, const char *expr);
 
-                //! action= newline
+                //! action = newline
                 void endl(const char *label);
 
 
@@ -113,6 +113,9 @@ namespace yocto
                 //
                 //--------------------------------------------------------------
                 void back(pattern *p, const callback &on_back);
+                void back(const char *expr); //!< back and do nothing else
+                void back_newline();         //!< back on newline, increase #line
+
                 template <typename HOST_POINTER, typename METHOD_POINTER>
                 inline void back(const char *expr, HOST_POINTER h, METHOD_POINTER m)
                 {

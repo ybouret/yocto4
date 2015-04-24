@@ -25,7 +25,10 @@ namespace yocto
                 }
 
             protected:
+                //! set the scanner's name and link it to the lexer
                 explicit plugin(const string &id, lexer &);
+
+                //! ctor wrapper
                 explicit plugin(const char   *id, lexer &);
 
 

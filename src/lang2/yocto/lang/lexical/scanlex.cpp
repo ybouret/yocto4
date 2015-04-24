@@ -180,6 +180,15 @@ namespace yocto
                 rules.push_back( rule::create(label,q.yield(),a,true) );
             }
             
+            void scanner::back(const char *expr)
+            {
+                back(expr, this, & scanner::discard_cb);
+            }
+
+            void scanner:: back_newline()
+            {
+                back("[:endl:]", this, & scanner::newline_cb);
+            }
             
         }
         
