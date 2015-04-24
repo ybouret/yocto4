@@ -49,14 +49,12 @@ namespace yocto
                 void  make(const string &label, pattern *p, const action &a);
 
                 //! action upon pattern, wrapper
-                void  make(const char   *label, const char *expr, const action &a, const p_dict *dict=NULL);
-
-                //! action upon pattern, wrapper
                 template <typename HOST_POINTER, typename METHOD_POINTER>
                 inline void make(const char *label, const char *expr, HOST_POINTER h, METHOD_POINTER m, const p_dict *dict=NULL)
                 {
+                    const string l(label);
                     const action a(h,m);
-                    make(label,expr,a,dict);
+                    make(l, regexp(expr,dict), a);
                 }
 
                 //! action= forward

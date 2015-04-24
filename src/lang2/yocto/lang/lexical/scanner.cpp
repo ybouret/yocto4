@@ -103,13 +103,7 @@ namespace yocto
                 check_label(label);
                 rules.push_back( rule::create(label,q.yield(),a) );
             }
-
-            void  scanner:: make(const char *l, const char *expr, const action &a, const p_dict *dict)
-            {
-                const string label(l);
-                make(label, regexp(expr,dict), a);
-            }
-
+            
             void scanner:: emit(const char *label, const char *expr,const p_dict *dict)
             {
                 make(label,expr,this, & scanner::forward, dict);
