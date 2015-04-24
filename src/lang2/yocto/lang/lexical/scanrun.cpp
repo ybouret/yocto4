@@ -87,7 +87,7 @@ namespace yocto
                         if( best_rule->apply(best_token) )
                         {
                             if(ctrl) throw exception("control rule '%s' MUST return FALSE", best_rule->label.c_str());
-                            std::cerr << "<" << name << ">[" << best_rule->label << "]='" << best_token << "' @" << line << std::endl;
+                            //std::cerr << "<" << name << ">[" << best_rule->label << "]='" << best_token << "' @" << line << std::endl;
                             lexeme *lx = new lexeme(best_rule->label,line);
                             lx->swap_with(best_token);
                             return lx;
