@@ -2,6 +2,7 @@
 #define YOCTO_LANG_LEX_PLUGIN_COMMENT_INCLUDED 1
 
 #include "yocto/lang/lexical/plugin.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {
@@ -18,11 +19,11 @@ namespace yocto
                 explicit comment(const char *id, lexer &, const char *marker);
 
                 virtual pattern *trigger() const;
-                virtual void     onEnter(const token &);
+                virtual void     on_call(const token &);
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(comment);
-                pattern *motif;
+                auto_ptr<pattern> motif;
             };
 
 

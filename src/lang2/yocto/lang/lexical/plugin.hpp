@@ -16,11 +16,11 @@ namespace yocto
                 virtual ~plugin() throw();
 
                 virtual  pattern *trigger() const = 0;
-                virtual  void     onEnter(const token &) = 0;
+                virtual  void     on_call(const token &) = 0;
 
-                void     enhance( scanner &scan )
+                void hook( scanner &scan )
                 {
-                    const callback cb(this, & plugin::onEnter );
+                    const callback cb(this, & plugin::on_call );
                     scan.call(name, trigger(), cb);
                 }
 

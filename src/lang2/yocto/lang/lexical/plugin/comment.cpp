@@ -9,34 +9,22 @@ namespace yocto
 
             comment:: ~comment() throw()
             {
-                assert(motif);
-                delete motif;
-                motif=0;
             }
 
             comment:: comment( const char *id, lexer &LX, const char *marker) :
             plugin(id,LX),
             motif( regexp(marker,dict) )
             {
-                try
-                {
-                    drop("CHAR", ".");
-                    back_newline();
-                }
-                catch(...)
-                {
-                    delete motif;
-                    throw;
-                }
+                drop("CHAR", ".");
+                back_newline();
             }
 
-            void comment:: onEnter(const token &)
+            void comment:: on_call(const token &)
             {
             }
 
             pattern * comment:: trigger() const
             {
-                assert(motif);
                 return motif->clone();
             }
         }

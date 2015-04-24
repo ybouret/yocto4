@@ -19,7 +19,7 @@ namespace yocto
                 explicit ccomment(const char *id, lexer &, const char *ini, const char *end);
 
                 virtual pattern *trigger() const;
-                virtual void     onEnter(const token &);
+                virtual void     on_call(const token &);
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(ccomment);

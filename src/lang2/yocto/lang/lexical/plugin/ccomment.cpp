@@ -23,7 +23,7 @@ namespace yocto
                 endl("ENDL");
             }
 
-            void ccomment:: onEnter(const token &)
+            void ccomment:: on_call(const token &)
             {
             }
 

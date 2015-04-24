@@ -39,10 +39,10 @@ namespace{
             com2.drop("CHAR",".");
 
             lexical::plugin &bash_com = load<lexical::comment>("BashComment","#");
-            bash_com.enhance(root);
+            bash_com.hook(root);
 
             lexical::plugin &xml_com = load<lexical::ccomment>("XmlComment","<!--","-->");
-            xml_com.enhance(root);
+            xml_com.hook(root);
 
             root.drop("WS", "[:blank:]");
             root.endl("ENDL");
