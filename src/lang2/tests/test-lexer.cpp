@@ -27,10 +27,16 @@ namespace{
             root.endl("ENDL");
             root.emit("SNGL", ".");
             root.call("COM", "//", &root, &lexical::scanner::discard_cb);
+            root.call("COM2", "/\\*", &root, &lexical::scanner::discard_cb);
 
             lexical::scanner &com = declare("COM");
-            com.drop("CHAR",".");
             com.back("[:endl:]", &com, &lexical::scanner::newline_cb);
+            com.drop("CHAR",".");
+
+            lexical::scanner &com2 = declare("COM2");
+            com2.back("\\*/", &root, &lexical::scanner::discard_cb);
+            com2.endl("ENDL");
+            com2.drop("CHAR",".");
 
         }
 
