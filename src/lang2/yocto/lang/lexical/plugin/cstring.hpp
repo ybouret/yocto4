@@ -24,6 +24,8 @@ namespace yocto
 
             private:
                 string            content;
+                void on_quit(const token &);
+                
             };
             
         }

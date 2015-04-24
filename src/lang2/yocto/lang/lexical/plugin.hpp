@@ -31,6 +31,7 @@ namespace yocto
                 //! ctor wrapper
                 explicit plugin(const char   *id, lexer &);
 
+                //lexer &get_lexer() { assert(lex); return *lex; }
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(plugin);

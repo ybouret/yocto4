@@ -101,7 +101,6 @@ namespace yocto
 
             lexeme *read_from(source &src, ios::istream &fp);
             
-            //friend class lexical::plugin;
             void   declare_plugin( lexical::plugin *plg);
 
         public:

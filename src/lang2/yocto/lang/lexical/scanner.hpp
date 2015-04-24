@@ -139,8 +139,8 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 r_list       rules;
-                lexer       *lex;
             protected:
+                lexer       *lex;
                 p_dict      *dict; //!< available when linked to lexer
             private:
                 unsigned     bidx;

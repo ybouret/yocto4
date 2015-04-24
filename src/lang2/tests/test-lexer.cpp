@@ -2,8 +2,10 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ptr/auto.hpp"
+
 #include "yocto/lang/lexical/plugin/comment.hpp"
 #include "yocto/lang/lexical/plugin/ccomment.hpp"
+#include "yocto/lang/lexical/plugin/cstring.hpp"
 
 #include <cstdlib>
 
@@ -43,6 +45,9 @@ namespace{
 
             lexical::plugin &xml_com = load<lexical::ccomment>("XmlComment","<!--","-->");
             xml_com.hook(root);
+
+            lexical::plugin &cstring =load<lexical::cstring>("string");
+            cstring.hook(root);
 
             root.drop("WS", "[:blank:]");
             root.endl("ENDL");
