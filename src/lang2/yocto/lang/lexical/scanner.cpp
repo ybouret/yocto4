@@ -16,6 +16,7 @@ name(id),   \
 line(ir),   \
 rules(),    \
 cache(),    \
+lex(0),     \
 echo(false)
 
             scanner:: scanner(const string &id , int &ir) :
@@ -69,6 +70,12 @@ echo(false)
             }
 
             const string & scanner:: key() const throw() { return name; }
+
+            void scanner:: link_to( lexer &parent )
+            {
+
+            }
+
         }
     }
 

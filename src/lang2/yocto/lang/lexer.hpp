@@ -21,6 +21,18 @@ namespace yocto
             const string name;
             int          line;
 
+            lexical::scanner & root() throw();
+
+            //! get/create-on-the-fly scanner
+            lexical::scanner & operator[](const string &id);
+
+            //! get/create scanner, wrapper
+            lexical::scanner & operator[](const char   *id);
+
+
+            //! jump to new scanner
+            void jump(const string &id);
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             typedef lexical::scanner::ptr p_scanner;

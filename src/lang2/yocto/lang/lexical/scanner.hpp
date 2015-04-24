@@ -11,8 +11,11 @@ namespace yocto
     namespace lang
     {
 
+        class lexer;
+
         namespace lexical
         {
+
             //! a simple scanner
             /**
              Transform a source of t_char into a source of lexemes.
@@ -30,6 +33,14 @@ namespace yocto
                 const string name;  //!< identifier
                 int         &line;  //!< line index reference
 
+                void link_to( lexer &parent );
+
+                //--------------------------------------------------------------
+                //
+                // rule: producing lexemes
+                //
+                //--------------------------------------------------------------
+
                 //! action upon pattern
                 void  make(const string &label, pattern *p, const action &a);
 
@@ -44,8 +55,13 @@ namespace yocto
                     make(label,expr,a,dict);
                 }
 
+                //! action= forward
                 void emit(const char *label, const char *expr,const p_dict *dict=NULL);
+
+                //! action= discard
                 void drop(const char *label, const char *expr,const p_dict *dict=NULL);
+
+                //! action= newline
                 void endl(const char *label);
 
 
@@ -53,6 +69,12 @@ namespace yocto
                 bool discard( const token & ); //!< return false
                 bool newline( const token & ); //!< return false, increase iline
 
+
+                //--------------------------------------------------------------
+                //
+                // rule: jump to another scanner
+                //
+                //--------------------------------------------------------------
 
                 //______________________________________________________________
                 //
@@ -71,6 +93,8 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 r_list       rules;
                 l_list       cache;
+                lexer       *lex;
+                
                 void check_label(const string &label);
                 
             public:

@@ -38,6 +38,59 @@ scanners(2,as_capacity)
             initialize(rs);
         }
 
+
+        lexical::scanner & lexer::root() throw()
+        {
+            assert(Root);
+            return *Root;
+        }
+
+        lexical::scanner & lexer:: operator[](const string &id)
+        {
+            p_scanner *pp = scanners.search(id);
+            if(!pp)
+            {
+                p_scanner q( new lexical::scanner(id,line) );
+                if(! scanners.insert(q) )
+                {
+                    throw exception("[%s][<%s>]: unexpected creation failure", name.c_str(), id.c_str());
+                }
+                return *q;
+            }
+            else
+            {
+                return **pp;
+            }
+        }
+
+        lexical::scanner & lexer:: operator[](const char *txt)
+        {
+            const string id(txt);
+            return (*this)[id];
+        }
     }
-    
+
 }
+
+
+namespace yocto
+{
+    namespace lang
+    {
+
+        void lexer:: jump(const string &id)
+        {
+            p_scanner *pp = scanners.search(id);
+            if(!pp)
+            {
+                throw exception("[%s]: no <%s> to JUMP", name.c_str(), id.c_str());
+            }
+            lexical::scanner &s = **pp;
+            scan = &s;
+        }
+
+    }
+
+}
+
+
