@@ -105,32 +105,6 @@ namespace yocto
             virtual bool is_valid(code_t) const throw();  
         };
 
-
-#if 0
-        //______________________________________________________________________
-        //
-        //! multiple chars
-        //______________________________________________________________________
-        class multi : public one_char
-        {
-        public:
-            static const uint32_t UUID = YOCTO_FOURCC('M','U','L','T');
-            codes_store           codes;
-
-            void add(code_t C);
-
-            virtual ~multi() throw();
-            static   multi   *create();
-            virtual  pattern *clone() const;
-            virtual  void     viz( ios::ostream & ) const;
-
-        private:
-            explicit multi() throw();
-            multi(const multi &);
-            YOCTO_DISABLE_ASSIGN(multi);
-            virtual bool is_valid(code_t) const throw();
-        };
-#endif
         
     }
 

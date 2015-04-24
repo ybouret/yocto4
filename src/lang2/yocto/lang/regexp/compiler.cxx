@@ -419,7 +419,6 @@ namespace yocto
                         //______________________________________________________
                     case '-':
                     {
-                        std::cerr << "Compiling Class Range: rhs=" << curr+1 << std::endl;
                         // do we have a previous single char ?
                         if(p->operands.size<=0)                    throw exception("no previous character for range");
                         if(p->operands.tail->uuid != single::UUID) throw exception("previous item is not a char for range");
@@ -451,7 +450,6 @@ namespace yocto
                                 ++curr;
                                 upper = C;
                         }
-                        std::cerr << "Class is Compiled" << std::endl;
                         p->append( range::create(lower, upper) );
 
                     } break;

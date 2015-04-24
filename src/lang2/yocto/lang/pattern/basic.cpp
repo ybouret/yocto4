@@ -113,7 +113,7 @@ namespace yocto
     {
         range:: ~range() throw() {}
 
-        range:: range(code_t lo, code_t hi) throw() : one_char( single::UUID ), lower(lo), upper(hi) {}
+        range:: range(code_t lo, code_t hi) throw() : one_char( range::UUID ), lower(lo), upper(hi) {}
 
         bool range::is_valid(code_t C) const throw() { return (C>=lower) && (C<=upper); }
 
@@ -146,43 +146,4 @@ namespace yocto
     }
     
 }
-
-#if 0
-namespace yocto
-{
-    namespace lang
-    {
-        multi::~multi() throw()
-        {
-        }
-
-        multi:: multi() throw() : one_char( multi::UUID ), codes() {}
-
-
-        multi:: multi(const multi &other) : one_char(other), codes(other.codes) {}
-
-        bool multi:: is_valid(code_t C)const throw() { return codes.search(C); }
-
-        multi *multi::create() { return new multi(); }
-
-        pattern *multi:: clone() const
-        {
-            return new multi(*this);
-        }
-        
-        void multi:: add(code_t C) { (void) codes.insert(C); }
-
-        void multi:: viz(ios::ostream &fp) const
-        {
-            fp.viz( (const pattern *)this );
-            fp("[shape=folder,label=\"");
-            fp("multi");
-            fp("\"];\n");
-        }
-        
-    }
-
-}
-#endif
-
 
