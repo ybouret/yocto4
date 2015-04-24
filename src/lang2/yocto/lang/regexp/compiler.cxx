@@ -426,7 +426,9 @@ namespace yocto
 
                         // do we have a next single char ?
                         if(++curr>=last)                           throw exception("unfinished range in class");
-                        auto_ptr<pattern> q(p->operands.pop_back());
+                        assert(p->operands.tail->uuid == single::UUID);
+                        auto_ptr<pattern> q(p->operands.pop_back()); assert(q->uuid==single::UUID); assert(q->content());
+
                         const code_t      lower = *(const code_t *)(q->content());
                         code_t            upper = 0;
 
@@ -449,6 +451,7 @@ namespace yocto
                                 ++curr;
                                 upper = C;
                         }
+                        std::cerr << "Class is Compiled" << std::endl;
                         p->append( range::create(lower, upper) );
 
                     } break;
