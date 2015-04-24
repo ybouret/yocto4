@@ -26,8 +26,8 @@ namespace{
             root.drop("WS", "[:blank:]");
             root.endl("ENDL");
             root.emit("SNGL", ".");
-            root.call("COM", "//", &root, &lexical::scanner::discard_cb);
-            root.call("COM2", "/\\*", &root, &lexical::scanner::discard_cb);
+            root.call("COM", "//");
+            root.call("COM2", "/\\*");
 
             lexical::scanner &com = declare("COM");
             com.back("[:endl:]", &com, &lexical::scanner::newline_cb);

@@ -99,6 +99,12 @@ namespace yocto
                 rules.push_back( rule::create(label,q.yield(),a, true) );
             }
 
+            void scanner:: jump(const char   *scanner_id, const char *expr, const p_dict *dict)
+            {
+                jump(scanner_id, expr, this, &scanner::discard_cb, dict);
+            }
+
+
             void scanner:: call( const string &scanner_id, pattern *p, const callback &on_call)
             {
                 auto_ptr<pattern> q(p);
@@ -112,6 +118,10 @@ namespace yocto
                 rules.push_back( rule::create(label,q.yield(),a, true) );
             }
 
+            void scanner:: call(const char   *scanner_id, const char *expr, const p_dict *dict)
+            {
+                call(scanner_id, expr, this, &scanner::discard_cb, dict);
+            }
 
             class BackAction
             {

@@ -81,6 +81,7 @@ namespace yocto
                 //
                 //--------------------------------------------------------------
                 void jump(const string &scanner_id, pattern *p, const callback &on_jump);
+                void jump(const char   *scanner_id, const char *expr, const p_dict *dict=NULL); //!< jump and do nothing else
 
                 template <typename HOST_POINTER, typename METHOD_POINTER>
                 inline void jump(const char *scanner_id, const char *expr, HOST_POINTER h, METHOD_POINTER m, const p_dict *dict=NULL)
@@ -96,6 +97,7 @@ namespace yocto
                 //
                 //--------------------------------------------------------------
                 void call(const string &scanner_id, pattern *p, const callback &on_call);
+                void call(const char   *scanner_id, const char *expr, const p_dict *dict=NULL); //!< call and do nothing else
 
                 template <typename HOST_POINTER, typename METHOD_POINTER>
                 inline void call(const char *scanner_id, const char *expr, HOST_POINTER h, METHOD_POINTER m, const p_dict *dict=NULL)
