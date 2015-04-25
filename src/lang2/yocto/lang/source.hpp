@@ -9,6 +9,10 @@ namespace yocto
     namespace lang
     {
 
+        //! converts an input stream
+        /**
+         the base class token is used as a cache.
+         */
         class source : public token
         {
         public:

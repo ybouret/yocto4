@@ -12,6 +12,7 @@ namespace yocto
 
 #define Y_LANG_PATTERN_MATCH_ARGS token &tkn, source &src, ios::istream &fp
 
+        //! base class to match a source of t_char
         class pattern : public counted_object
         {
         public:
@@ -29,11 +30,20 @@ namespace yocto
              must be left untouched otherwise !
              */
             virtual bool        match( Y_LANG_PATTERN_MATCH_ARGS ) const = 0;
-            virtual const void *content() const throw(); //!< internal content, default is NULL
             
+            //! internal content, default is NULL
+            virtual const void *content() const throw();
+            
+            //! write a graphviz representation
             virtual void  viz( ios::ostream & ) const = 0;
+            
+            //! graphviz helper
             static  void  encode( code_t code, ios::ostream &fp);
+            
+            //! graphviz helper
             static  void  vizlink( ios::ostream &fp, const pattern *src, const pattern *tgt);
+            
+            //! output to a .dot file
             void graphviz(const string &filename) const;
 
 

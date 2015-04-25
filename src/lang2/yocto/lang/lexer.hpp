@@ -11,6 +11,10 @@ namespace yocto
     {
 
         //! lexer
+        /**
+         use of multiple scanners to convert
+         a source of t_char into a source of tokens.
+         */
         class lexer : public object, public l_list
         {
         public:

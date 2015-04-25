@@ -9,7 +9,10 @@ namespace yocto
     namespace lang
     {
 
+        //! regular expression compiler
         pattern *regexp( const string &expr, const p_dict *dict );
+        
+        //! regular expression compiler
         pattern *regexp( const char   *expr, const p_dict *dict );
 
     }
