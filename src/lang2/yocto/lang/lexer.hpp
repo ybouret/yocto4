@@ -103,7 +103,6 @@ namespace yocto
 
             void initialize(const string &root_scanner);
 
-            lexeme *read_from(source &src, ios::istream &fp);
             
             void   declare_plugin( lexical::plugin *plg);
 

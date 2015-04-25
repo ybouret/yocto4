@@ -131,6 +131,7 @@ namespace yocto
 {
     namespace lang
     {
+#if 0
         lexeme *lexer:: read_from(source &src, ios::istream &fp)
         {
             assert(scan);
@@ -155,19 +156,44 @@ namespace yocto
             }
 
         }
-
+#endif
 
         lexeme * lexer:: get( source &src, ios::istream &fp )
         {
             assert(scan);
+        TRY_GET:
             if(size>0)
             {
                 return pop_front();
             }
             else
             {
-                return read_from(src,fp);
+                //______________________________________________________________
+                //
+                // try to get something
+                //______________________________________________________________
+                bool    ctl = false;
+                lexeme *lxm = scan->get(src, fp, ctl);
+                
+                if(!lxm)
+                {
+                    if(!ctl)
+                    {
+                        // nothing else remains
+                        return 0;
+                    }
+                    else
+                    {
+                        // it was a control: check no unget during control
+                        goto TRY_GET;
+                    }
+                }
+                else
+                {
+                    return lxm;
+                }
             }
+            
         }
 
         void   lexer:: unget( lexeme *lx ) throw()
@@ -185,15 +211,15 @@ namespace yocto
 
         const lexeme * lexer:: peek(source &src, ios::istream &fp)
         {
-            if(size>0)
+            lexeme *lxm = get(src,fp);
+            if(!lxm)
             {
-                return head;
+                return 0;
             }
             else
             {
-                lexeme *lx = read_from(src, fp);
-                if(lx) { push_front(lx); assert(1==size); }
-                return head;
+                push_front(lxm);
+                return lxm;
             }
         }
         
