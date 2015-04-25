@@ -46,7 +46,7 @@ namespace{
             lexical::plugin &xml_com = load<lexical::ccomment>("XmlComment","<!--","-->");
             xml_com.hook(root);
 
-            lexical::plugin &cstring =load<lexical::cstring>("string");
+            lexical::plugin &cstring =load<lexical::cstring>("CSTRING");
             cstring.hook(root);
 
             root.drop("WS", "[:blank:]");
