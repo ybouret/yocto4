@@ -25,6 +25,8 @@ namespace yocto
             private:
                 string            content;
                 void on_quit(const token &);
+                bool on_char(const token &tkn);
+                bool on_esc_char( const token &tkn );
                 
             };
             

@@ -61,7 +61,7 @@ namespace yocto
             //! is there anyone left ?
             const lexeme *peek(source &src, ios::istream &fp);
 
-
+            
             template <typename PLUGIN> inline
             lexical::plugin & load(const char *id)
             {
