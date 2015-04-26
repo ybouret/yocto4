@@ -45,6 +45,7 @@ namespace yocto
 			
 			for( size_t i=0; i < size; ++i )
 				indices[i] = i;
+            if(size>0)
 			{
                 c_array<size_t>  arr( indices, size );
                 rotlexdat        cmp = { buf_in, size };

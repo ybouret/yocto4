@@ -79,7 +79,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				//  need a new slice !
 				//--------------------------------------------------------------
-				slice *s = pool_.size > 0 ? pool_.query() : acquire_slice();
+				slice *s = (pool_.size > 0) ? pool_.query() : acquire_slice();
 				try 
 				{
 					new (s) slice( bytes, mini_size );					

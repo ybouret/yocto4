@@ -19,7 +19,7 @@ namespace yocto
                 }
                 if( &line != &parent.line)
                 {
-                    throw exception("<%s>'s line is not {%s}'s line", name.c_str(), lex->name.c_str());
+                    throw exception("<%s>'s line is not {%s}'s line", name.c_str(), parent.name.c_str());
                 }
                 lex  = &parent;
                 dict = &parent.dict;

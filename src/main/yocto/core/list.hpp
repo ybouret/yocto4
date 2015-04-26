@@ -59,6 +59,7 @@ namespace yocto
 				}
 				else 
 				{
+                    assert(head!=NULL);
 					node->next = head;
 					head->prev = node;
 					head       = node;
