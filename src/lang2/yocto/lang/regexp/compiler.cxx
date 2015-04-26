@@ -172,7 +172,7 @@ namespace yocto
 //
 ////////////////////////////////////////////////////////////////////////////////
 #include "yocto/code/utils.hpp"
-
+#include <cstring>
 namespace yocto
 {
     namespace lang

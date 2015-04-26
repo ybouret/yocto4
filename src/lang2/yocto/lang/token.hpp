@@ -3,7 +3,6 @@
 
 #include "yocto/core/list.hpp"
 #include "yocto/string.hpp"
-#include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
 {
@@ -12,12 +11,7 @@ namespace yocto
     {
         
         typedef int code_t;
-        typedef sorted_vector<
-        code_t,
-        comparator<code_t>,
-        memory::global::allocator>
-        codes_store;
-
+        
         class t_char
         {
         public:

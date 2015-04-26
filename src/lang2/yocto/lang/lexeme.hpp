@@ -12,8 +12,8 @@ namespace yocto
         class lexeme : public token
         {
         public:
-            lexeme *       next;
-            lexeme *       prev;
+            lexeme *       next;  //!< for list
+            lexeme *       prev;  //!< for list
             const string & label; //!< reference to the producing rule
             const int      line;  //!< creation line
 

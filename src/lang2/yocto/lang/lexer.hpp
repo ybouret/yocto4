@@ -102,9 +102,7 @@ namespace yocto
             historyDB         history;
 
             void initialize(const string &root_scanner);
-
-            
-            void   declare_plugin( lexical::plugin *plg);
+            void declare_plugin( lexical::plugin *plg);
 
         public:
             p_dict dict;

@@ -82,6 +82,8 @@ dict()
 }
 
 
+#include <iostream>
+
 namespace yocto
 {
     namespace lang

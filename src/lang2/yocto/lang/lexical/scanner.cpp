@@ -1,6 +1,8 @@
 #include "yocto/lang/lexical/scanner.hpp"
 #include "yocto/exception.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
     namespace lang
