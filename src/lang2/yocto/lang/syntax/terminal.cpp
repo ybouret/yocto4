@@ -29,11 +29,13 @@ namespace yocto
                 {
                     if(lx->label==label)
                     {
+                        std::cerr << "\t+" << label << std::endl;
                         grow(tree, xnode::term(*this,lx));
                         return true;
                     }
                     else
                     {
+                        std::cerr << "\t-" << label << std::endl;
                         lxr.unget(lx);
                         return false;
                     }

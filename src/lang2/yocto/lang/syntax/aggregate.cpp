@@ -38,6 +38,7 @@ namespace yocto
                     if(!r.accept(sub, lxr, src, fp))
                     {
                         assert(0==sub);
+                        std::cerr << "\t-" << label << std::endl;
                         xnode::restore(agg.yield(), lxr);
                         return false;
                     }

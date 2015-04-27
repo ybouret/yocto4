@@ -17,7 +17,7 @@ namespace yocto
             {
                 YOCTO_GIANT_LOCK();
                 ++counter;
-                string ans = vformat("ALT#%u",counter);
+                const string ans = vformat("ALT#%u",counter);
                 return ans;
             }
 

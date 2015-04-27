@@ -8,10 +8,20 @@ namespace yocto
         namespace syntax
         {
 
+            unsigned optional::counter;
+            
             optional:: ~optional() throw() {}
 
-            optional:: optional(const string &label, rule &r) :
-            joker(label,r)
+
+            string optional:: make_label()
+            {
+                YOCTO_GIANT_LOCK();
+                const string ans = vformat("OPT#%u", ++counter);
+                return ans;
+            }
+
+            optional:: optional(rule &r) :
+            joker(make_label(),r)
             {
             }
 

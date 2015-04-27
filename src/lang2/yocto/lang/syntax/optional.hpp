@@ -14,13 +14,16 @@ namespace yocto
             class optional : public joker
             {
             public:
-                explicit optional(const string &label, rule &r );
+                explicit optional( rule &r );
                 virtual ~optional() throw();
 
                 virtual bool accept( Y_LANG_SYNTAX_RULE_ACCEPT_ARGS ) const;
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(optional);
+                static unsigned counter;
+                static string   make_label();
+                
             };
 
         }

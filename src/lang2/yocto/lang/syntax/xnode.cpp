@@ -89,6 +89,8 @@ namespace yocto
 
 }
 
+//#include <iostream>
+
 namespace yocto
 {
     namespace lang
@@ -110,18 +112,20 @@ namespace yocto
                 assert(node);
                 if(node->terminal)
                 {
+                    //std::cerr << "restoring terminal " << node->label << std::endl;
                     lexemes.push_front(node->lx);
                     node->lx = 0;
-                    delete node;
                 }
                 else
                 {
+                    //std::cerr << "restoring leaf " << node->label << " / #" << node->children().size << std::endl;
                     xnode::leaves &nodes = node->children();
                     while(nodes.size>0)
                     {
                         restore( nodes.pop_back(), lexemes );
                     }
                 }
+                delete node;
             }
 
 

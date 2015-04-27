@@ -60,10 +60,10 @@ YOCTO_UNIT_TEST_IMPL(xnode)
 
     syntax::aggregate &rec = G.agg("REC");
 
-    syntax::alternate &top = G.alt();
-    top << G.term("ID") << G.term("INT");
+    //syntax::alternate &top = G.alt();
+    //top << G.term("ID") << G.term("INT");
 
-    rec << top;
+    rec << G.term("ID");
     rec << G.term(";");
 
     auto_ptr<syntax::xnode> tree( G.accept(lxr, src, fp) );
