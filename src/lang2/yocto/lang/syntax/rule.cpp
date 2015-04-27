@@ -31,7 +31,6 @@ namespace yocto
                     assert(!(tree->terminal));
                     tree->append(leaf);
                 }
-
             }
 
         }

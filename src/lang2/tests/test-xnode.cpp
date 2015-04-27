@@ -8,6 +8,7 @@
 #include "yocto/lang/lexical/plugin/cstring.hpp"
 
 #include "yocto/ios/icstream.hpp"
+#include "yocto/lang/syntax/grammar.hpp"
 
 using namespace yocto;
 using namespace lang;
@@ -50,27 +51,18 @@ namespace{
 
 YOCTO_UNIT_TEST_IMPL(xnode)
 {
-    Lexer LX;
-
-    ios::icstream fp(ios::cstdin);
+    Lexer         lxr;
     lang::source  src;
+    ios::icstream fp(ios::cstdin);
 
-    lexeme *lx = 0;
-    l_list  lexemes;
+    syntax::grammar G("grammar");
 
-    while( NULL !=(lx=LX.get(src,fp) ) )
-    {
-        std::cerr << lx->label << "='" << *lx << "'" << std::endl;
-        lexemes.push_back(lx);
-    }
+    syntax::alternate &top = G.alt();
+    top << G.term("ID") << G.term("INT");
+
+
+    auto_ptr<syntax::xnode> tree( G.accept(lxr, src, fp) );
     
-    std::cerr << "<Lexemes>" << std::endl;
-    for(const lexeme *lx=lexemes.head;lx;lx=lx->next)
-    {
-        std::cerr << "\t" << lx->label << " : " << *lx << std::endl;
-    }
-    std::cerr << "</Lexemes>" << std::endl;
 
-    
 }
 YOCTO_UNIT_TEST_DONE()

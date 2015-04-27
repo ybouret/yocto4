@@ -1,7 +1,10 @@
 #ifndef YOCTO_LANG_GRAMMAR_INCLUDED
 #define YOCTO_LANG_GRAMMAR_INCLUDED 1
 
-#include "yocto/lang/syntax/rule.hpp"
+#include "yocto/lang/syntax/terminal.hpp"
+#include "yocto/lang/syntax/alternate.hpp"
+#include "yocto/lang/syntax/aggregate.hpp"
+
 
 namespace yocto
 {
@@ -14,13 +17,24 @@ namespace yocto
             {
             public:
                 explicit grammar(const string &id);
+                explicit grammar(const char   *id);
                 virtual ~grammar() throw();
 
                 const string name;
 
                 //! accepting terminal
                 rule &term(const string &label);
+                //! wrapper
+                rule &term(const char   *label);
 
+                //! aggregate
+                aggregate &agg( const string &label);
+                //! wrapper
+                aggregate &agg( const char   *label);
+
+                //! aggregate
+                alternate &alt();
+                
                 //! set root from a previously declared rule
                 void set_root( rule &r ) throw();
 

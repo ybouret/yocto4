@@ -1,5 +1,7 @@
 #include "yocto/lang/syntax/terminal.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
     namespace lang
@@ -17,7 +19,7 @@ namespace yocto
 
             bool terminal:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
             {
-
+                std::cerr << "?TERM '" << label << "'" << std::endl;
                 lexeme *lx = lxr.get(src, fp);
                 if(!lx)
                 {
