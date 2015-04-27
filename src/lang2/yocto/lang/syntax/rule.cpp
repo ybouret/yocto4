@@ -9,30 +9,32 @@ namespace yocto
             rule:: ~rule() throw()
             {
             }
-
-
+            
+            
             rule:: rule(const string &id) :
             next(0),
             prev(0),
             label(id)
             {
             }
-
-
+            
+            
             void rule:: grow( xnode * &tree, xnode *leaf ) const throw()
             {
-                assert(leaf);
-                if(!tree)
+                if(leaf)
                 {
-                    tree = leaf;
-                }
-                else
-                {
-                    assert(!(tree->terminal));
-                    tree->append(leaf);
+                    if(!tree)
+                    {
+                        tree = leaf;
+                    }
+                    else
+                    {
+                        assert(!(tree->terminal));
+                        tree->append(leaf);
+                    }
                 }
             }
-
+            
         }
     }
 }

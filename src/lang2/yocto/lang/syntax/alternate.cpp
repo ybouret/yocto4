@@ -46,7 +46,7 @@ namespace yocto
                     xnode *sub = 0;
                     if( node->addr->accept(sub, lxr, src, fp))
                     {
-                        if(sub) grow(tree, sub);
+                        grow(tree, sub);
                         return true;
                     }
                 }
