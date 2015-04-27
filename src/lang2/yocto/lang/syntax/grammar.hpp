@@ -1,27 +1,33 @@
 #ifndef YOCTO_LANG_GRAMMAR_INCLUDED
 #define YOCTO_LANG_GRAMMAR_INCLUDED 1
 
-#include "yocto/lang/lexical/rule.hpp"
+#include "yocto/lang/syntax/rule.hpp"
 
 namespace yocto
 {
     namespace lang
     {
 
-        class grammar : public object
+        namespace syntax
         {
-        public:
-            explicit grammar(const string &id);
-            virtual ~grammar() throw();
+            class grammar : public object
+            {
+            public:
+                explicit grammar(const string &id);
+                virtual ~grammar() throw();
 
-            const string name;
+                const string name;
 
 
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGM(grammar);
+                //! set root from a previously declared rule
+                void set_root( rule &r ) throw();
 
-        };
-
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
+                r_list rules;
+            };
+        }
+        
     }
     
 }
