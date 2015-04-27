@@ -23,7 +23,7 @@ namespace yocto
                 virtual ~rule() throw();
 
 
-                virtual bool accept( Y_LANG_SYNTAX_RULE_ACCEPT_ARGS ) = 0;
+                virtual bool accept( Y_LANG_SYNTAX_RULE_ACCEPT_ARGS ) const = 0;
 
 
             protected:

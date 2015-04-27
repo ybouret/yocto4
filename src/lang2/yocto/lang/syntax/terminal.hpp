@@ -17,7 +17,7 @@ namespace yocto
                 virtual ~terminal() throw();
 
                 //! accept if lexeme->label == this->label
-                virtual bool accept( Y_LANG_SYNTAX_RULE_ACCEPT_ARGS );
+                virtual bool accept( Y_LANG_SYNTAX_RULE_ACCEPT_ARGS ) const;
 
 
             private:

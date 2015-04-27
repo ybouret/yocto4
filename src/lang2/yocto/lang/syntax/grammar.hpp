@@ -18,13 +18,21 @@ namespace yocto
 
                 const string name;
 
+                //! accepting terminal
+                rule &term(const string &label);
 
                 //! set root from a previously declared rule
                 void set_root( rule &r ) throw();
 
+                //! try to accept first rule
+                xnode *accept( lexer &lxr, source &src, ios::istream &fp);
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 r_list rules;
+                void check_label(const string &label) const;
+
             };
         }
         

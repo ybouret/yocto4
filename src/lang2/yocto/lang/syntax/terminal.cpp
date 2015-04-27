@@ -15,7 +15,7 @@ namespace yocto
             {
             }
 
-            bool terminal:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS)
+            bool terminal:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
             {
 
                 lexeme *lx = lxr.get(src, fp);
