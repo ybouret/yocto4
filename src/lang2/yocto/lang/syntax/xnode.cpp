@@ -8,27 +8,25 @@ namespace yocto
         {
             xnode:: ~xnode() throw()
             {
-                switch(type)
+                if(is_term)
                 {
-                    case is_terminal:
-                        assert(lx);
-                        delete lx;
-                        lx = 0;
-                        break;
-
-                    case is_internal:
-                        assert(ch);
-                        ch->clear();
-                        object::release1(ch);
-                        ch = 0;
-                        break;
+                    assert(lx);
+                    delete lx;
+                    lx = 0;
+                }
+                else
+                {
+                    assert(ch);
+                    ch->clear();
+                    object::release1(ch);
+                    ch = 0;
                 }
             }
 
-            xnode::xnode(type_t t) throw() :
+            xnode::xnode(bool flag) throw() :
             next(0),
             prev(0),
-            type(t)
+            is_term(flag)
             {
             }
 
@@ -37,7 +35,7 @@ namespace yocto
                 assert(l);
                 try
                 {
-                    xnode *node = new xnode(is_terminal);
+                    xnode *node = new xnode(true);
                     node->lx    = l;
                     return node;
                 }
@@ -51,7 +49,7 @@ namespace yocto
 
             xnode *xnode:: leaf()
             {
-                xnode *node = new xnode(is_internal);
+                xnode *node = new xnode(false);
                 try
                 {
                     node->ch = new (object::acquire1<leaves>()) leaves();
@@ -64,8 +62,37 @@ namespace yocto
                 }
             }
 
+
+            lexeme & xnode::lex() const
+            {
+                assert(is_term);
+                assert(lx);
+                return *lx;
+            }
+
+
         }
 
     }
 
 }
+
+namespace yocto
+{
+    namespace lang
+    {
+        namespace syntax
+        {
+            void    xnode:: append(xnode *node) throw()
+            {
+                assert(node);
+                assert(!is_term);
+                assert(NULL==node->parent);
+                node->parent = this;
+                ch->push_back(node);
+            }
+        }
+    }
+}
+
+

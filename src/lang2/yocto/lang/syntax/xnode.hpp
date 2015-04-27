@@ -14,15 +14,11 @@ namespace yocto
             class xnode
             {
             public:
-                enum type_t
-                {
-                    is_terminal,
-                    is_internal
-                };
 
                 xnode       *next;
                 xnode       *prev;
-                const type_t type;
+                xnode       *parent;
+                bool         is_term;
 
                 typedef core::list_of_cpp<xnode> leaves;
 
@@ -31,10 +27,15 @@ namespace yocto
                 static xnode *term(lexeme *l); //!< new terminal
                 static xnode *leaf();
 
+                lexeme &lex() const;
+                leaves &children() const;
+                void    append(xnode *node) throw(); //!< append to children
+
 
                 YOCTO_MAKE_OBJECT
+
             private:
-                xnode(type_t t) throw();
+                xnode(bool flag) throw();
 
                 union
                 {
