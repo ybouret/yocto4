@@ -38,6 +38,9 @@ namespace yocto
                 //! restore all lexemes and delete node
                 static  void restore(xnode *node, l_list &lexemes) throw();
 
+                void viz( ios::ostream &fp ) const;
+                void graphivz( const string &filename ) const;
+
                 YOCTO_MAKE_OBJECT
 
             private:

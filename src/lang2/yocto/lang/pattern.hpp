@@ -39,7 +39,8 @@ namespace yocto
             
             //! graphviz helper
             static  void  encode( code_t code, ios::ostream &fp);
-            
+            static  void  encode( const token &, ios::ostream &fp);
+
             //! graphviz helper
             static  void  vizlink( ios::ostream &fp, const pattern *src, const pattern *tgt);
             

@@ -123,8 +123,50 @@ namespace yocto
                     }
                 }
             }
-            
-            
+
+
+        }
+    }
+}
+
+#include "yocto/ios/ocstream.hpp"
+
+namespace yocto
+{
+    namespace lang
+    {
+        namespace syntax
+        {
+            void xnode:: viz( ios::ostream &fp ) const
+            {
+                fp.viz(this); fp( "[shape=box,label=\"");
+                fp << label;
+                fp("\"];\n");
+                if(terminal)
+                {
+
+                }
+                else
+                {
+                    for(const xnode *node=ch->head;node;node=node->next)
+                    {
+                        node->viz(fp);
+                        fp.viz(this); fp(" -> "); fp.viz(node); fp("\n");
+                    }
+                }
+            }
+
+            void xnode:: graphivz( const string &filename ) const
+            {
+                ios::ocstream fp(filename,false);
+                fp("digraph G {\n");
+
+                viz(fp);
+
+                fp("}\n");
+            }
+
+
         }
     }
 }

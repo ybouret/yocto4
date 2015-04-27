@@ -28,6 +28,7 @@ namespace{
 
             root.emit("ID",  "[_[:alpha:]][:word:]*");
             root.emit("INT", "[:digit:]+");
+            root.emit(";", ";");
 
             lexical::plugin &cstring =load<lexical::cstring>("STR");
             cstring.hook(root);
@@ -57,12 +58,19 @@ YOCTO_UNIT_TEST_IMPL(xnode)
 
     syntax::grammar G("grammar");
 
+    syntax::aggregate &rec = G.agg("REC");
+
     syntax::alternate &top = G.alt();
     top << G.term("ID") << G.term("INT");
 
+    rec << top;
+    rec << G.term(";");
 
     auto_ptr<syntax::xnode> tree( G.accept(lxr, src, fp) );
-    
+    if(tree.is_valid())
+    {
+        tree->graphivz("xnode.dot");
+    }
 
 }
 YOCTO_UNIT_TEST_DONE()

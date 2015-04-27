@@ -29,7 +29,7 @@ namespace yocto
                 {
                     if(lx->label==label)
                     {
-                        grow( tree, xnode::term(*this,lx) );
+                        grow(tree, xnode::term(*this,lx));
                         return true;
                     }
                     else

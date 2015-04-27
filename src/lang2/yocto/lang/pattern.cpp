@@ -34,7 +34,15 @@ namespace yocto
             {
                 fp("x%02x",C);
             }
-            
+
+        }
+
+        void  pattern::encode( const token &tkn, ios::ostream &fp)
+        {
+            for(const t_char *ch=tkn.head;ch;ch=ch->next)
+            {
+                encode(ch->code,fp);
+            }
         }
 
         void  pattern:: vizlink( ios::ostream &fp, const pattern *src, const pattern *tgt)
@@ -74,8 +82,8 @@ namespace yocto
             swap_with(tmp);
             return *this;
         }
-
+        
     }
-
-
+    
+    
 }
