@@ -71,11 +71,6 @@ YOCTO_UNIT_TEST_IMPL(xnode)
     }
     std::cerr << "</Lexemes>" << std::endl;
 
-    auto_ptr<syntax::xnode> root( syntax::xnode::leaf() );
-    while(lexemes.size)
-    {
-        root->append( syntax::xnode::term(lexemes.pop_front()) );
-    }
     
 }
 YOCTO_UNIT_TEST_DONE()

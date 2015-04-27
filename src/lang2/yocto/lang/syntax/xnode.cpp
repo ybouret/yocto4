@@ -1,4 +1,4 @@
-#include "yocto/lang/syntax/xnode.hpp"
+#include "yocto/lang/syntax/rule.hpp"
 
 namespace yocto
 {
@@ -8,11 +8,13 @@ namespace yocto
         {
             xnode:: ~xnode() throw()
             {
-                if(is_term)
+                if(terminal)
                 {
-                    assert(lx);
-                    delete lx;
-                    lx = 0;
+                    if(lx)
+                    {
+                        delete lx;
+                        lx = 0;
+                    }
                 }
                 else
                 {
@@ -23,19 +25,22 @@ namespace yocto
                 }
             }
 
-            xnode::xnode(bool flag) throw() :
+            xnode::xnode(const rule &r, bool flag, const property ppty) throw() :
             next(0),
             prev(0),
-            is_term(flag)
+            parent(0),
+            label(r.label),
+            terminal(flag),
+            modifier(ppty)
             {
             }
 
-            xnode * xnode:: term(lexeme *l)
+            xnode * xnode:: term(const rule &r, lexeme *l)
             {
                 assert(l);
                 try
                 {
-                    xnode *node = new xnode(true);
+                    xnode *node = new xnode(r,true,0);
                     node->lx    = l;
                     return node;
                 }
@@ -47,9 +52,9 @@ namespace yocto
             }
 
 
-            xnode *xnode:: leaf()
+            xnode *xnode:: leaf(const rule &r)
             {
-                xnode *node = new xnode(false);
+                xnode *node = new xnode(r,false,0);
                 try
                 {
                     node->ch = new (object::acquire1<leaves>()) leaves();
@@ -63,11 +68,18 @@ namespace yocto
             }
 
 
-            lexeme & xnode::lex() const
+            lexeme & xnode::lex() throw()
             {
-                assert(is_term);
+                assert(terminal);
                 assert(lx);
                 return *lx;
+            }
+
+            xnode::leaves & xnode::children() throw()
+            {
+                assert(!terminal);
+                assert(ch);
+                return *ch;
             }
 
 
@@ -86,10 +98,30 @@ namespace yocto
             void    xnode:: append(xnode *node) throw()
             {
                 assert(node);
-                assert(!is_term);
+                assert(!terminal);
                 assert(NULL==node->parent);
                 node->parent = this;
                 ch->push_back(node);
+            }
+
+
+            void xnode:: restore(xnode *node, l_list &lexemes) throw()
+            {
+                assert(node);
+                if(node->terminal)
+                {
+                    lexemes.push_front(node->lx);
+                    node->lx = 0;
+                    delete node;
+                }
+                else
+                {
+                    xnode::leaves &nodes = node->children();
+                    while(nodes.size>0)
+                    {
+                        restore( nodes.pop_back(), lexemes );
+                    }
+                }
             }
         }
     }

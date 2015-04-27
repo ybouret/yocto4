@@ -9,33 +9,39 @@ namespace yocto
     {
         namespace syntax
         {
+            class rule;
 
             //! a node to store lexemes in AST
             class xnode
             {
             public:
+                typedef int property;
 
-                xnode       *next;
-                xnode       *prev;
-                xnode       *parent;
-                bool         is_term;
+                xnode         *next;
+                xnode         *prev;
+                xnode         *parent;
+                const string  &label;    //!< name of the rule
+                bool           terminal; //!< true if is terminal
+                const property modifier; //!<
 
                 typedef core::list_of_cpp<xnode> leaves;
 
                 ~xnode() throw();
 
-                static xnode *term(lexeme *l); //!< new terminal
-                static xnode *leaf();
+                static xnode *term(const rule &r, lexeme *l); //!< new terminal
+                static xnode *leaf(const rule &r);
 
-                lexeme &lex() const;
-                leaves &children() const;
+                lexeme &lex() throw();
+                leaves &children() throw();
                 void    append(xnode *node) throw(); //!< append to children
 
+                //! restore all lexemes and delete node
+                static  void restore(xnode *node, l_list &lexemes) throw();
 
                 YOCTO_MAKE_OBJECT
 
             private:
-                xnode(bool flag) throw();
+                xnode(const rule &r, bool flag, const property ppty) throw();
 
                 union
                 {
