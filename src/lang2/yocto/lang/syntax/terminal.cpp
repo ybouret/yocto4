@@ -41,7 +41,15 @@ namespace yocto
                     }
                 }
             }
-            
+
+            void terminal::viz( ios::ostream &fp ) const
+            {
+                fp.viz((const rule*)this);
+                fp << "[shape=box,label=\"" << label << "\"];\n";
+            }
+
+            void terminal:: lnk(ios::ostream &) const {}
+
         }
         
     }

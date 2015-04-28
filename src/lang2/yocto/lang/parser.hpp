@@ -26,6 +26,15 @@ namespace yocto
             //! a terminal
             syntax::rule & term(const char *label, const char *expr);
 
+            //! a terminal from a plugin
+            template <typename PLUGIN>
+            syntax::rule  &term(const char *label)
+            {
+                lexical::plugin &plg = load<PLUGIN>(label);
+                plg.hook(scanner);
+                return decl_term(label);
+            }
+
             //! shortcut
             syntax::alternate & choice(Rule &r1, Rule &r2);
 

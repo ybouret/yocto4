@@ -52,6 +52,19 @@ namespace yocto
                 grow(tree,agg.yield());
                 return true;
             }
+
+            void aggregate:: viz( ios::ostream &fp ) const
+            {
+                fp.viz((const rule*)this); fp("[shape=house,label=\"%s\"];\n", label.c_str());
+            }
+
+            void aggregate:: lnk( ios::ostream &fp ) const
+            {
+                for(const operand *node=operands.head;node;node=node->next)
+                {
+                    fp.viz( (const rule*)this ); fp << " -> "; fp.viz(node->addr); fp << ";\n";
+                }
+            }
         }
     }
 }

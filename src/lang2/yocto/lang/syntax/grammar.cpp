@@ -27,7 +27,7 @@ namespace yocto
             {
 
             }
-            
+
             void grammar:: top_level( rule &r ) throw()
             {
                 assert( rules.owns(&r) );
@@ -141,7 +141,7 @@ namespace yocto
 {
     namespace lang
     {
-        
+
         namespace syntax
         {
             xnode *grammar:: accept( lexer &lxr, source &src, ios::istream &fp)
@@ -186,21 +186,57 @@ namespace yocto
                 // Let's study the result
                 //______________________________________________________________
                 auto_ptr<xnode> ast(tree);
-                const lexeme *lx = lxr.peek(src, fp);
+                const lexeme   *lx = lxr.peek(src, fp);
                 if(lx)
                 {
                     throw exception("%d:[[%s]]: unexpected extraneous %s", lx->line, gname, lx->label.c_str());
                 }
-
-
-
+                
+                
+                
                 return ast.yield();
-
+                
             }
             
         }
     }
 }
 
+#include "yocto/ios/ocstream.hpp"
+
+namespace yocto
+{
+    namespace lang
+    {
+        
+        namespace syntax
+        {
+            
+            void grammar:: gramviz( const string &filename ) const
+            {
+                ios::ocstream fp(filename,false);
+                fp << "digraph G{\n";
+                fp << "\tordering=out;\n";
+                
+                // prepare all nodes
+                for(const rule *r=rules.head;r;r=r->next)
+                {
+                    r->viz(fp);
+                }
+
+                // prepare all links
+                for(const rule *r=rules.head;r;r=r->next)
+                {
+                    r->lnk(fp);
+                }
+
+
+                fp << "}";
+            }
+            
+        }
+        
+    }
+}
 
 

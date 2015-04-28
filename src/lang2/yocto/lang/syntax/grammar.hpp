@@ -49,6 +49,7 @@ namespace yocto
                 //! try to accept first rule
                 xnode *accept( lexer &lxr, source &src, ios::istream &fp);
 
+                void gramviz( const string &filename ) const;
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);

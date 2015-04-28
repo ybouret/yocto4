@@ -24,7 +24,8 @@ namespace yocto
 
 
                 virtual bool accept( Y_LANG_SYNTAX_RULE_ACCEPT_ARGS ) const = 0;
-
+                virtual void viz( ios::ostream &fp ) const = 0;
+                virtual void lnk( ios::ostream &fp ) const = 0;
 
             protected:
                 explicit rule(const string &id);

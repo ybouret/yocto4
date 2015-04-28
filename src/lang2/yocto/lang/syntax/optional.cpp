@@ -38,7 +38,18 @@ namespace yocto
                 return true;
             }
             
-            
+            void optional:: viz( ios::ostream &fp ) const
+            {
+                fp.viz((const rule *)this);
+                fp << "[shape=circle,label=\"?\"];\n";
+            }
+
+            void optional:: lnk( ios::ostream &fp ) const
+            {
+                fp.viz( (const rule*)this ); fp << " -> "; fp.viz(&jk); fp << ";\n";
+            }
+
+
         }
 
     }

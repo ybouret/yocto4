@@ -27,8 +27,16 @@ namespace{
             Rule &ID = term("ID", "[_[:alpha:]][:word:]*");
             Rule &END = term("END",";");
 
+            Rule &INT = term("INT", "[:digit:]+");
+            Rule &HEX = term("HEX", "0x[:xdigit:]+");
+            Rule &STR = term<lexical::cstring>("STR");
+
+            Rule &EQ  = term("EQ","=");
+
             Agg &STATEMENT = agg("STATEMENT");
-            STATEMENT << ID << END;
+            Alt &VALUE     = alt();
+            VALUE << HEX << INT << STR;
+            STATEMENT << ID << EQ << VALUE << END;
 
             top_level( zero_or_more(STATEMENT) );
 
@@ -36,6 +44,10 @@ namespace{
             com.hook(scanner);
             scanner.drop("WS", "[:blank:]");
             scanner.endl("ENDL");
+
+            gramviz("gram.dot");
+            (void) system("dot -Tpng -o gram.png gram.dot");
+
         }
 
         virtual ~Parser() throw() {}
@@ -51,6 +63,8 @@ YOCTO_UNIT_TEST_IMPL(xnode)
     fs.try_remove_file("xnode.png");
 
     Parser P;
+
+
 
     ios::icstream fp(ios::cstdin);
     auto_ptr<syntax::xnode> tree( P.run(fp) );

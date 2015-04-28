@@ -9,32 +9,32 @@ namespace yocto
     {
         namespace syntax
         {
-            
-            
+
+
             at_least:: ~at_least() throw()
             {
             }
-            
+
             at_least:: at_least(rule &r, size_t n) :
             joker( make_label(n), r),
             nmin(n)
             {
             }
-            
+
             unsigned at_least:: counter = 0;
-            
+
             string at_least:: make_label(size_t n)
             {
                 YOCTO_GIANT_LOCK();
                 const string ans = vformat(">=%u#%u",unsigned(n),++counter);
                 return ans;
             }
-            
+
             bool at_least:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
             {
-                std::cerr << "?>=%u" << nmin << std::endl;
+                std::cerr << "?>=" << nmin << std::endl;
                 auto_ptr<xnode>  top( xnode::leaf(*this) );
-                
+
                 size_t count = 0;
                 for(;;)
                 {
@@ -50,21 +50,32 @@ namespace yocto
                         top->append(sub);
                     }
                 }
-                
+
                 if(count<nmin)
                 {
                     std::cerr << "\t->=" << nmin << std::endl;
                     xnode::restore(top.yield(), lxr);
                     return false;
                 }
-                
+
                 std::cerr << "\t+>=" << nmin << std::endl;
                 grow(tree, top.yield());
                 return true;
             }
 
+
+            void at_least:: viz( ios::ostream &fp ) const
+            {
+                fp.viz((const rule *)this);
+                fp("[shape=doublecircle,label=\">=%u\"];\n",unsigned(nmin));
+            }
+
+            void at_least:: lnk( ios::ostream &fp ) const
+            {
+                fp.viz( (const rule*)this ); fp << " -> "; fp.viz(&jk); fp << ";\n";
+            }
         }
-        
+
         
         
     }
