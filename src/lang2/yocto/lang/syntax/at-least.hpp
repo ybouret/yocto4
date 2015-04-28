@@ -26,7 +26,7 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(at_least);
                 static  unsigned counter;
-                static  string   make_label();
+                static  string   make_label(size_t);
             };
             
             //rule *zero_or_more( rule &r );

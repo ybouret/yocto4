@@ -16,17 +16,17 @@ namespace yocto
             }
             
             at_least:: at_least(rule &r, size_t n) :
-            joker( make_label(), r),
+            joker( make_label(n), r),
             nmin(n)
             {
             }
             
             unsigned at_least:: counter = 0;
             
-            string at_least:: make_label()
+            string at_least:: make_label(size_t n)
             {
                 YOCTO_GIANT_LOCK();
-                const string ans = vformat("AT_LEAST#%u",++counter);
+                const string ans = vformat(">=%u#%u",unsigned(n),++counter);
                 return ans;
             }
             

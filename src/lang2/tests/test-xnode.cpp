@@ -69,7 +69,7 @@ namespace{
             Agg  &Statement = agg("statement");
             Statement << ID << opt(Assign) << END;
 
-            top_level(Statement);
+            top_level( zero_or_more(Statement) );
 
             lexical::plugin &com     = load<lexical::comment>("COM","//");
             com.hook(scanner);

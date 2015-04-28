@@ -118,6 +118,16 @@ namespace yocto
                 return *R;
             }
 
+            rule & grammar:: zero_or_more(rule &r)
+            {
+                return at_least(r, 0);
+            }
+
+            rule & grammar:: one_or_more(rule &r)
+            {
+                return at_least(r, 1);
+            }
+
 
         }
 

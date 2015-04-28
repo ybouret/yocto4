@@ -40,7 +40,8 @@ namespace yocto
 
                 //! at least
                 rule &at_least(rule &r, const size_t nmin);
-
+                rule &zero_or_more( rule &r );
+                rule &one_or_more( rule &r );
                 
                 //! set top level from a previously declared rule
                 void top_level( rule &r ) throw();
