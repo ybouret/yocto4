@@ -55,7 +55,16 @@ namespace{
     public:
         explicit Parser() : parser("parser","root")
         {
-            
+
+            Rule &ID  = term("ID", "[_[:alpha:]][:word:]*");
+            Rule &EQ  = term("=","=");
+            Rule &INT = term("INT","[:digit]+");
+            Rule &HEX = term("HEX", "0x[:xdigit:]+");
+            Alt  &NUM = alt(); NUM << HEX << INT;
+            Rule &END = term("END", ";");
+
+
+
         }
 
         virtual ~Parser() throw() {}
