@@ -35,12 +35,12 @@ namespace yocto
             {
             }
 
-            xnode * xnode:: term(const rule &r, lexeme *l)
+            xnode * xnode:: term(const rule &r, lexeme *l, const property ppty)
             {
                 assert(l);
                 try
                 {
-                    xnode *node = new xnode(r,true,0);
+                    xnode *node = new xnode(r,true,ppty);
                     node->lx    = l;
                     return node;
                 }
@@ -54,7 +54,7 @@ namespace yocto
 
             xnode *xnode:: leaf(const rule &r)
             {
-                xnode *node = new xnode(r,false,0);
+                xnode *node = new xnode(r,false,variable);
                 try
                 {
                     node->ch = new (object::acquire1<leaves>()) leaves();

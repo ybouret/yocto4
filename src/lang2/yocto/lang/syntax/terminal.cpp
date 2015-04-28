@@ -22,7 +22,7 @@ namespace yocto
                 lexeme *lx = lxr.get(src, fp);
                 if(!lx)
                 {
-                    return false; //EOF
+                    return false; //EOF or stopped
                 }
                 else
                 {

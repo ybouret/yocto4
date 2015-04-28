@@ -22,10 +22,10 @@ namespace yocto
                 const string name;
 
                 //! accepting terminal
-                rule &decl_term(const string &label);
+                rule &decl_term(const string &label, const property ppty = variable);
 
                 //! wrapper
-                rule &decl_term(const char   *label);
+                rule &decl_term(const char   *label, const property ppty = variable);
 
                 //! aggregate
                 aggregate &agg( const string &label);

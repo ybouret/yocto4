@@ -65,7 +65,7 @@ namespace yocto
                 }
             }
 
-            rule & grammar:: decl_term( const string &label )
+            rule & grammar:: decl_term( const string &label  )
             {
                 check_label(label);
                 rule *r = new terminal(label);
