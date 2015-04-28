@@ -137,6 +137,7 @@ namespace yocto
 
 #include "yocto/ptr/auto.hpp"
 
+
 namespace yocto
 {
     namespace lang
@@ -189,15 +190,24 @@ namespace yocto
                 const lexeme   *lx = lxr.peek(src, fp);
                 if(lx)
                 {
-                    throw exception("%d:[[%s]]: unexpected extraneous %s", lx->line, gname, lx->label.c_str());
+                    assert(lxr.size>=1);
+                    if(lxr.size>1)
+                    {
+                        assert(lx->next);
+                        throw exception("%d:[[%s]]: unexpected %s after %s", lx->next->line, gname, lx->next->label.c_str(), lx->label.c_str());
+                    }
+                    else
+                    {
+                        throw exception("%d:[[%s]]: unexpected extraneous %s", lx->line, gname, lx->label.c_str());
+                    }
                 }
-                
-                
-                
+
+
+
                 return ast.yield();
-                
+
             }
-            
+
         }
     }
 }
@@ -208,10 +218,10 @@ namespace yocto
 {
     namespace lang
     {
-        
+
         namespace syntax
         {
-            
+
             void grammar:: gramviz( const string &filename ) const
             {
                 ios::ocstream fp(filename,false);
@@ -223,14 +233,14 @@ namespace yocto
                 {
                     r->viz(fp);
                 }
-
+                
                 // prepare all links
                 for(const rule *r=rules.head;r;r=r->next)
                 {
                     r->lnk(fp);
                 }
-
-
+                
+                
                 fp << "}";
             }
             

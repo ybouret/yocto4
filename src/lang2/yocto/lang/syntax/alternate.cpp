@@ -2,8 +2,6 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/exception.hpp"
 
-#include <iostream>
-
 namespace yocto
 {
     namespace lang
@@ -36,7 +34,6 @@ namespace yocto
 
             bool alternate:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
             {
-                std::cerr << "?ALT " << label << std::endl;
 
                 if(operands.size<=0)
                     throw exception("alternate '%s' has no operand", label.c_str());

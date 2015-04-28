@@ -2,7 +2,6 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/exception.hpp"
 
-#include <iostream>
 
 namespace yocto
 {
@@ -24,7 +23,6 @@ namespace yocto
 
             bool aggregate:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
             {
-                std::cerr << "?AGG '" << label << "'" << std::endl;
 
                 if(operands.size<=0)
                     throw exception("aggregate '%s' has no operand", label.c_str());
@@ -38,7 +36,6 @@ namespace yocto
                     if(!r.accept(sub, lxr, src, fp))
                     {
                         assert(0==sub);
-                        std::cerr << "\t-" << label << std::endl;
                         xnode::restore(agg.yield(), lxr);
                         return false;
                     }

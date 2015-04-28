@@ -1,7 +1,6 @@
 #include "yocto/lang/syntax/at-least.hpp"
 #include "yocto/ptr/auto.hpp"
 
-#include <iostream>
 
 namespace yocto
 {
@@ -32,7 +31,6 @@ namespace yocto
 
             bool at_least:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
             {
-                std::cerr << "?>=" << nmin << std::endl;
                 auto_ptr<xnode>  top( xnode::leaf(*this) );
 
                 size_t count = 0;
@@ -53,12 +51,10 @@ namespace yocto
 
                 if(count<nmin)
                 {
-                    std::cerr << "\t->=" << nmin << std::endl;
                     xnode::restore(top.yield(), lxr);
                     return false;
                 }
 
-                std::cerr << "\t+>=" << nmin << std::endl;
                 grow(tree, top.yield());
                 return true;
             }
