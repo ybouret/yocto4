@@ -20,17 +20,14 @@ namespace yocto
                 virtual bool accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const;
                 
                 const size_t nmin;
-                
-                
-                
+                                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(at_least);
                 static  unsigned counter;
                 static  string   make_label(size_t);
             };
             
-            //rule *zero_or_more( rule &r );
-            //rule *one_or_more(  rule &  );
+
         }
         
     }

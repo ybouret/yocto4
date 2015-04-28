@@ -62,19 +62,7 @@ namespace yocto
                 grow(tree, top.yield());
                 return true;
             }
-        
-#if 0
-            rule *zero_or_more( rule &r )
-            {
-                return new at_least(r,0);
-            }
 
-            rule *one_or_more( rule &r )
-            {
-                return new at_least(r,1);
-            }
-#endif
-            
         }
         
         

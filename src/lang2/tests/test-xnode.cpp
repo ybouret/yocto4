@@ -18,58 +18,19 @@ using namespace lang;
 namespace{
 
 
-    class Lexer : public lexer
-    {
-    public:
-        virtual ~Lexer() throw() {}
-
-        inline Lexer() : lexer("xLexer","root")
-        {
-
-            lexical::scanner &root = get_root();
-
-            root.emit("ID",  "[_[:alpha:]][:word:]*");
-            root.emit("INT", "[:digit:]+");
-            root.emit(";", ";");
-
-            lexical::plugin &cstring =load<lexical::cstring>("STR");
-            cstring.hook(root);
-
-            lexical::plugin &com     = load<lexical::comment>("COM","//");
-            com.hook(root);
-
-            root.drop("WS", "[:blank:]");
-            root.endl("ENDL");
-            root.emit("SNGL", ".");
-
-        }
-
-
-
-    private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(Lexer);
-    };
-
     class Parser : public parser
     {
     public:
         explicit Parser() : parser("parser","root")
         {
 
-            Rule &ID  = term("ID", "[_[:alpha:]][:word:]*");
-            Rule &EQ  = term("=","=");
-            Rule &INT = term("INT","[:digit:]+");
-            Rule &HEX = term("HEX", "0x[:xdigit:]+");
-            Alt  &NUM = choice(HEX,INT);
-            Rule &END = term("END", ";");
+            Rule &ID = term("ID", "[_[:alpha:]][:word:]*");
+            Rule &END = term("END",";");
 
-            Agg  &Assign = agg("assign");
-            Assign << EQ << NUM;
+            Agg &STATEMENT = agg("STATEMENT");
+            STATEMENT << ID << END;
 
-            Agg  &Statement = agg("statement");
-            Statement << ID << opt(Assign) << END;
-
-            top_level( zero_or_more(Statement) );
+            top_level( zero_or_more(STATEMENT) );
 
             lexical::plugin &com     = load<lexical::comment>("COM","//");
             com.hook(scanner);

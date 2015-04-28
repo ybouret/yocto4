@@ -59,7 +59,7 @@ dict()
             {
                 throw exception("{%s}[<%s>]: unexpected creation failure", name.c_str(), id.c_str());
             }
-            
+
             q->link_to(*this);
             return *q;
         }
@@ -176,7 +176,7 @@ namespace yocto
                 //______________________________________________________________
                 bool    ctl = false;
                 lexeme *lxm = scan->get(src, fp, ctl);
-                
+
                 if(!lxm)
                 {
                     if(!ctl)
@@ -195,7 +195,7 @@ namespace yocto
                     return lxm;
                 }
             }
-            
+
         }
 
         void   lexer:: unget( lexeme *lx ) throw()
@@ -224,6 +224,31 @@ namespace yocto
                 return lxm;
             }
         }
+
+#if 0
+        void lexer:: prefetch(size_t nmax, source &src, ios::istream &fp)
+        {
+            l_list stk;
+            stk.swap_with(*this);
+
+            try
+            {
+                for(size_t i=stk.size;i<=nmax;++i)
+                {
+                    lexeme *lx = get(src,fp);
+                    assert(0==size);
+                    if(!lx) break;
+                    stk.push_back(lx);
+                }
+                stk.swap_with(*this);
+            }
+            catch(...)
+            {
+                stk.swap_with(*this);
+                throw;
+            }
+        }
+#endif
         
         void lexer:: unget(const lexical::plugin &plg, const string &content)
         {
@@ -242,8 +267,8 @@ namespace yocto
                 throw exception("{%s}: plugin<%s>  already in use", name.c_str(), plg->name.c_str() );
             }
         }
-
-
+        
+        
     }
 }
 

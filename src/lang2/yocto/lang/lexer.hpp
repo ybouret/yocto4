@@ -36,7 +36,6 @@ namespace yocto
             lexical::scanner & declare(const char   *id);
 
 
-
             //! jump to another scanner
             void jump(const string &id);
 
@@ -85,8 +84,6 @@ namespace yocto
                 declare_plugin(plg);
                 return *plg;
             }
-
-
 
 
 

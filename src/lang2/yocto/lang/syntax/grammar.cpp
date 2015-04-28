@@ -135,6 +135,8 @@ namespace yocto
 
 }
 
+#include "yocto/ptr/auto.hpp"
+
 namespace yocto
 {
     namespace lang
@@ -144,6 +146,10 @@ namespace yocto
         {
             xnode *grammar:: accept( lexer &lxr, source &src, ios::istream &fp)
             {
+                //______________________________________________________________
+                //
+                // Let's go, try to accept the top level rules
+                //______________________________________________________________
                 const char *gname = name.c_str();
                 if(rules.size<=0) throw exception("[[%s]]: no top level rule!",gname);
 
@@ -153,10 +159,42 @@ namespace yocto
                 if( !root.accept(tree,lxr,src,fp) )
                 {
                     assert(NULL==tree);
+                    //__________________________________________________________
+                    //
+                    // not accepted: what happened ?
+                    //__________________________________________________________
+                    switch(lxr.size)
+                    {
+                        case 0:
+                            throw exception("[[%s]]: no lexeme",gname);
+
+                        case 1:
+                            throw exception("[[%s]]: unexpected single lexeme %s", gname, lxr.head->label.c_str());
+
+                        default:
+                            assert(lxr.tail);
+                            assert(lxr.tail->prev);
+                            throw exception("[[%s]]: unexpected %s after %s", gname, lxr.tail->label.c_str(), lxr.tail->prev->label.c_str());
+
+                    }
+
                     throw exception("[[%s]]: syntax error", gname);
                 }
 
-                return tree;
+                //______________________________________________________________
+                //
+                // Let's study the result
+                //______________________________________________________________
+                auto_ptr<xnode> ast(tree);
+                const lexeme *lx = lxr.peek(src, fp);
+                if(lx)
+                {
+                    throw exception("%d:[[%s]]: unexpected extraneous %s", lx->line, gname, lx->label.c_str());
+                }
+
+
+
+                return ast.yield();
 
             }
             
