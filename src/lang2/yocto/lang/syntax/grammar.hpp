@@ -5,7 +5,6 @@
 #include "yocto/lang/syntax/alternate.hpp"
 #include "yocto/lang/syntax/aggregate.hpp"
 
-
 namespace yocto
 {
     namespace lang
@@ -34,6 +33,14 @@ namespace yocto
 
                 //! aggregate
                 alternate &alt();
+
+                //! optional
+                rule &opt( rule & );
+
+                //! at least
+                rule &at_least(rule &r, const size_t nmin);
+                
+
                 
                 //! set root from a previously declared rule
                 void set_root( rule &r ) throw();

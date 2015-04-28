@@ -44,6 +44,8 @@ namespace yocto
 
 #include "yocto/exception.hpp"
 #include "yocto/lang/syntax/terminal.hpp"
+#include "yocto/lang/syntax/optional.hpp"
+#include "yocto/lang/syntax/at-least.hpp"
 
 namespace yocto
 {
@@ -97,7 +99,26 @@ namespace yocto
                 rules.push_back(r);
                 return *r;
             }
-            
+
+            rule & grammar:: opt(rule &r)
+            {
+                if( ! rules.owns(&r) )
+                    throw exception("rule '%s' doesn't belong to grammar [[%s]]", r.label.c_str(), name.c_str());
+                optional *R = new optional(r);
+                rules.push_back(R);
+                return *R;
+            }
+
+            rule & grammar:: at_least(rule &r, const size_t nmin)
+            {
+                if( ! rules.owns(&r) )
+                    throw exception("rule '%s' doesn't belong to grammar [[%s]]", r.label.c_str(), name.c_str());
+                rule *R = new syntax::at_least(r,nmin);
+                rules.push_back(R);
+                return *R;
+            }
+
+
         }
 
     }

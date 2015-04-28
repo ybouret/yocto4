@@ -29,8 +29,8 @@ namespace yocto
                 static  string   make_label();
             };
             
-            rule *zero_or_more( rule &r );
-            rule *one_or_more(  rule &  );
+            //rule *zero_or_more( rule &r );
+            //rule *one_or_more(  rule &  );
         }
         
     }

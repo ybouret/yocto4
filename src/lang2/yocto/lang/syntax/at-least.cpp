@@ -63,7 +63,7 @@ namespace yocto
                 return true;
             }
         
-            
+#if 0
             rule *zero_or_more( rule &r )
             {
                 return new at_least(r,0);
@@ -73,6 +73,8 @@ namespace yocto
             {
                 return new at_least(r,1);
             }
+#endif
+            
         }
         
         
