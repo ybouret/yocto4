@@ -22,9 +22,10 @@ namespace yocto
                 const string name;
 
                 //! accepting terminal
-                rule &term(const string &label);
+                rule &decl_term(const string &label);
+
                 //! wrapper
-                rule &term(const char   *label);
+                rule &decl_term(const char   *label);
 
                 //! aggregate
                 aggregate &agg( const string &label);
@@ -39,11 +40,10 @@ namespace yocto
 
                 //! at least
                 rule &at_least(rule &r, const size_t nmin);
-                
 
                 
-                //! set root from a previously declared rule
-                void set_root( rule &r ) throw();
+                //! set top level from a previously declared rule
+                void top_level( rule &r ) throw();
 
                 //! try to accept first rule
                 xnode *accept( lexer &lxr, source &src, ios::istream &fp);

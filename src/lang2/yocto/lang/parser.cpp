@@ -1,0 +1,61 @@
+#include "yocto/lang/parser.hpp"
+
+namespace yocto
+{
+    namespace lang
+    {
+
+        parser:: ~parser() throw()
+        {
+        }
+
+
+
+        parser:: parser(const string &langID, const string &mainScanner) :
+        syntax::grammar(langID+".grammar"),
+        lexer(          langID+".lexer", mainScanner ),
+        scanner( get_root() ),
+        src()
+        {
+        }
+
+        parser:: parser(const char *langID, const char *mainScanner) :
+        syntax::grammar(string(langID)+".grammar"),
+        lexer(          string(langID)+".lexer", string(mainScanner) ),
+        scanner( get_root() ),
+        src()
+        {
+        }
+
+    }
+}
+
+namespace yocto
+{
+    namespace lang
+    {
+
+        syntax::rule & parser:: term(const char *label, const char *expr)
+        {
+            // make a lexical rule
+            scanner.emit(label, expr);
+
+            // make a grammar rule
+            return grammar::decl_term(label);
+        }
+
+
+        syntax::xnode * parser::run(ios::istream &fp)
+        {
+            restart();
+            src.clear();
+            lexer::clear();
+            
+            syntax::xnode *ast = accept(*this, src, fp);
+
+            return ast;
+        }
+
+    }
+
+}

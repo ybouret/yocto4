@@ -8,7 +8,9 @@
 #include "yocto/lang/lexical/plugin/cstring.hpp"
 
 #include "yocto/ios/icstream.hpp"
-#include "yocto/lang/syntax/grammar.hpp"
+#include "yocto/lang/parser.hpp"
+
+#include "yocto/fs/local-fs.hpp"
 
 using namespace yocto;
 using namespace lang;
@@ -48,28 +50,34 @@ namespace{
         YOCTO_DISABLE_COPY_AND_ASSIGN(Lexer);
     };
 
+    class Parser : public parser
+    {
+    public:
+        explicit Parser() : parser("parser","root")
+        {
+            
+        }
+
+        virtual ~Parser() throw() {}
+
+    };
+
 }
 
 YOCTO_UNIT_TEST_IMPL(xnode)
 {
-    Lexer         lxr;
-    lang::source  src;
+    vfs &fs = local_fs::instance();
+    fs.try_remove_file("xnode.dot");
+    fs.try_remove_file("xnode.png");
+
+    Parser P;
+
     ios::icstream fp(ios::cstdin);
-
-    syntax::grammar G("grammar");
-
-    syntax::aggregate &rec = G.agg("REC");
-
-    //syntax::alternate &top = G.alt();
-    //top << G.term("ID") << G.term("INT");
-
-    rec << G.term("ID");
-    rec << G.term(";");
-
-    auto_ptr<syntax::xnode> tree( G.accept(lxr, src, fp) );
+    auto_ptr<syntax::xnode> tree( P.run(fp) );
     if(tree.is_valid())
     {
         tree->graphivz("xnode.dot");
+        (void) system("dot -Tpng -o xnode.png xnode.dot");
     }
 
 }

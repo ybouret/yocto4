@@ -28,7 +28,7 @@ namespace yocto
 
             }
             
-            void grammar:: set_root( rule &r ) throw()
+            void grammar:: top_level( rule &r ) throw()
             {
                 assert( rules.owns(&r) );
                 rules.move_to_front(&r);
@@ -65,7 +65,7 @@ namespace yocto
                 }
             }
 
-            rule & grammar:: term( const string &label )
+            rule & grammar:: decl_term( const string &label )
             {
                 check_label(label);
                 rule *r = new terminal(label);
@@ -73,10 +73,10 @@ namespace yocto
                 return *r;
             }
 
-            rule & grammar:: term( const char *label )
+            rule & grammar:: decl_term( const char *label )
             {
                 const string Label(label);
-                return term(Label);
+                return decl_term(Label);
             }
 
             aggregate & grammar:: agg( const string &label)
