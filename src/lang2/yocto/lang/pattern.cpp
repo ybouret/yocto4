@@ -39,10 +39,21 @@ namespace yocto
 
         void  pattern::encode( const token &tkn, ios::ostream &fp)
         {
+            fp << '\'';
             for(const t_char *ch=tkn.head;ch;ch=ch->next)
             {
-                encode(ch->code,fp);
+                const char C(ch->code);
+                if(C>=32 && C<127 && C!='\"' && C!='\\')
+                {
+                    fp("%c",C);
+                }
+                else
+                {
+                    fp("\\x%02x",C);
+                }
+
             }
+            fp << '\'';
         }
 
         void  pattern:: vizlink( ios::ostream &fp, const pattern *src, const pattern *tgt)

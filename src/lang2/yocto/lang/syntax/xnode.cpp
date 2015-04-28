@@ -89,7 +89,6 @@ namespace yocto
 
 }
 
-//#include <iostream>
 
 namespace yocto
 {
@@ -112,13 +111,11 @@ namespace yocto
                 assert(node);
                 if(node->terminal)
                 {
-                    //std::cerr << "restoring terminal " << node->label << std::endl;
                     lexemes.push_front(node->lx);
                     node->lx = 0;
                 }
                 else
                 {
-                    //std::cerr << "restoring leaf " << node->label << " / #" << node->children().size << std::endl;
                     xnode::leaves &nodes = node->children();
                     while(nodes.size>0)
                     {
@@ -143,15 +140,22 @@ namespace yocto
         {
             void xnode:: viz( ios::ostream &fp ) const
             {
-                fp.viz(this); fp( "[shape=box,label=\"");
-                fp << label;
-                fp("\"];\n");
+                fp.viz(this);
                 if(terminal)
                 {
-
+                    assert(lx);
+                    fp( "[shape=box,label=\"");
+                    fp << label;
+                    fp << '=';
+                    pattern::encode(*lx, fp);
+                    fp("\"];\n");
                 }
                 else
                 {
+                    assert(ch);
+                    fp("[shape=egg,label=\"");
+                    fp << label;
+                    fp("\"];\n");
                     for(const xnode *node=ch->head;node;node=node->next)
                     {
                         node->viz(fp);
@@ -164,13 +168,13 @@ namespace yocto
             {
                 ios::ocstream fp(filename,false);
                 fp("digraph G {\n");
-
+                
                 viz(fp);
-
+                
                 fp("}\n");
             }
-
-
+            
+            
         }
     }
 }

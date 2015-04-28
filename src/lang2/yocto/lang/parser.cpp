@@ -44,6 +44,32 @@ namespace yocto
             return grammar::decl_term(label);
         }
 
+        syntax::alternate & parser:: choice(Rule &r1, Rule &r2)
+        {
+            syntax::alternate &r = alt();
+            r << r1 << r2;
+            return r;
+        }
+
+        syntax::alternate & parser:: choice(Rule &r1, Rule &r2, Rule &r3)
+        {
+            syntax::alternate &r = alt();
+            r << r1 << r2 << r3;
+            return r;
+        }
+
+        syntax::aggregate & parser:: gather(const char *label, Rule &r1, Rule &r2)
+        {
+            syntax::aggregate &r = agg(label);
+            r << r1 << r2;
+            return r;
+        }
+        syntax::aggregate & parser:: gather(const char *label, Rule &r1, Rule &r2, Rule &r3)
+        {
+            syntax::aggregate &r = agg(label);
+            r << r1 << r2 << r3;
+            return r;
+        }
 
         syntax::xnode * parser::run(ios::istream &fp)
         {

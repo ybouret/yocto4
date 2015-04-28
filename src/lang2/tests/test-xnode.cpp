@@ -58,13 +58,23 @@ namespace{
 
             Rule &ID  = term("ID", "[_[:alpha:]][:word:]*");
             Rule &EQ  = term("=","=");
-            Rule &INT = term("INT","[:digit]+");
+            Rule &INT = term("INT","[:digit:]+");
             Rule &HEX = term("HEX", "0x[:xdigit:]+");
-            Alt  &NUM = alt(); NUM << HEX << INT;
+            Alt  &NUM = choice(HEX,INT);
             Rule &END = term("END", ";");
 
+            Agg  &Assign = agg("assign");
+            Assign << EQ << NUM;
 
+            Agg  &Statement = agg("statement");
+            Statement << ID << opt(Assign) << END;
 
+            top_level(Statement);
+
+            lexical::plugin &com     = load<lexical::comment>("COM","//");
+            com.hook(scanner);
+            scanner.drop("WS", "[:blank:]");
+            scanner.endl("ENDL");
         }
 
         virtual ~Parser() throw() {}
@@ -88,6 +98,6 @@ YOCTO_UNIT_TEST_IMPL(xnode)
         tree->graphivz("xnode.dot");
         (void) system("dot -Tpng -o xnode.png xnode.dot");
     }
-
+    
 }
 YOCTO_UNIT_TEST_DONE()
