@@ -13,7 +13,8 @@ namespace yocto
             class terminal : public rule
             {
             public:
-                explicit terminal(const string &id);
+                const property modifier; //!< for xnode
+                explicit terminal(const string &id,const property ppty=standard);
                 virtual ~terminal() throw();
 
                 //! accept if lexeme->label == this->label

@@ -12,8 +12,9 @@ namespace yocto
             {
             }
 
-            terminal:: terminal( const string &id ) :
-            rule(id)
+            terminal:: terminal( const string &id, const property ppty ) :
+            rule(id),
+            modifier(ppty)
             {
             }
 
@@ -28,7 +29,7 @@ namespace yocto
                 {
                     if(lx->label==label)
                     {
-                        grow(tree, xnode::term(*this,lx));
+                        grow(tree, xnode::term(*this,lx,modifier));
                         return true;
                     }
                     else

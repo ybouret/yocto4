@@ -11,7 +11,13 @@ namespace yocto
         {
             class rule;
 
-          
+            enum  property
+            {
+                standard,
+                univocal,
+                jettison
+            };
+
             //! a node to store lexemes in AST
             class xnode
             {
@@ -21,15 +27,16 @@ namespace yocto
                 xnode         *parent;
                 const string  &label;    //!< name of the rule
                 bool           terminal; //!< true if is terminal
+                const property modifier; //!< assigned by syntax rule
 
                 typedef core::list_of_cpp<xnode> leaves;
 
                 ~xnode() throw();
 
-                static xnode *term(const rule &r, lexeme *l); //!< new terminal
+                static xnode *term(const rule &r, lexeme *l, const property ppty=standard); //!< new terminal
                 static xnode *leaf(const rule &r);
 
-                lexeme &lex() throw();
+                lexeme &lex()      throw();
                 leaves &children() throw();
                 void    append(xnode *node) throw(); //!< append to children
 
@@ -42,7 +49,7 @@ namespace yocto
                 YOCTO_MAKE_OBJECT
 
             private:
-                xnode(const rule &r, bool flag) throw();
+                xnode(const rule &r, bool flag, const property ppty) throw();
 
                 union
                 {

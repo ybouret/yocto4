@@ -25,21 +25,22 @@ namespace yocto
                 }
             }
 
-            xnode::xnode(const rule &r, bool flag) throw() :
+            xnode::xnode(const rule &r, bool flag, const property ppty) throw() :
             next(0),
             prev(0),
             parent(0),
             label(r.label),
-            terminal(flag)
+            terminal(flag),
+            modifier(ppty)
             {
             }
 
-            xnode * xnode:: term(const rule &r, lexeme *l)
+            xnode * xnode:: term(const rule &r, lexeme *l,const property ppty)
             {
                 assert(l);
                 try
                 {
-                    xnode *node = new xnode(r,true);
+                    xnode *node = new xnode(r,true,ppty);
                     node->lx    = l;
                     return node;
                 }
@@ -53,7 +54,7 @@ namespace yocto
 
             xnode *xnode:: leaf(const rule &r)
             {
-                xnode *node = new xnode(r,false);
+                xnode *node = new xnode(r,false,standard);
                 try
                 {
                     node->ch = new (object::acquire1<leaves>()) leaves();
