@@ -25,13 +25,13 @@ namespace{
         {
 
             Rule &ID = term("ID", "[_[:alpha:]][:word:]*");
-            Rule &END = term("END",";");
+            Rule &END = term("END",";", syntax::jettison);
 
             Rule &INT = term("INT", "[:digit:]+");
             Rule &HEX = term("HEX", "0x[:xdigit:]+");
             Rule &STR = term<lexical::cstring>("STR");
 
-            Rule &EQ  = term("EQ","=");
+            Rule &EQ  = term("EQ","=",syntax::univocal);
 
             Agg &STATEMENT = agg("STATEMENT");
             Alt &VALUE     = alt();

@@ -65,18 +65,18 @@ namespace yocto
                 }
             }
 
-            rule & grammar:: decl_term( const string &label  )
+            rule & grammar:: decl_term( const string &label, const property ppty  )
             {
                 check_label(label);
-                rule *r = new terminal(label);
+                rule *r = new terminal(label,ppty);
                 rules.push_back(r);
                 return *r;
             }
 
-            rule & grammar:: decl_term( const char *label )
+            rule & grammar:: decl_term( const char *label, const property ppty  )
             {
                 const string Label(label);
-                return decl_term(Label);
+                return decl_term(Label,ppty);
             }
 
             aggregate & grammar:: agg( const string &label)
@@ -203,8 +203,11 @@ namespace yocto
                 }
 
 
-
-                return ast.yield();
+                //______________________________________________________________
+                //
+                // simplify the syntax tree
+                //______________________________________________________________
+                return xnode::AST(ast.yield());
 
             }
 

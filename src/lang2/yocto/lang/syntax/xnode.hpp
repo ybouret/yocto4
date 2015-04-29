@@ -43,10 +43,14 @@ namespace yocto
                 //! restore all lexemes and delete node
                 static  void restore(xnode *node, l_list &lexemes) throw();
 
-                void viz( ios::ostream &fp ) const;
+                //! output a graphiv representation
                 void graphivz( const string &filename ) const;
 
+
+                static xnode *AST( xnode *node ) throw();
+
                 YOCTO_MAKE_OBJECT
+
 
             private:
                 xnode(const rule &r, bool flag, const property ppty) throw();
@@ -57,6 +61,7 @@ namespace yocto
                     leaves   *ch;
                 };
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xnode);
+                void viz( ios::ostream &fp ) const;
             };
 
         }

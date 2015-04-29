@@ -35,13 +35,13 @@ namespace yocto
     namespace lang
     {
 
-        syntax::rule & parser:: term(const char *label, const char *expr)
+        syntax::rule & parser:: term(const char *label, const char *expr, syntax::property ppty)
         {
             // make a lexical rule
             scanner.emit(label, expr);
 
             // make a grammar rule
-            return grammar::decl_term(label);
+            return grammar::decl_term(label,ppty);
         }
 
         syntax::alternate & parser:: choice(Rule &r1, Rule &r2)

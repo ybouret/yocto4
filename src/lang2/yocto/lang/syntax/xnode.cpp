@@ -146,8 +146,11 @@ namespace yocto
                     assert(lx);
                     fp( "[shape=box,label=\"");
                     fp << label;
-                    fp << '=';
-                    pattern::encode(*lx, fp);
+                    if(modifier==standard)
+                    {
+                        fp << '=';
+                        pattern::encode(*lx, fp);
+                    }
                     fp("\"];\n");
                 }
                 else
@@ -168,15 +171,65 @@ namespace yocto
             {
                 ios::ocstream fp(filename,false);
                 fp("digraph G {\n");
-                
+
                 viz(fp);
-                
+
                 fp("}\n");
             }
-            
-            
+
+
         }
     }
+}
+
+
+namespace yocto
+{
+    namespace lang
+    {
+        namespace syntax
+        {
+
+            xnode * xnode:: AST( xnode *node ) throw()
+            {
+                if(!node) return 0;
+
+                if(node->terminal)
+                {
+                    //__________________________________________________________
+                    //
+                    // clear content if not standard
+                    //__________________________________________________________
+                    if(node->modifier!=standard)
+                    {
+                        node->lx->clear();
+                    }
+                }
+                else
+                {
+                    xnode::leaves stk;
+                    node->ch->swap_with(stk);
+                    while(stk.size)
+                    {
+                        xnode *sub = AST(stk.pop_front());
+                        if(sub->modifier==jettison)
+                        {
+                            delete sub;
+                        }
+                        else
+                        {
+                            node->ch->push_back(sub);
+                        }
+                    }
+                }
+                
+                return node;
+            }
+            
+        }
+        
+    }
+    
 }
 
 
