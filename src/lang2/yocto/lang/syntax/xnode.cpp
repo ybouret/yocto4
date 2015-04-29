@@ -204,9 +204,14 @@ namespace yocto
                     {
                         node->lx->clear();
                     }
+                    return node;
                 }
                 else
                 {
+                    //__________________________________________________________
+                    //
+                    // loop over nodes
+                    //__________________________________________________________
                     xnode::leaves stk;
                     node->ch->swap_with(stk);
                     while(stk.size)
@@ -221,9 +226,24 @@ namespace yocto
                             node->ch->push_back(sub);
                         }
                     }
+
+                    switch(node->ch->size)
+                    {
+                        case 0:
+                            delete node; return 0;
+
+                        case 1:
+                        {
+                            xnode *temp = node->ch->pop_back();
+                            delete node;
+                            node = temp;
+                        }
+
+                        default:
+                            return  node;
+                    }
                 }
                 
-                return node;
             }
             
         }
