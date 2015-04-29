@@ -18,7 +18,7 @@ namespace yocto
 
 
             protected:
-                explicit joker(const string &id, rule &r);
+                explicit joker(const string &id, rule &r, uint32_t uu);
                 const rule &jk;
 
             private:

@@ -15,7 +15,7 @@ namespace yocto
             }
 
             aggregate:: aggregate(const string &id, const property ppty) :
-            logical(id),
+            logical(id, UUID),
             modifier(ppty)
             {
                 switch(modifier)

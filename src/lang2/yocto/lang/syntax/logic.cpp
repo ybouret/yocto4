@@ -8,8 +8,8 @@ namespace yocto
         {
             logical:: ~logical() throw() {}
 
-            logical:: logical(const string &id) :
-            rule(id)
+            logical:: logical(const string &id, uint32_t uu) :
+            rule(id,uu)
             {
 
             }

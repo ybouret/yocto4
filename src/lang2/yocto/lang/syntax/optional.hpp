@@ -3,6 +3,7 @@
 
 #include "yocto/lang/lexer.hpp"
 #include "yocto/lang/syntax/joker.hpp"
+#include "yocto/code/fourcc.hpp"
 
 namespace yocto
 {
@@ -14,6 +15,7 @@ namespace yocto
             class optional : public joker
             {
             public:
+                static const uint32_t UUID = YOCTO_FOURCC('[', '?', '?', ']');
                 explicit optional( rule &r );
                 virtual ~optional() throw();
 

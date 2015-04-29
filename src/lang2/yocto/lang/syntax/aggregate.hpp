@@ -3,7 +3,7 @@
 
 #include "yocto/lang/lexer.hpp"
 #include "yocto/lang/syntax/logic.hpp"
-
+#include "yocto/code/fourcc.hpp"
 namespace yocto
 {
     namespace lang
@@ -14,6 +14,7 @@ namespace yocto
             class aggregate : public logical
             {
             public:
+                static const uint32_t UUID = YOCTO_FOURCC('[', '&', '&', ']');
                 const property modifier; //!< passed to xnode
                 virtual ~aggregate() throw();
                 explicit aggregate(const string &id, const property ppty = standard);

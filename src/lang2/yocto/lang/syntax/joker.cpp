@@ -11,8 +11,8 @@ namespace yocto
             {
             }
 
-            joker:: joker(const string &id, rule &r) :
-            rule(id),
+            joker:: joker(const string &id, rule &r, uint32_t uu) :
+            rule(id,uu),
             jk(r)
             {
                 

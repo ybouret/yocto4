@@ -16,9 +16,10 @@ namespace yocto
             class rule : public object
             {
             public:
-                rule         *next;
-                rule         *prev;
-                const string  label;
+                rule          *next;
+                rule          *prev;
+                const string   label;
+                const uint32_t uuid;
 
                 virtual ~rule() throw();
 
@@ -28,7 +29,7 @@ namespace yocto
                 virtual void lnk( ios::ostream &fp ) const = 0;
 
             protected:
-                explicit rule(const string &id);
+                explicit rule(const string &id, uint32_t uu);
                 
                 void grow( xnode * &tree, xnode *leaf ) const throw();
 

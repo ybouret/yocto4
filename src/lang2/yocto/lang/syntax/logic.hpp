@@ -23,7 +23,7 @@ namespace yocto
                 logical & operator<<( rule &r );
 
             protected:
-                explicit logical(const string &id);
+                explicit logical(const string &id, uint32_t uu);
                 addr_list<rule>  operands;
 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(logical);

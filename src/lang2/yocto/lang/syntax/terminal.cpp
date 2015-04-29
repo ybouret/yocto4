@@ -13,7 +13,7 @@ namespace yocto
             }
 
             terminal:: terminal( const string &id, const property ppty ) :
-            rule(id),
+            rule(id,UUID),
             modifier(ppty)
             {
             }

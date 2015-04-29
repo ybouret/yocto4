@@ -11,10 +11,11 @@ namespace yocto
             }
             
             
-            rule:: rule(const string &id) :
+            rule:: rule(const string &id, uint32_t uu) :
             next(0),
             prev(0),
-            label(id)
+            label(id),
+            uuid(uu)
             {
             }
             

@@ -3,6 +3,7 @@
 
 #include "yocto/lang/lexer.hpp"
 #include "yocto/lang/syntax/logic.hpp"
+#include "yocto/code/fourcc.hpp"
 
 namespace yocto
 {
@@ -14,6 +15,7 @@ namespace yocto
             class alternate : public logical
             {
             public:
+                static const uint32_t UUID = YOCTO_FOURCC('[', '|', '|', ']');
                 virtual ~alternate() throw();
                 explicit alternate();
 

@@ -2,6 +2,7 @@
 #define YOCTO_LANG_SYNTAX_TERM_INCLUDED 1
 
 #include "yocto/lang/syntax/rule.hpp"
+#include "yocto/code/fourcc.hpp"
 
 namespace yocto
 {
@@ -13,6 +14,8 @@ namespace yocto
             class terminal : public rule
             {
             public:
+                static const uint32_t UUID = YOCTO_FOURCC('T','E','R','M');
+                
                 const property modifier; //!< for xnode
                 explicit terminal(const string &id,const property ppty=standard);
                 virtual ~terminal() throw();

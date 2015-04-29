@@ -26,7 +26,7 @@ namespace yocto
             
 
             alternate:: alternate() :
-            logical( make_label() )
+            logical( make_label(), UUID)
             {
 
             }

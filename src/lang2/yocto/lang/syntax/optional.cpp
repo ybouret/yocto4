@@ -21,7 +21,7 @@ namespace yocto
             }
 
             optional:: optional(rule &r) :
-            joker(make_label(),r)
+            joker(make_label(),r,UUID)
             {
             }
 

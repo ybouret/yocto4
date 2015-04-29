@@ -15,7 +15,7 @@ namespace yocto
             }
 
             at_least:: at_least(rule &r, size_t n) :
-            joker( make_label(n), r),
+            joker( make_label(n), r, UUID),
             nmin(n)
             {
             }
