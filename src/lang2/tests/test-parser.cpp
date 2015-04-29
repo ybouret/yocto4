@@ -76,8 +76,21 @@ namespace
                 JSON_Vector << EmptyVector;
                 }
 
-                
+                {
+                    Agg &HeavyVector = agg("HeavyVector");
+                    HeavyVector << LBRACK;
+                    HeavyVector << JSON_Value;
+                    Agg &ExtraValue = agg("ExtraValue",syntax::temporary);
+                    ExtraValue << COMA << JSON_Value;
+                    HeavyVector << zero_or_more(ExtraValue);
+                    HeavyVector << RBRACK;
+                    JSON_Vector << HeavyVector;
+                }
+
             }
+
+            JSON_Value << JSON_Vector;
+
 
             //__________________________________________________________________
             //
@@ -86,7 +99,7 @@ namespace
             scanner.drop("WS", "[:blank:]");
             scanner.endl("ENDL");
 
-            top_level( JSON_Object );
+            top_level( choice(JSON_Object,JSON_Vector) );
 
             gramviz("gram.dot");
             (void) system("dot -Tpng -o gram.png gram.dot");
