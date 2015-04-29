@@ -57,6 +57,11 @@ namespace yocto
                 return false;
             }
         }
+
+        bool counting:: accept_empty() const throw()
+        {
+            return lower<=0 || jk->accept_empty();
+        }
         
         void counting:: viz( ios::ostream &fp ) const
         {

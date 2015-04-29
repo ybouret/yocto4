@@ -19,6 +19,7 @@ YOCTO_UNIT_TEST_IMPL(regexp)
         auto_ptr<pattern> p( regexp(expr,&dict) );
         p->graphviz("rx.dot");
         (void) system("dot -Tpng rx.dot -o rx.png");
+        std::cerr << "'" << expr << "' accepts EMPTY=" << (p->accept_empty() ? "TRUE" : "FALSE") << std::endl;
     }
 }
 YOCTO_UNIT_TEST_DONE()

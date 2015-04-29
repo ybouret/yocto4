@@ -57,6 +57,13 @@ namespace yocto
             fp("[shape=diamond,label=\"!!\"];\n");
             vizops(fp);
         }
+
+        bool NOT:: accept_empty() const throw()
+        {
+            //! if returns something, at least one char..
+            return false;
+        }
+
         
     }
 }

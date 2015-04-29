@@ -51,6 +51,11 @@ namespace yocto
                 return false;
             }
         }
+
+        bool at_least:: accept_empty() const throw()
+        {
+            return (count<=0) || jk->accept_empty();
+        }
         
         void at_least:: viz( ios::ostream &fp ) const
         {

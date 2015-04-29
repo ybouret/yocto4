@@ -33,10 +33,13 @@ namespace yocto
             
             //! internal content, default is NULL
             virtual const void *content() const throw();
-            
+
+            //! accept an empty token ?
+            virtual bool  accept_empty() const throw() = 0;
+
             //! write a graphviz representation
             virtual void  viz( ios::ostream & ) const = 0;
-            
+
             //! graphviz helper
             static  void  encode( code_t code, ios::ostream &fp);
             static  void  encode( const token &, ios::ostream &fp);

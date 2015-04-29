@@ -43,5 +43,19 @@ namespace yocto
             fp("[shape=diamond,label=\"||\"];\n");
             vizops(fp);
         }
+
+        bool OR:: accept_empty() const throw()
+        {
+            //! if one of the pattern accepts empty => true
+            for(const pattern *p = operands.head;p;p=p->next)
+            {
+                if(p->accept_empty())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
 }

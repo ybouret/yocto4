@@ -50,5 +50,18 @@ namespace yocto
             vizops(fp);
         }
 
+        bool AND:: accept_empty() const throw()
+        {
+            //! at least one of the pattern must not accept empty
+            for(const pattern *p = operands.head;p;p=p->next)
+            {
+                if(!p->accept_empty())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
     }
 }

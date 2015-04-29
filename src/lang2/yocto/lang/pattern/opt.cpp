@@ -33,7 +33,13 @@ namespace yocto
             (void) (jk->match(tkn, src, fp));
             return true;
         }
-        
+
+        bool optional:: accept_empty() const throw()
+        {
+            return true;
+        }
+
+
         void optional:: viz(ios::ostream &fp) const
         {
             fp.viz((const pattern *)this);

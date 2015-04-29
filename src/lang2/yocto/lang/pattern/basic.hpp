@@ -20,7 +20,7 @@ namespace yocto
             virtual ~one_char() throw();
 
             virtual bool match(Y_LANG_PATTERN_MATCH_ARGS) const;
-            
+            virtual bool accept_empty() const throw();
 
         protected:
             one_char(uint32_t ID) throw();

@@ -37,6 +37,10 @@ namespace yocto
             }
         }
 
+        bool one_char:: accept_empty() const throw()
+        {
+            return false;
+        }
     }
 }
 

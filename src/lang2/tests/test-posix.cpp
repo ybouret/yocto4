@@ -17,7 +17,7 @@ void test_posix_for(const char *name, pattern *p )
     q->graphviz(vizname);
     const string cmd     = "dot -Tpng " + vizname + " -o " + pngname;
     (void)system( cmd.c_str() );
-
+    std::cerr << name << " accepts emtpy = " << ( q->accept_empty() ? "TRUE" : "FALSE") << std::endl;
 }
 
 
