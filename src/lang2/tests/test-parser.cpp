@@ -27,6 +27,10 @@ namespace
 
             Rule &LBRACE = term("LBRACE","\\{", syntax::jettison);
             Rule &RBRACE = term("RBRACE","\\}", syntax::jettison);
+
+            Rule &LBRACK = term("LBRACK","\\[", syntax::jettison);
+            Rule &RBRACK = term("RBRACK","\\]", syntax::jettison);
+
             Rule &STRING = term<lexical::cstring>("String");
             Rule &COMA   = term("COMA",",", syntax::jettison);
 
@@ -42,10 +46,12 @@ namespace
 
             Alt &JSON_Object = alt();
             {
-                Agg &EmptyObject = agg("EmptyObject");
-                EmptyObject << LBRACE << RBRACE;
-                JSON_Object << EmptyObject;
-                
+                {
+                    Agg &EmptyObject = agg("EmptyObject");
+                    EmptyObject << LBRACE << RBRACE;
+                    JSON_Object << EmptyObject;
+                }
+
                 Agg &HeavyObject = agg("HeavyObject");
                 HeavyObject << LBRACE;
                 {
@@ -62,6 +68,17 @@ namespace
 
             JSON_Value << JSON_Object;
 
+            Alt &JSON_Vector = alt();
+            {
+                {
+                Agg &EmptyVector = agg("EmptyVector");
+                EmptyVector << LBRACK << RBRACK;
+                JSON_Vector << EmptyVector;
+                }
+
+                
+            }
+
             //__________________________________________________________________
             //
             // lexical
@@ -73,7 +90,7 @@ namespace
 
             gramviz("gram.dot");
             (void) system("dot -Tpng -o gram.png gram.dot");
-            
+
         }
 
         virtual ~JSON_Parser() throw()
@@ -97,7 +114,7 @@ YOCTO_UNIT_TEST_IMPL(json)
 
 
 
-
+    
     ios::icstream fp(ios::cstdin);
     auto_ptr<syntax::xnode> tree( P.run(fp) );
     if(tree.is_valid())
