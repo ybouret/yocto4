@@ -14,8 +14,9 @@ namespace yocto
             class aggregate : public logical
             {
             public:
+                const property modifier; //!< passed to xnode
                 virtual ~aggregate() throw();
-                explicit aggregate(const string &id);
+                explicit aggregate(const string &id, const property ppty = standard);
 
                 virtual bool accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const;
                 virtual void viz( ios::ostream &fp ) const;

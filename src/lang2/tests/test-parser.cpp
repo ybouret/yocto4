@@ -42,14 +42,19 @@ namespace
 
             Alt &JSON_Object = alt();
             {
-                JSON_Object << gather("EmptyObject", LBRACE, RBRACE);
+                Agg &EmptyObject = agg("EmptyObject");
+                EmptyObject << LBRACE << RBRACE;
+                JSON_Object << EmptyObject;
+                
                 Agg &HeavyObject = agg("HeavyObject");
                 HeavyObject << LBRACE;
                 {
                     Agg &JSON_Pair = agg("Pair");
                     JSON_Pair   << STRING << term(":",":",syntax::jettison) << JSON_Value;
                     HeavyObject << JSON_Pair;
-                    HeavyObject << zero_or_more( gather("ExtraPair", COMA, JSON_Pair) );
+                    Agg &ExtraPair = agg("ExtraPair",syntax::temporary);
+                    ExtraPair  << COMA << JSON_Pair;
+                    HeavyObject << zero_or_more( ExtraPair );
                 }
                 HeavyObject << RBRACE;
                 JSON_Object << HeavyObject;

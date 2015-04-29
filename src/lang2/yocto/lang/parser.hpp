@@ -44,8 +44,8 @@ namespace yocto
             syntax::alternate & choice(Rule &r1, Rule &r2, Rule &r3);
 
             //! shortcut
-            syntax::aggregate & gather(const char *label, Rule &r1, Rule &r2);
-            syntax::aggregate & gather(const char *label, Rule &r1, Rule &r2, Rule &r3);
+            //syntax::aggregate & gather(const char *label, Rule &r1, Rule &r2);
+            //syntax::aggregate & gather(const char *label, Rule &r1, Rule &r2, Rule &r3);
 
 
 

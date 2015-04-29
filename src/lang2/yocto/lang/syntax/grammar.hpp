@@ -28,9 +28,9 @@ namespace yocto
                 rule &decl_term(const char   *label, const property ppty=standard);
 
                 //! aggregate
-                aggregate &agg( const string &label);
+                aggregate &agg( const string &label, const property ppty=standard);
                 //! wrapper
-                aggregate &agg( const char   *label);
+                aggregate &agg( const char   *label, const property ppty=standard);
 
                 //! aggregate
                 alternate &alt();

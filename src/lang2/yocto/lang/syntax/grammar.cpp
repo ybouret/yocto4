@@ -79,17 +79,17 @@ namespace yocto
                 return decl_term(Label,ppty);
             }
 
-            aggregate & grammar:: agg( const string &label)
+            aggregate & grammar:: agg( const string &label, const property ppty)
             {
                 check_label(label);
-                aggregate *r = new aggregate(label);
+                aggregate *r = new aggregate(label,ppty);
                 rules.push_back(r);
                 return *r;
             }
 
-            aggregate & grammar:: agg( const char *label)
+            aggregate & grammar:: agg( const char *label, const property ppty)
             {
-                const string Label(label); return agg(Label);
+                const string Label(label); return agg(Label,ppty);
             }
 
 

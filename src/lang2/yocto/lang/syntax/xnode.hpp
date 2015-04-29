@@ -13,10 +13,10 @@ namespace yocto
 
             enum  property
             {
-                standard, //!< untouched in tree
-                univocal, //!< content is deleted
-                jettison, //!< node is deleted
-                temporay  //!< content is merged with parent's
+                standard,  //!< untouched in tree
+                univocal,  //!< content is deleted
+                jettison,  //!< node is deleted
+                temporary  //!< content is merged with parent's
             };
 
             //! a node to store lexemes in AST
@@ -40,7 +40,8 @@ namespace yocto
                 lexeme &lex()      throw();
                 leaves &children() throw();
                 void    append(xnode *node) throw(); //!< append to children
-
+                xnode  *pop() throw();               //!< head of children
+                
                 //! restore all lexemes and delete node
                 static  void restore(xnode *node, l_list &lexemes) throw();
 
@@ -54,7 +55,7 @@ namespace yocto
 
 
             private:
-                xnode(const rule &r, bool flag, const property ppty) throw();
+                xnode(const rule &r, bool flag, const property ppty);
 
                 union
                 {

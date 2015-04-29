@@ -1,4 +1,5 @@
 #include "yocto/lang/syntax/rule.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -25,7 +26,7 @@ namespace yocto
                 }
             }
 
-            xnode::xnode(const rule &r, bool flag, const property ppty) throw() :
+            xnode::xnode(const rule &r, bool flag, const property ppty):
             next(0),
             prev(0),
             parent(0),
@@ -33,6 +34,15 @@ namespace yocto
             terminal(flag),
             modifier(ppty)
             {
+                if(terminal)
+                {
+                    if(temporary==modifier) throw exception("|temporary| terminal '%s'", r.label.c_str());
+                }
+                else
+                {
+                    if(jettison==modifier) throw exception("|jettison| leaf '%s'", r.label.c_str());
+                    if(univocal==modifier) throw exception("|univocal| leaf '%s'", r.label.c_str());
+                }
             }
 
             xnode * xnode:: term(const rule &r, lexeme *l,const property ppty)
@@ -105,6 +115,15 @@ namespace yocto
                 ch->push_back(node);
             }
 
+            xnode * xnode::pop() throw()
+            {
+                assert(!terminal);
+                assert(ch->size>0);
+                xnode *node = ch->pop_front();
+                assert(node->parent==this);
+                node->parent = NULL;
+                return node;
+            }
 
             void xnode:: restore(xnode *node, l_list &lexemes) throw()
             {
@@ -219,40 +238,38 @@ namespace yocto
                     while(stk.size)
                     {
                         xnode *sub = AST(stk.pop_front());
-                        if(sub)
+                        if(!sub) continue;
+                        assert(sub->parent==node);
+                        switch(sub->modifier)
                         {
-                            if(sub->modifier==jettison)
-                            {
+                                //______________________________________________
+                                //
+                                // syntax only node
+                                //______________________________________________
+                            case jettison:
                                 delete sub;
-                            }
-                            else
-                            {
-                                node->ch->push_back(sub);
-                            }
+                                break;
+
+                                //______________________________________________
+                                //
+                                // temporary node, merge if possible
+                                //______________________________________________
+                            case temporary:
+                                assert(!sub->terminal);
+                                while(sub->ch->size)
+                                {
+                                    node->append(sub->pop());
+                                }
+                                delete sub;
+                                break;
+
+                            default:
+                                 node->ch->push_back(sub);
                         }
                     }
 
                     return node;
-                    
-                    //__________________________________________________________
-                    //
-                    // check node content
-                    //__________________________________________________________
-                    switch(node->ch->size)
-                    {
-                        case 0:
-                            delete node; return 0;
 
-                        case 1:
-                        {
-                            xnode *temp = node->ch->pop_back();
-                            delete node;
-                            node = temp;
-                        }
-                            
-                        default:
-                            return  node;
-                    }
                 }
                 
             }

@@ -14,10 +14,18 @@ namespace yocto
             {
             }
 
-            aggregate:: aggregate(const string &id) :
-            logical(id)
+            aggregate:: aggregate(const string &id, const property ppty) :
+            logical(id),
+            modifier(ppty)
             {
+                switch(modifier)
+                {
+                    case jettison:
+                    case univocal:
+                        throw exception("invalid modifier for '%s", id.c_str());
+                    default:;
 
+                }
             }
 
 
@@ -27,7 +35,7 @@ namespace yocto
                 if(operands.size<=0)
                     throw exception("aggregate '%s' has no operand", label.c_str());
 
-                auto_ptr<xnode> agg( xnode::leaf(*this) );
+                auto_ptr<xnode> agg( xnode::leaf(*this,modifier) );
 
                 for(const operand *node=operands.head;node;node=node->next)
                 {
