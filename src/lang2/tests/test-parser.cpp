@@ -55,6 +55,8 @@ namespace
                 JSON_Object << HeavyObject;
             }
 
+            JSON_Value << JSON_Object;
+
             //__________________________________________________________________
             //
             // lexical

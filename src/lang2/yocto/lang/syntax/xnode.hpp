@@ -13,9 +13,10 @@ namespace yocto
 
             enum  property
             {
-                standard,
-                univocal,
-                jettison
+                standard, //!< untouched in tree
+                univocal, //!< content is deleted
+                jettison, //!< node is deleted
+                temporay  //!< content is merged with parent's
             };
 
             //! a node to store lexemes in AST
@@ -34,7 +35,7 @@ namespace yocto
                 ~xnode() throw();
 
                 static xnode *term(const rule &r, lexeme *l, const property ppty=standard); //!< new terminal
-                static xnode *leaf(const rule &r);
+                static xnode *leaf(const rule &r, const property ppty = standard);
 
                 lexeme &lex()      throw();
                 leaves &children() throw();

@@ -52,9 +52,9 @@ namespace yocto
             }
 
 
-            xnode *xnode:: leaf(const rule &r)
+            xnode *xnode:: leaf(const rule &r, const property ppty)
             {
-                xnode *node = new xnode(r,false,standard);
+                xnode *node = new xnode(r,false,ppty);
                 try
                 {
                     node->ch = new (object::acquire1<leaves>()) leaves();
@@ -190,6 +190,8 @@ namespace yocto
         namespace syntax
         {
 
+
+
             xnode * xnode:: AST( xnode *node ) throw()
             {
                 if(!node) return 0;
@@ -210,23 +212,32 @@ namespace yocto
                 {
                     //__________________________________________________________
                     //
-                    // loop over nodes
+                    // loop over nodes -> recursion
                     //__________________________________________________________
                     xnode::leaves stk;
                     node->ch->swap_with(stk);
                     while(stk.size)
                     {
                         xnode *sub = AST(stk.pop_front());
-                        if(sub->modifier==jettison)
+                        if(sub)
                         {
-                            delete sub;
-                        }
-                        else
-                        {
-                            node->ch->push_back(sub);
+                            if(sub->modifier==jettison)
+                            {
+                                delete sub;
+                            }
+                            else
+                            {
+                                node->ch->push_back(sub);
+                            }
                         }
                     }
 
+                    return node;
+                    
+                    //__________________________________________________________
+                    //
+                    // check node content
+                    //__________________________________________________________
                     switch(node->ch->size)
                     {
                         case 0:
@@ -238,7 +249,7 @@ namespace yocto
                             delete node;
                             node = temp;
                         }
-
+                            
                         default:
                             return  node;
                     }
