@@ -13,6 +13,7 @@ namespace yocto
 
 #define Y_LANG_SYNTAX_RULE_ACCEPT_ARGS xnode * &tree, lexer &lxr, source &src, ios::istream &fp
 
+            //! a syntax rule
             class rule : public object
             {
             public:
@@ -23,9 +24,17 @@ namespace yocto
 
                 virtual ~rule() throw();
 
-
+                //! main accept routine
+                /**
+                 upon success, the tree is grown
+                 upon failure, the tree must be left unchanged
+                 */
                 virtual bool accept( Y_LANG_SYNTAX_RULE_ACCEPT_ARGS ) const = 0;
+
+                //! write name+label
                 virtual void viz( ios::ostream &fp ) const = 0;
+
+                //! write links
                 virtual void lnk( ios::ostream &fp ) const = 0;
 
             protected:

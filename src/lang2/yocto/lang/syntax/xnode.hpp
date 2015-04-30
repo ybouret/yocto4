@@ -49,6 +49,7 @@ namespace yocto
                 void graphivz( const string &filename ) const;
 
 
+                //! syntax tree rewrite
                 static xnode *AST( xnode *node ) throw();
 
                 YOCTO_MAKE_OBJECT
