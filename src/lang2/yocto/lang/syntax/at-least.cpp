@@ -31,7 +31,7 @@ namespace yocto
 
             bool at_least:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
             {
-                auto_ptr<xnode>  top( xnode::leaf(*this,temporary) );
+                auto_ptr<xnode>  top( xnode::leaf(*this,mergeAll) );
 
                 size_t count = 0;
                 for(;;)

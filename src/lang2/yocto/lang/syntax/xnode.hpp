@@ -13,10 +13,11 @@ namespace yocto
 
             enum  property
             {
-                standard,  //!< untouched in tree
-                univocal,  //!< content is deleted
-                jettison,  //!< node is deleted
-                temporary  //!< content is merged with parent's
+                standard,   //!< untouched in tree
+                univocal,   //!< content is deleted
+                jettison,   //!< node is deleted
+                mergeAll,   //!< content is merged with parent's
+                mergeOne    //!< content is merged if only 1 child (for grouping)
             };
 
             //! a node to store lexemes in AST

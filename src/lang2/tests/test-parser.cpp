@@ -58,7 +58,7 @@ namespace
                     Agg &JSON_Pair = agg("Pair");
                     JSON_Pair   << STRING << term(":",":",syntax::jettison) << JSON_Value;
                     HeavyObject << JSON_Pair;
-                    Agg &ExtraPair = agg("ExtraPair",syntax::temporary);
+                    Agg &ExtraPair = agg("ExtraPair",syntax::mergeAll);
                     ExtraPair  << COMA << JSON_Pair;
                     HeavyObject << zero_or_more( ExtraPair );
                 }
@@ -80,7 +80,7 @@ namespace
                     Agg &HeavyVector = agg("HeavyVector");
                     HeavyVector << LBRACK;
                     HeavyVector << JSON_Value;
-                    Agg &ExtraValue = agg("ExtraValue",syntax::temporary);
+                    Agg &ExtraValue = agg("ExtraValue",syntax::mergeAll);
                     ExtraValue << COMA << JSON_Value;
                     HeavyVector << zero_or_more(ExtraValue);
                     HeavyVector << RBRACK;

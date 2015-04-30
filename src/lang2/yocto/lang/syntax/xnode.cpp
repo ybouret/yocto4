@@ -36,7 +36,9 @@ namespace yocto
             {
                 if(terminal)
                 {
-                    if(temporary==modifier) throw exception("|temporary| terminal '%s'", r.label.c_str());
+                    if(mergeAll==modifier) throw exception("|mergeAll| terminal '%s'", r.label.c_str());
+                    if(mergeOne==modifier) throw exception("|mergeOne| terminal '%s'", r.label.c_str());
+
                 }
                 else
                 {
@@ -254,7 +256,7 @@ namespace yocto
                                 //
                                 // temporary node, merge if possible
                                 //______________________________________________
-                            case temporary:
+                            case mergeAll:
                                 assert(!sub->terminal);
                                 while(sub->ch->size)
                                 {
@@ -263,13 +265,28 @@ namespace yocto
                                 delete sub;
                                 break;
 
-                            default:
-                                 node->ch->push_back(sub);
+                            case mergeOne:
+                                assert(!sub->terminal);
+                                if(1==sub->ch->size)
+                                {
+                                    node->append(sub->pop());
+                                    delete sub;
+                                }
+                                else
+                                {
+                                    node->ch->push_back(sub);
+                                }
+                                break;
+                                
+                            case standard:
+                            case univocal:
+                                node->ch->push_back(sub);
+                                break;
                         }
                     }
-
+                    
                     return node;
-
+                    
                 }
                 
             }

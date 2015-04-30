@@ -26,8 +26,8 @@ namespace yocto
             Rule &COLON     = term(":",":",syntax::jettison);
             Rule &SEMICOLON = term(";",";",syntax::jettison);
             
-            //Rule &LPAREN    = term("(","\\(",syntax::univocal);
-            //Rule &RPAREN    = term(")","\\)",syntax::univocal);
+            Rule &LPAREN    = term("(","\\(",syntax::jettison);
+            Rule &RPAREN    = term(")","\\)",syntax::jettison);
             Rule &ALTERNATE = term("|","\\|",syntax::univocal);
 
             Agg  &RULE      = agg("RULE");
@@ -35,19 +35,34 @@ namespace yocto
             RULE << ID << COLON;
 
             {
-                Alt &ITEM = alt();
-                ITEM << ID;
-                ITEM << term<lexical::cstring>("regexp");
 
-                Agg &ITEMS = agg("ITEMS");
-                ITEMS << one_or_more(ITEM);
-                Agg &EXTRA_ITEMS = agg("EXTRA_ITEMS");
-                EXTRA_ITEMS << ALTERNATE << ITEMS;
 
-                Agg &EXPR = agg("EXPR");
-                EXPR << ITEMS << zero_or_more(EXTRA_ITEMS);
+                Alt &ATOM = alt();
+                ATOM << ID;
+                ATOM << term<lexical::cstring>("regexp");
 
-                RULE << EXPR;
+
+                Agg  &ITEM  = agg("ITEM",syntax::mergeOne);
+                ITEM << ATOM;
+                Alt  &MOD  = alt();
+                MOD << term("+","\\+",syntax::univocal);
+                MOD << term("*","\\*",syntax::univocal);
+                MOD << term("?","\\?",syntax::univocal);
+                ITEM << opt(MOD);
+
+                Rule &ITEMS = one_or_more(ITEM);
+                Agg  &ALT   = agg("ALT");
+                ALT << ALTERNATE << ITEMS;
+
+                Agg  &SUB  = agg("SUB");
+                SUB << ITEMS << zero_or_more(ALT);
+
+                Agg &XPRN  = agg("XPRN", syntax::mergeOne);
+                XPRN << LPAREN << SUB << RPAREN;
+
+                ATOM << XPRN;
+
+                RULE << SUB;
             }
 
             RULE << SEMICOLON;
