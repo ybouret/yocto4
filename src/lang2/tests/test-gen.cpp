@@ -15,10 +15,19 @@ namespace
 YOCTO_UNIT_TEST_IMPL(gen)
 {
     generator G("dummy");
+    vfs &fs = local_fs::instance();
+    fs.try_remove_file("xnode.dot");
+    fs.try_remove_file("xnode.png");
 
-    ios::icstream fp( ios::cstdin );
 
+    ios::icstream           fp( ios::cstdin );
     auto_ptr<syntax::xnode> tree( G.run(fp) );
-    
+
+    if(tree.is_valid())
+    {
+        tree->graphivz("xnode.dot");
+        (void) system("dot -Tpng -o xnode.png xnode.dot");
+    }
+
 }
 YOCTO_UNIT_TEST_DONE()
