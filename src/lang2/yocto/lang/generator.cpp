@@ -3,7 +3,6 @@
 #include "yocto/lang/lexical/plugin/comment.hpp"
 #include "yocto/lang/lexical/plugin/ccomment.hpp"
 
-
 namespace yocto
 {
     namespace lang
@@ -22,24 +21,25 @@ namespace yocto
             // Terminal
             //__________________________________________________________________
 
-            Rule &ID        = term("ID", "@?[:word:]+");
+            Rule &ID        = term("ID", "[:word:]+");
+            Rule &CODE      = term("@","@",syntax::univocal);
             Rule &COLON     = term(":",":",syntax::jettison);
             Rule &SEMICOLON = term(";",";",syntax::jettison);
             
             Rule &LPAREN    = term("(","\\(",syntax::jettison);
             Rule &RPAREN    = term(")","\\)",syntax::jettison);
-            Rule &ALTERNATE = term("|","\\|",syntax::univocal);
+            Rule &ALTERNATE = term("|","\\|",syntax::jettison);
 
             Agg  &RULE      = agg("RULE");
 
-            RULE << ID << COLON;
+            RULE << opt(CODE) << ID << COLON;
 
             {
 
 
                 Alt &ATOM = alt();
                 ATOM << ID;
-                ATOM << term<lexical::cstring>("regexp");
+                ATOM << term<lexical::cstring>("RX");
 
 
                 Agg  &ITEM  = agg("ITEM",syntax::mergeOne);
