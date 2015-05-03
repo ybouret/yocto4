@@ -22,7 +22,7 @@ namespace yocto
             // Terminal
             //__________________________________________________________________
 
-            Rule &ID        = term("ID", "[:word:]+");
+            Rule &ID        = term("ID", "@?[:word:]+");
             Rule &COLON     = term(":",":",syntax::jettison);
             Rule &SEMICOLON = term(";",";",syntax::jettison);
             

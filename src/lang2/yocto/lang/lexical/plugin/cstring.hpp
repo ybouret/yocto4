@@ -28,7 +28,7 @@ namespace yocto
                 void on_quit(const token &);
                
                 bool on_char(const token &tkn);
-                bool on_esc_char( const token &tkn );
+                void on_esc_char( const token &tkn );
                 
             };
             

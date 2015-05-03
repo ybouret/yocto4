@@ -1,6 +1,7 @@
 #include "yocto/lang/lexical/plugin/cstring.hpp"
 #include "yocto/lang/pattern/basic.hpp"
 #include "yocto/lang/lexer.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -15,7 +16,8 @@ namespace yocto
                 
             }
             
-            cstring:: cstring(const char *id, lexer &parent) :
+            cstring:: cstring(const char *id,
+                              lexer      &parent) :
             plugin(id,parent),
             content()
             {
@@ -45,11 +47,18 @@ namespace yocto
                     back( single::create('"'), cb);
                 }
                 
+                //______________________________________________________________
+                //
+                // Esc sequence sub scanner
+                //______________________________________________________________
                 {
                     const string esc_char = "esc_char";
-                    const action esc_char_add(this, & cstring::on_esc_char);
-                    Esc.make(esc_char, any1::create(), esc_char_add);
+                    const callback esc_char_add(this, & cstring::on_esc_char);
+                    
+                    // default
+                    Esc.back(any1::create(), esc_char_add);
                 }
+                
             }
             
             bool cstring:: on_char(const token &tkn )
@@ -59,11 +68,29 @@ namespace yocto
                 return false;
             }
             
-            bool cstring:: on_esc_char(const token &tkn)
+            void cstring:: on_esc_char(const token &tkn)
             {
                 assert(1==tkn.size);
-                content.append( char(tkn.head->code) );
-                return false;
+                
+                // single char, not hexa
+                char C = tkn.head->code;
+                switch(C)
+                {
+                    case 't': C = '\t'; break;
+                    case 'n': C = '\n'; break;
+                    case 'r': C = '\r'; break;
+                    case '0': C = 0;    break;
+                        
+                    case '\\':
+                    case '"':
+                    case '\'':
+                        break;
+                        
+                    default:
+                        throw exception("%s: unknown escape sequence %0x02u", name.c_str(), C);
+                }
+                
+                content.append( C );
             }
             
             void cstring:: on_call(const token &)
