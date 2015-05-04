@@ -3,6 +3,8 @@
 #include "yocto/lang/lexer.hpp"
 #include "yocto/exception.hpp"
 
+#include "yocto/code/utils.hpp"
+
 namespace yocto
 {
     
@@ -22,9 +24,11 @@ namespace yocto
             content()
             {
                 
-                const string EscID = name + "Esc";
-                scanner &Esc = parent.declare(EscID);
-                
+                const string EscID    = name + "Esc";
+                scanner     &Esc      = parent.declare(EscID);
+                const string EscHexID = name + "EscHex";
+                scanner     &EscHex   = parent.declare(EscHexID);
+
                 //______________________________________________________________
                 //
                 // default char
@@ -52,11 +56,25 @@ namespace yocto
                 // Esc sequence sub scanner
                 //______________________________________________________________
                 {
-                    const string esc_char = "esc_char";
-                    const callback esc_char_add(this, & cstring::on_esc_char);
-                    
-                    // default
-                    Esc.back(any1::create(), esc_char_add);
+
+                    const callback esc_hex_cb(this, & scanner::discard_cb);
+                    Esc.jump(EscHexID, single::create('x'), esc_hex_cb);
+
+                    // default: single escape char
+                    const callback esc_char_cb(this, & cstring::on_esc_char);
+                    Esc.back(any1::create(), esc_char_cb);
+                }
+
+                //______________________________________________________________
+                //
+                // EscHex sequence sub scanner
+                //______________________________________________________________
+                {
+                    EscHex.back("[:xdigit:][:xdigit:]",this,&cstring::on_esc_hexa);
+
+                    const callback bad_hexa(this, & cstring::on_bad_hexa);
+
+                    EscHex.back(any1::create(),bad_hexa);
                 }
                 
             }
@@ -92,7 +110,20 @@ namespace yocto
                 
                 content.append( C );
             }
-            
+
+            void cstring:: on_esc_hexa(const token &tkn )
+            {
+                assert(2==tkn.size);
+                const int C = hex2dec(tkn.head->code) * 16 + hex2dec(tkn.head->next->code);
+                content.append(C);
+            }
+
+            void cstring:: on_bad_hexa(const token &)
+            {
+                throw exception("%s: invalid hexadecimal escape sequence", name.c_str());
+            }
+
+
             void cstring:: on_call(const token &)
             {
                 content.clear();

@@ -29,7 +29,9 @@ namespace yocto
                
                 bool on_char(const token &tkn);
                 void on_esc_char( const token &tkn );
-                
+                void on_esc_hexa( const token &tkn );
+                void on_bad_hexa( const token &tkn );
+
             };
             
         }
