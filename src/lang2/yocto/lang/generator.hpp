@@ -7,19 +7,24 @@ namespace yocto
 {
     namespace lang
     {
-
+        
         class generator : public parser
         {
         public:
             virtual ~generator() throw();
-
+            
             explicit generator(const char *langID);
-
+            
+            
+            syntax::xnode *compile( ios::istream &fp );
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(generator);
-
+            void reshape(syntax::xnode *node) throw();
+            
         };
-
+        
     }
 }
 

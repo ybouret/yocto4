@@ -21,7 +21,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
 
 
     ios::icstream           fp( ios::cstdin );
-    auto_ptr<syntax::xnode> tree( G.run(fp) );
+    auto_ptr<syntax::xnode> tree( G.compile(fp) );
 
     if(tree.is_valid())
     {
