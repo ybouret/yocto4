@@ -11,13 +11,18 @@ namespace yocto
         namespace syntax
         {
 
+            LanGen:: ~LanGen() throw() {}
+
+
             LanGen:: LanGen(const xnode *node ) :
             root(node),
             rules(),
-            terms()
+            terms(),
+            G(0)
             {
                 assert(root!=NULL);
-                
+                G.reset( new grammar("dummy") );
+                collect(root);
             }
 
             void LanGen:: collect(const xnode *node)
@@ -52,6 +57,8 @@ namespace yocto
                         return;
                     }
 
+                    std::cerr << "\tunregistered " << node->label << "(" << node->lex() << ")" << std::endl;
+
                 }
                 else
                 {
@@ -67,3 +74,25 @@ namespace yocto
         }
     }
 }
+
+namespace yocto
+{
+    namespace lang
+    {
+        namespace syntax
+        {
+
+            void LanGen:: populate()
+            {
+                for(RDict::iterator i = rules.begin(); i != rules.end(); ++i )
+                {
+                    
+                }
+            }
+        }
+
+    }
+
+}
+
+
