@@ -79,49 +79,6 @@ namespace yocto
                 
             }
             
-            bool cstring:: on_char(const token &tkn )
-            {
-                assert(1==tkn.size);
-                content.append( char(tkn.head->code) );
-                return false;
-            }
-            
-            void cstring:: on_esc_char(const token &tkn)
-            {
-                assert(1==tkn.size);
-                
-                // single char, not hexa
-                char C = tkn.head->code;
-                switch(C)
-                {
-                    case 't': C = '\t'; break;
-                    case 'n': C = '\n'; break;
-                    case 'r': C = '\r'; break;
-                    case '0': C = 0;    break;
-                        
-                    case '\\':
-                    case '"':
-                    case '\'':
-                        break;
-                        
-                    default:
-                        throw exception("%s: unknown escape sequence %0x02u", name.c_str(), C);
-                }
-                
-                content.append( C );
-            }
-
-            void cstring:: on_esc_hexa(const token &tkn )
-            {
-                assert(2==tkn.size);
-                const int C = hex2dec(tkn.head->code) * 16 + hex2dec(tkn.head->next->code);
-                content.append(C);
-            }
-
-            void cstring:: on_bad_hexa(const token &)
-            {
-                throw exception("%s: invalid hexadecimal escape sequence", name.c_str());
-            }
 
 
             void cstring:: on_call(const token &)
@@ -141,3 +98,59 @@ namespace yocto
     }
     
 }
+
+namespace yocto
+{
+    namespace lang
+    {
+        namespace lexical
+        {
+            bool cstring:: on_char(const token &tkn )
+            {
+                assert(1==tkn.size);
+                content.append( char(tkn.head->code) );
+                return false;
+            }
+
+            void cstring:: on_esc_char(const token &tkn)
+            {
+                assert(1==tkn.size);
+
+                // single char, not hexa
+                char C = tkn.head->code;
+                switch(C)
+                {
+                    case 't': C = '\t'; break;
+                    case 'n': C = '\n'; break;
+                    case 'r': C = '\r'; break;
+                    case '0': C = 0;    break;
+
+                    case '\\':
+                    case '"':
+                    case '\'':
+                        break;
+
+                    default:
+                        throw exception("%s: unknown escape sequence %0x02u", name.c_str(), C);
+                }
+
+                content.append( C );
+            }
+
+            void cstring:: on_esc_hexa(const token &tkn )
+            {
+                assert(2==tkn.size);
+                const int C = hex2dec(tkn.head->code) * 16 + hex2dec(tkn.head->next->code);
+                content.append(C);
+            }
+
+            void cstring:: on_bad_hexa(const token &)
+            {
+                throw exception("%s: invalid hexadecimal escape sequence", name.c_str());
+            }
+
+        }
+    }
+
+}
+

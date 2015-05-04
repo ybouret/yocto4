@@ -11,7 +11,6 @@ namespace yocto
             rule:: rule( const string &l, pattern *p, const action &a , const bool is_ctrl) :
             next(0),
             prev(0),
-
             label(l),
             motif(p),
             apply(a),
@@ -40,6 +39,11 @@ namespace yocto
                     delete p;
                     throw;
                 }
+            }
+
+            const string & rule:: key() const throw()
+            {
+                return label;
             }
 
         }
