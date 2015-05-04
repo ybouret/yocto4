@@ -3,96 +3,7 @@
 #include "yocto/lang/lexical/plugin/comment.hpp"
 #include "yocto/lang/lexical/plugin/ccomment.hpp"
 
-#include "yocto/associative/set.hpp"
-#include "yocto/ptr/intr.hpp"
-
-#include "yocto/lang/syntax/aggregate.hpp"
-#include "yocto/exception.hpp"
-#include "yocto/lang/regexp.hpp"
-
-#include <iostream>
-namespace yocto
-{
-    namespace lang
-    {
-
-        namespace {
-
-            class LangGen
-            {
-            public:
-                typedef syntax::xnode         Node;
-                typedef syntax::rule          Rule;
-                typedef intr_ptr<string,Rule> pRule;
-                typedef set<string,pRule>     RDict;
-
-                const Node *root;
-                RDict       rules;
-                p_dict      terms;
-
-                inline LangGen(const Node *n ) :
-                root(n),
-                rules(),
-                terms()
-                {
-                    assert(root!=NULL);
-                    collect(root);
-                }
-
-                inline ~LangGen() throw() {}
-
-
-                void collect(const Node *node)
-                {
-                    if(node->terminal)
-                    {
-                        // a non terminal rule
-                        if(node->label=="ID")
-                        {
-                            const string r_id = node->lex().to_string();
-                            if( !rules.search(r_id) )
-                            {
-                                std::cerr << "New ID: " << node->lex() << std::endl;
-                                const pRule pR( new syntax::aggregate(r_id,syntax::standard) );
-                                if(!rules.insert(pR))
-                                {
-                                    throw exception("Failure in inserting '%s'", r_id.c_str());
-                                }
-                            }
-                            return;
-                        }
-
-
-                        if(node->label=="RX")
-                        {
-                            const string p_id = node->lex().to_string();
-                            if( !terms.search(p_id) )
-                            {
-                                std::cerr << "New RX: " << node->lex() << std::endl;
-                                terms.define(p_id, regexp(p_id, &terms) );
-                            }
-                            return;
-                        }
-
-                    }
-                    else
-                    {
-                        for(const Node *child = node->children().head; child;child=child->next)
-                        {
-                            collect(child);
-                        }
-                    }
-
-                }
-
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(LangGen);
-            };
-        }
-
-    }
-
-}
+#include "yocto/lang/syntax/langen.hxx"
 
 
 namespace yocto
@@ -176,7 +87,7 @@ namespace yocto
         {
             syntax::xnode *tree = run(fp);
             reshape(tree);
-            LangGen lg(tree);
+            syntax::LanGen lg(tree);
 
             return tree;
         }

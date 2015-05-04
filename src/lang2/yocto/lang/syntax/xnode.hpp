@@ -2,6 +2,7 @@
 #define YOCTO_LANG_SYNTAX_XNODE_INCLUDED 1
 
 #include "yocto/lang/lexeme.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
