@@ -211,6 +211,27 @@ namespace yocto
 
             }
 
+
+            bool grammar:: has(const string &id) const throw()
+            {
+                for(const rule *r=rules.head;r;r=r->next)
+                {
+                    if(id==r->label) return true;
+                }
+                return false;
+            }
+
+            bool grammar:: has(const char *id) const throw()
+            {
+                for(const rule *r=rules.head;r;r=r->next)
+                {
+                    if(id==r->label) return true;
+                }
+                return false;
+            }
+            
+
+
         }
     }
 }

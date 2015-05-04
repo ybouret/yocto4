@@ -16,12 +16,10 @@ namespace yocto
 
             LanGen:: LanGen(const xnode *node ) :
             root(node),
-            rules(),
-            terms(),
-            G(0)
+            P(0)
             {
                 assert(root!=NULL);
-                G.reset( new grammar("dummy") );
+                P.reset( new parser("dummy","main") );
                 collect(root);
             }
 
@@ -33,14 +31,9 @@ namespace yocto
                     if(node->label=="ID")
                     {
                         const string r_id = node->lex().to_string();
-                        if( !rules.search(r_id) )
+                        if(!P->has(r_id))
                         {
-                            std::cerr << "New ID: " << node->lex() << std::endl;
-                            const pRule pR( new aggregate(r_id,syntax::standard) );
-                            if(!rules.insert(pR))
-                            {
-                                throw exception("Failure in inserting '%s'", r_id.c_str());
-                            }
+                            (void) P->agg(r_id);
                         }
                         return;
                     }
@@ -48,11 +41,10 @@ namespace yocto
                     // a terminal regexp
                     if(node->label=="RX")
                     {
-                        const string p_id = node->lex().to_string();
-                        if( !terms.search(p_id) )
+                        const string t_id = node->lex().to_string();
+                        if(!P->has(t_id))
                         {
-                            std::cerr << "New RX: " << node->lex() << std::endl;
-                            terms.define(p_id, regexp(p_id, &terms) );
+                            (void) P->term(t_id.c_str(), t_id.c_str());
                         }
                         return;
                     }
@@ -82,13 +74,6 @@ namespace yocto
         namespace syntax
         {
 
-            void LanGen:: populate()
-            {
-                for(RDict::iterator i = rules.begin(); i != rules.end(); ++i )
-                {
-                    
-                }
-            }
         }
 
     }

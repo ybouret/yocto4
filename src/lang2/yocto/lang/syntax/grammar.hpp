@@ -49,7 +49,13 @@ namespace yocto
                 //! try to accept first rule
                 xnode *accept( lexer &lxr, source &src, ios::istream &fp);
 
+                //! build GraphViZ..
                 void gramviz( const string &filename ) const;
+
+                
+                bool has(const string &id ) const throw();
+
+                bool has(const char   *id ) const throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
