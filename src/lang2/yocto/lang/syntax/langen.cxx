@@ -21,6 +21,8 @@ namespace yocto
                 assert(root!=NULL);
                 P.reset( new parser("dummy","main") );
                 collect(root);
+                P->gramviz("langen.dot");
+                (void) system("dot -Tpng -o langen.png langen.dot");
             }
 
             void LanGen:: collect(const xnode *node)
