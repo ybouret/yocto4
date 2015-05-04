@@ -36,7 +36,6 @@ namespace yocto
 
                 static rule *create(const string &l, pattern *p, const action &a, const bool is_control=false);
 
-                const string & key() const throw();
 
             private:
                 explicit rule(const string &l, pattern *p, const action &a, const bool is_ctrl);

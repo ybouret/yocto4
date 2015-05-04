@@ -41,11 +41,7 @@ namespace yocto
                 }
             }
 
-            const string & rule:: key() const throw()
-            {
-                return label;
-            }
-
+            
         }
     }
 }

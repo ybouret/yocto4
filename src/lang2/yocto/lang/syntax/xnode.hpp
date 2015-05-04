@@ -38,10 +38,13 @@ namespace yocto
                 static xnode *term(const rule &r, lexeme *l, const property ppty=standard); //!< new terminal
                 static xnode *leaf(const rule &r, const property ppty = standard);
 
-                lexeme &lex()      throw();
-                leaves &children() throw();
-                void    append(xnode *node) throw(); //!< append to children
-                xnode  *pop() throw();               //!< head of children
+                lexeme       &lex()      throw();
+                leaves       &children() throw();
+                const leaves &children() const throw();
+                const lexeme &lex()      const throw();
+                
+                void    append(xnode *node) throw(); //!< append to children, make parent of this
+                xnode  *pop() throw();               //!< head of children, remove parenthood
                 
                 //! restore all lexemes and delete node
                 static  void restore(xnode *node, l_list &lexemes) throw();

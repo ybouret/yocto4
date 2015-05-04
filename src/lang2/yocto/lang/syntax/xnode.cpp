@@ -87,6 +87,14 @@ namespace yocto
                 return *lx;
             }
 
+            const lexeme & xnode::lex() const throw()
+            {
+                assert(terminal);
+                assert(lx);
+                return *lx;
+            }
+
+
             xnode::leaves & xnode::children() throw()
             {
                 assert(!terminal);
@@ -94,7 +102,12 @@ namespace yocto
                 return *ch;
             }
 
-
+            const xnode::leaves & xnode::children() const throw()
+            {
+                assert(!terminal);
+                assert(ch);
+                return *ch;
+            }
         }
 
     }

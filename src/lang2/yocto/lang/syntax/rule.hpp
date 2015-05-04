@@ -14,7 +14,7 @@ namespace yocto
 #define Y_LANG_SYNTAX_RULE_ACCEPT_ARGS xnode * &tree, lexer &lxr, source &src, ios::istream &fp
 
             //! a syntax rule
-            class rule : public object
+            class rule : public counted_object
             {
             public:
                 rule          *next;
@@ -36,6 +36,9 @@ namespace yocto
 
                 //! write links
                 virtual void lnk( ios::ostream &fp ) const = 0;
+
+                const string & key() const throw();
+
 
             protected:
                 explicit rule(const string &id, uint32_t uu);
