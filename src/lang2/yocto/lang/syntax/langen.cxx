@@ -1,6 +1,7 @@
 #include "yocto/lang/syntax/langen.hxx"
 #include "yocto/exception.hpp"
 #include "yocto/lang/syntax/aggregate.hpp"
+#include "yocto/lang/pattern/logic.hpp"
 
 #include <iostream>
 
@@ -24,56 +25,88 @@ namespace yocto
                 assert(root!=NULL);
                 P.reset( new parser("dummy","main") );
                 collect(root);
-                populate();
+                find_rules_from(root);
+                
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
             }
 
+            // in order collection
             void LanGen:: collect(const xnode *node)
             {
                 if(node->terminal)
                 {
+                    //__________________________________________________________
+                    //
                     // a non terminal rule
+                    //__________________________________________________________
                     if(node->label=="ID")
                     {
                         const string r_id = node->lex().to_string();
                         if(!rules.search(r_id))
                         {
-                            const agg_ptr q( new aggregate(r_id) );
+                            aggregate    *p = new aggregate(r_id);
+                            const agg_ptr q( p );
                             if(!rules.insert(q))
                                 throw exception("unexpected RULE '%s' insertion failure!", r_id.c_str());
+
+                            // make the new rule
+                            P->append(p);
+                            p->withhold();
                         }
                         return;
                     }
 
+                    //__________________________________________________________
+                    //
                     // a terminal regexp
+                    //__________________________________________________________
                     if(node->label=="RXP" )
                     {
                         const string t_id = node->lex().to_string();
                         if(!rxp.search(t_id))
                         {
-                            const term_ptr q( new terminal(t_id,standard) );
+                            terminal      *p = new terminal(t_id,standard);
+                            const term_ptr q( p );
                             if(!rxp.insert(q))
                             {
                                 if(!rxp.insert(q))
                                     throw exception("unexpected RegExp TERM '%s' insertion failure!", t_id.c_str());
+
                             }
+
+                            // make the terminal from regexp
+                            const char *id = p->label.c_str();
+                            P->scanner.emit(id,id);
+                            P->append( p );
+                            p->withhold();
                         }
                         return;
                     }
 
+                    //__________________________________________________________
+                    //
                     // a terminal raw
+                    //__________________________________________________________
                     if(node->label=="RAW" )
                     {
                         const string t_id = node->lex().to_string();
                         if(!raw.search(t_id))
                         {
-                            const term_ptr q( new terminal(t_id,standard) );
+                            terminal      *p = new terminal(t_id,standard);
+                            const term_ptr q(p);
                             if(!raw.insert(q))
                             {
                                 if(!raw.insert(q))
-                                    throw exception("unexpected RegExp TERM '%s' insertion failure!", t_id.c_str());
+                                    throw exception("unexpected Raw TERM '%s' insertion failure!", t_id.c_str());
                             }
+
+                            //make the terminal from raw
+                            const lexical::action emit( &(P->scanner), &lexical::scanner::forward);
+                            P->scanner.make(p->label, lang::logical::equal(p->label), emit);
+                            P->append( p);
+                            p->withhold();
+
                         }
                         return;
                     }
@@ -97,7 +130,6 @@ namespace yocto
     }
 }
 
-#include "yocto/lang/pattern/logic.hpp"
 
 namespace yocto
 {
@@ -105,55 +137,7 @@ namespace yocto
     {
         namespace syntax
         {
-            void LanGen:: populate()
-            {
-                //______________________________________________________________
-                //
-                // insert the rules
-                //______________________________________________________________
-                for( agg_set::iterator i=rules.begin();i!=rules.end();++i)
-                {
-                    rule &r = **i;
-                    P->append( &r );
-                    r.withhold();
-                }
-
-
-                //______________________________________________________________
-                //
-                // insert the terminals from rxp
-                //______________________________________________________________
-                for( term_set::iterator j=rxp.begin();j!=rxp.end();++j)
-                {
-                    terminal &t = **j;
-                    const char *id = t.label.c_str();
-                    P->scanner.emit(id,id);
-                    P->append( &t );
-                    t.withhold();
-                }
-
-                //______________________________________________________________
-                //
-                // insert the terminals from raw
-                //______________________________________________________________
-
-                for( term_set::iterator j=raw.begin();j!=raw.end();++j)
-                {
-                    terminal &t = **j;
-                    const lexical::action emit( &(P->scanner), &lexical::scanner::forward);
-                    P->scanner.make(t.label, lang::logical::equal(t.label), emit);
-                    P->append( &t );
-                    t.withhold();
-                }
-
-
-                //______________________________________________________________
-                //
-                // use the tree to feed the rules
-                //______________________________________________________________
-                find_rules_from(root);
-            }
-
+            
             void LanGen:: find_rules_from(const xnode *node)
             {
                 if(node->terminal)
@@ -204,6 +188,10 @@ namespace yocto
                 assert(parent);
                 assert(sub);
                 assert(sub->label=="SUB");
+                const syntax::xnode::leaves &children = sub->children();
+                assert(children.size>=1);
+                
+
             }
 
 
