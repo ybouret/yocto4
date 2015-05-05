@@ -206,7 +206,7 @@ namespace yocto
                     fp("[shape=egg,label=\"");
                     fp << label;
                     fp("\"];\n");
-                    unsigned i=0;
+                    //unsigned i=0;
                     for(const xnode *node=ch->head;node;node=node->next)
                     {
                         node->viz(fp);

@@ -78,8 +78,7 @@ namespace yocto
                         return;
                     }
 
-
-
+                    
                     std::cerr << "\tunregistered " << node->label << "(" << node->lex() << ")" << std::endl;
 
                 }
