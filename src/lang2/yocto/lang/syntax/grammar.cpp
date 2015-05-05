@@ -14,7 +14,7 @@ namespace yocto
                 while(rules.size)
                 {
                     rule *r = rules.pop_back();
-                    if(r->refcount()<=0)
+                    if(r->refcount()<=0 || r->liberate())
                     {
                         delete r;
                     }

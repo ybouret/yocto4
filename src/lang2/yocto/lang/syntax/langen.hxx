@@ -35,6 +35,7 @@ namespace yocto
             private:
                 void collect(const xnode *node);
                 void populate();
+                void probe_rules(const xnode *node);
                 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(LanGen);
             };

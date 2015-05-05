@@ -23,6 +23,7 @@ namespace yocto
                 assert(root!=NULL);
                 P.reset( new parser("dummy","main") );
                 collect(root);
+                populate();
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
             }
@@ -93,8 +94,11 @@ namespace yocto
                 for( agg_set::iterator i=rules.begin();i!=rules.end();++i)
                 {
                     rule &r = **i;
+                    std::cerr << r.label << " #ref=" << r.refcount() << std::endl;
                     P->append( &r );
+                    r.withhold();
                 }
+
 
                 //______________________________________________________________
                 //
@@ -106,8 +110,32 @@ namespace yocto
                     const char *id = t.label.c_str();
                     P->scanner.emit(id,id);
                     P->append( &t );
+                    t.withhold();
                 }
 
+                //______________________________________________________________
+                //
+                // use the tree to feed the rules
+                //______________________________________________________________
+
+                //probe_rules(root);
+            }
+
+            void LanGen:: probe_rules(const xnode *node)
+            {
+                if(node->terminal)
+                    return;
+                if("RULE"==node->label)
+                {
+                    std::cerr << "Found Rule " << node->children().head->lex() << std::endl;
+                }
+                else
+                {
+                    for(const xnode *child = node->children().head; child; child=child->next)
+                    {
+                        probe_rules(child);
+                    }
+                }
             }
         }
 
