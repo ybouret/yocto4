@@ -39,6 +39,8 @@ namespace yocto
                 void find_rules_from(const xnode *node);
                 void build_rule_from(const xnode *node);
 
+                void grow_rule( logical *parent, const xnode *sub);
+
                 YOCTO_DISABLE_COPY_AND_ASSIGN(LanGen);
             };
         }

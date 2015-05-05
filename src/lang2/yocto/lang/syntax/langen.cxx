@@ -182,20 +182,27 @@ namespace yocto
                 assert("RULE"==xnode->label);
                 const syntax::xnode::leaves &children = xnode->children();
                 assert(children.size>=2);
+
                 const syntax::xnode *child = children.head;
                 assert("ID"==child->label);
+
                 const string RuleID = child->lex().to_string();
                 std::cerr << "\tBuilding rule '" << RuleID << "'" << std::endl;
                 agg_ptr *pp = rules.search(RuleID);
                 if(!pp) throw exception("unexpected failure to get '%s'", RuleID.c_str());
 
-                child=child->next;
-                assert("SUB"==child->label);
-
-
-
-
+                logical *parent = & (**pp);
+                grow_rule(parent,child->next);
             }
+
+            void LanGen:: grow_rule( logical *parent, const xnode *sub)
+            {
+                assert(parent);
+                assert(sub);
+                assert(sub->label=="SUB");
+            }
+
+
         }
 
     }
