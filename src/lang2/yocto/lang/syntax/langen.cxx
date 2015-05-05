@@ -124,6 +124,7 @@ namespace yocto
             {
                 if(node->terminal)
                     return;
+
                 if("RULE"==node->label)
                 {
                     std::cerr << "Found Rule " << node->children().head->lex() << std::endl;
@@ -141,7 +142,7 @@ namespace yocto
 
             void LanGen :: build_rule_from(const xnode *xnode)
             {
-
+                
             }
         }
 
