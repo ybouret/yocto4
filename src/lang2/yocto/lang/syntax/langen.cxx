@@ -191,6 +191,10 @@ namespace yocto
                 agg_ptr *pp = rules.search(RuleID);
                 if(!pp) throw exception("unexpected failure to get '%s'", RuleID.c_str());
 
+                //______________________________________________________________
+                //
+                // grow from top level
+                //______________________________________________________________
                 logical *parent = & (**pp);
                 grow_rule(parent,child->next);
             }
