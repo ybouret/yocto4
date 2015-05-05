@@ -137,7 +137,6 @@ namespace yocto
     
 }
 
-#include <iostream>
 
 namespace yocto
 {
@@ -163,7 +162,6 @@ namespace yocto
 
                     if(ALT.size>0)
                     {
-                        std::cerr << "Should Rewrite !" << std::endl;
                         assert(node->children().size>0);
 
 
@@ -173,7 +171,7 @@ namespace yocto
                             xalt->append( node->pop_head() );
                         }
                         node->append(xalt);
-                        
+
                         while(ALT.size)
                         {
                             node->append(ALT.pop_front());
