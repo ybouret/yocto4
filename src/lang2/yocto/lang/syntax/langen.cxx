@@ -78,7 +78,7 @@ namespace yocto
                         return;
                     }
 
-                    
+                    // a modifier....
                     std::cerr << "\tunregistered " << node->label << "(" << node->lex() << ")" << std::endl;
 
                 }
@@ -186,6 +186,15 @@ namespace yocto
                 assert("ID"==child->label);
                 const string RuleID = child->lex().to_string();
                 std::cerr << "\tBuilding rule '" << RuleID << "'" << std::endl;
+                agg_ptr *pp = rules.search(RuleID);
+                if(!pp) throw exception("unexpected failure to get '%s'", RuleID.c_str());
+
+                child=child->next;
+                assert("SUB"==child->label);
+
+
+
+
             }
         }
 

@@ -88,7 +88,7 @@ namespace yocto
         syntax::xnode * generator::compile( ios::istream &fp )
         {
             syntax::xnode *tree = run(fp);
-            reshape(tree);
+            //reshape(tree);
             rewrite(tree);
             syntax::LanGen lg(tree);
 
