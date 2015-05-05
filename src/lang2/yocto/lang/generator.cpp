@@ -46,8 +46,8 @@ namespace yocto
             {
                 Alt &ATOM = alt();
                 ATOM << ID;
-                ATOM << term<lexical::cstring>("RX");
-
+                ATOM << term<lexical::cstring>("RXP");
+                ATOM << term<lexical::rstring>("RAW");
 
                 Agg  &ITEM  = agg("ITEM",syntax::mergeOne);
                 ITEM << ATOM;
@@ -158,7 +158,7 @@ namespace yocto
                     syntax::xnode::leaves  ALT;
                     while(node->children().size&&node->children().tail->label=="ALT")
                     {
-                        ALT.push_back(node->pop_tail());
+                        ALT.push_front(node->pop_tail());
                     }
 
                     if(ALT.size>0)

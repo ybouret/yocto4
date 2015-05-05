@@ -18,7 +18,8 @@ namespace yocto
             root(node),
             P(0),
             rules(),
-            terms()
+            rxp(),
+            raw()
             {
                 assert(root!=NULL);
                 P.reset( new parser("dummy","main") );
@@ -46,20 +47,38 @@ namespace yocto
                     }
 
                     // a terminal regexp
-                    if(node->label=="RX")
+                    if(node->label=="RXP" )
                     {
                         const string t_id = node->lex().to_string();
-                        if(!terms.search(t_id))
+                        if(!rxp.search(t_id))
                         {
-                            const term_ptr q( new terminal(t_id) );
-                            if(!terms.insert(q))
+                            const term_ptr q( new terminal(t_id,standard) );
+                            if(!rxp.insert(q))
                             {
-                                if(!terms.insert(q))
-                                    throw exception("unexpected TERM '%s' insertion failure!", t_id.c_str());
+                                if(!rxp.insert(q))
+                                    throw exception("unexpected RegExp TERM '%s' insertion failure!", t_id.c_str());
                             }
                         }
                         return;
                     }
+
+                    // a terminal raw
+                    if(node->label=="RAW" )
+                    {
+                        const string t_id = node->lex().to_string();
+                        if(!raw.search(t_id))
+                        {
+                            const term_ptr q( new terminal(t_id,standard) );
+                            if(!raw.insert(q))
+                            {
+                                if(!raw.insert(q))
+                                    throw exception("unexpected RegExp TERM '%s' insertion failure!", t_id.c_str());
+                            }
+                        }
+                        return;
+                    }
+
+
 
                     std::cerr << "\tunregistered " << node->label << "(" << node->lex() << ")" << std::endl;
 
@@ -78,6 +97,8 @@ namespace yocto
         }
     }
 }
+
+#include "yocto/lang/pattern/logic.hpp"
 
 namespace yocto
 {
@@ -101,9 +122,9 @@ namespace yocto
 
                 //______________________________________________________________
                 //
-                // insert the terminals
+                // insert the terminals from rxp
                 //______________________________________________________________
-                for( term_set::iterator j=terms.begin();j!=terms.end();++j)
+                for( term_set::iterator j=rxp.begin();j!=rxp.end();++j)
                 {
                     terminal &t = **j;
                     const char *id = t.label.c_str();
@@ -114,9 +135,23 @@ namespace yocto
 
                 //______________________________________________________________
                 //
-                // use the tree to feed the rules
+                // insert the terminals from raw
                 //______________________________________________________________
 
+                for( term_set::iterator j=raw.begin();j!=raw.end();++j)
+                {
+                    terminal &t = **j;
+                    const lexical::action emit( &(P->scanner), &lexical::scanner::forward);
+                    P->scanner.make(t.label, lang::logical::equal(t.label), emit);
+                    P->append( &t );
+                    t.withhold();
+                }
+
+
+                //______________________________________________________________
+                //
+                // use the tree to feed the rules
+                //______________________________________________________________
                 find_rules_from(root);
             }
 
@@ -127,7 +162,6 @@ namespace yocto
 
                 if("RULE"==node->label)
                 {
-                    std::cerr << "Found Rule " << node->children().head->lex() << std::endl;
                     build_rule_from(node);
                 }
                 else
@@ -142,7 +176,17 @@ namespace yocto
 
             void LanGen :: build_rule_from(const xnode *xnode)
             {
-                
+                //______________________________________________________________
+                //
+                // get rule ID
+                //______________________________________________________________
+                assert("RULE"==xnode->label);
+                const syntax::xnode::leaves &children = xnode->children();
+                assert(children.size>=2);
+                const syntax::xnode *child = children.head;
+                assert("ID"==child->label);
+                const string RuleID = child->lex().to_string();
+                std::cerr << "\tBuilding rule '" << RuleID << "'" << std::endl;
             }
         }
 

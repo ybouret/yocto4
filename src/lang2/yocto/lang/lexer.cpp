@@ -133,33 +133,6 @@ namespace yocto
 {
     namespace lang
     {
-#if 0
-        lexeme *lexer:: read_from(source &src, ios::istream &fp)
-        {
-            assert(scan);
-            for(;;)
-            {
-                bool    ctrl = false;
-                lexeme *lx   = scan->get(src, fp, ctrl);
-                if(!lx)
-                {
-                    if(!ctrl)
-                    {
-                        // EOF
-                        return 0;
-                    }
-                    else
-                    {
-                        // it was a control lexeme
-                        continue;
-                    }
-                }
-                return lx;
-            }
-
-        }
-#endif
-
         lexeme * lexer:: get( source &src, ios::istream &fp )
         {
             assert(scan);

@@ -27,7 +27,8 @@ namespace yocto
                 const xnode      *root;
                 auto_ptr<parser>  P;
                 agg_set           rules;
-                term_set          terms;
+                term_set          rxp;
+                term_set          raw;
 
                 LanGen( const xnode *node );
                 ~LanGen() throw();

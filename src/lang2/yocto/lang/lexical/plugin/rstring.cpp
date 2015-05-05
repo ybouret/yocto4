@@ -1,7 +1,6 @@
 #include "yocto/lang/lexical/plugin/rstring.hpp"
 #include "yocto/lang/lexer.hpp"
 #include "yocto/lang/pattern/basic.hpp"
-#include "yocto/lang/pattern/logic.hpp"
 
 namespace yocto
 {
