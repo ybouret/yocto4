@@ -11,6 +11,14 @@ namespace yocto
 
             grammar:: ~grammar() throw()
             {
+                while(rules.size)
+                {
+                    rule *r = rules.pop_back();
+                    if(r->refcount()<=0)
+                    {
+                        delete r;
+                    }
+                }
             }
 
 

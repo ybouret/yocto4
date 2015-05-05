@@ -86,18 +86,28 @@ namespace yocto
         {
             void LanGen:: populate()
             {
+                //______________________________________________________________
+                //
                 // insert the rules
+                //______________________________________________________________
                 for( agg_set::iterator i=rules.begin();i!=rules.end();++i)
                 {
                     rule &r = **i;
                     P->append( &r );
                 }
 
-                // insert the terminal
+                //______________________________________________________________
+                //
+                // insert the terminals
+                //______________________________________________________________
                 for( term_set::iterator j=terms.begin();j!=terms.end();++j)
                 {
+                    terminal &t = **j;
+                    const char *id = t.label.c_str();
+                    P->scanner.emit(id,id);
+                    P->append( &t );
                 }
-                
+
             }
         }
 
