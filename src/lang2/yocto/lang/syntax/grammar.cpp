@@ -44,6 +44,7 @@ namespace yocto
 
 
 
+
         }
 
     }
@@ -73,6 +74,25 @@ namespace yocto
                     }
                 }
             }
+
+            rule & grammar:: get_rule(const string &id)
+            {
+                for(rule *r=rules.head;r;r=r->next)
+                {
+                    if(id==r->label)
+                    {
+                        return *r;
+                    }
+                }
+                throw exception("grammar %s: no rule '%s'", name.c_str(),id.c_str());
+            }
+
+            rule & grammar:: get_rule(const char *id)
+            {
+                const string ID(id);
+                return get_rule(ID);
+            }
+
 
             rule & grammar:: decl_term( const string &label, const property ppty  )
             {
@@ -249,7 +269,7 @@ namespace yocto
                 }
                 return false;
             }
-            
+
 
 
         }
@@ -265,7 +285,7 @@ namespace yocto
 
         namespace syntax
         {
-
+            
             void grammar:: gramviz( const string &filename ) const
             {
                 ios::ocstream fp(filename,false);

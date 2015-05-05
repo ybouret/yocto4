@@ -53,8 +53,11 @@ namespace yocto
                 void gramviz( const string &filename ) const;
 
                 
-                bool has(const string &id ) const throw();
-                bool has(const char   *id ) const throw();
+                bool  has(const string &id ) const throw();
+                bool  has(const char   *id ) const throw();
+                rule &get_rule(const string &id);
+                rule &get_rule(const char   *id);
+
 
                 void append( rule *r ) throw();
 

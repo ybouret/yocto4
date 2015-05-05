@@ -88,6 +88,7 @@ namespace yocto
         {
             syntax::xnode *tree = run(fp);
             reshape(tree);
+            rewrite(tree);
             syntax::LanGen lg(tree);
 
             return tree;
@@ -109,13 +110,13 @@ namespace yocto
                 syntax::xnode::leaves stk;
                 while(node->children().size)
                 {
-                    syntax::xnode *child = node->pop();
+                    syntax::xnode *child = node->pop_head();
                     reshape(child);
                     if(node->label=="SUB" && child->label=="SUB")
                     {
                         while(child->children().size)
                         {
-                            stk.push_back(child->pop());
+                            stk.push_back(child->pop_head());
                         }
                         delete child;
                     }
@@ -134,6 +135,58 @@ namespace yocto
         
     }
     
+}
+
+#include <iostream>
+
+namespace yocto
+{
+    namespace lang
+    {
+
+        void generator:: rewrite( syntax::xnode *node )
+        {
+            if(!node->terminal)
+            {
+                for( syntax::xnode *child=node->children().head;child;child=child->next)
+                {
+                    rewrite(child);
+                }
+
+                if(node->label=="SUB")
+                {
+                    syntax::xnode::leaves  ALT;
+                    while(node->children().size&&node->children().tail->label=="ALT")
+                    {
+                        ALT.push_back(node->pop_tail());
+                    }
+
+                    if(ALT.size>0)
+                    {
+                        std::cerr << "Should Rewrite !" << std::endl;
+                        assert(node->children().size>0);
+
+
+                        syntax::xnode *xalt = syntax::xnode::leaf(get_rule("ALT"),syntax::standard);
+                        while(node->children().size)
+                        {
+                            xalt->append( node->pop_head() );
+                        }
+                        node->append(xalt);
+                        
+                        while(ALT.size)
+                        {
+                            node->append(ALT.pop_front());
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+    }
+
 }
 
 

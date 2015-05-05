@@ -22,7 +22,7 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(generator);
             void reshape(syntax::xnode *node) throw();
-            
+            void rewrite(syntax::xnode *node);
         };
         
     }

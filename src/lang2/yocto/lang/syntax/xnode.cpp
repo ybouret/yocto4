@@ -130,7 +130,7 @@ namespace yocto
                 ch->push_back(node);
             }
 
-            xnode * xnode::pop() throw()
+            xnode * xnode::pop_head() throw()
             {
                 assert(!terminal);
                 assert(ch->size>0);
@@ -139,6 +139,19 @@ namespace yocto
                 node->parent = NULL;
                 return node;
             }
+
+            xnode * xnode::pop_tail() throw()
+            {
+                assert(!terminal);
+                assert(ch->size>0);
+                xnode *node = ch->pop_back();
+                assert(node->parent==this);
+                node->parent = NULL;
+                return node;
+            }
+
+
+
 
             void xnode:: restore(xnode *node, l_list &lexemes) throw()
             {
@@ -273,7 +286,7 @@ namespace yocto
                                 assert(!sub->terminal);
                                 while(sub->ch->size)
                                 {
-                                    node->append(sub->pop());
+                                    node->append(sub->pop_head());
                                 }
                                 delete sub;
                                 break;
@@ -282,7 +295,7 @@ namespace yocto
                                 assert(!sub->terminal);
                                 if(1==sub->ch->size)
                                 {
-                                    node->append(sub->pop());
+                                    node->append(sub->pop_head());
                                     delete sub;
                                 }
                                 else
