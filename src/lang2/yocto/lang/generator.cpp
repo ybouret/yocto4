@@ -2,6 +2,7 @@
 #include "yocto/lang/lexical/plugin/cstring.hpp"
 #include "yocto/lang/lexical/plugin/comment.hpp"
 #include "yocto/lang/lexical/plugin/ccomment.hpp"
+#include "yocto/lang/lexical/plugin/rstring.hpp"
 
 #include "yocto/lang/syntax/langen.hxx"
 
@@ -163,8 +164,7 @@ namespace yocto
                     if(ALT.size>0)
                     {
                         assert(node->children().size>0);
-
-
+                        
                         syntax::xnode *xalt = syntax::xnode::leaf(get_rule("ALT"),syntax::standard);
                         while(node->children().size)
                         {

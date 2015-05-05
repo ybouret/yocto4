@@ -6,6 +6,7 @@
 #include "yocto/lang/lexical/plugin/comment.hpp"
 #include "yocto/lang/lexical/plugin/ccomment.hpp"
 #include "yocto/lang/lexical/plugin/cstring.hpp"
+#include "yocto/lang/lexical/plugin/rstring.hpp"
 
 #include <cstdlib>
 
@@ -48,6 +49,10 @@ namespace{
 
             lexical::plugin &cstring =load<lexical::cstring>("CSTRING");
             cstring.hook(root);
+
+
+            lexical::plugin &rstring =load<lexical::rstring>("RSTRING");
+            rstring.hook(root);
 
             root.drop("WS", "[:blank:]");
             root.endl("ENDL");
