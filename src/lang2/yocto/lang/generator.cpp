@@ -25,7 +25,7 @@ namespace yocto
             //__________________________________________________________________
 
             Rule &ID        = term("ID", "[:word:]+");
-            Rule &CODE      = term("@","@",syntax::univocal);
+            //Rule &CODE      = term("@","@",syntax::univocal);
             Rule &COLON     = term(":",":",syntax::jettison);
             Rule &SEMICOLON = term(";",";",syntax::jettison);
 
@@ -40,7 +40,8 @@ namespace yocto
             //__________________________________________________________________
             Agg  &RULE      = agg("RULE");
 
-            RULE << opt(CODE) << ID << COLON;
+            RULE //<< opt(CODE)
+            << ID << COLON;
             {
                 Alt &ATOM = alt();
                 ATOM << ID;

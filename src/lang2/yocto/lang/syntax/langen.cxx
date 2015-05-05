@@ -94,7 +94,6 @@ namespace yocto
                 for( agg_set::iterator i=rules.begin();i!=rules.end();++i)
                 {
                     rule &r = **i;
-                    std::cerr << r.label << " #ref=" << r.refcount() << std::endl;
                     P->append( &r );
                     r.withhold();
                 }
@@ -118,24 +117,31 @@ namespace yocto
                 // use the tree to feed the rules
                 //______________________________________________________________
 
-                //probe_rules(root);
+                find_rules_from(root);
             }
 
-            void LanGen:: probe_rules(const xnode *node)
+            void LanGen:: find_rules_from(const xnode *node)
             {
                 if(node->terminal)
                     return;
                 if("RULE"==node->label)
                 {
                     std::cerr << "Found Rule " << node->children().head->lex() << std::endl;
+                    build_rule_from(node);
                 }
                 else
                 {
                     for(const xnode *child = node->children().head; child; child=child->next)
                     {
-                        probe_rules(child);
+                        find_rules_from(child);
                     }
                 }
+            }
+
+
+            void LanGen :: build_rule_from(const xnode *xnode)
+            {
+
             }
         }
 

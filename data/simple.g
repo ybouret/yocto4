@@ -3,6 +3,6 @@ CODE : (INT|ID)+;
 ID : "[:alpha:][:word:]"+;
 INT : "[:digit:]"+;
 
-@skip :  "[ \t]" ;
-@endl :  "[:endl:]";
+skip :  "[ \t]" ;
+endl :  "[:endl:]";
 
