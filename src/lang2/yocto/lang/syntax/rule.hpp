@@ -37,6 +37,7 @@ namespace yocto
                 //! write links
                 virtual void lnk( ios::ostream &fp ) const = 0;
 
+                //! for intr_ptr if needed
                 const string & key() const throw();
 
 

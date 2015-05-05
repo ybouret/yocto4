@@ -16,7 +16,9 @@ namespace yocto
 
             LanGen:: LanGen(const xnode *node ) :
             root(node),
-            P(0)
+            P(0),
+            rules(),
+            terms()
             {
                 assert(root!=NULL);
                 P.reset( new parser("dummy","main") );
@@ -33,9 +35,11 @@ namespace yocto
                     if(node->label=="ID")
                     {
                         const string r_id = node->lex().to_string();
-                        if(!P->has(r_id))
+                        if(!rules.search(r_id))
                         {
-                            (void) P->agg(r_id);
+                            const agg_ptr q( new aggregate(r_id) );
+                            if(!rules.insert(q))
+                                throw exception("unexpected RULE '%s' insertion failure!", r_id.c_str());
                         }
                         return;
                     }
@@ -44,9 +48,14 @@ namespace yocto
                     if(node->label=="RX")
                     {
                         const string t_id = node->lex().to_string();
-                        if(!P->has(t_id))
+                        if(!terms.search(t_id))
                         {
-                            (void) P->term(t_id.c_str(), t_id.c_str());
+                            const term_ptr q( new terminal(t_id) );
+                            if(!terms.insert(q))
+                            {
+                                if(!terms.insert(q))
+                                    throw exception("unexpected TERM '%s' insertion failure!", t_id.c_str());
+                            }
                         }
                         return;
                     }
@@ -75,7 +84,21 @@ namespace yocto
     {
         namespace syntax
         {
+            void LanGen:: populate()
+            {
+                // insert the rules
+                for( agg_set::iterator i=rules.begin();i!=rules.end();++i)
+                {
+                    rule &r = **i;
+                    P->append( &r );
+                }
 
+                // insert the terminal
+                for( term_set::iterator j=terms.begin();j!=terms.end();++j)
+                {
+                }
+                
+            }
         }
 
     }

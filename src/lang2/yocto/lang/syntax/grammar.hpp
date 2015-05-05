@@ -54,8 +54,9 @@ namespace yocto
 
                 
                 bool has(const string &id ) const throw();
-
                 bool has(const char   *id ) const throw();
+
+                void append( rule *r ) throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);

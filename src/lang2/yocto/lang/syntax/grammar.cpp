@@ -35,6 +35,7 @@ namespace yocto
             }
 
 
+
         }
 
     }
@@ -129,6 +130,7 @@ namespace yocto
             }
 
 
+
         }
 
     }
@@ -145,6 +147,16 @@ namespace yocto
 
         namespace syntax
         {
+
+            void grammar:: append( rule *r ) throw()
+            {
+                assert(r);
+                auto_ptr<rule> p(r);
+                check_label(r->label);
+                rules.push_back( p.yield() );
+            }
+
+
             xnode *grammar:: accept( lexer &lxr, source &src, ios::istream &fp)
             {
                 //______________________________________________________________
