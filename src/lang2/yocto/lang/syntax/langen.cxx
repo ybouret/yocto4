@@ -170,16 +170,12 @@ namespace yocto
                 const xnode *child = children.head;
                 assert("ID"==child->label);
 
-                const string RuleID = child->lex().to_string();
-                std::cerr << "\tBuilding rule '" << RuleID << "'" << std::endl;
-                rule_ptr *pp = rules.search(RuleID);
-                if(!pp) throw exception("unexpected failure to get RULE '%s'", RuleID.c_str());
-
                 //______________________________________________________________
                 //
                 // grow from top level
                 //______________________________________________________________
-                logical *parent = & (**pp);
+                logical *parent = & get_std(child);
+                std::cerr << "\t\tBuilding Rule " << parent->label << std::endl;
                 grow_rule(parent,child->next);
             }
 
@@ -187,65 +183,61 @@ namespace yocto
             {
                 assert(parent);
                 assert(sub);
-                //assert(sub->label=="SUB");
-
-                const xnode::leaves &children = sub->children(); assert(children.size>0);
-                const xnode         *child    = children.head;      assert(child!=NULL);
-
-                std::cerr << "\t\tChild Label=" << child->label << std::endl;
-                if("ALT"==child->label)
-                {
-                    std::cerr << "\t\tfound alternation" << std::endl;
-                    return;
-                }
-                else
-                {
-                    while(child)
-                    {
-
-                        if("ID"==child->label)
-                        {
-                            const string id = child->lex().to_string();
-                            rule_ptr *pp = rules.search(id);
-                            if(!pp) throw exception("unexpected failure to get RULE '%s'", id.c_str());
-                            parent->append( **pp );
-                            goto NEXT_CHILD;
-                        }
-
-                        if("RXP"==child->label)
-                        {
-                            const string id = child->lex().to_string();
-                            term_ptr    *pp = rxp.search(id);
-                            if(!pp)
-                                throw exception("unexpected failure to get RegExp TERM '%s'", id.c_str());
-                            parent->append( **pp );
-                            goto NEXT_CHILD;
-                        }
-
-                        if("RAW"==child->label)
-                        {
-                            const string id = child->lex().to_string();
-                            term_ptr    *pp = raw.search(id);
-                            if(!pp)
-                                throw exception("unexpected failure to get Raw TERM '%s'", id.c_str());
-                            parent->append( **pp );
-                            goto NEXT_CHILD;
-                        }
-
-                    NEXT_CHILD:
-                        child=child->next;
-                    }
-                }
-                
-                
                 
             }
-            
             
         }
         
     }
     
 }
+namespace yocto
+{
+    namespace lang
+    {
+        namespace syntax
+        {
+
+            logical & LanGen:: get_std(const xnode *child)
+            {
+                assert(child);
+                assert("ID"==child->label);
+                const string id = child->content();
+                rule_ptr    *pp = rules.search(id);
+
+                if(!pp) throw exception("unexpected failure to get RULE '%s'", id.c_str());
+
+                return **pp;
+            }
+
+            rule & LanGen:: get_rxp(const xnode *child)
+            {
+                assert(child);
+                assert("RXP"==child->label);
+                const string id = child->content();
+                term_ptr    *pp = rxp.search(id);
+
+                if(!pp) throw exception("unexpected failure to RegExp TERM '%s'", id.c_str());
+
+                return **pp;
+            }
+
+            rule & LanGen:: get_raw(const xnode *child)
+            {
+                assert(child);
+                assert("RAW"==child->label);
+                const string id = child->content();
+                term_ptr    *pp = raw.search(id);
+
+                if(!pp) throw exception("unexpected failure to Raw TERM '%s'", id.c_str());
+
+                return **pp;
+            }
+
+
+        }
+    }
+}
+
 
 

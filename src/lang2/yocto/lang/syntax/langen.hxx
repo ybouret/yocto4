@@ -40,6 +40,10 @@ namespace yocto
 
                 void grow_rule(logical *parent, const xnode *sub);
 
+                logical &get_std(const xnode *node);
+                rule    &get_rxp(const xnode *node);
+                rule    &get_raw(const xnode *node);
+
                 YOCTO_DISABLE_COPY_AND_ASSIGN(LanGen);
             };
         }

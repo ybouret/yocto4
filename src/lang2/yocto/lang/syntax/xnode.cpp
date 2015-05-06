@@ -94,6 +94,12 @@ namespace yocto
                 return *lx;
             }
 
+            string xnode:: content()  const
+            {
+                assert(terminal);
+                assert(lx);
+                return lx->to_string();
+            }
 
             xnode::leaves & xnode::children() throw()
             {
