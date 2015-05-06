@@ -14,7 +14,7 @@ namespace yocto
             }
 
             rstring:: rstring(const char   *id, lexer &parent) :
-            plugin(id,parent)
+            plugin(id,parent),content()
             {
 
                 back("'",         this, & rstring::on_quit);

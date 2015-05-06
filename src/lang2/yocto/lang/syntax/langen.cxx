@@ -2,7 +2,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/lang/syntax/aggregate.hpp"
 #include "yocto/lang/pattern/logic.hpp"
-
+#include <cstdlib>
 #include <iostream>
 
 namespace yocto

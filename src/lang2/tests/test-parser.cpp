@@ -11,6 +11,8 @@
 #include "yocto/lang/parser.hpp"
 
 #include "yocto/fs/local-fs.hpp"
+#include <cstdlib>
+
 
 using namespace yocto;
 using namespace lang;
