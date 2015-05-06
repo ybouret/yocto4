@@ -26,7 +26,7 @@ namespace yocto
                 P.reset( new parser("dummy","main") );
                 collect(root);
                 find_rules_from(root);
-                
+
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
             }
@@ -137,7 +137,7 @@ namespace yocto
     {
         namespace syntax
         {
-            
+
             void LanGen:: find_rules_from(const xnode *node)
             {
                 if(node->terminal)
@@ -187,10 +187,10 @@ namespace yocto
             {
                 assert(parent);
                 assert(sub);
-                assert(sub->label=="SUB");
+                //assert(sub->label=="SUB");
 
                 const xnode::leaves &children = sub->children(); assert(children.size>0);
-                const xnode         *child = children.head;      assert(child!=NULL);
+                const xnode         *child    = children.head;      assert(child!=NULL);
 
                 std::cerr << "\t\tChild Label=" << child->label << std::endl;
                 if("ALT"==child->label)
@@ -198,36 +198,54 @@ namespace yocto
                     std::cerr << "\t\tfound alternation" << std::endl;
                     return;
                 }
-
-                if("RXP"==child->label)
+                else
                 {
-                    const string id = child->lex().to_string();
-                    term_ptr *pp = rxp.search(id);
-                    if(!pp)
-                        throw exception("unexpected failure to get RegExp TERM '%s'", id.c_str());
-                    parent->append( **pp );
-                    return;
+                    while(child)
+                    {
+
+                        if("ID"==child->label)
+                        {
+                            const string id = child->lex().to_string();
+                            rule_ptr *pp = rules.search(id);
+                            if(!pp) throw exception("unexpected failure to get RULE '%s'", id.c_str());
+                            parent->append( **pp );
+                            goto NEXT_CHILD;
+                        }
+
+                        if("RXP"==child->label)
+                        {
+                            const string id = child->lex().to_string();
+                            term_ptr    *pp = rxp.search(id);
+                            if(!pp)
+                                throw exception("unexpected failure to get RegExp TERM '%s'", id.c_str());
+                            parent->append( **pp );
+                            goto NEXT_CHILD;
+                        }
+
+                        if("RAW"==child->label)
+                        {
+                            const string id = child->lex().to_string();
+                            term_ptr    *pp = raw.search(id);
+                            if(!pp)
+                                throw exception("unexpected failure to get Raw TERM '%s'", id.c_str());
+                            parent->append( **pp );
+                            goto NEXT_CHILD;
+                        }
+
+                    NEXT_CHILD:
+                        child=child->next;
+                    }
                 }
-
-                if("RAW"==child->label)
-                {
-                    const string id = child->lex().to_string();
-                    term_ptr *pp = raw.search(id);
-                    if(!pp)
-                        throw exception("unexpected failure to get Raw TERM '%s'", id.c_str());
-                    parent->append( **pp );
-                    return;
-                }
-
-
-
+                
+                
+                
             }
-
-
+            
+            
         }
-
+        
     }
-
+    
 }
 
 
