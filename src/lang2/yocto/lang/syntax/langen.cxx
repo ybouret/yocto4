@@ -173,7 +173,7 @@ namespace yocto
                 const string RuleID = child->lex().to_string();
                 std::cerr << "\tBuilding rule '" << RuleID << "'" << std::endl;
                 rule_ptr *pp = rules.search(RuleID);
-                if(!pp) throw exception("unexpected failure to get '%s'", RuleID.c_str());
+                if(!pp) throw exception("unexpected failure to get RULE '%s'", RuleID.c_str());
 
                 //______________________________________________________________
                 //
@@ -198,10 +198,27 @@ namespace yocto
                     std::cerr << "\t\tfound alternation" << std::endl;
                     return;
                 }
-                else
+
+                if("RXP"==child->label)
                 {
-                    
+                    const string id = child->lex().to_string();
+                    term_ptr *pp = rxp.search(id);
+                    if(!pp)
+                        throw exception("unexpected failure to get RegExp TERM '%s'", id.c_str());
+                    parent->append( **pp );
+                    return;
                 }
+
+                if("RAW"==child->label)
+                {
+                    const string id = child->lex().to_string();
+                    term_ptr *pp = raw.search(id);
+                    if(!pp)
+                        throw exception("unexpected failure to get Raw TERM '%s'", id.c_str());
+                    parent->append( **pp );
+                    return;
+                }
+
 
 
             }
