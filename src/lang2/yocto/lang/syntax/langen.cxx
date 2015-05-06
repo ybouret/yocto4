@@ -45,8 +45,8 @@ namespace yocto
                         const string r_id = node->lex().to_string();
                         if(!rules.search(r_id))
                         {
-                            aggregate    *p = new aggregate(r_id);
-                            const agg_ptr q( p );
+                            aggregate     *p = new aggregate(r_id);
+                            const rule_ptr q( p );
                             if(!rules.insert(q))
                                 throw exception("unexpected RULE '%s' insertion failure!", r_id.c_str());
 
@@ -157,22 +157,22 @@ namespace yocto
             }
 
 
-            void LanGen :: build_rule_from(const xnode *xnode)
+            void LanGen :: build_rule_from(const xnode *node)
             {
                 //______________________________________________________________
                 //
                 // get rule ID
                 //______________________________________________________________
-                assert("RULE"==xnode->label);
-                const syntax::xnode::leaves &children = xnode->children();
+                assert("RULE"==node->label);
+                const xnode::leaves &children = node->children();
                 assert(children.size>=2);
 
-                const syntax::xnode *child = children.head;
+                const xnode *child = children.head;
                 assert("ID"==child->label);
 
                 const string RuleID = child->lex().to_string();
                 std::cerr << "\tBuilding rule '" << RuleID << "'" << std::endl;
-                agg_ptr *pp = rules.search(RuleID);
+                rule_ptr *pp = rules.search(RuleID);
                 if(!pp) throw exception("unexpected failure to get '%s'", RuleID.c_str());
 
                 //______________________________________________________________
@@ -188,9 +188,21 @@ namespace yocto
                 assert(parent);
                 assert(sub);
                 assert(sub->label=="SUB");
-                const syntax::xnode::leaves &children = sub->children();
-                assert(children.size>=1);
-                
+
+                const xnode::leaves &children = sub->children(); assert(children.size>0);
+                const xnode         *child = children.head;      assert(child!=NULL);
+
+                std::cerr << "\t\tChild Label=" << child->label << std::endl;
+                if("ALT"==child->label)
+                {
+                    std::cerr << "\t\tfound alternation" << std::endl;
+                    return;
+                }
+                else
+                {
+                    
+                }
+
 
             }
 
