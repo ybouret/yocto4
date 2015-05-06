@@ -3,6 +3,7 @@
 
 
 #include "yocto/memory/buffer.hpp"
+#include "yocto/core/list.hpp"
 
 namespace yocto
 {
@@ -26,19 +27,46 @@ namespace yocto
 
             void reset() throw();
 
-            static void fill_I(int          *I,
-                        int          &top,
-                        const void   *data,
-                        const size_t  size,
-                        uint8_t       h);
+            class node_t
+            {
+            public:
+                node_t        *prev;
+                node_t        *next;
+                const  uint8_t code;
+                node_t(uint8_t b) throw() : prev(0), next(0), code(b) {}
+                ~node_t() throw() {}
 
-            static void finish(int *I, int &top);
+                YOCTO_MAKE_OBJECT
 
-            void build_from(int *I);
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(node_t);
+            };
 
+            class list_t : public core::list_of_cpp<node_t>
+            {
+            public:
+                list_t() throw() {}
+                virtual ~list_t() throw() {}
+
+                void initialize()
+                {
+                    clear();
+                    for(unsigned i=0;i<256;++i)
+                    {
+                        push_back( new node_t(i) );
+                    }
+                }
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(list_t);
+            };
+
+            void fill_I( int *I, list_t &L, const void *data, const size_t size, const uint8_t H);
+
+            void  build_from(int *I);
 
         };
-
+        
     }
 }
 

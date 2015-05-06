@@ -33,16 +33,8 @@ YOCTO_UNIT_TEST_IMPL(pearson)
 
         int I[256];
         for(size_t i=0;i<256;++i) I[i] = -1;
-        int top = 0;
-        for(size_t i=1;i<=min_of<size_t>(1,nw);++i)
-        {
-            const string &word = words[i];
-            std::cerr << "'" << word << "'" << std::endl;
-            P.fill_I(I,top,word.ro(),word.length(),i-1);
-            std::cerr << std::endl;
-        }
-
-        P.finish(I,top);
+        hashing::Pearson::list_t L;
+        L.initialize();
 
         std::cerr.flush();
         for(size_t i=0,k=0;i<16;++i)

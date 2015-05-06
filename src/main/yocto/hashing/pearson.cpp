@@ -80,6 +80,7 @@ namespace yocto
             throw exception("invalid Pearson Table, missing %u!", unsigned(h) );
         }
 
+#if 0
         void Pearson:: fill_I(int *I, int &top, const void *data, const size_t size, uint8_t h)
         {
             assert(!(data==NULL&&size>0));
@@ -110,6 +111,37 @@ namespace yocto
                 }
             }
         }
+#endif
+
+        void Pearson:: fill_I(int *I, list_t &L, const void *data, const size_t size, const uint8_t H)
+        {
+            assert(!(data==NULL&&size>0));
+            const uint8_t *C = (const uint8_t *)data;
+            --C;
+
+            node_t *node = L.head;
+            for(size_t k=0;k<L.size;++k)
+            {
+                // trial
+                int J[256];
+                memcpy(J, I, sizeof(J) );
+
+                uint8_t h = H;
+                for(size_t q=size;q>0;--q)
+                {
+                    if(J[h]<=0)
+                    {
+
+                    }
+
+                }
+            }
+
+
+
+        }
+
+
 
         void Pearson:: build_from(int *I)
         {
@@ -130,6 +162,6 @@ namespace yocto
             }
             fflush(stderr);
         }
-
+        
     }
 }
