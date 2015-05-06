@@ -54,3 +54,21 @@ namespace yocto
     }
 
 }
+
+#include "yocto/exception.hpp"
+
+namespace yocto
+{
+    namespace hashing
+    {
+        uint8_t Pearson:: index_of( const uint8_t h ) const
+        {
+            for(unsigned i=0;i<256;++i)
+            {
+                if(h==table[i]) return i;
+            }
+            throw exception("invalid Pearson Table, missing %u!", unsigned(h) );
+        }
+
+    }
+}

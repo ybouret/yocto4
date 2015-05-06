@@ -22,7 +22,7 @@ namespace yocto
 
             uint8_t operator()( const void *data, const size_t size ) const throw();
             uint8_t operator()( const memory::ro_buffer &buff ) const throw();
-
+            uint8_t index_of( const uint8_t h ) const;
         };
 
     }
