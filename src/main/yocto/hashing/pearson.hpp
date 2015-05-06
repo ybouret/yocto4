@@ -23,6 +23,20 @@ namespace yocto
             uint8_t operator()( const void *data, const size_t size ) const throw();
             uint8_t operator()( const memory::ro_buffer &buff ) const throw();
             uint8_t index_of( const uint8_t h ) const;
+
+            void reset() throw();
+
+            static void fill_I(int          *I,
+                        int          &top,
+                        const void   *data,
+                        const size_t  size,
+                        uint8_t       h);
+
+            static void finish(int *I, int &top);
+
+            void build_from(int *I);
+
+
         };
 
     }

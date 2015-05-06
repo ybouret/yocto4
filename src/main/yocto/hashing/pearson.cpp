@@ -6,13 +6,19 @@ namespace yocto
     namespace hashing
     {
 
-        Pearson:: Pearson() throw() :
-        table()
+        void Pearson:: reset() throw()
         {
             for(unsigned i=0;i<256;++i)
             {
                 table[i] = uint8_t(i);
             }
+        }
+
+
+        Pearson:: Pearson() throw() :
+        table()
+        {
+            reset();
         }
 
         Pearson:: ~Pearson() throw()
@@ -56,6 +62,10 @@ namespace yocto
 }
 
 #include "yocto/exception.hpp"
+#include "yocto/sequence/lw-array.hpp"
+#include "yocto/sort/quick.hpp"
+
+#include <iostream>
 
 namespace yocto
 {
@@ -68,6 +78,57 @@ namespace yocto
                 if(h==table[i]) return i;
             }
             throw exception("invalid Pearson Table, missing %u!", unsigned(h) );
+        }
+
+        void Pearson:: fill_I(int *I, int &top, const void *data, const size_t size, uint8_t h)
+        {
+            assert(!(data==NULL&&size>0));
+            const uint8_t *C = (const uint8_t *)data;
+            --C;
+
+            for(size_t q=size;q>0;--q)
+            {
+                if(I[h]<=0)
+                {
+                    if(top>255) throw exception("-- fill FAILURE --");
+                    I[h] = top++;
+                    std::cerr << "I[" << int(h) << "]=" << I[h] << std::endl;
+                }
+                h = I[h] ^ C[q];
+            }
+        }
+
+
+        void Pearson::  finish(int *I, int &top)
+        {
+            for(int i=0;i<256;++i)
+            {
+                if(I[i]<0)
+                {
+                    if(top>255) throw exception("-- finish FAILURE --");
+                    I[i] = top++;
+                }
+            }
+        }
+
+        void Pearson:: build_from(int *I)
+        {
+            reset();
+            lw_array<int>     a(I,256);
+            lw_array<uint8_t> b(table,256);
+            co_qsort(a,b);
+
+            std::cerr << "table=" << std::endl;
+            std::cerr.flush();
+            for(size_t i=0,k=0;i<16;++i)
+            {
+                for(size_t j=0;j<16;++j)
+                {
+                    fprintf(stderr,"%3d ", int(table[k++]));
+                }
+                fprintf(stderr, "\n");
+            }
+            fflush(stderr);
         }
 
     }
