@@ -4,6 +4,7 @@
 
 #include "yocto/memory/buffer.hpp"
 #include "yocto/core/list.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -27,43 +28,59 @@ namespace yocto
 
             void reset() throw();
 
-            class node_t
+            class Code
             {
             public:
-                node_t        *prev;
-                node_t        *next;
-                const  uint8_t code;
-                node_t(uint8_t b) throw() : prev(0), next(0), code(b) {}
-                ~node_t() throw() {}
+                Code *next,*prev;
+                const uint8_t data;
+
+                Code( uint8_t C ) throw() : next(0), prev(0), data(C) {}
+                ~Code() throw() {}
 
                 YOCTO_MAKE_OBJECT
 
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(node_t);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Code);
             };
 
-            class list_t : public core::list_of_cpp<node_t>
+            class Word : public object, public core::list_of_cpp<Code>
             {
             public:
-                list_t() throw() {}
-                virtual ~list_t() throw() {}
+                Word   *next;
+                Word   *prev;
+                uint8_t H;
 
-                void initialize()
+                Word( const void *buffer, const size_t buflen ) : next(0), prev(0), H(0)
                 {
-                    clear();
-                    for(unsigned i=0;i<256;++i)
-                    {
-                        push_back( new node_t(i) );
-                    }
+                    store(buffer,buflen);
                 }
 
+                Word( const memory::ro_buffer &buffer ) : next(0), prev(0), H(0)
+                {
+                    store(buffer.ro(), buffer.length());
+                }
+
+                virtual ~Word() throw() {}
+                friend std::ostream & operator<<( std::ostream &os, const Word &w )
+                {
+                    for(const Code *c = w.head;c;c=c->next)
+                    {
+                        os << char(c->data);
+                    }
+                    return os;
+                }
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(list_t);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Word);
+                void store( const void *buffer, const size_t buflen )
+                {
+                    const uint8_t *C = (const uint8_t *)buffer;
+                    for(size_t i=0;i<buflen;++i) push_back( new Code(C[i]) );
+                }
             };
 
-            void fill_I( int *I, list_t &L, const void *data, const size_t size, const uint8_t H);
+            typedef core::list_of_cpp<Word> Words;
 
-            void  build_from(int *I);
+            void build( Words &words );
 
         };
         

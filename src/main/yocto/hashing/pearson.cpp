@@ -64,6 +64,8 @@ namespace yocto
 #include "yocto/exception.hpp"
 #include "yocto/sequence/lw-array.hpp"
 #include "yocto/sort/quick.hpp"
+#include "yocto/sort/merge.hpp"
+#include "yocto/code/utils.hpp"
 
 #include <iostream>
 
@@ -80,69 +82,8 @@ namespace yocto
             throw exception("invalid Pearson Table, missing %u!", unsigned(h) );
         }
 
+
 #if 0
-        void Pearson:: fill_I(int *I, int &top, const void *data, const size_t size, uint8_t h)
-        {
-            assert(!(data==NULL&&size>0));
-            const uint8_t *C = (const uint8_t *)data;
-            --C;
-
-            for(size_t q=size;q>0;--q)
-            {
-                if(I[h]<=0)
-                {
-                    if(top>255) throw exception("-- fill FAILURE --");
-                    I[h] = top++;
-                    std::cerr << "I[" << int(h) << "]=" << I[h] << std::endl;
-                }
-                h = I[h] ^ C[q];
-            }
-        }
-
-
-        void Pearson::  finish(int *I, int &top)
-        {
-            for(int i=0;i<256;++i)
-            {
-                if(I[i]<0)
-                {
-                    if(top>255) throw exception("-- finish FAILURE --");
-                    I[i] = top++;
-                }
-            }
-        }
-#endif
-
-        void Pearson:: fill_I(int *I, list_t &L, const void *data, const size_t size, const uint8_t H)
-        {
-            assert(!(data==NULL&&size>0));
-            const uint8_t *C = (const uint8_t *)data;
-            --C;
-
-            node_t *node = L.head;
-            for(size_t k=0;k<L.size;++k)
-            {
-                // trial
-                int J[256];
-                memcpy(J, I, sizeof(J) );
-
-                uint8_t h = H;
-                for(size_t q=size;q>0;--q)
-                {
-                    if(J[h]<=0)
-                    {
-
-                    }
-
-                }
-            }
-
-
-
-        }
-
-
-
         void Pearson:: build_from(int *I)
         {
             reset();
@@ -162,6 +103,80 @@ namespace yocto
             }
             fflush(stderr);
         }
-        
+#endif
+
+        static int compareWords( const Pearson::Word *lhs, const Pearson::Word *rhs, void * )
+        {
+
+            const size_t lmin = min_of(lhs->size,rhs->size);
+            const Pearson::Code *L = lhs->head;
+            const Pearson::Code *R = rhs->head;
+
+            for(size_t i=0;i<lmin;++i,L=L->next,R=R->next)
+            {
+                if(L->data<R->data)
+                {
+                    return -1;
+                }
+                else
+                {
+                    if(R->data<L->data)
+                    {
+                        return 1;
+                    }
+                    // else continue
+                }
+            }
+
+
+            if(L)
+            {
+                assert(NULL==R);
+                // L is longer
+                return 1;
+            }
+            else
+            {
+                if(R)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+
+        }
+
+        void Pearson:: build( Words &words )
+        {
+            int I[256];
+            for(size_t i=0;i<256;++i) I[i] = -1;
+
+            const size_t nw = words.size;
+            if(nw>255) throw exception("too many words...");
+            std::cerr << "Building " << nw << " words" << std::endl;
+            // init H
+            {
+                unsigned H = 0;
+                for(Word *word = words.head;word;word=word->next)
+                {
+                    word->H = H++;
+                    std::cerr << "Word #" << H << " : '" << *word << "'" << std::endl;
+                }
+            }
+
+            //lexi sort
+            core::merging<Word>::sort(words, compareWords, 0);
+
+            std::cerr << "processing..." << std::endl;
+            for(Word *word = words.head;word;word=word->next)
+            {
+                std::cerr << "'" << *word << "' => " << int(word->H) << std::endl;
+            }
+            
+            
+        }
     }
 }

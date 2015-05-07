@@ -12,29 +12,33 @@ YOCTO_UNIT_TEST_IMPL(pearson)
 {
     hashing::Pearson P;
 
-    if(argc>1)
-    {
+
         vector<string> words;
         {
-            const string   filename = argv[1];
-            ios::icstream  fp(filename);
+            ios::icstream  fp(ios::cstdin);
             string        line;
             while( line.clear(), fp.read_line(line)>=0) words.push_back(line);
             std::cerr << "words=" << words << std::endl;
         }
         const size_t nw = words.size();
 
+        hashing::Pearson::Words PWords;
+
         for(size_t i=1;i<=nw;++i)
         {
             const string &word = words[i];
             const int     hw   = P(word);
             std::cerr << "'" << word << "' => " << hw << std::endl;
+            PWords.push_back( new hashing::Pearson::Word(word) );
         }
+
+        P.build(PWords);
+
+        return 0;
 
         int I[256];
         for(size_t i=0;i<256;++i) I[i] = -1;
-        hashing::Pearson::list_t L;
-        L.initialize();
+
 
         std::cerr.flush();
         for(size_t i=0,k=0;i<16;++i)
@@ -47,18 +51,9 @@ YOCTO_UNIT_TEST_IMPL(pearson)
         }
         fflush(stderr);
 
-        P.build_from(I);
-
-        for(size_t i=1;i<=min_of<size_t>(1,nw);++i)
-        {
-            const string &word = words[i];
-            const int     hw   = P(word);
-            std::cerr << "'" << word << "' => " << hw << std::endl;
-        }
 
 
-    }
-    
+
     
 }
 YOCTO_UNIT_TEST_DONE()
