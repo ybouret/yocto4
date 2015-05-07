@@ -264,6 +264,20 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(clist_of);
         };
         
+        
+        template <typename NODE>
+        class clist_of_cpp : public clist_of<NODE>
+        {
+        public:
+            explicit clist_of_cpp() throw() : clist_of<NODE>() {}
+            virtual ~clist_of_cpp() throw() { clear(); }
+            
+            inline void clear() throw() { this->auto_delete(); }
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(clist_of_cpp);
+        };
+        
     }
     
 }
