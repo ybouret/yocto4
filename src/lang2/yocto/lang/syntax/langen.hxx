@@ -7,6 +7,7 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/ptr/intr.hpp"
 #include "yocto/associative/set.hpp"
+#include "yocto/hashing/perfect.hpp"
 
 namespace yocto
 {
@@ -29,7 +30,8 @@ namespace yocto
                 rule_set          rules;
                 term_set          rxp;
                 term_set          raw;
-
+                hashing::perfect  cmph; //!< collect hasher
+                
                 LanGen( const xnode *node );
                 ~LanGen() throw();
 

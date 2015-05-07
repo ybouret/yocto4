@@ -15,12 +15,21 @@ namespace yocto
             LanGen:: ~LanGen() throw() {}
 
 
+
+            static const char *ckw[] =
+            {
+                "ID",    // 0
+                "RXP",   // 1
+                "RAW"    // 2
+            };
+
             LanGen:: LanGen(const xnode *node ) :
             root(node),
             P(0),
             rules(),
             rxp(),
-            raw()
+            raw(),
+            cmph( ckw, sizeof(ckw)/sizeof(ckw[0]) )
             {
                 assert(root!=NULL);
                 P.reset( new parser("dummy","main") );
@@ -36,53 +45,66 @@ namespace yocto
             {
                 if(node->terminal)
                 {
-                    //__________________________________________________________
-                    //
-                    // a non terminal rule
-                    //__________________________________________________________
-                    if(node->label=="ID")
-                    {
-                        const string r_id = node->lex().to_string();
-                        if(!rules.search(r_id))
-                        {
-                            aggregate     *p = new aggregate(r_id);
-                            const rule_ptr q( p );
-                            if(!rules.insert(q))
-                                throw exception("unexpected RULE '%s' insertion failure!", r_id.c_str());
 
-                            // make the new rule
-                            P->append(p);
-                            p->withhold();
-                        }
-                        return;
-                    }
-
-                    //__________________________________________________________
-                    //
-                    // a terminal regexp
-                    //__________________________________________________________
-                    if(node->label=="RXP" )
+                    switch( cmph(node->label) )
                     {
-                        const string t_id = node->lex().to_string();
-                        if(!rxp.search(t_id))
-                        {
-                            terminal      *p = new terminal(t_id,standard);
-                            const term_ptr q( p );
-                            if(!rxp.insert(q))
+                        case 0: {
+                            assert("ID"==node->label);
+                            //__________________________________________________
+                            //
+                            // a non terminal rule
+                            //__________________________________________________
+                            const string r_id = node->lex().to_string();
+                            if(!rules.search(r_id))
                             {
-                                if(!rxp.insert(q))
-                                    throw exception("unexpected RegExp TERM '%s' insertion failure!", t_id.c_str());
+                                aggregate     *p = new aggregate(r_id);
+                                const rule_ptr q( p );
+                                if(!rules.insert(q))
+                                    throw exception("unexpected RULE '%s' insertion failure!", r_id.c_str());
 
+                                // make the new rule
+                                P->append(p);
+                                p->withhold();
+                            }
+                        } break;
+
+                        case 1 : {
+                            assert("RXP"==node->label);
+                            //__________________________________________________
+                            //
+                            // a terminal regexp
+                            //__________________________________________________
+                            const string t_id = node->lex().to_string();
+                            if(!rxp.search(t_id))
+                            {
+                                terminal      *p = new terminal(t_id,standard);
+                                const term_ptr q( p );
+                                if(!rxp.insert(q))
+                                {
+                                    if(!rxp.insert(q))
+                                        throw exception("unexpected RegExp TERM '%s' insertion failure!", t_id.c_str());
+
+                                }
+
+                                // make the terminal from regexp
+                                const char *id = p->label.c_str();
+                                P->scanner.emit(id,id);
+                                P->append( p );
+                                p->withhold();
                             }
 
-                            // make the terminal from regexp
-                            const char *id = p->label.c_str();
-                            P->scanner.emit(id,id);
-                            P->append( p );
-                            p->withhold();
-                        }
-                        return;
+                        } break;
+
+
+                        case 2 : {
+                            assert("RAW" == node->label );
+                            
+                        } break;
+
+                        default:
+                            std::cerr << "unregistered " << node->label << " content='" << node->lex() << "'" << std::endl;
                     }
+
 
                     //__________________________________________________________
                     //
@@ -183,13 +205,13 @@ namespace yocto
             {
                 assert(parent);
                 assert(sub);
-                
+
             }
-            
+
         }
-        
+
     }
-    
+
 }
 namespace yocto
 {
@@ -216,25 +238,25 @@ namespace yocto
                 assert("RXP"==child->label);
                 const string id = child->content();
                 term_ptr    *pp = rxp.search(id);
-
+                
                 if(!pp) throw exception("unexpected failure to RegExp TERM '%s'", id.c_str());
-
+                
                 return **pp;
             }
-
+            
             rule & LanGen:: get_raw(const xnode *child)
             {
                 assert(child);
                 assert("RAW"==child->label);
                 const string id = child->content();
                 term_ptr    *pp = raw.search(id);
-
+                
                 if(!pp) throw exception("unexpected failure to Raw TERM '%s'", id.c_str());
-
+                
                 return **pp;
             }
-
-
+            
+            
         }
     }
 }
