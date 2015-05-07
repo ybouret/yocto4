@@ -66,6 +66,7 @@ namespace yocto
 #include "yocto/sort/quick.hpp"
 #include "yocto/sort/merge.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/ordered/sorted-vector.hpp"
 
 #include <iostream>
 
@@ -103,51 +104,57 @@ namespace yocto
                 for(Word *word = words.head;word;word=word->next)
                 {
                     word->H = H++;
+                    word->h = 0;
                     std::cerr << "Word #" << H << " : '" << *word << "'" << std::endl;
                 }
             }
 
+#if 1
             //length
             core::merging<Word>::sort(words, compareWords, 0);
-
+#endif
             std::cerr << "processing..." << std::endl;
             for(Word *word = words.head;word;word=word->next)
             {
                 std::cerr << "'" << *word << "' => " << int(word->H) << std::endl;
             }
 
+            sorted_vector<uint8_t> codes;
+
             unsigned top = nw;
             unsigned rnd = 0;
             while(words.size)
             {
                 ++rnd;
-                std::cerr << "Round #" << rnd << std::endl;
                 Words stk;
+
+                std::cerr << "Round #" << rnd << std::endl;
+                codes.free();
+
                 while(words.size)
                 {
                     Word *w = words.pop_front(); assert(w->size>0);
-                    std::cerr << "\tprocessing " << *w << std::endl;
-                    const uint8_t j = w->h ^ w->head->data;
+                    stk.push_back(w);
+                    const size_t j = w->head->data ^ w->h;
                     if(1==w->size)
                     {
-                        const uint8_t H = w->H;
-                        delete        w;
-                        if(J[j]>=0 && J[j] != H) throw exception("Level-1 failure");
-                        J[j] = H;
+                        std::cerr << "Assigning Final H=" << int(w->H) << std::endl;
+                        if(J[j]<0) J[j] = w->H;
+                        if(J[j]>=0&&J[j]!=w->H)
+                        {
+                            throw exception("Level 1 FAILURE");
+                        }
+                        delete stk.pop_back();
                     }
                     else
                     {
-                        stk.push_back(w);
-                        if(J[j]<0)
-                        {
-                            if(top>255) throw exception("Level-2 failure");
-                        }
-                        J[j] = top++;
-                        w->h = J[j];
+                        w->h = j;
                         delete w->pop_front();
                     }
                 }
-                
+
+                //std::cerr << "codes=" << codes << std::endl;
+                //break;
                 words.swap_with(stk);
             }
             
