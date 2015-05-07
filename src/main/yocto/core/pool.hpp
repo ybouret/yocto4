@@ -62,8 +62,8 @@ namespace yocto
 				assert( proc );
 				while(size>0) proc( query() );
 			}
-			
-			
+
+
 			template <typename ARGS>
 			inline void delete_with( void (*proc)( NODE *, ARGS), ARGS args ) throw()
 			{
@@ -86,7 +86,23 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(pool_of);
 		};
 		
-		
+
+        template <typename NODE>
+        class pool_of_cpp : public pool_of<NODE>
+        {
+        public:
+            explicit pool_of_cpp() throw() : pool_of<NODE>() {}
+            virtual ~pool_of_cpp() throw() { clear(); }
+
+            inline void clear() throw()
+            {
+                while(this->size>0) delete this->query();
+            }
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(pool_of_cpp);
+        };
+
 	}
 	
 }

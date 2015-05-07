@@ -9,6 +9,8 @@
 #include "yocto/sort/merge.hpp"
 #include "yocto/comparator.hpp"
 
+#include "yocto/hashing/perfect.hpp"
+
 using namespace yocto;
 
 namespace
@@ -197,6 +199,7 @@ YOCTO_UNIT_TEST_IMPL(phash)
     }
     std::cerr << "words=" << words  << std::endl;
 
+#if 0
     Tree tree;
     for(size_t i=1;i<=words.size();++i)
     {
@@ -210,8 +213,37 @@ YOCTO_UNIT_TEST_IMPL(phash)
         std::cerr << "Hash(" << words[i] <<")=" << tree.Hash(words[i]) << std::endl;
     }
 
-    string s = "dummy";
     std::cerr << "Hash(" << s << ")=" << tree.Hash(s) << std::endl;
+#endif
+    string s = "dummy";
 
+    hashing::perfect mph;
+    for(size_t i=1;i<=words.size();++i)
+    {
+        mph.insert(words[i],i-1);
+    }
+    mph.optimize();
+    std::cerr << std::endl;
+    std::cerr << "\t\t #mph nodes=" << mph.nodes << std::endl;
+    std::cerr << "\t\t sizeof(mph node)=" << sizeof(hashing::perfect::node_type) << std::endl;
+    for(size_t i=1;i<=words.size();++i)
+    {
+        std::cerr << "mph(" << words[i] <<")=" << mph(words[i]) << std::endl;
+    }
+    std::cerr << "mph(" << s << ")=" << mph(s) << std::endl;
+
+    mph.graphviz("htree.dot");
+    (void) system("dot -Tpng -o htree.png htree.dot");
+    
+    
+    const char *other[] =
+    {
+        "for",
+        "while",
+        "toto"
+    };
+    
+    const hashing::perfect kw(other,sizeof(other)/sizeof(other[0]));
+    
 }
 YOCTO_UNIT_TEST_DONE()
