@@ -83,75 +83,10 @@ namespace yocto
         }
 
 
-#if 0
-        void Pearson:: build_from(int *I)
-        {
-            reset();
-            lw_array<int>     a(I,256);
-            lw_array<uint8_t> b(table,256);
-            co_qsort(a,b);
-
-            std::cerr << "table=" << std::endl;
-            std::cerr.flush();
-            for(size_t i=0,k=0;i<16;++i)
-            {
-                for(size_t j=0;j<16;++j)
-                {
-                    fprintf(stderr,"%3d ", int(table[k++]));
-                }
-                fprintf(stderr, "\n");
-            }
-            fflush(stderr);
-        }
-#endif
 
         static int compareWords( const Pearson::Word *lhs, const Pearson::Word *rhs, void * )
         {
-
-            const size_t lmin = min_of(lhs->size,rhs->size);
-            const Pearson::Code *L = lhs->head;
-            const Pearson::Code *R = rhs->head;
-
-            for(size_t i=0;i<lmin;++i,L=L->next,R=R->next)
-            {
-                if(L->data<R->data)
-                {
-                    return -1;
-                }
-                else
-                {
-                    if(R->data<L->data)
-                    {
-                        return 1;
-                    }
-                    // else continue
-                }
-            }
-
-
-            if(L)
-            {
-                assert(NULL==R);
-                // L is longer
-                return 1;
-            }
-            else
-            {
-                if(R)
-                {
-                    return -1;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-
-        }
-
-        namespace
-        {
-
+            return __compare<size_t>(lhs->size,rhs->size);
         }
 
         void Pearson:: build( Words &words )
@@ -172,8 +107,7 @@ namespace yocto
                 }
             }
 
-#if 0
-            //lexi sort
+            //length
             core::merging<Word>::sort(words, compareWords, 0);
 
             std::cerr << "processing..." << std::endl;
@@ -181,7 +115,6 @@ namespace yocto
             {
                 std::cerr << "'" << *word << "' => " << int(word->H) << std::endl;
             }
-#endif
 
             unsigned top = nw;
             unsigned rnd = 0;
@@ -199,7 +132,7 @@ namespace yocto
                     {
                         const uint8_t H = w->H;
                         delete        w;
-                        if(J[j]>=0) throw exception("Level-1 failure");
+                        if(J[j]>=0 && J[j] != H) throw exception("Level-1 failure");
                         J[j] = H;
                     }
                     else
@@ -211,6 +144,7 @@ namespace yocto
                         }
                         J[j] = top++;
                         w->h = J[j];
+                        delete w->pop_front();
                     }
                 }
                 
