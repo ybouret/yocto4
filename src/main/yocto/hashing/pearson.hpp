@@ -48,9 +48,10 @@ namespace yocto
             public:
                 Word   *next;
                 Word   *prev;
-                uint8_t H;
+                uint8_t h; // current value
+                uint8_t H; // final value
 
-                Word( const void *buffer, const size_t buflen ) : next(0), prev(0), H(0)
+                Word( const void *buffer, const size_t buflen ) : next(0), prev(0), h(0), H(0)
                 {
                     store(buffer,buflen);
                 }

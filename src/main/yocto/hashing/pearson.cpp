@@ -149,10 +149,15 @@ namespace yocto
 
         }
 
+        namespace
+        {
+
+        }
+
         void Pearson:: build( Words &words )
         {
-            int I[256];
-            for(size_t i=0;i<256;++i) I[i] = -1;
+            int J[256];
+            for(size_t i=0;i<256;++i) J[i] = -1;
 
             const size_t nw = words.size;
             if(nw>255) throw exception("too many words...");
@@ -167,6 +172,7 @@ namespace yocto
                 }
             }
 
+#if 0
             //lexi sort
             core::merging<Word>::sort(words, compareWords, 0);
 
@@ -175,7 +181,41 @@ namespace yocto
             {
                 std::cerr << "'" << *word << "' => " << int(word->H) << std::endl;
             }
-            
+#endif
+
+            unsigned top = nw;
+            unsigned rnd = 0;
+            while(words.size)
+            {
+                ++rnd;
+                std::cerr << "Round #" << rnd << std::endl;
+                Words stk;
+                while(words.size)
+                {
+                    Word *w = words.pop_front(); assert(w->size>0);
+                    std::cerr << "\tprocessing " << *w << std::endl;
+                    const uint8_t j = w->h ^ w->head->data;
+                    if(1==w->size)
+                    {
+                        const uint8_t H = w->H;
+                        delete        w;
+                        if(J[j]>=0) throw exception("Level-1 failure");
+                        J[j] = H;
+                    }
+                    else
+                    {
+                        stk.push_back(w);
+                        if(J[j]<0)
+                        {
+                            if(top>255) throw exception("Level-2 failure");
+                        }
+                        J[j] = top++;
+                        w->h = J[j];
+                    }
+                }
+                
+                words.swap_with(stk);
+            }
             
         }
     }
