@@ -61,6 +61,7 @@ namespace yocto
             const size_t nodes;
         };
 
+#define YOCTO_PERFECT_HASHER_OF(WORDS) hashing::perfect(WORDS,sizeof(WORDS)/sizeof(WORDS[0]))
     }
 }
 
