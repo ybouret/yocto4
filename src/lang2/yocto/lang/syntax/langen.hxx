@@ -31,6 +31,7 @@ namespace yocto
                 term_set          rxp;
                 term_set          raw;
                 hashing::perfect  cmph; //!< collect hasher
+                hashing::perfect  rmph; //!< growing rules hasher
                 
                 LanGen( const xnode *node );
                 ~LanGen() throw();

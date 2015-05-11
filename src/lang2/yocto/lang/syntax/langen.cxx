@@ -16,11 +16,18 @@ namespace yocto
 
 
 
-            static const char *ckw[] =
+            static const char *collect_keywords[] =
             {
                 "ID",    // 0
                 "RXP",   // 1
                 "RAW"    // 2
+            };
+
+
+            static const char *grow_rule_keywords[] =
+            {
+                "SUB",
+                "ITEM"
             };
 
             LanGen:: LanGen(const xnode *node ) :
@@ -29,18 +36,29 @@ namespace yocto
             rules(),
             rxp(),
             raw(),
-            cmph( ckw, sizeof(ckw)/sizeof(ckw[0]) )
+            cmph( YOCTO_PERFECT_HASHER_FOR(collect_keywords)   ),
+            rmph( YOCTO_PERFECT_HASHER_FOR(grow_rule_keywords) )
             {
                 assert(root!=NULL);
+
+                std::cerr << "Collect MPH #nodes=" << cmph.nodes << std::endl;
+                std::cerr << "Growing MPH #nodes=" << rmph.nodes << std::endl;
+
                 P.reset( new parser("dummy","main") );
                 collect(root);
                 find_rules_from(root);
+
 
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
             }
 
+            //__________________________________________________________________
+            //
+            //
             // in order collection
+            //
+            //__________________________________________________________________
             void LanGen:: collect(const xnode *node)
             {
                 if(node->terminal)
@@ -151,6 +169,12 @@ namespace yocto
         namespace syntax
         {
 
+            //__________________________________________________________________
+            //
+            //
+            // Scan the tree for named rules
+            //
+            //__________________________________________________________________
             void LanGen:: find_rules_from(const xnode *node)
             {
                 if(node->terminal)
@@ -158,7 +182,7 @@ namespace yocto
 
                 if("RULE"==node->label)
                 {
-                    build_rule_from(node);
+                    build_rule_from(node); // then return
                 }
                 else
                 {
@@ -170,6 +194,12 @@ namespace yocto
             }
 
 
+            //__________________________________________________________________
+            //
+            //
+            // build one named rule
+            //
+            //__________________________________________________________________
             void LanGen :: build_rule_from(const xnode *node)
             {
                 //______________________________________________________________
@@ -192,11 +222,68 @@ namespace yocto
                 grow_rule(parent,child->next);
             }
 
-            void LanGen:: grow_rule( logical *parent, const xnode *sub)
+
+            //__________________________________________________________________
+            //
+            //
+            // build one named rule
+            //
+            //__________________________________________________________________
+            void LanGen:: grow_rule( logical *parent, const xnode *node)
             {
                 assert(parent);
-                assert(sub);
+                assert(node);
+                std::cerr << "\t\t\tgrow_rule '" << node->label << "'" << std::endl;
 
+                if("SUB"==node->label)
+                {
+                    const xnode::leaves &subs = node->children();assert(subs.size>0);
+                    const xnode         *sub  = subs.head;
+
+
+                    if( "ALT" == sub->label)
+                    {
+                        std::cerr << "\t\t\t -- new alternation" << std::endl;
+                        logical &child = P->alt();
+                        for(;sub;sub=sub->next)
+                        {
+                            assert("ALT"==sub->label);
+                            grow_rule(&child,sub);
+                        }
+                        parent->append(child);
+                    }
+                    else
+                    {
+                        std::cerr << "\t\t\t -- new aggregation" << std::endl;
+                        for(;sub;sub=sub->next)
+                        {
+                            grow_rule(parent,sub);
+                        }
+                    }
+
+                }
+                else
+                {
+                    std::cerr << "\t\t\t -- new " << node->label << std::endl;
+
+                    if( "RXP" == node->label)
+                    {
+                        parent->append( get_rxp(node) );
+                        return;
+                    }
+
+                    if( "RAW" == node->label )
+                    {
+                        parent->append( get_raw(node) );
+                        return;
+                    }
+
+                    if( "ID" == node->label )
+                    {
+                        parent->append( get_std(node) );
+                        return;
+                    }
+                }
             }
 
         }
