@@ -10,6 +10,7 @@
 #include "yocto/comparator.hpp"
 
 #include "yocto/hashing/perfect.hpp"
+#include <cstdlib>
 
 using namespace yocto;
 
