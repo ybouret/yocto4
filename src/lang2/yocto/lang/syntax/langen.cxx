@@ -26,8 +26,11 @@ namespace yocto
 
             static const char *grow_rule_keywords[] =
             {
-                "SUB",
-                "ITEM"
+                "SUB", //0
+                "ALT", //1
+                "RXP", //2
+                "RAW", //3
+                "ITEM" //4
             };
 
             LanGen:: LanGen(const xnode *node ) :
