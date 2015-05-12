@@ -48,6 +48,7 @@ namespace yocto
                 rule    &get_raw(const xnode *node);
 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(LanGen);
+                unsigned indx;
             };
         }
     }

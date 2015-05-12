@@ -37,7 +37,8 @@ namespace yocto
             rxp(),
             raw(),
             cmph( YOCTO_PERFECT_HASHER_FOR(collect_keywords)   ),
-            rmph( YOCTO_PERFECT_HASHER_FOR(grow_rule_keywords) )
+            rmph( YOCTO_PERFECT_HASHER_FOR(grow_rule_keywords) ),
+            indx(0)
             {
                 assert(root!=NULL);
 
@@ -218,7 +219,7 @@ namespace yocto
                 // grow from top level
                 //______________________________________________________________
                 logical *parent = & get_std(child);
-                std::cerr << "\t\tBuilding Rule " << parent->label << std::endl;
+                std::cerr << "\t\tBuilding Rule for " << parent->label << std::endl;
                 grow_rule(parent,child->next);
             }
 
@@ -260,9 +261,22 @@ namespace yocto
                             grow_rule(parent,sub);
                         }
                     }
-
+                    return;
                 }
-                else
+                
+                if("ALT"==node->label)
+                {
+                    const string agg_label =  vformat("@sub#%u",++indx);
+                    logical &r = P->agg(agg_label);
+                    parent->append(r);
+                    for(const xnode *ch = node->children().head;ch;ch=ch->next)
+                    {
+                        grow_rule(&r,ch);
+                    }
+                    return;
+                }
+                
+                
                 {
                     std::cerr << "\t\t\t -- new " << node->label << std::endl;
 
@@ -282,6 +296,18 @@ namespace yocto
                     {
                         parent->append( get_std(node) );
                         return;
+                    }
+                    
+                    if("ITEM" == node->label)
+                    {
+                        assert(2==node->children().size);
+                        const string itm_label =  vformat("@sub#%u",++indx);
+                        logical &r = P->agg(itm_label);
+                        grow_rule(&r,node->children().head);
+                        
+                        //const string &kind = node->children().label;
+                        
+                        
                     }
                 }
             }
