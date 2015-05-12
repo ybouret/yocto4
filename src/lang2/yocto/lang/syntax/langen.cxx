@@ -305,9 +305,28 @@ namespace yocto
                         logical &r = P->agg(itm_label);
                         grow_rule(&r,node->children().head);
                         
-                        //const string &kind = node->children().label;
+                        const string &kind = node->children().tail->label;
+                        std::cerr << "ITEM kind=" << kind << std::endl;
+
+                        if(kind=="+")
+                        {
+                            parent->append( P->one_or_more(r) );
+                            return;
+                        }
+
+                        if(kind=="?")
+                        {
+                            parent->append( P->opt(r) );
+                            return;
+                        }
+
+                        if(kind=="*")
+                        {
+                            parent->append( P->zero_or_more(r) );
+                        }
+
                         
-                        
+
                     }
                 }
             }
