@@ -32,7 +32,7 @@ namespace yocto
 
             Rule &LPAREN    = term("(","\\(",syntax::jettison);
             Rule &RPAREN    = term(")","\\)",syntax::jettison);
-            Rule &ALTERNATE = term("|","\\|",syntax::jettison);
+            Rule &ALTERN    = term("|","\\|",syntax::jettison);
 
 
             //__________________________________________________________________
@@ -59,7 +59,7 @@ namespace yocto
 
                 Rule &ITEMS = one_or_more(ITEM);
                 Agg  &ALT   = agg("ALT");
-                ALT << ALTERNATE << ITEMS;
+                ALT << ALTERN << ITEMS;
 
                 Agg  &SUB  = agg("SUB");
                 SUB << ITEMS << zero_or_more(ALT);
