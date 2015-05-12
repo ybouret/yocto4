@@ -30,7 +30,8 @@ namespace yocto
                 "ALT", //1
                 "RXP", //2
                 "RAW", //3
-                "ITEM" //4
+                "ID",  //4
+                "ITEM" //5
             };
 
             LanGen:: LanGen(const xnode *node ) :
@@ -239,75 +240,96 @@ namespace yocto
                 assert(node);
                 std::cerr << "\t\t\tgrow_rule '" << node->label << "'" << std::endl;
 
-                if("SUB"==node->label)
+
+                switch( rmph(node->label) )
                 {
-                    const xnode::leaves &subs = node->children();assert(subs.size>0);
-                    const xnode         *sub  = subs.head;
+                    case 0: {
+                        assert("SUB"==node->label);
+                        //______________________________________________________
+                        //
+                        // a new SUB node
+                        //______________________________________________________
+                        const xnode::leaves &subs = node->children();assert(subs.size>0);
+                        const xnode         *sub  = subs.head;
 
 
-                    if( "ALT" == sub->label)
-                    {
-                        std::cerr << "\t\t\t -- new alternation" << std::endl;
-                        logical &child = P->alt();
-                        for(;sub;sub=sub->next)
+                        if( "ALT" == sub->label)
                         {
-                            assert("ALT"==sub->label);
-                            grow_rule(&child,sub);
+                            std::cerr << "\t\t\t -- new alternation" << std::endl;
+                            logical &child = P->alt();
+                            for(;sub;sub=sub->next)
+                            {
+                                assert("ALT"==sub->label);
+                                grow_rule(&child,sub);
+                            }
+                            parent->append(child);
                         }
-                        parent->append(child);
-                    }
-                    else
-                    {
-                        std::cerr << "\t\t\t -- new aggregation" << std::endl;
-                        for(;sub;sub=sub->next)
+                        else
                         {
-                            grow_rule(parent,sub);
+                            std::cerr << "\t\t\t -- new aggregation" << std::endl;
+                            for(;sub;sub=sub->next)
+                            {
+                                grow_rule(parent,sub);
+                            }
                         }
-                    }
-                    return;
-                }
-                
-                if("ALT"==node->label)
-                {
-                    const string agg_label =  vformat("@sub#%u",++indx);
-                    logical &r = P->agg(agg_label);
-                    parent->append(r);
-                    for(const xnode *ch = node->children().head;ch;ch=ch->next)
-                    {
-                        grow_rule(&r,ch);
-                    }
-                    return;
-                }
-                
-                
-                {
-                    std::cerr << "\t\t\t -- new " << node->label << std::endl;
 
-                    if( "RXP" == node->label)
-                    {
+                    } break;
+
+                    case 1: {
+                        assert("ALT"==node->label);
+                        //______________________________________________________
+                        //
+                        // a new ALT node
+                        //______________________________________________________
+                        const string agg_label =  vformat("@sub#%u",++indx);
+                        logical &r = P->agg(agg_label);
+                        parent->append(r);
+                        for(const xnode *ch = node->children().head;ch;ch=ch->next)
+                        {
+                            grow_rule(&r,ch);
+                        }
+
+                    } break;
+
+                    case 2: {
+                        assert("RXP"==node->label);
+                        //______________________________________________________
+                        //
+                        // a new RXP node
+                        //______________________________________________________
                         parent->append( get_rxp(node) );
-                        return;
-                    }
+                    } break;
 
-                    if( "RAW" == node->label )
-                    {
+                    case 3: {
+                        assert("RAW"==node->label);
+                        //______________________________________________________
+                        //
+                        // a new RAW node
+                        //______________________________________________________
                         parent->append( get_raw(node) );
-                        return;
-                    }
+                    } break;
 
-                    if( "ID" == node->label )
-                    {
+
+                    case 4: {
+                        assert("ID"==node->label);
+                        //______________________________________________________
+                        //
+                        // a new ID node
+                        //______________________________________________________
                         parent->append( get_std(node) );
-                        return;
-                    }
-                    
-                    if("ITEM" == node->label)
-                    {
+                    } break;
+
+                    case 5: {
+                        assert("ITEM"==node->label);
+                        //______________________________________________________
+                        //
+                        // a new ITEM node
+                        //______________________________________________________
                         assert(2==node->children().size);
                         const string itm_label =  vformat("@sub#%u",++indx);
                         logical &r = P->agg(itm_label);
                         grow_rule(&r,node->children().head);
-                        
+
                         const string &kind = node->children().tail->label;
                         std::cerr << "ITEM kind=" << kind << std::endl;
 
@@ -328,10 +350,15 @@ namespace yocto
                             parent->append( P->zero_or_more(r) );
                         }
 
-                        
+                        throw exception("Invaluid kind='%s'", kind.c_str());
 
-                    }
+                    } break;
+
+                    default:
+                        ;
                 }
+
+
             }
 
         }
@@ -352,12 +379,12 @@ namespace yocto
                 assert("ID"==child->label);
                 const string id = child->content();
                 rule_ptr    *pp = rules.search(id);
-
+                
                 if(!pp) throw exception("unexpected failure to get RULE '%s'", id.c_str());
-
+                
                 return **pp;
             }
-
+            
             rule & LanGen:: get_rxp(const xnode *child)
             {
                 assert(child);
