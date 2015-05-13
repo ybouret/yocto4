@@ -32,6 +32,7 @@ namespace yocto
                 term_set          raw;
                 hashing::perfect  cmph; //!< collect hasher
                 hashing::perfect  rmph; //!< growing rules hasher
+                hashing::perfect  jmph; //!< for kind of joker
                 
                 LanGen( const xnode *node );
                 ~LanGen() throw();
@@ -49,6 +50,10 @@ namespace yocto
 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(LanGen);
                 unsigned indx;
+
+                void grow_sub( logical *parent, const xnode *node);
+                void grow_alt( logical *parent, const xnode *node);
+                void grow_itm( logical *parent, const xnode *node);
             };
         }
     }

@@ -32,12 +32,12 @@ namespace yocto
             bool aggregate:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
             {
 
-                if(operands.size<=0)
+                if(size<=0)
                     throw exception("aggregate '%s' has no operand", label.c_str());
 
                 auto_ptr<xnode> agg( xnode::leaf(*this,modifier) );
 
-                for(const operand *node=operands.head;node;node=node->next)
+                for(const operand *node=head;node;node=node->next)
                 {
                     const rule &r   = *(node->addr);
                     xnode      *sub = 0;
@@ -65,7 +65,7 @@ namespace yocto
 
             void aggregate:: lnk( ios::ostream &fp ) const
             {
-                for(const operand *node=operands.head;node;node=node->next)
+                for(const operand *node=head;node;node=node->next)
                 {
                     fp.viz( (const rule*)this ); fp << " -> "; fp.viz(node->addr); fp << ";\n";
                 }

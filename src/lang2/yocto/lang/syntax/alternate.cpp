@@ -35,10 +35,10 @@ namespace yocto
             bool alternate:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
             {
 
-                if(operands.size<=0)
+                if(size<=0)
                     throw exception("alternate '%s' has no operand", label.c_str());
 
-                for(const operand *node=operands.head;node;node=node->next)
+                for(const operand *node=head;node;node=node->next)
                 {
                     xnode *sub = 0;
                     if( node->addr->accept(sub, lxr, src, fp))
@@ -58,7 +58,7 @@ namespace yocto
 
             void alternate:: lnk( ios::ostream &fp ) const
             {
-                for(const operand *node=operands.head;node;node=node->next)
+                for(const operand *node=head;node;node=node->next)
                 {
                     fp.viz( (const rule*)this ); fp << " -> "; fp.viz(node->addr); fp << ";\n";
                 }
