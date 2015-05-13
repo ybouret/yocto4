@@ -28,7 +28,7 @@ namespace yocto
             bool optional:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
             {
                 xnode *sub = 0;
-                if(jk.accept(sub,lxr,src,fp))
+                if(jk->accept(sub,lxr,src,fp))
                 {
                     if(sub)
                     {
@@ -46,7 +46,7 @@ namespace yocto
 
             void optional:: lnk( ios::ostream &fp ) const
             {
-                fp.viz( (const rule*)this ); fp << " -> "; fp.viz(&jk); fp << ";\n";
+                fp.viz( (const rule*)this ); fp << " -> "; fp.viz(jk); fp << ";\n";
             }
 
 

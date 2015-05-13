@@ -285,6 +285,31 @@ namespace yocto
                 return rules.size;
             }
 
+            void grammar:: cleanup() throw()
+            {
+                r_list stk;
+                while(rules.size>0 )
+                {
+                    rule *r = rules.pop_front();
+                    if(r->uuid==aggregate::UUID)
+                    {
+                        operands *ops = (operands *)(r->content());
+                        if(ops->size<=0)
+                        {
+                            delete r;
+                        }
+                        else
+                        {
+                            stk.push_back(r);
+                        }
+                    }
+                    else
+                    {
+                        stk.push_back(r);
+                    }
+                }
+                stk.swap_with(rules);
+            }
 
         }
     }

@@ -13,14 +13,14 @@ namespace yocto
 
             joker:: joker(const string &id, rule &r, uint32_t uu) :
             rule(id,uu),
-            jk(r)
+            jk(&r)
             {
                 
             }
 
             void * joker:: content() throw()
             {
-                return (void*)&jk;
+                return (void*)jk;
             }
 
         }

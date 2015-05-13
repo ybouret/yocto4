@@ -18,9 +18,11 @@ namespace yocto
 
                 virtual void *content() throw(); //!< return &jk;
 
+
             protected:
                 explicit joker(const string &id, rule &r, uint32_t uu);
-                const rule &jk;
+                
+                const rule *jk;
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(joker);

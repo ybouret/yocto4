@@ -8,6 +8,7 @@
 #include "yocto/ptr/intr.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/hashing/perfect.hpp"
+#include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
 {
@@ -57,8 +58,10 @@ namespace yocto
                 void grow_alt( logical *parent, const xnode *node);
                 void grow_itm( logical *parent, const xnode *node);
 
-                void simplify(rule *r) throw();
-                
+                void simplify(rule *r);
+
+                typedef rule *rptr;
+                sorted_vector<rptr> simplified;
             };
         }
     }

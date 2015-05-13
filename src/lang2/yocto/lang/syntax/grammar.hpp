@@ -65,6 +65,8 @@ namespace yocto
 
                 size_t count() const throw();
 
+                void cleanup() throw(); //! remove empty aggregate
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 r_list rules;

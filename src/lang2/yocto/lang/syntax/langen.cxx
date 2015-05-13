@@ -62,11 +62,14 @@ namespace yocto
                 collect(root);
                 find_rules_from(root);
 
-                for( rule *r = & P->top_level();r;r=r->next)
-                {
-                    simplify( r );
-                }
 
+                P->gramviz("lanraw.dot");
+                (void) system("dot -Tpng -o lanraw.png lanraw.dot");
+
+                simplified.ensure( P->count() );
+                simplify(& P->top_level() );
+                P->cleanup();
+                
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
             }
@@ -443,16 +446,16 @@ namespace yocto
                         assert(-1==jmph(kind));
                         throw exception("%s: invalid modifier '%s'", P->grammar::name.c_str(), kind.c_str());
                 }
-                
-                
+
+
             }
-            
-            
-            
+
+
+
         }
-        
+
     }
-    
+
 }
 
 #include "yocto/lang/syntax/optional.hpp"
@@ -464,32 +467,89 @@ namespace yocto
     {
         namespace syntax
         {
-            
-            void LanGen:: simplify( rule *r ) throw()
+
+            static inline bool is_internal_sub( const string &label )
+            {
+                static const char   sub[] = "@sub#";
+                static const size_t len   = sizeof(sub)/sizeof(sub[0])-1;
+                if(label.size()>=len)
+                {
+                    for(size_t i=0;i<len;++i)
+                    {
+                        if( sub[i] != label[i] )
+                            return false;
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            void LanGen:: simplify( rule *r )
             {
                 assert(r);
                 std::cerr << "simplify "  << r->label << std::endl;
-                return;
+                if(simplified.search(r)) return;
+                if(!simplified.insert(r))
+                {
+                    throw exception("unexpected simplify failure");
+                }
+
                 switch (r->uuid)
                 {
                     case aggregate::UUID:
                     case alternate::UUID:
                     {
-                        operands *ops = (operands *)(r->content()); assert(ops);
+                        // simplify children
+                        operands *ops = (operands *)(r->content());
                         for( logical::operand *ch = ops->head; ch; ch=ch->next)
                         {
                             simplify(ch->addr);
                         }
-                    } break;
 
+                        // check internal sub children with 1 child
+                        operands stk;
+                        while(ops->size)
+                        {
+                            logical::operand *ch  = ops->pop_front();
+                            rule             *sub = ch->addr;
+                            if( is_internal_sub(sub->label) )
+                            {
+                                std::cerr << "\t\tINTERNAL " << sub->label << std::endl;
+                                operands *children = (operands *)(sub->content()); assert(children);
+                                if(1==children->size)
+                                {
+                                    std::cerr << "\t\tfusion!" << std::endl;
+                                    stk.push_back(children->pop_front());
+                                    delete ch;
+                                }
+                                else
+                                {
+                                    stk.push_back(ch);
+                                }
+                            }
+                            else
+                            {
+                                stk.push_back(ch);
+                            }
+                        }
+                        
+                        ops->swap_with(stk);
+                        
+                        
+                    }   break;
+                        
                     case optional::UUID:
                     case at_least::UUID:
-                        simplify( (rule *)(r->content() ) );
+                        simplify( (rule*)(r->content()) );
                         break;
-
+                        
+                        
                     default:
+                        
                         break;
                 }
+                
+                
             }
         }
         

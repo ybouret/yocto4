@@ -37,7 +37,7 @@ namespace yocto
                 for(;;)
                 {
                     xnode *sub = 0;
-                    if(! jk.accept(sub,lxr,src,fp) )
+                    if(! jk->accept(sub,lxr,src,fp) )
                     {
                         assert(0==sub);
                         break;
@@ -68,7 +68,7 @@ namespace yocto
 
             void at_least:: lnk( ios::ostream &fp ) const
             {
-                fp.viz( (const rule*)this ); fp << " -> "; fp.viz(&jk); fp << ";\n";
+                fp.viz( (const rule*)this ); fp << " -> "; fp.viz(jk); fp << ";\n";
             }
         }
 
