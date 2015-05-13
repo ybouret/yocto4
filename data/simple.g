@@ -6,6 +6,6 @@ HEX : "0x[:xdigit:]+";
 
 NUM : INT | HEX; 
 
-skip :  "[ \t]" ;
+skip [ @code  ]:  "[ \t]" ;
 endl :  "[:endl:]";
 

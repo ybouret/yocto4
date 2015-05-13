@@ -35,8 +35,8 @@ namespace yocto
             Rule &RPAREN    = term(")","\\)",syntax::jettison);
             Rule &ALTERN    = term("|","\\|",syntax::jettison);
 
-            //Rule &LBRACK    = term("[","\\[",syntax::jettison);
-            //Rule &RBRACK    = term("]","\\]",syntax::jettison);
+            Rule &LBRACK    = term("[","\\[",syntax::jettison);
+            Rule &RBRACK    = term("]","\\]",syntax::jettison);
 
             //__________________________________________________________________
             //
@@ -44,9 +44,13 @@ namespace yocto
             //__________________________________________________________________
             Agg  &RULE      = agg("RULE");
 
-            RULE
-            << ID
-            << COLON;
+            RULE << ID;
+            {
+                Agg &CODE = agg("USR",syntax::mergeOne);
+                CODE << LBRACK << term("CODE","@[:word:]+") << RBRACK;
+                RULE << opt(CODE);
+            }
+            RULE << COLON;
             {
                 Alt &ATOM = alt();
                 ATOM << ID;

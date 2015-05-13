@@ -253,7 +253,9 @@ namespace yocto
                 //______________________________________________________________
                 logical *parent = & get_std(child);
                 std::cerr << "\t\tBuilding Rule for " << parent->label << std::endl;
-                grow_rule(parent,child->next);
+                child = child->next;
+                
+                grow_rule(parent,child);
             }
 
 
