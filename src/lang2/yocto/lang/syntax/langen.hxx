@@ -34,38 +34,41 @@ namespace yocto
                 hashing::perfect  cmph; //!< collect hasher
                 hashing::perfect  rmph; //!< growing rules hasher
                 hashing::perfect  jmph; //!< for kind of joker
-                
+
                 LanGen( const xnode *node );
                 ~LanGen() throw();
 
-                
+
 
             private:
-                void collect(const xnode *node);
-                void find_rules_from(const xnode *node);
-                void build_rule_from(const xnode *node);
-
-                void grow_rule(logical *parent, const xnode *sub);
+                void     collect(const xnode *node);
+                void     find_rules_from(const xnode *node);
+                void     build_rule_from(const xnode *node);
+                void     compile_lexical(const xnode *node);
+                pattern *compile_lexical_pattern(const xnode *node);
+                void     grow_rule(logical *parent, const xnode *sub);
 
                 logical &get_std(const xnode *node);
                 rule    &get_rxp(const xnode *node);
                 rule    &get_raw(const xnode *node);
 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(LanGen);
-                unsigned indx;
+                const char *name;
+                unsigned    indx; //!< for internal rules
+                unsigned    jndx; //!< for lexical  rules
 
                 void grow_sub( logical *parent, const xnode *node);
                 void grow_alt( logical *parent, const xnode *node);
                 void grow_itm( logical *parent, const xnode *node);
 
                 void simplify(rule *r);
-
+                
                 typedef rule *rptr;
                 sorted_vector<rptr> simplified;
             };
         }
     }
-
+    
 }
 
 #endif

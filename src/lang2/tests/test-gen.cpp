@@ -24,11 +24,6 @@ YOCTO_UNIT_TEST_IMPL(gen)
     ios::icstream           fp( ios::cstdin );
     auto_ptr<syntax::xnode> tree( G.compile(fp) );
 
-    if(tree.is_valid())
-    {
-        tree->graphivz("xnode.dot");
-        (void) system("dot -Tpng -o xnode.png xnode.dot");
-    }
-
+   
 }
 YOCTO_UNIT_TEST_DONE()

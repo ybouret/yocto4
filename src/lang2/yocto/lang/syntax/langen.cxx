@@ -51,7 +51,10 @@ namespace yocto
             cmph( YOCTO_PERFECT_HASHER_FOR(collect_keywords)   ),
             rmph( YOCTO_PERFECT_HASHER_FOR(grow_rule_keywords) ),
             jmph( YOCTO_PERFECT_HASHER_FOR(joker_keywords)     ),
-            indx(0)
+            name(0),
+            indx(0),
+            jndx(0),
+            simplified()
             {
                 assert(root!=NULL);
 
@@ -59,6 +62,8 @@ namespace yocto
                 std::cerr << "Growing MPH #nodes=" << rmph.nodes << std::endl;
 
                 P.reset( new parser("dummy","main") );
+
+                name = P->grammar::name.c_str();
                 collect(root);
                 find_rules_from(root);
                 P->cleanup();
@@ -69,7 +74,7 @@ namespace yocto
                 simplified.ensure( P->count() );
                 simplify(& P->top_level() );
                 P->cleanup();
-                
+
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
             }
@@ -106,13 +111,15 @@ namespace yocto
                             //
                             // a non terminal rule
                             //__________________________________________________
-                            const string r_id = node->lex().to_string();
+                            const string r_id = node->content();
                             if(!rules.search(r_id))
                             {
+                                std::cerr << "New ID " << r_id << std::endl;
+
                                 aggregate     *p = new aggregate(r_id);
                                 const rule_ptr q( p );
                                 if(!rules.insert(q))
-                                    throw exception("unexpected RULE '%s' insertion failure!", r_id.c_str());
+                                    throw exception("%s: unexpected RULE '%s' insertion failure!",name,r_id.c_str());
 
                                 // make the new rule
                                 P->append(p);
@@ -126,7 +133,7 @@ namespace yocto
                             //
                             // a terminal regexp
                             //__________________________________________________
-                            const string t_id = node->lex().to_string();
+                            const string t_id = node->content();
                             if(!rxp.search(t_id))
                             {
                                 terminal      *p = new terminal(t_id,standard);
@@ -134,7 +141,7 @@ namespace yocto
                                 if(!rxp.insert(q))
                                 {
                                     if(!rxp.insert(q))
-                                        throw exception("unexpected RegExp TERM '%s' insertion failure!", t_id.c_str());
+                                        throw exception("%s: unexpected RegExp TERM '%s' insertion failure!",name,t_id.c_str());
 
                                 }
 
@@ -154,7 +161,7 @@ namespace yocto
                             //
                             // a terminal raw
                             //__________________________________________________
-                            const string t_id = node->lex().to_string();
+                            const string t_id = node->content();
                             if(!raw.search(t_id))
                             {
                                 terminal      *p = new terminal(t_id,standard);
@@ -162,7 +169,7 @@ namespace yocto
                                 if(!raw.insert(q))
                                 {
                                     if(!raw.insert(q))
-                                        throw exception("unexpected Raw TERM '%s' insertion failure!", t_id.c_str());
+                                        throw exception("%s: unexpected Raw TERM '%s' insertion failure!",name,t_id.c_str());
                                 }
 
                                 //make the terminal from raw
@@ -182,9 +189,16 @@ namespace yocto
                 }
                 else
                 {
-                    for(const xnode *child = node->children().head; child;child=child->next)
+                    if(node->label!="LXR")
                     {
-                        collect(child);
+                        for(const xnode *child = node->children().head; child;child=child->next)
+                        {
+                            collect(child);
+                        }
+                    }
+                    else
+                    {
+                        compile_lexical(node);
                     }
                 }
 
@@ -195,6 +209,66 @@ namespace yocto
     }
 }
 
+namespace yocto
+{
+    namespace lang
+    {
+        namespace syntax
+        {
+            void LanGen:: compile_lexical(const xnode *node)
+            {
+                assert("LXR"==node->label);
+                assert(2==node->children().size);
+
+                const string code = node->children().head->content();
+                std::cerr << "\tLEXICAL: " << code << std::endl;
+
+                auto_ptr<pattern> p( compile_lexical_pattern(node->children().tail) );
+
+                if(code=="@drop")
+                {
+                    const string code_id = code + vformat("/%u",++jndx);
+                    const lexical::action drop( & P->scanner, & lexical::scanner::discard);
+                    P->scanner.make(code_id, p.yield(), drop);
+                    return;
+                }
+
+                if(code=="@endl")
+                {
+                    const string code_id = code + vformat("/%u",++jndx);
+                    const lexical::action endl( & P->scanner, & lexical::scanner::newline);
+                    P->scanner.make(code_id, p.yield(), endl);
+                    return;
+                }
+
+
+                throw exception("%s: unregisterd code '%s'", name, code.c_str());
+            }
+
+            pattern *LanGen:: compile_lexical_pattern(const xnode *node)
+            {
+                if("RXP"==node->label)
+                {
+                    const string expr = node->content();
+                    std::cerr << "\t\tcompiling \"" << expr << "\"" << std::endl;
+                    return regexp(expr, & (P->dict) );
+                }
+
+                if("RAW"==node->label)
+                {
+                    const string expr = node->content();
+                    std::cerr << "\t\tcompiling '" << expr << "'" << std::endl;
+                    return lang::logical::equal(expr);
+                }
+
+                throw exception("%s: Unexpected Lexical Rule Failure",name);
+            }
+
+
+
+        }
+    }
+}
 
 namespace yocto
 {
@@ -247,6 +321,8 @@ namespace yocto
                 const xnode *child = children.head;
                 assert("ID"==child->label);
 
+
+
                 //______________________________________________________________
                 //
                 // grow from top level
@@ -254,7 +330,6 @@ namespace yocto
                 logical *parent = & get_std(child);
                 std::cerr << "\t\tBuilding Rule for " << parent->label << std::endl;
                 child = child->next;
-                
                 grow_rule(parent,child);
             }
 
@@ -308,7 +383,7 @@ namespace yocto
                     case 5: grow_itm(parent,node); break;
 
                     default: assert(-1==rmph(node->label));
-                        throw exception("%s: unexpected node '%s'", P->grammar::name.c_str(), node->label.c_str());
+                        throw exception("%s: unexpected node '%s'", name, node->label.c_str());
                 }
 
 
@@ -335,7 +410,7 @@ namespace yocto
                 const string id = child->content();
                 rule_ptr    *pp = rules.search(id);
 
-                if(!pp) throw exception("unexpected failure to get RULE '%s'", id.c_str());
+                if(!pp) throw exception("%s: unexpected failure to get RULE '%s'", name, id.c_str());
 
                 return **pp;
             }
@@ -347,7 +422,7 @@ namespace yocto
                 const string id = child->content();
                 term_ptr    *pp = rxp.search(id);
 
-                if(!pp) throw exception("unexpected failure to RegExp TERM '%s'", id.c_str());
+                if(!pp) throw exception("%s: unexpected failure to RegExp TERM '%s'",name, id.c_str());
 
                 return **pp;
             }
@@ -359,7 +434,7 @@ namespace yocto
                 const string id = child->content();
                 term_ptr    *pp = raw.search(id);
 
-                if(!pp) throw exception("unexpected failure to Raw TERM '%s'", id.c_str());
+                if(!pp) throw exception("%s: unexpected failure to Raw TERM '%s'", name, id.c_str());
 
                 return **pp;
             }
@@ -498,7 +573,8 @@ namespace yocto
             void LanGen:: simplify( rule *r )
             {
                 assert(r);
-                std::cerr << "simplify "  << r->label << std::endl;
+                //std::cerr << "simplify "  << r->label << std::endl;
+
                 if(simplified.search(r)) return;
                 if(!simplified.insert(r))
                 {

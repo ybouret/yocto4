@@ -34,9 +34,8 @@ namespace yocto
             Rule &LPAREN    = term("(","\\(",syntax::jettison);
             Rule &RPAREN    = term(")","\\)",syntax::jettison);
             Rule &ALTERN    = term("|","\\|",syntax::jettison);
-
-            Rule &LBRACK    = term("[","\\[",syntax::jettison);
-            Rule &RBRACK    = term("]","\\]",syntax::jettison);
+            Rule &RXP       = term<lexical::cstring>("RXP");
+            Rule &RAW       = term<lexical::rstring>("RAW");
 
             //__________________________________________________________________
             //
@@ -45,17 +44,12 @@ namespace yocto
             Agg  &RULE      = agg("RULE");
 
             RULE << ID;
-            {
-                Agg &CODE = agg("USR",syntax::mergeOne);
-                CODE << LBRACK << term("CODE","@[:word:]+") << RBRACK;
-                RULE << opt(CODE);
-            }
             RULE << COLON;
             {
                 Alt &ATOM = alt();
                 ATOM << ID;
-                ATOM << term<lexical::cstring>("RXP");
-                ATOM << term<lexical::rstring>("RAW");
+                ATOM << RXP;
+                ATOM << RAW;
 
                 Agg  &ITEM  = agg("ITEM",syntax::mergeOne);
                 ITEM << ATOM;
@@ -82,7 +76,17 @@ namespace yocto
 
             RULE << SEMICOLON;
 
-            top_level( zero_or_more(RULE) );
+            //__________________________________________________________________
+            //
+            // LEXICAL RULE
+            //__________________________________________________________________
+            Agg &LXR = agg("LXR");
+            LXR << term("LX","@[:word:]+");
+            LXR << COLON;
+            LXR << choice(RXP,RAW);
+            LXR << SEMICOLON;
+            
+            top_level( zero_or_more(choice(RULE,LXR)) );
 
             // some comments
             load<lexical::comment>("C++ Comment","//").hook(scanner);
@@ -102,6 +106,12 @@ namespace yocto
             syntax::xnode          *tree = run(fp);
             auto_ptr<syntax::xnode> guard(tree);
             rewrite( tree );
+            if(tree)
+            {
+                tree->graphivz("xnode.dot");
+                (void) system("dot -Tpng -o xnode.png xnode.dot");
+            }
+
             syntax::LanGen lg(tree);
             
             return guard.yield();
