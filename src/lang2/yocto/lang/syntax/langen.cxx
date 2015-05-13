@@ -20,18 +20,22 @@ namespace yocto
             {
                 "ID",    // 0
                 "RXP",   // 1
-                "RAW"    // 2
+                "RAW",   // 2
+                "?",     // 3
+                "*",     // 4
+                "+"      // 5
             };
 
 
             static const char *grow_rule_keywords[] =
             {
-                "SUB", //0
-                "ALT", //1
-                "RXP", //2
-                "RAW", //3
-                "ID",  //4
+                "SUB",  //0
+                "ALT",  //1
+                "RXP",  //2
+                "RAW",  //3
+                "ID",   //4
                 "ITEM" //5
+
             };
 
             static const char *joker_keywords[] =
@@ -179,6 +183,11 @@ namespace yocto
                                 p->withhold();
                             }
                         } break;
+
+                        case 3:
+                        case 4:
+                        case 5:
+                            break;
 
                         default:
                             assert(-1==cmph(node->label));
@@ -329,8 +338,7 @@ namespace yocto
                 //______________________________________________________________
                 logical *parent = & get_std(child);
                 std::cerr << "\t\tBuilding Rule for " << parent->label << std::endl;
-                child = child->next;
-                grow_rule(parent,child);
+                grow_rule(parent,child->next);
             }
 
 
@@ -531,7 +539,7 @@ namespace yocto
                     case 2: assert("+"==kind); parent->add( P->one_or_more(*r)  ); break;
                     default:
                         assert(-1==jmph(kind));
-                        throw exception("%s: invalid modifier '%s'", P->grammar::name.c_str(), kind.c_str());
+                        throw exception("%s: invalid modifier '%s'", name, kind.c_str());
                 }
 
             }
@@ -573,12 +581,11 @@ namespace yocto
             void LanGen:: simplify( rule *r )
             {
                 assert(r);
-                //std::cerr << "simplify "  << r->label << std::endl;
 
                 if(simplified.search(r)) return;
                 if(!simplified.insert(r))
                 {
-                    throw exception("unexpected simplify failure");
+                    throw exception("%s: unexpected simplify failure for '%s'", name, r->label.c_str());
                 }
 
                 switch (r->uuid)
