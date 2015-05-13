@@ -6,6 +6,8 @@
 
 #include "yocto/lang/syntax/langen.hxx"
 
+#include <cstdlib>
+
 
 namespace yocto
 {
@@ -26,7 +28,6 @@ namespace yocto
             //__________________________________________________________________
 
             Rule &ID        = term("ID", "[:word:]+");
-            //Rule &CODE      = term("@","@",syntax::univocal);
             Rule &COLON     = term(":",":",syntax::jettison);
             Rule &SEMICOLON = term(";",";",syntax::jettison);
 
@@ -34,6 +35,8 @@ namespace yocto
             Rule &RPAREN    = term(")","\\)",syntax::jettison);
             Rule &ALTERN    = term("|","\\|",syntax::jettison);
 
+            //Rule &LBRACK    = term("[","\\[",syntax::jettison);
+            //Rule &RBRACK    = term("]","\\]",syntax::jettison);
 
             //__________________________________________________________________
             //
@@ -41,8 +44,9 @@ namespace yocto
             //__________________________________________________________________
             Agg  &RULE      = agg("RULE");
 
-            RULE //<< opt(CODE)
-            << ID << COLON;
+            RULE
+            << ID
+            << COLON;
             {
                 Alt &ATOM = alt();
                 ATOM << ID;
@@ -52,9 +56,9 @@ namespace yocto
                 Agg  &ITEM  = agg("ITEM",syntax::mergeOne);
                 ITEM << ATOM;
                 Alt  &MOD  = alt();
-                MOD << term("+","\\+",syntax::univocal);
-                MOD << term("*","\\*",syntax::univocal);
-                MOD << term("?","\\?",syntax::univocal);
+                MOD  << term("+","\\+",syntax::univocal);
+                MOD  << term("*","\\*",syntax::univocal);
+                MOD  << term("?","\\?",syntax::univocal);
                 ITEM << opt(MOD);
 
                 Rule &ITEMS = one_or_more(ITEM);
@@ -83,15 +87,20 @@ namespace yocto
             // other chars
             scanner.drop("WS", "[:blank:]");
             scanner.endl("ENDL");
+
+            grammar::gramviz("ggram.dot");
+            (void)system("dot -Tpng -o ggram.png ggram.dot");
+
         }
 
         syntax::xnode * generator::compile( ios::istream &fp )
         {
-            syntax::xnode *tree = run(fp);
-            rewrite(tree);
+            syntax::xnode          *tree = run(fp);
+            auto_ptr<syntax::xnode> guard(tree);
+            rewrite( tree );
             syntax::LanGen lg(tree);
-
-            return tree;
+            
+            return guard.yield();
         }
 
     }
