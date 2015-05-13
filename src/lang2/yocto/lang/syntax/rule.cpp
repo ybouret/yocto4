@@ -43,6 +43,11 @@ namespace yocto
             }
 
 
+            void * rule:: content() throw()
+            {
+                return 0;
+            }
+
         }
     }
 }

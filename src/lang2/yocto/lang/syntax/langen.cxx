@@ -62,6 +62,10 @@ namespace yocto
                 collect(root);
                 find_rules_from(root);
 
+                for( rule *r = & P->top_level();r;r=r->next)
+                {
+                    simplify( r );
+                }
 
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
@@ -439,7 +443,7 @@ namespace yocto
                         assert(-1==jmph(kind));
                         throw exception("%s: invalid modifier '%s'", P->grammar::name.c_str(), kind.c_str());
                 }
-
+                
                 
             }
             
@@ -451,6 +455,47 @@ namespace yocto
     
 }
 
+#include "yocto/lang/syntax/optional.hpp"
+#include "yocto/lang/syntax/at-least.hpp"
+
+namespace yocto
+{
+    namespace lang
+    {
+        namespace syntax
+        {
+            
+            void LanGen:: simplify( rule *r ) throw()
+            {
+                assert(r);
+                std::cerr << "simplify "  << r->label << std::endl;
+                return;
+                switch (r->uuid)
+                {
+                    case aggregate::UUID:
+                    case alternate::UUID:
+                    {
+                        operands *ops = (operands *)(r->content()); assert(ops);
+                        for( logical::operand *ch = ops->head; ch; ch=ch->next)
+                        {
+                            simplify(ch->addr);
+                        }
+                    } break;
+
+                    case optional::UUID:
+                    case at_least::UUID:
+                        simplify( (rule *)(r->content() ) );
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+        
+    }
+    
+}
 
 
 

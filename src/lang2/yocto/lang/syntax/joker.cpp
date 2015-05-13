@@ -17,6 +17,12 @@ namespace yocto
             {
                 
             }
+
+            void * joker:: content() throw()
+            {
+                return (void*)&jk;
+            }
+
         }
 
     }

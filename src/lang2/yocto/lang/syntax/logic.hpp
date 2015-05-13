@@ -12,8 +12,9 @@ namespace yocto
         namespace syntax
         {
 
+            typedef addr_list<rule> operands;
 
-            class logical : public rule, public addr_list<rule>
+            class logical : public rule, public operands
             {
             public:
                 typedef addr_node<rule> operand;
@@ -24,6 +25,8 @@ namespace yocto
 
                 logical & operator<<( rule &r );
 
+                //! return & operands
+                virtual void *content() throw();
 
             protected:
                 explicit logical(const string &id, uint32_t uu);

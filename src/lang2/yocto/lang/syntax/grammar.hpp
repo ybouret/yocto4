@@ -61,6 +61,10 @@ namespace yocto
 
                 void append( rule *r ) throw();
 
+                rule &top_level();
+
+                size_t count() const throw();
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 r_list rules;

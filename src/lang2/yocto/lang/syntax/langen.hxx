@@ -37,6 +37,8 @@ namespace yocto
                 LanGen( const xnode *node );
                 ~LanGen() throw();
 
+                
+
             private:
                 void collect(const xnode *node);
                 void find_rules_from(const xnode *node);
@@ -54,6 +56,9 @@ namespace yocto
                 void grow_sub( logical *parent, const xnode *node);
                 void grow_alt( logical *parent, const xnode *node);
                 void grow_itm( logical *parent, const xnode *node);
+
+                void simplify(rule *r) throw();
+                
             };
         }
     }

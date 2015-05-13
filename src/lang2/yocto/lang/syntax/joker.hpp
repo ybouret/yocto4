@@ -16,6 +16,7 @@ namespace yocto
             public:
                 virtual ~joker() throw();
 
+                virtual void *content() throw(); //!< return &jk;
 
             protected:
                 explicit joker(const string &id, rule &r, uint32_t uu);

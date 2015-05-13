@@ -40,6 +40,8 @@ namespace yocto
                 //! for intr_ptr if needed
                 const string & key() const throw();
 
+                //! internal data for specific stuff, default=NULL
+                virtual void *content() throw();
 
             protected:
                 explicit rule(const string &id, uint32_t uu);

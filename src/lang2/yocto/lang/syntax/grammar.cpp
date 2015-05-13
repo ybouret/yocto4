@@ -271,6 +271,20 @@ namespace yocto
             }
 
 
+            rule &grammar:: top_level()
+            {
+                if(rules.size<=0)
+                {
+                    throw exception("%s: no top level rule", name.c_str());
+                }
+                return *(rules.head);
+            }
+
+            size_t grammar:: count() const throw()
+            {
+                return rules.size;
+            }
+
 
         }
     }

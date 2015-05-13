@@ -9,7 +9,7 @@ namespace yocto
             logical:: ~logical() throw() {}
 
             logical:: logical(const string &id, uint32_t uu) :
-            rule(id,uu)
+            rule(id,uu), operands()
             {
 
             }
@@ -25,7 +25,12 @@ namespace yocto
                 add(r);
                 return *this;
             }
-            
+
+            void * logical::content() throw()
+            {
+                operands &ops = *this;
+                return &ops;
+            }
         }
 
     }
