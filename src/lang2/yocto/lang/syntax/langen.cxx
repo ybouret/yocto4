@@ -260,7 +260,6 @@ namespace yocto
             {
                 assert(parent);
                 assert(node);
-                std::cerr << "\t\t\tgrow_rule '" << node->label << "'" << std::endl;
 
 
                 switch( rmph(node->label) )
@@ -382,7 +381,6 @@ namespace yocto
 
                 if( "ALT" == sub->label)
                 {
-                    std::cerr << "\t\t\t -- new alternation" << std::endl;
                     logical &child = P->alt();
                     for(;sub;sub=sub->next)
                     {
@@ -393,7 +391,6 @@ namespace yocto
                 }
                 else
                 {
-                    std::cerr << "\t\t\t -- new aggregation" << std::endl;
                     for(;sub;sub=sub->next)
                     {
                         grow_rule(parent,sub);
@@ -428,35 +425,16 @@ namespace yocto
                 assert(2==node->children().size);
 
 
-                auto_ptr<logical> tmp( new aggregate(node->label) );
-                grow_rule(& *tmp,node->children().head);
-                assert(tmp->size>0);
-                rule *r = NULL;
-                if(1==tmp->size)
-                {
-                    assert(NULL!=tmp->head->addr);
-                    r = tmp->head->addr;
-                }
-                else
-                {
-                    const string itm_label =  vformat("@sub#%u",++indx);
-                    logical     &itm       = P->agg(itm_label);
-                    tmp->swap_with(itm);
-                    r = &itm;
-                }
-
-                assert(r!=NULL);
-
+                const string itm_label = vformat("@sub#%u",++indx);
+                logical     &itm       = P->agg(itm_label);
+                grow_rule(&itm,node->children().head);
                 const string &kind = node->children().tail->label;
-                std::cerr << "ITEM kind=" << kind << std::endl;
-
-                tmp.release();
 
                 switch( jmph(kind) )
                 {
-                    case 0: assert("?"==kind); parent->add( P->opt(*r) );          break;
-                    case 1: assert("*"==kind); parent->add( P->zero_or_more(*r) ); break;
-                    case 2: assert("+"==kind); parent->add( P->one_or_more(*r) );  break;
+                    case 0: assert("?"==kind); parent->add( P->opt(itm) );          break;
+                    case 1: assert("*"==kind); parent->add( P->zero_or_more(itm) ); break;
+                    case 2: assert("+"==kind); parent->add( P->one_or_more(itm)  );  break;
                     default:
                         assert(-1==jmph(kind));
                         throw exception("%s: invalid modifier '%s'", P->grammar::name.c_str(), kind.c_str());
