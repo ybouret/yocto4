@@ -61,7 +61,7 @@ namespace yocto
                 P.reset( new parser("dummy","main") );
                 collect(root);
                 find_rules_from(root);
-
+                P->cleanup();
 
                 P->gramviz("lanraw.dot");
                 (void) system("dot -Tpng -o lanraw.png lanraw.dot");
@@ -437,16 +437,25 @@ namespace yocto
                 grow_rule(&itm,node->children().head);
                 const string &kind = node->children().tail->label;
 
+                // simplify at this point...
+                rule *r = &itm;
+                if(itm.size==1)
+                {
+                    logical::operand *op = itm.pop_front();
+                    r = op->addr;
+                    delete op;
+                }
+                assert(r);
+
                 switch( jmph(kind) )
                 {
-                    case 0: assert("?"==kind); parent->add( P->opt(itm) );          break;
-                    case 1: assert("*"==kind); parent->add( P->zero_or_more(itm) ); break;
-                    case 2: assert("+"==kind); parent->add( P->one_or_more(itm)  );  break;
+                    case 0: assert("?"==kind); parent->add( P->opt(*r) );          break;
+                    case 1: assert("*"==kind); parent->add( P->zero_or_more(*r) ); break;
+                    case 2: assert("+"==kind); parent->add( P->one_or_more(*r)  ); break;
                     default:
                         assert(-1==jmph(kind));
                         throw exception("%s: invalid modifier '%s'", P->grammar::name.c_str(), kind.c_str());
                 }
-
 
             }
 
