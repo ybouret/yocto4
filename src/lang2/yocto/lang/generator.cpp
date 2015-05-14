@@ -37,6 +37,15 @@ namespace yocto
             Rule &RXP       = term<lexical::cstring>("RXP");
             Rule &RAW       = term<lexical::rstring>("RAW");
 
+            
+            //__________________________________________________________________
+            //
+            // name definition
+            //__________________________________________________________________
+            Agg &THE_NAME = agg("THE_NAME");
+            THE_NAME << term("NAME","\\.[:word:]+");
+            THE_NAME << SEMICOLON;
+            
             //__________________________________________________________________
             //
             // Rule Definitions
@@ -86,7 +95,14 @@ namespace yocto
             LXR << choice(RXP,RAW);
             LXR << SEMICOLON;
             
-            top_level( zero_or_more(choice(RULE,LXR)) );
+            
+            Agg &THE_GRAMMAR = agg("grammar");
+            THE_GRAMMAR << THE_NAME;
+            THE_GRAMMAR << zero_or_more(choice(RULE,LXR));
+            
+            
+            top_level( THE_GRAMMAR );
+            
 
             // some comments
             load<lexical::comment>("C++ Comment","//").hook(scanner);

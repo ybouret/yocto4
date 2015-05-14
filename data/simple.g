@@ -1,3 +1,5 @@
+.simple;
+
 CODE : (NUM|ID)+;
 
 ID  : "[:alpha:][:word:]"+;
