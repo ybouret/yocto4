@@ -67,13 +67,32 @@ namespace yocto
             }
         }
 
-        string token:: to_string() const
+        string token:: to_string(size_t nskip,size_t ntrim) const
         {
-            string ans(size,as_capacity);
-            for(const t_char *ch = head;ch; ch=ch->next)
+
+            const size_t nzap = nskip+ntrim;
+            if(nzap>=size)
             {
-                ans.append(char(ch->code));
+                return string();
             }
+
+            const size_t  neff = size - nzap;
+            string        ans(neff,as_capacity);
+            const t_char *chr = head;
+
+            for(size_t i=0;i<nskip;++i)
+            {
+                assert(chr);
+                chr=chr->next;
+            }
+
+            for(size_t i=0;i<neff;++i)
+            {
+                assert(chr);
+                ans.append(char(chr->code));
+                chr=chr->next;
+            }
+            
             return ans;
         }
 

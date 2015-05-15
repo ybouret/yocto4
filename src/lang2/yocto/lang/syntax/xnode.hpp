@@ -43,7 +43,7 @@ namespace yocto
                 leaves       &children() throw();
                 const leaves &children() const throw();
                 const lexeme &lex()      const throw();
-                string        content()  const; //!< lex()->to_string
+                string        content(size_t nskip=0,size_t ntrim=0)  const; //!< lex()->to_string
 
                 void    append(xnode *node) throw(); //!< append to children, make parent of this
                 xnode  *pop_head() throw();          //!< head of children, remove parenthood

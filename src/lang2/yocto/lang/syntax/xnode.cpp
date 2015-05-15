@@ -94,11 +94,11 @@ namespace yocto
                 return *lx;
             }
 
-            string xnode:: content()  const
+            string xnode:: content(size_t nskip,size_t ntrim)  const
             {
                 assert(terminal);
                 assert(lx);
-                return lx->to_string();
+                return lx->to_string(nskip,ntrim);
             }
 
             xnode::leaves & xnode::children() throw()

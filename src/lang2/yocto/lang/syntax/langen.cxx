@@ -34,7 +34,7 @@ namespace yocto
                 "RXP",  //2
                 "RAW",  //3
                 "ID",   //4
-                "ITEM" //5
+                "ITEM"  //5
 
             };
 
@@ -75,9 +75,9 @@ namespace yocto
                     const xnode *ch = root->children().head;
                     assert(ch);
                     assert("NAME"==ch->label);
-                    const string parser_name = ch->content();
+                    const string parser_name = ch->content(1,0);
                     const string parser_main = "main";
-
+                    std::cerr << "\t### " << parser_name << " ###" << std::endl;
                     P.reset( new parser(parser_name,parser_main) );
                 }
 

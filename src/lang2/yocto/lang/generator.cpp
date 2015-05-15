@@ -37,7 +37,7 @@ namespace yocto
             Rule &RXP       = term<lexical::cstring>("RXP");
             Rule &RAW       = term<lexical::rstring>("RAW");
 
-            
+
             //__________________________________________________________________
             //
             // name definition
@@ -45,7 +45,7 @@ namespace yocto
             Agg &THE_NAME = agg("USR",syntax::mergeOne);
             THE_NAME << term("NAME","\\.[:word:]+");
             THE_NAME << SEMICOLON;
-            
+
             //__________________________________________________________________
             //
             // Rule Definitions
@@ -94,15 +94,15 @@ namespace yocto
             LXR << COLON;
             LXR << choice(RXP,RAW);
             LXR << SEMICOLON;
-            
-            
+
+
             Agg &THE_PARSER = agg("parser");
             THE_PARSER << THE_NAME;
             THE_PARSER << zero_or_more(choice(RULE,LXR));
-            
-            
+
+
             top_level( THE_PARSER );
-            
+
 
             // some comments
             load<lexical::comment>("C++ Comment","//").hook(scanner);
@@ -117,7 +117,7 @@ namespace yocto
 
         }
 
-        syntax::xnode * generator::compile( ios::istream &fp )
+        parser *generator::compile( ios::istream &fp )
         {
             syntax::xnode          *tree = run(fp);
             auto_ptr<syntax::xnode> guard(tree);
@@ -129,8 +129,8 @@ namespace yocto
             }
 
             syntax::LanGen lg(tree);
-            
-            return guard.yield();
+
+            return lg.P.yield();
         }
 
     }
@@ -171,10 +171,10 @@ namespace yocto
                 }
             }
         }
-        
-        
+
+
     }
-    
+
 }
 #endif
 
@@ -205,27 +205,27 @@ namespace yocto
                     if(ALT.size>0)
                     {
                         assert(node->children().size>0);
-                        
+
                         syntax::xnode *xalt = syntax::xnode::leaf(get_rule("ALT"),syntax::standard);
                         while(node->children().size)
                         {
                             xalt->append( node->pop_head() );
                         }
                         node->append(xalt);
-
+                        
                         while(ALT.size)
                         {
                             node->append(ALT.pop_front());
                         }
-
+                        
                     }
-
+                    
                 }
             }
         }
-
+        
     }
-
+    
 }
 
 

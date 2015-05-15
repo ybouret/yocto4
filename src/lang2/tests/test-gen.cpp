@@ -19,11 +19,20 @@ YOCTO_UNIT_TEST_IMPL(gen)
     vfs &fs = local_fs::instance();
     fs.try_remove_file("xnode.dot");
     fs.try_remove_file("xnode.png");
+    fs.try_remove_file("langen.dot");
+    fs.try_remove_file("langen.png");
+    fs.try_remove_file("lanraw.dot");
+    fs.try_remove_file("lanraw.png");
+    fs.try_remove_file("ggram.dot");
+    fs.try_remove_file("ggram.png");
 
 
-    ios::icstream           fp( ios::cstdin );
-    auto_ptr<syntax::xnode> tree( G.compile(fp) );
+    if(argc>1)
+    {
+        ios::icstream           fp( argv[1] );
+        auto_ptr<parser>        P( G.compile(fp) );
+    }
 
-   
+
 }
 YOCTO_UNIT_TEST_DONE()
