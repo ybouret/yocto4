@@ -65,14 +65,26 @@ namespace yocto
                 std::cerr << "Collect MPH #nodes=" << cmph.nodes << std::endl;
                 std::cerr << "Growing MPH #nodes=" << rmph.nodes << std::endl;
 
+                //______________________________________________________________
+                //
+                // Find the parser name and create it
+                //______________________________________________________________
                 assert(!root->terminal);
-                assert("grammar"==root->label);
+                assert("parser"==root->label);
                 {
-                    const xnode *ch;
-                }
-                
-                P.reset( new parser("dummy","main") );
+                    const xnode *ch = root->children().head;
+                    assert(ch);
+                    assert("NAME"==ch->label);
+                    const string parser_name = ch->content();
+                    const string parser_main = "main";
 
+                    P.reset( new parser(parser_name,parser_main) );
+                }
+
+                //______________________________________________________________
+                //
+                // First Pass: raw build
+                //______________________________________________________________
                 name = P->grammar::name.c_str();
                 collect(root);
                 find_rules_from(root);
@@ -81,6 +93,10 @@ namespace yocto
                 P->gramviz("lanraw.dot");
                 (void) system("dot -Tpng -o lanraw.png lanraw.dot");
 
+                //______________________________________________________________
+                //
+                // Second Pass: remove useless sub rules
+                //______________________________________________________________
                 simplified.ensure( P->count() );
                 simplify(& P->top_level() );
                 P->cleanup();

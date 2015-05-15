@@ -96,12 +96,12 @@ namespace yocto
             LXR << SEMICOLON;
             
             
-            Agg &THE_GRAMMAR = agg("grammar");
-            THE_GRAMMAR << THE_NAME;
-            THE_GRAMMAR << zero_or_more(choice(RULE,LXR));
+            Agg &THE_PARSER = agg("parser");
+            THE_PARSER << THE_NAME;
+            THE_PARSER << zero_or_more(choice(RULE,LXR));
             
             
-            top_level( THE_GRAMMAR );
+            top_level( THE_PARSER );
             
 
             // some comments
