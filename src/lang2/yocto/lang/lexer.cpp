@@ -98,7 +98,7 @@ namespace yocto
             }
             lexical::scanner &s = **pp;
             scan = &s;
-            std::cerr << "\t@JUMP@" << id << std::endl;
+            //std::cerr << "\t@JUMP@" << id << std::endl;
         }
 
         void lexer:: call(const string &id)
@@ -111,7 +111,7 @@ namespace yocto
             lexical::scanner &s = **pp;
             history.append(scan);
             scan = &s;
-            std::cerr << "\t@CALL@" << id << std::endl;
+            //std::cerr << "\t@CALL@" << id << std::endl;
         }
 
         void lexer:: back()
@@ -120,7 +120,7 @@ namespace yocto
             assert(0!=history.tail->addr);
             scan = history.tail->addr;
             history.remove();
-            std::cerr << "\t@BACK@" << scan->name << std::endl;
+            //std::cerr << "\t@BACK@" << scan->name << std::endl;
         }
 
 

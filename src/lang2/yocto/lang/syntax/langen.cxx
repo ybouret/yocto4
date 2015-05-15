@@ -58,7 +58,7 @@ namespace yocto
             name(0),
             indx(0),
             jndx(0),
-            simplified()
+            visited()
             {
                 assert(root!=NULL);
 
@@ -97,9 +97,16 @@ namespace yocto
                 //
                 // Second Pass: remove useless sub rules
                 //______________________________________________________________
-                simplified.ensure( P->count() );
+                visited.ensure( P->count() );
                 simplify(& P->top_level() );
                 P->cleanup();
+
+                //______________________________________________________________
+                //
+                // Third Pass: change meaning of RAW...
+                //______________________________________________________________
+                visited.free();
+                semantic(& P->top_level() );
 
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
@@ -606,17 +613,16 @@ namespace yocto
             {
                 assert(r);
 
-                if(simplified.search(r)) return;
-                if(!simplified.insert(r))
+                if(visited.search(r)) return;
+                if(!visited.insert(r))
                 {
-                    throw exception("%s: unexpected simplify failure for '%s'", name, r->label.c_str());
+                    throw exception("%s: unexpected simplify/visited failure for '%s'", name, r->label.c_str());
                 }
 
                 switch (r->uuid)
                 {
                     case aggregate::UUID:
-                    case alternate::UUID:
-                    {
+                    case alternate::UUID: {
                         // simplify children
                         operands *ops = (operands *)(r->content());
                         for( logical::operand *ch = ops->head; ch; ch=ch->next)
@@ -632,11 +638,11 @@ namespace yocto
                             rule             *sub = ch->addr;
                             if( is_internal_sub(sub->label) )
                             {
-                                std::cerr << "\t\tINTERNAL " << sub->label << std::endl;
+                                //std::cerr << "\t\tINTERNAL " << sub->label << std::endl;
                                 operands *children = (operands *)(sub->content()); assert(children);
                                 if(1==children->size)
                                 {
-                                    std::cerr << "\t\tfusion!" << std::endl;
+                                    //std::cerr << "\t\tfusion!" << std::endl;
                                     stk.push_back(children->pop_front());
                                     delete ch;
                                 }
@@ -650,10 +656,10 @@ namespace yocto
                                 stk.push_back(ch);
                             }
                         }
-                        
+
                         ops->swap_with(stk);
-                        
-                        
+
+
                     }   break;
                         
                     case optional::UUID:
@@ -673,6 +679,51 @@ namespace yocto
         
     }
     
+}
+
+
+namespace yocto
+{
+    namespace lang
+    {
+        namespace syntax
+        {
+            void LanGen:: semantic(rule *r)
+            {
+                assert(r);
+                if(visited.search(r)) return;
+                if(!visited.insert(r))
+                {
+                    throw exception("%s: unexpected simplify/visited failure for '%s'", name, r->label.c_str());
+                }
+
+                std::cerr << "\t\tsemantic for '" << r->label << "' " <<  std::endl;
+
+                switch (r->uuid)
+                {
+                    case aggregate::UUID:
+                    case alternate::UUID: {
+                        // semantic children
+                        operands *ops = (operands *)(r->content());
+                        for( logical::operand *ch = ops->head; ch; ch=ch->next)
+                        {
+                            semantic(ch->addr);
+                        }
+                    } break;
+                        
+                    case optional::UUID:
+                    case at_least::UUID:
+                        semantic( (rule*)(r->content()) );
+                        break;
+                        
+                    default:
+                        std::cerr << "unhandled..." << std::endl;
+                        break;
+                }
+                
+            }
+        }
+    }
 }
 
 

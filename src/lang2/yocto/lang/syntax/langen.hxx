@@ -53,7 +53,8 @@ namespace yocto
                 rule    &get_raw(const xnode *node);
 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(LanGen);
-                const char *name;
+
+                const char *name; //!< P->grammar::name.c_str()
                 unsigned    indx; //!< for internal rules
                 unsigned    jndx; //!< for lexical  rules
 
@@ -65,7 +66,10 @@ namespace yocto
                 void simplify(rule *r);
                 
                 typedef rule *rptr;
-                sorted_vector<rptr> simplified;
+                sorted_vector<rptr> visited;
+
+                void semantic(rule *r);
+                
             };
         }
     }
