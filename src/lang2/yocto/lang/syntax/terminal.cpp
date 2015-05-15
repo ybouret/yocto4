@@ -43,7 +43,20 @@ namespace yocto
             void terminal::viz( ios::ostream &fp ) const
             {
                 fp.viz((const rule*)this);
-                fp << "[shape=box,label=\"" << label << "\"];\n";
+                const char *shape = "box";
+
+                if(univocal==modifier)
+                {
+                    shape = "circle";
+                }
+
+                if(jettison==modifier)
+                {
+                    shape = "circle,style=filled";
+                }
+
+                fp("[shape=%s,label=\"",shape);
+                fp << label << "\"];\n";
             }
 
             void terminal:: lnk(ios::ostream &) const {}

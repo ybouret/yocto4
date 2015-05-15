@@ -58,7 +58,7 @@ namespace yocto
 
                 //! syntax tree rewrite
                 static xnode *AST( xnode *node ) throw();
-
+                
                 YOCTO_MAKE_OBJECT
 
 
