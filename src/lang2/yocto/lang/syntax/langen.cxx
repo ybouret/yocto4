@@ -145,8 +145,9 @@ namespace yocto
                                 aggregate     *p = new aggregate(r_id);
                                 const rule_ptr q( p );
                                 if(!rules.insert(q))
+                                {
                                     throw exception("%s: unexpected RULE '%s' insertion failure!",name,r_id.c_str());
-
+                                }
                                 // make the new rule
                                 P->append(p);
                                 p->withhold();
@@ -167,8 +168,9 @@ namespace yocto
                                 if(!rxp.insert(q))
                                 {
                                     if(!rxp.insert(q))
+                                    {
                                         throw exception("%s: unexpected RegExp TERM '%s' insertion failure!",name,t_id.c_str());
-
+                                    }
                                 }
 
                                 // make the terminal from regexp
