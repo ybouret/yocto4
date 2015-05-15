@@ -88,10 +88,16 @@ namespace yocto
                 name = P->grammar::name.c_str();
                 collect(root);
                 find_rules_from(root);
-                P->cleanup();
+
+                //check existing rules
+                for( rule *r = & P->top_level(); r; r=r->next )
+                {
+                    check_valid(r);
+                }
 
                 P->gramviz("lanraw.dot");
                 (void) system("dot -Tpng -o lanraw.png lanraw.dot");
+                P->cleanup();
 
                 //______________________________________________________________
                 //
@@ -100,6 +106,8 @@ namespace yocto
                 visited.ensure( P->count() );
                 simplify(& P->top_level() );
                 P->cleanup();
+
+                
 
                 //______________________________________________________________
                 //
@@ -110,6 +118,27 @@ namespace yocto
 
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
+            }
+
+
+            void LanGen:: check_valid( rule *r)
+            {
+                assert(r);
+                switch(r->uuid)
+                {
+                    case aggregate::UUID:
+                    case alternate::UUID:
+                    {
+                        const operands *ops = (operands *)(r->content());
+                        if(ops->size<=0)
+                        {
+                            throw exception("%s: void rule '%s'", name, r->label.c_str());
+                        }
+                    } break;
+
+                    default:
+                        break;
+                }
             }
 
         }

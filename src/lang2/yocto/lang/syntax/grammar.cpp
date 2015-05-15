@@ -167,7 +167,6 @@ namespace yocto
 
 #include "yocto/ptr/auto.hpp"
 
-
 namespace yocto
 {
     namespace lang
@@ -296,7 +295,20 @@ namespace yocto
                         operands *ops = (operands *)(r->content());
                         if(ops->size<=0)
                         {
-                            delete r;
+                            switch(r->refcount())
+                            {
+                                case 1:
+                                    (void)r->liberate();
+                                case 0:
+                                    delete r;
+                                    break;
+
+                                default:
+                                    assert(r->refcount()>=2);
+                                    (void) r->liberate();
+                            }
+
+
                         }
                         else
                         {
@@ -324,7 +336,7 @@ namespace yocto
 
         namespace syntax
         {
-            
+
             void grammar:: gramviz( const string &filename ) const
             {
                 ios::ocstream fp(filename,false);
