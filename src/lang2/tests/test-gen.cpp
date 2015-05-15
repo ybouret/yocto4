@@ -25,7 +25,8 @@ YOCTO_UNIT_TEST_IMPL(gen)
     fs.try_remove_file("lanraw.png");
     fs.try_remove_file("ggram.dot");
     fs.try_remove_file("ggram.png");
-
+    fs.try_remove_file("gen.dot");
+    fs.try_remove_file("gen.png");
 
     if(argc>1)
     {
@@ -40,7 +41,8 @@ YOCTO_UNIT_TEST_IMPL(gen)
             auto_ptr<syntax::xnode> tree( P->run(fp) );
             if(tree.is_valid())
             {
-                
+                tree->graphivz("gen.dot");
+                (void) system("dot -Tpng -o gen.png gen.dot");
             }
         }
 
