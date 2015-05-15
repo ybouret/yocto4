@@ -1,6 +1,6 @@
 .JSON;
 
-json   : value+;
+json   : value | object;
 
 value  : number | 'null' | 'true' | 'false';
 
