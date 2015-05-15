@@ -199,7 +199,7 @@ namespace yocto
                             const string t_id = node->content();
                             if(!raw.search(t_id))
                             {
-                                terminal      *p = new terminal(t_id,standard);
+                                terminal      *p = new terminal(t_id,univocal);
                                 const term_ptr q(p);
                                 if(!raw.insert(q))
                                 {

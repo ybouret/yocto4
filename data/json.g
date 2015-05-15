@@ -6,7 +6,9 @@ value  : number | 'null' | 'true' | 'false';
 
 number : "[:digit:]+";
 
-object : '{' '}' | '{' value (',' value)* '}';
+object : empty_object | '{' value (',' value)* '}';
+
+empty_object : '{' '}';
 
 @drop : "[:blank:]";
 @endl : "[:endl:]";

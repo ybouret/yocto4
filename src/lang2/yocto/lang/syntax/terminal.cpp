@@ -47,12 +47,12 @@ namespace yocto
 
                 if(univocal==modifier)
                 {
-                    shape = "circle";
+                    shape = "box,style=dotted";
                 }
 
                 if(jettison==modifier)
                 {
-                    shape = "circle,style=filled";
+                    shape = "box,style=filled";
                 }
 
                 fp("[shape=%s,label=\"",shape);
