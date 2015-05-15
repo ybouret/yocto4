@@ -42,7 +42,7 @@ namespace yocto
             //
             // name definition
             //__________________________________________________________________
-            Agg &THE_NAME = agg("THE_NAME");
+            Agg &THE_NAME = agg("USR",syntax::mergeOne);
             THE_NAME << term("NAME","\\.[:word:]+");
             THE_NAME << SEMICOLON;
             
