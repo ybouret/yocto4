@@ -60,7 +60,8 @@ namespace yocto
                 void grow_sub( logical *parent, const xnode *node);
                 void grow_alt( logical *parent, const xnode *node);
                 void grow_itm( logical *parent, const xnode *node);
-
+                
+                
                 void simplify(rule *r);
                 
                 typedef rule *rptr;

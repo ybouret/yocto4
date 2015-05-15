@@ -65,6 +65,12 @@ namespace yocto
                 std::cerr << "Collect MPH #nodes=" << cmph.nodes << std::endl;
                 std::cerr << "Growing MPH #nodes=" << rmph.nodes << std::endl;
 
+                assert(!root->terminal);
+                assert("grammar"==root->label);
+                {
+                    const xnode *ch;
+                }
+                
                 P.reset( new parser("dummy","main") );
 
                 name = P->grammar::name.c_str();
