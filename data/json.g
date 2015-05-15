@@ -10,6 +10,6 @@ object : empty_object | heavy_object;
 
 empty_object : '{' '}';
 heavy_object : '{' pair (',' pair)* '}';
-
+pair         : "[:cstring:]" ':' value;
 @drop : "[:blank:]";
 @endl : "[:endl:]";

@@ -92,7 +92,7 @@ namespace yocto
                 //check existing rules
                 for( rule *r = & P->top_level(); r; r=r->next )
                 {
-                    check_valid(r);
+                    check_valid_declared(r);
                 }
 
                 P->gramviz("lanraw.dot");
@@ -121,9 +121,14 @@ namespace yocto
             }
 
 
-            void LanGen:: check_valid( rule *r)
+            void LanGen:: check_valid_declared(rule *r)
             {
                 assert(r);
+                if( !rules.search(r->label) )
+                {
+                    return;
+                }
+                
                 switch(r->uuid)
                 {
                     case aggregate::UUID:

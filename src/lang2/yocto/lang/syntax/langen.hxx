@@ -52,7 +52,7 @@ namespace yocto
                 rule    &get_rxp(const xnode *node);
                 rule    &get_raw(const xnode *node);
 
-                void     check_valid( rule *r );
+                void     check_valid_declared( rule *r );
 
 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(LanGen);
