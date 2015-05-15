@@ -29,8 +29,21 @@ YOCTO_UNIT_TEST_IMPL(gen)
 
     if(argc>1)
     {
-        ios::icstream           fp( argv[1] );
-        auto_ptr<parser>        P( G.compile(fp) );
+        auto_ptr<parser> P;
+        {
+            ios::icstream fp( argv[1] );
+            P.reset( G.compile(fp) );
+        }
+
+        {
+            ios::icstream           fp( ios::cstdin );
+            auto_ptr<syntax::xnode> tree( P->run(fp) );
+            if(tree.is_valid())
+            {
+                
+            }
+        }
+
     }
 
 
