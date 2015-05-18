@@ -1,4 +1,5 @@
 // some comment
+.calc;
 
 prog : stat+;
 
@@ -16,8 +17,8 @@ atom 	:	INT
 
 ID 	: "[_[:alpha:]][:word:]*";
 INT 	: "[:digit:]"+;
-NEWLINE : "[:endl:]" ;
-WS	: "[ \t]";
+@endl   : "[:endl:]" ;
+@drop   : "[ \t]";
 PLUS    : '+' ;
 MINUS   : '-'    ;
 MULT    : '*'    ;

@@ -89,15 +89,18 @@ namespace yocto
                 collect(root);
                 find_rules_from(root);
 
+                //______________________________________________________________
+                //
                 //check existing rules
+                //______________________________________________________________
                 for( rule *r = & P->top_level(); r; r=r->next )
                 {
                     check_valid_declared(r);
                 }
+                P->cleanup();
 
                 P->gramviz("lanraw.dot");
                 (void) system("dot -Tpng -o lanraw.png lanraw.dot");
-                P->cleanup();
 
                 //______________________________________________________________
                 //

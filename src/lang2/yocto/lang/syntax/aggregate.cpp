@@ -60,7 +60,18 @@ namespace yocto
 
             void aggregate:: viz( ios::ostream &fp ) const
             {
-                fp.viz((const rule*)this); fp("[shape=house,label=\"%s\"];\n", label.c_str());
+                const char *style = "solid";
+                switch(modifier)
+                {
+                    case mergeOne: style = "dotted"; break;
+
+
+                    case mergeAll: style = "filled"; break;
+                        
+                    default:
+                        break;
+                }
+                fp.viz((const rule*)this); fp("[shape=house,style=%s,label=\"%s\"];\n", style,label.c_str());
             }
 
             void aggregate:: lnk( ios::ostream &fp ) const
