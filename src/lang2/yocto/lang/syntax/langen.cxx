@@ -562,7 +562,7 @@ namespace yocto
             {
                 assert("ALT"==node->label);
                 const string agg_label =  vformat("@sub#%u",++indx);
-                logical &r = P->agg(agg_label);
+                logical &r = P->agg(agg_label,mergeOne);
                 parent->add(r);
 
                 for(const xnode *ch = node->children().head;ch;ch=ch->next)
@@ -582,7 +582,7 @@ namespace yocto
 
 
                 const string itm_label = vformat("@sub#%u",++indx);
-                logical     &itm       = P->agg(itm_label);
+                logical     &itm       = P->agg(itm_label,mergeOne);
                 grow_rule(&itm,node->children().head);
                 const string &kind = node->children().tail->label;
 
