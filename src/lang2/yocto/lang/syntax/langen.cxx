@@ -62,8 +62,8 @@ namespace yocto
             {
                 assert(root!=NULL);
 
-                std::cerr << "Collect MPH #nodes=" << cmph.nodes << std::endl;
-                std::cerr << "Growing MPH #nodes=" << rmph.nodes << std::endl;
+                //std::cerr << "Collect MPH #nodes=" << cmph.nodes << std::endl;
+                //std::cerr << "Growing MPH #nodes=" << rmph.nodes << std::endl;
 
                 //______________________________________________________________
                 //
@@ -111,7 +111,7 @@ namespace yocto
 
                 //______________________________________________________________
                 //
-                // Third Pass: change meaning of RAW...
+                // Third Pass: change semantic meanings (RAW...)
                 //______________________________________________________________
                 visited.free();
                 for( rule *r = & P->top_level(); r; r=r->next )
@@ -656,14 +656,20 @@ namespace yocto
                 {
                     case aggregate::UUID:
                     case alternate::UUID: {
+                        //______________________________________________________
+                        //
                         // simplify children
+                        //______________________________________________________
                         operands *ops = (operands *)(r->content());
                         for( logical::operand *ch = ops->head; ch; ch=ch->next)
                         {
                             simplify(ch->addr);
                         }
 
+                        //______________________________________________________
+                        //
                         // check internal sub children with 1 child
+                        //______________________________________________________
                         operands stk;
                         while(ops->size)
                         {
@@ -754,71 +760,6 @@ namespace yocto
                     }
                 }
 
-#if 0
-                assert(r);
-
-                if(visited.search(r)) return;
-                if(!visited.insert(r))
-                {
-                    throw exception("%s: unexpected simplify/visited failure for '%s'", name, r->label.c_str());
-                }
-
-                std::cerr << "\t\tsemantic for '" << r->label << "' " <<  std::endl;
-
-                //______________________________________________________________
-                //
-                // propagate
-                //______________________________________________________________
-                switch (r->uuid)
-                {
-                    case aggregate::UUID:
-                    case alternate::UUID: {
-                        // semantic children
-                        operands *ops = (operands *)(r->content());
-                        for( logical::operand *ch = ops->head; ch; ch=ch->next)
-                        {
-                            semantic(ch->addr);
-                        }
-                        
-                    } break;
-                        
-                    case optional::UUID:
-                    case at_least::UUID:
-                        semantic( (rule*)(r->content()) );
-                        break;
-                        
-                    default:
-                        std::cerr << "\t\tunhandled..." << std::endl;
-                        break;
-                }
-                
-                //______________________________________________________________
-                //
-                // analyze
-                //______________________________________________________________
-                if(aggregate::UUID==r->uuid)
-                {
-                    std::cerr << "\t\tscanning semantic " << r->label << std::endl;
-                    operands *ops = (operands *)(r->content());
-                    if(ops->size>1)
-                    {
-                        for( logical::operand *ch = ops->head; ch; ch=ch->next)
-                        {
-                            rule *sub = ch->addr;
-                            
-                            
-                            if(raw.search(sub->label))
-                            {
-                                std::cerr << "\t\t\tshould set " << sub->label << " to JETTISON" << std::endl;
-                                property *modif = (property *)(sub->content());
-                                assert(modif!=NULL);
-                                assert(univocal==*modif || jettison==*modif);
-                                *modif = jettison;
-                            }
-                        }
-                    }
-                }
-#endif
             }
         }
     }
