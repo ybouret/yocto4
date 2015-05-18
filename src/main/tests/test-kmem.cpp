@@ -298,6 +298,9 @@ YOCTO_UNIT_TEST_DONE()
 
 namespace
 {
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
     template <size_t N>
     class raw_node
     {

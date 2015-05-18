@@ -78,7 +78,7 @@ YOCTO_UNIT_TEST_IMPL(ari)
             if(max_comb.bits()<=64)
             {
                 const uint64_t m = max_comb.to<uint64_t>();
-                const double   x = m;
+                const double   x = double(m);
                 fp("%llu %llu %g\n", n,m, log(x));
             }
         }
