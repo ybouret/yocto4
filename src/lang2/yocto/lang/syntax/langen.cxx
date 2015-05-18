@@ -183,17 +183,36 @@ namespace yocto
                             //
                             // a non terminal rule
                             //__________________________________________________
-                            const string r_id = node->content();
-                            if(!rules.search(r_id))
+                            property     ppty = standard;
+                            const token &itkn = node->lex();
+                            assert(itkn.size>0);
+                            // checking property
+                            if('%'==itkn.head->code)
                             {
-                                std::cerr << "New ID " << r_id << std::endl;
+                                ppty = mergeOne;
+                                delete ((token&)itkn).pop_front();
+                            }
+                            const string r_id = node->content();
+                            rule_ptr    *agg = rules.search(r_id);
+                            if(!agg)
+                            {
+                                std::cerr << "+ID=" << r_id << ", ppty=" << int(ppty) << std::endl;
 
-                                aggregate     *p = new aggregate(r_id);
+                                aggregate     *p = new aggregate(r_id,ppty);
                                 P->append(p);
                                 const rule_ptr q( p );
                                 if(!rules.insert(q))
                                 {
                                     throw exception("%s: unexpected RULE '%s' insertion failure!",name,r_id.c_str());
+                                }
+                            }
+                            else
+                            {
+                                property &curr = (property &)(**agg).modifier;
+                                if(curr==standard&&ppty!=standard)
+                                {
+                                    std::cerr << "@ID=" << r_id << " : change ppty" << std::endl;
+                                    curr = ppty;
                                 }
                             }
                         } break;
