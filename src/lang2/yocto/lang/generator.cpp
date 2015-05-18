@@ -42,9 +42,9 @@ namespace yocto
             //
             // name definition
             //__________________________________________________________________
-            Agg &THE_NAME = agg("USR",syntax::mergeOne);
-            THE_NAME << term("NAME","\\.[:word:]+");
-            THE_NAME << SEMICOLON;
+            Agg &USR_NAME = agg("USR",syntax::mergeOne);
+            USR_NAME << term("NAME","\\.[:word:]+");
+            USR_NAME << SEMICOLON;
 
             //__________________________________________________________________
             //
@@ -97,7 +97,7 @@ namespace yocto
 
 
             Agg &THE_PARSER = agg("parser");
-            THE_PARSER << THE_NAME;
+            THE_PARSER << USR_NAME;
             THE_PARSER << zero_or_more(choice(RULE,LXR));
 
 

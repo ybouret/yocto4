@@ -314,6 +314,8 @@ namespace yocto
     }
 }
 
+#include "yocto/lang/lexical/plugin/comment.hpp"
+
 namespace yocto
 {
     namespace lang
@@ -328,24 +330,29 @@ namespace yocto
                 const string code = node->children().head->content();
                 //std::cerr << "\tLEXICAL: " << code << std::endl;
 
-                auto_ptr<pattern> p( compile_lexical_pattern(node->children().tail) );
+                const string code_id = code + vformat("/%u",++jndx);
+                const xnode *meta    = node->children().tail;
 
                 if(code=="@drop")
                 {
-                    const string code_id = code + vformat("/%u",++jndx);
                     const lexical::action drop( & P->scanner, & lexical::scanner::discard);
-                    P->scanner.make(code_id, p.yield(), drop);
+                    P->scanner.make(code_id, compile_lexical_pattern(meta), drop);
                     return;
                 }
 
                 if(code=="@endl")
                 {
-                    const string code_id = code + vformat("/%u",++jndx);
                     const lexical::action endl( & P->scanner, & lexical::scanner::newline);
-                    P->scanner.make(code_id, p.yield(), endl);
+                    P->scanner.make(code_id, compile_lexical_pattern(meta), endl);
                     return;
                 }
 
+                if(code=="@comment")
+                {
+                    const string marker = meta->content();
+                    P->load<lexical::comment>(code_id.c_str(), marker.c_str()).hook(P->scanner);
+                    return;
+                }
 
                 throw exception("%s: unregisterd code '%s'", name, code.c_str());
             }
