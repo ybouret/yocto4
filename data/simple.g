@@ -2,11 +2,11 @@
 
 code : (string)*;
 
+string : "[:cstring:]";
 
 @drop  :  "[ \t]" ;
 @endl  :  "[:endl:]";
 
-string : "[:cstring:]";
 
 
 @comment: "#";
