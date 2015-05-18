@@ -61,6 +61,11 @@ namespace yocto
 
             void terminal:: lnk(ios::ostream &) const {}
 
+            void * terminal:: content() throw()
+            {
+                return (void *)&modifier;
+            }
+
         }
         
     }

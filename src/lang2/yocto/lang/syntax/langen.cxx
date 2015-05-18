@@ -107,15 +107,17 @@ namespace yocto
                 simplify(& P->top_level() );
                 P->cleanup();
 
-                
+
 
                 //______________________________________________________________
                 //
                 // Third Pass: change meaning of RAW...
                 //______________________________________________________________
                 visited.free();
-                semantic(& P->top_level() );
-
+                for( rule *r = & P->top_level(); r; r=r->next )
+                {
+                    semantic(r);
+                }
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
             }
@@ -128,7 +130,7 @@ namespace yocto
                 {
                     return;
                 }
-                
+
                 switch(r->uuid)
                 {
                     case aggregate::UUID:
@@ -692,24 +694,24 @@ namespace yocto
 
 
                     }   break;
-                        
+
                     case optional::UUID:
                     case at_least::UUID:
                         simplify( (rule*)(r->content()) );
                         break;
-                        
-                        
+
+
                     default:
-                        
+
                         break;
                 }
-                
-                
+
+
             }
         }
-        
+
     }
-    
+
 }
 
 
@@ -722,7 +724,39 @@ namespace yocto
             void LanGen:: semantic(rule *r)
             {
                 assert(r);
-                
+                if(aggregate::UUID==r->uuid)
+                {
+                    std::cerr << "\t\t\tscanning semantic " << r->label << std::endl;
+                    operands *ops = (operands *)(r->content());
+                    if(ops->size>1)
+                    {
+                        for( logical::operand *ch = ops->head; ch; ch=ch->next)
+                        {
+                            rule *sub = ch->addr;
+                            if(visited.search(sub))
+                            {
+                                continue;
+                            }
+
+                            if(raw.search(sub->label))
+                            {
+                                std::cerr << "\t\t\tsetting " << sub->label << " to JETTISON" << std::endl;
+                                property *modif = (property *)(sub->content());
+                                assert(modif!=NULL);
+                                assert(univocal==*modif || jettison==*modif);
+                                *modif = jettison;
+                                if(!visited.insert(sub))
+                                {
+                                    throw exception("%s: unexpected visited semantic failure for '%s'", name, sub->label.c_str());
+                                }
+                            }
+                        }
+                    }
+                }
+
+#if 0
+                assert(r);
+
                 if(visited.search(r)) return;
                 if(!visited.insert(r))
                 {
@@ -731,7 +765,10 @@ namespace yocto
 
                 std::cerr << "\t\tsemantic for '" << r->label << "' " <<  std::endl;
 
+                //______________________________________________________________
+                //
                 // propagate
+                //______________________________________________________________
                 switch (r->uuid)
                 {
                     case aggregate::UUID:
@@ -742,7 +779,7 @@ namespace yocto
                         {
                             semantic(ch->addr);
                         }
-
+                        
                     } break;
                         
                     case optional::UUID:
@@ -751,11 +788,14 @@ namespace yocto
                         break;
                         
                     default:
-                        std::cerr << "unhandled..." << std::endl;
+                        std::cerr << "\t\tunhandled..." << std::endl;
                         break;
                 }
-
+                
+                //______________________________________________________________
+                //
                 // analyze
+                //______________________________________________________________
                 if(aggregate::UUID==r->uuid)
                 {
                     std::cerr << "\t\tscanning semantic " << r->label << std::endl;
@@ -764,14 +804,21 @@ namespace yocto
                     {
                         for( logical::operand *ch = ops->head; ch; ch=ch->next)
                         {
-                            if(raw.search(ch->addr->label))
+                            rule *sub = ch->addr;
+                            
+                            
+                            if(raw.search(sub->label))
                             {
-                                std::cerr << "\t\t\tshould set " << ch->addr->label << " to JETTISON" << std::endl;
+                                std::cerr << "\t\t\tshould set " << sub->label << " to JETTISON" << std::endl;
+                                property *modif = (property *)(sub->content());
+                                assert(modif!=NULL);
+                                assert(univocal==*modif || jettison==*modif);
+                                *modif = jettison;
                             }
                         }
                     }
                 }
-                
+#endif
             }
         }
     }
