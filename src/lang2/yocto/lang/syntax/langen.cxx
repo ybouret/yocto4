@@ -62,8 +62,7 @@ namespace yocto
             {
                 assert(root!=NULL);
 
-                //std::cerr << "Collect MPH #nodes=" << cmph.nodes << std::endl;
-                //std::cerr << "Growing MPH #nodes=" << rmph.nodes << std::endl;
+
 
                 //______________________________________________________________
                 //
@@ -130,6 +129,15 @@ namespace yocto
                 //______________________________________________________________
                 visited.free();
                 check_visit( &P->top_level() );
+                for( rule *r = & P->top_level(); r; r=r->next )
+                {
+                    if(!visited.search(r))
+                    {
+                        throw exception("%s: unused rule '%s'", name, r->label.c_str());
+                    }
+                }
+
+
 
             }
 
@@ -833,9 +841,37 @@ namespace yocto
         {
 
 
-            void LanGen:: check_visit(rule *r)
+            void LanGen:: check_visit( rule *r)
             {
+                assert(r);
+                if(visited.search(r))
+                {
+                    return;
+                }
+                if(!visited.insert(r))
+                {
+                    throw exception("%s: unexpected visit chekcing failure for '%s'", name, r->label.c_str());
+                }
 
+                switch(r->uuid)
+                {
+                    case aggregate::UUID:
+                    case alternate::UUID: {
+                        operands *ops = (operands *)(r->content());
+                        for( logical::operand *ch = ops->head; ch; ch=ch->next)
+                        {
+                            check_visit(ch->addr);
+                        }
+                    } break;
+
+                    case optional::UUID:
+                    case at_least::UUID:
+                        check_visit( (rule*)(r->content()) );
+                        break;
+
+                    default:
+                        break;
+                }
             }
 
         }
