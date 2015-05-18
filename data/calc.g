@@ -1,13 +1,13 @@
 // some comment
 .calc;
 
-prog : stat+;
+prog : stat*;
 
 stat :	expr END
 	|	ID ASSIGN expr END
 	|	END; 			
 
-expr 	:	multExpr ((PLUS | MINUS )multExpr)*;
+expr 	:	multExpr ((PLUS|MINUS) multExpr)*;
 
 multExpr:	atom ((MULT | DIV) atom )*;
 
@@ -20,10 +20,10 @@ INT 	: "[:digit:]"+;
 @endl   : "[:endl:]" ;
 @drop   : "[ \t]";
 PLUS    : '+' ;
-MINUS   : '-'    ;
-MULT    : '*'    ;
-DIV     : '/'    ;
-ASSIGN  : '='    ;
-END     : ';'    ;
-LPAREN  : '(';
-RPAREN  : ')';
+MINUS   : '-' ;
+MULT    : '*' ;
+DIV     : '/' ;
+ASSIGN  : '=' ;
+END     : ';' ;
+LPAREN  : '(' ;
+RPAREN  : ')' ;

@@ -167,6 +167,18 @@ namespace yocto
                 }
             }
 
+            void LanGen:: mark_visited(rule *r,const char *ctx)
+            {
+                assert(r);
+                assert(ctx);
+                if(!visited.insert(r))
+                {
+                    throw exception("%s: unexpected visited insertion failure for '%s' during %s", name, r->label.c_str(), ctx);
+                }
+
+            }
+
+
         }
     }
 }
@@ -199,36 +211,18 @@ namespace yocto
                             //
                             // a non terminal rule
                             //__________________________________________________
-                            property     ppty = standard;
-                            const token &itkn = node->lex();
-                            assert(itkn.size>0);
-                            // checking property
-                            if('%'==itkn.head->code)
-                            {
-                                ppty = mergeOne;
-                                delete ((token&)itkn).pop_front();
-                            }
                             const string r_id = node->content();
                             rule_ptr    *agg = rules.search(r_id);
                             if(!agg)
                             {
-                                std::cerr << "+ID=" << r_id << ", ppty=" << int(ppty) << std::endl;
+                                std::cerr << "+ID=" << r_id << std::endl;
 
-                                aggregate     *p = new aggregate(r_id,ppty);
+                                aggregate     *p = new aggregate(r_id,standard);
                                 P->append(p);
                                 const rule_ptr q( p );
                                 if(!rules.insert(q))
                                 {
                                     throw exception("%s: unexpected RULE '%s' insertion failure!",name,r_id.c_str());
-                                }
-                            }
-                            else
-                            {
-                                property &curr = (property &)(**agg).modifier;
-                                if(curr==standard&&ppty!=standard)
-                                {
-                                    std::cerr << "@ID=" << r_id << " : change ppty" << std::endl;
-                                    curr = ppty;
                                 }
                             }
                         } break;
@@ -685,10 +679,7 @@ namespace yocto
                 assert(r);
 
                 if(visited.search(r)) return;
-                if(!visited.insert(r))
-                {
-                    throw exception("%s: unexpected simplify/visited failure for '%s'", name, r->label.c_str());
-                }
+                mark_visited(r, "simplification");
 
                 switch (r->uuid)
                 {
@@ -775,22 +766,17 @@ namespace yocto
                 assert(modif!=NULL);
                 assert(univocal==*modif || jettison==*modif);
                 *modif = jettison;
-                if(!visited.insert(sub))
-                {
-                    throw exception("%s: unexpected visited semantic failure for '%s'", name, sub->label.c_str());
-                }
-
-
-
+                mark_visited(sub,"set_jettison");
             }
 
             void LanGen:: semantic(rule *r)
             {
                 assert(r);
+                std::cerr << "\t\tscanning semantic " << r->label << std::endl;
+
                 //! one raw in a multiple operands aggregate
                 if(aggregate::UUID==r->uuid)
                 {
-                    std::cerr << "\t\t\tscanning semantic " << r->label << std::endl;
                     operands *ops = (operands *)(r->content());
                     if(ops->size>1)
                     {
@@ -812,20 +798,35 @@ namespace yocto
                 }
 
                 //! alias: a single raw in a declared aggregate
-                if(aggregate::UUID==r->uuid&&rules.search(r->label))
+                rule_ptr *pp = rules.search(r->label);
+                if(pp!=NULL)
                 {
                     operands *ops = (operands *)(r->content());
                     if(1==ops->size)
                     {
                         rule *sub = ops->head->addr;
 
-                        if(!visited.search(sub) && raw.search(sub->label))
+                        if(!visited.search(sub))
                         {
-                            std::cerr << "\t\t\taliasing " << sub->label <<  std::endl;
-                            set_jettison(sub);
+                            if(raw.search(sub->label) )
+                            {
+                                std::cerr << "\t\t\taliasing " << sub->label <<  std::endl;
+                                set_jettison(sub);
+                            }
+
+                            //! merging: a single ALT in a declared aggregate
+                            if(alternate::UUID==sub->uuid)
+                            {
+                                std::cerr << "\t\t\tsetting mergeOne for " << r->label << std::endl;
+                                (property &)((**pp).modifier) = mergeOne;
+                                mark_visited(sub,"mergeOne");
+                            }
                         }
+
+
                     }
                 }
+
 
 
             }
@@ -873,11 +874,11 @@ namespace yocto
                         break;
                 }
             }
-
+            
         }
-
+        
     }
-
+    
 }
 
 

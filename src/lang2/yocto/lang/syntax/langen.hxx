@@ -75,7 +75,7 @@ namespace yocto
                 void set_jettison(rule *sub);
 
                 void check_visit(rule *r);
-
+                void mark_visited(rule *r,const char *ctx);
             };
         }
     }
