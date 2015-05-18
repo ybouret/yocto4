@@ -36,13 +36,12 @@ namespace yocto
                 }
             }
 
-
             const string & rule:: key() const throw()
             {
                 return label;
             }
 
-
+            
             void * rule:: content() throw()
             {
                 return 0;

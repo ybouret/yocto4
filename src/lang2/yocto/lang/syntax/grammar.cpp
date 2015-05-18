@@ -14,10 +14,11 @@ namespace yocto
                 while(rules.size)
                 {
                     rule *r = rules.pop_back();
-                    if(r->refcount()<=0 || r->liberate())
-                    {
-                        delete r;
-                    }
+                    //if(r->refcount()<=0 || r->liberate())
+                    //{
+                    //    delete r;
+                    //}
+                    delete r;
                 }
             }
 
@@ -295,20 +296,7 @@ namespace yocto
                         operands *ops = (operands *)(r->content());
                         if(ops->size<=0)
                         {
-                            switch(r->refcount())
-                            {
-                                case 1:
-                                    (void)r->liberate();
-                                case 0:
-                                    delete r;
-                                    break;
-
-                                default:
-                                    assert(r->refcount()>=2);
-                                    (void) r->liberate();
-                            }
-
-
+                            delete r;
                         }
                         else
                         {

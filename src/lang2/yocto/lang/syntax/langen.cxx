@@ -184,14 +184,12 @@ namespace yocto
                                 std::cerr << "New ID " << r_id << std::endl;
 
                                 aggregate     *p = new aggregate(r_id);
+                                P->append(p);
                                 const rule_ptr q( p );
                                 if(!rules.insert(q))
                                 {
                                     throw exception("%s: unexpected RULE '%s' insertion failure!",name,r_id.c_str());
                                 }
-                                // make the new rule
-                                P->append(p);
-                                p->withhold();
                             }
                         } break;
 
@@ -205,6 +203,7 @@ namespace yocto
                             if(!rxp.search(t_id))
                             {
                                 terminal      *p = new terminal(t_id,standard);
+                                P->append(p);
                                 const term_ptr q( p );
                                 if(!rxp.insert(q))
                                 {
@@ -217,8 +216,7 @@ namespace yocto
                                 // make the terminal from regexp
                                 const char *id = p->label.c_str();
                                 P->scanner.emit(id,id);
-                                P->append( p );
-                                p->withhold();
+
                             }
 
                         } break;
@@ -234,6 +232,7 @@ namespace yocto
                             if(!raw.search(t_id))
                             {
                                 terminal      *p = new terminal(t_id,univocal);
+                                P->append(p);
                                 const term_ptr q(p);
                                 if(!raw.insert(q))
                                 {
@@ -244,8 +243,6 @@ namespace yocto
                                 //make the terminal from raw
                                 const lexical::action emit( &(P->scanner), &lexical::scanner::forward);
                                 P->scanner.make(p->label, lang::logical::equal(p->label), emit);
-                                P->append( p);
-                                p->withhold();
                             }
                         } break;
 

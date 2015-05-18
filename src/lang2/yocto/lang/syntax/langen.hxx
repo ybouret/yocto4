@@ -5,7 +5,7 @@
 #include "yocto/lang/pattern/dict.hpp"
 
 #include "yocto/ptr/auto.hpp"
-#include "yocto/ptr/intr.hpp"
+#include "yocto/ptr/alias.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/hashing/perfect.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
@@ -20,11 +20,11 @@ namespace yocto
             class LanGen
             {
             public:
-                typedef intr_ptr<string,aggregate> rule_ptr;
-                typedef set<string,rule_ptr>       rule_set;
+                typedef alias_ptr<string,aggregate> rule_ptr;
+                typedef set<string,rule_ptr>        rule_set;
 
-                typedef intr_ptr<string,terminal>  term_ptr;
-                typedef set<string,term_ptr>       term_set;
+                typedef alias_ptr<string,terminal>  term_ptr;
+                typedef set<string,term_ptr>        term_set;
 
                 const xnode      *root;
                 auto_ptr<parser>  P;

@@ -14,7 +14,7 @@ namespace yocto
 #define Y_LANG_SYNTAX_RULE_ACCEPT_ARGS xnode * &tree, lexer &lxr, source &src, ios::istream &fp
 
             //! a syntax rule
-            class rule : public counted_object
+            class rule : public object
             {
             public:
                 rule          *next;
