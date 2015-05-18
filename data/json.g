@@ -1,12 +1,12 @@
 .JSON;
 
-json   : value;
+json   : object | vector;
 
 %value : object | number | 'null' | 'true' | 'false' | vector;
 
 number : "[:digit:]+";
 
-object : empty_object | heavy_object;
+%object : empty_object | heavy_object;
 
 empty_object : '{' '}';
 heavy_object : '{' pair (',' pair)* '}';
@@ -14,7 +14,7 @@ pair         : "[:cstring:]" ':' value;
 
 empty_vector : '[' ']';
 heavy_vector : '[' value (',' value)* ']';
-vector       : empty_vector | heavy_vector;
+%vector       : empty_vector | heavy_vector;
 
 // lexical rules
 @drop : "[:blank:]";
