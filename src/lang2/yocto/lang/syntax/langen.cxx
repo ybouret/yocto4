@@ -98,8 +98,8 @@ namespace yocto
                 }
                 P->cleanup();
 
-                P->gramviz("lanraw.dot");
-                (void) system("dot -Tpng -o lanraw.png lanraw.dot");
+                //P->gramviz("lanraw.dot");
+                //(void) system("dot -Tpng -o lanraw.png lanraw.dot");
 
                 //______________________________________________________________
                 //
@@ -215,7 +215,7 @@ namespace yocto
                             rule_ptr    *agg = rules.search(r_id);
                             if(!agg)
                             {
-                                std::cerr << "+ID=" << r_id << std::endl;
+                                //std::cerr << "+ID=" << r_id << std::endl;
 
                                 aggregate     *p = new aggregate(r_id,standard);
                                 P->append(p);
@@ -287,7 +287,7 @@ namespace yocto
 
                         default:
                             assert(-1==cmph(node->label));
-                            std::cerr << "unregistered " << node->label << " content='" << node->lex() << "'" << std::endl;
+                            //std::cerr << "unregistered " << node->label << " content='" << node->lex() << "'" << std::endl;
                     }
 
 
@@ -326,7 +326,7 @@ namespace yocto
                 assert(2==node->children().size);
 
                 const string code = node->children().head->content();
-                std::cerr << "\tLEXICAL: " << code << std::endl;
+                //std::cerr << "\tLEXICAL: " << code << std::endl;
 
                 auto_ptr<pattern> p( compile_lexical_pattern(node->children().tail) );
 
@@ -355,18 +355,18 @@ namespace yocto
                 if("RXP"==node->label)
                 {
                     const string expr = node->content();
-                    std::cerr << "\t\tcompiling \"" << expr << "\"" << std::endl;
+                    //std::cerr << "\tcompiling \"" << expr << "\"" << std::endl;
                     return regexp(expr, & (P->dict) );
                 }
 
                 if("RAW"==node->label)
                 {
                     const string expr = node->content();
-                    std::cerr << "\t\tcompiling '" << expr << "'" << std::endl;
+                    //std::cerr << "\tcompiling '" << expr << "'" << std::endl;
                     return lang::logical::equal(expr);
                 }
 
-                throw exception("%s: Unexpected Lexical Rule Failure",name);
+                throw exception("%s: Unexpected Lexical Rule Failure '%s'",name,node->label.c_str());
             }
 
 
@@ -433,7 +433,7 @@ namespace yocto
                 // grow from top level
                 //______________________________________________________________
                 logical *parent = & get_std(child);
-                std::cerr << "\t\tBuilding Rule for " << parent->label << std::endl;
+                std::cerr << "\tBuilding Rule for " << parent->label << std::endl;
                 grow_rule(parent,child->next);
             }
 
@@ -772,7 +772,7 @@ namespace yocto
             void LanGen:: semantic(rule *r)
             {
                 assert(r);
-                std::cerr << "\t\tscanning semantic " << r->label << std::endl;
+                //std::cerr << "\t\tscanning semantic " << r->label << std::endl;
 
                 //! one raw in a multiple operands aggregate
                 if(aggregate::UUID==r->uuid)
@@ -790,7 +790,7 @@ namespace yocto
 
                             if(raw.search(sub->label))
                             {
-                                std::cerr << "\t\t\tsetting " << sub->label << " to JETTISON" << std::endl;
+                                std::cerr << "\t" << sub->label << " ==> JETTISON" << std::endl;
                                 set_jettison(sub);
                             }
                         }
@@ -810,14 +810,14 @@ namespace yocto
                         {
                             if(raw.search(sub->label) )
                             {
-                                std::cerr << "\t\t\taliasing " << sub->label <<  std::endl;
+                                std::cerr << "\t" << sub->label <<  " ==> alias " << r->label << std::endl;
                                 set_jettison(sub);
                             }
 
                             //! merging: a single ALT in a declared aggregate
                             if(alternate::UUID==sub->uuid)
                             {
-                                std::cerr << "\t\t\tsetting mergeOne for " << r->label << std::endl;
+                                std::cerr << "\t" << r->label << " ==> mergeOne" << std::endl;
                                 (property &)((**pp).modifier) = mergeOne;
                                 mark_visited(sub,"mergeOne");
                             }

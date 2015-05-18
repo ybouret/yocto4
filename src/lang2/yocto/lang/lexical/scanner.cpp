@@ -103,6 +103,10 @@ namespace yocto
             {
                 auto_ptr<pattern> q(p);
                 check_label(label);
+                if(p->accept_empty())
+                {
+                    throw exception("<%s>: '%s' accepts empty!", name.c_str(), label.c_str());
+                }
                 rules.push_back( rule::create(label,q.yield(),a) );
             }
             
