@@ -53,7 +53,9 @@ namespace yocto
 
             void alternate:: viz(ios::ostream &fp) const
             {
-                fp.viz((const rule*)this); fp("[shape=diamond,label=\"%s\"];\n", label.c_str());
+                fp.viz((const rule*)this); fp("[shape=diamond,label=\"");
+                encode_label(fp);
+                fp("\"];\n");
             }
 
             void alternate:: lnk( ios::ostream &fp ) const

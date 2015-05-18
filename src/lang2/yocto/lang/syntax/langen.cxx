@@ -236,6 +236,7 @@ namespace yocto
                             const string t_id = node->content();
                             if(!rxp.search(t_id))
                             {
+                                std::cerr << "Compiling <" << t_id << ">" << std::endl;
                                 terminal      *p = new terminal(t_id,standard);
                                 P->append(p);
                                 const term_ptr q( p );

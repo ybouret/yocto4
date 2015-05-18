@@ -56,7 +56,8 @@ namespace yocto
                 }
 
                 fp("[shape=%s,label=\"",shape);
-                fp << label << "\"];\n";
+                encode_label(fp);
+                fp << "\"];\n";
             }
 
             void terminal:: lnk(ios::ostream &) const {}

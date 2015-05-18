@@ -61,6 +61,7 @@ namespace yocto
                 
                 YOCTO_MAKE_OBJECT
 
+                void encode_label(ios::ostream &fp) const;
 
             private:
                 xnode(const rule &r, bool flag, const property ppty);

@@ -43,6 +43,8 @@ namespace yocto
                 //! internal data for specific stuff, default=NULL
                 virtual void *content() throw();
 
+                void encode_label( ios::ostream &fp ) const;
+
             protected:
                 explicit rule(const string &id, uint32_t uu);
                 

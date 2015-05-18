@@ -71,7 +71,10 @@ namespace yocto
                     default:
                         break;
                 }
-                fp.viz((const rule*)this); fp("[shape=house,style=%s,label=\"%s\"];\n", style,label.c_str());
+                fp.viz((const rule*)this);
+                fp("[shape=house,style=%s,label=\"",style);
+                encode_label(fp);
+                fp("\"];\n");
             }
 
             void aggregate:: lnk( ios::ostream &fp ) const

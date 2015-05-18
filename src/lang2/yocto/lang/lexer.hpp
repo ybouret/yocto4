@@ -85,7 +85,7 @@ namespace yocto
                 return *plg;
             }
 
-
+            void dump() const throw();
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);

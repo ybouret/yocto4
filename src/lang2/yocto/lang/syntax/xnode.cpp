@@ -198,7 +198,7 @@ namespace yocto
                 {
                     assert(lx);
                     fp( "[shape=box,label=\"");
-                    fp << label;
+                    encode_label(fp);
                     if(modifier==standard)
                     {
                         fp << '=';
@@ -210,7 +210,7 @@ namespace yocto
                 {
                     assert(ch);
                     fp("[shape=egg,label=\"");
-                    fp << label;
+                    encode_label(fp);
                     fp("\"];\n");
                     //unsigned i=0;
                     for(const xnode *node=ch->head;node;node=node->next)
@@ -220,6 +220,31 @@ namespace yocto
                     }
                 }
             }
+
+            void xnode:: encode_label( ios::ostream &fp ) const
+            {
+                for(size_t i=0;i<label.size();++i)
+                {
+                    const char C = label[i];
+                    if(C>=32 && C<127)
+                    {
+                        switch(C)
+                        {
+                            case '\\': fp("\\\\"); break;
+                            case '"' : fp("\\\""); break;
+
+                            default:
+                                fp("%c",C);
+                        }
+
+                    }
+                    else
+                    {
+                        fp("\\x%02x",C);
+                    }
+                }
+            }
+
 
             void xnode:: graphivz( const string &filename ) const
             {

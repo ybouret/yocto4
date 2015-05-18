@@ -198,30 +198,6 @@ namespace yocto
             }
         }
 
-#if 0
-        void lexer:: prefetch(size_t nmax, source &src, ios::istream &fp)
-        {
-            l_list stk;
-            stk.swap_with(*this);
-
-            try
-            {
-                for(size_t i=stk.size;i<=nmax;++i)
-                {
-                    lexeme *lx = get(src,fp);
-                    assert(0==size);
-                    if(!lx) break;
-                    stk.push_back(lx);
-                }
-                stk.swap_with(*this);
-            }
-            catch(...)
-            {
-                stk.swap_with(*this);
-                throw;
-            }
-        }
-#endif
         
         void lexer:: unget(const lexical::plugin &plg, const string &content)
         {
@@ -244,5 +220,26 @@ namespace yocto
         
     }
 }
+
+namespace yocto
+{
+    namespace lang
+    {
+
+        void lexer:: dump() const throw()
+        {
+            std::cerr << "\t\tdumping " << name << std::endl;
+            size_t i = size;
+            for(const lexeme *lx = tail; lx;lx=lx->prev)
+            {
+                std::cerr << i << ": <" << lx->label << "> : '" << *lx << "'" << std::endl;
+                --i;
+            }
+        }
+
+    }
+
+}
+
 
 

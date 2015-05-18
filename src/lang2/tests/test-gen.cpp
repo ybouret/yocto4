@@ -31,11 +31,13 @@ YOCTO_UNIT_TEST_IMPL(gen)
     if(argc>1)
     {
         auto_ptr<parser> P;
+
         {
             ios::icstream fp( argv[1] );
             P.reset( G.compile(fp) );
         }
 
+        try
         {
             ios::icstream           fp( ios::cstdin );
             auto_ptr<syntax::xnode> tree( P->run(fp) );
@@ -45,9 +47,17 @@ YOCTO_UNIT_TEST_IMPL(gen)
                 (void) system("dot -Tpng -o gen.png gen.dot");
             }
         }
-
+        catch(...)
+        {
+            if(P.is_valid())
+            {
+                P->dump();
+            }
+            throw;
+        }
+        
     }
-
-
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()

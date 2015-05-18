@@ -88,6 +88,9 @@ namespace yocto
             
             void cstring:: on_quit(const token &)
             {
+                //assert(content.size()>=2);
+                //content.trim(1);
+                //content.skip(1);
                 lex->unget(*this, content);
             }
             

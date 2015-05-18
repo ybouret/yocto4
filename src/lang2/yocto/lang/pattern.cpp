@@ -43,9 +43,15 @@ namespace yocto
             for(const t_char *ch=tkn.head;ch;ch=ch->next)
             {
                 const char C(ch->code);
-                if(C>=32 && C<127 && C!='\"' && C!='\\')
+                if(C>=32 && C<127)
                 {
-                    fp("%c",C);
+                    switch(C)
+                    {
+                        case '\"': fp("\\\""); break;
+                        case '\\': fp("\\\\"); break;
+                        default:
+                            fp("%c",C);
+                    }
                 }
                 else
                 {

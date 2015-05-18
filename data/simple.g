@@ -1,14 +1,12 @@
 .simple;
 
-CODE : (NUM|ID)+;
+code : (string)*;
 
-ID  : "[:alpha:][:word:]*";
-INT : "[:digit:]"+;
-HEX : "0x[:xdigit:]+";
-
-NUM : INT | HEX; 
 
 @drop  :  "[ \t]" ;
 @endl  :  "[:endl:]";
+
+string : "[:cstring:]";
+
 
 @comment: "#";
