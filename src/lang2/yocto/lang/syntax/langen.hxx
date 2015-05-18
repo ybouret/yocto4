@@ -72,7 +72,7 @@ namespace yocto
                 sorted_vector<rptr> visited;
 
                 void semantic(rule *r);
-                
+                void set_jettison(rule *sub);
             };
         }
     }

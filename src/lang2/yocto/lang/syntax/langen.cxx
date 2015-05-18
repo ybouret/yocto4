@@ -730,9 +730,29 @@ namespace yocto
     {
         namespace syntax
         {
+            void LanGen::set_jettison(rule *sub)
+            {
+                assert(sub);
+                assert(raw.search(sub->label));
+                assert(!visited.search(sub));
+
+                property *modif = (property *)(sub->content());
+                assert(modif!=NULL);
+                assert(univocal==*modif || jettison==*modif);
+                *modif = jettison;
+                if(!visited.insert(sub))
+                {
+                    throw exception("%s: unexpected visited semantic failure for '%s'", name, sub->label.c_str());
+                }
+
+
+
+            }
+
             void LanGen:: semantic(rule *r)
             {
                 assert(r);
+                //! one raw in a multiple operands aggregate
                 if(aggregate::UUID==r->uuid)
                 {
                     std::cerr << "\t\t\tscanning semantic " << r->label << std::endl;
@@ -750,18 +770,28 @@ namespace yocto
                             if(raw.search(sub->label))
                             {
                                 std::cerr << "\t\t\tsetting " << sub->label << " to JETTISON" << std::endl;
-                                property *modif = (property *)(sub->content());
-                                assert(modif!=NULL);
-                                assert(univocal==*modif || jettison==*modif);
-                                *modif = jettison;
-                                if(!visited.insert(sub))
-                                {
-                                    throw exception("%s: unexpected visited semantic failure for '%s'", name, sub->label.c_str());
-                                }
+                                set_jettison(sub);
                             }
                         }
                     }
                 }
+
+                //! alias: a single raw in a declared aggregate
+                if(aggregate::UUID==r->uuid&&rules.search(r->label))
+                {
+                    operands *ops = (operands *)(r->content());
+                    if(1==ops->size)
+                    {
+                        rule *sub = ops->head->addr;
+
+                        if(!visited.search(sub) && raw.search(sub->label))
+                        {
+                            std::cerr << "\t\t\taliasing " << sub->label <<  std::endl;
+                            set_jettison(sub);
+                        }
+                    }
+                }
+
 
             }
         }
