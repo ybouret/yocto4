@@ -73,6 +73,9 @@ namespace yocto
 
                 void semantic(rule *r);
                 void set_jettison(rule *sub);
+
+                void check_visit(rule *r);
+
             };
         }
     }

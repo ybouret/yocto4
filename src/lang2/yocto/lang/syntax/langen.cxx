@@ -123,6 +123,14 @@ namespace yocto
                 }
                 P->gramviz("langen.dot");
                 (void) system("dot -Tpng -o langen.png langen.dot");
+
+                //______________________________________________________________
+                //
+                // Check everybody is OK
+                //______________________________________________________________
+                visited.free();
+                check_visit( &P->top_level() );
+
             }
 
 
@@ -816,6 +824,26 @@ namespace yocto
         }
     }
 }
+
+namespace yocto
+{
+    namespace lang
+    {
+        namespace syntax
+        {
+
+
+            void LanGen:: check_visit(rule *r)
+            {
+
+            }
+
+        }
+
+    }
+
+}
+
 
 
 

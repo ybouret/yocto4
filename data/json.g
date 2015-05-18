@@ -12,6 +12,8 @@ empty_object : '{' '}';
 heavy_object : '{' pair (',' pair)* '}';
 pair         : "[:cstring:]" ':' value;
 
+empty_vector : '[' ']';
+
 
 
 // lexical rules
