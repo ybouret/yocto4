@@ -722,6 +722,7 @@ namespace yocto
             void LanGen:: semantic(rule *r)
             {
                 assert(r);
+                
                 if(visited.search(r)) return;
                 if(!visited.insert(r))
                 {
@@ -730,6 +731,7 @@ namespace yocto
 
                 std::cerr << "\t\tsemantic for '" << r->label << "' " <<  std::endl;
 
+                // propagate
                 switch (r->uuid)
                 {
                     case aggregate::UUID:
@@ -740,6 +742,7 @@ namespace yocto
                         {
                             semantic(ch->addr);
                         }
+
                     } break;
                         
                     case optional::UUID:
@@ -750,6 +753,23 @@ namespace yocto
                     default:
                         std::cerr << "unhandled..." << std::endl;
                         break;
+                }
+
+                // analyze
+                if(aggregate::UUID==r->uuid)
+                {
+                    std::cerr << "\t\tscanning semantic " << r->label << std::endl;
+                    operands *ops = (operands *)(r->content());
+                    if(ops->size>1)
+                    {
+                        for( logical::operand *ch = ops->head; ch; ch=ch->next)
+                        {
+                            if(raw.search(ch->addr->label))
+                            {
+                                std::cerr << "\t\t\tshould set " << ch->addr->label << " to JETTISON" << std::endl;
+                            }
+                        }
+                    }
                 }
                 
             }
