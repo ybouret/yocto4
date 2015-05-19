@@ -41,6 +41,8 @@ namespace yocto
 
 
             private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(LanGen);
+
                 void     collect(const xnode *node);
                 void     find_rules_from(const xnode *node);
                 void     build_rule_from(const xnode *node);
@@ -55,7 +57,6 @@ namespace yocto
                 void     check_valid_declared( rule *r );
 
 
-                YOCTO_DISABLE_COPY_AND_ASSIGN(LanGen);
 
                 const char *name; //!< P->grammar::name.c_str()
                 unsigned    indx; //!< for internal rules

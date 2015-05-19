@@ -295,7 +295,6 @@ namespace yocto
 
                         default:
                             assert(-1==cmph(node->label));
-                            //std::cerr << "unregistered " << node->label << " content='" << node->lex() << "'" << std::endl;
                     }
 
 
@@ -336,15 +335,13 @@ namespace yocto
                 assert("LXR"==node->label);
                 assert(2==node->children().size);
 
-                const string code = node->children().head->content();
-                //std::cerr << "\tLEXICAL: " << code << std::endl;
-
+                const string code    = node->children().head->content();
                 const string code_id = code + vformat("/%u",++jndx);
                 const xnode *meta    = node->children().tail;
 
                 //______________________________________________________________
                 //
-                // Reserved Words
+                // Reserved Keywords
                 //______________________________________________________________
                 if(code=="@drop")
                 {
@@ -372,8 +369,11 @@ namespace yocto
                 // otherwise, plugins...
                 //______________________________________________________________
 
-                
+
+                //______________________________________________________________
+                //
                 // find the top level rule to insert plugin
+                //______________________________________________________________
                 assert(code.size()>=2);
                 const string rule_name = &code[1];
                 rule_ptr *ppR = rules.search(rule_name);
@@ -381,11 +381,12 @@ namespace yocto
                 {
                     throw exception("%s: not found rule name '%s'",name,rule_name.c_str());
                 }
-                
+
+                //______________________________________________________________
+                //
                 // find the name of the plugin to use
+                //______________________________________________________________
                 const string plug_name = meta->content();
-                std::cerr << "using plugin '" << plug_name << "'" << std::endl;
-                
                 
                 if( plug_name == "cstring" )
                 {
@@ -395,7 +396,7 @@ namespace yocto
                     return;
                 }
                 
-                throw exception("%s: unregisterd code '%s'", name, code.c_str());
+                throw exception("%s: unregistered plugin '%s' for '%s'", plug_name.c_str(), name, code.c_str());
             }
 
             pattern *LanGen:: compile_lexical_pattern(const xnode *node)
@@ -754,11 +755,9 @@ namespace yocto
                             rule             *sub = ch->addr;
                             if( is_internal_sub(sub->label) )
                             {
-                                //std::cerr << "\t\tINTERNAL " << sub->label << std::endl;
                                 operands *children = (operands *)(sub->content()); assert(children);
                                 if(1==children->size)
                                 {
-                                    //std::cerr << "\t\tfusion!" << std::endl;
                                     stk.push_back(children->pop_front());
                                     delete ch;
                                 }
@@ -820,9 +819,11 @@ namespace yocto
             void LanGen:: semantic(rule *r)
             {
                 assert(r);
-                //std::cerr << "\t\tscanning semantic " << r->label << std::endl;
 
-                //! one raw in a multiple operands aggregate
+                //______________________________________________________________
+                //
+                // one raw in a multiple operands aggregate
+                //______________________________________________________________
                 if(aggregate::UUID==r->uuid)
                 {
                     operands *ops = (operands *)(r->content());
@@ -845,7 +846,10 @@ namespace yocto
                     }
                 }
 
-                //! alias: a single raw in a declared aggregate
+                //______________________________________________________________
+                //
+                // alias: a single raw in a declared aggregate
+                //______________________________________________________________
                 rule_ptr *pp = rules.search(r->label);
                 if(pp!=NULL)
                 {
@@ -862,7 +866,10 @@ namespace yocto
                                 set_jettison(sub);
                             }
 
-                            //! merging: a single ALT in a declared aggregate
+                            //__________________________________________________
+                            //
+                            // merging: a single ALT in a declared aggregate
+                            //__________________________________________________
                             if(alternate::UUID==sub->uuid)
                             {
                                 std::cerr << "\tmergeOne ==> " << r->label << std::endl;
@@ -899,7 +906,7 @@ namespace yocto
                 }
                 if(!visited.insert(r))
                 {
-                    throw exception("%s: unexpected visit chekcing failure for '%s'", name, r->label.c_str());
+                    throw exception("%s: unexpected visit checking failure for '%s'", name, r->label.c_str());
                 }
 
                 switch(r->uuid)

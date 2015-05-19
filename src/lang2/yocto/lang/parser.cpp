@@ -57,21 +57,6 @@ namespace yocto
             r << r1 << r2 << r3;
             return r;
         }
-
-#if 0
-        syntax::aggregate & parser:: gather(const char *label, Rule &r1, Rule &r2)
-        {
-            syntax::aggregate &r = agg(label);
-            r << r1 << r2;
-            return r;
-        }
-        syntax::aggregate & parser:: gather(const char *label, Rule &r1, Rule &r2, Rule &r3)
-        {
-            syntax::aggregate &r = agg(label);
-            r << r1 << r2 << r3;
-            return r;
-        }
-#endif
         
         syntax::xnode * parser::run(ios::istream &fp)
         {

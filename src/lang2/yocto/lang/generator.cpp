@@ -137,49 +137,6 @@ namespace yocto
 
 }
 
-#if 0
-namespace yocto
-{
-    namespace lang
-    {
-
-        void generator::reshape( syntax::xnode *node ) throw()
-        {
-            if(!node->terminal)
-            {
-                syntax::xnode::leaves stk;
-                while(node->children().size)
-                {
-                    syntax::xnode *child = node->pop_head();
-                    reshape(child);
-                    if(node->label=="SUB" && child->label=="SUB")
-                    {
-                        while(child->children().size)
-                        {
-                            stk.push_back(child->pop_head());
-                        }
-                        delete child;
-                    }
-                    else
-                    {
-                        stk.push_back(child);
-                    }
-                }
-                while(stk.size)
-                {
-                    node->append(stk.pop_front());
-                }
-            }
-        }
-
-
-    }
-
-}
-#endif
-
-
-
 namespace yocto
 {
     namespace lang

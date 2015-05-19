@@ -42,12 +42,7 @@ namespace yocto
 
             //! shortcut
             syntax::alternate & choice(Rule &r1, Rule &r2, Rule &r3);
-
-            //! shortcut
-            //syntax::aggregate & gather(const char *label, Rule &r1, Rule &r2);
-            //syntax::aggregate & gather(const char *label, Rule &r1, Rule &r2, Rule &r3);
-
-
+            
 
             //! clear all and accept top level rule
             syntax::xnode *run( ios::istream &fp );

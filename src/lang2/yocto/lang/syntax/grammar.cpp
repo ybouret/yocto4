@@ -207,7 +207,7 @@ namespace yocto
                     switch(lxr.size)
                     {
                         case 0:
-                            throw exception("[[%s]]: no lexeme",gname);
+                            throw exception("[[%s]]: no lexeme, expecting '%s'",gname,root.label.c_str());
 
                         case 1:
                             throw exception("[[%s]]: unexpected single lexeme %s", gname, lxr.head->label.c_str());
@@ -219,7 +219,7 @@ namespace yocto
 
                     }
 
-                    throw exception("[[%s]]: syntax error", gname);
+                    //throw exception("[[%s]]: syntax error", gname);
                 }
 
                 //______________________________________________________________
@@ -231,10 +231,10 @@ namespace yocto
                 if(lx)
                 {
                     assert(lxr.size>=1);
-                    if(lxr.size>1)
+                    if(lx->next)
                     {
                         assert(lx->next);
-                        throw exception("%d:[[%s]]: unexpected %s after %s", lx->next->line, gname, lx->next->label.c_str(), lx->label.c_str());
+                        throw exception("%d:[[%s]]: unexpected extraneous %s after %s", lx->next->line, gname, lx->next->label.c_str(), lx->label.c_str());
                     }
                     else
                     {
