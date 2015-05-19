@@ -904,10 +904,7 @@ namespace yocto
                 {
                     return;
                 }
-                if(!visited.insert(r))
-                {
-                    throw exception("%s: unexpected visit checking failure for '%s'", name, r->label.c_str());
-                }
+                mark_visited(r, "checking");
 
                 switch(r->uuid)
                 {
