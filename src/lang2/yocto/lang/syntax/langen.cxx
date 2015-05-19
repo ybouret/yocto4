@@ -76,7 +76,7 @@ namespace yocto
                     assert("NAME"==ch->label);
                     const string parser_name = ch->content(1,0);
                     const string parser_main = "main";
-                    std::cerr << "\t### " << parser_name << " ###" << std::endl;
+                    std::cerr << "\t### <" << parser_name << "> ###" << std::endl;
                     P.reset( new parser(parser_name,parser_main) );
                 }
 
@@ -84,6 +84,7 @@ namespace yocto
                 //
                 // First Pass: raw build
                 //______________________________________________________________
+                std::cerr << "Finding Rules" << std::endl;
                 name = P->grammar::name.c_str();
                 collect(root);
                 find_rules_from(root);
@@ -92,6 +93,7 @@ namespace yocto
                 //
                 //check existing rules
                 //______________________________________________________________
+                std::cerr << "Checking Rules" << std::endl;
                 for( rule *r = & P->top_level(); r; r=r->next )
                 {
                     check_valid_declared(r);
@@ -105,6 +107,7 @@ namespace yocto
                 //
                 // Second Pass: remove useless sub rules
                 //______________________________________________________________
+                std::cerr << "Simplify Rules" << std::endl;
                 visited.ensure( P->count() );
                 simplify(& P->top_level() );
                 P->cleanup();
@@ -115,6 +118,7 @@ namespace yocto
                 //
                 // Third Pass: change semantic meanings (RAW...)
                 //______________________________________________________________
+                std::cerr << "Semantic Rules" << std::endl;
                 visited.free();
                 for( rule *r = & P->top_level(); r; r=r->next )
                 {
@@ -127,6 +131,7 @@ namespace yocto
                 //
                 // Check everybody is OK
                 //______________________________________________________________
+                std::cerr << "Checking Rules Graph" << std::endl;
                 visited.free();
                 check_visit( &P->top_level() );
                 for( rule *r = & P->top_level(); r; r=r->next )
@@ -137,7 +142,7 @@ namespace yocto
                     }
                 }
 
-
+                std::cerr << "\t### </" << name << "> ###" << std::endl;
 
             }
 
@@ -215,7 +220,7 @@ namespace yocto
                             rule_ptr    *agg = rules.search(r_id);
                             if(!agg)
                             {
-                                //std::cerr << "+ID=" << r_id << std::endl;
+                                std::cerr << "+ID=" << r_id << std::endl;
 
                                 aggregate     *p = new aggregate(r_id,standard);
                                 P->append(p);
@@ -266,6 +271,7 @@ namespace yocto
                             const string t_id = node->content();
                             if(!raw.search(t_id))
                             {
+                                std::cerr << "Using <" << t_id << ">" << std::endl;
                                 terminal      *p = new terminal(t_id,univocal);
                                 P->append(p);
                                 const term_ptr q(p);
@@ -278,6 +284,7 @@ namespace yocto
                                 //make the terminal from raw
                                 const lexical::action emit( &(P->scanner), &lexical::scanner::forward);
                                 P->scanner.make(p->label, lang::logical::equal(p->label), emit);
+                                std::cerr << "\t done..." << std::endl;
                             }
                         } break;
 
@@ -335,6 +342,10 @@ namespace yocto
                 const string code_id = code + vformat("/%u",++jndx);
                 const xnode *meta    = node->children().tail;
 
+                //______________________________________________________________
+                //
+                // Reserved Words
+                //______________________________________________________________
                 if(code=="@drop")
                 {
                     const lexical::action drop( & P->scanner, & lexical::scanner::discard);
@@ -356,20 +367,31 @@ namespace yocto
                     return;
                 }
 
+                //______________________________________________________________
+                //
                 // otherwise, plugins...
+                //______________________________________________________________
+
+                
+                // find the top level rule to insert plugin
                 assert(code.size()>=2);
-                const string term_name = &code[1];
+                const string rule_name = &code[1];
+                rule_ptr *ppR = rules.search(rule_name);
+                if(!ppR)
+                {
+                    throw exception("%s: not found rule name '%s'",name,rule_name.c_str());
+                }
+                
+                // find the name of the plugin to use
                 const string plug_name = meta->content();
-                std::cerr << "using plugin '" << plug_name << "' as terminal '" << term_name << "'" << std::endl;
+                std::cerr << "using plugin '" << plug_name << "'" << std::endl;
+                
                 
                 if( plug_name == "cstring" )
                 {
+                    const string term_name = "@" + rule_name;
                     terminal &r = P->term<lexical::cstring>(term_name.c_str(),standard);
-                    const term_ptr p(&r);
-                    if(!rxp.insert(p))
-                    {
-                        throw exception("%s: unexpected failure to insert plugin '%s'=>'%s'",name,plug_name.c_str(),term_name.c_str());
-                    }
+                    (**ppR).append(&r);
                     return;
                 }
                 
@@ -816,7 +838,7 @@ namespace yocto
 
                             if(raw.search(sub->label))
                             {
-                                std::cerr << "\t" << sub->label << " ==> JETTISON" << std::endl;
+                                std::cerr << "\tJETTISON ==> " << sub->label  << std::endl;
                                 set_jettison(sub);
                             }
                         }
@@ -836,14 +858,14 @@ namespace yocto
                         {
                             if(raw.search(sub->label) )
                             {
-                                std::cerr << "\t" << sub->label <<  " ==> alias " << r->label << std::endl;
+                                std::cerr << "\tALIAS    ==>" << sub->label <<  " ==>  " << r->label << std::endl;
                                 set_jettison(sub);
                             }
 
                             //! merging: a single ALT in a declared aggregate
                             if(alternate::UUID==sub->uuid)
                             {
-                                std::cerr << "\t" << r->label << " ==> mergeOne" << std::endl;
+                                std::cerr << "\tmergeOne ==> " << r->label << std::endl;
                                 (property &)((**pp).modifier) = mergeOne;
                                 mark_visited(sub,"mergeOne");
                             }

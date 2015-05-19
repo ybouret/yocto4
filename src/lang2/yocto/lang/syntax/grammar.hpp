@@ -59,7 +59,7 @@ namespace yocto
                 rule &get_rule(const char   *id);
 
 
-                void append( rule *r ) throw();
+                void append( rule *r );
 
                 rule &top_level();
 

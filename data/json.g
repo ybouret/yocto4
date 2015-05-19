@@ -2,20 +2,22 @@
 
 json   : object | vector;
 
-value : object | number | 'null' | 'true' | 'false' | vector;
+value :  number | 'null' | 'true' | 'false' | string | vector | object;
 
-number : "[:digit:]+";
+
+number : "-?[0-9]+([.][0-9]*)?([eE][-+]?[0-9]+)?";
 
 object : empty_object | heavy_object;
 
 empty_object : '{' '}';
 heavy_object : '{' pair (',' pair)* '}';
-pair         : "[:cstring:]" ':' value;
+pair         : string ':' value;
 
 empty_vector : '[' ']';
 heavy_vector : '[' value (',' value)* ']';
 vector       : empty_vector | heavy_vector;
 
 // lexical rules
-@drop : "[:blank:]";
-@endl : "[:endl:]";
+@string : "cstring";
+@drop :   "[:blank:]";
+@endl :   "[:endl:]";

@@ -176,7 +176,7 @@ namespace yocto
         namespace syntax
         {
 
-            void grammar:: append( rule *r ) throw()
+            void grammar:: append( rule *r )
             {
                 assert(r);
                 auto_ptr<rule> p(r);
