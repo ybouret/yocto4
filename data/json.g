@@ -19,5 +19,5 @@ vector       : empty_vector | heavy_vector;
 
 // lexical rules
 @string : "cstring";
-@drop :   "[:blank:]";
-@endl :   "[:endl:]";
+@drop   : "[:blank:]";
+@endl   : "[:endl:]";
