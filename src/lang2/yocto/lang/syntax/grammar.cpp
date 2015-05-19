@@ -95,15 +95,15 @@ namespace yocto
             }
 
 
-            rule & grammar:: decl_term( const string &label, const property ppty  )
+            terminal & grammar:: decl_term( const string &label, const property ppty  )
             {
                 check_label(label);
-                rule *r = new terminal(label,ppty);
+                terminal *r = new terminal(label,ppty);
                 rules.push_back(r);
                 return *r;
             }
 
-            rule & grammar:: decl_term( const char *label, const property ppty  )
+            terminal & grammar:: decl_term( const char *label, const property ppty  )
             {
                 const string Label(label);
                 return decl_term(Label,ppty);

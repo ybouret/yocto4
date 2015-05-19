@@ -316,6 +316,7 @@ namespace yocto
 }
 
 #include "yocto/lang/lexical/plugin/comment.hpp"
+#include "yocto/lang/lexical/plugin/cstring.hpp"
 
 namespace yocto
 {
@@ -355,6 +356,23 @@ namespace yocto
                     return;
                 }
 
+                // otherwise, plugins...
+                assert(code.size()>=2);
+                const string term_name = &code[1];
+                const string plug_name = meta->content();
+                std::cerr << "using plugin '" << plug_name << "' as terminal '" << term_name << "'" << std::endl;
+                
+                if( plug_name == "cstring" )
+                {
+                    terminal &r = P->term<lexical::cstring>(term_name.c_str(),standard);
+                    const term_ptr p(&r);
+                    if(!rxp.insert(p))
+                    {
+                        throw exception("%s: unexpected failure to insert plugin '%s'=>'%s'",name,plug_name.c_str(),term_name.c_str());
+                    }
+                    return;
+                }
+                
                 throw exception("%s: unregisterd code '%s'", name, code.c_str());
             }
 

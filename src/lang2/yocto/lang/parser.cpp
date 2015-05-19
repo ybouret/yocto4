@@ -35,7 +35,7 @@ namespace yocto
     namespace lang
     {
 
-        syntax::rule & parser:: term(const char *label, const char *expr, syntax::property ppty)
+        syntax::terminal & parser:: term(const char *label, const char *expr, syntax::property ppty)
         {
             // make a lexical rule
             scanner.emit(label, expr);
