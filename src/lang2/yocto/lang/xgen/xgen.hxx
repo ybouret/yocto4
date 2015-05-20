@@ -77,6 +77,8 @@ namespace yocto
                 void     check_connectivity( rule *r);
                 void     mark_visited( rule *r, const char *ctx);
                 void     validate(rule *r);
+
+                void     check_semantic(rule *r) throw();
             };
 
         }

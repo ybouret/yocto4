@@ -55,21 +55,26 @@ namespace yocto
 
                 if("ALT"==sub->label)
                 {
+                    logical *tmp = new_sub();
                     for( const xnode *ch = sub->head(); ch; ch=ch->next)
                     {
-                        logical *tmp = new_sub();
+
                         grow(tmp,ch);
-                        if(1==tmp->size)
-                        {
-                            logical::operand *op = tmp->pop_front();
-                            parent->append(op->addr);
-                            delete op;
-                        }
-                        else
-                        {
-                            parent->append(tmp);
-                        }
                     }
+                    //parent->append(tmp);
+                    //return;
+
+                    if(1==tmp->size)
+                    {
+                        logical::operand *op = tmp->pop_front();
+                        parent->append(op->addr);
+                        delete op;
+                    }
+                    else
+                    {
+                        parent->append(tmp);
+                    }
+
                     return;
                 }
 
@@ -83,7 +88,7 @@ namespace yocto
                 {
                     const string expr = sub->content();
                     std::cerr << "\t\t|_'" << expr << "'" << std::endl;
-                    const string label = "$" + expr;
+                    const string label = expr;
 
                     term_ptr *ppT = raw.search(label);
                     if(!ppT)
@@ -105,7 +110,7 @@ namespace yocto
                 {
                     const string expr = sub->content();
                     std::cerr << "\t\t|_\"" << expr << "\"" << std::endl;
-                    const string label = "$" + expr;
+                    const string label =  expr;
 
                     term_ptr *ppT = rxp.search(label);
                     if(!ppT)
@@ -183,11 +188,19 @@ namespace yocto
                 grow(itm,sub->children().head);
                 const string &kind = sub->children().tail->label;
 
+                rule *r = itm;
+                if(1==itm->size)
+                {
+                    logical::operand *op = itm->pop_front();
+                    r = op->addr;
+                    delete op;
+                }
+
                 switch(kmph(kind))
                 {
-                    case 0: assert("?"==kind); *parent << xprs->opt(*itm);          break;
-                    case 1: assert("*"==kind); *parent << xprs->zero_or_more(*itm); break;
-                    case 2: assert("+"==kind); *parent << xprs->one_or_more(*itm);  break;
+                    case 0: assert("?"==kind); *parent << xprs->opt(*r);          break;
+                    case 1: assert("*"==kind); *parent << xprs->zero_or_more(*r); break;
+                    case 2: assert("+"==kind); *parent << xprs->one_or_more(*r);  break;
                     default:
                         assert(-1==kmph(kind));
                         throw exception("%s: unexpected item kind '%s'",name, kind.c_str());

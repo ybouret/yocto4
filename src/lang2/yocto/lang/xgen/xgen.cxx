@@ -60,7 +60,7 @@ namespace yocto
                 const string         parser_main = "main";
                 xprs.reset( new parser(parser_name,parser_main) );
 
-                std::cerr << "\t### <" << parser_name << "> ###" << std::endl;
+                std::cerr << "### " << parser_name << " ###" << std::endl;
                 name = xprs->grammar::name.c_str();
 
                 //______________________________________________________________
@@ -90,7 +90,7 @@ namespace yocto
                 //
                 // Second Pass: Processing Top Level Rules
                 //______________________________________________________________
-                std::cerr << "Processing Standard Rules" << std::endl;
+                std::cerr << "### Processing Standard Rules" << std::endl;
                 ch=root->head();
                 for(ch=ch->next;ch;ch=ch->next)
                 {
@@ -100,15 +100,25 @@ namespace yocto
 
                 //______________________________________________________________
                 //
-                // check connectivity
+                // Third Pass: Check Connectivity
                 //______________________________________________________________
+                std::cerr << "### Checking Connectivity" << std::endl;
                 visited.ensure( xprs->count() );
                 check_connectivity( &xprs->top_level() );
-
                 check_connected(agg);
                 check_connected(rxp);
                 check_connected(raw);
+                xprs->cleanup();
 
+                //______________________________________________________________
+                //
+                // Fourth Pass: Check Semantic
+                //______________________________________________________________
+                std::cerr << "### Checking Semantic" << std::endl;
+                visited.free();
+                check_semantic( &xprs->top_level() );
+
+                std::cerr << "### Done" << std::endl;
                 xprs->gramviz("lanraw.dot");
                 (void)system("dot -Tpng -o lanraw.png lanraw.dot");
 

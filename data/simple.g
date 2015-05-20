@@ -1,7 +1,7 @@
 .simple;
 
 
-code    : (id|string)*;
+code    : (id|string| id "=" string )*;
 
 id      : "[:alpha:][:word:]*";
 

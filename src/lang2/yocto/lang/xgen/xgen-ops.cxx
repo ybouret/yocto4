@@ -34,15 +34,15 @@ namespace yocto
 
             void xgen:: check_connectivity(rule *r)
             {
-                if(!visited.search(r))
-                {
-                    mark_visited(r, "checking connectivity");
-                }
-                
+                assert(r);
+                if(visited.search(r)) return;
+                mark_visited(r, "checking connectivity");
+
                 switch(r->uuid)
                 {
                     case aggregate::UUID:
                     case alternate::UUID: {
+                        assert(r->content());
                         operands *ops = static_cast<operands *>(r->content());
                         for(logical::operand *op=ops->head;op;op=op->next)
                         {
@@ -52,6 +52,7 @@ namespace yocto
 
                     case optional::UUID:
                     case at_least::UUID: {
+                        assert(r->content());
                         check_connectivity( static_cast<rule *>(r->content()) );
                     } break;
 
@@ -59,6 +60,63 @@ namespace yocto
                         break;
                 }
             }
+
+
+            void xgen:: check_semantic(rule *r) throw()
+            {
+                assert(r);
+                if(visited.search(r)) return;
+                mark_visited(r, "checking semantic");
+
+                // propagate
+                switch(r->uuid)
+                {
+                    case aggregate::UUID:
+                    case alternate::UUID: {
+                        assert(r->content());
+                        operands *ops = static_cast<operands *>(r->content());
+                        for(logical::operand *op=ops->head;op;op=op->next)
+                        {
+                            check_semantic( op->addr );
+                        }
+                    } break;
+
+                    case optional::UUID:
+                    case at_least::UUID: {
+                        assert(r->content());
+                        check_semantic( static_cast<rule *>(r->content()) );
+                    } break;
+
+                    default:
+                        break;
+                }
+
+                // would jettison RAW in big enough aggregates
+                if(r->uuid==aggregate::UUID)
+                {
+                    std::cerr << "\t\tsemantic check in " << r->label << std::endl;
+                    assert(r->content());
+                    operands *ops = static_cast<operands *>(r->content());
+                    if(ops->size>1)
+                    {
+                        for(logical::operand *op=ops->head;op;op=op->next)
+                        {
+                            rule *sub  = op->addr;
+                            if(terminal::UUID==sub->uuid)
+                            {
+                                if(raw.search(sub->label))
+                                {
+                                    *static_cast<property *>(sub->content()) = jettison;
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            
+
 
         }
 
