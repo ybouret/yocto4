@@ -45,8 +45,20 @@ namespace yocto
 
                 void     process_rule_level1(const xnode *node);
                 void     process_lxr__level1(const xnode *node);
+
                 pattern *compile_lexical(const xnode *node,const size_t nsub);
                 pattern *compile_lexical(const xnode *node);
+
+                void     register_std(const string &label);
+                void     register_rxp(const string &label, const string &expr); 
+                void     register_raw(const string &label, const string &expr);
+
+                size_t   count(const string &type, const string &expr) const;
+                void     count_cb(size_t &num, const string &type, const string &expr, const xnode *node) const;
+
+                void     process_rule_level2(const xnode *node);
+
+
             };
         }
     }

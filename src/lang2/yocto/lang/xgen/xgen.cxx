@@ -77,11 +77,25 @@ namespace yocto
                     throw exception("%s: unexpected top level '%s'", name, ch->label.c_str());
                 }
 
+                //______________________________________________________________
+                //
+                // Second Pass: Processing Top Level Rules
+                //______________________________________________________________
+                std::cerr << "Processing Standard Rules" << std::endl;
+                ch=children.head;
+                for(ch=ch->next;ch;ch=ch->next)
+                {
+                    if("RULE"!=ch->label) continue;
+                    process_rule_level2(ch);
+                }
+
+                xprs->gramviz("lanraw.dot");
+                (void)system("dot -Tpng -o lanraw.png lanraw.dot");
+
             }
 
+          
 
-
-            
         }
         
     }
