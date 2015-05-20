@@ -94,7 +94,7 @@ namespace yocto
             Agg &LXR = agg("LXR");
             LXR << term("LX","@[:word:]+");
             LXR << COLON;
-            LXR << choice(RXP,RAW);
+            LXR << one_or_more(choice(RXP,RAW));
             LXR << SEMICOLON;
 
 

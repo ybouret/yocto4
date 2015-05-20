@@ -19,12 +19,16 @@ namespace yocto
                 typedef alias_ptr<string,aggregate> agg_ptr;
                 typedef set<string,agg_ptr>         agg_set;
 
+                typedef alias_ptr<string,terminal>  term_ptr;
+                typedef set<string,term_ptr>        term_set;
 
                 const xnode      *root;
                 auto_ptr<parser>  xprs;
                 const char       *name;
                 agg_set           agg;
-                
+                term_set          rxp;
+                term_set          raw;
+
                 hashing::perfect  cmph; //!< lxr codes: @drop, @endl, @comment
                 hashing::perfect  mmph; //!< lxr meta: RXP|RAW
 
@@ -41,6 +45,7 @@ namespace yocto
 
                 void     process_rule_level1(const xnode *node);
                 void     process_lxr__level1(const xnode *node);
+                pattern *compile_lexical(const xnode *node,const size_t nsub);
                 pattern *compile_lexical(const xnode *node);
             };
         }

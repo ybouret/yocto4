@@ -29,6 +29,7 @@ namespace yocto
                 //
                 // check reserved words
                 //______________________________________________________________
+                const size_t nsub = node->children().size-1;
                 switch( cmph(code) )
                 {
 
@@ -36,14 +37,14 @@ namespace yocto
                     {
                         const string          l = code + vformat("/%u",++jndx);
                         const lexical::action a(& xprs->scanner, & lexical::scanner::discard);
-                        xprs->scanner.make(l, compile_lexical(data), a);
+                        xprs->scanner.make(l, compile_lexical(data,nsub), a);
                     } return;
 
                     case 1: assert("@endl"==code);
                     {
                         const string          l = code + vformat("/%u",++jndx);
                         const lexical::action a(& xprs->scanner, & lexical::scanner::newline);
-                        xprs->scanner.make(l, compile_lexical(data), a);
+                        xprs->scanner.make(l, compile_lexical(data,nsub), a);
                     } return;
 
                     case 2: assert("@comment"==code);
@@ -85,8 +86,29 @@ namespace yocto
 
             }
 
+            pattern *xgen:: compile_lexical(const xnode *node,const size_t nsub)
+            {
+                assert(node);
+                assert(nsub>0);
+                if(1==nsub)
+                {
+                    return compile_lexical(node);
+                }
+                else
+                {
+                    auto_ptr<lang::logical> p( AND::create() );
+                    while(node)
+                    {
+                        p->append(compile_lexical(node));
+                        node=node->next;
+                    }
+                    return p.yield();
+                }
+            }
+            
             pattern *xgen:: compile_lexical(const xnode *node)
             {
+                
                 assert(node);
                 switch( mmph(node->label) )
                 {
