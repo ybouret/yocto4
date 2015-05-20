@@ -62,27 +62,25 @@ namespace yocto
 
                 //______________________________________________________________
                 //
-                // try a plugin
+                // try a plugin: a terminal will be created
                 //______________________________________________________________
                 const string plug_name = data->content();
                 std::cerr << "\t\tplugin: " << code << " ==> " << plug_name << std::endl;
-                const string rule_name = code;
-                ((string&)rule_name).skip(1);
-                std::cerr << "\t\tplug into rule '" << rule_name << "'" << std::endl;
-                agg_ptr *ppA = agg.search(rule_name);
-                if(!ppA)
-                {
-                    throw exception("%s: rule '%s' must be declared before use of plugin",name,rule_name.c_str());
-                }
-
-                const char *plugID = plug_name.c_str();
+                const string term_name = code;
+                ((string&)term_name).skip(1);
+                
+                const char *termID = term_name.c_str();
                 if( "cstring" == plug_name )
                 {
-                    rule &r = xprs->term<lexical::cstring>(plugID);
-                    (*ppA)->append(&r);
+                    terminal &r = xprs->term<lexical::cstring>(termID);
+                    if(!rxp.insert(&r))
+                    {
+                        throw exception("%s: unexpected failure for plugin '%s' insertion", name, termID);
+                    }
+                    return;
                 }
 
-                throw exception("%s: no plugin '%s'", name, plugID);
+                throw exception("%s: no plugin '%s'", name, plug_name.c_str());
 
             }
 

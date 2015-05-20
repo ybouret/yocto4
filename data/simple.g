@@ -6,7 +6,7 @@ code    : (id|string)*;
 id      : "[:alpha:][:word:]*";
 coma    : ',';
 
-//@string : "cstring";
+@string : "cstring";
 
 @drop   : "[ \t]" ;
 @endl   : "[:endl:]";
