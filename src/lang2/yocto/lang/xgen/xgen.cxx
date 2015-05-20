@@ -13,10 +13,29 @@ namespace yocto
             {
             }
 
+
+            static const char *code_keywords[] =
+            {
+                "@drop",      // 0
+                "@endl",      // 1
+                "@comment"    // 2
+            };
+
+            static const char *meta_keywords[] =
+            {
+                "RXP", //0
+                "RAW"  //1
+            };
+
             xgen:: xgen(const xnode *node) :
             root(node),
             xprs(0),
-            name(0)
+            name(0),
+            agg(),
+            cmph( YOCTO_PERFECT_HASHER_FOR(code_keywords) ),
+            mmph( YOCTO_PERFECT_HASHER_FOR(meta_keywords) ),
+            indx(0),
+            jndx(0)
             {
                 assert(root);
                 assert(!root->terminal);
