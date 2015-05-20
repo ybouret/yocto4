@@ -43,7 +43,8 @@ namespace yocto
             mmph( YOCTO_PERFECT_HASHER_FOR(meta_keywords) ),
             kmph( YOCTO_PERFECT_HASHER_FOR(kind_keywords) ),
             indx(0),
-            jndx(0)
+            jndx(0),
+            visited()
             {
                 assert(root);
                 assert(!root->terminal);
@@ -53,8 +54,8 @@ namespace yocto
                 //
                 // Find the parser name and create it
                 //______________________________________________________________
-                const xnode::leaves &children    = root->children();  assert(children.size>0);
-                const xnode         *ch          = children.head;     assert(ch); assert("NAME"==ch->label);
+                assert(root->size()>0);
+                const xnode         *ch          = root->head();     assert(ch); assert("NAME"==ch->label);
                 const string         parser_name = ch->content(1,0);
                 const string         parser_main = "main";
                 xprs.reset( new parser(parser_name,parser_main) );
@@ -90,12 +91,23 @@ namespace yocto
                 // Second Pass: Processing Top Level Rules
                 //______________________________________________________________
                 std::cerr << "Processing Standard Rules" << std::endl;
-                ch=children.head;
+                ch=root->head();
                 for(ch=ch->next;ch;ch=ch->next)
                 {
                     if("RULE"!=ch->label) continue;
                     process_rule_level2(ch);
                 }
+
+                //______________________________________________________________
+                //
+                // check connectivity
+                //______________________________________________________________
+                visited.ensure( xprs->count() );
+                check_connectivity( &xprs->top_level() );
+
+                check_connected(agg);
+                check_connected(rxp);
+                check_connected(raw);
 
                 xprs->gramviz("lanraw.dot");
                 (void)system("dot -Tpng -o lanraw.png lanraw.dot");
@@ -108,6 +120,8 @@ namespace yocto
                 aggregate   &r  = xprs->agg(id,mergeOne);
                 return      &r;
             }
+
+          
 
 
         }

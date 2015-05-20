@@ -49,10 +49,13 @@ namespace yocto
                 //
                 // assuming not a terminal
                 //______________________________________________________________
-                void    append(xnode *node) throw(); //!< append to children, make parent of this
-                xnode  *pop_head() throw();          //!< head of children, remove parenthood
-                xnode  *pop_tail() throw();          //!< tail of children, remove parenthood
-                
+                void         append(xnode *node) throw(); //!< append to children, make parent of this
+                xnode       *pop_head() throw();          //!< head of children, remove parenthood
+                xnode       *pop_tail() throw();          //!< tail of children, remove parenthood
+                const xnode *head() const throw();        //!< R/O children head
+                const xnode *tail() const throw();        //!< R/O children tail
+                size_t       size() const throw();
+
                 //! restore all lexemes and delete node
                 static  void restore(xnode *node, l_list &lexemes) throw();
 

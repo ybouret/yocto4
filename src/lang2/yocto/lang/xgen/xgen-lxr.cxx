@@ -21,15 +21,15 @@ namespace yocto
                 assert("LXR" == node->label);
                 assert(!node->terminal);
                 assert(2==node->children().size);
-                const string code = node->children().head->content();
-                const xnode *data = node->children().tail;
+                const string code = node->head()->content();
+                const xnode *data = node->tail();
                 std::cerr << "\t\tcode='" << code << "'" << std::endl;
 
                 //______________________________________________________________
                 //
                 // check reserved words
                 //______________________________________________________________
-                const size_t nsub = node->children().size-1;
+                const size_t nsub = node->size()-1;
                 switch( cmph(code) )
                 {
 

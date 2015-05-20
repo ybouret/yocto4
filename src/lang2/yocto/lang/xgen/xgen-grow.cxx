@@ -29,6 +29,12 @@ namespace yocto
                         // standard ALT
                         //______________________________________________________
                         std::cerr << "\t+ALT" << std::endl;
+                        logical *alt =  & xprs->alt();
+                        for(;ch;ch=ch->next)
+                        {
+                            grow(alt,ch);
+                        }
+                        parent->append(alt);
                     }
                     else
                     {
@@ -46,6 +52,27 @@ namespace yocto
 
                     return;
                 }
+
+                if("ALT"==sub->label)
+                {
+                    for( const xnode *ch = sub->head(); ch; ch=ch->next)
+                    {
+                        logical *tmp = new_sub();
+                        grow(tmp,ch);
+                        if(1==tmp->size)
+                        {
+                            logical::operand *op = tmp->pop_front();
+                            parent->append(op->addr);
+                            delete op;
+                        }
+                        else
+                        {
+                            parent->append(tmp);
+                        }
+                    }
+                    return;
+                }
+
 
 
                 //______________________________________________________________
@@ -69,6 +96,30 @@ namespace yocto
                     parent->append( &(**ppT) );
                     return;
                 }
+
+                //______________________________________________________________
+                //
+                // RXP
+                //______________________________________________________________
+                if("RXP"==sub->label)
+                {
+                    const string expr = sub->content();
+                    std::cerr << "\t\t|_\"" << expr << "\"" << std::endl;
+                    const string label = "$" + expr;
+
+                    term_ptr *ppT = rxp.search(label);
+                    if(!ppT)
+                    {
+                        register_rxp(label, expr);
+                        ppT = rxp.search(label);
+                        if(!ppT) throw exception("%s: unexpected missing \"%s\"", name, label.c_str());
+                    }
+                    assert(ppT);
+                    parent->append( &(**ppT) );
+                    return;
+                }
+
+
 
                 //______________________________________________________________
                 //
@@ -116,10 +167,9 @@ namespace yocto
                     return;
                 }
 
-                return;
                 throw exception("%s: unexpected '%s'", name, sub->label.c_str());
-                
-                
+
+
             }
 
             void     xgen:: grow_item( logical *parent, const xnode *sub)
@@ -143,10 +193,10 @@ namespace yocto
                         throw exception("%s: unexpected item kind '%s'",name, kind.c_str());
                 }
             }
-
-
+            
+            
         }
-
+        
     }
     
 }

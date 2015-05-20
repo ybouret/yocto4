@@ -6,6 +6,7 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/ptr/alias.hpp"
 #include "yocto/hashing/perfect.hpp"
+#include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
 {
@@ -22,6 +23,8 @@ namespace yocto
                 typedef alias_ptr<string,terminal>  term_ptr;
                 typedef set<string,term_ptr>        term_set;
 
+                typedef  rule *rule_p;
+
                 const xnode      *root;
                 auto_ptr<parser>  xprs;
                 const char       *name;
@@ -34,11 +37,21 @@ namespace yocto
                 hashing::perfect  kmph; //!< kind of item
                 unsigned          indx; //!< for sub rules naming
                 unsigned          jndx; //!< for lexical rules naming
-
+                sorted_vector<rule_p> visited;
 
 
                 xgen(const xnode *node);
                 ~xgen() throw();
+
+                template <typename DB>
+                inline void check_connected( DB &db )
+                {
+                    for( typename DB::iterator i=db.begin(); i != db.end(); ++i )
+                    {
+                        rule &r = **i;
+                        validate(&r);
+                    }
+                }
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xgen);
@@ -61,8 +74,11 @@ namespace yocto
                 void     grow_item( logical *parent, const xnode *sub);
                 logical *new_sub();
 
-
+                void     check_connectivity( rule *r);
+                void     mark_visited( rule *r, const char *ctx);
+                void     validate(rule *r);
             };
+
         }
     }
 }

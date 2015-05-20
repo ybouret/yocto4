@@ -156,6 +156,22 @@ namespace yocto
                 return node;
             }
 
+            const xnode * xnode::head() const throw()
+            {
+                assert(!terminal);
+                return ch->head;
+            }
+
+            const xnode * xnode::tail() const throw()
+            {
+                assert(!terminal);
+                return ch->tail;
+            }
+            
+            size_t xnode::size() const throw()
+            {
+                return terminal ? 0 : (ch->size);
+            }
 
 
 

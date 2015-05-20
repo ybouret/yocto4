@@ -12,12 +12,12 @@ namespace yocto
             {
                 assert(node);
                 assert(!node->terminal);
+                assert(2==node->size());
                 //______________________________________________________________
                 //
                 // take the top level node for the rule content
                 //______________________________________________________________
-                const xnode::leaves &children = node->children(); assert(children.size==2);
-                const xnode         *ch       = children.head;    assert(ch); assert("ID"==ch->label);
+                const xnode         *ch       = node->head();    assert(ch); assert("ID"==ch->label);
                 const string         ID       = ch->content();
 
                 std::cerr << "\t\tID=" << ID << std::endl;
