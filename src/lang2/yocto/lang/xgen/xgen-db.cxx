@@ -62,7 +62,6 @@ namespace yocto
                             ++num;
                         }
                     }
-
                 }
                 else
                 {

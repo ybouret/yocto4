@@ -20,7 +20,6 @@ namespace yocto
                 const xnode         *ch       = node->head();    assert(ch); assert("ID"==ch->label);
                 const string         ID       = ch->content();
 
-                std::cerr << "\t\tID=" << ID << std::endl;
 
                 if(xprs->has(ID))
                 {
@@ -40,7 +39,6 @@ namespace yocto
                     const xnode *sngl = sub.head;
                     if("RAW"==sngl->label)
                     {
-                        std::cerr << "\t\tis a RawTxt alias" << std::endl;
                         const string expr = sngl->content();
                         if( count(sngl->label,expr) != 1 )
                         {
@@ -52,7 +50,6 @@ namespace yocto
 
                     if("RXP"==sngl->label)
                     {
-                        std::cerr << "\t\tis a RegExp alias" << std::endl;
                         const string expr = sngl->content();
                         if( count(sngl->label,expr) != 1)
                         {
@@ -99,10 +96,8 @@ namespace yocto
                 agg_ptr             *ppA      = agg.search(ID);
                 if(!ppA)
                 {
-                    std::cerr << "|-already processed " << ID << std::endl;
                     return; // already processed !
                 }
-                std::cerr << "|+processing " << ID << std::endl;
                 logical *parent = &(**ppA);
                 grow(parent,ch->next);
             }

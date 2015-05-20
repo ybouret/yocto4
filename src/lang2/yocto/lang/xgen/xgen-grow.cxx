@@ -28,7 +28,6 @@ namespace yocto
                         //
                         // standard ALT
                         //______________________________________________________
-                        std::cerr << "\t+ALT" << std::endl;
                         logical *alt =  & xprs->alt();
                         for(;ch;ch=ch->next)
                         {
@@ -42,10 +41,8 @@ namespace yocto
                         //
                         // standard SUB
                         //______________________________________________________
-                        std::cerr << "\t+SUB" << std::endl;
                         for(;ch;ch=ch->next)
                         {
-                            std::cerr << "\t\t" << ch->label << std::endl;
                             grow(parent,ch);
                         }
                     }
@@ -58,11 +55,8 @@ namespace yocto
                     logical *tmp = new_sub();
                     for( const xnode *ch = sub->head(); ch; ch=ch->next)
                     {
-
                         grow(tmp,ch);
                     }
-                    //parent->append(tmp);
-                    //return;
 
                     if(1==tmp->size)
                     {
@@ -86,9 +80,8 @@ namespace yocto
                 //______________________________________________________________
                 if("RAW"==sub->label)
                 {
-                    const string expr = sub->content();
-                    std::cerr << "\t\t|_'" << expr << "'" << std::endl;
-                    const string label = expr;
+                    const string  expr  = sub->content();
+                    const string &label = expr;
 
                     term_ptr *ppT = raw.search(label);
                     if(!ppT)
@@ -108,9 +101,8 @@ namespace yocto
                 //______________________________________________________________
                 if("RXP"==sub->label)
                 {
-                    const string expr = sub->content();
-                    std::cerr << "\t\t|_\"" << expr << "\"" << std::endl;
-                    const string label =  expr;
+                    const string expr   = sub->content();
+                    const string &label =  expr;
 
                     term_ptr *ppT = rxp.search(label);
                     if(!ppT)
@@ -133,8 +125,7 @@ namespace yocto
                 if("ID"==sub->label)
                 {
                     const string ruleID = sub->content();
-                    std::cerr << "\t\t|_" << ruleID << std::endl;
-
+                    
                     // may be a standard rule
                     agg_ptr *ppA = agg.search(ruleID);
                     if(ppA)

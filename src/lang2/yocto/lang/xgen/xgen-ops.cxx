@@ -94,7 +94,6 @@ namespace yocto
                 // would jettison RAW in big enough aggregates
                 if(r->uuid==aggregate::UUID)
                 {
-                    std::cerr << "\t\tsemantic check in " << r->label << std::endl;
                     assert(r->content());
                     operands *ops = static_cast<operands *>(r->content());
                     if(ops->size>1)

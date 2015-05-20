@@ -4,7 +4,7 @@
 #include "yocto/lang/lexical/plugin/ccomment.hpp"
 #include "yocto/lang/lexical/plugin/rstring.hpp"
 
-#include "yocto/lang/syntax/langen.hxx"
+//#include "yocto/lang/syntax/langen.hxx"
 
 #include "yocto/lang/xgen/xgen.hxx"
 
@@ -131,14 +131,7 @@ namespace yocto
             }
 
             syntax::xgen   xg(tree);
-
-            return 0;
-            
-            syntax::LanGen lg(tree);
-
-
-
-            return lg.P.yield();
+            return xg.xprs.yield();
         }
 
     }

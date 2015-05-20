@@ -1,8 +1,8 @@
 .simple;
 
 
-code    : (id|string| id "=" string )*;
-
+code    : ((assign|id|string) ';') *;
+assign  : id "=" string ;
 id      : "[:alpha:][:word:]*";
 
 @string : "cstring";

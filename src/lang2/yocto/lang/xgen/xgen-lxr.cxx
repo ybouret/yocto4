@@ -23,8 +23,7 @@ namespace yocto
                 assert(2==node->children().size);
                 const string code = node->head()->content();
                 const xnode *data = node->tail();
-                std::cerr << "\t\tcode='" << code << "'" << std::endl;
-
+                
                 //______________________________________________________________
                 //
                 // check reserved words
@@ -65,7 +64,6 @@ namespace yocto
                 // try a plugin: a terminal will be created
                 //______________________________________________________________
                 const string plug_name = data->content();
-                std::cerr << "\t\tplugin: " << code << " ==> " << plug_name << std::endl;
                 const string term_name = code;
                 ((string&)term_name).skip(1);
                 
