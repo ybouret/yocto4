@@ -68,17 +68,13 @@ namespace yocto
                 // default: create a new aggregate
                 //______________________________________________________________
                 register_std(ID);
-                
-                
-                
+
             }
-            
+
 
 
         }
-        
     }
-    
 }
 
 
@@ -103,11 +99,12 @@ namespace yocto
                 agg_ptr             *ppA      = agg.search(ID);
                 if(!ppA)
                 {
+                    std::cerr << "|_already processed " << ID << std::endl;
                     return; // already processed !
                 }
-                std::cerr << "-- processing " << ID << std::endl;
+                std::cerr << "|_processing " << ID << std::endl;
             }
-
+            
         }
     }
 }
