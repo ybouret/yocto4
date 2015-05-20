@@ -31,7 +31,7 @@ namespace yocto
 
                 hashing::perfect  cmph; //!< lxr codes: @drop, @endl, @comment
                 hashing::perfect  mmph; //!< lxr meta: RXP|RAW
-
+                hashing::perfect  kmph; //!< kind of item
                 unsigned          indx; //!< for sub rules naming
                 unsigned          jndx; //!< for lexical rules naming
 
@@ -57,6 +57,9 @@ namespace yocto
                 void     count_cb(size_t &num, const string &type, const string &expr, const xnode *node) const;
 
                 void     process_rule_level2(const xnode *node);
+                void     grow( logical *parent, const xnode *sub);
+                void     grow_item( logical *parent, const xnode *sub);
+                logical *new_sub();
 
 
             };

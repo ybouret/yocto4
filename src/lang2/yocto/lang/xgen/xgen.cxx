@@ -27,6 +27,13 @@ namespace yocto
                 "RAW"  //1
             };
 
+            static const char *kind_keywords[] =
+            {
+                "?", //0
+                "*", //1
+                "+"  //2
+            };
+
             xgen:: xgen(const xnode *node) :
             root(node),
             xprs(0),
@@ -34,6 +41,7 @@ namespace yocto
             agg(),
             cmph( YOCTO_PERFECT_HASHER_FOR(code_keywords) ),
             mmph( YOCTO_PERFECT_HASHER_FOR(meta_keywords) ),
+            kmph( YOCTO_PERFECT_HASHER_FOR(kind_keywords) ),
             indx(0),
             jndx(0)
             {
@@ -94,9 +102,15 @@ namespace yocto
 
             }
 
-          
+            logical * xgen:: new_sub()
+            {
+                const string id = vformat(".sub%u", ++indx);
+                aggregate   &r  = xprs->agg(id,mergeOne);
+                return      &r;
+            }
+
 
         }
-        
+
     }
 }
