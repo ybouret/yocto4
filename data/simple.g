@@ -2,7 +2,7 @@
 
 
 code    : ((assign|id|string) ';') *;
-assign  : id "=" string ;
+assign  : id '=' string ;
 id      : "[:alpha:][:word:]*";
 
 @string : "cstring";
