@@ -37,6 +37,8 @@ YOCTO_UNIT_TEST_IMPL(gen)
             P.reset( G.compile(fp) );
         }
 
+        return 0;
+        
         try
         {
             ios::icstream           fp( ios::cstdin );

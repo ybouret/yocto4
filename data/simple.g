@@ -1,5 +1,7 @@
 .simple;
 
+
+
 code    : (id|string)*;
 
 id      : "[:alpha:][:word:]*";
@@ -9,4 +11,4 @@ id      : "[:alpha:][:word:]*";
 @drop   : "[ \t]" ;
 @endl   : "[:endl:]";
 
-@comment: "#";
+@comment: '#';

@@ -38,6 +38,11 @@ SET(syntax_srcs ${syntax_decl} ${syntax_impl}
 INSTALL(FILES ${syntax_decl} DESTINATION include/yocto/lang/syntax )
 SOURCE_GROUP(lang/syntax FILES ${syntax_srcs}) 
 
+FILE(GLOB xgen_decl yocto/lang/xgen/*.hxx)
+FILE(GLOB xgen_impl yocto/lang/xgen/*.cxx)
+SET(xgen_srcs ${xgen_decl} ${xgen_impl})
+SOURCE_GROUP(lang/xgen FILES ${xgen_srcs})
+
 INCLUDE_DIRECTORIES(../main .)
 
 ADD_LIBRARY(y-lang2 STATIC 
@@ -47,6 +52,7 @@ ADD_LIBRARY(y-lang2 STATIC
 	${lex_srcs} 
 	${plug_lex_srcs} 
 	${syntax_srcs}
+	${xgen_srcs}
 )
 
 #INSTALL( TARGETS y-lang ARCHIVE DESTINATION lib )

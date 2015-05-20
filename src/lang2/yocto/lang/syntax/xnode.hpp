@@ -45,10 +45,14 @@ namespace yocto
                 const lexeme &lex()      const throw();
                 string        content(size_t nskip=0,size_t ntrim=0)  const; //!< lex()->to_string
 
+                //______________________________________________________________
+                //
+                // assuming not a terminal
+                //______________________________________________________________
                 void    append(xnode *node) throw(); //!< append to children, make parent of this
                 xnode  *pop_head() throw();          //!< head of children, remove parenthood
                 xnode  *pop_tail() throw();          //!< tail of children, remove parenthood
-
+                
                 //! restore all lexemes and delete node
                 static  void restore(xnode *node, l_list &lexemes) throw();
 

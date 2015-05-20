@@ -6,6 +6,8 @@
 
 #include "yocto/lang/syntax/langen.hxx"
 
+#include "yocto/lang/xgen/xgen.hxx"
+
 #include <cstdlib>
 
 
@@ -128,7 +130,13 @@ namespace yocto
                 (void) system("dot -Tpng -o xnode.png xnode.dot");
             }
 
+            syntax::xgen   xg(tree);
+
+            return 0;
+            
             syntax::LanGen lg(tree);
+
+
 
             return lg.P.yield();
         }
