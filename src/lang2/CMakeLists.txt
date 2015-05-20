@@ -32,8 +32,8 @@ SOURCE_GROUP(lang/lexical/plugin FILES ${plug_lex_srcs})
 FILE(GLOB syntax_decl yocto/lang/syntax/*.hpp)
 FILE(GLOB syntax_impl yocto/lang/syntax/*.cpp)
 SET(syntax_srcs ${syntax_decl} ${syntax_impl} 
-	yocto/lang/syntax/langen.hxx
-	yocto/lang/syntax/langen.cxx
+#yocto/lang/syntax/langen.hxx
+#yocto/lang/syntax/langen.cxx
 )
 INSTALL(FILES ${syntax_decl} DESTINATION include/yocto/lang/syntax )
 SOURCE_GROUP(lang/syntax FILES ${syntax_srcs}) 

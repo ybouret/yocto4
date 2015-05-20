@@ -35,6 +35,7 @@ namespace yocto
                 hashing::perfect  cmph; //!< lxr codes: @drop, @endl, @comment
                 hashing::perfect  mmph; //!< lxr meta: RXP|RAW
                 hashing::perfect  kmph; //!< kind of item
+                
                 unsigned          indx; //!< for sub rules naming
                 unsigned          jndx; //!< for lexical rules naming
                 sorted_vector<rule_p> visited;
