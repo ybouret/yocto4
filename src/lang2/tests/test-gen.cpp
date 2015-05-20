@@ -15,7 +15,6 @@ namespace
 
 YOCTO_UNIT_TEST_IMPL(gen)
 {
-    generator G("dummy");
     vfs &fs = local_fs::instance();
     fs.try_remove_file("xnode.dot");
     fs.try_remove_file("xnode.png");
@@ -27,6 +26,9 @@ YOCTO_UNIT_TEST_IMPL(gen)
     fs.try_remove_file("ggram.png");
     fs.try_remove_file("gen.dot");
     fs.try_remove_file("gen.png");
+
+
+    generator G("dummy");
 
     if(argc>1)
     {
