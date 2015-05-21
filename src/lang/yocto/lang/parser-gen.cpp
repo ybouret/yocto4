@@ -1,6 +1,8 @@
 #include "yocto/lang/generator.hpp"
 #include "yocto/ios/imstream.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
     namespace lang
@@ -8,6 +10,7 @@ namespace yocto
 
         parser * parser::generate( const char *langID, ios::istream &fp )
         {
+            std::cerr << "Generating Parser for " << langID << std::endl;
             generator G(langID);
             return G.compile(fp);
         }

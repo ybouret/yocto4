@@ -60,7 +60,7 @@ namespace yocto
                 static  void restore(xnode *node, l_list &lexemes) throw();
 
                 //! output a graphiv representation
-                void graphivz( const string &filename ) const;
+                void graphviz( const string &filename ) const;
 
 
                 //! syntax tree rewrite

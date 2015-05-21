@@ -3,12 +3,9 @@
 #include "yocto/lang/lexical/plugin/comment.hpp"
 #include "yocto/lang/lexical/plugin/ccomment.hpp"
 #include "yocto/lang/lexical/plugin/rstring.hpp"
-
-//#include "yocto/lang/syntax/langen.hxx"
-
 #include "yocto/lang/xgen/xgen.hxx"
 
-#include <cstdlib>
+//#include <cstdlib>
 
 
 namespace yocto
@@ -114,8 +111,8 @@ namespace yocto
             scanner.drop("WS", "[:blank:]");
             scanner.endl("ENDL");
 
-            grammar::gramviz("ggram.dot");
-            (void)system("dot -Tpng -o ggram.png ggram.dot");
+            //grammar::gramviz("ggram.dot");
+            //(void)system("dot -Tpng -o ggram.png ggram.dot");
 
         }
 
@@ -126,7 +123,7 @@ namespace yocto
             rewrite( tree );
             if(tree)
             {
-                tree->graphivz("xnode.dot");
+                tree->graphviz("xnode.dot");
                 (void) system("dot -Tpng -o xnode.png xnode.dot");
             }
 

@@ -1,8 +1,8 @@
 .JSON;
 
-json   : object | vector;
+json   : object | array;
 
-value :  number | 'null' | 'true' | 'false' | string | vector | object;
+value :  number | 'null' | 'true' | 'false' | string | array | object;
 
 
 number : "-?[0-9]+([.][0-9]*)?([eE][-+]?[0-9]+)?";
@@ -13,9 +13,9 @@ empty_object : '{' '}';
 heavy_object : '{' pair (',' pair)* '}';
 pair         : string ':' value;
 
-empty_vector : '[' ']';
-heavy_vector : '[' value (',' value)* ']';
-vector       : empty_vector | heavy_vector;
+empty_array : '[' ']';
+heavy_array : '[' value (',' value)* ']';
+array       : empty_array | heavy_array;
 
 // lexical rules
 @string : "cstring";

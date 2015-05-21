@@ -262,7 +262,7 @@ namespace yocto
             }
 
 
-            void xnode:: graphivz( const string &filename ) const
+            void xnode:: graphviz( const string &filename ) const
             {
                 ios::ocstream fp(filename,false);
                 fp("digraph G {\n");

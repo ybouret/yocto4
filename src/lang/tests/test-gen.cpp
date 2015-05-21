@@ -46,7 +46,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
             auto_ptr<syntax::xnode> tree( P->run(fp) );
             if(tree.is_valid())
             {
-                tree->graphivz("gen.dot");
+                tree->graphviz("gen.dot");
                 (void) system("dot -Tpng -o gen.png gen.dot");
             }
         }
