@@ -14,6 +14,12 @@ namespace yocto
             }
 
 
+            static const char *main_keywords[] =
+            {
+                "RULE", //0
+                "LXR"   //1
+            };
+
             static const char *code_keywords[] =
             {
                 "@drop",      // 0
@@ -39,6 +45,7 @@ namespace yocto
             xprs(0),
             name(0),
             agg(),
+            zmph( YOCTO_PERFECT_HASHER_FOR(main_keywords) ),
             cmph( YOCTO_PERFECT_HASHER_FOR(code_keywords) ),
             mmph( YOCTO_PERFECT_HASHER_FOR(meta_keywords) ),
             kmph( YOCTO_PERFECT_HASHER_FOR(kind_keywords) ),
@@ -69,19 +76,14 @@ namespace yocto
                 for(ch=ch->next;ch;ch=ch->next)
                 {
 
-                    if("RULE"==ch->label)
+                    switch(zmph(ch->label))
                     {
-                        process_rule_level1(ch);
-                        continue;
+                        case 0: assert("RULE"==ch->label); process_rule_level1(ch); break;
+                        case 1: assert("LXR" ==ch->label); process_lxr__level1(ch); break;
+                        default: assert(-1==zmph(ch->label));
+                            throw exception("%s: unexpected top level '%s'", name, ch->label.c_str());
                     }
-
-                    if("LXR"==ch->label)
-                    {
-                        process_lxr__level1(ch);
-                        continue;
-                    }
-
-                    throw exception("%s: unexpected top level '%s'", name, ch->label.c_str());
+                    
                 }
 
                 //______________________________________________________________
@@ -121,8 +123,7 @@ namespace yocto
             logical * xgen:: new_sub()
             {
                 const string id = vformat(".sub%u", ++indx);
-                aggregate   &r  = xprs->agg(id,mergeOne);
-                return      &r;
+                return & xprs->agg(id,mergeOne);
             }
 
           

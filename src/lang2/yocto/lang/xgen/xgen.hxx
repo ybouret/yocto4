@@ -32,6 +32,7 @@ namespace yocto
                 term_set          rxp;
                 term_set          raw;
 
+                hashing::perfect  zmph; //!< RULE | LXR
                 hashing::perfect  cmph; //!< lxr codes: @drop, @endl, @comment
                 hashing::perfect  mmph; //!< lxr meta: RXP|RAW
                 hashing::perfect  kmph; //!< kind of item
