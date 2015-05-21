@@ -28,10 +28,14 @@ namespace yocto
                 void on_quit(const token &);
                
                 bool on_char(const token &tkn);
+                bool on_bad_char(const token &tkn);
                 void on_esc_char( const token &tkn );
+
                 void on_esc_hexa( const token &tkn );
                 void on_bad_hexa( const token &tkn );
 
+                void on_esc_uni4(const token &);
+                void on_bad_uni4(const token &);
             };
             
         }

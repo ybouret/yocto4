@@ -164,7 +164,16 @@ namespace yocto
                     esc->append(logical::among( "\\\"'nrbtfav" ));
                     q->append(esc.yield());
                 }
-                
+
+                {
+                    auto_ptr<logical> hex( AND::create() );
+                    hex->append(single::create( 92 ));
+                    hex->append(single::create( 'x'));
+                    hex->append( xdigit() );
+                    hex->append( xdigit() );
+                    q->append(hex.yield());
+                }
+
                 p->append( zero_or_more(q.yield()) );
             }
             
