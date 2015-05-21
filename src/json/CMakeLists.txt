@@ -1,14 +1,23 @@
 PROJECT(json)
 
+SET(JSON_GRAM yocto/json/json.g)
+SET(JSON_INCL yocto/json/json.inc)
+
 FILE( GLOB decl yocto/json/*.hpp)
 FILE( GLOB impl yocto/json/*.cpp)
 SET( srcs ${decl} ${impl} )
 INSTALL( FILES ${decl} DESTINATION include/yocto/json )
-SOURCE_GROUP( json FILES ${srcs} )
+SOURCE_GROUP( json FILES ${srcs} ${JSON_GRAM} ${JSON_INCL})
+
+ADD_CUSTOM_COMMAND(
+OUTPUT ${JSON_INCL}
+COMMAND file2data ${CMAKE_CURRENT_SOURCE_DIR}/${JSON_GRAM} ${CMAKE_CURRENT_BINARY_DIR}/${JSON_INCL}
+DEPENDS file2data ${CMAKE_CURRENT_SOURCE_DIR}/${JSON_GRAM}
+)
 
 INCLUDE_DIRECTORIES( . ../main ../lang)
 
-ADD_LIBRARY( y-json STATIC ${srcs} )
+ADD_LIBRARY( y-json STATIC ${srcs} ${JSON_GRAM} ${JSON_INCL})
 INSTALL( TARGETS y-json ARCHIVE DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
