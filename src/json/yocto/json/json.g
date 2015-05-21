@@ -1,5 +1,5 @@
 .JSON;
-
+// structure
 json   : object | array;
 
 value :  number | 'null' | 'true' | 'false' | string | array | object;
