@@ -15,7 +15,7 @@ namespace yocto
     
     namespace JSON
     {
-        
+
         namespace
         {
 
