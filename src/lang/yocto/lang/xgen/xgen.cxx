@@ -41,6 +41,17 @@ namespace yocto
                 "+"  //2
             };
 
+
+            static const char *grow_keywords[] =
+            {
+                "SUB",
+                "ALT",
+                "RAW",
+                "RXP",
+                "ID",
+                "ITEM"
+            };
+
             xgen:: xgen(const xnode *node) :
             root(node),
             xprs(0),
@@ -50,6 +61,7 @@ namespace yocto
             cmph( YOCTO_PERFECT_HASHER_FOR(code_keywords) ),
             mmph( YOCTO_PERFECT_HASHER_FOR(meta_keywords) ),
             kmph( YOCTO_PERFECT_HASHER_FOR(kind_keywords) ),
+            gmph( YOCTO_PERFECT_HASHER_FOR(grow_keywords) ),
             indx(0),
             jndx(0),
             visited()

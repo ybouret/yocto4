@@ -36,6 +36,7 @@ namespace yocto
                 hashing::perfect  cmph; //!< lxr codes: @drop, @endl, @comment
                 hashing::perfect  mmph; //!< lxr meta: RXP|RAW
                 hashing::perfect  kmph; //!< kind of item
+                hashing::perfect  gmph; //!< for growing rules
                 
                 unsigned          indx; //!< for sub rules naming
                 unsigned          jndx; //!< for lexical rules naming
@@ -73,9 +74,12 @@ namespace yocto
 
                 void     process_rule_level2(const xnode *node);
                 void     grow( logical *parent, const xnode *sub);
-                void     grow_item( logical *parent, const xnode *sub);
+                void     grow_sub( logical *parent, const xnode *sub);
+                void     grow_itm( logical *parent, const xnode *sub);
                 void     grow_id(logical *parent, const xnode *sub);
                 void     grow_rxp(logical *parent, const xnode *sub);
+                void     grow_raw(logical *parent, const xnode *sub);
+                void     grow_alt(logical *parent, const xnode *sub);
 
                 logical *new_sub();
 

@@ -14,125 +14,59 @@ namespace yocto
                 assert(parent);
                 assert(sub);
 
-                //______________________________________________________________
-                //
-                // SUB
-                //______________________________________________________________
-                if("SUB"==sub->label)
-                {
-                    const xnode::leaves &children = sub->children(); assert(children.size>0);
-                    const xnode         *ch       = children.head;
-                    if("ALT"==ch->label)
-                    {
-                        //______________________________________________________
-                        //
-                        // standard ALT
-                        //______________________________________________________
-                        logical *alt =  & xprs->alt();
-                        for(;ch;ch=ch->next)
-                        {
-                            grow(alt,ch);
-                        }
-                        parent->append(alt);
-                    }
-                    else
-                    {
-                        //______________________________________________________
-                        //
-                        // standard SUB
-                        //______________________________________________________
-                        for(;ch;ch=ch->next)
-                        {
-                            grow(parent,ch);
-                        }
-                    }
 
-                    return;
+                switch(gmph(sub->label))
+                {
+                    case 0: grow_sub(parent,sub); break;
+                    case 1: grow_alt(parent,sub); break;
+                    case 2: grow_raw(parent,sub); break;
+                    case 3: grow_rxp(parent,sub); break;
+                    case 4: grow_id( parent,sub); break;
+                    case 5: grow_itm(parent,sub); break;
+                    default:
+                        assert(-1==gmph(sub->label));
+                        throw exception("%s: unexpected '%s'", name, sub->label.c_str());
                 }
 
-                if("ALT"==sub->label)
+                
+            }
+
+            void     xgen:: grow_sub( logical *parent, const xnode *sub)
+            {
+                assert(parent);
+                assert(sub);
+                assert("SUB"==sub->label);
+                const xnode::leaves &children = sub->children(); assert(children.size>0);
+                const xnode         *ch       = children.head;
+                if("ALT"==ch->label)
                 {
-                    logical *tmp = new_sub();
-                    for( const xnode *ch = sub->head(); ch; ch=ch->next)
+                    //______________________________________________________
+                    //
+                    // standard ALT
+                    //______________________________________________________
+                    logical *alt =  & xprs->alt();
+                    for(;ch;ch=ch->next)
                     {
-                        grow(tmp,ch);
+                        grow(alt,ch);
                     }
-
-                    if(1==tmp->size)
+                    parent->append(alt);
+                }
+                else
+                {
+                    //______________________________________________________
+                    //
+                    // standard SUB
+                    //______________________________________________________
+                    for(;ch;ch=ch->next)
                     {
-                        logical::operand *op = tmp->pop_front();
-                        parent->append(op->addr);
-                        delete op;
+                        grow(parent,ch);
                     }
-                    else
-                    {
-                        parent->append(tmp);
-                    }
-
-                    return;
                 }
-
-
-
-                //______________________________________________________________
-                //
-                // RAW
-                //______________________________________________________________
-                if("RAW"==sub->label)
-                {
-                    const string  expr  = sub->content();
-                    const string &label = expr;
-
-                    term_ptr *ppT = raw.search(label);
-                    if(!ppT)
-                    {
-                        register_raw(label, expr);
-                        ppT = raw.search(label);
-                        if(!ppT) throw exception("%s: unexpected missing '%s'", name, label.c_str());
-                    }
-                    assert(ppT);
-                    parent->append( &(**ppT) );
-                    return;
-                }
-
-                //______________________________________________________________
-                //
-                // RXP
-                //______________________________________________________________
-                if("RXP"==sub->label)
-                {
-                    grow_rxp(parent,sub);
-                    return;
-                }
-
-
-
-                //______________________________________________________________
-                //
-                // ID
-                //______________________________________________________________
-                if("ID"==sub->label)
-                {
-                    grow_id(parent,sub);
-                    return;
-                }
-
-                //______________________________________________________________
-                //
-                // ITEM
-                //______________________________________________________________
-                if("ITEM"==sub->label)
-                {
-                    grow_item(parent,sub);
-                    return;
-                }
-
-                throw exception("%s: unexpected '%s'", name, sub->label.c_str());
-
 
             }
 
-            void     xgen:: grow_item( logical *parent, const xnode *sub)
+
+            void     xgen:: grow_itm( logical *parent, const xnode *sub)
             {
                 assert(parent);
                 assert(sub);
@@ -214,6 +148,49 @@ namespace yocto
                 }
                 assert(ppT);
                 parent->append( &(**ppT) );
+            }
+
+
+            void xgen::grow_raw(logical *parent, const xnode *sub)
+            {
+                assert(parent);
+                assert(sub);
+                assert("RAW"==sub->label);
+                const string  expr  = sub->content();
+                const string &label = expr;
+
+                term_ptr *ppT = raw.search(label);
+                if(!ppT)
+                {
+                    register_raw(label, expr);
+                    ppT = raw.search(label);
+                    if(!ppT) throw exception("%s: unexpected missing '%s'", name, label.c_str());
+                }
+                assert(ppT);
+                parent->append( &(**ppT) );
+            }
+
+            void xgen::grow_alt(logical *parent, const xnode *sub)
+            {
+                assert(parent);
+                assert(sub);
+                assert("ALT"==sub->label);
+                logical *tmp = new_sub();
+                for( const xnode *ch = sub->head(); ch; ch=ch->next)
+                {
+                    grow(tmp,ch);
+                }
+
+                if(1==tmp->size)
+                {
+                    logical::operand *op = tmp->pop_front();
+                    parent->append(op->addr);
+                    delete op;
+                }
+                else
+                {
+                    parent->append(tmp);
+                }
             }
 
 
