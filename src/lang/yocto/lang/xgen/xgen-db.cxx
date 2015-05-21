@@ -12,7 +12,7 @@ namespace yocto
 
             void xgen:: register_std( const string &label )
             {
-                aggregate &r = xprs->agg(label);
+                aggregate &r = xprs->agg(label,standard);
                 if(!agg.insert(&r))
                 {
                     throw exception("%s: unexpected storage failure for ID='%s'",name,label.c_str());

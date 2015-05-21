@@ -112,6 +112,26 @@ namespace yocto
                     }
                 }
 
+                // make a temporary ?
+                agg_ptr *ppA = agg.search(r->label);
+                if(ppA)
+                {
+                    // rule is a named rule
+                    aggregate &A = **ppA;
+                    if(A.size==1)
+                    {
+                        std::cerr << "\t\t" << A.label << " may be temporary" << std::endl;
+                        const rule *sngl = A.head->addr;
+                        if(
+                           agg.search(sngl->label)        || // ==> an alias...
+                           alternate::UUID == sngl->uuid     // ==> an alternation
+                           )
+                        {
+                            ( (property&)A.modifier ) = mergeOne;
+                            std::cerr << "\t\t\t==>mergeOne " << A.label << std::endl;
+                        }
+                    }
+                }
 
             }
             
