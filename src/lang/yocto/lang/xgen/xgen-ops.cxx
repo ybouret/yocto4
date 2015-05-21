@@ -68,7 +68,10 @@ namespace yocto
                 if(visited.search(r)) return;
                 mark_visited(r, "checking semantic");
 
-                // propagate
+                //______________________________________________________________
+                //
+                // Phase 1: propagate
+                //______________________________________________________________
                 switch(r->uuid)
                 {
                     case aggregate::UUID:
@@ -91,7 +94,10 @@ namespace yocto
                         break;
                 }
 
-                // would jettison RAW in big enough aggregates
+                //______________________________________________________________
+                //
+                // Phase 2: would jettison RAW in big enough aggregates
+                //______________________________________________________________
                 if(r->uuid==aggregate::UUID)
                 {
                     assert(r->content());
@@ -112,7 +118,10 @@ namespace yocto
                     }
                 }
 
-                // make a temporary ?
+                //______________________________________________________________
+                //
+                // Phase 3: make a temporary ?
+                //______________________________________________________________
                 agg_ptr *ppA = agg.search(r->label);
                 if(ppA)
                 {
@@ -120,7 +129,6 @@ namespace yocto
                     aggregate &A = **ppA;
                     if(A.size==1)
                     {
-                        std::cerr << "\t\t" << A.label << " may be temporary" << std::endl;
                         const rule *sngl = A.head->addr;
                         if(
                            agg.search(sngl->label)        || // ==> an alias...
@@ -128,7 +136,6 @@ namespace yocto
                            )
                         {
                             ( (property&)A.modifier ) = mergeOne;
-                            std::cerr << "\t\t\t==>mergeOne " << A.label << std::endl;
                         }
                     }
                 }
