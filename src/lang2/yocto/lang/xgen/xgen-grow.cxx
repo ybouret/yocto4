@@ -101,18 +101,7 @@ namespace yocto
                 //______________________________________________________________
                 if("RXP"==sub->label)
                 {
-                    const string expr   = sub->content();
-                    const string &label =  expr;
-
-                    term_ptr *ppT = rxp.search(label);
-                    if(!ppT)
-                    {
-                        register_rxp(label, expr);
-                        ppT = rxp.search(label);
-                        if(!ppT) throw exception("%s: unexpected missing \"%s\"", name, label.c_str());
-                    }
-                    assert(ppT);
-                    parent->append( &(**ppT) );
+                    grow_rxp(parent,sub);
                     return;
                 }
 
@@ -124,33 +113,8 @@ namespace yocto
                 //______________________________________________________________
                 if("ID"==sub->label)
                 {
-                    const string ruleID = sub->content();
-                    
-                    // may be a standard rule
-                    agg_ptr *ppA = agg.search(ruleID);
-                    if(ppA)
-                    {
-                        parent->append( &(**ppA) );
-                        return;
-                    }
-
-                    // may be an alias RegExp
-                    term_ptr *ppT = rxp.search(ruleID);
-                    if(ppT)
-                    {
-                        parent->append( &(**ppT) );
-                        return;
-                    }
-
-                    // may be an alias RawTxt
-                    ppT = raw.search(ruleID);
-                    if(ppT)
-                    {
-                        parent->append( &(**ppT) );
-                        return;
-                    }
-
-                    throw exception("%s: undeclared rule '%s'",name, ruleID.c_str());
+                    grow_id(parent,sub);
+                    return;
                 }
 
                 //______________________________________________________________
@@ -197,10 +161,64 @@ namespace yocto
                         throw exception("%s: unexpected item kind '%s'",name, kind.c_str());
                 }
             }
-            
-            
+
+            void xgen:: grow_id( logical *parent, const xnode *sub )
+            {
+                assert(parent);
+                assert(sub);
+                assert("ID"==sub->label);
+                const string ruleID = sub->content();
+
+                // may be a standard rule
+                agg_ptr *ppA = agg.search(ruleID);
+                if(ppA)
+                {
+                    parent->append( &(**ppA) );
+                    return;
+                }
+
+                // may be an alias RegExp
+                term_ptr *ppT = rxp.search(ruleID);
+                if(ppT)
+                {
+                    parent->append( &(**ppT) );
+                    return;
+                }
+
+                // may be an alias RawTxt
+                ppT = raw.search(ruleID);
+                if(ppT)
+                {
+                    parent->append( &(**ppT) );
+                    return;
+                }
+
+                throw exception("%s: undeclared rule '%s'",name, ruleID.c_str());
+            }
+
+            void xgen::grow_rxp(logical *parent, const xnode *sub)
+            {
+                assert(parent);
+                assert(sub);
+                assert("RXP"==sub->label);
+
+                const string expr   = sub->content();
+                const string &label =  expr;
+
+                term_ptr *ppT = rxp.search(label);
+                if(!ppT)
+                {
+                    register_rxp(label, expr);
+                    ppT = rxp.search(label);
+                    if(!ppT) throw exception("%s: unexpected missing \"%s\"", name, label.c_str());
+                }
+                assert(ppT);
+                parent->append( &(**ppT) );
+            }
+
+
         }
-        
+
     }
     
 }

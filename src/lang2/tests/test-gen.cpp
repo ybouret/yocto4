@@ -40,6 +40,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
         }
 
         std::cerr << "Ready" << std::endl;
+        
         try
         {
             ios::icstream           fp( ios::cstdin );

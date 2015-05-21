@@ -84,7 +84,7 @@ namespace yocto
                         default: assert(-1==zmph(ch->label));
                             throw exception("%s: unexpected top level '%s'", name, ch->label.c_str());
                     }
-                    
+
                 }
 
                 //______________________________________________________________

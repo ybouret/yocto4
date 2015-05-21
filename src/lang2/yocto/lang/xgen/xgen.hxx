@@ -74,6 +74,9 @@ namespace yocto
                 void     process_rule_level2(const xnode *node);
                 void     grow( logical *parent, const xnode *sub);
                 void     grow_item( logical *parent, const xnode *sub);
+                void     grow_id(logical *parent, const xnode *sub);
+                void     grow_rxp(logical *parent, const xnode *sub);
+
                 logical *new_sub();
 
                 void     check_connectivity( rule *r);

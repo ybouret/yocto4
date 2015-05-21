@@ -2,7 +2,6 @@
 #include "yocto/exception.hpp"
 #include "yocto/lang/pattern/logic.hpp"
 
-#include <iostream>
 
 namespace yocto
 {
