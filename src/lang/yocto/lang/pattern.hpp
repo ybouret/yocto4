@@ -50,7 +50,6 @@ namespace yocto
             //! output to a .dot file
             void graphviz(const string &filename) const;
 
-
         protected:
             explicit pattern(uint32_t ID) throw();
             pattern(const pattern &) throw();

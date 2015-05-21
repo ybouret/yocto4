@@ -27,7 +27,6 @@ namespace yocto
             syntax::terminal & term(const char *label, const char *expr, syntax::property ppty = syntax::standard );
 
 
-
             //! a terminal from a plugin
             template <typename PLUGIN>
             syntax::terminal  &term(const char *label, syntax::property ppty = syntax::standard)
@@ -47,7 +46,8 @@ namespace yocto
             //! clear all and accept top level rule
             syntax::xnode *run( ios::istream &fp );
 
-
+            static parser *generate( const char *langID, ios::istream &fp );
+            static parser *generate( const char *langID, const char *data, const size_t size);
 
         private:
             source src;

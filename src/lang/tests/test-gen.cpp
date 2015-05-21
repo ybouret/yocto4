@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/fs/local-fs.hpp"
-#include "yocto/lang/generator.hpp"
+#include "yocto/lang/parser.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ptr/auto.hpp"
 #include <cstdlib>
@@ -28,7 +28,6 @@ YOCTO_UNIT_TEST_IMPL(gen)
     fs.try_remove_file("gen.png");
 
 
-    generator G("dummy");
 
     if(argc>1)
     {
@@ -36,7 +35,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
 
         {
             ios::icstream fp( argv[1] );
-            P.reset( G.compile(fp) );
+            P.reset( parser::generate("dummy",fp) );
         }
 
         std::cerr << "Ready" << std::endl;

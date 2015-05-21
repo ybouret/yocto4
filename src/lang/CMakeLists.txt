@@ -45,7 +45,7 @@ SOURCE_GROUP(lang/xgen FILES ${xgen_srcs})
 
 INCLUDE_DIRECTORIES(../main .)
 
-ADD_LIBRARY(y-lang2 STATIC 
+ADD_LIBRARY(y-lang STATIC 
 	${lang_srcs} 
 	${pat_srcs} 
 	${rx_srcs}
@@ -55,7 +55,7 @@ ADD_LIBRARY(y-lang2 STATIC
 	${xgen_srcs}
 )
 
-#INSTALL( TARGETS y-lang ARCHIVE DESTINATION lib )
+INSTALL( TARGETS y-lang ARCHIVE DESTINATION lib )
 
 
 ADD_SUBDIRECTORY(tests)
