@@ -1,6 +1,7 @@
 #include "yocto/lang/xgen/xgen.hxx"
 #include "yocto/exception.hpp"
 #include <iostream>
+#include <cstdlib>
 
 namespace yocto
 {
