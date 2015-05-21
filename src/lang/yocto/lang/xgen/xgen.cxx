@@ -126,13 +126,12 @@ namespace yocto
                 // Fourth Pass: Check Semantic
                 //______________________________________________________________
                 visited.free();
-                // TODO: detect temporary rules (aka value in JSON)
                 check_semantic( &xprs->top_level() );
 
 
 
-                xprs->gramviz("lanraw.dot");
-                (void)system("dot -Tpng -o lanraw.png lanraw.dot");
+                //xprs->gramviz("lanraw.dot");
+                //(void)system("dot -Tpng -o lanraw.png lanraw.dot");
 
             }
 
