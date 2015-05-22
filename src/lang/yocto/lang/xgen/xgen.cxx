@@ -57,6 +57,8 @@ namespace yocto
             xprs(0),
             name(0),
             agg(),
+		rxp(),
+		raw(),
             zmph( YOCTO_PERFECT_HASHER_FOR(main_keywords) ),
             cmph( YOCTO_PERFECT_HASHER_FOR(code_keywords) ),
             mmph( YOCTO_PERFECT_HASHER_FOR(meta_keywords) ),

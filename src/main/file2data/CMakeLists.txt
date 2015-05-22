@@ -1,5 +1,5 @@
 ADD_EXECUTABLE(file2data file2data.cpp)
-TARGET_LINK_LIBRARIES(file2data yocto)
+TARGET_LINK_YOCTO(file2data)
 
 INSTALL( TARGETS file2data RUNTIME DESTINATION bin )
 

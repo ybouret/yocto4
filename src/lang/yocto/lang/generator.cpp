@@ -5,7 +5,7 @@
 #include "yocto/lang/lexical/plugin/rstring.hpp"
 #include "yocto/lang/xgen/xgen.hxx"
 
-//#include <cstdlib>
+#include <cstdlib>
 
 
 namespace yocto
