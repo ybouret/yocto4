@@ -24,13 +24,15 @@ namespace yocto
             static pattern *simplify( logical *p ) throw();
 
             virtual const void *content() const throw(); //!< return &operands
+            virtual void        save( ios::ostream &fp ) const;
 
         protected:
             logical(const uint32_t) throw();
             logical(const logical &other);
 
             void vizops( ios::ostream &fp ) const;
-
+            void save_ops( ios::istream &fp ) const;
+            
         private:
             YOCTO_DISABLE_ASSIGN(logical);
         };
@@ -47,6 +49,7 @@ namespace yocto
             static  logical *create();
             virtual void     viz( ios::ostream & ) const;
             virtual bool     accept_empty() const throw();
+
         private:
             AND() throw();
             AND(const AND &);

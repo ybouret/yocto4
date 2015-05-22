@@ -35,7 +35,7 @@ namespace yocto
                 virtual ~rule() throw();
 
                 static rule *create(const string &l, pattern *p, const action &a, const bool is_control=false);
-
+                
 
             private:
                 explicit rule(const string &l, pattern *p, const action &a, const bool is_ctrl);

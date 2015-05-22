@@ -44,7 +44,8 @@ namespace yocto
             virtual pattern *clone() const;
             static  pattern *create();
             virtual void     viz( ios::ostream & ) const;
-            
+            virtual void     save( ios::ostream &fp ) const;
+
         private:
             any1() throw();
             YOCTO_DISABLE_COPY_AND_ASSIGN(any1);
@@ -68,6 +69,7 @@ namespace yocto
             virtual pattern *clone() const;
             static  pattern *create(code_t C);
             virtual void     viz( ios::ostream & ) const;
+            virtual void     save( ios::ostream &fp ) const;
 
             virtual const void *content() const throw();
 
@@ -96,6 +98,7 @@ namespace yocto
             virtual pattern *clone() const;
             static  pattern *create(code_t lo, code_t hi);
             virtual void     viz( ios::ostream & ) const;
+            virtual void     save( ios::ostream &fp ) const;
 
         private:
             range(code_t lo, code_t hi) throw();

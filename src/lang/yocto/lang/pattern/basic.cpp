@@ -70,6 +70,12 @@ namespace yocto
             fp.viz( (const pattern *)this );
             fp("[label=\"ANY1\",shape=box];\n");
         }
+
+        void any1:: save( ios::ostream &fp ) const
+        {
+            fp.emit(uuid);
+        }
+
     }
 
 }
@@ -105,6 +111,12 @@ namespace yocto
             fp("[shape=ellipse,label=\"");
             encode(code, fp);
             fp("\"];\n");
+        }
+
+        void single:: save( ios::ostream &fp ) const
+        {
+            fp.emit(uuid);
+            fp.emit(code);
         }
     }
     
@@ -146,6 +158,13 @@ namespace yocto
             fp << "-";
             encode(upper, fp);
             fp << "\"];\n";
+        }
+
+        void range:: save( ios::ostream &fp ) const
+        {
+            fp.emit(uuid);
+            fp.emit(lower);
+            fp.emit(upper);
         }
     }
     

@@ -34,6 +34,7 @@ namespace yocto
             virtual bool     match(Y_LANG_PATTERN_MATCH_ARGS) const;
             virtual void     viz( ios::ostream & ) const;
             virtual bool     accept_empty() const throw();
+            virtual void     save( ios::ostream &fp ) const;
 
         private:
             optional(pattern *p) throw();
@@ -55,6 +56,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual bool     accept_empty() const throw();
+            virtual void     save( ios::ostream &fp ) const;
 
         private:
             at_least(pattern *p,size_t n) throw();
@@ -78,6 +80,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual bool     accept_empty() const throw();
+            virtual void     save( ios::ostream &fp ) const;
 
         private:
             explicit counting(pattern *p, size_t n, size_t m) throw();

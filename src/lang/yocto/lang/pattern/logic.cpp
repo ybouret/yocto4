@@ -32,6 +32,18 @@ namespace yocto
             return &operands;
         }
 
+        void logical::save( ios::ostream &fp ) const
+        {
+            fp.emit(uuid);
+            fp.emit<uint32_t>(operands.size);
+            for( const pattern *p = operands.head; p; p=p->next)
+            {
+                p->save(fp);
+            }
+
+        }
+
+
     }
 }
 

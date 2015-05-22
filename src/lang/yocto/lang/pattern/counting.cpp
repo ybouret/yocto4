@@ -71,5 +71,14 @@ namespace yocto
             vizlink(fp,this, jk);
         }
 
+        void counting:: save( ios::ostream &fp ) const
+        {
+            fp.emit(uuid);
+            fp.emit<uint32_t>(lower);
+            fp.emit<uint32_t>(upper);
+            jk->save(fp);
+        }
+
+
     }
 }

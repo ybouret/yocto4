@@ -14,8 +14,7 @@ namespace yocto
             label(l),
             motif(p),
             apply(a),
-            ctrl(is_ctrl)
-            {
+            ctrl(is_ctrl)            {
                 assert(motif!=0);
             }
 

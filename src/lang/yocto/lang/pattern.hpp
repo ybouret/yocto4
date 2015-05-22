@@ -50,6 +50,9 @@ namespace yocto
             //! output to a .dot file
             void graphviz(const string &filename) const;
 
+            //! output to binary
+            virtual void save( ios::ostream &fp ) const = 0;
+
         protected:
             explicit pattern(uint32_t ID) throw();
             pattern(const pattern &) throw();
