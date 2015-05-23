@@ -100,6 +100,7 @@ namespace yocto
                 }
                 logical *parent = &(**ppA);
                 curr            = parent;
+                indx            = 0;
                 grow(parent,ch->next);
             }
             
