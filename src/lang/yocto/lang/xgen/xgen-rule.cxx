@@ -99,6 +99,7 @@ namespace yocto
                     return; // already processed !
                 }
                 logical *parent = &(**ppA);
+                curr            = parent;
                 grow(parent,ch->next);
             }
             

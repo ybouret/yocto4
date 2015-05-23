@@ -57,8 +57,8 @@ namespace yocto
             xprs(0),
             name(0),
             agg(),
-		rxp(),
-		raw(),
+            rxp(),
+            raw(),
             zmph( YOCTO_PERFECT_HASHER_FOR(main_keywords) ),
             cmph( YOCTO_PERFECT_HASHER_FOR(code_keywords) ),
             mmph( YOCTO_PERFECT_HASHER_FOR(meta_keywords) ),
@@ -66,7 +66,8 @@ namespace yocto
             gmph( YOCTO_PERFECT_HASHER_FOR(grow_keywords) ),
             indx(0),
             jndx(0),
-            visited()
+            visited(),
+            curr(0)
             {
                 assert(root);
                 assert(!root->terminal);
@@ -90,7 +91,6 @@ namespace yocto
                 //______________________________________________________________
                 for(ch=ch->next;ch;ch=ch->next)
                 {
-
                     switch(zmph(ch->label))
                     {
                         case 0: assert("RULE"==ch->label); process_rule_level1(ch); break;
@@ -98,7 +98,6 @@ namespace yocto
                         default: assert(-1==zmph(ch->label));
                             throw exception("%s: unexpected top level '%s'", name, ch->label.c_str());
                     }
-
                 }
 
                 //______________________________________________________________
@@ -134,19 +133,21 @@ namespace yocto
 
                 //xprs->gramviz("lanraw.dot");
                 //(void)system("dot -Tpng -o lanraw.png lanraw.dot");
-
+                
             }
-
+            
             logical * xgen:: new_sub()
             {
-                const string id = vformat(".sub%u", ++indx);
+                assert(curr!=NULL);
+                std::cerr << "\tnew sub for curr=" << curr->label << std::endl;
+                const string id = curr->label + vformat("#%u", ++indx);
                 return & xprs->agg(id,mergeOne);
             }
-
-          
-
-
+            
+            
+            
+            
         }
-
+        
     }
 }

@@ -41,7 +41,7 @@ namespace yocto
                 unsigned          indx; //!< for sub rules naming
                 unsigned          jndx; //!< for lexical rules naming
                 sorted_vector<rule_p> visited;
-
+                const rule       *curr; //!< current top level rule
 
                 xgen(const xnode *node);
                 ~xgen() throw();

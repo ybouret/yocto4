@@ -3,8 +3,7 @@
 code     : expr*;
 
 expr     : term END;
-termN    :  (PLUS|MINUS)  factor;
-term     :  (PLUS|MINUS)? factor termN*;
+term     :  (PLUS|MINUS)? factor ((PLUS|MINUS)  factor)*;
 factor   : atom ( (MUL|DIV) atom)*;
 atom     : INT | ID | LPAREN term RPAREN;
 
