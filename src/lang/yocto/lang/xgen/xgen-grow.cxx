@@ -8,13 +8,13 @@ namespace yocto
     {
         namespace syntax
         {
-
+            
             void xgen::grow(logical *parent, const xnode *sub)
             {
                 assert(parent);
                 assert(sub);
-
-
+                
+                
                 switch(gmph(sub->label))
                 {
                     case 0: grow_sub(parent,sub); break;
@@ -27,10 +27,10 @@ namespace yocto
                         assert(-1==gmph(sub->label));
                         throw exception("%s: unexpected '%s'", name, sub->label.c_str());
                 }
-
+                
                 
             }
-
+            
             void     xgen:: grow_sub( logical *parent, const xnode *sub)
             {
                 assert(parent);
@@ -62,29 +62,30 @@ namespace yocto
                         grow(parent,ch);
                     }
                 }
-
+                
             }
-
-
+            
+            
             void     xgen:: grow_itm( logical *parent, const xnode *sub)
             {
                 assert(parent);
                 assert(sub);
                 assert("ITEM"==sub->label);
                 assert(2==sub->children().size);
-
+                
                 logical *itm = new_sub();
                 grow(itm,sub->children().head);
                 const string &kind = sub->children().tail->label;
-
+                
                 rule *r = itm;
                 if(1==itm->size)
                 {
                     logical::operand *op = itm->pop_front();
                     r = op->addr;
+                    std::cerr << "should kill " << itm->label << std::endl;
                     delete op;
                 }
-
+                
                 switch(kmph(kind))
                 {
                     case 0: assert("?"==kind); *parent << xprs->opt(*r);          break;
@@ -95,14 +96,14 @@ namespace yocto
                         throw exception("%s: unexpected item kind '%s'",name, kind.c_str());
                 }
             }
-
+            
             void xgen:: grow_id( logical *parent, const xnode *sub )
             {
                 assert(parent);
                 assert(sub);
                 assert("ID"==sub->label);
                 const string ruleID = sub->content();
-
+                
                 // may be a standard rule
                 agg_ptr *ppA = agg.search(ruleID);
                 if(ppA)
@@ -110,7 +111,7 @@ namespace yocto
                     parent->append( &(**ppA) );
                     return;
                 }
-
+                
                 // may be an alias RegExp
                 term_ptr *ppT = rxp.search(ruleID);
                 if(ppT)
@@ -118,7 +119,7 @@ namespace yocto
                     parent->append( &(**ppT) );
                     return;
                 }
-
+                
                 // may be an alias RawTxt
                 ppT = raw.search(ruleID);
                 if(ppT)
@@ -126,19 +127,19 @@ namespace yocto
                     parent->append( &(**ppT) );
                     return;
                 }
-
+                
                 throw exception("%s: undeclared rule '%s'",name, ruleID.c_str());
             }
-
+            
             void xgen::grow_rxp(logical *parent, const xnode *sub)
             {
                 assert(parent);
                 assert(sub);
                 assert("RXP"==sub->label);
-
+                
                 const string expr   = sub->content();
                 const string &label =  expr;
-
+                
                 term_ptr *ppT = rxp.search(label);
                 if(!ppT)
                 {
@@ -149,8 +150,8 @@ namespace yocto
                 assert(ppT);
                 parent->append( &(**ppT) );
             }
-
-
+            
+            
             void xgen::grow_raw(logical *parent, const xnode *sub)
             {
                 assert(parent);
@@ -158,7 +159,7 @@ namespace yocto
                 assert("RAW"==sub->label);
                 const string  expr  = sub->content();
                 const string &label = expr;
-
+                
                 term_ptr *ppT = raw.search(label);
                 if(!ppT)
                 {
@@ -169,7 +170,7 @@ namespace yocto
                 assert(ppT);
                 parent->append( &(**ppT) );
             }
-
+            
             void xgen::grow_alt(logical *parent, const xnode *sub)
             {
                 assert(parent);
@@ -180,22 +181,23 @@ namespace yocto
                 {
                     grow(tmp,ch);
                 }
-
+                
                 if(1==tmp->size)
                 {
                     logical::operand *op = tmp->pop_front();
                     parent->append(op->addr);
                     delete op;
+                    std::cerr << "should kill " << tmp->label << std::endl;
                 }
                 else
                 {
                     parent->append(tmp);
                 }
             }
-
-
+            
+            
         }
-
+        
     }
     
 }
