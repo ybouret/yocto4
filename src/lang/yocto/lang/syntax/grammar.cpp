@@ -1,4 +1,5 @@
 #include "yocto/lang/syntax/grammar.hpp"
+#include "yocto/ptr/alias.hpp"
 
 namespace yocto
 {
@@ -8,16 +9,24 @@ namespace yocto
         namespace syntax
         {
 
+            typedef alias_ptr<string,rule> rule_alias;
+            typedef set<string,rule_alias> rule_dbase;
+            class grammar:: dbase : public rule_dbase
+            {
+            public:
+                explicit  dbase() throw() : rule_dbase() {}
+                virtual  ~dbase() throw() {}
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(dbase);
+            };
 
             grammar:: ~grammar() throw()
             {
+                delete db;
                 while(rules.size)
                 {
                     rule *r = rules.pop_back();
-                    //if(r->refcount()<=0 || r->liberate())
-                    //{
-                    //    delete r;
-                    //}
                     delete r;
                 }
             }
@@ -25,14 +34,16 @@ namespace yocto
 
             grammar:: grammar(const string &id) :
             name(id),
-            rules()
+            rules(),
+            db( new dbase() )
             {
 
             }
 
             grammar:: grammar(const char  *id) :
             name(id),
-            rules()
+            rules(),
+            db( new dbase() )
             {
 
             }

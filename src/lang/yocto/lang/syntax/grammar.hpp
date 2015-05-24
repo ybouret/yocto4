@@ -72,9 +72,11 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
+                class  dbase;
                 r_list rules;
+                dbase *db;
                 void check_label(const string &label) const;
-
+                
             };
         }
         

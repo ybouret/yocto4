@@ -37,7 +37,7 @@ namespace yocto
                 //! write links
                 virtual void lnk( ios::ostream &fp ) const = 0;
 
-                //! for intr_ptr if needed
+                //! for smart pointer
                 const string & key() const throw();
 
                 //! internal data for specific stuff, default=NULL
