@@ -73,7 +73,7 @@ namespace yocto
                 assert("ITEM"==sub->label);
                 assert(2==sub->children().size);
                 
-                logical *itm = new_sub();
+                logical *itm = create_sub();
                 grow(itm,sub->children().head);
                 const string &kind = sub->children().tail->label;
                 
@@ -82,8 +82,9 @@ namespace yocto
                 {
                     logical::operand *op = itm->pop_front();
                     r = op->addr;
-                    std::cerr << "should kill " << itm->label << std::endl;
+                    //std::cerr << "should kill " << itm->label << std::endl;
                     delete op;
+                    delete_sub(itm->label);
                 }
                 
                 switch(kmph(kind))
@@ -176,7 +177,7 @@ namespace yocto
                 assert(parent);
                 assert(sub);
                 assert("ALT"==sub->label);
-                logical *tmp = new_sub();
+                logical *tmp = create_sub();
                 for( const xnode *ch = sub->head(); ch; ch=ch->next)
                 {
                     grow(tmp,ch);
@@ -187,7 +188,8 @@ namespace yocto
                     logical::operand *op = tmp->pop_front();
                     parent->append(op->addr);
                     delete op;
-                    std::cerr << "should kill " << tmp->label << std::endl;
+                    //std::cerr << "should kill " << tmp->label << std::endl;
+                    delete_sub(tmp->label);
                 }
                 else
                 {

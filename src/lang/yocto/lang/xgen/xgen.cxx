@@ -131,20 +131,24 @@ namespace yocto
 
 
 
-                //xprs->gramviz("lanraw.dot");
-                //(void)system("dot -Tpng -o lanraw.png lanraw.dot");
+                xprs->gramviz("lanraw.dot");
+                (void)system("dot -Tpng -o lanraw.png lanraw.dot");
                 
             }
             
-            logical * xgen:: new_sub()
+            logical * xgen:: create_sub()
             {
                 assert(curr!=NULL);
-                std::cerr << "\tnew sub for curr=" << curr->label << std::endl;
+                //std::cerr << "\tcreate sub for curr=" << curr->label << std::endl;
                 const string id = curr->label + vformat("#%u", ++indx);
                 return & xprs->agg(id,mergeOne);
             }
             
-            
+            void xgen:: delete_sub(const string &label)
+            {
+                xprs->remove(label);
+                --indx;
+            }
             
             
         }

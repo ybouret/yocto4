@@ -35,7 +35,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
 
         {
             ios::icstream fp( argv[1] );
-            P.reset( parser::generate("dummy",fp) );
+            P.reset( parser::generate(vfs::get_base_name(argv[1]),fp) );
         }
 
         std::cerr << "Ready" << std::endl;

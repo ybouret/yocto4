@@ -315,6 +315,43 @@ namespace yocto
     }
 }
 
+namespace yocto
+{
+    namespace lang
+    {
+        
+        namespace syntax
+        {
+
+            void grammar:: remove( const string &label )
+            {
+                rule *r = 0;
+                for( rule *ch=rules.head;ch;ch=ch->next)
+                {
+                    if(label==ch->label)
+                    {
+                        r = ch;
+                        break;
+                    }
+                }
+                if(!r)
+                {
+                    throw exception("%s: no '%s' to remove", name.c_str(), label.c_str());
+                }
+                // TODO: check if we can remove it...
+                r = rules.unlink(r);
+                
+                delete r;
+            }
+
+        }
+        
+    }
+    
+}
+
+
+
 #include "yocto/ios/ocstream.hpp"
 
 namespace yocto

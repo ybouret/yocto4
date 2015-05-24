@@ -81,8 +81,9 @@ namespace yocto
                 void     grow_raw(logical *parent, const xnode *sub);
                 void     grow_alt(logical *parent, const xnode *sub);
 
-                logical *new_sub();
-
+                logical *create_sub();
+                void     delete_sub(const string &label);
+                
                 void     check_connectivity( rule *r);
                 void     mark_visited( rule *r, const char *ctx);
                 void     validate(rule *r);
