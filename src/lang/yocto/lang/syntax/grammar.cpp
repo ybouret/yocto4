@@ -315,7 +315,7 @@ namespace yocto
                         operands *ops = (operands *)(r->content());
                         if(ops->size<=0)
                         {
-                            delete r;
+                            remove(r->label);
                         }
                         else
                         {
