@@ -2,10 +2,11 @@
 
 code     : expr*;
 
-expr     : term END;
+expr     : args END;
 term     :  (PLUS|MINUS)? factor ((PLUS|MINUS)  factor)*;
 factor   : atom ( (MUL|DIV) atom)*;
-atom     : INT | ID | LPAREN term RPAREN;
+function : ID LPAREN args RPAREN;
+atom     : INT | function | ID | LPAREN term RPAREN;
 
 PLUS   : '+';
 MINUS  : '-';
@@ -13,9 +14,11 @@ LPAREN : '(';
 MUL    : '*';
 DIV    : '/';
 RPAREN : ')';
+args   : term ( ',' term )*;
 
 END   : ';';
 INT   : "[:digit:]+";
 ID    : "([:alpha:]|_)([:word:]|_)*";
 @drop : "[:blank:]";
 @endl : "[:endl:]";
+

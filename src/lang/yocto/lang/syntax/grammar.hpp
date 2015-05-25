@@ -77,6 +77,7 @@ namespace yocto
                 class  dbase;
                 r_list rules;
                 dbase *db;
+                
                 void check_label(const string &label) const;
                 void enroll( rule *r );
             };

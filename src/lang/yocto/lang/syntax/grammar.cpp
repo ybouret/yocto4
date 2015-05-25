@@ -57,7 +57,11 @@ namespace yocto
             
             grammar:: ~grammar() throw()
             {
-                delete db;
+                if(db)
+                {
+                    delete db;
+                    db = NULL;
+                }
             }
             
             
