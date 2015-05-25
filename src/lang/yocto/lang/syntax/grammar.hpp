@@ -54,7 +54,7 @@ namespace yocto
 
                 
                 bool  has(const string &id ) const throw();
-                bool  has(const char   *id ) const throw();
+                bool  has(const char   *id ) const;
                 rule &get_rule(const string &id);
                 rule &get_rule(const char   *id);
 
@@ -76,7 +76,7 @@ namespace yocto
                 r_list rules;
                 dbase *db;
                 void check_label(const string &label) const;
-                
+                void enroll( rule *r );
             };
         }
         

@@ -1,5 +1,6 @@
 #include "yocto/lang/syntax/grammar.hpp"
 #include "yocto/ptr/alias.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -11,6 +12,7 @@ namespace yocto
 
             typedef alias_ptr<string,rule> rule_alias;
             typedef set<string,rule_alias> rule_dbase;
+            
             class grammar:: dbase : public rule_dbase
             {
             public:
@@ -21,6 +23,18 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(dbase);
             };
 
+            void grammar:: enroll( rule *r )
+            {
+                assert(r);
+                const rule_alias ra(r);
+                if(!db->insert(ra))
+                {
+                    throw exception("[[%s]]: unexpected failure to decl '%s'", name.c_str(),r->label.c_str());
+                }
+            }
+            
+
+            
             grammar:: ~grammar() throw()
             {
                 delete db;
@@ -55,8 +69,6 @@ namespace yocto
             }
 
 
-
-
         }
 
     }
@@ -64,7 +76,6 @@ namespace yocto
 }
 
 
-#include "yocto/exception.hpp"
 #include "yocto/lang/syntax/terminal.hpp"
 #include "yocto/lang/syntax/optional.hpp"
 #include "yocto/lang/syntax/at-least.hpp"
@@ -78,25 +89,21 @@ namespace yocto
         {
             void grammar:: check_label(const string &label) const
             {
-                for(const rule *r=rules.head;r;r=r->next)
+                if(db->search(label))
                 {
-                    if(label==r->label)
-                    {
-                        throw exception("grammar %s: multiple rule '%s'", name.c_str(), label.c_str());
-                    }
+                     throw exception("[[%s]]: multiple rule '%s'", name.c_str(), label.c_str());
                 }
+                
             }
 
             rule & grammar:: get_rule(const string &id)
             {
-                for(rule *r=rules.head;r;r=r->next)
+                rule_alias *ppR = db->search(id);
+                if(ppR)
                 {
-                    if(id==r->label)
-                    {
-                        return *r;
-                    }
+                    return **ppR;
                 }
-                throw exception("grammar %s: no rule '%s'", name.c_str(),id.c_str());
+                throw exception("[[%s]]: no rule '%s'", name.c_str(),id.c_str());
             }
 
             rule & grammar:: get_rule(const char *id)
@@ -106,14 +113,21 @@ namespace yocto
             }
 
 
+#define ENROLL(RULE_PTR) do {                     \
+rules.push_back(RULE_PTR);                        \
+try { enroll(RULE_PTR); }                         \
+catch(...) { delete rules.pop_back(); throw;   }  \
+} while(false)
+            
             terminal & grammar:: decl_term( const string &label, const property ppty  )
             {
                 check_label(label);
                 terminal *r = new terminal(label,ppty);
-                rules.push_back(r);
+                ENROLL(r);
                 return *r;
             }
 
+            
             terminal & grammar:: decl_term( const char *label, const property ppty  )
             {
                 const string Label(label);
@@ -124,7 +138,7 @@ namespace yocto
             {
                 check_label(label);
                 aggregate *r = new aggregate(label,ppty);
-                rules.push_back(r);
+                ENROLL(r);
                 return *r;
             }
 
@@ -137,14 +151,14 @@ namespace yocto
             alternate & grammar:: alt()
             {
                 alternate *r = new alternate();
-                rules.push_back(r);
+                ENROLL(r);
                 return *r;
             }
 
             rule & grammar:: opt(rule &r)
             {
                 if( ! rules.owns(&r) )
-                    throw exception("rule '%s' doesn't belong to grammar [[%s]]", r.label.c_str(), name.c_str());
+                    throw exception("rule '%s' doesn't belong to [[%s]]", r.label.c_str(), name.c_str());
                 optional *R = new optional(r);
                 rules.push_back(R);
                 return *R;
@@ -153,7 +167,7 @@ namespace yocto
             rule & grammar:: at_least(rule &r, const size_t nmin)
             {
                 if( ! rules.owns(&r) )
-                    throw exception("rule '%s' doesn't belong to grammar [[%s]]", r.label.c_str(), name.c_str());
+                    throw exception("rule '%s' doesn't belong to [[%s]]", r.label.c_str(), name.c_str());
                 rule *R = new syntax::at_least(r,nmin);
                 rules.push_back(R);
                 return *R;
@@ -192,7 +206,8 @@ namespace yocto
                 assert(r);
                 auto_ptr<rule> p(r);
                 check_label(r->label);
-                rules.push_back( p.yield() );
+                p.forget();
+                ENROLL(r);
             }
 
 
@@ -265,20 +280,13 @@ namespace yocto
 
             bool grammar:: has(const string &id) const throw()
             {
-                for(const rule *r=rules.head;r;r=r->next)
-                {
-                    if(id==r->label) return true;
-                }
-                return false;
+                return NULL != db->search(id);
             }
 
-            bool grammar:: has(const char *id) const throw()
+            bool grammar:: has(const char *id) const
             {
-                for(const rule *r=rules.head;r;r=r->next)
-                {
-                    if(id==r->label) return true;
-                }
-                return false;
+                const string ID(id);
+                return has(ID);
             }
 
 
@@ -286,7 +294,7 @@ namespace yocto
             {
                 if(rules.size<=0)
                 {
-                    throw exception("%s: no top level rule", name.c_str());
+                    throw exception("[[%s]]: no top level rule", name.c_str());
                 }
                 return *(rules.head);
             }
@@ -336,21 +344,14 @@ namespace yocto
 
             void grammar:: remove( const string &label )
             {
-                rule *r = 0;
-                for( rule *ch=rules.head;ch;ch=ch->next)
+                rule_alias *ppR = db->search(label);
+                if(!ppR)
                 {
-                    if(label==ch->label)
-                    {
-                        r = ch;
-                        break;
-                    }
+                    throw exception("[[%s]]: no '%s' to remove", name.c_str(), label.c_str());
                 }
-                if(!r)
-                {
-                    throw exception("%s: no '%s' to remove", name.c_str(), label.c_str());
-                }
+                rule *r = rules.unlink(&(**ppR));
+                (void) db->remove(label);
                 // TODO: check if we can remove it...
-                r = rules.unlink(r);
                 
                 delete r;
             }
