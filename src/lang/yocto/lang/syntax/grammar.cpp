@@ -18,7 +18,7 @@ namespace yocto
             class grammar:: dbase : public rule_dbase
             {
             public:
-                explicit  dbase() throw() : rule_dbase() {}
+                explicit  dbase() throw() : rule_dbase(),addr() {}
                 virtual  ~dbase() throw() {}
                 
                 sorted_vector<rule_addr> addr;
