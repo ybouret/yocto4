@@ -70,7 +70,7 @@ namespace yocto
                 void cleanup(); //! remove empty aggregate
                 void remove( const string &label );
                 
-                
+                void lock() throw();
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);

@@ -61,7 +61,14 @@ namespace yocto
                 }
             }
             
-            
+            void grammar:: lock() throw()
+            {
+                if(db)
+                {
+                    delete db;
+                    db = 0;
+                }
+            }
             
             grammar:: ~grammar() throw()
             {
