@@ -46,7 +46,7 @@ namespace yocto {
 
         }
 
-        const socket_address_format IPv4 =
+        const socket_address_format IPv4FORMAT =
         {
             sizeof(sockaddr_in),
             sizeof(net32_t),

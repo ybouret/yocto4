@@ -8,7 +8,7 @@ namespace yocto {
     namespace network {
 
         //! IPv6 address format
-        extern const socket_address_format IPv6;
+        extern const socket_address_format IPv6FORMAT;
         
     }
     

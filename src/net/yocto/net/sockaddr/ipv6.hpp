@@ -8,7 +8,7 @@ namespace yocto {
 
     namespace network
     {
-        typedef _socket_address<&IPv6,net128_t>  IPv6address;
+        typedef _socket_address<&IPv6FORMAT,net128_t>  IPv6;
 
     }
 

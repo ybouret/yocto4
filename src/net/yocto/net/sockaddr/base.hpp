@@ -5,6 +5,7 @@
 #include "yocto/net/sockaddr/sys.hpp"
 #include "yocto/memory/buffer.hpp"
 #include "yocto/string.hpp"
+#include "yocto/counted.hpp"
 
 namespace yocto
 {
@@ -22,7 +23,7 @@ namespace yocto
         struct socket_address_format;
 
         //! IPv[4|6] address
-        class socket_address : public memory::rw_buffer
+        class socket_address : public memory::rw_buffer, public counted
         {
         public:
             const socket_address_format &fmt;       //!< external format
@@ -59,7 +60,7 @@ namespace yocto
              * \param net_port the host port (big endian)
              * if net_port is zero then try to extract host_name:port from net_name.
              */
-            explicit socket_address( const socket_address_format &fmt, const string &      net_name, net16_t net_port );
+            explicit socket_address( const socket_address_format &fmt, const string & net_name, net16_t net_port );
 
             //! copy constructor
             socket_address( const socket_address &sa ) throw();

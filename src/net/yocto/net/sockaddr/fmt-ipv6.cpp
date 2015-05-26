@@ -82,7 +82,7 @@ namespace yocto {
                 os<< int(h[15]);
         }
         
-        const socket_address_format IPv6 =
+        const socket_address_format IPv6FORMAT =
         {
             sizeof(sockaddr_in6),
             sizeof(net128_t),

@@ -8,7 +8,7 @@ namespace yocto {
 
     namespace network
     {
-        typedef _socket_address<&IPv4,net32_t>  IPv4address;
+        typedef _socket_address<&IPv4FORMAT,net32_t>  IPv4;
         
     }
     

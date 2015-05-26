@@ -56,6 +56,7 @@ namespace yocto {
             host( *static_cast<T *>(host_) )
             {
             }
+
             
         private:
             static inline const socket_address_format & get_format() throw()

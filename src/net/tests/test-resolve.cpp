@@ -1,7 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/net/net.hpp"
-#include "yocto/net/sockaddr/ipv4.hpp"
-#include "yocto/net/sockaddr/ipv6.hpp"
+#include "yocto/net/ipaddr.hpp"
 
 using namespace yocto;
 using namespace network;
@@ -28,16 +27,23 @@ static inline void try_resolve( socket_address &ip, const string &name )
 
 YOCTO_UNIT_TEST_IMPL(resolve)
 {
+    std::cerr << "sizeof(IPv4)=" << sizeof(IPv4) << std::endl;
+    std::cerr << "sizeof(IPv6)=" << sizeof(IPv6) << std::endl;
+
     for(int i=1;i<argc;++i)
     {
         const string name = argv[i];
         std::cerr << "resolving " << name << "..." << std::endl;
 
-        IPv4address ipv4;
+        IPv4 ipv4;
         try_resolve(ipv4,name);
-        IPv6address ipv6;
+        IPv6 ipv6;
         try_resolve(ipv6,name);
+
+        //IPaddress ipaddr = new IPv4();
     }
+
+
 }
 YOCTO_UNIT_TEST_DONE()
 
