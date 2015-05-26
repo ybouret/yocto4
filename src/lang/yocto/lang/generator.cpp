@@ -128,6 +128,7 @@ namespace yocto
             }
 
             syntax::xgen   xg(tree);
+            xg.xprs->lock();
             return xg.xprs.yield();
         }
 
