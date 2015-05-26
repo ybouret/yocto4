@@ -2,7 +2,7 @@
 #define YOCTO_NET_DELAY_INCLUDED 1
 
 #include "yocto/object.hpp"
-#if defined(__linux__)
+#if defined(YOCTO_BSD)
 #include <sys/time.h>
 #endif
 
