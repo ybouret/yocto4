@@ -256,6 +256,7 @@ namespace yocto
                 if( !root.accept(tree,lxr,src,fp) )
                 {
                     assert(NULL==tree);
+                    std::cerr << "## " << name << " NOT ACCEPTED" << std::endl;
                     //__________________________________________________________
                     //
                     // not accepted: what happened ?
@@ -281,6 +282,7 @@ namespace yocto
                 //
                 // Let's study the result
                 //______________________________________________________________
+                std::cerr << "## " << name << " ACCEPTED" << std::endl;
                 auto_ptr<xnode> ast(tree);
                 const lexeme   *lx = lxr.peek(src, fp);
                 if(lx)
