@@ -69,7 +69,7 @@ namespace  yocto {
 			explicit socket( const socket_address &ip, type2type<udp_client> );
 
 			//------------------------------------------------------------------
-			// udp client
+			// udp server
 			//------------------------------------------------------------------
 			//! create udp, set options, bind to ip address
 			explicit socket( const socket_address &ip, type2type<udp_server> );

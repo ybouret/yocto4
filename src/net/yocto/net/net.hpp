@@ -12,9 +12,9 @@ namespace yocto
     {
 
         //! forward declaration
-        class socket_address;
+        class  socket_address;
 
-
+        
 #if defined(YOCTO_BSD)
         typedef int socket_t;
 #endif
@@ -40,7 +40,23 @@ namespace yocto
              * It uses the network database.
              */
             void resolve( socket_address &ip, const string &id ) const;
-            
+
+            //! low-level TCP socket setup
+            /**
+             *  \param protocol PF_INET[6]
+             *  \param level    "IP[v4|v6]"
+             *  \return a TCP socket, ready to be used
+             */
+            socket_t open_tcp( int procotol, const char *level ) const;
+
+            //! low-level TCP socket setup
+            /**
+             *  \param protocol PF_INET[6]
+             *  \param level    "IP[v4|v6]"
+             *  \return a UDP socket, ready to be used
+             */
+            socket_t open_udp( int procotol, const char *level ) const; 
+
             
             static const uint16_t reserved_port;   //!< port < reserved_port: for system
             static const uint16_t first_user_port; //!< port >= first_user_port: for user
