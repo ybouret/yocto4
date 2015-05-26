@@ -1,7 +1,7 @@
 
 FILE(GLOB test_srcs test-*.cpp)
-ADD_EXECUTABLE(test-net main.cpp ${test_srcs})
-TARGET_LINK_YOCTO( test-net net)
+ADD_EXECUTABLE(test-net-old main.cpp ${test_srcs})
+TARGET_LINK_YOCTO( test-net-old net-old)
 IF(WIN32)
 	IF( "${CC_NAME}" MATCHES "gcc.*" )
 		TARGET_LINK_LIBRARIES( test-net ws2_32 )
