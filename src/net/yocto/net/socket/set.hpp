@@ -34,6 +34,13 @@ namespace yocto
             void insert( socket & s );          //!< insert a socket into the set
             void remove( socket & s ) throw();  //!< remove a socket from the set
             
+            //!check the activity of the set.
+            /**
+             *  \param d a network delay (-1=>wait until something happens)
+             *	\return the number of active sockets.
+             */
+            size_t check( delay &d );
+
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(socket_set);
