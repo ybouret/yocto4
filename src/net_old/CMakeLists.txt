@@ -1,4 +1,3 @@
-PROJECT(net)
 
 FILE( GLOB net_decl yocto/net/*.hpp)
 FILE( GLOB net_impl yocto/net/*.cpp)
@@ -30,8 +29,8 @@ SET( srcs ${net_srcs} ${sys_srcs} ${ip_srcs} ${io_srcs} )
 
 INCLUDE_DIRECTORIES( . ../main )
 
-ADD_LIBRARY(y-net STATIC ${srcs} )
+ADD_LIBRARY(y-net-old STATIC ${srcs} )
 
-INSTALL( TARGETS y-net ARCHIVE DESTINATION lib )
+INSTALL( TARGETS y-net-old ARCHIVE DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
