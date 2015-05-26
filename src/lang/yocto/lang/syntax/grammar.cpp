@@ -309,6 +309,7 @@ namespace yocto
             
             bool grammar:: has(const string &id) const throw()
             {
+                check_locked();
                 return NULL != db->search(id);
             }
             
