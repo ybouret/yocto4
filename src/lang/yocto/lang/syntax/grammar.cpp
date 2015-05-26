@@ -252,51 +252,26 @@ namespace yocto
                 
                 xnode          *tree = 0;
                 const rule     &root = *(rules.head);
-                
+
                 if( !root.accept(tree,lxr,src,fp) )
                 {
                     assert(NULL==tree);
-                    std::cerr << "## " << name << " NOT ACCEPTED" << std::endl;
                     //__________________________________________________________
                     //
                     // not accepted: what happened ?
                     //__________________________________________________________
-                    switch(lxr.size)
-                    {
-                        case 0:
-                            throw exception("[[%s]]: no lexeme, expecting '%s'",gname,root.label.c_str());
-                            
-                        case 1:
-                            throw exception("[[%s]]: unexpected single lexeme %s", gname, lxr.head->label.c_str());
-                            
-                        default:
-                            assert(lxr.tail);
-                            assert(lxr.tail->prev);
-                            throw exception("[[%s]]: unexpected %s after %s", gname, lxr.tail->label.c_str(), lxr.tail->prev->label.c_str());
-                            
-                    }
-                    
+                    failure(lxr);
                 }
-                
+
                 //______________________________________________________________
                 //
                 // Let's study the result
                 //______________________________________________________________
-                std::cerr << "## " << name << " ACCEPTED" << std::endl;
                 auto_ptr<xnode> ast(tree);
                 const lexeme   *lx = lxr.peek(src, fp);
                 if(lx)
                 {
-                    assert(lxr.size>=1);
-                    if(lx->next)
-                    {
-                        assert(lx->next);
-                        throw exception("%d:[[%s]]: unexpected extraneous %s after %s", lx->next->line, gname, lx->next->label.c_str(), lx->label.c_str());
-                    }
-                    else
-                    {
-                        throw exception("%d:[[%s]]: unexpected extraneous %s", lx->line, gname, lx->label.c_str());
-                    }
+                    failure(lxr);
                 }
                 
                 
@@ -307,8 +282,47 @@ namespace yocto
                 return xnode::AST(ast.yield());
                 
             }
-            
-            
+
+            void grammar::failure(lexer &lxr)
+            {
+                const char     *gname = name.c_str();
+                const rule     &root  = *(rules.head);
+
+                switch(lxr.size)
+                {
+                    case 0:
+                        throw exception("[[%s]]: no lexeme, expecting %s",gname,root.label.c_str());
+
+                    case 1:
+                    {
+                        const lexeme *lx = lxr.head;
+                        const string  tx = lx->to_string();
+                        throw exception("%d:[[%s]]: unexpected single lexeme %s('%s')", lx->line, gname, lx->label.c_str(), tx.c_str());
+                    }
+
+                    default:
+                    {
+                        assert(lxr.tail);
+                        assert(lxr.tail->prev);
+                        const lexeme *tail   = lxr.tail;
+                        const string  tail_s = tail->to_string();
+                        const lexeme *prev   = tail->prev;
+                        const string  prev_s = prev->to_string();
+
+                        throw exception("%d:[[%s]]: unexpected %s('%s') after %s('%s')",
+                                        tail->line,
+                                        gname,
+                                        tail->label.c_str(),
+                                        tail_s.c_str(),
+                                        prev->label.c_str(),
+                                        prev_s.c_str());
+                    }
+
+                }
+
+            }
+
+
             bool grammar:: has(const string &id) const throw()
             {
                 check_locked();

@@ -81,6 +81,7 @@ namespace yocto
                 void check_label(const string &label) const;
                 void check_locked() const;
                 void enroll( rule *r );
+                void failure(lexer &lxr);
             };
         }
         

@@ -24,7 +24,6 @@ namespace yocto
                     case univocal:
                         throw exception("invalid modifier for '%s", id.c_str());
                     default:;
-
                 }
             }
 
