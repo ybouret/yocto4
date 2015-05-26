@@ -8,11 +8,6 @@
 using namespace yocto;
 using namespace lang;
 
-namespace
-{
-
-}
-
 YOCTO_UNIT_TEST_IMPL(gen)
 {
     vfs &fs = local_fs::instance();

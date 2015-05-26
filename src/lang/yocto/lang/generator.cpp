@@ -52,6 +52,7 @@ namespace yocto
             Agg  &RULE      = agg("RULE");
 
             RULE << ID;
+
             RULE << COLON;
             {
                 Alt &ATOM = alt();
@@ -95,9 +96,24 @@ namespace yocto
             LXR << SEMICOLON;
 
 
+            //__________________________________________________________________
+            //
+            // PROPERTY RULE
+            //__________________________________________________________________
+
+            Agg &PTY = agg("PTY");
+            PTY << term("PN","$[:word:]+");
+            PTY << COLON;
+            PTY << zero_or_more(ID);
+            PTY << SEMICOLON;
+
+            //__________________________________________________________________
+            //
+            // And finally assemble the parser...
+            //__________________________________________________________________
             Agg &THE_PARSER = agg("parser");
             THE_PARSER << USR_NAME;
-            THE_PARSER << zero_or_more(choice(RULE,LXR));
+            THE_PARSER << zero_or_more(choice(RULE,LXR,PTY));
 
 
             top_level( THE_PARSER );

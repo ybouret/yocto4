@@ -1,12 +1,12 @@
 .evaluator;
 
-code     : expr*;
+code     : (args END)*;
 
-expr     : args END;
 term     :  (PLUS|MINUS)? factor ((PLUS|MINUS)  factor)*;
 factor   : atom ( (MUL|DIV) atom)*;
 function : ID LPAREN args RPAREN;
 atom     : INT | function | ID | LPAREN term RPAREN;
+$mergeOne: term factor;
 
 PLUS   : '+';
 MINUS  : '-';

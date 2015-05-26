@@ -18,7 +18,8 @@ namespace yocto
             static const char *main_keywords[] =
             {
                 "RULE", //0
-                "LXR"   //1
+                "LXR" , //1
+                "PTY"   //2
             };
 
             static const char *code_keywords[] =
@@ -67,7 +68,9 @@ namespace yocto
             indx(0),
             jndx(0),
             visited(),
-            curr(0)
+            curr(0),
+            mergeOneDB(),
+            mergeAllDB()
             {
                 assert(root);
                 assert(!root->terminal);
@@ -95,10 +98,13 @@ namespace yocto
                     {
                         case 0: assert("RULE"==ch->label); process_rule_level1(ch); break;
                         case 1: assert("LXR" ==ch->label); process_lxr__level1(ch); break;
+                        case 2: assert("PTY" ==ch->label); process_pty__level1(ch); break;
                         default: assert(-1==zmph(ch->label));
                             throw exception("%s: unexpected top level '%s'", name, ch->label.c_str());
                     }
                 }
+
+                check_properties();
 
                 //______________________________________________________________
                 //

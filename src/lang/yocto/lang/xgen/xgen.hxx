@@ -23,7 +23,9 @@ namespace yocto
                 typedef alias_ptr<string,terminal>  term_ptr;
                 typedef set<string,term_ptr>        term_set;
 
-                typedef  rule *rule_p;
+                typedef  rule                      *rule_p;
+                typedef  sorted_vector<rule_p>      rule_v;
+                typedef  sorted_vector<string>      pptyDB;
 
                 const xnode      *root;
                 auto_ptr<parser>  xprs;
@@ -32,16 +34,18 @@ namespace yocto
                 term_set          rxp;
                 term_set          raw;
 
-                hashing::perfect  zmph; //!< RULE | LXR
+                hashing::perfect  zmph; //!< RULE | LXR | PTY
                 hashing::perfect  cmph; //!< lxr codes: @drop, @endl, @comment
                 hashing::perfect  mmph; //!< lxr meta: RXP|RAW
                 hashing::perfect  kmph; //!< kind of item
                 hashing::perfect  gmph; //!< for growing rules
                 
-                unsigned          indx; //!< for sub rules naming
-                unsigned          jndx; //!< for lexical rules naming
-                sorted_vector<rule_p> visited;
-                const rule       *curr; //!< current top level rule
+                unsigned          indx;       //!< for sub rules naming
+                unsigned          jndx;       //!< for lexical rules naming
+                rule_v            visited;    //!< for tree walking
+                const rule       *curr;       //!< current top level rule
+                pptyDB            mergeOneDB; //!< for top level modification
+                pptyDB            mergeAllDB; //!< for sub level modification
 
                 xgen(const xnode *node);
                 ~xgen() throw();
@@ -56,11 +60,17 @@ namespace yocto
                     }
                 }
 
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xgen);
 
                 void     process_rule_level1(const xnode *node);
                 void     process_lxr__level1(const xnode *node);
+                void     process_pty__level1(const xnode *node);
+                void     check_properties();
+
+                void     check_ppty_db(const pptyDB &db);
 
                 pattern *compile_lexical(const xnode *node,const size_t nsub);
                 pattern *compile_lexical(const xnode *node);
