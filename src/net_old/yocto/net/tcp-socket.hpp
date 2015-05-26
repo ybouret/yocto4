@@ -11,7 +11,8 @@ namespace yocto {
 	namespace network {
 		
 		//! TCP server
-		class tcp_server : public socket {
+		class tcp_server : public socket
+        {
 		public:
 			//! constructor.
 			/**
@@ -29,7 +30,7 @@ namespace yocto {
 			friend class tcp_client;
 			socket_t get_socket() const throw();
 		};
-		
+
 		
 		
 		//! TCP client
