@@ -1,6 +1,8 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/net/net.hpp"
-#include "yocto/net/ipaddr.hpp"
+#include "yocto/net/sockaddr/ipv4.hpp"
+#include "yocto/net/sockaddr/ipv6.hpp"
+
 
 using namespace yocto;
 using namespace network;
@@ -40,7 +42,6 @@ YOCTO_UNIT_TEST_IMPL(resolve)
         IPv6 ipv6;
         try_resolve(ipv6,name);
 
-        //IPaddress ipaddr = new IPv4();
     }
 
 

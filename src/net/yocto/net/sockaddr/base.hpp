@@ -5,7 +5,6 @@
 #include "yocto/net/sockaddr/sys.hpp"
 #include "yocto/memory/buffer.hpp"
 #include "yocto/string.hpp"
-#include "yocto/counted.hpp"
 
 namespace yocto
 {
@@ -23,7 +22,7 @@ namespace yocto
         struct socket_address_format;
 
         //! IPv[4|6] address
-        class socket_address : public memory::rw_buffer, public counted
+        class socket_address : public memory::rw_buffer
         {
         public:
             const socket_address_format &fmt;       //!< external format
