@@ -137,8 +137,8 @@ namespace yocto
 
 
 
-                xprs->gramviz("lanraw.dot");
-                (void)system("dot -Tpng -o lanraw.png lanraw.dot");
+                //xprs->gramviz("lanraw.dot");
+                //(void)system("dot -Tpng -o lanraw.png lanraw.dot");
                 
             }
             

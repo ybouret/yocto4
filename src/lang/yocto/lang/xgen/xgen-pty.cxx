@@ -1,6 +1,5 @@
 #include "yocto/lang/xgen/xgen.hxx"
 #include "yocto/exception.hpp"
-#include <iostream>
 
 namespace yocto
 {
@@ -15,7 +14,6 @@ namespace yocto
                 const xnode *ch = node->head();
                 assert("PN"==ch->label);
                 const string  pname = ch->content(1,0);
-                std::cerr << "-- will change ppty " << pname << std::endl;
                 ordered<string>       *IDB = 0;
                 if("mergeOne"==pname)
                 {
@@ -37,7 +35,6 @@ namespace yocto
                 {
                     assert("ID"==ch->label);
                     const string id = ch->content();
-                    std::cerr << "\t+" << id << std::endl;
                     if(! IDB->insert(id))
                     {
                         throw exception("%s: multiple rule '%s' in %s",name, id.c_str(), pname.c_str());

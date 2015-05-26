@@ -8,7 +8,7 @@ function : ID LPAREN args RPAREN;
 atom     : INT | function | ID | LPAREN term RPAREN;
 
 $mergeOne: term;
-$mergeAll: factor;
+$mergeOne: factor;
 
 PLUS   : '+';
 MINUS  : '-';

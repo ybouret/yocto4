@@ -137,12 +137,14 @@ namespace yocto
             syntax::xnode          *tree = run(fp);
             auto_ptr<syntax::xnode> guard(tree);
             rewrite( tree );
+
+#if 0
             if(tree)
             {
                 tree->graphviz("xnode.dot");
                 (void) system("dot -Tpng -o xnode.png xnode.dot");
             }
-
+#endif
             syntax::xgen   xg(tree);
             xg.xprs->lock();
             return xg.xprs.yield();
