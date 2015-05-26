@@ -15,15 +15,15 @@ namespace yocto
                 assert("PN"==ch->label);
                 const string  pname = ch->content(1,0);
                 ordered<string>       *IDB = 0;
-                if("mergeOne"==pname)
+                if("no_single"==pname)
                 {
-                    IDB = & mergeOneDB;
+                    IDB = & no_single;
                     goto FILL_DB;
                 }
 
-                if("mergeAll"==pname)
+                if("one_level"==pname)
                 {
-                    IDB = & mergeAllDB;
+                    IDB = &one_level;
                     goto FILL_DB;
                 }
 
@@ -44,12 +44,12 @@ namespace yocto
 
             void xgen::check_properties()
             {
-                check_ppty_db(mergeOneDB);
-                check_ppty_db(mergeAllDB);
+                check_ppty_db(no_single);
+                check_ppty_db(one_level);
 
-                for(size_t i=mergeOneDB.size();i>0;--i)
+                for(size_t i=no_single.size();i>0;--i)
                 {
-                    agg_ptr       *ppA = agg.search(mergeOneDB[i]); assert(ppA);
+                    agg_ptr       *ppA = agg.search(no_single[i]); assert(ppA);
                     (property &)((**ppA).modifier) = mergeOne;
                 }
 

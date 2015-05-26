@@ -44,8 +44,8 @@ namespace yocto
                 unsigned          jndx;       //!< for lexical rules naming
                 rule_v            visited;    //!< for tree walking
                 const rule       *curr;       //!< current top level rule
-                pptyDB            mergeOneDB; //!< for top level modification
-                pptyDB            mergeAllDB; //!< for sub level modification
+                pptyDB            no_single; //!< for top level modification
+                pptyDB            one_level; //!< for sub level modification
 
                 xgen(const xnode *node);
                 ~xgen() throw();

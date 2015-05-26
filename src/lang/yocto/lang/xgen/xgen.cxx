@@ -69,8 +69,8 @@ namespace yocto
             jndx(0),
             visited(),
             curr(0),
-            mergeOneDB(),
-            mergeAllDB()
+            no_single(),
+            one_level()
             {
                 assert(root);
                 assert(!root->terminal);
@@ -147,7 +147,7 @@ namespace yocto
                 assert(curr!=NULL);
                 const string label = curr->label;
                 const string id    = label + vformat("#%u", ++indx);
-                return & xprs->agg(id, mergeAllDB.search(label) ? mergeAll : mergeOne);
+                return & xprs->agg(id, one_level.search(label) ? mergeAll : mergeOne);
             }
             
             void xgen:: delete_sub(const string &label)

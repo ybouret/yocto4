@@ -7,8 +7,8 @@ factor   : atom ( (MUL|DIV) atom)*;
 function : ID LPAREN args RPAREN;
 atom     : INT | function | ID | LPAREN term RPAREN;
 
-$mergeOne: term;
-$mergeOne: factor;
+$no_single:   term factor;
+$one_level:   factor;
 
 PLUS   : '+';
 MINUS  : '-';
