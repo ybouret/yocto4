@@ -91,6 +91,7 @@ namespace yocto {
 } // yocto
 
 
+#include <cstdlib>
 
 namespace yocto
 {
