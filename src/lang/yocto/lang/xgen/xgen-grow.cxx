@@ -82,7 +82,6 @@ namespace yocto
                 {
                     logical::operand *op = itm->pop_front();
                     r = op->addr;
-                    //std::cerr << "should kill " << itm->label << std::endl;
                     delete op;
                     delete_sub(itm->label);
                 }
@@ -188,7 +187,6 @@ namespace yocto
                     logical::operand *op = tmp->pop_front();
                     parent->append(op->addr);
                     delete op;
-                    //std::cerr << "should kill " << tmp->label << std::endl;
                     delete_sub(tmp->label);
                 }
                 else
