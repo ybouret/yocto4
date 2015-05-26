@@ -28,12 +28,7 @@ namespace yocto
             friend std::ostream & operator<< ( std::ostream &, const net128_t & );
             
         };
-
-        inline net8_t  swap_nbo(uint8_t  x) throw() { return x; }
-        inline net16_t swap_nbo(uint16_t x) throw() { return YOCTO_SWAP_BE16(x); }
-        inline net32_t swap_nbo(uint32_t x) throw() { return YOCTO_SWAP_BE32(x); }
-        inline net64_t swap_nbo(uint64_t x) throw() { return YOCTO_SWAP_BE64(x); }
-
+        
     }
 }
 
