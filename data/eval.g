@@ -6,7 +6,9 @@ term     :  (PLUS|MINUS)? factor ((PLUS|MINUS)  factor)*;
 factor   : atom ( (MUL|DIV) atom)*;
 function : ID LPAREN args RPAREN;
 atom     : INT | function | ID | LPAREN term RPAREN;
-$mergeOne: term factor;
+
+$mergeOne: term;
+$mergeAll: factor;
 
 PLUS   : '+';
 MINUS  : '-';

@@ -145,9 +145,9 @@ namespace yocto
             logical * xgen:: create_sub()
             {
                 assert(curr!=NULL);
-                //std::cerr << "\tcreate sub for curr=" << curr->label << std::endl;
-                const string id = curr->label + vformat("#%u", ++indx);
-                return & xprs->agg(id,mergeOne);
+                const string label = curr->label;
+                const string id    = label + vformat("#%u", ++indx);
+                return & xprs->agg(id, mergeAllDB.search(label) ? mergeAll : mergeOne);
             }
             
             void xgen:: delete_sub(const string &label)
