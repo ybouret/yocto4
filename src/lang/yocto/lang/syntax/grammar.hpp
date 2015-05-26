@@ -67,7 +67,7 @@ namespace yocto
 
                 size_t count() const throw();
 
-                void cleanup() throw(); //! remove empty aggregate
+                void cleanup(); //! remove empty aggregate
                 void remove( const string &label );
                 
                 
@@ -79,6 +79,7 @@ namespace yocto
                 dbase *db;
                 
                 void check_label(const string &label) const;
+                void check_locked() const;
                 void enroll( rule *r );
             };
         }

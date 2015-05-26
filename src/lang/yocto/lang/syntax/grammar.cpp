@@ -27,18 +27,26 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(dbase);
             };
-            
+
+            void grammar:: check_locked() const
+            {
+                if(!db) throw exception("[[%s]] is locked!",name.c_str());
+            }
+
             void grammar:: enroll( rule *r )
             {
                 assert(r);
+                check_locked();
                 const rule_alias ra(r);
                 if(!db->insert(ra))
                 {
+                    // multiple label ?
                     throw exception("[[%s]]: unexpected failure to enroll '%s' level-1", name.c_str(),r->label.c_str());
                 }
                 
                 try
                 {
+                    // multiple address ?
                     if(!db->addr.insert(r))
                     {
                         (void) db->remove(r->label);
@@ -108,6 +116,7 @@ namespace yocto
         {
             void grammar:: check_label(const string &label) const
             {
+                check_locked();
                 if(db->search(label))
                 {
                     throw exception("[[%s]]: multiple rule '%s'", name.c_str(), label.c_str());
@@ -117,6 +126,7 @@ namespace yocto
             
             rule & grammar:: get_rule(const string &id)
             {
+                check_locked();
                 rule_alias *ppR = db->search(id);
                 if(ppR)
                 {
@@ -169,6 +179,7 @@ catch(...) { delete rules.pop_back(); throw;   }  \
             
             alternate & grammar:: alt()
             {
+                check_locked();
                 alternate *r = new alternate();
                 ENROLL(r);
                 return *r;
@@ -310,6 +321,7 @@ namespace yocto
             bool  grammar:: has(const rule *r) const throw()
             {
                 assert(r);
+                check_locked();
                 return db->addr.search((rule*)r);
             }
 
@@ -328,8 +340,9 @@ namespace yocto
                 return rules.size;
             }
             
-            void grammar:: cleanup() throw()
+            void grammar:: cleanup()
             {
+                check_locked();
                 r_list stk;
                 while(rules.size>0 )
                 {
@@ -368,6 +381,7 @@ namespace yocto
             
             void grammar:: remove( const string &label )
             {
+                check_locked();
                 rule_alias *ppR = db->search(label);
                 if(!ppR)
                 {
