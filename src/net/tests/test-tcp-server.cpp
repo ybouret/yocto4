@@ -55,25 +55,7 @@ static inline void handle_tcp_server( socket_address &ip )
 
         }
 
-#if 0
-        ios::iflux input( cln, iobuff );
-
-        line.clear();
-        while( input.read_line( line ) > 0 )
-        {
-            std::cerr << ">" << line << std::endl;
-            if( line == ".end" )
-                break;
-            if( line == ".quit" )
-            {
-                run = false;
-                break;
-            }
-
-            line.clear();
-        }
-#endif
-
+        
     }
 
 

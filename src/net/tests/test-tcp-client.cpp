@@ -1,7 +1,6 @@
-#if 0
 #include "yocto/utest/run.hpp"
-#include "yocto/net/tcp-socket.hpp"
-#include "yocto/net/ip-address.hpp"
+#include "yocto/net/socket/tcp.hpp"
+#include "yocto/net/ipaddr.hpp"
 #include "yocto/ios/icstream.hpp"
 
 #include <cstdlib>
@@ -24,13 +23,16 @@ void handle_tcp_client( socket_address &ip, const string &hostname )
 		string line;
 		while( input.read_line(line) > 0 )
 		{
-			size_t done = 0;
 			std::cerr << "-->'" << line << "'" << std::endl;
 			line += '\n';
 			
-			cln.put_all( line, done);
-			std::cerr << "/done #" << done << std::endl;
-			line.clear();
+			//cln.put_all( line, done);
+            const size_t ns = line.size();
+            if(ns!=cln.send(line.c_str(),ns))
+            {
+                break;
+            }
+            line.clear();
 			(std::cerr << "> ").flush();
 		}
 	}
@@ -62,16 +64,15 @@ YOCTO_UNIT_TEST_IMPL(tcp_client)
 	
 	if( version == 4 )
 	{
-		IPv4address addr( socket_address_none, net_port );
+		IPv4 addr( socket_address_none, net_port );
 		handle_tcp_client( addr, hostname );
 	}
 	else 
 	{
-		IPv6address addr( socket_address_none, net_port );
+		IPv6 addr( socket_address_none, net_port );
 		handle_tcp_client( addr, hostname );
 	}
 	
 }
 YOCTO_UNIT_TEST_DONE()
-#endif
 

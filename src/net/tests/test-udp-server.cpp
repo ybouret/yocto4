@@ -1,8 +1,6 @@
-#if 0
 #include "yocto/utest/run.hpp"
-#include "yocto/net/ip-address.hpp"
-#include "yocto/net/udp-socket.hpp"
-#include "yocto/ios/iflux.hpp"
+#include "yocto/net/ipaddr.hpp"
+#include "yocto/net/socket/udp.hpp"
 #include "yocto/memory/buffers.hpp"
 
 #include <cstdlib>
@@ -20,10 +18,9 @@ static inline void handle_udp_server( socket_address &ip )
 	bool run = true;
 	while( run )
 	{
-		size_t done=0;
-		memset( iobuff.rw(), 0, iobuff.length() );
-		srv.get( iobuff.rw(), iobuff.length()-1, done);
-		const string msg( iobuff(), done );
+        memset( iobuff.rw(), 0, iobuff.length() );
+        const size_t done = srv.recv( iobuff(), iobuff.length()-1);
+        const string msg( iobuff(), done );
 		std::cerr << "from " << srv.peer() << std::endl;
 		std::cerr << "'" << msg << "'" << std::endl;
 		if( ".quit" == msg ) run=false;
@@ -50,12 +47,12 @@ YOCTO_UNIT_TEST_IMPL(udp_server)
 	
 	if( version == 4 )
 	{
-		IPv4address addr( socket_address_any, net_port );
+		IPv4 addr( socket_address_any, net_port );
 		handle_udp_server( addr );
 	}
 	else 
 	{
-		IPv6address addr( socket_address_any, net_port );
+		IPv6 addr( socket_address_any, net_port );
 		handle_udp_server( addr );
 	}
 	
@@ -63,4 +60,3 @@ YOCTO_UNIT_TEST_IMPL(udp_server)
 	
 }
 YOCTO_UNIT_TEST_DONE()
-#endif

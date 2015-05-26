@@ -1,7 +1,6 @@
-#if 0
 #include "yocto/utest/run.hpp"
-#include "yocto/net/udp-socket.hpp"
-#include "yocto/net/ip-address.hpp"
+#include "yocto/net/socket/udp.hpp"
+#include "yocto/net/ipaddr.hpp"
 #include "yocto/ios/icstream.hpp"
 
 #include <cstdlib>
@@ -52,15 +51,14 @@ YOCTO_UNIT_TEST_IMPL(udp_client)
 	
 	if( version == 4 )
 	{
-		IPv4address addr( socket_address_none, net_port );
+		IPv4 addr( socket_address_none, net_port );
 		handle_udp_client( addr, hostname );
 	}
 	else 
 	{
-		IPv6address addr( socket_address_none, net_port );
+		IPv6 addr( socket_address_none, net_port );
 		handle_udp_client( addr, hostname );
 	}
 	
 }
 YOCTO_UNIT_TEST_DONE()
-#endif
