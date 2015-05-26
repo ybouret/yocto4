@@ -197,7 +197,7 @@ catch(...) { delete rules.pop_back(); throw;   }  \
                 if( ! has(&r) )
                     throw exception("rule '%s' doesn't belong to [[%s]]", r.label.c_str(), name.c_str());
                 optional *R = new optional(r);
-                rules.push_back(R);
+                ENROLL(R);
                 return *R;
             }
             
@@ -206,7 +206,7 @@ catch(...) { delete rules.pop_back(); throw;   }  \
                 if( ! has(&r) )
                     throw exception("rule '%s' doesn't belong to [[%s]]", r.label.c_str(), name.c_str());
                 rule *R = new syntax::at_least(r,nmin);
-                rules.push_back(R);
+                ENROLL(R);
                 return *R;
             }
             
