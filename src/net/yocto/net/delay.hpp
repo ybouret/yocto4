@@ -1,0 +1,34 @@
+#ifndef YOCTO_NET_DELAY_INCLUDED
+#define YOCTO_NET_DELAY_INCLUDED 1
+
+#include "yocto/object.hpp"
+
+
+namespace yocto {
+
+    namespace network {
+
+        class socket_set;
+        
+        //! wrapper for select(...) timeval
+        class delay : public object {
+        public:
+            explicit delay( const double seconds=-1.0) throw();
+            virtual ~delay() throw();
+            delay( const delay &) throw();
+            delay&operator=( const delay & other ) throw();
+
+            double operator*() const throw();
+
+        private:
+            struct timeval  data_; //!< time from 0 to 1 day.
+            struct timeval *wait_; //!< NULL: wait for ever else wait = data
+            friend class socket_set;
+        };
+        
+    }
+    
+}
+
+#endif
+
