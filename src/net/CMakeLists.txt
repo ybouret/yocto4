@@ -18,13 +18,22 @@ INSTALL( FILES ${bsd_decl} DESTINATION include/yocto/net/bsd )
 SOURCE_GROUP( net/bsd FILES ${bsd_srcs} )
 
 
+FILE( GLOB socket_decl yocto/net/socket/*.hpp )
+FILE( GLOB socket_impl yocto/net/socket/*.cpp )
+SET( socket_srcs ${socket_decl} ${socket_impl}  )
+INSTALL( FILES ${socket_decl} DESTINATION include/yocto/net/socket )
+SOURCE_GROUP( net/socket FILES ${socket_srcs} )
+
+
 INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY(y-net STATIC
 ${net_srcs}
 ${addr_srcs}
 yocto/net/sockaddr/ctor.hxx
-${bsd_srcs} )
+${bsd_srcs} 
+${socket_srcs}
+)
 
 INSTALL( TARGETS y-net ARCHIVE DESTINATION lib )
 
