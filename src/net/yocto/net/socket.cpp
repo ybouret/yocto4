@@ -132,6 +132,7 @@ namespace yocto {
 
     namespace network {
 
+        //! UDP client
         socket:: socket( const socket_address &ip, type2type<udp_client> ) :
         ipaddr_( ip ),
         socket_(  bsd::socket_set_default_options(
@@ -153,6 +154,7 @@ namespace yocto {
 
     namespace network {
 
+        // UDP server
         socket:: socket( const socket_address &ip, type2type<udp_server> ) :
         ipaddr_( ip ),
         socket_(  bsd::socket_bind(

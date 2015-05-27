@@ -6,6 +6,7 @@
 #include "yocto/net/bsd/socket.hpp"
 #include "yocto/net/sockaddr/fmt.hpp"
 #include "yocto/code/property.hpp"
+#include "yocto/counted.hpp"
 
 namespace  yocto {
 
@@ -29,7 +30,7 @@ namespace  yocto {
         };
 
         //! bsd sockets wrapper
-        class socket : public virtual object
+        class socket : public virtual object, public counted
         {
         public:
             virtual ~socket() throw();
@@ -78,7 +79,7 @@ namespace  yocto {
             socket_address ipaddr_;  //!< generic ip address, depends on initialization.
             socket_t       socket_;  //!< O/S interface.
             int            ioflag_;  //!< socket api I/O flags, default=0
-            bool           sending_; //!< internal flag
+            bool           sending_; //!< internal flag for property
             
         public:
             sndppty        sending; //!< user controled: true => check if ready to write in socket_set
