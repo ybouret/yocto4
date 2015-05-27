@@ -65,7 +65,7 @@ assert(w<last)
                 const size_t old_bytes = bytes();
 #endif
                 memmove(blk,r,w-r);
-		const size_t ns = static_cast<size_t>(r-blk);
+                const size_t ns = static_cast<size_t>(r-blk);
                 w -= ns;
                 r  = blk;
                 Y_CHECK_NETBLK();
@@ -100,10 +100,10 @@ namespace yocto
             Y_CHECK_NETBLK();
             return nw;
         }
-
-
-
+        
+        
+        
     }
-
+    
 }
 

@@ -23,7 +23,7 @@ namespace yocto
 
             size_t shift() const throw(); //!< how many consumed bytes
             size_t bytes() const throw(); //!< stored bytes
-            size_t space() const throw(); //!< availabe byte
+            size_t space() const throw(); //!< available space
 
             void initialize() throw(); //!< reset pointers
             void defragment() throw(); //!< optimize space
