@@ -1,7 +1,8 @@
 #ifndef YOCTO_NET_DELAY_INCLUDED
 #define YOCTO_NET_DELAY_INCLUDED 1
 
-#include "yocto/object.hpp"
+#include "yocto/net/sockaddr/sys.hpp"
+
 #if defined(YOCTO_BSD)
 #include <sys/time.h>
 #endif
@@ -13,11 +14,11 @@ namespace yocto {
         class socket_set;
         
         //! wrapper for select(...) timeval
-        class delay : public object
+        class delay 
         {
         public:
             delay( const double seconds=-1.0) throw();
-            virtual ~delay() throw();
+            ~delay() throw();
             delay( const delay &) throw();
             delay&operator=( const delay & other ) throw();
 
