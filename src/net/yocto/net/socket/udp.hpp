@@ -10,7 +10,7 @@ namespace yocto
     {
         //! low-level UDP socket
         class udp_socket :
-        public socket, public socket_io
+        public socket, public io_socket
         {
         public:
             virtual ~udp_socket() throw();

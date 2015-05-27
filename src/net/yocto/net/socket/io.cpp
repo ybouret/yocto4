@@ -5,8 +5,8 @@ namespace yocto
     namespace network
     {
 
-        socket_io::  socket_io() throw() {}
-        socket_io:: ~socket_io() throw() {}
+        io_socket::  io_socket() throw() {}
+        io_socket:: ~io_socket() throw() {}
 
     }
 

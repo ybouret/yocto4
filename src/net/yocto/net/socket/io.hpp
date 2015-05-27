@@ -8,19 +8,19 @@ namespace yocto
     namespace network
     {
 
-        class socket_io
+        class io_socket
         {
         public:
-            virtual ~socket_io() throw();
+            virtual ~io_socket() throw();
             
             virtual size_t send( const void *, size_t ) = 0; //!< TCP send or UDP sendto
             virtual size_t recv( void       *, size_t ) = 0; //!< TCP recv or UDP recvfrom
 
         protected:
-            explicit socket_io() throw();
+            explicit io_socket() throw();
 
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(socket_io);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(io_socket);
         };
 
     }

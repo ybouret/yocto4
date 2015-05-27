@@ -31,7 +31,7 @@ namespace yocto
 
 
         //! TCP client
-        class tcp_client: public socket, public socket_io
+        class tcp_client: public socket, public io_socket
         {
         public:
             //! connect(...) constructor
