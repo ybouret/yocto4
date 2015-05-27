@@ -217,7 +217,7 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	## Network Specific Flags
 	####################################################################
 	IF(YOCTO_HAS_NET)
-		MESSAGE( STATUS "|_${tgt} uses network libraries" )
+		MESSAGE( STATUS "${tgt} uses network libraries" )
 		
 		IF(WIN32)
 			IF( "${CC_NAME}" MATCHES "gcc.*" )

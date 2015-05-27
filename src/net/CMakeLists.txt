@@ -24,6 +24,12 @@ SET( socket_srcs ${socket_decl} ${socket_impl}  )
 INSTALL( FILES ${socket_decl} DESTINATION include/yocto/net/socket )
 SOURCE_GROUP( net/socket FILES ${socket_srcs} )
 
+FILE( GLOB io_decl yocto/net/io/*.hpp )
+FILE( GLOB io_impl yocto/net/io/*.cpp )
+SET( io_srcs ${io_decl} ${io_impl}  )
+INSTALL( FILES ${io_decl} DESTINATION include/yocto/net/io )
+SOURCE_GROUP( net/io FILES ${io_srcs} )
+
 
 INCLUDE_DIRECTORIES( . ../main )
 
@@ -33,6 +39,7 @@ ${addr_srcs}
 yocto/net/sockaddr/ctor.hxx
 ${bsd_srcs} 
 ${socket_srcs}
+${io_srcs}
 )
 
 INSTALL( TARGETS y-net ARCHIVE DESTINATION lib )

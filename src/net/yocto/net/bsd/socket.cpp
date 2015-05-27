@@ -2,7 +2,7 @@
 #include "yocto/exceptions.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/net/sockaddr/base.hpp"
-#include "yocto/net/sockaddr/fmt.hpp"
+#include "yocto/net/sockaddr/format.hpp"
 
 #if defined(YOCTO_BSD)
 #include <cerrno>

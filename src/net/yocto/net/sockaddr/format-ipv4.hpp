@@ -1,7 +1,7 @@
 #ifndef YOCTO_NET_SOCKADDR_FMT_IPV4_INCLUDED
 #define YOCTO_NET_SOCKADDR_FMT_IPV4_INCLUDED 1
 
-#include "yocto/net/sockaddr/fmt.hpp"
+#include "yocto/net/sockaddr/format.hpp"
 
 namespace yocto {
 

@@ -2,7 +2,7 @@
 #define YOCTO_SOCKADDR_IPV4_INCLUDED
 
 #include "yocto/net/sockaddr/type.hpp"
-#include "yocto/net/sockaddr/fmt-ipv4.hpp"
+#include "yocto/net/sockaddr/format-ipv4.hpp"
 
 namespace yocto {
 

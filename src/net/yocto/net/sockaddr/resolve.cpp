@@ -1,6 +1,6 @@
 #include "yocto/net/net.hpp"
 #include "yocto/net/sockaddr/base.hpp"
-#include "yocto/net/sockaddr/fmt.hpp"
+#include "yocto/net/sockaddr/format.hpp"
 #include "yocto/exceptions.hpp"
 
 #if defined(YOCTO_BSD)

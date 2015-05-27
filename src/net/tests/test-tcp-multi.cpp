@@ -32,7 +32,7 @@ namespace
 
         // insert the server
         socks.insert(srv);
-
+        std::cerr << "srv: snd=" << srv.sndbuf() << ", rcv=" << srv.rcvbuf() << std::endl;
         Clients clients;
 
         memory::buffer_of<char,memory::global> iobuf(1024);
@@ -42,7 +42,7 @@ namespace
         bool  run = true;
         while(run)
         {
-            delay  d  = 1.0;
+            delay  d  = 2.0;
             std::cerr << "-- checking " << srv.self() << ":" << int(swap_be(srv.self().port)) << std::endl;
             const size_t na = socks.check(d);
             std::cerr << "\t#activity=" << na << std::endl;

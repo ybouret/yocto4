@@ -4,7 +4,7 @@
 #define YOCTO_SOCKET_INCLUDED 1
 
 #include "yocto/net/bsd/socket.hpp"
-#include "yocto/net/sockaddr/fmt.hpp"
+#include "yocto/net/sockaddr/format.hpp"
 #include "yocto/code/property.hpp"
 #include "yocto/counted.hpp"
 
