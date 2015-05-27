@@ -24,15 +24,14 @@ namespace
     void  handle_tcp_multi_server( const socket_address &ipaddr )
     {
         // create the server
-        tcp_server *srv = new tcp_server(ipaddr,2);
-        socket_ptr  Server( srv );
-        srv->blocking(false);
+        tcp_server srv(ipaddr,2);
+        srv.blocking(false);
 
         // use a socket set
         socket_set socks;
 
         // insert the server
-        socks.insert(Server);
+        socks.insert(srv);
 
         Clients clients;
 
@@ -44,22 +43,21 @@ namespace
         while(run)
         {
             delay  d  = 1.0;
-            std::cerr << "-- checking " << srv->self() << ":" << int(swap_be(srv->self().port)) << std::endl;
+            std::cerr << "-- checking " << srv.self() << ":" << int(swap_be(srv.self().port)) << std::endl;
             const size_t na = socks.check(d);
             std::cerr << "\t#activity=" << na << std::endl;
 
             if(na>0)
             {
-                if(socks.is_ready(*srv))
+                if(socks.is_ready(srv))
                 {
-                    Client cln( new tcp_client(*srv) );
+                    Client cln( new tcp_client(srv) );
                     if(!clients.insert(cln))
                     {
                         throw exception("unable to insert client");
                     }
                     std::cerr << "\t new connection from " << cln->self() << " : " << int(swap_be(cln->self().port)) << std::endl;
-                    const socket_ptr cnx( & *cln );
-                    socks.insert(cnx);
+                    socks.insert(*cln);
                 }
                 else
                 {
@@ -83,8 +81,7 @@ namespace
                     {
                         const sock_key_t &k   = to_remove.back();
                         Client           &cln = * clients.search(k);
-                        const socket_ptr  ptr( & *cln );
-                        socks.remove(ptr);
+                        socks.remove(*cln);
                         clients.remove(k);
                         to_remove.pop_back();
                     }

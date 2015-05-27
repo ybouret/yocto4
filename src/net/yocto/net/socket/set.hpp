@@ -10,18 +10,6 @@
 #include <sys/select.h>
 #endif
 
-#include "yocto/ptr/arc.hpp"
-
-namespace yocto
-{
-    namespace network
-    {
-        typedef arc_ptr<socket> socket_ptr;
-    }
-    
-}
-
-YOCTO_SUPPORT_BITWISE_OPS(network::socket_ptr);
 
 namespace yocto
 {
@@ -43,8 +31,8 @@ namespace yocto
             virtual void        release() throw();         //!< free and release memory
             virtual void        reserve( size_t n );       //!< if possible
             
-            void insert( const socket_ptr & s );          //!< insert a socket into the set
-            void remove( const socket_ptr & s ) throw();  //!< remove a socket from the set
+            void insert( socket &s );                //!< insert a socket into the set
+            void remove( const socket &s ) throw();  //!< remove a socket from the set
             
             //!check the activity of the set.
             /**
@@ -70,14 +58,14 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(socket_set);
-            
+            typedef socket *socket_ptr;
             //! order socket by DECREASING file descriptor value
             class    sock_cmp
             {
             public:
                 sock_cmp() throw();
                 ~sock_cmp() throw();
-                int operator()( const socket_ptr &lhs, const socket_ptr &rhs ) const throw();
+                int operator()( const socket_ptr lhs, const socket_ptr rhs ) const throw();
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(sock_cmp);
             };

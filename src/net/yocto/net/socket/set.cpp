@@ -9,8 +9,9 @@ namespace yocto
         socket_set:: sock_cmp::  sock_cmp() throw() {}
         socket_set:: sock_cmp:: ~sock_cmp() throw() {}
 
-        int socket_set:: sock_cmp:: operator()( const socket_ptr &lhs, const socket_ptr &rhs ) const throw()
+        int socket_set:: sock_cmp:: operator()( const socket_ptr lhs, const socket_ptr rhs ) const throw()
         {
+            assert(lhs);assert(rhs);
             const ptrdiff_t L = lhs->fdvalue;
             const ptrdiff_t R = rhs->fdvalue;
             return int(R-L);
@@ -63,7 +64,7 @@ namespace yocto
         
         const char * socket_set::name() const throw() { return "socket_set"; }
         
-        void socket_set:: insert( const socket_ptr &s )
+        void socket_set:: insert( socket &s )
         {
             //----------------------------------------------------------
             // use O/S hard limit
@@ -75,7 +76,7 @@ namespace yocto
             // then register the descriptor
             //----------------------------------------------------------
             //const bsd::socket_t sock = s.socket_;
-            if( !sock_reg_.insert( s ) ) {
+            if( !sock_reg_.insert( &s ) ) {
                 throw libc::exception( EINVAL, "socket already in socket_set" );
             }
         }
@@ -98,9 +99,9 @@ namespace yocto
             
         }
         
-        void socket_set:: remove( const socket_ptr &s ) throw()
+        void socket_set:: remove( const socket &s ) throw()
         {
-            (void)sock_reg_.remove( s );
+            (void)sock_reg_.remove( (socket *)&s );
         }
         
         void socket_set:: free() throw()
