@@ -11,8 +11,8 @@ namespace yocto
 
         int socket_set:: sock_cmp:: operator()( const socket_ptr &lhs, const socket_ptr &rhs ) const throw()
         {
-            const ptrdiff_t L = lhs->fd_value();
-            const ptrdiff_t R = rhs->fd_value();
+            const ptrdiff_t L = lhs->fdvalue;
+            const ptrdiff_t R = rhs->fdvalue;
             return int(R-L);
         }
         
@@ -90,7 +90,8 @@ namespace yocto
                                       unsigned( capacity() ),
                                       int(max_size) );
             }
-            else {
+            else
+            {
                 sock_reg_.reserve( n );
             }
             
@@ -144,7 +145,6 @@ namespace yocto
                 
 #if defined(YOCTO_BSD)
                 const int fd_max_p1 = 1 + (*fd_iter)->socket_; //!< for select
-                //std::cout << "fd_max=" << fd_max_p1-1 << std::endl;
 #endif
                 
                 YOCTO_LOOP_(n,
@@ -200,4 +200,53 @@ namespace yocto
         
     }
 }
+
+namespace yocto
+{
+    namespace network
+    {
+
+        bool socket_set:: is_ready( const socket &s ) throw()
+        {
+            
+            //assert( sock_reg_.search( s ) );
+
+            socket_t sock    = s.socket_ ;
+            fd_set  *fd_recv = &recv_set_;
+
+            if( FD_ISSET( sock, fd_recv) )
+            {
+                FD_CLR( sock, fd_recv );
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        bool socket_set:: can_send( const socket  &s ) throw()
+        {
+
+            //assert( sock_reg_.search( s ) );
+
+            socket_t   sock    = s.socket_;
+            fd_set    *fd_send = &send_set_;
+            
+            if( FD_ISSET( sock, fd_send) )
+            {
+                FD_CLR( sock, fd_send );
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            
+        }
+
+    }
+}
+
 

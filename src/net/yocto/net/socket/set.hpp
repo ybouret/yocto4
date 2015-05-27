@@ -27,7 +27,7 @@ namespace yocto
 {
     namespace network
     {
-        
+
         class socket_set : public container
         {
         public:
@@ -53,6 +53,20 @@ namespace yocto
              */
             size_t check( delay &d );
             
+            //! Test the activity of a socket.
+            /**
+             - true if the socket is active after check
+             - always false after a second call!
+             */
+            bool        is_ready( const socket  &s ) throw();
+
+            //! Test the availability of a socket
+            /**
+             - true if the socket can send after
+             - always false after a second call!
+             \note the socket must have sending=true before check
+             */
+            bool        can_send( const socket &s ) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(socket_set);

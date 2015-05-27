@@ -29,10 +29,14 @@ namespace  yocto {
             YOCTO_DISABLE_COPY_AND_ASSIGN(sndppty);
         };
 
+        typedef ptrdiff_t sock_key_t;
+
         //! bsd sockets wrapper
         class socket : public virtual object, public counted
         {
         public:
+            typedef ptrdiff_t fd_key_t;
+
             virtual ~socket() throw();
 
             void shutdown(const shutdown_mode sd ) throw(); //!< manual shutdown.
@@ -40,8 +44,7 @@ namespace  yocto {
 
             const socket_address &self() const throw(); //!< associated address
 
-            ptrdiff_t fd_value() const throw(); //!< a cast bsd::socket_
-
+            const sock_key_t & key() const throw();
 
         protected:
 
@@ -76,13 +79,14 @@ namespace  yocto {
             explicit socket( const socket_address &ip, type2type<udp_server> );
 
 
-            socket_address ipaddr_;  //!< generic ip address, depends on initialization.
-            socket_t       socket_;  //!< O/S interface.
-            int            ioflag_;  //!< socket api I/O flags, default=0
-            bool           sending_; //!< internal flag for property
+            socket_address   ipaddr_;  //!< generic ip address, depends on initialization.
+            socket_t         socket_;  //!< O/S interface.
+            int              ioflag_;  //!< socket api I/O flags, default=0
+            bool             sending_; //!< internal flag for property
             
         public:
-            sndppty        sending; //!< user controled: true => check if ready to write in socket_set
+            sndppty          sending; //!< user controled: true => check if ready to write in socket_set
+            const sock_key_t fdvalue; //!< a cast of socket_
             
             size_t         sndbuf(void) const throw(); //!< hardware sendbuf
             size_t         rcvbuf(void) const throw(); //!< hardware recvbuf

@@ -25,11 +25,12 @@ namespace yocto {
 
     namespace network {
 
-
-        ptrdiff_t socket:: fd_value() const throw()
+        
+        const sock_key_t & socket:: key() const throw()
         {
-            return static_cast<ptrdiff_t>( socket_ );
+            return fdvalue;
         }
+
 
         socket:: ~socket() throw()
         {
@@ -78,7 +79,8 @@ namespace yocto {
                 ),
         ioflag_( 0 ),
         sending_( false ),
-        sending( sending_, false )
+        sending( sending_, false ),
+        fdvalue( static_cast<ptrdiff_t>(socket_) )
         {
         }
 
@@ -105,7 +107,8 @@ namespace yocto {
                 ),
         ioflag_(0),
         sending_( false ),
-        sending( sending_, true )
+        sending( sending_, true ),
+        fdvalue( static_cast<ptrdiff_t>(socket_) )
         {
         }
 
@@ -119,7 +122,8 @@ namespace yocto {
                 ),
         ioflag_( 0 ),
         sending_( false ),
-        sending( sending_, true )
+        sending( sending_, true ),
+        fdvalue( static_cast<ptrdiff_t>(socket_) )
         {
         }
 
@@ -141,7 +145,8 @@ namespace yocto {
                 ),
         ioflag_( 0  ),
         sending_( false ),
-        sending( sending_, true )
+        sending( sending_, true ),
+        fdvalue( static_cast<ptrdiff_t>(socket_) )
         {
         }
 
@@ -168,7 +173,8 @@ namespace yocto {
                 ),
         ioflag_( 0 ),
         sending_( false ),
-        sending( sending_, true )
+        sending( sending_, true ),
+        fdvalue( static_cast<ptrdiff_t>(socket_) )
         {
         }
 
