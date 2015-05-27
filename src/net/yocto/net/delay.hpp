@@ -13,9 +13,10 @@ namespace yocto {
         class socket_set;
         
         //! wrapper for select(...) timeval
-        class delay : public object {
+        class delay : public object
+        {
         public:
-            explicit delay( const double seconds=-1.0) throw();
+            delay( const double seconds=-1.0) throw();
             virtual ~delay() throw();
             delay( const delay &) throw();
             delay&operator=( const delay & other ) throw();

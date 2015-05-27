@@ -9,55 +9,59 @@
 using namespace yocto;
 using namespace network;
 
-static inline void handle_tcp_server( socket_address &ip )
-{
-    // start up !
-    std::cerr << "-- tcp_server@" << ip << " port " << swap_be(ip.port) << std::endl;
-    tcp_server srv( ip, 2 );
-    memory::buffer_of<char,memory::global> iobuff( 128 );
-    string     line;
+namespace {
 
-    bool run = true;
-    while( run )
+    static inline void handle_tcp_server( socket_address &ip )
     {
-        // wait for client
-        std::cerr << "-- listening..." << std::endl;
-        tcp_client cln( srv );
-        std::cerr << "-- accepting from " << cln.self() << ":" << int( swap_be(cln.self().port)) << std::endl;
+        // start up !
+        std::cerr << "-- tcp_server@" << ip << " port " << swap_be(ip.port) << std::endl;
+        tcp_server srv( ip, 2 );
+        memory::buffer_of<char,memory::global> iobuff( 128 );
+        string     line;
 
-
-
-        for(;;)
+        bool run = true;
+        while( run )
         {
-            size_t nr = cln.recv(iobuff.rw(),iobuff.length());
-            if(nr<=0)
-            {
-                break;
-            }
-            std::cerr.write(iobuff(),nr);
+            // wait for client
+            std::cerr << "-- listening..." << std::endl;
+            tcp_client cln( srv );
+            std::cerr << "-- accepting from " << cln.self() << ":" << int( swap_be(cln.self().port)) << std::endl;
 
-            if(3!=cln.send("OK\n",3))
+
+
+            for(;;)
             {
-                std::cerr << "-- send failure..." << std::endl;
-                break;
+                size_t nr = cln.recv(iobuff.rw(),iobuff.length());
+                if(nr<=0)
+                {
+                    break;
+                }
+                std::cerr.write(iobuff(),nr);
+
+                if(3!=cln.send("OK\n",3))
+                {
+                    std::cerr << "-- send failure..." << std::endl;
+                    break;
+                }
+
+                if( ! memcmp(".end", iobuff(), 4) )
+                {
+                    break;
+                }
+
+                if( ! memcmp(".quit",iobuff(),5) )
+                {
+                    run = false;
+                    break;
+                }
+
             }
 
-            if( ! memcmp(".end", iobuff(), 4) )
-            {
-                break;
-            }
-
-            if( ! memcmp(".quit",iobuff(),5) )
-            {
-                run = false;
-                break;
-            }
 
         }
 
-        
-    }
 
+    }
 
 }
 
