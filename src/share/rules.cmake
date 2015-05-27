@@ -166,9 +166,15 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	####################################################################
 	## Reverse order extra libraries
 	####################################################################
+	SET(YOCTO_HAS_NET OFF)
 	FOREACH( extra ${ARGN} )
 		TARGET_LINK_LIBRARIES( ${tgt} y-${extra} )
+		IF("net" STREQUAL ${extra})
+			SET(YOCTO_HAS_NET ON)
+		ENDIF()
 	ENDFOREACH()
+	
+	
 
 	####################################################################
 	## Yocto Core C/C++
@@ -203,9 +209,26 @@ MACRO(TARGET_LINK_YOCTO tgt)
 		TARGET_LINK_LIBRARIES( ${tgt} -w )
 	ENDIF()
   
-  IF( YOCTO_CLANG )
+	IF( YOCTO_CLANG )
 		TARGET_LINK_LIBRARIES( ${tgt} stdc++ ) #-flto 
-  ENDIF()
+	ENDIF()
+  
+	####################################################################
+	## Network Specific Flags
+	####################################################################
+	IF(YOCTO_HAS_NET)
+		MESSAGE( STATUS "|_${tgt} uses network libraries" )
+		
+		IF(WIN32)
+			IF( "${CC_NAME}" MATCHES "gcc.*" )
+				TARGET_LINK_LIBRARIES( ${tgt} ws2_32 )
+			ENDIF()
+		ENDIF()
+
+		IF(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
+			TARGET_LINK_LIBRARIES(${tgt} socket nsl)
+		ENDIF()
+	ENDIF()	
   
 ENDMACRO()
 
