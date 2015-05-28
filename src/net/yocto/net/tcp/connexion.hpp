@@ -9,6 +9,7 @@ namespace yocto
     namespace network
     {
 
+
         //! an asynchronous TCP connexion
         class connexion : public tcp_client
         {
@@ -17,11 +18,14 @@ namespace yocto
             explicit connexion( tcp_server           &src,    io_cache &shared );
             virtual ~connexion() throw();
 
+            //! close connection ASAP
             void       close() throw();
             
             const bool closed;
             io_queue   recvQ;
             io_queue   sendQ;
+
+            size_t     enqueue_recv();
 
             
         private:

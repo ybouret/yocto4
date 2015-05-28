@@ -29,8 +29,8 @@ namespace yocto
             void defragment() throw(); //!< optimize space
 
 
-            size_t load( io_socket &iosock ); //!< load content of iosock, using space()
-            size_t emit( io_socket &iosock ); //!< emit content to iosock, using space()
+            size_t recv( io_socket &iosock ); //!< recv content of iosock, using space()
+            size_t send( io_socket &iosock ); //!< send content to iosock, using space()
 
 
             //! in space()

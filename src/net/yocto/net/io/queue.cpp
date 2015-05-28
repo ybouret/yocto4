@@ -65,7 +65,7 @@ namespace yocto
 
         }
 
-        size_t io_queue:: load(io_socket &iosock)
+        size_t io_queue:: recv(io_socket &iosock)
         {
 
             // find some place
@@ -74,7 +74,7 @@ namespace yocto
             // write the content at the end
             assert(NULL!=blocks.tail);
             assert(blocks.tail->space()>0);
-            const size_t nw = blocks.tail->load(iosock);
+            const size_t nw = blocks.tail->recv(iosock);
             active += nw;
             return nw;
         }
@@ -88,11 +88,11 @@ namespace yocto
             }
         }
 
-        size_t io_queue:: emit(io_socket &iosock)
+        size_t io_queue:: send(io_socket &iosock)
         {
             if(blocks.head)
             {
-                const size_t nr = blocks.head->emit(iosock);
+                const size_t nr = blocks.head->send(iosock);
                 burn_after_reading();
                 assert(nr<=active);
                 active -= nr;

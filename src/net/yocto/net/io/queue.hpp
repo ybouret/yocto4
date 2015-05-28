@@ -20,8 +20,8 @@ namespace yocto
             io_queue( io_cache &shared ) throw();
             ~io_queue() throw();
 
-            size_t load(io_socket &iosock); //!< load data
-            size_t emit(io_socket &iosock); //!< emit data
+            size_t recv(io_socket &iosock); //!< load data
+            size_t send(io_socket &iosock); //!< emit data
             size_t bytes() const throw();
             size_t count() const throw();
             void   free() throw();

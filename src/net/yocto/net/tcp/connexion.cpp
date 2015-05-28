@@ -37,7 +37,12 @@ sendQ(shared)
             (bool &)closed = true;
             shutdown(shutdown_recv);
         }
-        
+
+
+        size_t connexion:: enqueue_recv()
+        {
+            return recvQ.recv(*this);
+        }
     }
     
 }

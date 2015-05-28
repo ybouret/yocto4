@@ -5,6 +5,7 @@
 #include "yocto/net/socket/set.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/ptr/intr.hpp"
+#include "yocto/sequence/list.hpp"
 
 namespace yocto
 {
@@ -31,7 +32,11 @@ namespace yocto
             socket_set sockset;
             conn_set   conn_db;
             io_cache   cache;
-            
+            list<sock_key_t> disconnected;
+
+            void check_recv();
+            void check_conn();
+
         public:
             double   stand_by; //!< default=1 seconds
 

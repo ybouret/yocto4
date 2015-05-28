@@ -105,7 +105,7 @@ namespace yocto
     namespace network
     {
 
-        size_t io_block:: load( io_socket &iosock )
+        size_t io_block:: recv( io_socket &iosock )
         {
             Y_CHECK_NETBLK();
             const size_t nr = iosock.recv(w,space());
@@ -114,7 +114,7 @@ namespace yocto
             return nr;
         }
 
-        size_t io_block:: emit( io_socket &iosock )
+        size_t io_block:: send( io_socket &iosock )
         {
             Y_CHECK_NETBLK();
             const size_t nw = iosock.send(r,bytes());
