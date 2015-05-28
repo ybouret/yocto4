@@ -14,6 +14,7 @@
 #include "yocto/sequence/lw-array.hpp"
 
 #include <iostream>
+#include <cstdlib>
 
 namespace yocto
 {
@@ -454,7 +455,8 @@ namespace yocto
         inline static void sort_hooks_of( lexicon &target )
         {
             lw_array<Hook> hooks(target.hook,target.items);
-            quicksort(hooks,compare_hook_by_keys);
+	    int (*proc)(const Hook&,const Hook&) = compare_hook_by_keys;	
+            quicksort(hooks,proc);
         }
         
         //______________________________________________________________________
