@@ -2,24 +2,6 @@
 #include <iostream>
 #include "yocto/exception.hpp"
 
-namespace yocto {
-
-    namespace network {
-
-
-        sndppty:: ~sndppty() throw() {}
-        sndppty:: sndppty( bool &sending, bool rw ) throw() : property<bool>( sending, rw )
-        {
-        }
-
-        const char *sndppty:: name() const throw()
-        {
-            return "sending";
-        }
-
-    }
-
-}
 
 namespace yocto {
 
@@ -79,7 +61,7 @@ namespace yocto {
                 ),
         ioflag_( 0 ),
         sending_( false ),
-        sending( sending_, false ),
+        sending( sending_, false, "tcp_server sending"),
         fdvalue( static_cast<ptrdiff_t>(socket_) )
         {
         }
@@ -107,7 +89,7 @@ namespace yocto {
                 ),
         ioflag_(0),
         sending_( false ),
-        sending( sending_, true ),
+        sending( sending_, true, "tcp_client sending"),
         fdvalue( static_cast<ptrdiff_t>(socket_) )
         {
         }
@@ -122,7 +104,7 @@ namespace yocto {
                 ),
         ioflag_( 0 ),
         sending_( false ),
-        sending( sending_, true ),
+        sending( sending_, true, "tcp_client sending" ),
         fdvalue( static_cast<ptrdiff_t>(socket_) )
         {
         }
@@ -145,7 +127,7 @@ namespace yocto {
                 ),
         ioflag_( 0  ),
         sending_( false ),
-        sending( sending_, true ),
+        sending( sending_, true, "udp_client sending"),
         fdvalue( static_cast<ptrdiff_t>(socket_) )
         {
         }
@@ -173,7 +155,7 @@ namespace yocto {
                 ),
         ioflag_( 0 ),
         sending_( false ),
-        sending( sending_, true ),
+        sending( sending_, true, "udp server sending"),
         fdvalue( static_cast<ptrdiff_t>(socket_) )
         {
         }

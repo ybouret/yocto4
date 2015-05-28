@@ -35,15 +35,14 @@ namespace yocto
                 const conn_iter conn_end          = conn_db.end();
                 double          delay_value       = stand_by;
                 bool            has_data_to_send  = false;
+
                 for( conn_iter i = conn_db.begin(); i != conn_end; ++i )
                 {
                     connexion &cnx = **i;
-                    property<bool>   &snd = cnx.sending;
-                    snd  = (cnx.sendQ.bytes()>0);
-                    if( false )
+                    if( (cnx.sending=(cnx.sendQ.bytes()>0) ) )
                     {
                         has_data_to_send = true;
-                        break;
+                        delay_value      = 0;
                     }
                 }
 
@@ -51,12 +50,12 @@ namespace yocto
                 //
                 // network scanning
                 //______________________________________________________________
-                delay        d = stand_by;
+                delay        d = delay_value;
                 const size_t n = sockset.check(d);
 
                 if(n>0)
                 {
-                    
+
                 }
 
             }

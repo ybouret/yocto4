@@ -9,7 +9,7 @@ YOCTO_UNIT_TEST_IMPL(ppty)
 	
 	int my_int = 5;
 	
-	property<int> I( my_int, false );
+	property<int> I( my_int, false,"I" );
 	
 	std::cerr << "read ppty" << std::endl;
 	int j = I;
@@ -19,7 +19,7 @@ YOCTO_UNIT_TEST_IMPL(ppty)
 
 	bool my_sending = true;
 	
-	property<bool> sending( my_sending, true );
+	property<bool> sending( my_sending, true, "sending");
 	
 	std::cerr << "sending=" << ( sending ?  "true" : "false" ) << std::endl;
 	sending = false;

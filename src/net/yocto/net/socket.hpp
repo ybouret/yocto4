@@ -18,17 +18,6 @@ namespace  yocto {
         class udp_server;
 
 
-        //! send property (for socket which can perform I/O)
-        class sndppty : public property<bool>
-        {
-        public:
-            explicit sndppty( bool &sending, bool rw ) throw();
-            virtual ~sndppty() throw();
-            virtual const char *name() const throw();
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(sndppty);
-        };
-
         typedef ptrdiff_t sock_key_t;
 
         //! bsd sockets wrapper
@@ -84,7 +73,7 @@ namespace  yocto {
             bool             sending_; //!< internal flag for property
             
         public:
-            sndppty          sending; //!< user controled: true => check if ready to write in socket_set
+            property<bool>   sending; //!< user controled: true => check if ready to write in socket_set
             const sock_key_t fdvalue; //!< a cast of socket_
             
             size_t         sndbuf(void) const throw(); //!< hardware sendbuf

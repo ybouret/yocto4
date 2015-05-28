@@ -1,4 +1,5 @@
 #include "yocto/code/property.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto 
 {
@@ -20,7 +21,18 @@ namespace yocto
 	{
 		writable_ = rw;
 	}
-	
-	const char * ppty:: name() const throw() { return "ppty"; }
+
+    void ppty:: not_writable(const char *name) const
+    {
+        if(name)
+        {
+            throw exception("[property] '%s' is read-only", name);
+        }
+        else
+        {
+            throw exception("[property] is read-only");
+        }
+    }
+
 }
 

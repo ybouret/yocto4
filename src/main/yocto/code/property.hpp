@@ -2,7 +2,6 @@
 #define YOCTO_PROPERTY_INCLUDED 1
 
 #include "yocto/type/args.hpp"
-#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -11,20 +10,19 @@ namespace yocto
     {
     public:
         virtual ~ppty() throw();
-        
         bool is_writable() const throw();
-        
-        virtual const char *name() const throw();
-        
+
     protected:
         explicit ppty( bool rw ) throw();
         ppty( const ppty & ) throw();
         
         void set_writable( bool ) throw();
-        
+        void not_writable(const char *name) const;
+
     private:
         YOCTO_DISABLE_ASSIGN( ppty );
         bool writable_;
+
     };
 	
 	template <typename T>
@@ -38,7 +36,7 @@ namespace yocto
         
         
         //! should be use withing classes only
-        inline   property( T &value, bool rw ) : ppty( rw ), value_( value )
+        inline   property( T &value, bool rw , const char *id) : ppty( rw ), value_( value )
         {
         }
         
@@ -52,7 +50,7 @@ namespace yocto
             }
             else
             {
-                throw exception("[property] '%s' is read-only", this->name() );
+                this->not_writable(name);
             }
             return *this;
         }
@@ -63,7 +61,8 @@ namespace yocto
         virtual void         set( param_type args ) { value_ = args;  }
         YOCTO_DISABLE_COPY_AND_ASSIGN(property);
         T &value_;
-        
+        const char *name;
+
     };
 	
 }
