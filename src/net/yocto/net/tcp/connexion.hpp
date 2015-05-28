@@ -23,7 +23,7 @@ namespace yocto
             io_queue   recvQ;
             io_queue   sendQ;
 
-
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(connexion);
         };
