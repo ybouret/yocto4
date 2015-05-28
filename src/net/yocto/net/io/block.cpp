@@ -1,5 +1,6 @@
 #include "yocto/net/io/block.hpp"
 #include "yocto/memory/global.hpp"
+#include "yocto/code/utils.hpp"
 
 #include <cstring>
 
@@ -31,9 +32,9 @@ namespace yocto
 #define Y_CHECK_NETBLK() \
 assert(blk);   \
 assert(r>=blk);\
-assert(r<last);\
+assert(r<=last);\
 assert(w>=r);  \
-assert(w<last)
+assert(w<=last)
 
         size_t io_block:: shift() const throw()
         {
@@ -72,6 +73,27 @@ assert(w<last)
                 assert(bytes()==old_bytes);
             }
         }
+
+        size_t io_block:: store(const void *data, const size_t size) throw()
+        {
+            assert(!(0==data&&size>0));
+            const size_t nw = min_of(size,space());
+            memcpy(w,data,nw);
+            w += nw;
+            Y_CHECK_NETBLK();
+            return nw;
+        }
+
+        size_t io_block:: query(void *data, const size_t size) throw()
+        {
+            assert(!(0==data&&size>0));
+            const size_t nr = min_of(size,bytes());
+            memcpy(data,r,nr);
+            r += nr;
+            Y_CHECK_NETBLK();
+            return nr;
+        }
+
 
     }
 }

@@ -24,14 +24,20 @@ namespace yocto
             size_t shift() const throw(); //!< how many consumed bytes
             size_t bytes() const throw(); //!< stored bytes
             size_t space() const throw(); //!< available space
-
+            
             void initialize() throw(); //!< reset pointers
             void defragment() throw(); //!< optimize space
 
 
-            size_t load( io_socket &iosock );
-            size_t emit( io_socket &iosock );
+            size_t load( io_socket &iosock ); //!< load content of iosock, using space()
+            size_t emit( io_socket &iosock ); //!< emit content to iosock, using space()
 
+
+            //! in space()
+            size_t store(const void *data, const size_t size) throw();
+
+            //! in bytes()
+            size_t query(void *data, const size_t size) throw();
             YOCTO_MAKE_OBJECT
 
         private:

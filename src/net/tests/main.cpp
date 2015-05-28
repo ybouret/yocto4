@@ -9,6 +9,7 @@ YOCTO_UNIT_TEST_INIT(16)
     YOCTO_UNIT_TEST_DECL(udp_server);
     YOCTO_UNIT_TEST_DECL(udp_client);
     YOCTO_UNIT_TEST_DECL(tcp_multi);
+    YOCTO_UNIT_TEST_DECL(io);
 
 }
 YOCTO_UNIT_TEST_EXEC()

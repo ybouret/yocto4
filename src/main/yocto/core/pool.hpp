@@ -28,7 +28,7 @@ namespace yocto
 			{
 				assert( NULL != node       );
 				assert( NULL == node->next );
-				assert( ! owns(node)       );
+				//assert( ! owns(node)       );
 				node->next = top;
 				top        = node;
 				++size;

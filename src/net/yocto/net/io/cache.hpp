@@ -18,8 +18,8 @@ namespace yocto
             virtual ~io_cache() throw();
 
 
-            size_t count() const throw();
-            size_t bytes() const throw();
+            size_t count() const throw(); //!< #blocks in pool
+            size_t bytes() const throw(); //!< #bytes in pool
 
             //! store a previously allocated blk
             void      store( io_block *blk ) throw();
