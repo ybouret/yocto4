@@ -30,7 +30,8 @@ namespace yocto
             tcp_server server;
             socket_set sockset;
             conn_set   conn_db;
-
+            io_cache   cache;
+            
         public:
             double   stand_by; //!< default=1 seconds
 
