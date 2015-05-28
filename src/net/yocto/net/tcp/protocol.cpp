@@ -77,6 +77,47 @@ namespace yocto
 {
     namespace network
     {
+        void protocol:: disconnect()
+        {
+            //__________________________________________________________________
+            //
+            // drop disconnected
+            //__________________________________________________________________
+            while( disconnected.size() )
+            {
+                const sock_key_t k = disconnected.back();
+                disconnected.pop_back();
+                conn_ptr *pcnx = conn_db.search(k);
+                if(!pcnx)
+                {
+                    throw exception("unexpected unregistered disconnected!");
+                }
+                connexion &cnx = **pcnx;
+
+                //--------------------------------------------------------------
+                //
+                // PROCESS DISCONNECT
+                //
+                //--------------------------------------------------------------
+                {
+
+                }
+
+                sockset.remove(cnx);
+                (void) conn_db.remove(k);
+            }
+
+        }
+
+    }
+
+}
+
+
+namespace yocto
+{
+    namespace network
+    {
         void protocol:: check_recv()
         {
             //__________________________________________________________________
@@ -89,7 +130,7 @@ namespace yocto
                 connexion   &cnx = **i;
                 if(!sockset.is_ready(cnx)) continue;
 
-                const size_t nr  = cnx.enqueue_recv();
+                const size_t nr  = cnx.do_recv();
                 if(nr<=0)
                 {
                     //__________________________________________________________
@@ -119,35 +160,8 @@ namespace yocto
                     }
                 }
             }
+            disconnect();
 
-            //__________________________________________________________________
-            //
-            // drop disconnected
-            //__________________________________________________________________
-            while( disconnected.size() )
-            {
-                const sock_key_t k = disconnected.back();
-                disconnected.pop_back();
-                conn_ptr *pcnx = conn_db.search(k);
-                if(!pcnx)
-                {
-                    throw exception("unexpected unregistered disconnected!");
-                }
-                connexion &cnx = **pcnx;
-
-                //--------------------------------------------------------------
-                //
-                // PROCESS DISCONNECT
-                //
-                //--------------------------------------------------------------
-                {
-                    
-                }
-                
-                sockset.remove(cnx);
-                (void) conn_db.remove(k);
-            }
-            
         }
     }
 }
@@ -183,11 +197,11 @@ namespace yocto
 
                 try
                 {
-                    //--------------------------------------------------
+                    //----------------------------------------------------------
                     //
                     // PROCESS CONNECT
                     //
-                    //--------------------------------------------------
+                    //----------------------------------------------------------
                 }
                 catch(...)
                 {
@@ -201,6 +215,49 @@ namespace yocto
 
     }
 
+}
+
+
+namespace yocto
+{
+    namespace network
+    {
+        
+        void protocol:: check_send()
+        {
+            disconnected.free();
+
+            for( conn_iter i = conn_db.begin(); i != conn_db.end(); ++i )
+            {
+                connexion   &cnx = **i;
+                if(cnx.sending)
+                {
+                    assert(cnx.sendQ.bytes()>0);
+
+                    if(!sockset.can_send(cnx)) continue; // not ready
+                    if(cnx.do_send()<=0)       continue; // no transmitted bytes
+                    if(cnx.sendQ.bytes()>0)    continue; // remaining data
+
+                    if(cnx.closed)
+                    {
+                        disconnected.push_back(cnx.key());
+                        continue;
+                    }
+
+                    //----------------------------------------------------------
+                    //
+                    // PROCESS SENT
+                    //
+                    //----------------------------------------------------------
+
+                }
+            }
+
+            disconnect();
+        }
+        
+    }
+    
 }
 
 

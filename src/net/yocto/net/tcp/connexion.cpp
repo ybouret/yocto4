@@ -39,10 +39,16 @@ sendQ(shared)
         }
 
 
-        size_t connexion:: enqueue_recv()
+        size_t connexion:: do_recv()
         {
             return recvQ.recv(*this);
         }
+
+        size_t connexion:: do_send()
+        {
+            return sendQ.send(*this);
+        }
+
     }
     
 }

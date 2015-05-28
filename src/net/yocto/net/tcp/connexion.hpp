@@ -25,8 +25,8 @@ namespace yocto
             io_queue   recvQ;
             io_queue   sendQ;
 
-            size_t     enqueue_recv();
-
+            size_t     do_recv(); //!< fill recv queue
+            size_t     do_send(); //!< emit send queue
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(connexion);

@@ -36,7 +36,10 @@ namespace yocto
 
             void check_recv();
             void check_conn();
+            void check_send();
 
+            void disconnect();
+            
         public:
             double   stand_by; //!< default=1 seconds
 
