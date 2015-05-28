@@ -30,6 +30,13 @@ SET( io_srcs ${io_decl} ${io_impl}  )
 INSTALL( FILES ${io_decl} DESTINATION include/yocto/net/io )
 SOURCE_GROUP( net/io FILES ${io_srcs} )
 
+FILE( GLOB tcp_decl yocto/net/tcp/*.hpp )
+FILE( GLOB tcp_impl yocto/net/tcp/*.cpp )
+SET( tcp_srcs ${tcp_decl} ${tcp_impl}  )
+INSTALL( FILES ${tcp_decl} DESTINATION include/yocto/net/tcp )
+SOURCE_GROUP( net/tcp FILES ${tcp_srcs} )
+
+
 
 INCLUDE_DIRECTORIES( . ../main )
 
@@ -40,6 +47,7 @@ yocto/net/sockaddr/ctor.hxx
 ${bsd_srcs} 
 ${socket_srcs}
 ${io_srcs}
+${tcp_srcs}
 )
 
 INSTALL( TARGETS y-net ARCHIVE DESTINATION lib )
