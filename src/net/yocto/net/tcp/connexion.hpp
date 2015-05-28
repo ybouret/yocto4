@@ -10,21 +10,21 @@ namespace yocto
     {
 
         //! an asynchronous TCP connexion
-        class connexion : public object
+        class connexion : public tcp_client
         {
         public:
             explicit connexion( const socket_address &ipaddr, io_cache &shared );
+            explicit connexion( tcp_server           &src,    io_cache &shared );
             virtual ~connexion() throw();
 
+            void       close() throw();
             
-
-
-        private:
-            tcp_client client;
-            bool       closed;
+            const bool closed;
             io_queue   recvQ;
             io_queue   sendQ;
 
+
+        private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(connexion);
         };
         

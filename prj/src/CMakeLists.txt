@@ -38,4 +38,6 @@ ADD_SUBDIRECTORY(volfit)
 #ADD_SUBDIRECTORY(genfish)
 #ADD_SUBDIRECTORY(gencolors)
 #ADD_SUBDIRECTORY(otsu-voro)
+ADD_SUBDIRECTORY(cbridge)
+
 

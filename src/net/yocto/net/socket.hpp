@@ -43,7 +43,7 @@ namespace  yocto {
             void blocking( bool do_block ) throw();         //!< manual blocking status.
 
             const socket_address &self() const throw(); //!< associated address
-            const sock_key_t     &key() const throw();
+            const sock_key_t     &key() const throw();  //!< for socket_set
 
         protected:
 
