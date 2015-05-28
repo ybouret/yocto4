@@ -8,3 +8,4 @@ SEXP lyre_version() throw()
     Rprintf("1\n");
     return R_NilValue;
 }
+
