@@ -21,14 +21,14 @@ YOCTO_UNIT_TEST_IMPL(io)
 
     char buffer[8];
 
-    size_t nch = 0;
+    size_t nch  = 0;
+    size_t done = 0;
     {
         ios::icstream fp( ios::cstdin );
         string line;
         while(line.clear(), fp.read_line(line) > 0 )
         {
             nch += line.size();
-            size_t done = 0;
             Q.put_all(line,done);
             const size_t nb = 1+ alea_lt(sizeof(buffer));
             Q.get(buffer,nb,done);
@@ -42,6 +42,20 @@ YOCTO_UNIT_TEST_IMPL(io)
 
     std::cerr << "C.bytes= " << cache.bytes() << std::endl;
     std::cerr << "C.count= " << cache.bytes() << std::endl;
+
+    std::cerr << std::endl << "...get..." << std::endl;
+    const size_t nh = Q.bytes() /2;
+    while( Q.bytes() > nh )
+    {
+        const size_t nb = 1+ alea_lt(sizeof(buffer));
+        Q.get(buffer,nb,done);
+    }
+    std::cerr << "Q.bytes= " << Q.bytes() << std::endl;
+    std::cerr << "Q.count= " << Q.count() << " block(s)" << std::endl;
+
+    std::cerr << "C.bytes= " << cache.bytes() << std::endl;
+    std::cerr << "C.count= " << cache.bytes() << std::endl;
+
 
     std::cerr << std::endl << "...free..." << std::endl;
     Q.free();
