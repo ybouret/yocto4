@@ -27,7 +27,7 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(connexion);
         };
-        
+
     }
 
 }
