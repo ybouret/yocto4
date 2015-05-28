@@ -8,7 +8,8 @@ namespace yocto
 {
     namespace network
     {
-
+        
+        class protocol;
 
         //! an asynchronous TCP connexion
         class connexion : public tcp_client
@@ -25,11 +26,12 @@ namespace yocto
             io_queue   recvQ;
             io_queue   sendQ;
 
-            size_t     do_recv(); //!< fill recv queue
-            size_t     do_send(); //!< emit send queue
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(connexion);
+            size_t     do_recv(); //!< fill recv queue
+            size_t     do_send(); //!< emit send queue
+            friend class protocol;
         };
 
     }

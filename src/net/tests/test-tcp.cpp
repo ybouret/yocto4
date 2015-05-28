@@ -8,7 +8,9 @@ using namespace network;
 static inline void handle_proto(const socket_address &ipaddr)
 {
     protocol proto(ipaddr);
-
+    
+    proto.execute();
+    
 }
 
 YOCTO_UNIT_TEST_IMPL(proto)

@@ -25,6 +25,22 @@ namespace yocto
         }
 
 
+        bool protocol:: check_init()
+        {
+            bool would_send = false;
+            
+            for( conn_iter i = conn_db.begin(); i != conn_db.end(); ++i )
+            {
+                connexion &cnx = **i;
+                if( (cnx.sending=(cnx.sendQ.bytes()>0) ) )
+                {
+                    would_send  = true;
+                }
+            }
+            
+            return would_send;
+        }
+
 
         void protocol:: execute()
         {
@@ -37,31 +53,24 @@ namespace yocto
                 // do we have someting to send
                 //______________________________________________________________
                 double          delay_value       = stand_by;
-                bool            would_send        = false;
-                for( conn_iter i = conn_db.begin(); i != conn_db.end(); ++i )
+                if( check_init() )
                 {
-                    connexion &cnx = **i;
-                    if( (cnx.sending=(cnx.sendQ.bytes()>0) ) )
-                    {
-                        would_send  = true;
-                        delay_value = 0;
-                    }
+                    delay_value = 0;
                 }
-
+                
                 //______________________________________________________________
                 //
                 // network scanning
                 //______________________________________________________________
                 delay            d = delay_value;
                 const size_t     n = sockset.check(d);
+                std::cerr << server.self() << ": #activity=" << n << std::endl;
                 if(n>0)
                 {
 
                     check_recv();
                     check_conn();
-
-
-
+                    check_send();
                 }
 
             }
@@ -100,7 +109,7 @@ namespace yocto
                 //
                 //--------------------------------------------------------------
                 {
-
+                    std::cerr << "disconnecting " << cnx.self() << ":" << int(swap_be(cnx.self().port)) << std::endl;
                 }
 
                 sockset.remove(cnx);
@@ -156,7 +165,7 @@ namespace yocto
                         // PROCESS INPUT
                         //
                         //------------------------------------------------------
-
+                        std::cerr << "input from " << cnx.self() << ":" << int(swap_be(cnx.self().port)) << ": #" << nr << std::endl;
                     }
                 }
             }
@@ -202,6 +211,8 @@ namespace yocto
                     // PROCESS CONNECT
                     //
                     //----------------------------------------------------------
+                    std::cerr << "connexion from " << cnx->self() << ":" << int(swap_be(cnx->self().port)) << std::endl;
+                    onInit(*cnx);
                 }
                 catch(...)
                 {
@@ -256,6 +267,20 @@ namespace yocto
             disconnect();
         }
         
+    }
+    
+}
+
+
+namespace yocto
+{
+    namespace network
+    {
+        
+        void protocol:: onInit(connexion &)
+        {
+            
+        }
     }
     
 }

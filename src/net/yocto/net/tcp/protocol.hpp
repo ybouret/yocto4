@@ -21,6 +21,8 @@ namespace yocto
 
             void execute();
 
+            virtual void onInit(connexion &);
+            
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(protocol);
@@ -34,6 +36,7 @@ namespace yocto
             io_cache   cache;
             list<sock_key_t> disconnected;
 
+            bool check_init();
             void check_recv();
             void check_conn();
             void check_send();
