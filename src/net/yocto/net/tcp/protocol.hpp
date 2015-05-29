@@ -31,12 +31,13 @@ namespace yocto
             typedef intr_ptr<sock_key_t,connexion> conn_ptr;
             typedef set<sock_key_t,conn_ptr>       conn_set;
             typedef conn_set::iterator             conn_iter;
-            
+            typedef list<sock_key_t>               keys_list;
+
             tcp_server server;
             socket_set sockset;
             conn_set   conn_db;
             io_cache   cache;
-            list<sock_key_t> disconnected;
+            keys_list  disconnected;
 
             bool check_init();
             void check_recv();
