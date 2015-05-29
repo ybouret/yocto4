@@ -36,7 +36,7 @@ namespace yocto
         
         
         //! should be use withing classes only
-        inline   property( T &value, bool rw , const char *id) : ppty( rw ), value_( value )
+        inline   property( T &value, bool rw , const char *id) : ppty( rw ), value_( value ), name(id)
         {
         }
         

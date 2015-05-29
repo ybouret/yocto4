@@ -6,7 +6,8 @@ namespace yocto
     namespace network
     {
         io_cache:: io_cache( const size_t blk_size ) throw() :
-        block_size( max_of<size_t>(blk_size,sizeof(ptrdiff_t)))
+        block_size( max_of<size_t>(blk_size,sizeof(ptrdiff_t))),
+	blocks()
         {
         }
 
