@@ -38,6 +38,7 @@ namespace yocto
             virtual void onSent(connexion &);
             virtual void onIdle();
 
+            void    link_to(const socket_address &ipaddr);
             void    suspend() throw();
 
         protected:

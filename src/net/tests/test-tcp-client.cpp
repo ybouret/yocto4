@@ -10,10 +10,10 @@ using namespace network;
 
 
 static 
-void handle_tcp_client( socket_address &ip, const string &hostname )
+void handle_tcp_client( const socket_address &ip)
 {
-	net &NT = net::instance();
-	NT.resolve( ip, hostname );
+	//net &NT = net::instance();
+	//NT.resolve( ip, hostname );
 	std::cerr << "-- tcp_client to " << ip << ":" << swap_be( ip.port ) << std::endl;
 	try 
 	{
@@ -64,13 +64,13 @@ YOCTO_UNIT_TEST_IMPL(tcp_client)
 	
 	if( version == 4 )
 	{
-		IPv4 addr( socket_address_none, net_port );
-		handle_tcp_client( addr, hostname );
+		IPv4 addr( hostname, net_port );
+		handle_tcp_client( addr );
 	}
 	else 
 	{
-		IPv6 addr( socket_address_none, net_port );
-		handle_tcp_client( addr, hostname );
+		IPv6 addr( hostname, net_port );
+		handle_tcp_client( addr );
 	}
 	
 }

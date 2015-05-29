@@ -15,9 +15,7 @@ namespace yocto
             explicit client_protocol(const size_t block_size );
             virtual ~client_protocol() throw();
 
-            void start( const socket_address &ipaddr);
-
-            bool dial( const socket_address &ipaddr );
+            void start(const socket_address &ipaddr);
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(client_protocol);

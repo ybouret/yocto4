@@ -98,7 +98,9 @@ namespace yocto
     namespace network
     {
 #include "ctor.hxx"
-        socket_address::socket_address( const socket_address_format &f, const string &net_name, net16_t net_port  ) :
+        socket_address::socket_address(const socket_address_format &f,
+                                       const string                &net_name,
+                                       net16_t                      net_port  ) :
         fmt( f ),
         YOCTO_SOCKADDR_CTOR()
         {
@@ -108,9 +110,9 @@ namespace yocto
 
             if( 0 == net_port )
             {
-                char *       col = (char *)&net_name[0];
+                char *       col     = (char *)net_name.c_str();
                 bool         has_col = false;
-                for(size_t i= net_name.size(); i>0; --i, ++col )
+                for(size_t i=net_name.size(); i>0; --i, ++col )
                 {
                     if( ':' == *col )
                     {
@@ -136,10 +138,15 @@ namespace yocto
                     
                 }
                 else
+                {
                     net::instance().resolve( *this, net_name );
+                }
             }
             else
+            {
                 net::instance().resolve( *this, net_name );
+            }
+            
         }
 
     }

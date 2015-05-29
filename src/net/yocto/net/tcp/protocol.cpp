@@ -50,6 +50,12 @@ namespace yocto
             running = false;
         }
 
+        void tcp_protocol:: link_to(const socket_address &ipaddr)
+        {
+            enqueue( new connexion(ipaddr,cache) );
+        }
+
+
     }
 
 }
