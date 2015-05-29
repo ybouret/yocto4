@@ -8,11 +8,14 @@ namespace yocto
     namespace network
     {
 
+        //! a client protocol
         class client_protocol : public tcp_protocol
         {
         public:
             explicit client_protocol(const size_t block_size );
             virtual ~client_protocol() throw();
+
+            void start( const socket_address &ipaddr);
 
             bool dial( const socket_address &ipaddr );
 

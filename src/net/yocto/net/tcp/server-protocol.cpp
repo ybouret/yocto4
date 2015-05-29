@@ -16,10 +16,7 @@ namespace yocto
             sockset.insert(server);
         }
 
-        void server_protocol:: suspend() throw()
-        {
-            running = false;
-        }
+      
     }
 }
 
@@ -30,46 +27,56 @@ namespace yocto
     {
         void server_protocol:: execute()
         {
+            if(running) return;
+
             running = true;
-            while(true)
+            try
             {
-                //______________________________________________________________
-                //
-                // do we have someting to send
-                //______________________________________________________________
-                double          delay_value       = every;
-                if( initialize() )
+                while(true)
                 {
-                    delay_value = 0;
-                }
-                else
-                {
-                    // nothing to send...
-                    if(!running)
+                    //__________________________________________________________
+                    //
+                    // do we have someting to send
+                    //__________________________________________________________
+                    double          delay_value       = every;
+                    if( initialize() )
                     {
-                        return;
+                        delay_value = 0;
                     }
-                }
+                    else
+                    {
+                        // nothing to send...
+                        if(!running)
+                        {
+                            return;
+                        }
+                    }
 
-                //______________________________________________________________
-                //
-                // network scanning
-                //______________________________________________________________
-                delay            d = delay_value;
-                const size_t     n = sockset.check(d);
-                std::cerr << server.self() << ": #activity=" << n << std::endl;
-                if(n>0)
-                {
-                    check_recv();
-                    check_conn();
-                    check_send();
-                }
+                    //__________________________________________________________
+                    //
+                    // network scanning
+                    //__________________________________________________________
+                    delay            d = delay_value;
+                    const size_t     n = sockset.check(d);
+                    std::cerr << server.self() << ": #activity=" << n << std::endl;
+                    if(n>0)
+                    {
+                        check_recv();
+                        check_conn();
+                        check_send();
+                    }
 
-                //______________________________________________________________
-                //
-                // other things to do
-                //______________________________________________________________
-                onIdle();
+                    //__________________________________________________________
+                    //
+                    // other things to do
+                    //__________________________________________________________
+                    onIdle();
+                }
+            }
+            catch(...)
+            {
+                running = false;
+                throw;
             }
 
         }
@@ -92,46 +99,8 @@ namespace yocto
             //__________________________________________________________________
             if( sockset.is_ready(server) )
             {
-                conn_ptr         cnx( new connexion(server,cache) );
-                const sock_key_t k  = cnx->key();
-                if(!conn_db.insert(cnx))
-                {
-                    throw exception("invalid new connexion key!");
-                }
-                try
-                {
-                    sockset.insert(*cnx);
-                }
-                catch(...)
-                {
-                    (void)conn_db.remove(k);
-                    throw;
-                }
-                
-                if(!running)
-                {
-                    cnx->close();
-                    return;
-                }
-
-                try
-                {
-                    //----------------------------------------------------------
-                    //
-                    // PROCESS CONNECT
-                    //
-                    //----------------------------------------------------------
-                    std::cerr << "connexion from " << cnx->self() << ":" << int(swap_be(cnx->self().port)) << std::endl;
-                    onInit(*cnx);
-                }
-                catch(...)
-                {
-                    sockset.remove(*cnx);
-                    (void)conn_db.remove(k);
-                    throw;
-                }
+                enqueue(new connexion(server,cache));
             }
-            
         }
         
     }

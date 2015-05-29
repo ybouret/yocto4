@@ -41,18 +41,71 @@ namespace yocto
 
         }
 
-
         void tcp_protocol:: onIdle()
         {
         }
         
+        void tcp_protocol:: suspend() throw()
+        {
+            running = false;
+        }
 
-        
     }
 
 }
 
+namespace yocto
+{
+    namespace network
+    {
 
+        void tcp_protocol:: enqueue( connexion *c )
+        {
+            assert(c);
+
+            // insert all
+            conn_ptr         cnx(c);
+            const sock_key_t key  = cnx->key();
+            if(!conn_db.insert(cnx))
+            {
+                throw exception("invalid new connexion key!");
+            }
+            try
+            {
+                sockset.insert(*cnx);
+            }
+            catch(...)
+            {
+                (void)conn_db.remove(key);
+                throw;
+            }
+
+            // short cut...
+            if(!running)
+            {
+                cnx->close();
+                return;
+            }
+
+            // admin...
+            try
+            {
+                std::cerr << "connexion from " << cnx->self() << ":" << int(swap_be(cnx->self().port)) << std::endl;
+                onInit(*cnx);
+            }
+            catch(...)
+            {
+                sockset.remove(*cnx);
+                (void)conn_db.remove(key);
+                throw;
+            }
+
+
+        }
+
+
+    }
+}
 
 namespace yocto
 {

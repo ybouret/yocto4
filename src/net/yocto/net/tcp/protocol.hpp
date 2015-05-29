@@ -38,6 +38,7 @@ namespace yocto
             virtual void onSent(connexion &);
             virtual void onIdle();
 
+            void    suspend() throw();
 
         protected:
             explicit tcp_protocol(size_t block_size);
@@ -51,7 +52,10 @@ namespace yocto
             bool initialize() throw(); //!< prepare each connection
             void check_recv();         //!< check what is received
             void check_send();         //!< check what is to be sent
-            
+
+            void enqueue( connexion *c ); //!< WARNING: close if !running
+
+
         public:
             io_cache   cache;
             double     every;
