@@ -39,6 +39,11 @@ namespace yocto
         {
 
         }
+
+
+        void tcp_protocol:: onIdle()
+        {
+        }
         
 
         
@@ -214,7 +219,7 @@ namespace yocto
 }
 
 
-
+#if 0
 namespace yocto
 {
     namespace network
@@ -513,6 +518,7 @@ namespace yocto
     }
     
 }
+#endif
 
 
 

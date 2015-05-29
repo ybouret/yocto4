@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/net/tcp/protocol.hpp"
+#include "yocto/net/tcp/server-protocol.hpp"
 #include "yocto/net/ipaddr.hpp"
 #include <cstdlib>
 
@@ -9,10 +9,10 @@ using namespace network;
 
 namespace
 {
-    class YProtocol : public protocol
+    class YProtocol : public server_protocol
     {
     public:
-        YProtocol(const socket_address &ipaddr) : protocol(ipaddr,4)
+        YProtocol(const socket_address &ipaddr) : server_protocol(ipaddr,4,128)
         {
         }
 
@@ -46,7 +46,7 @@ static inline void handle_proto(const socket_address &ipaddr)
 {
     YProtocol proto(ipaddr);
 
-    proto.stand_by = 5;
+    proto.every = 5;
     proto.execute();
 
 
