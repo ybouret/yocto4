@@ -16,6 +16,10 @@ namespace yocto
             sockset.insert(server);
         }
 
+        void server_protocol:: suspend() throw()
+        {
+            running = false;
+        }
     }
 }
 
@@ -26,9 +30,8 @@ namespace yocto
     {
         void server_protocol:: execute()
         {
-
-            bool run = true;
-            while(run)
+            running = true;
+            while(true)
             {
                 //______________________________________________________________
                 //
@@ -38,6 +41,14 @@ namespace yocto
                 if( initialize() )
                 {
                     delay_value = 0;
+                }
+                else
+                {
+                    // nothing to send...
+                    if(!running)
+                    {
+                        return;
+                    }
                 }
 
                 //______________________________________________________________
@@ -60,10 +71,10 @@ namespace yocto
                 //______________________________________________________________
                 onIdle();
             }
-            
+
         }
 
-        
+
     }
 }
 
@@ -96,6 +107,12 @@ namespace yocto
                     (void)conn_db.remove(k);
                     throw;
                 }
+                
+                if(!running)
+                {
+                    cnx->close();
+                    return;
+                }
 
                 try
                 {
@@ -114,7 +131,7 @@ namespace yocto
                     throw;
                 }
             }
-
+            
         }
         
     }

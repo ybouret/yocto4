@@ -8,6 +8,7 @@ namespace yocto
     namespace network
     {
 
+        //! a server protocol
         class server_protocol : public tcp_protocol
         {
         public:
@@ -15,6 +16,7 @@ namespace yocto
             virtual ~server_protocol() throw();
 
             void execute();
+            void suspend() throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(server_protocol);

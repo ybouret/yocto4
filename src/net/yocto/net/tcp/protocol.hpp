@@ -12,6 +12,7 @@ namespace yocto
     namespace network
     {
 
+        //! common architecture for tcp protocol
         class tcp_protocol
         {
         public:
@@ -36,13 +37,15 @@ namespace yocto
             virtual void onInit(connexion &);
             virtual void onSent(connexion &);
             virtual void onIdle();
-            
+
+
         protected:
             explicit tcp_protocol(size_t block_size);
             
             socket_set sockset;
             conn_set   conn_db;
             keys_list  dropped;
+            bool       running;
 
             void disconnect();         //!< disconnect dropped connections
             bool initialize() throw(); //!< prepare each connection
@@ -52,6 +55,7 @@ namespace yocto
         public:
             io_cache   cache;
             double     every;
+
         };
 
 
