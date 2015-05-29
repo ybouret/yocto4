@@ -29,6 +29,9 @@ namespace yocto
             virtual void put( const void *data, size_t size, size_t &done );
             virtual void get( void       *data, size_t size, size_t &done );
 
+            void merge( io_queue &Q ) throw();
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(io_queue);
             core::list_of_cpp<io_block> blocks; //!< dynamic blocks

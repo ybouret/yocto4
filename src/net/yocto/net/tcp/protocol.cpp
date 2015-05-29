@@ -110,6 +110,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 {
                     std::cerr << "disconnecting " << cnx.self() << ":" << int(swap_be(cnx.self().port)) << std::endl;
+                    onQuit(cnx);
                 }
 
                 sockset.remove(cnx);
@@ -166,6 +167,7 @@ namespace yocto
                         //
                         //------------------------------------------------------
                         std::cerr << "input from " << cnx.self() << ":" << int(swap_be(cnx.self().port)) << ": #" << nr << std::endl;
+                        onRecv(cnx);
                     }
                 }
             }
@@ -260,7 +262,7 @@ namespace yocto
                     // PROCESS SENT
                     //
                     //----------------------------------------------------------
-
+                    onSent(cnx);
                 }
             }
 
@@ -281,6 +283,20 @@ namespace yocto
         {
             
         }
+
+        void protocol:: onQuit(connexion &) throw()
+        {
+
+        }
+
+        void protocol:: onRecv(connexion &)
+        {
+        }
+
+        void protocol:: onSent(connexion &)
+        {
+        }
+
     }
     
 }

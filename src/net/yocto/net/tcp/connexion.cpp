@@ -7,8 +7,8 @@ namespace yocto
 
         connexion:: ~connexion() throw()
         {
+            
         }
-
 
 #define  Y_CNX_CTOR() \
 closed(false),        \
@@ -43,12 +43,12 @@ sendQ(shared)
         {
             return recvQ.recv(*this);
         }
-
+        
         size_t connexion:: do_send()
         {
             return sendQ.send(*this);
         }
-
+        
     }
     
 }

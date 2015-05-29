@@ -22,8 +22,10 @@ namespace yocto
             void execute();
 
             virtual void onInit(connexion &);
+            virtual void onQuit(connexion &) throw();
+            virtual void onRecv(connexion &);
+            virtual void onSent(connexion &);
             
-
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(protocol);
             typedef intr_ptr<sock_key_t,connexion> conn_ptr;

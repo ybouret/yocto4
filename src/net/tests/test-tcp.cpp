@@ -5,12 +5,50 @@
 using namespace yocto;
 using namespace network;
 
+
+namespace
+{
+    class YProtocol : public protocol
+    {
+    public:
+        YProtocol(const socket_address &ipaddr) : protocol(ipaddr,4)
+        {
+        }
+
+
+
+        virtual ~YProtocol() throw()
+        {
+        }
+
+        virtual void onInit( connexion &conn )
+        {
+            const  char msg[] = "Welcome\n";
+            size_t done = 0;
+            conn.sendQ.put_all(msg,length_of(msg),done);
+        }
+
+        virtual void onRecv( connexion &conn )
+        {
+            std::cerr << conn.self() << ":" << swap_be(conn.self().port) << " : rbytes=" << conn.recvQ.bytes() << std::endl;
+            conn.sendQ.merge(conn.recvQ);
+        }
+
+
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(YProtocol);
+    };
+
+}
+
 static inline void handle_proto(const socket_address &ipaddr)
 {
-    protocol proto(ipaddr);
-    
+    YProtocol proto(ipaddr);
+
+    proto.stand_by = 5;
     proto.execute();
-    
+
+
 }
 
 YOCTO_UNIT_TEST_IMPL(proto)
@@ -40,6 +78,6 @@ YOCTO_UNIT_TEST_IMPL(proto)
         IPv6 addr( socket_address_any, net_port );
         handle_proto( addr );
     }
-
+    
 }
 YOCTO_UNIT_TEST_DONE()

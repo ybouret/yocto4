@@ -144,6 +144,21 @@ namespace yocto
                 done = 0;
             }
         }
+
+
+        void io_queue:: merge( io_queue &Q ) throw()
+        {
+            assert(this != &Q );
+            size_t n = 0;
+            while( Q.blocks.head && (n=Q.blocks.head->bytes())>0 )
+            {
+                assert(n<=Q.active);
+                blocks.push_back( Q.blocks.pop_front() );
+                active   += n;
+                Q.active -= n;
+            }
+        }
+
     }
 
 }
