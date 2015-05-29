@@ -128,7 +128,8 @@ namespace yocto
                 YOCTO_TAO_LOOP(a.size(),MULSUB);
 #undef  Y_TAO_MULSUB
             }
-            
+
+            //! a = b + x * c
             template <typename ARR, typename BRR, typename CRR>
             static inline void setprobe( ARR &a, const BRR &b, typename ARR::param_type x, const CRR &c) throw()
             {
