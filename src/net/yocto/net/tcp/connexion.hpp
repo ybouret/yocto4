@@ -8,7 +8,8 @@ namespace yocto
 {
     namespace network
     {
-        
+
+        class tcp_protocol;
         class protocol;
 
         
@@ -34,6 +35,7 @@ namespace yocto
             size_t     do_recv(); //!< fill recv queue
             size_t     do_send(); //!< emit send queue
             friend class protocol;
+            friend class tcp_protocol;
         };
 
     }
