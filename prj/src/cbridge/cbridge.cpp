@@ -155,7 +155,10 @@ public:
                 success = false;
                 break;
             }
-            fp("%g %g\n",U[1],y_end);
+            if(U[1]<4)
+            {
+                fp("%g %g\n",U[1],y_end);
+            }
         }
 
 
@@ -186,6 +189,7 @@ public:
                 return alpha;
             }
         }
+        std::cerr << "No Lower" << std::endl;
         return -1;
     }
 
@@ -235,8 +239,10 @@ private:
 
 YOCTO_PROGRAM_START()
 {
-    Bridge b(1.0,80,1e-4);
-    b.beta = 0.1;
+
+    
+    Bridge b(0.1,120,1e-4);
+    b.beta = 0.2;
     b.OutputBridge();
     const double alpha = b.FindAlpha();
     std::cerr << "alpha=" << alpha << std::endl;
