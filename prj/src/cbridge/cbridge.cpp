@@ -241,7 +241,7 @@ YOCTO_PROGRAM_START()
 {
 
     
-    Bridge b(0.1,120,1e-4);
+    Bridge b(0.1,60,1e-4);
     b.beta = 0.2;
     b.OutputBridge();
     const double alpha = b.FindAlpha();
