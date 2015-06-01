@@ -39,5 +39,7 @@ ADD_SUBDIRECTORY(volfit)
 #ADD_SUBDIRECTORY(gencolors)
 #ADD_SUBDIRECTORY(otsu-voro)
 ADD_SUBDIRECTORY(cbridge)
+ADD_SUBDIRECTORY(tcp-relay)
+
 
 
