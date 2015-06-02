@@ -130,3 +130,14 @@ YOCTO_UNIT_TEST_IMPL(client)
 
 }
 YOCTO_UNIT_TEST_DONE()
+
+#define _SHOW(TYPE) std::cerr << "sizeof(" << #TYPE << ")=" << sizeof(TYPE) << std::endl
+
+YOCTO_UNIT_TEST_IMPL(sizes)
+{
+    _SHOW(connexion);
+    _SHOW(io_block);
+}
+YOCTO_UNIT_TEST_DONE()
+
+

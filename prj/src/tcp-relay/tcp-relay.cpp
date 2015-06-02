@@ -25,7 +25,7 @@ public:
     virtual ~RelayProtocol() throw()
     {
     }
-    
+
     virtual void onInit( connexion &conn )
     {
         if(source)

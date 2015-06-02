@@ -7,26 +7,26 @@ namespace yocto
     {
         io_cache:: io_cache( const size_t blk_size ) throw() :
         block_size( max_of<size_t>(blk_size,sizeof(ptrdiff_t))),
-	blocks()
+        blocks()
         {
         }
-
+        
         io_cache:: ~io_cache() throw()
         {
-            
+            //std::cerr << "Killing Cache" << std::endl;
         }
-
+        
         size_t io_cache:: count() const throw() { return blocks.size; }
         size_t io_cache:: bytes() const throw() { return blocks.size * block_size; }
-
-
+        
+        
         void io_cache:: store(io_block *blk) throw()
         {
             assert(blk);
             assert(block_size==blk->len);
             blocks.store(blk);
         }
-
+        
         io_block * io_cache:: query()
         {
             if( blocks.size )

@@ -41,6 +41,8 @@ namespace yocto
             void    link_to(const socket_address &ipaddr);
             void    suspend() throw();
 
+            io_cache   cache;
+
         protected:
             explicit tcp_protocol(size_t block_size);
             
@@ -58,7 +60,6 @@ namespace yocto
 
 
         public:
-            io_cache   cache;
             double     every;
 
         };

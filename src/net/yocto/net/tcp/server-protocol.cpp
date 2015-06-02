@@ -7,6 +7,7 @@ namespace yocto
     {
         server_protocol:: ~server_protocol() throw()
         {
+            sockset.release();
         }
 
         server_protocol:: server_protocol(const socket_address &ipaddr, const int max_pending, const size_t block_size ) :

@@ -12,11 +12,11 @@ namespace yocto
         }
 
         tcp_protocol:: tcp_protocol(size_t block_size) :
+        cache(block_size),
         sockset(4),
         conn_db(4,as_capacity),
         dropped(4,as_capacity),
         running(false),
-        cache(block_size),
         every(1.0)
         {
         }

@@ -14,9 +14,10 @@ namespace yocto
 
         io_queue:: ~io_queue() throw()
         {
-            while(blocks.size)
+            //std::cerr << "Killing Queue" << std::endl;
+            while(blocks.size>0)
             {
-                shblk.store( blocks.pop_front() );
+                shblk.store( blocks.pop_back() );
             }
             active = 0;
         }
@@ -25,7 +26,7 @@ namespace yocto
         {
             while(blocks.size>1)
             {
-                shblk.store( blocks.pop_front() );
+                shblk.store( blocks.pop_back() );
             }
             if(blocks.size>=1)
             {
@@ -60,7 +61,6 @@ namespace yocto
             else
             {
                 blocks.push_back( shblk.query() );
-
             }
 
         }
