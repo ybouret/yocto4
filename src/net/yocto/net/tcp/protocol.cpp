@@ -93,6 +93,7 @@ namespace yocto
                 return;
             }
 
+           
             // admin...
             try
             {
@@ -106,6 +107,7 @@ namespace yocto
                 throw;
             }
 
+           
 
         }
 
@@ -117,7 +119,6 @@ namespace yocto
 {
     namespace network
     {
-
 
 
         void tcp_protocol:: disconnect()

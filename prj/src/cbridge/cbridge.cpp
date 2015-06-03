@@ -263,7 +263,7 @@ public:
         beta   = lower;
         alpha  = FindAlpha();
         
-        return 0;
+        return beta;
     }
     
     inline ~Bridge() throw()
@@ -314,6 +314,7 @@ YOCTO_PROGRAM_START()
     }
 #endif
     
+#if 0
     if(argc<=2)
     {
         throw exception("need K theta");
@@ -324,7 +325,31 @@ YOCTO_PROGRAM_START()
     Bridge b(K,theta,1e-4);
     b.FindBetaMax();
     b.OutputBridge();
-
+#endif
+    
+    if(argc<=2)
+    {
+        throw exception("need K theta");
+    }
+    const double K     = strconv::to<double>(argv[1],"K");
+    const double theta = strconv::to<double>(argv[2],"theta");
+    Bridge b(K,theta,1e-4);
+    const double beta_max = b.FindBetaMax();
+    
+    std::cerr << std::endl << "beta_max=" << beta_max << std::endl;
+    const size_t nbeta    = 20;
+    const string filename = vformat("alpha-K=%g-theta=%g.dat",K,theta);
+    ios::ocstream::overwrite(filename);
+    for(size_t i=0;i<=nbeta;++i)
+    {
+        b.beta = (i*beta_max)/nbeta;
+        const double alpha = b.FindAlpha();
+        ios::ocstream fp(filename,true);
+        fp("%g %g\n",b.beta,alpha);
+    }
+    
+    
+    
     
 }
 YOCTO_PROGRAM_END()
