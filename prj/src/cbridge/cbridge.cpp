@@ -129,7 +129,7 @@ public:
     bool ComputeFinalRadius(const double alpha)
     {
         
-        ios::ocstream fp("profile.dat",false);
+        //ios::ocstream fp("profile.dat",false);
         
         const double alpha_rad = numeric<double>::pi * alpha / 180.0;
         const double theta_rad = numeric<double>::pi * theta / 180.0;
@@ -145,7 +145,7 @@ public:
         // initial condition
         U[1] = u_c;
         U[2] = dudy;
-        fp("%g %g\n", u_c, y_c);
+        //fp("%g %g\n", u_c, y_c);
         bool success = true;
         for(size_t i=ny;i>0;--i)
         {
@@ -158,7 +158,7 @@ public:
             }
             if(U[1]<4)
             {
-                fp("%g %g\n",U[1],y_end);
+                //fp("%g %g\n",U[1],y_end);
             }
         }
         
@@ -228,7 +228,7 @@ public:
     
     inline double FindBetaMax()
     {
-        std::cerr << "Finding Beta Max" << std::endl;
+        std::cerr << "Finding Beta Max K=" <<  K << ", theta=" << theta << std::endl;
         beta = 0;
         double alpha = FindAlpha();
         if(alpha<0)
@@ -288,45 +288,49 @@ private:
 YOCTO_PROGRAM_START()
 {
     
-#if 0
-    Bridge b(0.1,120,1e-4);
-    b.beta = 0.2;
-    b.OutputBridge();
-    const double alpha = b.FindAlpha();
-    std::cerr << "alpha=" << alpha << std::endl;
+#if 1
+    {
+        Bridge b(1,0,1e-4);
+        const double beta_max = b.FindBetaMax();
+        std::cerr << "beta_max_null(K=1)=" << beta_max << std::endl;
+    }
+    
+    const double lnKmin   = -4.7;
+    const double lnKmax   =  4.7;
+    const int    nk       =  50;
+    const string filename = "beta_max_null.dat";
+    
+    ios::ocstream::overwrite(filename);
+    for(int k=nk;k>=0;--k)
+    {
+        const double lnK = lnKmin + ( k*(lnKmax-lnKmin) )/nk;
+        const double K   = exp(lnK);
+        Bridge b(K,0,1e-4);
+        const double beta_max = b.FindBetaMax();
+        ios::ocstream fp(filename,true);
+        fp("%g %g %g\n",lnK,beta_max,K);
+    }
 #endif
     
 #if 0
     if(argc<=1)
     {
-        throw exception("need theta");
+        throw exception("need K");
     }
-    const double theta = strconv::to<double>(argv[1],"theta");
-    Bridge b(1,theta,1e-4);
+    const double K        = strconv::to<double>(argv[1],"K");
+    const string filename = vformat("beta_max%g.dat",K);
+    
+    ios::ocstream::overwrite(filename);
+    for(int theta=0;theta<=175;theta+=5)
     {
-        ios::ocstream fp( vformat("alpha0-%g.dat",theta),false);
-        for(double lnK=-2;lnK<=2;lnK+=0.1)
-        {
-            const double K      = Pow(10.0,lnK);
-            const double alpha0 = b.Alpha0(K);
-            fp("%g %g\n",K,alpha0);
-        }
+        Bridge b(K,theta,1e-4);
+        const double beta_max = b.FindBetaMax();
+        ios::ocstream fp(filename,true);
+        fp("%g %g\n",b.theta,beta_max);
     }
 #endif
     
 #if 0
-    if(argc<=2)
-    {
-        throw exception("need K theta");
-    }
-
-    const double K     = strconv::to<double>(argv[1],"K");
-    const double theta = strconv::to<double>(argv[2],"theta");
-    Bridge b(K,theta,1e-4);
-    b.FindBetaMax();
-    b.OutputBridge();
-#endif
-    
     if(argc<=2)
     {
         throw exception("need K theta");
@@ -337,7 +341,7 @@ YOCTO_PROGRAM_START()
     const double beta_max = b.FindBetaMax();
     
     std::cerr << std::endl << "beta_max=" << beta_max << std::endl;
-    const size_t nbeta    = 20;
+    const size_t nbeta    = 40;
     const string filename = vformat("alpha-K=%g-theta=%g.dat",K,theta);
     ios::ocstream::overwrite(filename);
     for(size_t i=0;i<=nbeta;++i)
@@ -347,7 +351,7 @@ YOCTO_PROGRAM_START()
         ios::ocstream fp(filename,true);
         fp("%g %g\n",b.beta,alpha);
     }
-    
+#endif
     
     
     
