@@ -226,9 +226,25 @@ public:
         return alpha;
     }
     
+    double FindSurface()
+    {
+        const double alpha = FindAlpha();
+        return Square(Sin(numeric<double>::pi*alpha/180.0));
+    }
+    
+    inline double BetaMaxNull()
+    {
+        static const double a               = 0.219828;//         +/- 0.001115     (0.5073%)
+        static const double b               = -0.132213;//        +/- 0.004947     (3.742%)
+        static const double c               = 0.665322;//         +/- 0.007842     (1.179%)
+        const double x = log(K);
+        return sqrt(a*x*x+b*x+c) - sqrt(a) * x;
+    }
+    
     inline double FindBetaMax()
     {
         std::cerr << "Finding Beta Max K=" <<  K << ", theta=" << theta << std::endl;
+#if 0
         beta = 0;
         double alpha = FindAlpha();
         if(alpha<0)
@@ -236,20 +252,36 @@ public:
             return -1;
         }
         std::cerr << "alpha0=" << alpha << std::endl;
-        
+#endif
         
         // find a beta with invalid alpha
-        beta = 1.0/K;
-        while( FindAlpha()>=0 ) beta *= 2;
-        std::cerr << "start@beta=" << beta << std::endl;
-        
         double lower = 0;
-        double upper = beta;
+        double upper = 0;
+        beta = BetaMaxNull();
+        if(FindAlpha()>=0)
+        {
+            lower = beta;
+            do
+            {
+                beta *= 1.1;
+            } while(FindAlpha()>=0);
+            upper = beta;
+        }
+        else
+        {
+            upper = beta;
+            do
+            {
+                beta *= 0.9;
+            } while(FindAlpha()<0);
+            lower = beta;
+        }
+        
         while( (upper-lower)>BTOL )
         {
             const double middle = 0.5*(lower+upper);
             beta  = middle;
-            alpha = FindAlpha();
+            const double alpha = FindAlpha();
             if(alpha<0)
             {
                 upper = middle;
@@ -261,7 +293,7 @@ public:
             }
         }
         beta   = lower;
-        alpha  = FindAlpha();
+        //alpha  = FindAlpha();
         
         return beta;
     }
@@ -288,7 +320,9 @@ private:
 YOCTO_PROGRAM_START()
 {
     
-#if 1
+    
+    
+#if 0
     {
         Bridge b(1,0,1e-4);
         const double beta_max = b.FindBetaMax();
@@ -330,7 +364,7 @@ YOCTO_PROGRAM_START()
     }
 #endif
     
-#if 0
+#if 1
     if(argc<=2)
     {
         throw exception("need K theta");
@@ -342,14 +376,14 @@ YOCTO_PROGRAM_START()
     
     std::cerr << std::endl << "beta_max=" << beta_max << std::endl;
     const size_t nbeta    = 40;
-    const string filename = vformat("alpha-K=%g-theta=%g.dat",K,theta);
+    const string filename = vformat("surface-K=%g-theta=%g.dat",K,theta);
     ios::ocstream::overwrite(filename);
     for(size_t i=0;i<=nbeta;++i)
     {
         b.beta = (i*beta_max)/nbeta;
-        const double alpha = b.FindAlpha();
+        const double surf = b.FindSurface();
         ios::ocstream fp(filename,true);
-        fp("%g %g\n",b.beta,alpha);
+        fp("%g %g\n",b.beta,surf);
     }
 #endif
     
