@@ -61,7 +61,7 @@ namespace yocto
                     //__________________________________________________________
                     delay            d = delay_value;
                     const size_t     n = sockset.check(d);
-                    std::cerr << "#activity=" << n << std::endl;
+                    std::cerr << "[protocol] #activity=" << n << std::endl;
                     if(n>0)
                     {
                         check_recv();

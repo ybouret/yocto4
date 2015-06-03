@@ -29,6 +29,22 @@ namespace yocto
             
         };
         
+        inline uint16_t swap_nbo(const uint16_t x) throw()
+        {
+            return YOCTO_SWAP_BE16(x);
+        }
+        
+        inline uint32_t swap_nbo(const uint32_t x) throw()
+        {
+            return YOCTO_SWAP_BE32(x);
+        }
+
+        
+        inline uint64_t swap_nbo(const uint64_t x) throw()
+        {
+            return YOCTO_SWAP_BE64(x);
+        }
+        
     }
 }
 

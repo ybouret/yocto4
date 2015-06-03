@@ -41,7 +41,7 @@ namespace yocto
             void    link_to(const socket_address &ipaddr);
             
             //! set the running flag to false
-            void    suspend() throw();
+            void    terminate() throw();
 
             io_cache   cache;
 

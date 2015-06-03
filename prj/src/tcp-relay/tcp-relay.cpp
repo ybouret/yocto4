@@ -25,7 +25,7 @@ public:
     virtual ~RelayProtocol() throw()
     {
     }
-
+    
     virtual void onInit( connexion &conn )
     {
         if(source)
@@ -39,13 +39,13 @@ public:
             {
                 // second connexion: target
                 target = &conn;
-                std::cerr << "relay.connected to " << conn.self() << ":" << swap_be(conn.self().port) << std::endl;
+                std::cerr << "relay.connected to " << conn.self() << ":" << swap_nbo(conn.self().port) << std::endl;
             }
         }
         else
         {
             //first connexion
-            std::cerr << "relay.connexion from " << conn.self() << ":" << swap_be(conn.self().port) << std::endl;
+            std::cerr << "relay.connexion from " << conn.self() << ":" << swap_nbo(conn.self().port) << std::endl;
             source = &conn;
             link_to(client_addr);
         }
@@ -53,7 +53,25 @@ public:
     
     virtual void onQuit( connexion &conn ) throw()
     {
-        this->suspend();
+        if(target==&conn)
+        {
+            std::cerr << "Target Quit" << std::endl;
+            if(source)
+            {
+                source->close();
+            }
+            target = NULL;
+        }
+        
+        if(source==&conn)
+        {
+            std::cerr << "Source Quit" << std::endl;
+            if(target)
+            {
+                target->close();
+            }
+            source = NULL;
+        }
     }
     
     virtual void onRecv( connexion &conn )
@@ -69,7 +87,7 @@ public:
         }
         
     }
-
+    
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(RelayProtocol);
 };
@@ -88,8 +106,9 @@ YOCTO_PROGRAM_START()
     const uint16_t server_port = strconv::to<size_t>(argv[3],"server port");
     const IPv4     client_addr( client_name, swap_be(client_port));
     const IPv4     server_addr( socket_address_any, swap_be(server_port) );
-
+    
     RelayProtocol  relay(client_addr,server_addr);
+    relay.every = 5;
     relay.execute();
 }
 YOCTO_PROGRAM_END()
