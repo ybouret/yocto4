@@ -1,13 +1,14 @@
 #ifndef YOCTO_GEMS_IO_CRYSTAL_INCLUDED
 #define YOCTO_GEMS_IO_CRYSTAL_INCLUDED 1
 
-#include "yocto/gems/atoms.hpp"
+#include "yocto/gems/types.hpp"
 #include "yocto/math/types.hpp"
 
 namespace yocto
 {
     namespace gems
     {
+        using math::v3d;
 
         class crystal
         {
@@ -54,6 +55,7 @@ namespace yocto
                                    void          *args
                                    ) throw();
 
+#if 0
             template <typename T>
             static inline void build_fcc(atoms<T>      &Atoms,
                                          const coord_t &cr,
@@ -61,9 +63,10 @@ namespace yocto
             {
                 build_fcc(cr, box.x, box.y, box.z, build_atom<T>,&Atoms);
             }
-
+#endif
 
         private:
+#if 0
             template <typename T>
             static inline void build_atom(size_t indx, double x, double y, double z,void *args) throw()
             {
@@ -74,6 +77,7 @@ namespace yocto
                 r.y = T(y);
                 r.z = T(z);
             }
+#endif
         };
         
     }

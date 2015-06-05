@@ -2,44 +2,34 @@
 #define YOCTO_GEMS_PROPERTIES_INCLUDED 1
 
 #include "yocto/gems/types.hpp"
-#include "yocto/container/vslot.hpp"
-#include "yocto/counted-object.hpp"
-#include "yocto/associative/dual-set.hpp"
 #include "yocto/string.hpp"
-#include "yocto/ptr/nosy.hpp"
 
 namespace yocto
 {
     namespace gems
     {
-
-        //! information about a given kind of atom
-        class properties : public counted_object
+        
+        class properties
         {
         public:
+            const string name; //!< given
+            const word_t uuid; //!< for communication
 
-            const string name; //!< user's name
-            const word_t uuid; //!< uuid, for transfert of atoms
-            const double mass; //!< double precision mass
-            vslot        data; //!< for force field etc..
-            virtual ~properties() throw();
-            explicit properties(const string &id, const double m);
-            const string &key() const throw();
-            const word_t &subkey() const throw();
+            const string & key() const throw();
+            const word_t & subkey() const throw();
 
-            static word_t compute_uuid(const string &) throw();
+            ~properties() throw();
+            properties( const string &id );
 
-            typedef nosy_ptr<string,word_t,properties> pointer;
-            typedef dual_set<string,word_t,pointer>    database;
+            static word_t compute_uuid(const string &id) throw();
+
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(properties);
         };
-        
-        
-    }
-    
-}
 
+    }
+}
 
 #endif

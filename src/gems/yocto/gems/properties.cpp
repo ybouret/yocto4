@@ -1,29 +1,29 @@
 #include "yocto/gems/properties.hpp"
+#include "yocto/hashing/sha1.hpp"
 
 namespace yocto
 {
     namespace gems
     {
 
-        word_t properties:: compute_uuid(const string &s) throw()
+
+        properties:: properties(const string &id) :
+        name(id),
+        uuid( compute_uuid(name) )
         {
-            hashing::sha1 H;
-            return H.key<word_t>(s);
         }
+        
 
         properties:: ~properties() throw()
         {
         }
 
-        properties:: properties(const string &id, const double m) :
-        name(id),
-        uuid( compute_uuid(name) ),
-        mass(m),
-	data()
+
+        word_t properties:: compute_uuid(const string &id) throw()
         {
+            hashing::sha1 H;
+            return H.key<word_t>(id);
         }
-
     }
-
 }
 
