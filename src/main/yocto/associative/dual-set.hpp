@@ -19,7 +19,7 @@ namespace yocto
         extern const char dual_set_name[];
     }
     
-    //! a map indexed by two keys
+    //! a set indexed by two keys
     template <
     typename KEY,
     typename SUBKEY,
@@ -34,6 +34,9 @@ namespace yocto
         YOCTO_ARGUMENTS_DECL_SUBKEY;
         
         //! holds real keys and data
+        /**
+         must return references to key and subkey
+         */
         class KNode
         {
         public:
@@ -159,8 +162,9 @@ namespace yocto
             //==================================================================
             // dual check
             //==================================================================
-            const_key &key = args.key();
+            const_key   &key  = args.key();
             const size_t hkey = keyHasher(key);
+
             if(find_by_key(key,hkey))
                 return false;
             
