@@ -62,6 +62,43 @@ public:
         dudy[2] = accel;
     }
 
+    bool IsValid(const double r,const double y) const throw()
+    {
+        if(isinf(r))
+        {
+            //std::cerr << "INFINITE" << std::endl;
+            return false;
+        }
+
+        if(isnan(r))
+        {
+            //std::cerr << "NaN" << std::endl;
+            return false;
+        }
+
+        if(r<=0)
+        {
+            //std::cerr << "NEGATIVE R" << std::endl;
+            return false;
+        }
+
+        {
+            const double bridge_r = 0;
+            const double bridge_y = beta + 1.0;
+            const double dr       = r - bridge_r;
+            const double dy       = y - bridge_y;
+            const double l2       = dr*dr + dy*dy;
+            if(l2<1)
+            {
+                //std::cerr << "INSIDE BRIDGE" << std::endl;
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
     inline bool RK4(const double y_ini,
                     const double y_end) throw()
     {
@@ -84,7 +121,7 @@ public:
             U[i] += h * (k1[i]+k2[i]+k2[i]+k3[i]+k3[i]+k4[i]) / 6.0;
         }
 
-        return true; //IsValid(U[1],y_end);
+        return IsValid(U[1],y_end);
     }
 
     inline void OutputBridge() const
@@ -116,6 +153,76 @@ public:
     }
 
 
+    bool ComputeFinalRadius(const double alpha)
+    {
+
+        std::cerr << "FinalRadius(" << alpha << ").."; std::cerr.flush();
+        //ios::ocstream fp("profile.dat",false);
+        bool success = true;
+
+        if(theta+alpha>=180.0)
+        {
+            success = false;
+        }
+        else
+        {
+            const double alpha_rad = numeric<double>::pi * alpha / 180.0;
+            const double theta_rad = numeric<double>::pi * theta / 180.0;
+
+            // contact coordinates
+            const double u_c  = sin(alpha_rad);
+            const double y_c  = beta + (1.0-cos(alpha_rad));
+            const double dudy = 1.0/tan(alpha_rad+theta_rad);
+
+
+            // number of step
+            const size_t ny   = max_of<size_t>( size_t( Ceil(y_c/dY) + 1), 10 );
+
+            // initial condition
+            U[1] = u_c;
+            U[2] = dudy;
+            //fp("%g %g\n", u_c, y_c);
+            for(size_t i=ny;i>0;--i)
+            {
+                const double y_ini = (i  )*y_c/ny;
+                const double y_end = (i-1)*y_c/ny;
+                if(!RK4(y_ini,y_end))
+                {
+                    success = false;
+                    break;
+                }
+                if(U[1]<4)
+                {
+                    //fp("%g %g\n",U[1],y_end);
+                }
+            }
+        }
+
+        if(success) {std::cerr << "..OK" << std::endl;} else {std::cerr << "..NO" << std::endl;}
+
+        return success;
+    }
+
+
+    void ScanAlpha()
+    {
+        ios::ocstream fp( "alpha.dat", false);
+        const int alpha_max = int(ceil(180-theta));
+        for(int alpha=0;alpha<=alpha_max;++alpha)
+        {
+            double ans = 0;
+            if( ComputeFinalRadius(alpha) )
+            {
+                ans = 1.0 / U[1];
+            }
+            fp("%d %g\n", alpha, ans);
+        }
+
+    }
+
+    
+
+
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Bridge);
 };
@@ -132,9 +239,10 @@ YOCTO_PROGRAM_START()
     b.K     = strconv::to<double>(argv[1],"K");
     b.theta = strconv::to<double>(argv[2],"theta");
     b.beta  = strconv::to<double>(argv[3],"beta");
-
+    
     b.OutputBridge();
     b.OutputTangents();
-
+    b.ScanAlpha();
+    
 }
 YOCTO_PROGRAM_END()
