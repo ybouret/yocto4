@@ -3,6 +3,9 @@
 
 #include "yocto/gems/types.hpp"
 #include "yocto/string.hpp"
+#include "yocto/ptr/nosy.hpp"
+#include "yocto/associative/dual-set.hpp"
+#include "yocto/counted-object.hpp"
 
 namespace yocto
 {
@@ -10,10 +13,11 @@ namespace yocto
     {
 
         
-        class properties
+        class properties : public counted_object
         {
         public:
-
+            typedef nosy_ptr<string,word_t,properties> ptr;
+            typedef dual_set<string, word_t,ptr>       db;
             
             const string name; //!< given
             const word_t uuid; //!< for communication
