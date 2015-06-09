@@ -320,6 +320,19 @@ public:
         return lo;
     }
 
+    inline double ComputeSurface()
+    {
+        const double alpha = ComputeAlpha();
+        if(alpha<0)
+            return -1;
+        else
+        {
+            const double aa = numeric<double>::pi * alpha / 180.0;
+            const double sa = Sin(aa);
+            return sa*sa;
+        }
+    }
+
     inline double ComputeBetaMax()
     {
         double blo = 0;     //! assume good
