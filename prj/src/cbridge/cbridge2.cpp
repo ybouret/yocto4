@@ -152,11 +152,12 @@ public:
 
     }
 
+    inline double GetLastRadius() const throw() { return U[1]; }
 
-    bool ComputeFinalRadius(const double alpha)
+    inline bool ComputeFinalRadius(const double alpha)
     {
 
-        std::cerr << "FinalRadius(" << alpha << ").."; std::cerr.flush();
+        //std::cerr << "FinalRadius(" << alpha << ").."; std::cerr.flush();
         //ios::ocstream fp("profile.dat",false);
         bool success = true;
 
@@ -198,7 +199,7 @@ public:
             }
         }
 
-        if(success) {std::cerr << "..OK" << std::endl;} else {std::cerr << "..NO" << std::endl;}
+        //if(success) {std::cerr << "..OK" << std::endl;} else {std::cerr << "..NO" << std::endl;}
 
         return success;
     }
@@ -213,14 +214,58 @@ public:
             double ans = 0;
             if( ComputeFinalRadius(alpha) )
             {
-                ans = 1.0 / U[1];
+                ans = 1.0/GetLastRadius();
             }
             fp("%d %g\n", alpha, ans);
         }
 
     }
 
-    
+    double ComputeAlpha()
+    {
+        double hi = 180 - theta; // assuming invalid
+        double lo = hi/2;        // we don't know
+
+        //----------------------------------------------------------------------
+        // bracket
+        //----------------------------------------------------------------------
+        while(true)
+        {
+            if(ComputeFinalRadius(lo))
+            {
+                break;
+            }
+            else
+            {
+                lo = hi;
+                lo /= 2;
+                if(lo<=numeric<double>::minimum)
+                {
+                    return -1;
+                }
+
+            }
+        }
+        std::cerr << "bracket_alpha: " << lo << " -> " << hi << std::endl;
+
+        //----------------------------------------------------------------------
+        // bissect
+        //----------------------------------------------------------------------
+        while(hi-lo>ATOL)
+        {
+            const double mid = 0.5*(lo+hi);
+            if(ComputeFinalRadius(mid))
+            {
+                lo = mid;
+            }
+            else
+            {
+                hi = mid;
+            }
+        }
+        (void)ComputeFinalRadius(lo);
+        return lo;
+    }
 
 
 private:
@@ -240,9 +285,10 @@ YOCTO_PROGRAM_START()
     b.theta = strconv::to<double>(argv[2],"theta");
     b.beta  = strconv::to<double>(argv[3],"beta");
     
-    b.OutputBridge();
-    b.OutputTangents();
+    //b.OutputBridge();
+    //b.OutputTangents();
     b.ScanAlpha();
-    
+    const double alpha = b.ComputeAlpha();
+    std::cerr << "alpha=" << alpha << std::endl;
 }
 YOCTO_PROGRAM_END()
