@@ -10,9 +10,10 @@ using namespace yocto;
 using namespace math;
 
 static const size_t NVAR = 2;
-static double       ATOL = 1e-4;
+static double       ATOL = 1e-5;
 static double       BTOL = 1e-4;
 static double       dY   = 1e-4;
+static double       AMIN = 0.01;
 typedef array<double> array_t;
 
 
@@ -56,7 +57,7 @@ public:
     {
         const double r     = u[1];
         const double drdy  = u[2];
-        const double speed = Hypotenuse(1.0, drdy);
+        const double speed = sqrt(1.0+drdy*drdy);
         const double accel = ((K*K*y)+1.0/r/speed)*speed*speed*speed;
         dudy[1] = drdy;
         dudy[2] = accel;
@@ -88,7 +89,7 @@ public:
             const double dr       = r - bridge_r;
             const double dy       = y - bridge_y;
             const double l2       = dr*dr + dy*dy;
-            if(l2<1)
+            if(l2<1.0)
             {
                 //std::cerr << "INSIDE BRIDGE" << std::endl;
                 return false;
@@ -181,6 +182,8 @@ public:
             // initial condition
             U[1] = u_c;
             U[2] = dudy;
+            double reg[3] = { U[1],0,0 };
+            size_t num    = 1;
             for(size_t i=ny;i>0;--i)
             {
                 const double y_ini = (i  )*y_c/ny;
@@ -189,6 +192,21 @@ public:
                 {
                     success = false;
                     break;
+                }
+                if(num<3)
+                {
+                    reg[num++] = U[1];
+                }
+                else
+                {
+                    reg[0] = reg[1];
+                    reg[1] = reg[2];
+                    reg[2] = U[1];
+                    if((reg[1]+reg[1])>= (reg[0]+reg[2]) )
+                    {
+                        success = false;
+                        break;
+                    }
                 }
             }
         }
@@ -238,7 +256,7 @@ public:
 
     void ScanAlpha()
     {
-        std::cerr << "ScanAlpha(K=" << K << ",theta=" << theta << ",beta=" << beta <<")" << std::endl;
+        //std::cerr << "ScanAlpha(K=" << K << ",theta=" << theta << ",beta=" << beta <<")" << std::endl;
 
         ios::ocstream fp( "alpha.dat", false);
         const int alpha_max = int(ceil(180-theta));
@@ -256,7 +274,7 @@ public:
 
     inline double ComputeAlpha()
     {
-        std::cerr << "FindAlpha(K=" << K << ",theta=" << theta << ",beta=" << beta <<")" << std::endl;
+        //std::cerr << "FindAlpha(K=" << K << ",theta=" << theta << ",beta=" << beta <<")" << std::endl;
         double hi = 180 - theta; // assuming invalid
         double lo = hi/2;        // we don't know
 
@@ -274,14 +292,14 @@ public:
                 hi  = lo;
                 lo /=  2;
                 //std::cerr << "lo=" << lo << std::endl;
-                if(lo<=numeric<double>::minimum)
+                if(lo<=AMIN)
                 {
                     return -1; // not found
                 }
 
             }
         }
-        std::cerr << "\tbracket_alpha: " << lo << " -> " << hi << std::endl;
+        //std::cerr << "\tbracket_alpha: " << lo << " -> " << hi << std::endl;
 
         //----------------------------------------------------------------------
         // bissect
@@ -314,23 +332,21 @@ public:
         const double dBeta = 1.0/K;
         double bhi = dBeta;
         beta = bhi;
-        ScanAlpha();
-        std::cerr << "beta=" << beta << std::endl;
+        //ScanAlpha();
+        //std::cerr << "beta=" << beta << std::endl;
         double alpha = 0;
         while( (alpha=ComputeAlpha()) >=0 )
         {
-            std::cerr << "alpha(" << beta << ")=" << alpha << std::endl;
+            //std::cerr << "alpha(" << beta << ")=" << alpha << std::endl;
             beta += dBeta;
-            std::cerr << "beta=" << beta << std::endl;
+            //std::cerr << "beta=" << beta << std::endl;
         }
         bhi  = beta;
-        OutputBridge();
-        return -1;
 
         // blo=good, bhi=bad
         while(bhi-blo>BTOL)
         {
-            std::cerr << "blo=" << blo << ", bhi=" << bhi << std::endl;
+            //std::cerr << "blo=" << blo << ", bhi=" << bhi << std::endl;
             const double mid = (blo+bhi)*0.5;
             beta = mid;
             if( ComputeAlpha() < 0 )
@@ -390,7 +406,6 @@ YOCTO_PROGRAM_START()
 
         ios::ocstream fp(fn,true);
         fp("%g %g\n",b.theta,bmax);
-        break;
     }
 
 }
