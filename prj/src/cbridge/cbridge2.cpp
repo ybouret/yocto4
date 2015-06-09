@@ -422,6 +422,25 @@ public:
         }
     }
 
+    void Inverse(Bridge &B)
+    {
+
+        zfunction<double> zfn(&B, &Bridge::AlphaOf, 0);
+        for(size_t i=Length;i<=Length;++i)
+        {
+            B.beta = beta[i];
+            zfn.target = 0;
+            std::cerr << "alpha[" << i << "]=" << alpha[i] << std::endl;
+            const double theta_max = 180.0 - alpha[i];
+            ios::ocstream fp("alpha-theta.dat",false);
+            for(double theta=0;theta<theta_max;theta+=0.1)
+            {
+                fp("%g %g\n", theta, zfn.call(theta) );
+            }
+            break;
+        }
+    }
+
     virtual ~DataFile() throw()
     {
     }
@@ -491,15 +510,6 @@ YOCTO_PROGRAM_START()
     Bridge       B;
     B.K = R*kappa;
 
-    {
-        ios::ocstream fp("alpha_theta.dat",false);
-        for(double theta=1;theta<=179.9;theta+=0.1)
-        {
-
-            fp("%g %g\n", double(theta), B.AlphaOf(theta) );
-        }
-
-    }
 
     for(int i=3;i<argc;++i)
     {
@@ -515,6 +525,7 @@ YOCTO_PROGRAM_START()
                 fp("%g %g %g %g\n",datafile.Height[j], datafile.Surface[j], datafile.beta[j], datafile.alpha[j]);
             }
         }
+        datafile.Inverse(B);
     }
 #endif
     
