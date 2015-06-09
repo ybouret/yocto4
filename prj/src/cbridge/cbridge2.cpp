@@ -13,7 +13,7 @@ static const size_t NVAR = 2;
 static double       ATOL = 1e-5;
 static double       BTOL = 1e-4;
 static double       dY   = 1e-4;
-static double       AMIN = 0.01;
+static double       AMIN = 0.001;
 typedef array<double> array_t;
 
 
@@ -329,7 +329,7 @@ public:
         {
             const double aa = numeric<double>::pi * alpha / 180.0;
             const double sa = Sin(aa);
-            return sa*sa;
+            return numeric<double>::pi * sa*sa;
         }
     }
 
@@ -345,8 +345,6 @@ public:
         const double dBeta = 1.0/K;
         double bhi = dBeta;
         beta = bhi;
-        //ScanAlpha();
-        //std::cerr << "beta=" << beta << std::endl;
         double alpha = 0;
         while( (alpha=ComputeAlpha()) >=0 )
         {
@@ -380,7 +378,59 @@ private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Bridge);
 };
 
+
+#include "yocto/math/io/data-set.hpp"
+#include "yocto/ios/icstream.hpp"
+
+class DataFile
+{
+public:
+    explicit DataFile(const string &filename) :
+    Height(),
+    Surface(),
+    Length(0),
+    beta(),
+    alpha()
+    {
+        data_set<double> ds;
+        ds.use(1, Height);
+        ds.use(2, Surface);
+        ios::icstream fp(filename);
+        ds.load(fp);
+        (size_t &)Length = Height.size();
+        beta.make(Length,0);
+        alpha.make(Length,0);
+        std::cerr << "Length=" << Length << std::endl;
+    }
+
+    void Normalize(const double R)
+    {
+        const double area = numeric<double>::pi*R*R;
+        for(size_t j=Length;j>0;--j)
+        {
+            beta[j] = Height[j]/R;
+            const double sa = clamp<double>(0,Surface[j]/area,1.0);
+            alpha[j] = 180.0 * (Asin(sa)/numeric<double>::pi);
+        }
+    }
+
+    virtual ~DataFile() throw()
+    {
+    }
+
+    vector<double> Height;
+    vector<double> Surface;
+    const size_t   Length;
+    vector<double> beta;
+    vector<double> alpha;
+
+private:
+    YOCTO_DISABLE_COPY_AND_ASSIGN(DataFile);
+};
+
+
 #include "yocto/string/conv.hpp"
+#include "yocto/fs/local-fs.hpp"
 
 YOCTO_PROGRAM_START()
 {
@@ -402,12 +452,13 @@ YOCTO_PROGRAM_START()
     std::cerr << "beta_max=" << b.ComputeBetaMax() << std::endl;
 #endif
 
+#if 0
     if(argc<=1)
     {
         throw exception("need K");
     }
     Bridge b;
-    b.K     = strconv::to<double>(argv[1],"K");
+    b.K = strconv::to<double>(argv[1],"K");
     const string fn = vformat("beta_max-K%g.dat",b.K);
     ios::ocstream::overwrite(fn);
     for(int theta = 5; theta <= 175; theta += 5)
@@ -420,6 +471,33 @@ YOCTO_PROGRAM_START()
         ios::ocstream fp(fn,true);
         fp("%g %g\n",b.theta,bmax);
     }
+#endif
+
+#if 1
+    if(argc<=2)
+    {
+        throw exception("need R[mm], 1/kappa [mm]");
+    }
+    const double R     = strconv::to<double>(argv[1],"R");
+    const double kappa = 1.0/strconv::to<double>(argv[2],"1/kappa");
+    Bridge       B;
+    B.K = R*kappa;
+    for(int i=3;i<argc;++i)
+    {
+        const string filename = argv[i];
+        DataFile     datafile(filename);
+        datafile.Normalize(R);
+        string bname = vfs::get_base_name(filename);
+        bname += ".dat";
+        {
+            ios::ocstream fp(bname,false);
+            for(size_t j=1;j<=datafile.Length;++j)
+            {
+                fp("%g %g %g %g\n",datafile.Height[j], datafile.Surface[j], datafile.beta[j], datafile.alpha[j]);
+            }
+        }
+    }
+#endif
 
 }
 YOCTO_PROGRAM_END()
