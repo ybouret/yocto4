@@ -158,7 +158,6 @@ public:
     {
 
         //std::cerr << "FinalRadius(" << alpha << ").."; std::cerr.flush();
-        //ios::ocstream fp("profile.dat",false);
         bool success = true;
 
         if(theta+alpha>=180.0)
@@ -182,7 +181,6 @@ public:
             // initial condition
             U[1] = u_c;
             U[2] = dudy;
-            //fp("%g %g\n", u_c, y_c);
             for(size_t i=ny;i>0;--i)
             {
                 const double y_ini = (i  )*y_c/ny;
@@ -191,10 +189,6 @@ public:
                 {
                     success = false;
                     break;
-                }
-                if(U[1]<4)
-                {
-                    //fp("%g %g\n",U[1],y_end);
                 }
             }
         }
@@ -205,8 +199,47 @@ public:
     }
 
 
+    inline void SaveProfile(const string &filename,const double alpha)
+    {
+        ios::ocstream fp(filename,false);
+        if(theta+alpha>=180.0) return;
+
+        const double alpha_rad = numeric<double>::pi * alpha / 180.0;
+        const double theta_rad = numeric<double>::pi * theta / 180.0;
+
+        // contact coordinates
+        const double u_c  = sin(alpha_rad);
+        const double y_c  = beta + (1.0-cos(alpha_rad));
+        const double dudy = 1.0/tan(alpha_rad+theta_rad);
+
+
+        // number of step
+        const size_t ny   = max_of<size_t>( size_t( Ceil(y_c/dY) + 1), 10 );
+
+        // initial condition
+        U[1] = u_c;
+        U[2] = dudy;
+        //fp("%g %g\n", u_c, y_c);
+        for(size_t i=ny;i>0;--i)
+        {
+            const double y_ini = (i  )*y_c/ny;
+            const double y_end = (i-1)*y_c/ny;
+            if(!RK4(y_ini,y_end))
+            {
+                break;
+            }
+            if(U[1]<4)
+            {
+                fp("%g %g\n",U[1],y_end);
+            }
+        }
+
+    }
+
     void ScanAlpha()
     {
+        std::cerr << "ScanAlpha(K=" << K << ",theta=" << theta << ",beta=" << beta <<")" << std::endl;
+
         ios::ocstream fp( "alpha.dat", false);
         const int alpha_max = int(ceil(180-theta));
         for(int alpha=0;alpha<=alpha_max;++alpha)
@@ -223,6 +256,7 @@ public:
 
     inline double ComputeAlpha()
     {
+        std::cerr << "FindAlpha(K=" << K << ",theta=" << theta << ",beta=" << beta <<")" << std::endl;
         double hi = 180 - theta; // assuming invalid
         double lo = hi/2;        // we don't know
 
@@ -242,12 +276,12 @@ public:
                 //std::cerr << "lo=" << lo << std::endl;
                 if(lo<=numeric<double>::minimum)
                 {
-                    return -1;
+                    return -1; // not found
                 }
 
             }
         }
-        //std::cerr << "bracket_alpha: " << lo << " -> " << hi << std::endl;
+        std::cerr << "\tbracket_alpha: " << lo << " -> " << hi << std::endl;
 
         //----------------------------------------------------------------------
         // bissect
@@ -280,15 +314,23 @@ public:
         const double dBeta = 1.0/K;
         double bhi = dBeta;
         beta = bhi;
-        while( ComputeAlpha() >=0 )
+        ScanAlpha();
+        std::cerr << "beta=" << beta << std::endl;
+        double alpha = 0;
+        while( (alpha=ComputeAlpha()) >=0 )
         {
+            std::cerr << "alpha(" << beta << ")=" << alpha << std::endl;
             beta += dBeta;
+            std::cerr << "beta=" << beta << std::endl;
         }
         bhi  = beta;
+        OutputBridge();
+        return -1;
 
         // blo=good, bhi=bad
         while(bhi-blo>BTOL)
         {
+            std::cerr << "blo=" << blo << ", bhi=" << bhi << std::endl;
             const double mid = (blo+bhi)*0.5;
             beta = mid;
             if( ComputeAlpha() < 0 )
@@ -313,6 +355,7 @@ private:
 
 YOCTO_PROGRAM_START()
 {
+#if 0
     if(argc<=3)
     {
         throw exception("need K theta beta");
@@ -328,6 +371,27 @@ YOCTO_PROGRAM_START()
     //const double alpha = b.ComputeAlpha();
     //std::cerr << "alpha=" << alpha << std::endl;
     std::cerr << "beta_max=" << b.ComputeBetaMax() << std::endl;
+#endif
+
+    if(argc<=1)
+    {
+        throw exception("need K");
+    }
+    Bridge b;
+    b.K     = strconv::to<double>(argv[1],"K");
+    const string fn = vformat("beta_max-K%g.dat",b.K);
+    ios::ocstream::overwrite(fn);
+    for(int theta = 5; theta <= 175; theta += 5)
+    {
+        std::cerr << "theta=" << theta << std::endl;
+        b.theta = theta;
+        const double bmax = b.ComputeBetaMax();
+        b.beta = bmax;
+
+        ios::ocstream fp(fn,true);
+        fp("%g %g\n",b.theta,bmax);
+        break;
+    }
 
 }
 YOCTO_PROGRAM_END()
