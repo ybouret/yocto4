@@ -221,7 +221,7 @@ public:
 
     }
 
-    double ComputeAlpha()
+    inline double ComputeAlpha()
     {
         double hi = 180 - theta; // assuming invalid
         double lo = hi/2;        // we don't know
@@ -237,8 +237,9 @@ public:
             }
             else
             {
-                lo = hi;
-                lo /= 2;
+                hi  = lo;
+                lo /=  2;
+                //std::cerr << "lo=" << lo << std::endl;
                 if(lo<=numeric<double>::minimum)
                 {
                     return -1;
@@ -246,7 +247,7 @@ public:
 
             }
         }
-        std::cerr << "bracket_alpha: " << lo << " -> " << hi << std::endl;
+        //std::cerr << "bracket_alpha: " << lo << " -> " << hi << std::endl;
 
         //----------------------------------------------------------------------
         // bissect
@@ -267,6 +268,42 @@ public:
         return lo;
     }
 
+    inline double ComputeBetaMax()
+    {
+        double blo = 0;     //! assume good
+        beta = blo;
+        if(ComputeAlpha()<0)
+        {
+            return -1;
+        }
+
+        const double dBeta = 1.0/K;
+        double bhi = dBeta;
+        beta = bhi;
+        while( ComputeAlpha() >=0 )
+        {
+            beta += dBeta;
+        }
+        bhi  = beta;
+
+        // blo=good, bhi=bad
+        while(bhi-blo>BTOL)
+        {
+            const double mid = (blo+bhi)*0.5;
+            beta = mid;
+            if( ComputeAlpha() < 0 )
+            {
+                bhi = mid;
+            }
+            else
+            {
+                blo = mid;
+            }
+        }
+
+        beta = blo;
+        return beta;
+    }
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Bridge);
@@ -287,8 +324,10 @@ YOCTO_PROGRAM_START()
     
     //b.OutputBridge();
     //b.OutputTangents();
-    b.ScanAlpha();
-    const double alpha = b.ComputeAlpha();
-    std::cerr << "alpha=" << alpha << std::endl;
+    //b.ScanAlpha();
+    //const double alpha = b.ComputeAlpha();
+    //std::cerr << "alpha=" << alpha << std::endl;
+    std::cerr << "beta_max=" << b.ComputeBetaMax() << std::endl;
+
 }
 YOCTO_PROGRAM_END()
