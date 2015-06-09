@@ -360,7 +360,7 @@ namespace yocto
         // I/O
         //
         //======================================================================
-        typedef uint32_t io_key_t;
+        typedef uint64_t io_key_t;
         class ostream : public ios::ostream
         {
         public:
@@ -380,7 +380,9 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(ostream);
             ios::ostream *fp;
         };
+
         
+
         //======================================================================
         //
         //! information relay
