@@ -5,6 +5,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/math/kernel/tao.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/math/fcn/zfind.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -374,6 +375,13 @@ public:
         return beta;
     }
 
+    double AlphaOf(double Theta)
+    {
+        theta = Theta;
+        return ComputeAlpha();
+    }
+
+
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Bridge);
 };
@@ -443,7 +451,7 @@ YOCTO_PROGRAM_START()
     b.K     = strconv::to<double>(argv[1],"K");
     b.theta = strconv::to<double>(argv[2],"theta");
     b.beta  = strconv::to<double>(argv[3],"beta");
-    
+
     //b.OutputBridge();
     //b.OutputTangents();
     //b.ScanAlpha();
@@ -482,6 +490,17 @@ YOCTO_PROGRAM_START()
     const double kappa = 1.0/strconv::to<double>(argv[2],"1/kappa");
     Bridge       B;
     B.K = R*kappa;
+
+    {
+        ios::ocstream fp("alpha_theta.dat",false);
+        for(double theta=1;theta<=179.9;theta+=0.1)
+        {
+
+            fp("%g %g\n", double(theta), B.AlphaOf(theta) );
+        }
+
+    }
+
     for(int i=3;i<argc;++i)
     {
         const string filename = argv[i];
@@ -498,6 +517,6 @@ YOCTO_PROGRAM_START()
         }
     }
 #endif
-
+    
 }
 YOCTO_PROGRAM_END()
