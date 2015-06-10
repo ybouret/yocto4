@@ -138,7 +138,7 @@ namespace yocto
 		inline float  Floor( float  x ) throw()  { return floorf( x ); }
 		inline double Floor( double x ) throw()  { return floor(  x );  }
 		
-        
+
 		inline float Hypotenuse( float a, float b) throw()
         {
             const float absa=Fabs(a);
