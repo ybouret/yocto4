@@ -25,8 +25,8 @@ namespace yocto
             const string & key() const throw();
             const word_t & subkey() const throw();
 
-            ~properties() throw();
-            properties( const string &id );
+            virtual ~properties() throw();
+            explicit properties( const string &id );
 
             static word_t compute_uuid(const string &id) throw();
 
