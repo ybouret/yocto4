@@ -30,7 +30,30 @@ namespace yocto
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ocstream);
 		};
-		
+
+
+        class acstream : public ocstream
+        {
+        public:
+            virtual ~acstream() throw();
+            acstream(const char   *filename);
+            acstream(const string &filename);
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(acstream);
+        };
+
+        class wcstream : public ocstream
+        {
+        public:
+            virtual ~wcstream() throw();
+            wcstream(const char   *filename);
+            wcstream(const string &filename);
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(wcstream);
+        };
+
 	}
 	
 }

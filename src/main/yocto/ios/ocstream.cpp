@@ -7,10 +7,10 @@
 
 namespace yocto
 {
-	
-	namespace ios
-	{
-		
+
+    namespace ios
+    {
+
 		ocstream:: ~ocstream() throw() {}
 		
 		ocstream:: ocstream( const char   *filename, bool append ) : cfile( filename, append ? "ab" : "wb" ) {}
@@ -55,4 +55,53 @@ namespace yocto
 	}
 	
 }
+
+namespace yocto
+{
+
+    namespace ios
+    {
+
+        acstream:: acstream(const char   *filename) : ocstream(filename,true)
+        {
+        }
+
+        acstream:: acstream(const string &filename) : ocstream(filename,true)
+        {
+        }
+
+        acstream:: ~acstream() throw()
+        {}
+
+        
+
+    }
+
+}
+
+namespace yocto
+{
+
+    namespace ios
+    {
+
+        wcstream:: wcstream(const char   *filename) : ocstream(filename,false)
+        {
+        }
+
+        wcstream:: wcstream(const string &filename) : ocstream(filename,false)
+        {
+        }
+
+        wcstream:: ~wcstream() throw()
+        {}
+        
+        
+        
+    }
+    
+}
+
+
+
 
