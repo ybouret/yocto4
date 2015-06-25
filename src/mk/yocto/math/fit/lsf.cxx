@@ -9,15 +9,15 @@ namespace yocto
     {
         template <>
         LeastSquares<real_t>::Sample:: Wrapper:: ~Wrapper() throw() {}
-        
+
         template <>
         LeastSquares<real_t>::Sample:: Wrapper:: Wrapper(Sample &from) throw():
         S(from),F(0),x(0),q(0)
         {
-            
+
         }
-        
-        
+
+
         template <>
         real_t LeastSquares<real_t>::Sample:: Wrapper:: Eval( real_t U )
         {
@@ -32,7 +32,7 @@ namespace yocto
             return ans;
         }
     }
-    
+
 }
 
 
@@ -41,16 +41,16 @@ namespace yocto
 {
     namespace math
     {
-        
+
         template <>
         LeastSquares<real_t>::Sample:: ~Sample() throw()
         {
         }
-        
+
 #if defined(_MSC_VER)
 #pragma warning ( disable : 4355 )
 #endif
-        
+
         template <>
         LeastSquares<real_t>::Sample:: Sample(const Array &userX,
                                               const Array &userY,
@@ -73,7 +73,7 @@ namespace yocto
         f(&w,&Wrapper::Eval)
         {
         }
-        
+
         template <>
         void LeastSquares<real_t>::Sample:: prepare(size_t local_nvar, size_t global_nvar)
         {
@@ -89,7 +89,7 @@ namespace yocto
             }
             (size_t &)L = local_nvar;
             (size_t &)M = global_nvar;
-            
+
             Gamma .make(L,M);
             u     .make(L,0);
             dFdu  .make(L,0);
@@ -97,19 +97,19 @@ namespace yocto
             alpha .make(L,L);
             __ag  .make(L,M);
             Alpha .make(M,M);
-            
+
             if(L==M)
             {
                 Gamma.ld1();
             }
         }
-        
+
         template <>
         void LeastSquares<real_t>::Sample::prepare(size_t nvar)
         {
             prepare(nvar,nvar);
         }
-        
+
         template <>
         real_t LeastSquares<real_t>::Sample:: compute_D( Function &F, const Array &a) const
         {
@@ -118,7 +118,7 @@ namespace yocto
             // Evaluate u from a
             //__________________________________________________________________
             tao::mul((Vector&)u,Gamma,a);
-            
+
             //__________________________________________________________________
             //
             // run
@@ -132,7 +132,7 @@ namespace yocto
             }
             return ans;
         }
-        
+
         template <>
         real_t LeastSquares<real_t>::Sample:: compute_D(Function &F,const Array &a, derivative<real_t> &drvs, real_t h)
         {
@@ -141,7 +141,7 @@ namespace yocto
             // Evaluate u from a
             //__________________________________________________________________
             tao::mul(u,Gamma,a);
-            
+
             //__________________________________________________________________
             //
             // initialize
@@ -149,12 +149,12 @@ namespace yocto
             w.F = &F;
             tao::ld(beta,REAL(0.0));
             alpha.ldz();
-            
+
             //__________________________________________________________________
             //
             // accumulate
             //__________________________________________________________________
-            
+
             real_t ans = 0;
             for(size_t i=N;i>0;--i)
             {
@@ -173,7 +173,7 @@ namespace yocto
                     dFdu[q]  = g;
                     beta[q] += d * g;
                 }
-                
+
                 for(size_t j=L;j>0;--j)
                 {
                     for(size_t k=j;k>0;--k)
@@ -181,10 +181,10 @@ namespace yocto
                         alpha[j][k] += dFdu[j] * dFdu[k];
                     }
                 }
-                
+
                 ans += d*d;
             }
-            
+
             //__________________________________________________________________
             //
             // symmetric part
@@ -196,24 +196,24 @@ namespace yocto
                     alpha[k][j] = alpha[j][k];
                 }
             }
-            
+
             //__________________________________________________________________
             //
             // compute alpha * Gamma
             //__________________________________________________________________
             tao::mmul(__ag,alpha,Gamma);
-            
+
             //__________________________________________________________________
             //
             // compute curv = Gamma'*alpha
             //__________________________________________________________________
             tao::mmul_ltrn(Alpha,Gamma,__ag);
-            
+
             D = ans;
             return ans;
         }
-        
-        
+
+
         template <>
         void  LeastSquares<real_t>::Sample::collect( Matrix &user_alpha, Array &user_beta ) const throw()
         {
@@ -229,7 +229,7 @@ namespace yocto
                 }
             }
         }
-        
+
         template <>
         void LeastSquares<real_t>::Sample:: connect( size_t local_ivar, size_t global_ivar ) throw()
         {
@@ -241,24 +241,24 @@ namespace yocto
             for(size_t j=1;j<=M;++j) Gamma[local_ivar][j] = 0;
             Gamma[local_ivar][global_ivar] = 1;
         }
-        
-        
+
+
     }
-    
+
 }
 
 namespace yocto
 {
     namespace math
     {
-        
-        
+
+
         template <>
         LeastSquares<real_t>:: Samples:: Samples() throw() {}
-        
+
         template <>
         LeastSquares<real_t>:: Samples:: ~Samples() throw() {}
-        
+
         template <>
         LeastSquares<real_t>:: Sample & LeastSquares<real_t>:: Samples:: append(const Array &X, const Array &Y, Array &Z)
         {
@@ -266,7 +266,7 @@ namespace yocto
             push_back(ptr);
             return *ptr;
         }
-        
+
         template <>
         void LeastSquares<real_t>:: Samples:: prepare(size_t local_nvar, size_t global_nvar)
         {
@@ -275,13 +275,13 @@ namespace yocto
                 (*(*this)[i]).prepare(local_nvar, global_nvar);
             }
         }
-        
+
         template <>
         void LeastSquares<real_t>:: Samples:: prepare(size_t nvar)
         {
             prepare(nvar, nvar);
         }
-        
+
         template <>
         real_t  LeastSquares<real_t>:: Samples:: computeD(Function &F, const Array &a) const
         {
@@ -293,14 +293,14 @@ namespace yocto
             }
             return D;
         }
-        
+
         template <>
         real_t  LeastSquares<real_t>:: Samples::corr() const
         {
             size_t n = 0;
             real_t mean_y = 0;
             real_t mean_z = 0;
-            
+
             for(size_t i=size();i>0;--i)
             {
                 const Sample &sample = *(*this)[i];
@@ -318,11 +318,11 @@ namespace yocto
             }
             mean_y /= n;
             mean_z /= n;
-            
+
             real_t sum_dy2 = 0;
             real_t sum_dz2 = 0;
             real_t sum_dyz = 0;
-            
+
             for(size_t i=size();i>0;--i)
             {
                 const Sample &sample = *(*this)[i];
@@ -342,10 +342,10 @@ namespace yocto
             const real_t den   = (sig_y * sig_z + numeric<real_t>::tiny);
             return covyz/den;
         }
-        
-        
+
+
     }
-    
+
 }
 
 #include "yocto/math/kernel/crout.hpp"
@@ -356,25 +356,48 @@ namespace yocto
 
 #include "yocto/math/kernel/jacobi.hpp"
 
+#include <iomanip>
+
 namespace yocto
 {
     namespace math
     {
-        
-        
-        
+
+        template <>
+        void LeastSquares<real_t>::display(std::ostream &os,
+                                           const Array  &aorg,
+                                           const Array  &aerr ) const
+        {
+            assert(aerr.size()==aorg.size());
+            const size_t n = aorg.size();
+            for(size_t i=1;i<=n;++i)
+            {
+                const real_t AA = aorg[i];
+                const real_t AE = aerr[i];
+                os << "\tparam[" << std::setw(3) << i << "]= " << std::setw(16) << AA  << " +/-" << std::setw(16) << AE;
+                if(Fabs(AA)>0)
+                {
+                    std::cerr << " (" << (REAL(100.0)*AE/Fabs(AA)) << "%)";
+                }
+                os << std::endl;
+            }
+            
+        }
+
+
+
         template <>
         LeastSquares<real_t>:: ~LeastSquares() throw()
         {
         }
-        
+
         template <>
         real_t LeastSquares<real_t>:: evalD(real_t x)
         {
             tao::setprobe(Atmp, Aorg, x, step);
             return S->computeD(*F,Atmp);
         }
-        
+
         template <>
         LeastSquares<real_t>:: LeastSquares() :
         S(0),
@@ -395,12 +418,12 @@ namespace yocto
         fast(false)
         {
         }
-        
+
         template <>
         real_t LeastSquares<real_t>:: computeD()
         {
             real_t ans(0);
-            
+
             //__________________________________________________________________
             //
             // full evaluation
@@ -413,7 +436,7 @@ namespace yocto
                 ans += s.compute_D(*F,Aorg,drvs,h);
                 s.collect(alpha,beta);
             }
-            
+
             //__________________________________________________________________
             //
             // alpha and beta correction
@@ -431,12 +454,12 @@ namespace yocto
                     alpha[i][i] = 1.0;
                 }
             }
-            
+
             return ans;
         }
-        
-        
-        
+
+
+
         template <>
         bool LeastSquares<real_t>:: build_curvature(real_t lam)
         {
@@ -448,15 +471,15 @@ namespace yocto
             }
             return crout<real_t>::build(curv);
         }
-        
-        
-        
+
+
+
         template <>
         const int LeastSquares<real_t>:: LAMBDA_MIN_POW10 = int(Floor(Log10(numeric<real_t>::epsilon)));
-        
+
         template <>
         const int LeastSquares<real_t>:: LAMBDA_MAX_POW10 = int(Ceil(Log10(numeric<real_t>::maximum)))/2;
-        
+
         template<>
         real_t  LeastSquares<real_t>::  compute_lam(int p)  throw()
         {
@@ -469,9 +492,9 @@ namespace yocto
                 return (p < 0) ? ipower(REAL(0.1),-p) : ipower(REAL(10.0),p);
             }
         }
-        
-        
-        
+
+
+
         template <>
         bool LeastSquares<real_t>:: operator()(Samples           &user_S,
                                                Function          &user_F,
@@ -481,7 +504,7 @@ namespace yocto
                                                Callback          *cb)
         {
             static const int    LAMBDA_INI_POW10 =  LAMBDA_MIN_POW10/2;
-            
+
             //__________________________________________________________________
             //
             // prepare variables
@@ -492,7 +515,7 @@ namespace yocto
             nvar = aorg.size();
             assert(used.size()>=nvar);
             assert(aerr.size()>=nvar);
-            
+
             size_t ndata = 0;
             for(size_t i=ns;i>0;--i)
             {
@@ -508,7 +531,7 @@ namespace yocto
             {
                 throw exception("Fit: not enough #data=%u for #param=%u", unsigned(ndata), unsigned(param));
             }
-            
+
             //__________________________________________________________________
             //
             // allocate memory
@@ -520,7 +543,7 @@ namespace yocto
             alpha .make(nvar,nvar);
             curv  .make(nvar,nvar);
             step  .make(nvar,0);
-            
+
             //__________________________________________________________________
             //
             // initialize local variables
@@ -531,8 +554,8 @@ namespace yocto
                 Used[i] = used[i];
             }
             int p = LAMBDA_INI_POW10;
-            
-            
+
+
 #define Y_LSF_CB() do { if(cb && !(*cb)(*F,*S) ) return false; } while(false)
             //__________________________________________________________________
             //
@@ -546,8 +569,8 @@ namespace yocto
                 std::cerr << "\ta=" << Aorg << std::endl;
                 std::cerr << "\tD=" << Dorg << std::endl;
             }
-            
-            
+
+
             //__________________________________________________________________
             //
             // loop
@@ -571,21 +594,21 @@ namespace yocto
                 }
                 goto UPDATE_LAMBDA;
             }
-            
+
             //__________________________________________________________________
             //
             // compute step
             //__________________________________________________________________
             tao::set(step,beta);
             crout<real_t>::solve(curv,step);
-            
+
             //__________________________________________________________________
             //
             // compute full step trial, keep information to change p
             //__________________________________________________________________
             const real_t Dtmp = evalD(1.0);
             const bool   isOK = Dtmp <= Dorg;
-            
+
             //__________________________________________________________________
             //
             // Line minimize for numerical optimum, may get back !
@@ -594,8 +617,8 @@ namespace yocto
             triplet<real_t> DD = { Dorg, Dtmp, Dtmp };
             bracket<real_t>::expand(scan,XX,DD);
             minimize<real_t>(scan, XX, DD, 0);
-            
-            
+
+
             //__________________________________________________________________
             //
             // We have it
@@ -607,14 +630,14 @@ namespace yocto
                 Atmp[i] -= Aorg[i];
                 aorg[i]  = Aorg[i];
             }
-            
+
             if(verbose)
             {
                 std::cerr << "#step " << ++count << ", p=" << p << std::endl;
                 std::cerr << "\ta="   << aorg << std::endl;
                 std::cerr << "\tD="   << DD.b << std::endl;
             }
-            
+
             //__________________________________________________________________
             //
             // Test convergence on values
@@ -631,7 +654,7 @@ namespace yocto
                         break;
                     }
                 }
-                
+
                 if(cvg)
                 {
                     if( verbose )
@@ -640,7 +663,7 @@ namespace yocto
                     }
                     goto COMPUTE_ERROR;
                 }
-                
+
                 //__________________________________________________________________
                 //
                 // Test convergence on D, using the minimised value
@@ -677,17 +700,17 @@ namespace yocto
             {
                 p = max_of(--p,LAMBDA_MIN_POW10);
             }
-            
+
             //__________________________________________________________________
             //
             // Full update and go on
             //__________________________________________________________________
             Dorg = computeD();
             goto UPDATE_LAMBDA;
-            
-            
-            
-            
+
+
+
+
         COMPUTE_ERROR:
             //__________________________________________________________________
             //
@@ -701,7 +724,7 @@ namespace yocto
             }
             Dorg = computeD(); //@aorg
             Y_LSF_CB();
-            
+
             //__________________________________________________________________
             //
             // compute covariance matrix in alpha
@@ -710,10 +733,10 @@ namespace yocto
             {
                 throw exception("Fit: unexpected singular curvature");
             }
-            
+
             alpha.ld1();
             crout<real_t>::solve(curv, alpha);
-            
+
             //__________________________________________________________________
             //
             // deduce individual errors
@@ -732,30 +755,17 @@ namespace yocto
                     aerr[i] = 0;
                 }
             }
-            
+
             if(verbose)
             {
-                for(size_t i=1;i<=nvar;++i)
-                {
-                    
-                    const real_t AA = aorg[i];
-                    const real_t AE = aerr[i];
-                    std::cerr << "\ta[" << i << "]=" << AA  << " +/-" << AE;
-                    if(Fabs(AA)>0)
-                    {
-                        std::cerr << " (" << (REAL(100.0)*AE/Fabs(AA)) << "%)";
-                    }
-                    std::cerr << std::endl;
-                }
+                display(std::cerr,aorg,aerr);
             }
-            
+
             return true;
-            
+
         }
-        
-        
-        
-        
+
+
         
     }
 }
