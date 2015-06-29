@@ -110,9 +110,10 @@ YOCTO_UNIT_TEST_IMPL(extend)
     
     vector<double> z2(n,0.0);
     vector<double> w2(n,0.0);
+
     sm(z2,x,z,xtd2,&w2);
     {
-        ios::ocstream fp("xz2.dat", false);
+        ios::ocstream fp("xz_cyclic.dat", false);
         for(size_t i=1; i<=n; ++i )
         {
             fp("%g %g %g\n", x[i], z2[i], w2[i]);
@@ -123,7 +124,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
     vector<double> w1(n,0.0);
     sm(z1,x,z,xtd1,&w1);
     {
-        ios::ocstream fp("xz1.dat", false);
+        ios::ocstream fp("xz_const.dat", false);
         for(size_t i=1; i<=n; ++i )
         {
             fp("%g %g %g\n", x[i], z1[i], w1[i]);
@@ -134,7 +135,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
     vector<double> w3(n,0.0);
     sm(z3,x,z,xtd3,&w3);
     {
-        ios::ocstream fp("xz3.dat", false);
+        ios::ocstream fp("xz_odd.dat", false);
         for(size_t i=1; i<=n; ++i )
         {
             fp("%g %g %g\n", x[i], z1[i], w1[i]);
@@ -143,12 +144,13 @@ YOCTO_UNIT_TEST_IMPL(extend)
     
     sm(z2,x,z,xtd2,w2);
     {
-        ios::ocstream fp("xw2.dat", false);
+        ios::ocstream fp("xz_cyclic2.dat", false);
         for(size_t i=1; i<=n; ++i )
         {
             fp("%g %g %g\n", x[i], z2[i], w2[i]);
         }
     }
+
 }
 YOCTO_UNIT_TEST_DONE()
 
