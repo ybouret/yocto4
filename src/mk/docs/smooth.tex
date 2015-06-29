@@ -1,0 +1,26 @@
+\documentclass[aps,twocolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+%% concentration notations
+\newcommand{\mymat}[1]{\boldsymbol{#1}}
+\newcommand{\mytrn}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\myvec}[1]{\overrightarrow{#1}}
+\newcommand{\mygrad}{\vec{\nabla}}
+\newcommand{\myhess}{\mathcal{H}}
+
+\begin{document}
+\title{Smoothing Data}
+\maketitle
+
+\section{Description}
+Let us assume that we have a set of data $\lbrace X_i,Y_i\rbrace_{i\in[1,N]}$ with $X_i<X_{i+1}$.
+We want to approximate the data with a polynomial of maximum degree $d$ on each window
+defined by $[X_i-a,X_i+b]$.
+
+\end{document}
