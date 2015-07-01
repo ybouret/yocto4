@@ -7,6 +7,7 @@
 #include "yocto/code/endian.hpp"
 
 #include "yocto/ios/ostream.hpp"
+#include "yocto/ios/istream.hpp"
 #include "yocto/string.hpp"
 #include "yocto/type/spec.hpp"
 #include "yocto/sequence/vector.hpp"
@@ -361,6 +362,8 @@ namespace yocto
         //
         //======================================================================
         typedef uint64_t io_key_t;
+
+        //! write info sequentially into master's open file
         class ostream : public ios::ostream
         {
         public:
@@ -381,7 +384,25 @@ namespace yocto
             ios::ostream *fp;
         };
 
-        
+
+        //! read info from master, dispatch to others
+        class istream : public ios::istream
+        {
+        public:
+            static const int tag = 6;
+            explicit istream( const mpi &, const string &filename);
+            virtual ~istream() throw();
+            const mpi    & MPI;
+            const io_key_t key;
+
+            virtual bool query( char &C );
+            virtual void store( char  C );
+            virtual void get( void *data, size_t size, size_t &done );
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(istream);
+            ios::istream *fp;
+        };
 
         //======================================================================
         //

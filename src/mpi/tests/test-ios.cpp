@@ -3,7 +3,7 @@
 
 using namespace yocto;
 
-YOCTO_UNIT_TEST_IMPL(ios)
+YOCTO_UNIT_TEST_IMPL(ostream)
 {
     YOCTO_MPI_ENV();
     {
@@ -24,5 +24,37 @@ YOCTO_UNIT_TEST_IMPL(ios)
         //MPI.Printf(stderr,"Done\n");
     }
     
+}
+YOCTO_UNIT_TEST_DONE()
+
+YOCTO_UNIT_TEST_IMPL(istream)
+{
+    YOCTO_MPI_ENV();
+    MPI.Barrier(MPI_COMM_WORLD);
+    if(argc>1)
+    {
+        const string filename = argv[1];
+        mpi::istream fp(MPI,filename);
+
+        int32_t code=0;
+        size_t done;
+        fp.get(&code,4,done);
+        MPI.Printf(stderr, "done=%u\n", unsigned(done));
+        MPI.Printf(stderr, "word=%08x\n", code);
+        MPI.Barrier(MPI_COMM_WORLD);
+
+        string line;
+        int    count=0;
+        mpi::hashing_function H;
+        H.set();
+        while( line.clear(), fp.read_line(line)>0 )
+        {
+            MPI.Printf(stderr,"%10d: %s\n",++count,line.c_str());
+            H(line);
+        }
+        const unsigned hk = H.key<unsigned>();
+        MPI.Printf(stderr, "HK=%u\n", hk);
+    }
+
 }
 YOCTO_UNIT_TEST_DONE()
