@@ -37,7 +37,7 @@ YOCTO_UNIT_TEST_IMPL(istream)
         mpi::istream fp(MPI,filename);
 
         int32_t code=0;
-        size_t done;
+        size_t  done;
         fp.get(&code,4,done);
         MPI.Printf(stderr, "done=%u\n", unsigned(done));
         MPI.Printf(stderr, "word=%08x\n", code);
