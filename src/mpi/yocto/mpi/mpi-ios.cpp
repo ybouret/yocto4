@@ -91,6 +91,8 @@ namespace yocto
     void mpi:: ostream:: flush()
     {
         if(fp)
+
+
             fp->flush();
     }
 

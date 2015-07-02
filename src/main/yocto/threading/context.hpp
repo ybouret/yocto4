@@ -34,10 +34,17 @@ namespace yocto
             {
                 this->build<WINDOW,context&,size_t,size_t>(*this,length,offset);
             }
+
+            //! build a window in the vslot with a given args
+            template <typename WINDOW, typename ARGS>
+            inline void create( ARGS &args )
+            {
+                this->build<WINDOW,context&,ARGS&>(*this,args);
+            }
             
             //! create WINDOWs in self
             /** 
-             which must have a 'size' field and a
+             'self' must have a 'size' field and a
              context & operator[](rank) function
              */
             template <typename CONTAINER,typename WINDOW>
