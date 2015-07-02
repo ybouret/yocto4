@@ -2,8 +2,8 @@
 #define YOCTO_THREADING_CONTEXT_INCLUDED 1
 
 #include "yocto/lockable.hpp"
-#include "yocto/container/vslot.hpp"
 #include "yocto/functor.hpp"
+#include "yocto/container/vslot.hpp"
 
 namespace yocto
 {
@@ -27,34 +27,6 @@ namespace yocto
             
             explicit context( size_t r, size_t s, lockable &lock_ref) throw();
             virtual ~context() throw();
-            
-            //! build a window in the vslot
-            template <typename WINDOW>
-            inline void create( size_t length, size_t offset )
-            {
-                this->build<WINDOW,context&,size_t,size_t>(*this,length,offset);
-            }
-
-            //! build a window in the vslot with a given args
-            template <typename WINDOW, typename ARGS>
-            inline void create( ARGS &args )
-            {
-                this->build<WINDOW,context&,ARGS&>(*this,args);
-            }
-            
-            //! create WINDOWs in self
-            /** 
-             'self' must have a 'size' field and a
-             context & operator[](rank) function
-             */
-            template <typename CONTAINER,typename WINDOW>
-            static inline void dispatch(CONTAINER &self, size_t length, size_t offset)
-            {
-                for(size_t rank=0;rank<self.size;++rank)
-                {
-                    self[rank].template create<WINDOW>(length,offset);
-                }
-            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(context);

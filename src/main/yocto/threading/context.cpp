@@ -14,11 +14,11 @@ namespace yocto
         context:: ~context() throw() {}
         
         context::  context( size_t r, size_t s, lockable &lock_ref) throw() :
+        vslot(),
         rank(r),
         indx(rank+1),
         size(s),
-        access(lock_ref)
-        {
+        access(lock_ref)        {
         }
         
     }

@@ -24,7 +24,7 @@ namespace yocto
         template <typename T>
         inline void make()
         {
-            prepare_for(sizeof(T)); // get memory
+            prepare_for(sizeof(T)); // free and get memory
             new (slot_.data) T();   // try to construct, may throw
             activate<T>();          // activate the object
         }
@@ -33,7 +33,7 @@ namespace yocto
         template <typename T>
         inline void make( typename type_traits<T>::parameter_type args )
         {
-            prepare_for(sizeof(T));    // get memory
+            prepare_for(sizeof(T));    // free and get memory
             new (slot_.data) T(args);  // try to construct, may throw
             activate<T>();             // activate the object
         }
@@ -42,7 +42,7 @@ namespace yocto
         template <typename T,typename U>
         inline void build(typename type_traits<U>::parameter_type args)
         {
-            prepare_for(sizeof(T));    // get memory
+            prepare_for(sizeof(T));    // free and get memory
             new (slot_.data) T(args);  // try to construct, may throw
             activate<T>();             // activate the object
         }

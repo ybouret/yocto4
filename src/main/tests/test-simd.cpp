@@ -22,13 +22,14 @@ namespace  {
         YOCTO_LOCK(ctx.access);
         std::cerr << "working from " << ctx.size << "." << ctx.rank << std::endl;
     }
-    
+
+#if 1
     class Sum
     {
     public:
         explicit Sum() : pA(0), pB(0), pC(0) {}
         virtual ~Sum() throw() {}
-        
+
         const array<double> *pA;
         const array<double> *pB;
         array<double>       *pC;
@@ -42,7 +43,7 @@ namespace  {
             const array<double> &B = *pB;
             array<double>       &C = *pC;
             
-            const window &win = ctx.as<window>();
+            const window win(ctx,A.size(),1);
             for(size_t i=win.start;i<=win.final;++i)
             {
                 const double a = A[i];
@@ -55,8 +56,32 @@ namespace  {
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(Sum);
     };
-    
+#endif
+
+
+    class DummyTask
+    {
+    public:
+        explicit DummyTask(const context &ctx)
+        {
+            std::cerr << "\t (*) DummyTask for " << ctx.size << "." << ctx.rank << std::endl;
+        }
+
+        explicit DummyTask(const context &ctx, int a)
+        {
+            std::cerr << "\t (*) DummyTask for " << ctx.size << "." << ctx.rank << " (a=" << a << ")" << std::endl;
+        }
+
+
+        virtual ~DummyTask() throw()
+        {
+        }
+
+    };
+
 }
+
+
 
 YOCTO_UNIT_TEST_IMPL(simd)
 {
@@ -78,15 +103,23 @@ YOCTO_UNIT_TEST_IMPL(simd)
     }
     
     SIMD simd;
-    
-    SIMD::Kernel K = cfunctor( DoSomething );
+
+    simd.create<int>();
+    simd.create<int,int>(2);
+    simd.create_from_context<DummyTask>();
+    simd.create_from_context<DummyTask,int>(2);
+
+
+    context::kernel K = cfunctor( DoSomething );
     for(size_t cycle=1+alea_leq(3);cycle>0;--cycle)
     {
         simd(K);
     }
-    
+
+    return 0;
+
     Sum sum;
-    SIMD::Kernel kSum( &sum, & Sum::run );
+    context::kernel kSum( &sum, & Sum::run );
     
     vector<double> A(N,0);
     vector<double> B(N,0);
@@ -103,18 +136,10 @@ YOCTO_UNIT_TEST_IMPL(simd)
     sum.pB = &B;
     sum.pC = &C;
     
-    simd.dispatch<window>(N,1);
-    for(size_t rank=0;rank<simd.size;++rank)
-    {
-        const window &w = simd[rank].as<window>();
-        std::cerr << "rank=" << rank << ": " << w.start << " -> " << w.final << " #" << w.count << std::endl;
-    }
-    
-    
+
     
     single_context mono;
-    mono.create<window>(N,1);
-    
+
     
     wtime chrono;
     chrono.start();
@@ -123,7 +148,7 @@ YOCTO_UNIT_TEST_IMPL(simd)
         sum.run(mono);
     }
     const double tmx0 = chrono.query() / CYCLES;
-    std::cerr << "tmx0=" << tmx0 << std::endl;
+    std::cerr << "tmxST=" << tmx0 << std::endl;
     
     chrono.start();
     for(size_t i=0; i< CYCLES; ++i )
@@ -131,11 +156,11 @@ YOCTO_UNIT_TEST_IMPL(simd)
         simd( kSum );
     }
     const double tmx = chrono.query()/CYCLES;
-    std::cerr << "tmx=" << tmx << std::endl;
+    std::cerr << "tmxMT=" << tmx << std::endl;
     
     std::cerr << std::endl;
     std::cerr << "SpeedUp=" << tmx0/tmx << std::endl;
     std::cerr << std::endl;
-    
+
 }
 YOCTO_UNIT_TEST_DONE()

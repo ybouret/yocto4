@@ -20,36 +20,118 @@ namespace yocto
             virtual ~SIMD() throw();
             
             //! a Kernel: context dependent function
-            typedef context::kernel Kernel;
-            
+
             
             context       & operator[]( size_t rank ) throw();
             const context & operator[]( const size_t rank) const throw();
-            
+
             //! execute #threads copy of kernel with different contexts
-            void operator()( Kernel &K );
-            
-            //! make windows in contexts data
-            template <typename WINDOW>
-            inline void dispatch( size_t length, size_t offset )
+            void operator()( context::kernel &K );
+
+            //! create a DATATYPE inside context::vslot, no args, no ctx
+            template <typename DATATYPE>
+            inline void create()
             {
-                context::dispatch<SIMD,WINDOW>(*this,length,offset);
+                SIMD &self = *this;
+                for(size_t i=0;i<size;++i)
+                {
+                    self[i]. template make<DATATYPE>();
+                }
             }
-            
-            
+
+            //! create a DATATYPE(args) inside context::vslot, 1 arg, no ctx
+            template <typename DATATYPE,typename ARG>
+            inline void create( typename type_traits<ARG>::parameter_type arg )
+            {
+                SIMD &self = *this;
+                for(size_t i=0;i<size;++i)
+                {
+                    self[i]. template make<DATATYPE>(arg);
+                }
+            }
+
+            //! create a DATATYPE(args) inside context::vslot, 2 args, no ctx
+            template <typename DATATYPE,typename ARG1, typename ARG2>
+            inline void create(typename type_traits<ARG1>::parameter_type arg1,
+                               typename type_traits<ARG1>::parameter_type arg2)
+            {
+                SIMD &self = *this;
+                for(size_t i=0;i<size;++i)
+                {
+                    self[i]. template build<DATATYPE>(arg1,arg2);
+                }
+            }
+
+            //! create a DATATYPE(args) inside context::vslot, 3 args, no ctx
+            template <typename DATATYPE,typename ARG1, typename ARG2, typename ARG3>
+            inline void create(typename type_traits<ARG1>::parameter_type arg1,
+                               typename type_traits<ARG1>::parameter_type arg2,
+                               typename type_traits<ARG1>::parameter_type arg3
+                               )
+            {
+                SIMD &self = *this;
+                for(size_t i=0;i<size;++i)
+                {
+                    self[i]. template build<DATATYPE>(arg1,arg2,arg3);
+                }
+            }
+
+
+            //! create a DATATYPE inside context::vslot, no args, self context
+            template <typename DATATYPE>
+            inline void create_from_context()
+            {
+                SIMD &self = *this;
+                for(size_t i=0;i<size;++i)
+                {
+                    context &ctx = self[i];
+                    ctx. template build<DATATYPE,const context &>(ctx);
+                }
+            }
+
+            //! create a DATATYPE inside context::vslot, 1 arg, self context
+            template <typename DATATYPE,typename ARG>
+            inline void create_from_context(typename type_traits<ARG>::parameter_type arg )
+            {
+                SIMD &self = *this;
+                for(size_t i=0;i<size;++i)
+                {
+                    context &ctx = self[i];
+                    ctx. template build<DATATYPE,const context &,ARG>(ctx,arg);
+                }
+            }
+
+            //! create a DATATYPE inside context::vslot, 2 args, self context
+            template <typename DATATYPE,typename ARG1,typename ARG2>
+            inline void create_from_context(typename type_traits<ARG1>::parameter_type arg1,
+                                            typename type_traits<ARG2>::parameter_type arg2)
+            {
+                SIMD &self = *this;
+                for(size_t i=0;i<size;++i)
+                {
+                    context &ctx = self[i];
+                    ctx. template build<DATATYPE,const context &,ARG1,ARG2>(ctx,arg1,arg2);
+                }
+            }
+
+
+
+
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(SIMD);
             threads    workers; //!< internal threads
         public:
             mutex     &access;  //!< shared access for everyone
         private:
-            condition  enter;  //!< cycle synchro
-            condition  leave;  //!< main thread wait on it
-            size_t     ready;  //!< availability
-            size_t     activ;  //!< detect end of work
-            bool       stop;   //!< to shutdown threads
-            size_t     built;  //!< global count for terminate
-            Kernel    *kproc;  //!< what to do during the cycle
+            condition        enter;  //!< cycle synchro
+            condition        leave;  //!< main thread wait on it
+            size_t           ready;  //!< availability
+            size_t           activ;  //!< detect end of work
+            bool             stop;   //!< to shutdown threads
+            size_t           built;  //!< global count for terminate
+            context::kernel *kproc;  //!< what to do during the cycle
             
             size_t   wlen; //!< extra memory size
             void    *wksp; //!< extra memory data

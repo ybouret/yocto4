@@ -284,7 +284,7 @@ wksp(0)
         }
         
         
-        void SIMD:: operator()( Kernel &K )
+        void SIMD:: operator()( context::kernel &K )
         {
             //------------------------------------------------------------------
             //-- get a lock on a synchronized crew

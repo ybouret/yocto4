@@ -8,6 +8,9 @@ namespace yocto
     namespace threading
     {
         //! can be used as a base class for data segmenting
+        /**
+         split length according to context
+         */
         class window
         {
         public:
