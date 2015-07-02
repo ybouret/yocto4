@@ -23,7 +23,6 @@ namespace  {
         std::cerr << "working from " << ctx.size << "." << ctx.rank << std::endl;
     }
 
-#if 1
     class Sum
     {
     public:
@@ -56,8 +55,7 @@ namespace  {
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(Sum);
     };
-#endif
-
+    
 
     class DummyTask
     {
