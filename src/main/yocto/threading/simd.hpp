@@ -46,7 +46,7 @@ namespace yocto
                 SIMD &self = *this;
                 for(size_t i=0;i<size;++i)
                 {
-                    self[i]. template make<DATATYPE>(arg);
+                    self[i]. template build<DATATYPE,ARG>(arg);
                 }
             }
 
@@ -58,7 +58,7 @@ namespace yocto
                 SIMD &self = *this;
                 for(size_t i=0;i<size;++i)
                 {
-                    self[i]. template build<DATATYPE>(arg1,arg2);
+                    self[i]. template build<DATATYPE,ARG1,ARG2>(arg1,arg2);
                 }
             }
 
@@ -72,7 +72,7 @@ namespace yocto
                 SIMD &self = *this;
                 for(size_t i=0;i<size;++i)
                 {
-                    self[i]. template build<DATATYPE>(arg1,arg2,arg3);
+                    self[i]. template build<DATATYPE,ARG1,ARG2,ARG3>(arg1,arg2,arg3);
                 }
             }
 
