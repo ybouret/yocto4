@@ -53,7 +53,7 @@ namespace yocto
             //! create a DATATYPE(args) inside context::vslot, 2 args, no ctx
             template <typename DATATYPE,typename ARG1, typename ARG2>
             inline void create(typename type_traits<ARG1>::parameter_type arg1,
-                               typename type_traits<ARG1>::parameter_type arg2)
+                               typename type_traits<ARG2>::parameter_type arg2)
             {
                 SIMD &self = *this;
                 for(size_t i=0;i<size;++i)
@@ -65,8 +65,8 @@ namespace yocto
             //! create a DATATYPE(args) inside context::vslot, 3 args, no ctx
             template <typename DATATYPE,typename ARG1, typename ARG2, typename ARG3>
             inline void create(typename type_traits<ARG1>::parameter_type arg1,
-                               typename type_traits<ARG1>::parameter_type arg2,
-                               typename type_traits<ARG1>::parameter_type arg3
+                               typename type_traits<ARG2>::parameter_type arg2,
+                               typename type_traits<ARG3>::parameter_type arg3
                                )
             {
                 SIMD &self = *this;
