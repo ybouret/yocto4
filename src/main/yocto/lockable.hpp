@@ -5,6 +5,7 @@
 
 namespace yocto 
 {
+    //! interface to lockable object
 	class lockable
 	{
 	public:
@@ -18,7 +19,8 @@ namespace yocto
 	private:
 		YOCTO_DISABLE_COPY_AND_ASSIGN(lockable);
 	};
-	
+
+    //! a faked locking class
     class faked_lock : public lockable
     {
     public:
@@ -32,7 +34,8 @@ namespace yocto
         YOCTO_DISABLE_COPY_AND_ASSIGN(faked_lock);
         int depth;
     };
-    
+
+    //! a lock restrained to current scope
 	class scoped_lock
 	{
 	public:

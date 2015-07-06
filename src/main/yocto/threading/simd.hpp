@@ -77,7 +77,7 @@ namespace yocto
             }
 
 
-            //! create a DATATYPE inside context::vslot, no args, self context
+            //! create a DATATYPE inside context::vslot, self context, no args
             template <typename DATATYPE>
             inline void create_from_context()
             {
@@ -89,7 +89,7 @@ namespace yocto
                 }
             }
 
-            //! create a DATATYPE inside context::vslot, 1 arg, self context
+            //! create a DATATYPE inside context::vslot, self context, 1 arg
             template <typename DATATYPE,typename ARG>
             inline void create_from_context(typename type_traits<ARG>::parameter_type arg )
             {
@@ -101,7 +101,7 @@ namespace yocto
                 }
             }
 
-            //! create a DATATYPE inside context::vslot, 2 args, self context
+            //! create a DATATYPE inside context::vslot, self context, 2 args
             template <typename DATATYPE,typename ARG1,typename ARG2>
             inline void create_from_context(typename type_traits<ARG1>::parameter_type arg1,
                                             typename type_traits<ARG2>::parameter_type arg2)

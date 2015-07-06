@@ -13,7 +13,8 @@ namespace yocto
         //! context of current thread
         /**
          information about rank and size, 
-         and uses the vslot class to hold user extra information if needed.
+         and uses the vslot class to hold 
+         per thread information...
          */
         class context : public vslot
         {
