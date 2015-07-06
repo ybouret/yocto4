@@ -15,14 +15,14 @@ namespace yocto
         class SIMD : public layout
         {
         public:
-            explicit SIMD(); //!< use layout
+            explicit SIMD(); //!< use layout API (aka YOCTO_THREADING...)
             explicit SIMD(size_t num_threads, size_t thread_offset=0); //!< manual settings
             virtual ~SIMD() throw();
-            
-            //! a Kernel: context dependent function
 
-            
+            //! get a 0..size-1 context
             context       & operator[]( size_t rank ) throw();
+
+            //! get a 0..size-t const context
             const context & operator[]( const size_t rank) const throw();
 
             //! execute #threads copy of kernel with different contexts
@@ -114,10 +114,8 @@ namespace yocto
                 }
             }
 
-
-
-
-
+            void free()    throw();
+            void release() throw();
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(SIMD);

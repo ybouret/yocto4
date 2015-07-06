@@ -7,6 +7,26 @@ namespace yocto
 {
     namespace threading
     {
+
+        void SIMD:: free() throw()
+        {
+            SIMD &self = *this;
+            for(size_t i=1;i<=size;++i)
+            {
+                self[size-i].free();
+            }
+        }
+
+        void SIMD:: release() throw()
+        {
+            SIMD &self = *this;
+            for(size_t i=1;i<=size;++i)
+            {
+                context &ctx = self[size-i];
+                ctx.free();
+                ctx.deallocate();
+            }
+        }
         
 #define YOCTO_SIMD_CTOR() \
 workers( "SIMD" ),        \
@@ -331,5 +351,6 @@ wksp(0)
             
         }
         
+
     }
 }

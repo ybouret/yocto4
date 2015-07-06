@@ -107,6 +107,8 @@ YOCTO_UNIT_TEST_IMPL(simd)
     simd.create_from_context<DummyTask>();
     simd.create_from_context<DummyTask,int>(2);
 
+    simd.free();
+    simd.release();
 
     context::kernel K = cfunctor( DoSomething );
     for(size_t cycle=1+alea_leq(3);cycle>0;--cycle)
