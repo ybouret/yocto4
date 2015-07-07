@@ -3,8 +3,8 @@
 
 #include "yocto/threading/threads.hpp"
 #include "yocto/threading/layout.hpp"
-#include "yocto/threading/context.hpp"
 #include "yocto/threading/condition.hpp"
+#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -15,18 +15,69 @@ namespace yocto
         class SIMD : public layout
         {
         public:
+
+            //! context of current thread
+            /**
+             information about rank and size,
+             and uses the vslot class to hold
+             per thread information...
+             */
+            class Context : public vslot
+            {
+            public:
+                const size_t rank;   //!< 0..size-1
+                const size_t indx;   //!< rank+1, for information
+                const size_t size;   //!< the size=#threads
+                lockable    &access; //!< common lock for synchronization
+
+                //typedef functor<void,TL1(context&)> kernel;
+
+                explicit Context( size_t r, size_t s, lockable &lock_ref) throw();
+                virtual ~Context() throw();
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Context);
+            };
+
+            class SingleContext : public faked_lock, public Context
+            {
+            public:
+                explicit SingleContext() throw();
+                virtual ~SingleContext() throw();
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(SingleContext);
+            };
+
+            typedef functor<void,TL1(Context&)> Kernel;
+
+            class Window
+            {
+            public:
+                explicit Window(const Context &, size_t length, size_t offset ) throw();
+                virtual ~Window() throw();
+                Window(const Window &w) throw();
+                const size_t start;
+                const size_t count;
+                const size_t final;
+
+            private:
+                YOCTO_DISABLE_ASSIGN(Window);
+            };
+
+
             explicit SIMD(); //!< use layout API (aka YOCTO_THREADING...)
             explicit SIMD(size_t num_threads, size_t thread_offset=0); //!< manual settings
             virtual ~SIMD() throw();
 
             //! get a 0..size-1 context
-            context       & operator[]( size_t rank ) throw();
+            Context       & operator[]( size_t rank ) throw();
 
             //! get a 0..size-t const context
-            const context & operator[]( const size_t rank) const throw();
+            const Context & operator[]( const size_t rank) const throw();
 
             //! execute #threads copy of kernel with different contexts
-            void operator()( context::kernel &K );
+            void operator()( Kernel &K );
 
             //! create a DATATYPE inside context::vslot, no args, no ctx
             template <typename DATATYPE>
@@ -84,8 +135,8 @@ namespace yocto
                 SIMD &self = *this;
                 for(size_t i=0;i<size;++i)
                 {
-                    context &ctx = self[i];
-                    ctx. template build<DATATYPE,const context &>(ctx);
+                    Context &ctx = self[i];
+                    ctx. template build<DATATYPE,const Context &>(ctx);
                 }
             }
 
@@ -96,8 +147,8 @@ namespace yocto
                 SIMD &self = *this;
                 for(size_t i=0;i<size;++i)
                 {
-                    context &ctx = self[i];
-                    ctx. template build<DATATYPE,const context &,ARG>(ctx,arg);
+                    Context &ctx = self[i];
+                    ctx. template build<DATATYPE,const Context &,ARG>(ctx,arg);
                 }
             }
 
@@ -109,8 +160,8 @@ namespace yocto
                 SIMD &self = *this;
                 for(size_t i=0;i<size;++i)
                 {
-                    context &ctx = self[i];
-                    ctx. template build<DATATYPE,const context &,ARG1,ARG2>(ctx,arg1,arg2);
+                    Context &ctx = self[i];
+                    ctx. template build<DATATYPE,const Context &,ARG1,ARG2>(ctx,arg1,arg2);
                 }
             }
 
@@ -129,10 +180,10 @@ namespace yocto
             size_t           activ;  //!< detect end of work
             bool             stop;   //!< to shutdown threads
             size_t           built;  //!< global count for terminate
-            context::kernel *kproc;  //!< what to do during the cycle
+            Kernel          *kproc;  //!< what to do during the cycle
             
-            size_t   wlen; //!< extra memory size
-            void    *wksp; //!< extra memory data
+            size_t           wlen; //!< extra memory size
+            void            *wksp; //!< extra memory data
             
             void initialize();
             void terminate() throw();

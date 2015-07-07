@@ -1,6 +1,5 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/threading/simd.hpp"
-#include "yocto/threading/window.hpp"
 
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
@@ -17,7 +16,7 @@ namespace  {
     
     
     static inline
-    void DoSomething( context &ctx )
+    void DoSomething( SIMD::Context &ctx )
     {
         YOCTO_LOCK(ctx.access);
         std::cerr << "working from " << ctx.size << "." << ctx.rank << std::endl;
@@ -33,7 +32,7 @@ namespace  {
         const array<double> *pB;
         array<double>       *pC;
         
-        void run( const context &ctx )
+        void run( const SIMD::Context &ctx )
         {
             assert(pA);
             assert(pB);
@@ -42,7 +41,7 @@ namespace  {
             const array<double> &B = *pB;
             array<double>       &C = *pC;
             
-            const window win(ctx,A.size(),1);
+            const SIMD::Window win(ctx,A.size(),1);
             for(size_t i=win.start;i<=win.final;++i)
             {
                 const double a = A[i];
@@ -60,12 +59,12 @@ namespace  {
     class DummyTask
     {
     public:
-        explicit DummyTask(const context &ctx)
+        explicit DummyTask(const SIMD::Context &ctx)
         {
             std::cerr << "\t (*) DummyTask for " << ctx.size << "." << ctx.rank << std::endl;
         }
 
-        explicit DummyTask(const context &ctx, int a)
+        explicit DummyTask(const SIMD::Context &ctx, int a)
         {
             std::cerr << "\t (*) DummyTask for " << ctx.size << "." << ctx.rank << " (a=" << a << ")" << std::endl;
         }
@@ -110,7 +109,7 @@ YOCTO_UNIT_TEST_IMPL(simd)
     simd.free();
     simd.release();
 
-    context::kernel K = cfunctor( DoSomething );
+    SIMD::Kernel K = cfunctor( DoSomething );
     for(size_t cycle=1+alea_leq(3);cycle>0;--cycle)
     {
         simd(K);
@@ -119,7 +118,7 @@ YOCTO_UNIT_TEST_IMPL(simd)
     return 0;
 
     Sum sum;
-    context::kernel kSum( &sum, & Sum::run );
+    SIMD::Kernel kSum( &sum, & Sum::run );
     
     vector<double> A(N,0);
     vector<double> B(N,0);
@@ -138,7 +137,7 @@ YOCTO_UNIT_TEST_IMPL(simd)
     
 
     
-    single_context mono;
+    SIMD::SingleContext mono;
 
     
     wtime chrono;

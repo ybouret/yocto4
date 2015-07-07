@@ -22,7 +22,7 @@ namespace yocto
             SIMD &self = *this;
             for(size_t i=1;i<=size;++i)
             {
-                context &ctx = self[size-i];
+                Context &ctx = self[size-i];
                 ctx.free();
                 ctx.deallocate();
             }
@@ -66,20 +66,20 @@ wksp(0)
             class member
             {
             public:
-                SIMD   *simd;
-                context ctx;
+                SIMD         *simd;
+                SIMD::Context ctx;
                 
             private:
             };
         }
         
-        context       & SIMD:: operator[]( size_t rank ) throw()
+        SIMD::Context & SIMD:: operator[]( size_t rank ) throw()
         {
             assert(rank<size);
             return (static_cast<member *>(wksp)+rank)->ctx;
         }
         
-        const context & SIMD:: operator[]( size_t rank ) const throw()
+        const  SIMD::Context & SIMD:: operator[]( size_t rank ) const throw()
         {
             assert(rank<size);
             return (static_cast<member *>(wksp)+rank)->ctx;
@@ -99,7 +99,7 @@ wksp(0)
             {
                 member &m = members[rank];
                 m.simd    = this;
-                new ( &m.ctx ) context(rank,size,access);
+                new ( &m.ctx ) Context(rank,size,access);
             }
         }
         
@@ -113,7 +113,7 @@ wksp(0)
                 while(rank>0)
                 {
                     member &m = members[--rank];
-                    m.ctx.~context();
+                    m.ctx.~Context();
                 }
                 memory::kind<memory::global>::release(wksp, wlen);
             }
@@ -242,7 +242,7 @@ wksp(0)
             assert(rank<size);
             assert(wksp);
             member  &m   = *(static_cast<member *>(wksp)+rank);
-            context &ctx = m.ctx;
+            Context &ctx = m.ctx;
             assert(rank == ctx.rank );
             {
                 YOCTO_LOCK(access);
@@ -304,7 +304,7 @@ wksp(0)
         }
         
         
-        void SIMD:: operator()( context::kernel &K )
+        void SIMD:: operator()( Kernel &K )
         {
             //------------------------------------------------------------------
             //-- get a lock on a synchronized crew
