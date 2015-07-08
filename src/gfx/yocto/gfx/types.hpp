@@ -32,7 +32,8 @@ namespace yocto
 
             static string b2s(uint8_t);
             
-            static const float unit_float[256];
+            static const float  unit_float[256];
+            static const double unit_double[256];
             static float       greyscale_f(uint8_t r,uint8_t g,uint8_t b) throw();
             static uint8_t     greyscale(uint8_t r,uint8_t g,uint8_t b) throw();
         };
