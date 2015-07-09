@@ -220,10 +220,100 @@ namespace yocto
                     swap(p,q);
                 }
             }
-            
+
         }
-        
-        
+
+
+        bitmap:: bitmap(const bitmap &other, const rectangle *rect) :
+        d(other.d),
+        w(rect ? check_width(rect->w)  : other.w ),
+        h(rect ? check_height(rect->h) : other.h ),
+        pitch(w*d),
+        stride(pitch),
+        entry(0),
+        peek(other.peek),
+        model(memory_is_global),
+        swap(other.swap)
+        {
+            try
+            {
+                //const rectangle full(0,0,other.w,other.h);
+                if(rect)
+                {
+                    if(!other.contains(*rect))
+                    {
+                        throw exception("bitmap hard copy: invalid rectangle");
+                    }
+                }
+
+                allocated = pitch*h;
+                entry     = memory::kind<memory::global>::acquire(allocated);
+
+                if(rect)
+                {
+                    const uint8_t *dst = (uint8_t *)entry;
+                    for(unit_t j=rect->y;j<rect->yout;++j,dst+=stride)
+                    {
+                        const void *src = other.get(rect->x,j);
+                        memcpy((void*)dst,src,pitch);
+                    }
+
+                }
+                else
+                {
+                    uint8_t       *p = (uint8_t *)entry;
+                    const uint8_t *q = (const uint8_t *)(other.entry);
+                    for(unit_t j=h;j>0;--j,p+=this->stride,q+=this->stride)
+                    {
+                        memcpy(p,q,pitch);
+                    }
+                }
+            }
+            catch(...)
+            {
+                YOCTO_HARD_RESET(bitmap, d, this);
+                throw;
+            }
+        }
+
+
+        bitmap:: bitmap(bitmap::pointer &bmp,
+                        const rectangle *rect) :
+        d(bmp->d),
+        w(rect ? check_width(rect->w)  : bmp->w ),
+        h(rect ? check_height(rect->h) : bmp->h ),
+        pitch(w*d),
+        stride(bmp->stride),
+        entry(0),
+        peek(bmp->peek),
+        model(memory_is_shared),
+        swap(bmp->swap)
+        {
+            try
+            {
+                if(rect)
+                {
+                    if(!bmp->contains(*rect))
+                    {
+                        throw exception("bitmap sharing: invalid rectangle");
+                    }
+                    entry =  (bmp->get(rect->x, rect->y));
+                }
+                else
+                {
+                    entry =  (bmp->entry);
+                }
+                shared = & *bmp;
+                shared->withhold();
+            }
+            catch(...)
+            {
+                YOCTO_HARD_RESET(bitmap, d, this);
+                throw;
+            }
+        }
+
+
     }
 }
 

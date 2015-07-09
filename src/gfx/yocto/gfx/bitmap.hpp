@@ -53,11 +53,27 @@ namespace yocto
                             void        *data,
                             const unit_t S);
 
+            //! hard copy of a full/partial other bitmap
+            explicit bitmap(const bitmap &other, const rectangle *rect);
+
+            //! linking to a full/partial other bitmap
+            explicit bitmap(bitmap::pointer &bmp, const rectangle *rect);
+
+
             virtual ~bitmap() throw();
             
             static unit_t check_depth( const unit_t); //!< sanity check
             static unit_t check_width( const unit_t); //!< sanity check
             static unit_t check_height(const unit_t); //!< sanity check
+
+            inline bool contains( const rectangle &rect ) const throw()
+            {
+                return
+                (rect.x>=0)    &&
+                (rect.y>=0)    &&
+                (rect.xout<=w) &&
+                (rect.yout<=h);
+            }
 
             //! get line address, no check
             inline  void *get_line(unit_t y) throw()
@@ -96,9 +112,7 @@ namespace yocto
             }
 
             void ldz() throw();
-
             void flip_vert() throw();
-            
 
 
         private:
