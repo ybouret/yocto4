@@ -1,5 +1,3 @@
-PROJECT(gfx)
-
 FILE( GLOB decl yocto/gfx/*.hpp)
 FILE( GLOB impl yocto/gfx/*.cpp)
 
@@ -37,9 +35,9 @@ INCLUDE_DIRECTORIES( . ../main ../third_party/png ../third_party/jpeg ../tiff++)
 ## Generating the library 
 ##
 ########################################################################
-ADD_LIBRARY( y-gfx STATIC ${srcs} ${img_srcs} ${ops_srcs} ${ramp_srcs}
+ADD_LIBRARY( y-gfx_old STATIC ${srcs} ${img_srcs} ${ops_srcs} ${ramp_srcs}
 )
-INSTALL( TARGETS y-gfx ARCHIVE DESTINATION lib )
+#INSTALL( TARGETS y-gfx ARCHIVE DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
 
