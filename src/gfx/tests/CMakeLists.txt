@@ -6,3 +6,5 @@ TARGET_LINK_YOCTO(test-gfx gfx)
 ENABLE_TESTING()
 
 ADD_TEST(GreyScale test-gfx greyscale)
+ADD_TEST(Bitmap    test-gfx bitmap)
+
