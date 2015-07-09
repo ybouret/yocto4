@@ -114,7 +114,9 @@ namespace yocto
             void ldz() throw();
             void flip_vert() throw();
 
-
+        protected:
+            static void check_depths(const char *L, const int lhs, const char *R, const int rhs);
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(bitmap);
             union

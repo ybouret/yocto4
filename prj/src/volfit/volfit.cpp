@@ -92,7 +92,7 @@ int main( int argc, char *argv[] )
         
         if(argc<4)
         {
-            throw exception("usage: %s datafile #columns_to_process time_limit",prog);
+            throw exception("usage: %s datafile #column_to_process time_limit",prog);
         }
         
         const size_t   nvar = 4;
@@ -113,9 +113,9 @@ int main( int argc, char *argv[] )
         LeastSquares<double>::Samples samples;
         
         const string fn   = argv[1];
-        const size_t ncol = strconv::to<size_t>(argv[2],"#columns");
+        const size_t icol = strconv::to<size_t>(argv[2],"#columns");
         const double tmax = strconv::to<double>(argv[3],"time_limit");
-        std::cerr << "Fitting " << ncol << " column" << (ncol>1? "s" : "") << " of '" << fn << "'" << std::endl;
+        std::cerr << "Fitting column #" << icol << " of '" << fn << "'" << std::endl;
         
         
         vector<double> t,V,Vf;
@@ -124,7 +124,7 @@ int main( int argc, char *argv[] )
         
         vector<double> torg,Vorg;
         
-        for(size_t c=1;c<=ncol;++c)
+        for(size_t c=icol;c<=icol;++c)
         {
             std::cerr << std::endl << "-- column " << c << std::endl;
             samples.free();
@@ -139,8 +139,10 @@ int main( int argc, char *argv[] )
             Vf.make(n,0);
             torg.make(n,0);
             Vorg.make(n,0);
+            const double V1 = V[1];
             for(size_t i=1;i<=n;++i)
             {
+                V[i]    = V[i]/V1;
                 torg[i] = t[i];
                 Vorg[i] = V[i];
             }
@@ -162,7 +164,7 @@ int main( int argc, char *argv[] )
             
             aorg[1] = 23;   // t0
             aorg[2] = 0.03;  // K
-            aorg[3] = 0.5;  // Cosm
+            aorg[3] = 1.5;  // Cosm
             aorg[4] = V[1]; // scaling
             
             if( !fit(samples,vol.fitter,aorg,used,aerr,NULL) )
@@ -199,8 +201,8 @@ int main( int argc, char *argv[] )
         }
         for(size_t i=1;i<=nvar;++i)
         {
-            ave_aerr[i] /= ncol;
-            ave_aorg[i] /= ncol;
+            ave_aerr[i] /= 1;
+            ave_aorg[i] /= 1;
         }
         
         {
