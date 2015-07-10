@@ -52,6 +52,26 @@ namespace yocto
 
         struct put_rgba
         {
+            static inline void to_rgba(void *addr, const rgba_t &C, void *) throw()
+            {
+                assert(addr);
+                *(rgba_t *)addr = C;
+            }
+
+            static inline void to_rgb(void *addr, const rgba_t &C, void *) throw()
+            {
+                assert(addr);
+                rgb_t &c = *(rgb_t *)addr;
+                c.r = C.r;
+                c.g = C.g;
+                c.b = C.b;
+            }
+
+            static inline void to_gsf(void *addr, const rgba_t &C, void *) throw()
+            {
+                assert(addr);
+                *(float *)addr = greyscale<float>(C.r, C.g, C.b);
+            }
 
         };
 

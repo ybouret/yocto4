@@ -70,7 +70,7 @@ YOCTO_UNIT_TEST_IMPL(pixmap)
     pixmap<float> pf(300,450);
     do_pixmap(pf);
 
-    pixmap<float> pf2(p3,rgb2gsf<rgb_t>);
+    pixmap<float> pf2(p3,rgb2gsf<rgb_t> );
     pixmap<float> pf3(p4,rgb2gsf<rgba_t>);
 
     pixmap<double> pd(100,250);

@@ -2,6 +2,7 @@
 #include "yocto/gfx/image/jpeg.hpp"
 #include "yocto/gfx/image/png.hpp"
 #include "yocto/gfx/image/tiff.hpp"
+#include "yocto/gfx/rawpix.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -35,6 +36,22 @@ YOCTO_UNIT_TEST_IMPL(img)
     show_format( IMG["JPEG"] );
     show_format( IMG["TIFF"] );
     
-    
+    if(argc>1)
+    {
+        const string    filename = argv[1];
+        {
+            bitmap::pointer bmp(IMG.load(filename,3, put_rgba::to_rgb,NULL,NULL));
+            pixmap3         pxm(bmp,NULL);
+            save_ppm("image3.ppm",pxm);
+        }
+
+        {
+            bitmap::pointer bmp(IMG.load(filename,4, put_rgba::to_gsf,NULL,NULL));
+            pixmapf         pxm(bmp,NULL);
+            save_ppm("imagef.ppm",pxm);
+        }
+    }
+
+
 }
 YOCTO_UNIT_TEST_DONE()
