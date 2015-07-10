@@ -3,7 +3,7 @@
 
 using namespace yocto;
 
-#define __SHOW(TYPE) MPI.Printf(stderr, "%-16s : 0x%x\n", #TYPE, unsigned(MPI.get_type<TYPE>()) )
+#define __SHOW(TYPE) MPI.Printf(stderr, "%-16s : 0x%lx\n", #TYPE, (unsigned long)(MPI.get_type<TYPE>()) )
 
 
 template <typename T>
@@ -44,9 +44,9 @@ YOCTO_UNIT_TEST_IMPL(ops)
     for( size_t i=1; i <= db.size(); ++i )
     {
         const mpi::data_type &item = db[i];
-        MPI.Printf(stderr, "%-10s => 0x%x\n", item.name(), unsigned(item.id) );
+        MPI.Printf(stderr, "%-10s => 0x%lx\n", item.name(), (unsigned long)(item.id) );
         const MPI_Datatype res = MPI.get_type(item);
-        MPI.Printf(stderr,"found 0x%x\n", unsigned(res));
+        MPI.Printf(stderr,"found 0x%lx\n", (unsigned long)(res));
     }
     MPI.Printf0(stderr,"\n");
     
