@@ -91,7 +91,7 @@ namespace yocto
         bitmap *image::load(const string         &path,
                             unit_t                depth,
                             image::put_rgba_proc  proc,
-                            const void           *args,
+                            void                 *args,
                             const void           *options) const
         {
             const format &fmt = get_format_for(path);

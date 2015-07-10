@@ -43,7 +43,7 @@ namespace yocto
         bitmap  *tiff_format:: load(const string          &filename,
                                     unit_t                 depth,
                                     image::put_rgba_proc   proc,
-                                    const void            *args,
+                                    void                  *args,
                                     const void            *options) const
         {
             const char *fn = filename.c_str();
@@ -143,7 +143,7 @@ namespace yocto
         bitmap *tiff_format:: load_bitmap(const string          &filename,
                                           unit_t                 depth,
                                           image::put_rgba_proc   proc,
-                                          const void            *args,
+                                          void                  *args,
                                           const uint32_t         indx) const
 
         {
@@ -155,7 +155,7 @@ namespace yocto
         void tiff_format:: save(const string        &filename,
                                 const bitmap        &bmp,
                                 image::get_rgba_proc proc,
-                                const void          *args,
+                                void                  *args,
                                 const void          *options) const
         {
             

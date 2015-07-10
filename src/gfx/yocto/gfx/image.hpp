@@ -3,9 +3,12 @@
 
 #include "yocto/gfx/bitmap.hpp"
 #include "yocto/gfx/rgb.hpp"
+#include "yocto/gfx/imgio.hpp"
+
 #include "yocto/ptr/intr.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/string.hpp"
+
 
 namespace yocto
 {
@@ -15,8 +18,8 @@ namespace yocto
         class image : public singleton<image>
         {
         public:
-            typedef void   (*put_rgba_proc)(void *addr, const rgba_t &C, const void *args);
-            typedef rgba_t (*get_rgba_proc)(const void *,const void *);
+            typedef void   (*put_rgba_proc)(void *addr, const rgba_t &C, void *args);
+            typedef rgba_t (*get_rgba_proc)(const void *, void *);
             
             
             //! image format
@@ -31,13 +34,13 @@ namespace yocto
                 virtual bitmap  *load(const string         &filename,
                                       unit_t                depth,
                                       image::put_rgba_proc  proc,
-                                      const void           *args,
+                                      void                 *args,
                                       const void           *options) const = 0;
                 
                 virtual void     save(const string        &filename,
                                       const bitmap        &bmp,
                                       image::get_rgba_proc proc,
-                                      const void          *args,
+                                      void                *args,
                                       const void          *options) const = 0;
                 
                 virtual const char **extensions() const throw() = 0;
@@ -64,7 +67,7 @@ namespace yocto
             bitmap *load(const string         &path,
                          unit_t                depth,
                          image::put_rgba_proc  proc,
-                         const void           *args,
+                         void                 *args,
                          const void           *options) const;
             
             //! pixmap if based on rgba_t

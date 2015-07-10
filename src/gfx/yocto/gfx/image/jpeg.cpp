@@ -73,7 +73,7 @@ namespace yocto
         bitmap  * jpeg_format:: load(const string         &filename,
                                      unit_t                depth,
                                      image::put_rgba_proc  proc,
-                                     const void           *args,
+                                     void                  *args,
                                      const void           *) const
         {
             static const char fn[] = "jpeg::load";
@@ -201,7 +201,7 @@ namespace yocto
         void jpeg_format:: save(const string        &filename,
                                 const bitmap        &bmp,
                                 image::get_rgba_proc proc,
-                                const void          *args,
+                                void                  *args,
                                 const void          *options) const
         {
             static const char fn[] = "jpeg::save";

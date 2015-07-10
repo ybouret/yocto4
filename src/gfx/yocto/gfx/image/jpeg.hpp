@@ -17,13 +17,13 @@ namespace yocto
             virtual bitmap  *load(const string          &filename,
                                   unit_t                 depth,
                                   image::put_rgba_proc   proc,
-                                  const void            *args,
+                                  void                  *args,
                                   const void            *options) const;
             
             virtual void     save(const string        &filename,
                                   const bitmap        &bmp,
                                   image::get_rgba_proc proc,
-                                  const void          *args,
+                                  void                *args,
                                   const void          *options) const;
             
             
