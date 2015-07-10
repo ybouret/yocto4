@@ -128,19 +128,26 @@ namespace yocto
                 return os;
             }
 
-            static inline rgba rampf(float x) throw() { return rgba( rgb<T>::rampf(x) ); }
+            static inline rgba make_ramp(float x) throw() { return rgba( rgb<T>::make_ramp(x) ); }
         };
 
         typedef rgba<uint8_t> rgba_t;
 
+        //______________________________________________________________________
+        //
         //! converting rgb to a float value
+        //______________________________________________________________________
+
         template <typename RGB_TYPE>
         inline float rgb2gsf(const RGB_TYPE &C) throw()
         {
             return greyscale<float>(C.r, C.g, C.b);
         }
 
+        //______________________________________________________________________
+        //
         //! color inversion prototype
+        //______________________________________________________________________
         template <typename T>
         T invert_color(const T &) throw();
 
@@ -161,6 +168,11 @@ namespace yocto
         {
             return rgba_t(0xff-c.r,0xff-c.g,0xff-c.b,c.a);
         }
+
+        //______________________________________________________________________
+        //
+        //! testing zero pixel
+        //______________________________________________________________________
 
         template <typename T>
         bool is_zero_pixel(const T &) throw();

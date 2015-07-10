@@ -10,11 +10,15 @@ SET(ramp_srcs ${ramp_decl} ${ramp_impl})
 INSTALL( FILES ${ramp_decl} DESTINATION include/yocto/gfx/ramp )
 SOURCE_GROUP( gfx/ramp FILES ${ramp_srcs} )
 
-
+FILE(GLOB image_decl yocto/gfx/image/*.hpp)
+FILE(GLOB image_impl yocto/gfx/image/*.cpp)
+SET(image_srcs ${image_decl} ${image_impl})
+INSTALL( FILES ${image_decl} DESTINATION include/yocto/gfx/image )
+SOURCE_GROUP( gfx/image FILES ${image_srcs} )
 
 INCLUDE_DIRECTORIES( . ../main ../third_party/png ../third_party/jpeg ../tiff++)
 
-ADD_LIBRARY(y-gfx STATIC ${srcs} ${ramp_srcs})
+ADD_LIBRARY(y-gfx STATIC ${srcs} ${ramp_srcs} ${image_srcs} )
 
 ADD_SUBDIRECTORY(tests)
 

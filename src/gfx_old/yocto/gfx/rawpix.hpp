@@ -14,6 +14,7 @@ namespace yocto
         typedef pixmap<float>  pixmapf;
         typedef pixmap<double> pixmapd;
         
+        
 
              
     }
