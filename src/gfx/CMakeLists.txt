@@ -16,9 +16,16 @@ SET(image_srcs ${image_decl} ${image_impl})
 INSTALL( FILES ${image_decl} DESTINATION include/yocto/gfx/image )
 SOURCE_GROUP( gfx/image FILES ${image_srcs} )
 
+FILE(GLOB ops_decl yocto/gfx/ops/*.hpp)
+FILE(GLOB ops_impl yocto/gfx/ops/*.cpp)
+SET(ops_srcs ${ops_decl} ${ops_impl})
+INSTALL( FILES ${ops_decl} DESTINATION include/yocto/gfx/ops )
+SOURCE_GROUP( gfx/ops FILES ${ops_srcs} )
+
+
 INCLUDE_DIRECTORIES( . ../main ../third_party/png ../third_party/jpeg ../tiff++)
 
-ADD_LIBRARY(y-gfx STATIC ${srcs} ${ramp_srcs} ${image_srcs} )
+ADD_LIBRARY(y-gfx STATIC ${srcs} ${ramp_srcs} ${image_srcs} ${ops_srcs} )
 
 ADD_SUBDIRECTORY(tests)
 
