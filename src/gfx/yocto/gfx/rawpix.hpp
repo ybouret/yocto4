@@ -38,6 +38,30 @@ namespace yocto
             return rgb_t(u,u,u);
         }
 
+        
+        inline rgb_t to_ppm_r(const void *addr) throw()
+        {
+            assert(addr);
+            const uint8_t u = *(const uint8_t *)addr;
+            return rgb_t(u,0,0);
+        }
+
+        inline rgb_t to_ppm_g(const void *addr) throw()
+        {
+            assert(addr);
+            const uint8_t u = *(const uint8_t *)addr;
+            return rgb_t(0,u,0);
+        }
+        
+        inline rgb_t to_ppm_b(const void *addr) throw()
+        {
+            assert(addr);
+            const uint8_t u = *(const uint8_t *)addr;
+            return rgb_t(0,0,u);
+        }
+        
+
+        
         //! extract rgb, directly
         template <>
         inline rgb_t to_ppm_rgb<rgb_t>(const void *addr) throw()

@@ -45,7 +45,12 @@ YOCTO_UNIT_TEST_IMPL(img)
             bitmap::pointer bmp(IMG.load(filename,3, put_rgba::to_rgb,NULL,NULL));
             pixmap3         pxm(bmp,NULL);
             save_ppm("image3.ppm",pxm);
-            pixmaps<uint8_t> px(3,pxm.w,pxm.h);
+            pixmaps<uint8_t> ch(3,pxm.w,pxm.h);
+            split_channels(ch,pxm);
+            save_ppm("image_r.ppm", ch[0], to_ppm_r);
+            save_ppm("image_g.ppm", ch[0], to_ppm_g);
+            save_ppm("image_b.ppm", ch[0], to_ppm_b);
+
         }
 
         {
