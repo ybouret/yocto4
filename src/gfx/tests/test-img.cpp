@@ -61,7 +61,7 @@ YOCTO_UNIT_TEST_IMPL(img)
                 ios::wcstream fp("hist.dat");
                 for(int i=0;i<256;++i)
                 {
-                    fp("%d %g %g\n", i, Hgs.count[i], Hbw.count[i]);
+                    fp("%d %g %g %g %g\n", i, Hgs.count[i], Hbw.count[i], Hgs.cumul[i], Hbw.cumul[i]);
                 }
             }
 

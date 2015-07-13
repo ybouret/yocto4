@@ -58,11 +58,15 @@ namespace yocto
             inline void build_cdf() throw()
             {
                 cumul[0] = count[0];
-                for(int i=1;i<bins;++i)
+                for(unsigned i=1;i<bins;++i)
                 {
                     cumul[i] = cumul[i-1] + count[i];
                 }
-
+                const double total = cumul[bins-1];
+                for(unsigned i=0;i<bins;++i)
+                {
+                    cumul[i] /= total;
+                }
             }
 
             template <typename U>
