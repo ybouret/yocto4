@@ -2,6 +2,7 @@
 #define YOCTO_GFX_OPS_HISTOGRAM_INCLUDED 1
 
 #include "yocto/gfx/pixmap.hpp"
+#include "yocto/code/utils.hpp"
 #include <cstring>
 
 namespace yocto
@@ -11,16 +12,20 @@ namespace yocto
 
 
 
-        template <typename T>
         class histogram
         {
         public:
-            static const size_t bins = 256;
-            T               count[bins];
-            double          cumul[bins];
-
-            explicit histogram() throw() :
-            count()
+            static const size_t max_bins = 256;
+            unsigned            bins; //!< for cdf
+            size_t              count[max_bins];
+            uint8_t             bin[max_bins]; //! 0..bins-1
+            double              cdf[max_bins]; //! 0..bins-1
+            
+            explicit histogram():
+            bins(0),
+            count(),
+            bin(),
+            cdf()
             {
                 reset();
             }
@@ -32,7 +37,7 @@ namespace yocto
 
             inline histogram(const histogram &H) throw() : count()
             {
-                __dup(H);
+                unsafe_dup(H);
             }
 
             inline histogram & operator=(const histogram &H) throw()
@@ -43,32 +48,23 @@ namespace yocto
 
             inline void reset() throw()
             {
+                bins = 0;
                 memset(count,0,sizeof(count));
-                memset(cumul,0,sizeof(cumul));
+                memset(bin,0,sizeof(bin));
+                memset(cdf,0,sizeof(cdf));
+                
             }
 
             inline void duplicate( const histogram &H ) throw()
             {
                 if(this != &H )
                 {
-                    __dup(H);
+                    unsafe_dup(H);
                 }
             }
 
-            inline void build_cdf() throw()
-            {
-                cumul[0] = count[0];
-                for(unsigned i=1;i<bins;++i)
-                {
-                    cumul[i] = cumul[i-1] + count[i];
-                }
-                const double total = cumul[bins-1];
-                for(unsigned i=0;i<bins;++i)
-                {
-                    cumul[i] /= total;
-                }
-            }
-
+            
+            
             template <typename U>
             void build_for( const pixmap<U> &pxm, uint8_t (*data2byte)(const U &)  ) throw()
             {
@@ -81,18 +77,30 @@ namespace yocto
                     const typename pixmap<U>::row &pxr = pxm[j];
                     for(unit_t i=0;i<w;++i)
                     {
-                        ++count[ data2byte(pxr[i]) ];
+                        const uint8_t u =data2byte(pxr[i]);
+                        ++count[u];
                     }
                 }
                 build_cdf();
             }
+            
+            inline void build_cdf() throw()
+            {
+                bins = 0;
+                for(unsigned i=0;i<bins;++i)
+                {
+                    
+                }
+            }
 
         private:
-            inline void __dup(const histogram &H) throw()
+            inline void unsafe_dup(const histogram &H) throw()
             {
-                assert(H!=&this);
+                assert(&H!=this);
+                bins = H.bins;
                 memcpy(count,H.count,sizeof(count));
-                memcpy(cumul,H.cumul,sizeof(cumul));
+                memcpy(bin,H.bin,sizeof(bin));
+                memcpy(cdf,H.cdf,sizeof(cdf));
             }
             
         };

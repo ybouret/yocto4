@@ -162,9 +162,9 @@ int main( int argc, char *argv[] )
             samples.append(t,V,Vf);
             samples.prepare(nvar);
             
-            aorg[1] = 23;   // t0
+            aorg[1] = 10;   // t0
             aorg[2] = 0.03;  // K
-            aorg[3] = 1.5;  // Cosm
+            aorg[3] = 0.5;  // Cosm
             aorg[4] = V[1]; // scaling
             
             if( !fit(samples,vol.fitter,aorg,used,aerr,NULL) )
