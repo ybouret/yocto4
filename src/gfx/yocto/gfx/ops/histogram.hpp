@@ -87,9 +87,25 @@ namespace yocto
             inline void build_cdf() throw()
             {
                 bins = 0;
-                for(unsigned i=0;i<bins;++i)
+                size_t tot = 0;
+                for(int i=0;i<max_bins;++i)
                 {
-                    
+                    const size_t ni = count[i];
+                    if(ni>0)
+                    {
+                        bin[bins] = i;
+                        cdf[bins] = ni;
+                        tot      += ni;
+                        ++bins;
+                    }
+                }
+                for(size_t i=1;i<bins;++i)
+                {
+                    cdf[i] += cdf[i-1];
+                }
+                for(size_t i=0;i<bins;++i)
+                {
+                    cdf[i] /= tot;
                 }
             }
 

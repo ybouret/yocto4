@@ -65,6 +65,22 @@ YOCTO_UNIT_TEST_IMPL(img)
                 }
             }
             
+            {
+                ios::wcstream fp("cdf_gs.dat");
+                for(size_t i=0;i<Hgs.bins;++i)
+                {
+                    fp("%g %g\n", double(Hgs.bin[i]),Hgs.cdf[i]);
+                }
+            }
+            
+            {
+                ios::wcstream fp("cdf_bw.dat");
+                for(size_t i=0;i<Hbw.bins;++i)
+                {
+                    fp("%g %g\n", double(Hbw.bin[i]),Hbw.cdf[i]);
+                }
+            }
+            
         }
         
         {
