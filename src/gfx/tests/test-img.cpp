@@ -4,6 +4,7 @@
 #include "yocto/gfx/image/tiff.hpp"
 #include "yocto/gfx/rawpix.hpp"
 #include "yocto/gfx/ops/split-channels.hpp"
+#include "yocto/gfx/ops/histogram.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -24,6 +25,8 @@ namespace
     }
 
 }
+
+#include "yocto/ios/ocstream.hpp"
 
 YOCTO_UNIT_TEST_IMPL(img)
 {
@@ -48,8 +51,19 @@ YOCTO_UNIT_TEST_IMPL(img)
             pixmaps<uint8_t> ch(3,pxm.w,pxm.h);
             split_channels(ch,pxm);
             save_ppm("image_r.ppm", ch[0], to_ppm_r);
-            save_ppm("image_g.ppm", ch[0], to_ppm_g);
-            save_ppm("image_b.ppm", ch[0], to_ppm_b);
+            save_ppm("image_g.ppm", ch[1], to_ppm_g);
+            save_ppm("image_b.ppm", ch[2], to_ppm_b);
+
+            histogram<float> Hgs,Hbw;
+            Hgs.build_for(pxm,rgb2gsu);
+            Hbw.build_for(pxm,rgb2bwu);
+            {
+                ios::wcstream fp("hist.dat");
+                for(int i=0;i<256;++i)
+                {
+                    fp("%d %g %g\n", i, Hgs.count[i], Hbw.count[i]);
+                }
+            }
 
         }
 
@@ -79,6 +93,6 @@ YOCTO_UNIT_TEST_IMPL(tiff)
             pixmap3         pxm(bmp,NULL);
             
         }
-    }
-}
-YOCTO_UNIT_TEST_DONE()
+        }
+        }
+        YOCTO_UNIT_TEST_DONE()

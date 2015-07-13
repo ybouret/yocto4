@@ -12,16 +12,16 @@ namespace yocto
         //! default pixel representation
         typedef uint32_t  pixel_t;
 
-        template <typename T> uint8_t to_byte(const T) throw();
+        template <typename T> uint8_t to_byte(const T &) throw();
 
         template <>
-        inline uint8_t to_byte(const uint8_t u) throw() { return u; }
+        inline uint8_t to_byte(const uint8_t &u) throw() { return u; }
 
         template <>
-        inline uint8_t to_byte(const float   f) throw() { return uint8_t( floorf(f*255.0f + 0.5f) ); }
+        inline uint8_t to_byte(const float   &f) throw() { return uint8_t( floorf(f*255.0f + 0.5f) ); }
 
         template <>
-        inline uint8_t to_byte(const double  d) throw() { return uint8_t( floor(d*255.0 + 0.5) ); }
+        inline uint8_t to_byte(const double  &d) throw() { return uint8_t( floor(d*255.0 + 0.5) ); }
 
         extern const float unit_float[256];
 
@@ -55,11 +55,28 @@ namespace yocto
         {
             return double( greyscale<float>(R,G,B) );
         }
+
+
+        template <typename T>
+        T black_and_white(const uint8_t R, const uint8_t G, const uint8_t B) throw();
+
+
+        template <>
+        inline float black_and_white<float>(const uint8_t R,
+                                            const uint8_t G,
+                                            const uint8_t B) throw()
+        {
+            return (unit_float[R]+unit_float[G]+unit_float[B])/3.0;
+        }
         
-        
-        
-        
-        
+        template <>
+        inline uint8_t black_and_white<uint8_t>(const uint8_t R,
+                                                const uint8_t G,
+                                                const uint8_t B) throw()
+        {
+            return uint8_t( (unsigned(R)+unsigned(G)+unsigned(B))/3 );
+        }
+
     }
     
 }
