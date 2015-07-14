@@ -32,7 +32,7 @@ YOCTO_UNIT_TEST_IMPL(img)
 {
     image &IMG = image::instance();
     
-    IMG.declare( new png_format() );
+    IMG.declare( new png_format()  );
     IMG.declare( new jpeg_format() );
     IMG.declare( new tiff_format() );
     
@@ -86,8 +86,16 @@ YOCTO_UNIT_TEST_IMPL(img)
         {
             bitmap::pointer bmp(IMG.load(filename,4, put_rgba::to_gsf,NULL,NULL));
             pixmapf         pxm(bmp,NULL);
-            save_ppm("imagef.ppm",pxm);
+            save_ppm("image_gs.ppm",pxm);
         }
+        
+        {
+            bitmap::pointer bmp(IMG.load(filename,4, put_rgba::to_bwf,NULL,NULL));
+            pixmapf         pxm(bmp,NULL);
+            save_ppm("image_bw.ppm",pxm);
+        }
+
+        
     }
     
     

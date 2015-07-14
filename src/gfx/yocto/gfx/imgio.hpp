@@ -72,6 +72,12 @@ namespace yocto
                 assert(addr);
                 *(float *)addr = greyscale<float>(C.r, C.g, C.b);
             }
+            
+            static inline void to_bwf(void *addr, const rgba_t &C, void *) throw()
+            {
+                assert(addr);
+                *(float *)addr = black_and_white<float>(C.r, C.g, C.b);
+            }
 
         };
 

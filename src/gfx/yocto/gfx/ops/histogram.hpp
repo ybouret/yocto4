@@ -18,7 +18,7 @@ namespace yocto
             static const size_t max_bins = 256;
             unsigned            bins; //!< for cdf
             size_t              count[max_bins];
-            uint8_t             bin[max_bins]; //! 0..bins-1
+            double              bin[max_bins]; //! 0..bins-1
             double              cdf[max_bins]; //! 0..bins-1
             
             explicit histogram():
@@ -87,7 +87,6 @@ namespace yocto
             inline void build_cdf() throw()
             {
                 bins = 0;
-                size_t tot = 0;
                 for(int i=0;i<max_bins;++i)
                 {
                     const size_t ni = count[i];
@@ -95,7 +94,6 @@ namespace yocto
                     {
                         bin[bins] = i;
                         cdf[bins] = ni;
-                        tot      += ni;
                         ++bins;
                     }
                 }
@@ -103,10 +101,18 @@ namespace yocto
                 {
                     cdf[i] += cdf[i-1];
                 }
+                const double min_y = cdf[0];
+                const double max_y = cdf[bins-1];
+                const double dy    = max_y - min_y;
+                //const double min_x = bin[0];
+                //const double max_x = bin[bins-1];
+                //const double dx    = max_x - min_x;
                 for(size_t i=0;i<bins;++i)
                 {
-                    cdf[i] /= tot;
+                    //bin[i] = (255.0 * (bin[i]-min_x))/dx;
+                    cdf[i] =  255*(cdf[i]-min_y)/dy;
                 }
+                
             }
 
         private:
