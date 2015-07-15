@@ -21,7 +21,7 @@ namespace yocto
             double  count[bins];
             uint8_t bin[bins]; //! 0..classes-1
             double  cdf[bins]; //! 0..classes-1
-
+            uint8_t lut[bins]; //! Look Up Table
         
 
 
@@ -30,9 +30,11 @@ namespace yocto
 
             void reset() throw();
             void build_cdf() throw();
-            
+            void build_lut(const double gam) throw();
+
+
             template <typename T>
-            void build_from( const pixmap<T> &px, uint8_t (*addr2byte)(const T&) ) throw()
+            void append( const pixmap<T> &px, uint8_t (*addr2byte)(const T&) ) throw()
             {
                 assert(addr2byte);
                 const unit_t w = px.w;
@@ -46,8 +48,16 @@ namespace yocto
                         ++count[w];
                     }
                 }
+            }
+
+            template <typename T>
+            void build_for(const pixmap<T> &px, uint8_t (*addr2byte)(const T&) ) throw()
+            {
+                reset();
+                append(px,addr2byte);
                 build_cdf();
             }
+            
 
             size_t threshold() const throw(); //! Otsu
             

@@ -57,8 +57,9 @@ YOCTO_UNIT_TEST_IMPL(img)
 #if 1
             {
                 histogram Hgs,Hbw;
-                Hgs.build_from(pxm,rgb2gs8);
-                Hbw.build_from(pxm,rgb2bw8);
+                Hgs.build_for(pxm,rgb2gs8);
+                Hbw.build_for(pxm,rgb2bw8);
+
                 {
                     ios::wcstream fp("hist.dat");
                     for(int i=0;i<256;++i)
@@ -106,6 +107,15 @@ YOCTO_UNIT_TEST_IMPL(img)
                     save_ppm("image_bw_bg.ppm", bw_bg);
                 }
 
+                Hgs.build_lut(1.0);
+                Hbw.build_lut(1.0);
+                {
+                    ios::wcstream fp("lut.dat");
+                    for(size_t i=0;i<histogram::bins;++i)
+                    {
+                        fp("%d %d %d\n", int(i), int(Hgs.lut[i]), int(Hbw.lut[i]));
+                    }
+                }
 
 
             }
