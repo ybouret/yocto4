@@ -41,7 +41,6 @@ YOCTO_UNIT_TEST_IMPL(greyscale)
             {
                 __TEST_CONV(float,greyscale<float>);
                 __TEST_CONV(float,black_and_white<float>);
-
             }
         }
     }

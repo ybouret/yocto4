@@ -14,14 +14,23 @@ namespace yocto
 
         template <typename T> uint8_t to_byte(const T &) throw();
 
-        template <>
-        inline uint8_t to_byte(const uint8_t &u) throw() { return u; }
 
         template <>
-        inline uint8_t to_byte(const float   &f) throw() { return uint8_t( floorf(f*255.0f + 0.5f) ); }
+        inline uint8_t to_byte<uint8_t>(const uint8_t &u) throw() { return u; }
 
         template <>
-        inline uint8_t to_byte(const double  &d) throw() { return uint8_t( floor(d*255.0 + 0.5) ); }
+        inline uint8_t to_byte<float>(const float   &f) throw() { return uint8_t( floorf(f*255.0f + 0.5f) ); }
+
+        template <>
+        inline uint8_t to_byte<double>(const double  &d) throw() { return uint8_t( floor(d*255.0 + 0.5) ); }
+
+        template <typename T> uint16_t to_word(const T &) throw();
+        template<> inline uint16_t to_word<float>(const float  &f) throw() { return uint16_t( floorf(f*512.0f + 0.5f) ); }
+        template<> inline uint16_t to_word<double>(const double &d) throw() { return uint16_t( floor( d*512.0  + 0.5 ) ); }
+
+
+
+
 
         extern const float unit_float[256];
 
@@ -56,6 +65,15 @@ namespace yocto
             return double( greyscale<float>(R,G,B) );
         }
 
+        template <>
+        inline uint16_t greyscale<uint16_t>(const uint8_t R,
+                                            const uint8_t G,
+                                            const uint8_t B) throw()
+        {
+            return to_word<float>( greyscale<float>(R,G,B) );
+        }
+
+
 
         template <typename T>
         T black_and_white(const uint8_t R, const uint8_t G, const uint8_t B) throw();
@@ -68,15 +86,24 @@ namespace yocto
         {
             return (unit_float[R]+unit_float[G]+unit_float[B])/3.0;
         }
-        
+
         template <>
         inline uint8_t black_and_white<uint8_t>(const uint8_t R,
                                                 const uint8_t G,
                                                 const uint8_t B) throw()
         {
-            return uint8_t( (unsigned(R)+unsigned(G)+unsigned(B))/3 );
+            return to_byte<float>(black_and_white<float>(R,G,B));
         }
 
+
+        template <>
+        inline uint16_t black_and_white<uint16_t>(const uint8_t R,
+                                                  const uint8_t G,
+                                                  const uint8_t B) throw()
+        {
+             return to_word<float>(black_and_white<float>(R,G,B));
+        }
+        
     }
     
 }

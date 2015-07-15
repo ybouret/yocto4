@@ -155,15 +155,32 @@ namespace yocto
         //! converting rgb to a byte value
         //______________________________________________________________________
         template <typename RGB_TYPE>
-        inline uint8_t rgb2gsu(const RGB_TYPE &C) throw()
+        inline uint8_t rgb2gs8(const RGB_TYPE &C) throw()
         {
             return greyscale<uint8_t>(C.r, C.g, C.b);
         }
 
         template <typename RGB_TYPE>
-        inline uint8_t rgb2bwu(const RGB_TYPE &C) throw()
+        inline uint8_t rgb2bw8(const RGB_TYPE &C) throw()
         {
             return black_and_white<uint8_t>(C.r, C.g, C.b);
+        }
+
+
+        //______________________________________________________________________
+        //
+        //! converting rgb to a word value
+        //______________________________________________________________________
+        template <typename RGB_TYPE>
+        inline uint16_t rgb2gs16(const RGB_TYPE &C) throw()
+        {
+            return greyscale<uint16_t>(C.r, C.g, C.b);
+        }
+
+        template <typename RGB_TYPE>
+        inline uint16_t rgb2bw16(const RGB_TYPE &C) throw()
+        {
+            return black_and_white<uint16_t>(C.r, C.g, C.b);
         }
 
 

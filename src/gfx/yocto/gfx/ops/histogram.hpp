@@ -3,6 +3,7 @@
 
 #include "yocto/gfx/pixmap.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/type/ints.hpp"
 #include <cstring>
 
 namespace yocto
@@ -12,18 +13,30 @@ namespace yocto
 
 
 
+        //!
+        template <size_t BYTES>
         class histogram
         {
         public:
-            static const size_t max_bins = 256;
-            unsigned            bins; //!< for cdf
-            size_t              count[max_bins];
-            double              bin[max_bins]; //! 0..bins-1
-            double              cdf[max_bins]; //! 0..bins-1
-            uint8_t             lut[max_bins];
-            
-            explicit histogram():
-            bins(0),
+            typedef typename unsigned_int<BYTES>::type uint_t;
+            static  const size_t                       bins = unsigned_int<BYTES>::maximum;
+
+            size_t classes;
+            double count[bins];
+            uint_t bin[bins]; //! 0..classes-1
+            double cdf[bins]; //! 0..classes-1
+
+            inline void reset() throw()
+            {
+                classes=0;
+                memset(count,0,sizeof(count));
+                memset(bin,0,sizeof(bin));
+                memset(cdf,0,sizeof(cdf));
+            }
+
+
+            explicit histogram() throw() :
+            classes(0),
             count(),
             bin(),
             cdf()
@@ -33,90 +46,53 @@ namespace yocto
 
             virtual ~histogram() throw()
             {
-
-            }
-
-            inline histogram(const histogram &H) throw() : count()
-            {
-                unsafe_dup(H);
-            }
-
-            inline histogram & operator=(const histogram &H) throw()
-            {
-                duplicate(H);
-                return *this;
-            }
-
-            inline void reset() throw()
-            {
-                bins = 0;
-                memset(count,0,sizeof(count));
-                memset(bin,0,sizeof(bin));
-                memset(cdf,0,sizeof(cdf));
-                memset(lut,9,sizeof(lut));
-            }
-
-            inline void duplicate( const histogram &H ) throw()
-            {
-                if(this != &H )
-                {
-                    unsafe_dup(H);
-                }
-            }
-
-            
-            
-            template <typename U>
-            void build_for( const pixmap<U> &pxm, uint8_t (*data2byte)(const U &)  ) throw()
-            {
-                assert(data2byte);
                 reset();
-                const unit_t w = pxm.w;
-                const unit_t h = pxm.h;
+            }
+
+            template <typename T>
+            void build_from( const pixmap<T> &px, uint_t (*addr2word)(const T&) ) throw()
+            {
+                assert(addr2word);
+                const unit_t w = px.w;
+                const unit_t h = px.h;
                 for(unit_t j=0;j<h;++j)
                 {
-                    const typename pixmap<U>::row &pxr = pxm[j];
+                    const typename pixmap<T>::row &Rj = px[j];
                     for(unit_t i=0;i<w;++i)
                     {
-                        const uint8_t u =data2byte(pxr[i]);
-                        ++count[u];
+                        const uint_t w = addr2word( Rj[i] );
+                        ++count[w];
                     }
                 }
                 build_cdf();
             }
-            
-            inline void build_cdf() throw()
+
+            void build_cdf() throw()
             {
-                bins = 0;
-                for(int i=0;i<max_bins;++i)
+                classes = 0;
+                for(uint_t i=0;i<bins;++i)
                 {
-                    const size_t ni = count[i];
+                    const double ni = count[i];
                     if(ni>0)
                     {
-                        bin[bins] = i;
-                        cdf[bins] = ni;
-                        ++bins;
+                        bin[classes] = i;
+                        cdf[classes] = ni;
+                        ++classes;
                     }
                 }
-                for(size_t i=1;i<bins;++i)
+                for(unit_t i=1;i<classes;++i)
                 {
                     cdf[i] += cdf[i-1];
                 }
             }
 
+
         private:
-            inline void unsafe_dup(const histogram &H) throw()
-            {
-                assert(&H!=this);
-                bins = H.bins;
-                memcpy(count,H.count,sizeof(count));
-                memcpy(bin,H.bin,sizeof(bin));
-                memcpy(cdf,H.cdf,sizeof(cdf));
-                memcpy(lut,H.lut,sizeof(lut));
-            }
-            
+            YOCTO_DISABLE_COPY_AND_ASSIGN(histogram);
         };
-        
+
+        typedef histogram<1> hist8;
+        typedef histogram<2> hist16;
     }
 }
 
