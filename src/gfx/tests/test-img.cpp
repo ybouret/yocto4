@@ -107,6 +107,14 @@ YOCTO_UNIT_TEST_IMPL(img)
                     save_ppm("image_bw_bg.ppm", bw_bg);
                 }
 
+                {
+                    ios::wcstream fp("icdf.dat");
+                    for(double y=0;y<=1;y+=0.01)
+                    {
+                        fp("%g %g %g %g\n", y, Hgs.icdf(y, 0.8), Hgs.icdf(y,1.0), Hgs.icdf(y, 1.2) );
+                    }
+                }
+
                 Hgs.build_lut(1.0);
                 Hbw.build_lut(1.0);
                 {
@@ -117,6 +125,18 @@ YOCTO_UNIT_TEST_IMPL(img)
                     }
                 }
 
+                {
+                    pixmap1 eq_gs(pxm.w,pxm.h);
+                    Hgs.apply_lut(eq_gs, to_byte<uint8_t>,pxm,rgb2gs8);
+                    save_ppm("image_eq_gs1.0.ppm",eq_gs);
+                    Hgs.build_lut(0.4);
+                    Hgs.apply_lut(eq_gs, to_byte<uint8_t>,pxm,rgb2gs8);
+                    save_ppm("image_eq_gs0.4.ppm",eq_gs);
+                    Hgs.build_lut(2.2);
+                    Hgs.apply_lut(eq_gs, to_byte<uint8_t>,pxm,rgb2gs8);
+                    save_ppm("image_eq_gs2.2.ppm",eq_gs);
+
+                }
 
             }
 #endif

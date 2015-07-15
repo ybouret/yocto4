@@ -22,21 +22,23 @@ namespace yocto
             uint8_t bin[bins]; //! 0..classes-1
             double  cdf[bins]; //! 0..classes-1
             uint8_t lut[bins]; //! Look Up Table
-        
+
 
 
             explicit histogram() throw();
             virtual ~histogram() throw();
 
-            void reset() throw();
-            void build_cdf() throw();
+            void   reset() throw();
+            void   build_cdf() throw();
+            double icdf(const double y,const double gam) const throw();
+
             void build_lut(const double gam) throw();
 
 
             template <typename T>
-            void append( const pixmap<T> &px, uint8_t (*addr2byte)(const T&) ) throw()
+            void append( const pixmap<T> &px, uint8_t (*item2byte)(const T&) ) throw()
             {
-                assert(addr2byte);
+                assert(item2byte);
                 const unit_t w = px.w;
                 const unit_t h = px.h;
                 for(unit_t j=0;j<h;++j)
@@ -44,23 +46,45 @@ namespace yocto
                     const typename pixmap<T>::row &Rj = px[j];
                     for(unit_t i=0;i<w;++i)
                     {
-                        const uint8_t w = addr2byte( Rj[i] );
+                        const uint8_t w = item2byte( Rj[i] );
                         ++count[w];
                     }
                 }
             }
 
             template <typename T>
-            void build_for(const pixmap<T> &px, uint8_t (*addr2byte)(const T&) ) throw()
+            void build_for(const pixmap<T> &px, uint8_t (*item2byte)(const T&) ) throw()
             {
                 reset();
-                append(px,addr2byte);
+                append(px,item2byte);
                 build_cdf();
             }
-            
 
-            size_t threshold() const throw(); //! Otsu
-            
+
+            size_t threshold() const throw(); //! Otsu, to apply threshold
+
+            template <typename U,typename T>
+            void apply_lut(pixmap<U> &target,
+                           U (*byte2data)(const uint8_t &),
+                           const pixmap<T> &source,
+                           uint8_t (*item2byte)(const T&) ) throw()
+            {
+                assert(target.w==source.w);
+                assert(target.h==source.h);
+                assert(byte2data);
+                assert(item2byte);
+                const unit_t w=target.w;
+                const unit_t h=target.h;
+                for(unit_t j=0;j<h;++j)
+                {
+                    const typename pixmap<T>::row &Sj = source[j];
+                    typename pixmap<U>::row       &Tj = target[j];
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        Tj[i] = byte2data( lut[ item2byte(Sj[i]) ] );
+                    }
+                }
+            }
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(histogram);
@@ -123,10 +147,10 @@ namespace yocto
                         }
                     }
                 }
-
+                
             }
         };
-
+        
     }
 }
 

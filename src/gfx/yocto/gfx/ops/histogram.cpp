@@ -1,4 +1,6 @@
 #include "yocto/gfx/ops/histogram.hpp"
+#include "yocto/code/utils.hpp"
+#include "yocto/math/types.hpp"
 
 #include <iostream>
 
@@ -67,6 +69,54 @@ namespace yocto
         }
 
 
+        double histogram:: icdf(const double y, const double gam) const throw()
+        {
+            assert(classes>1);
+            const size_t top = classes-1;
+            assert(bin[top]>bin[0]);
+
+            if(y<=0.0)
+            {
+                return 0;
+            }
+            else
+            {
+                if(y>=1.0)
+                {
+                    return 255;
+                }
+                else
+                {
+                    size_t jlo = 0;
+                    size_t jhi = top;
+                    while(jhi-jlo>1)
+                    {
+                        const size_t jmid = (jlo+jhi)>>1;
+                        const double ymid = pow(cdf[jmid],gam);
+                        if(y<ymid)
+                        {
+                            jhi = jmid;
+                        }
+                        else
+                        {
+                            jlo = jmid;
+                        }
+                    }
+                    const double ylo = (jlo<=0 ? 0 : pow(cdf[jlo],gam));
+                    const double yhi = pow(cdf[jhi],gam);
+                    const double xlo = bin[jlo];
+                    const double xhi = bin[jhi];
+                    // raw result
+                    const double x0  = xlo + (xhi-xlo)*(y-ylo)/(yhi-ylo);
+
+                    // expand result
+                    const double b0 = bin[0];
+                    return clamp<double>(0,255.0*(x0-b0)/(bin[top]-b0),255);
+                }
+            }
+
+        }
+
         void histogram:: build_lut(const double gam) throw()
         {
             switch(classes)
@@ -82,38 +132,14 @@ namespace yocto
                 default:
                     break;
             }
-            const size_t top = classes-1;
+            //const size_t top = classes-1;
 
+            static const double den = bins-1;
+            for(size_t j=0;j<bins;++j)
             {
-                const size_t head = bin[0];
-                for(size_t i=0;i<=head;++i)
-                {
-                    lut[i] = 0;
-                }
-            }
-
-            {
-                const size_t last = bin[top];
-                for(size_t i=last;i<bins;++i)
-                {
-                    lut[i] = 255;
-                }
-            }
-
-            size_t jlo = bin[0];
-            double clo = 0;
-            for(size_t i=1;i<classes;++i)
-            {
-                const size_t jhi = bin[i];
-                const double chi = cdf[i];
-                const double dj  = double(jhi - jlo);
-                const double dc  = chi - clo;
-                for(size_t j=jlo;j<jhi;++j)
-                {
-                    const double cj = clo + ((j-jlo)/dj) * dc;
-                }
-                jlo = jhi;
-                clo = chi;
+                const double y = j/den;
+                const double x = icdf(y,gam);
+                lut[j] = uint8_t( floor(x+0.5) );
             }
         }
 
@@ -200,7 +226,7 @@ namespace yocto
                 return 0;
             }
         }
-
+        
         size_t histogram:: threshold() const throw()
         {
             size_t ans = 0;
