@@ -20,6 +20,7 @@ namespace yocto
             size_t              count[max_bins];
             double              bin[max_bins]; //! 0..bins-1
             double              cdf[max_bins]; //! 0..bins-1
+            uint8_t             lut[max_bins];
             
             explicit histogram():
             bins(0),
@@ -52,7 +53,7 @@ namespace yocto
                 memset(count,0,sizeof(count));
                 memset(bin,0,sizeof(bin));
                 memset(cdf,0,sizeof(cdf));
-                
+                memset(lut,9,sizeof(lut));
             }
 
             inline void duplicate( const histogram &H ) throw()
@@ -101,18 +102,6 @@ namespace yocto
                 {
                     cdf[i] += cdf[i-1];
                 }
-                const double min_y = cdf[0];
-                const double max_y = cdf[bins-1];
-                const double dy    = max_y - min_y;
-                //const double min_x = bin[0];
-                //const double max_x = bin[bins-1];
-                //const double dx    = max_x - min_x;
-                for(size_t i=0;i<bins;++i)
-                {
-                    //bin[i] = (255.0 * (bin[i]-min_x))/dx;
-                    cdf[i] =  255*(cdf[i]-min_y)/dy;
-                }
-                
             }
 
         private:
@@ -123,6 +112,7 @@ namespace yocto
                 memcpy(count,H.count,sizeof(count));
                 memcpy(bin,H.bin,sizeof(bin));
                 memcpy(cdf,H.cdf,sizeof(cdf));
+                memcpy(lut,H.lut,sizeof(lut));
             }
             
         };
