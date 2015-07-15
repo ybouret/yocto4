@@ -56,7 +56,7 @@ YOCTO_UNIT_TEST_IMPL(img)
 
 #if 1
             {
-                hist8 Hgs,Hbw;
+                histogram Hgs,Hbw;
                 Hgs.build_from(pxm,rgb2gs8);
                 Hbw.build_from(pxm,rgb2bw8);
                 {
@@ -82,39 +82,33 @@ YOCTO_UNIT_TEST_IMPL(img)
                         fp("%g %g\n", double(Hbw.bin[i]),Hbw.cdf[i]);
                     }
                 }
+
+                const size_t gs_t = Hgs.threshold();
+                const size_t bw_t = Hbw.threshold();
+                std::cerr << "thresholds=" << gs_t << ", " << bw_t << std::endl;
+
+                {
+                    pixmap3 gs_fg(pxm.w,pxm.h),gs_bg(pxm.w,pxm.h);
+                    threshold::apply(gs_fg, gs_t, pxm,rgb2gs8, threshold::keep_foreground );
+                    threshold::apply(gs_bg, gs_t, pxm,rgb2gs8, threshold::keep_background );
+
+                    save_ppm("image_gs_fg.ppm", gs_fg);
+                    save_ppm("image_gs_bg.ppm", gs_bg);
+                }
+
+
+                {
+                    pixmap3 bw_fg(pxm.w,pxm.h),bw_bg(pxm.w,pxm.h);
+                    threshold::apply(bw_fg, bw_t, pxm,rgb2bw8, threshold::keep_foreground );
+                    threshold::apply(bw_bg, bw_t, pxm,rgb2bw8, threshold::keep_background );
+
+                    save_ppm("image_bw_fg.ppm", bw_fg);
+                    save_ppm("image_bw_bg.ppm", bw_bg);
+                }
+
+
+
             }
-
-            {
-                hist16 Hgs,Hbw;
-                Hgs.build_from(pxm,rgb2gs16);
-                Hbw.build_from(pxm,rgb2bw16);
-                {
-                    ios::wcstream fp("hist16.dat");
-                    for(int i=0;i<256;++i)
-                    {
-                        fp("%d %u %u\n", i, unsigned(Hgs.count[i]), unsigned(Hbw.count[i]));
-                    }
-                }
-
-                {
-                    ios::wcstream fp("cdf_gs16.dat");
-                    for(size_t i=0;i<Hgs.classes;++i)
-                    {
-                        fp("%g %g\n", double(Hgs.bin[i]),Hgs.cdf[i]);
-                    }
-                }
-
-                {
-                    ios::wcstream fp("cdf_bw16.dat");
-                    for(size_t i=0;i<Hbw.classes;++i)
-                    {
-                        fp("%g %g\n", double(Hbw.bin[i]),Hbw.cdf[i]);
-                    }
-                }
-            }
-
-
-
 #endif
 
         }
