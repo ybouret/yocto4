@@ -32,6 +32,32 @@ namespace yocto
                 return rgba_t(u,u,u);
             }
 
+            //! address is a byte=>red channel
+            static inline rgba_t from_byte_r(const void *addr, void *) throw()
+            {
+                assert(addr);
+                const uint8_t u = *(const uint8_t *)addr;
+                return rgba_t(u,0,0);
+            }
+
+            //! address is a byte=>red channel
+            static inline rgba_t from_byte_g(const void *addr, void *) throw()
+            {
+                assert(addr);
+                const uint8_t u = *(const uint8_t *)addr;
+                return rgba_t(0,u,0);
+            }
+
+
+            //! address is a byte=>red channel
+            static inline rgba_t from_byte_b(const void *addr, void *) throw()
+            {
+                assert(addr);
+                const uint8_t u = *(const uint8_t *)addr;
+                return rgba_t(0,0,u);
+            }
+
+
             //! address is a float greyscale
             static inline rgba_t from_gsf(const void *addr, void *) throw()
             {

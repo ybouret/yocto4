@@ -86,6 +86,24 @@ namespace yocto
                 }
             }
 
+            template <typename U,typename T>
+            inline void equalize(pixmap<U> &target,
+                                 U (*byte2data)(const uint8_t &),
+                                 const pixmap<T> &source,
+                                 uint8_t (*item2byte)(const T&),
+                                 const double gam) throw()
+            {
+                this->build_for<T>(source,item2byte);
+                this->build_lut(gam);
+                this->apply_lut<U,T>(target,byte2data,source,item2byte);
+            }
+
+            inline void equalize8(pixmap<uint8_t> &px,const double gam)
+            {
+                this->equalize(px,to_byte<uint8_t>,px,to_byte<uint8_t>,gam);
+            }
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(histogram);
         };
