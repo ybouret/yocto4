@@ -5,6 +5,7 @@
 #include "yocto/gfx/rawpix.hpp"
 #include "yocto/gfx/ops/split-channels.hpp"
 #include "yocto/gfx/ops/histogram.hpp"
+#include "yocto/gfx/ops/stencil.hpp"
 
 using namespace yocto;
 using namespace gfx;
