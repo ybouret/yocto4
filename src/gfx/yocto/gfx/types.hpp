@@ -12,28 +12,38 @@ namespace yocto
         //! default pixel representation
         typedef uint32_t  pixel_t;
 
+        //! converting type to byte
         template <typename T> uint8_t to_byte(const T &) throw();
 
 
-        template <>
-        inline uint8_t to_byte<uint8_t>(const uint8_t &u) throw() { return u; }
+        template <> inline uint8_t to_byte<uint8_t>(const uint8_t &u) throw() { return u; }
+        template <> inline uint8_t to_byte<float>(  const float   &f) throw() { return uint8_t( floorf(f*255.0f + 0.5f) ); }
+        template <> inline uint8_t to_byte<double>( const double  &d) throw() { return uint8_t( floor(d*255.0 + 0.5) ); }
 
-        template <>
-        inline uint8_t to_byte<float>(const float   &f) throw() { return uint8_t( floorf(f*255.0f + 0.5f) ); }
-
-        template <>
-        inline uint8_t to_byte<double>(const double  &d) throw() { return uint8_t( floor(d*255.0 + 0.5) ); }
-
+        // converting type to word
         template <typename T> uint16_t to_word(const T &) throw();
         template<> inline uint16_t to_word<float>(const float  &f) throw() { return uint16_t( floorf(f*512.0f + 0.5f) ); }
         template<> inline uint16_t to_word<double>(const double &d) throw() { return uint16_t( floor( d*512.0  + 0.5 ) ); }
 
 
-
-
-
+        
         extern const float unit_float[256];
+        inline float to_float(const uint8_t &u) throw()
+        {
+            return unit_float[u];
+        }
+        
+        
+        // converting double in [0:1] to scaled type
+        template <typename T>
+        T to_unit(const double d) throw();
+        
+        template <> inline float   to_unit<float>(const double d) throw()   { return float(d); }
+        template <> inline double  to_unit<double>(const double d) throw()  { return d; }
+        template <> inline uint8_t to_unit<uint8_t>(const double d) throw() { return uint8_t( floor(d*255.0 + 0.5) ); }
 
+        
+        
         template <typename T>
         T greyscale(const uint8_t R, const uint8_t G, const uint8_t B) throw();
 
