@@ -102,7 +102,13 @@ namespace yocto
             {
                 this->equalize(px,to_byte<uint8_t>,px,to_byte<uint8_t>,gam);
             }
+            
+            inline void equalizef(pixmap<float> &px, const double gam)
+            {
+                this->equalize(px,to_float,px,to_byte<float>, gam);
+            }
 
+            
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(histogram);
