@@ -15,6 +15,7 @@ namespace yocto
         {
             assert(size>0);
             assert(rank<size);
+            //assert(length>=0);
             T todo(length/size);
             for(size_t r=1;r<=rank;++r)
             {

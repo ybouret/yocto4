@@ -115,7 +115,7 @@ YOCTO_UNIT_TEST_IMPL(simd)
         simd(K);
     }
 
-    return 0;
+    //return 0;
 
     Sum sum;
     SIMD::Kernel kSum( &sum, & Sum::run );
