@@ -111,17 +111,28 @@ if(gg>Gmax) { Gmax = gg; }                       \
             // and corners...
             //__________________________________________________________________
             {
-                const double gx = 0;
-                const double gy = 0;
+                const double gx = 4.0 * double(data[0][0]) - 3.0 * double(data[0][1]) - double(data[0][2]);
+                const double gy = 4.0 * double(data[0][0]) - 3.0 * double(data[1][0]) - double(data[2][0]);
                 YOCTO_GFX_GRADIENT_COMPUTE(G[0][0]);
             }
 
             {
-
+                const double gx = 4.0 * double(data[0][w0]) - 3.0 * double(data[0][w1]) - double(data[0][w2]);
+                const double gy = 4.0 * double(data[0][w0]) - 3.0 * double(data[1][w0]) - double(data[2][w0]);
+                YOCTO_GFX_GRADIENT_COMPUTE(G[0][w0]);
             }
 
+            {
+                const double gx = 4.0 * double(data[h0][0]) - 3.0 * double(data[h0][1]) - double(data[h0][2]);
+                const double gy = 4.0 * double(data[h0][0]) - 3.0 * double(data[h1][0]) - double(data[h2][0]);
+                YOCTO_GFX_GRADIENT_COMPUTE(G[h0][0]);
+            }
 
-
+            {
+                const double gx = 4.0 * double(data[h0][w0]) - 3.0 * double(data[h0][w1]) - double(data[h0][w2]);
+                const double gy = 4.0 * double(data[h0][w0]) - 3.0 * double(data[h1][w0]) - double(data[h2][w0]);
+                YOCTO_GFX_GRADIENT_COMPUTE(G[h0][w0]);
+            }
             return Gmax;
         }
         
@@ -137,12 +148,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
             // first pass: build 'real' gradient
             pixmap<double> G(w,h);
             const double Gmax = gradient_of(data, G);
-
-            G[0][0]     = Gmax;
-            G[0][w-1]   = Gmax;
-            G[h-1][0]   = Gmax;
-            G[h-1][w-1] = Gmax;
-
+            
             // second pass: convert to type
             if(Gmax<=0)
             {
