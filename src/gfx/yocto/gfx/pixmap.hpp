@@ -131,7 +131,11 @@ namespace yocto
                     throw;
                 }
             }
-            
+
+            inline void ld(param_type src) throw()
+            {
+                ld_(&src);
+            }
             
         private:
             size_t nrow;

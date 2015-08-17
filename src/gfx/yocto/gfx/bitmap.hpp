@@ -114,6 +114,8 @@ namespace yocto
             void ldz() throw();
             void flip_vert() throw();
 
+            void ld_(const void *src) throw(); //!< copy d bytes from src at each location
+
         protected:
             static void check_depths(const char *L, const int lhs, const char *R, const int rhs);
             

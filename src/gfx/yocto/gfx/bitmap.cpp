@@ -205,6 +205,20 @@ namespace yocto
 
         }
 
+        void bitmap:: ld_(const void *src) throw()
+        {
+            assert(w);
+            uint8_t *line = (uint8_t *)entry;
+            for(unit_t j=0;j<h;++j,line+=stride)
+            {
+                uint8_t *p = line;
+                for(unit_t i=0;i<w;++i,p+=d)
+                {
+                    memcpy(p,src,d);
+                }
+            }
+        }
+
 
         void bitmap:: flip_vert() throw()
         {
