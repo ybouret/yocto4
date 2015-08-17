@@ -46,7 +46,7 @@ namespace {
                 T xlength = global_xlength;
                 T ylength = global_ylength;
                 core::mpi_split(rank, size, xoffset, yoffset, xlength, ylength);
-                std::cerr << " x: " << xoffset << "->" << (xoffset+xlength-1);
+                std::cerr << " x: "  << xoffset << "->" << (xoffset+xlength-1);
                 std::cerr << "| y: " << yoffset << "->" << (yoffset+ylength-1);
                 std::cerr << std::endl;
 

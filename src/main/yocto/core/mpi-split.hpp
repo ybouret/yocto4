@@ -55,7 +55,7 @@ namespace yocto
             const size_t ry = rank / px;
             //std::cerr << "px=" << px << ", py=" << py << ", rx=" << rx << ", ry=" << ry << std::endl;
             mpi_split(rx,px,xoffset,xlength);
-            mpi_split(ry,py,xoffset,ylength);
+            mpi_split(ry,py,yoffset,ylength);
         }
         
         
