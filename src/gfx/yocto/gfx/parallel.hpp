@@ -12,12 +12,16 @@ namespace yocto
     namespace gfx
     {
 
+
         //! a patch interface
         class ipatch
         {
 
         public:
             const rectangle rect;
+            void           *source;
+            void           *target;
+            void           *params;
 
             //! compute the parameters from w and h
             static void setup_parallel_metrics(unit_t      &xoff,
@@ -31,9 +35,14 @@ namespace yocto
             explicit ipatch(const rectangle &r) throw();
             virtual ~ipatch() throw();
 
+            //! assuming contexts are built from ipatch
+            static void dispatch(threading::SIMD &simd, void *src,void *tgt,void *prm);
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ipatch);
         };
+
 
         //! DATATYPE is a kind of patch...
         template <typename DATATYPE> inline
@@ -67,7 +76,6 @@ namespace yocto
                 ctx.build<DATATYPE,const rectangle&>(rect);
             }
         }
-
 
 
 

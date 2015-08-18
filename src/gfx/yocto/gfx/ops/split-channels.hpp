@@ -13,7 +13,8 @@ namespace yocto
         typename T,
         typename U,
         template <typename> class COLORSPACE>
-        inline void split_channels( pixmaps<T> &ch, const pixmap< COLORSPACE<U> > &px) throw()
+        inline void split_channels(pixmaps<T>                    &ch,
+                                   const pixmap< COLORSPACE<U> > &px) throw()
         {
             assert(ch.w==px.w);
             assert(ch.h==px.h);
@@ -62,5 +63,6 @@ namespace yocto
 
     }
 }
+
 
 #endif
