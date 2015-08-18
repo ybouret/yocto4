@@ -194,30 +194,45 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 gradient_patch &self = ctx.as<gradient_patch>();
                 {
                     YOCTO_LOCK(ctx.access);
-                    std::cerr << "@ctx#" << ctx.rank << "[" << self.rect.x << ":" << self.rect.xout-1 << "] x [" << self.rect.y << ":" << self.rect.yout-1 << "]" << std::endl;
+                    std::cerr << "$1@ctx#" << ctx.rank << "[" << self.rect.x << ":" << self.rect.xout-1 << "] x [" << self.rect.y << ":" << self.rect.yout-1 << "]" << std::endl;
                 }
                 self.compute1();
             }
 
+            static inline
+            void call2(threading::SIMD::Context &ctx ) throw()
+            {
+                gradient_patch &self = ctx.as<gradient_patch>();
+                {
+                    YOCTO_LOCK(ctx.access);
+                    std::cerr << "$2@ctx#" << ctx.rank << "[" << self.rect.x << ":" << self.rect.xout-1 << "] x [" << self.rect.y << ":" << self.rect.yout-1 << "]" << std::endl;
+                }
+                self.compute2();
+            }
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(gradient_patch);
-            void compute1() throw()
+            inline void compute1() throw()
             {
+                assert(source);
+                assert(target);
                 Gmax = 0;
                 const pixmap<T> &data = *(const pixmap<T> *)(source);
                 pixmap<double>  &G    = *(pixmap<double>  *)(target);
-                const unit_t xlo = rect.x;
-                const unit_t xhi = rect.xout;
-                const unit_t xlom = xlo-1;
-                const unit_t xlop = xlo+1;
-                const unit_t ylo = rect.y;
-                const unit_t yhi = rect.yout;
+                const unit_t     xlo  = rect.x;
+                const unit_t     xhi  = rect.xout;
+                const unit_t     xlom = xlo-1;
+                const unit_t     xlop = xlo+1;
+                const unit_t     ylo  = rect.y;
+                const unit_t     yhi  = rect.yout;
+
                 for(unit_t jm=ylo-1,j=ylo,jp=ylo+1;j<yhi;++jm,++j,++jp)
                 {
                     pixmap<double>::row           &Gj  = G[j];
                     const typename pixmap<T>::row &dj  = data[j];
                     const typename pixmap<T>::row &djm = data[jm];
                     const typename pixmap<T>::row &djp = data[jp];
+
                     for(unit_t im=xlom,i=xlo,ip=xlop;i<xhi;++im,++i,++ip)
                     {
                         const double gx = double(dj[ip])-double(dj[im]);
@@ -225,7 +240,29 @@ if(gg>Gmax) { Gmax = gg; }                       \
                         YOCTO_GFX_GRADIENT_COMPUTE(Gj[i]);
                     }
                 }
+            }
 
+            inline void compute2() throw()
+            {
+                assert(source);
+                assert(target);
+                assert(params);
+                const double          den  = *(const double *)params;
+                const pixmap<double> &G    = *(const pixmap<double> *)(source);
+                pixmap<T>            &grad = *(pixmap<T>            *)(target);
+                const unit_t          xlo  = rect.x;
+                const unit_t          xhi  = rect.xout;
+                const unit_t          ylo  = rect.y;
+                const unit_t          yhi  = rect.yout;
+                for(unit_t j=ylo;j<yhi;++j)
+                {
+                    typename pixmap<T>::row            &gj = grad[j];
+                    const typename pixmap<double>::row &Gj = G[j];
+                    for(unit_t i=xlo;i<xhi;++i)
+                    {
+                        gj[i] = to_unit<T>(Gj[i]/den);
+                    }
+                }
             }
         };
 
@@ -264,23 +301,32 @@ if(gg>Gmax) { Gmax = gg; }                       \
         template <typename T>
         void gradient( pixmap<T> &grad, const pixmap<T> &data, threading::SIMD &simd) throw()
         {
-            
+
             assert(grad.w == data.w );
             assert(grad.h == data.h );
             const unit_t w = data.w;
             const unit_t h = data.h;
-            
+
             // first pass: build 'real' gradient
             pixmap<double> G(w,h);
             const double   Gmax = gradient_of(data, G,simd);
-            (void)Gmax;
-            
-            
+            if(Gmax<=0)
+            {
+                grad.ldz();
+            }
+            else
+            {
+                setup_contexts< gradient_patch<T> >(simd,w,h,true);
+                reset_contexts< gradient_patch<T> >(simd, &G, &grad, &Gmax);
+                threading::SIMD::Kernel K( cfunctor(gradient_patch<T>::call2) );
+                simd(K);
+            }
+
         }
-        
-        
+
+
     }
-    
+
 }
 
 #endif

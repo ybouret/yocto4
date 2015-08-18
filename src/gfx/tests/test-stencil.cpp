@@ -46,12 +46,6 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             const unit_t w = pxm.w;
             const unit_t h = pxm.h;
 
-#if 0
-            std::cerr << std::endl << std::endl;
-            std::cerr << "\t(*) building patches..." << std::endl;
-            setup_contexts<ipatch>(simd, w, h, true);
-            std::cerr << std::endl << std::endl;
-#endif
 
             pixmaps<uint8_t> ch(3,w,h);
             split_channels(ch,pxm);
@@ -73,6 +67,12 @@ YOCTO_UNIT_TEST_IMPL(stencil)
 
             split_channels(ch,pxm2);
             gradient(ch[0], ch[0], simd);
+            gradient(ch[1], ch[1], simd);
+            gradient(ch[2], ch[2], simd);
+            PNG.save("para_grad_image_r.png",ch[0], get_rgba::from_byte_r,NULL, NULL);
+            PNG.save("para_grad_image_g.png",ch[1], get_rgba::from_byte_g,NULL, NULL);
+            PNG.save("para_grad_image_b.png",ch[2], get_rgba::from_byte_b,NULL, NULL);
+
         }
         
     }
