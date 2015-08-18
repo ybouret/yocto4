@@ -1,6 +1,4 @@
 #include "yocto/core/mpi-split.hpp"
-#include "yocto/core/list.hpp"
-#include "yocto/object.hpp"
 
 #include <cmath>
 
@@ -10,85 +8,55 @@ namespace yocto
     namespace core
     {
 
-        namespace
+
+
+        static inline double ComputeH(const size_t px,
+                                      const size_t py,
+                                      const size_t Nx,
+                                      const size_t Ny) throw()
         {
-            class node2D
-            {
-            public:
-                const size_t x,y;
-                const double ratio;
-                node2D *next,*prev;
-                inline node2D(const size_t px,
-                              const size_t py,
-                              const size_t Nx,
-                              const size_t Ny) throw() :
-                x(px),
-                y(py),
-                ratio( fabs( double(Nx)/px - double(Ny)/py) ),
-                next(0),
-                prev(0)
-                {
-
-                }
-
-                inline ~node2D() throw()
-                {}
-
-
-                YOCTO_MAKE_OBJECT
-
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(node2D);
-            };
-
-            typedef core::list_of_cpp<node2D> list2D;
-
+            return fabs( fabs( double(Nx)/px - double(Ny)/py) );
         }
 
-        static inline void build_list2D(list2D       &l,
-                                        const size_t nproc,
-                                        const size_t Nx,
-                                        const size_t Ny)
+        void find_mpi_split2D(size_t      &px,
+                              size_t      &py,
+                              const size_t nproc,
+                              const size_t Nx,
+                              const size_t Ny) throw()
         {
-            assert(nproc>0);
+            assert(0==px);
+            assert(0==py);
+            double H    = -1;
+            bool   init = true;
+
             for(size_t x=1;x<=nproc;++x)
             {
                 for(size_t y=1;y<=nproc;++y)
                 {
                     if(x*y==nproc)
                     {
-                        l.push_back( new node2D(x,y,Nx,Ny) );
+                        if(init)
+                        {
+                            px   = x;
+                            py   = y;
+                            H    = ComputeH(x,y, Nx, Ny);
+                            init = false;
+                        }
+                        else
+                        {
+                            const double tmp = ComputeH(x, y, Nx, Ny);
+                            if(tmp<H)
+                            {
+                                px = x;
+                                py = y;
+                                H  = tmp;
+                            }
+                        }
                     }
                 }
             }
         }
-
-        void find_mpi_split(size_t      &px,
-                            size_t      &py,
-                            const size_t nproc,
-                            const size_t Nx,
-                            const size_t Ny)
-        {
-            list2D l;
-            build_list2D(l, nproc, Nx, Ny);
-            assert(l.size>0);
-            px    = l.head->x;
-            py    = l.head->y;
-            double ratio = l.head->ratio;
-            delete l.pop_front();
-            while(l.size)
-            {
-                const double tmp = l.head->ratio;
-                if(tmp<ratio)
-                {
-                    px    = l.head->x;
-                    py    = l.head->y;
-                    ratio = l.head->ratio;
-                }
-                delete l.pop_front();
-            }
-        }
-
+        
     }
     
 }

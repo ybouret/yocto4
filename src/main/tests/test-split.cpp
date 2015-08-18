@@ -38,6 +38,7 @@ namespace {
         for(size_t size=1;size<=8;++size)
         {
             std::cerr << std::endl;
+            core::mpi_split2D<T> split(size,global_xlength,global_ylength);
             for(size_t rank=0;rank<size;++rank)
             {
                 std::cerr << "\t" << size << "." << rank << ": ";
@@ -45,7 +46,7 @@ namespace {
                 T yoffset = global_offset;
                 T xlength = global_xlength;
                 T ylength = global_ylength;
-                core::mpi_split(rank, size, xoffset, yoffset, xlength, ylength);
+                split(rank, xoffset, yoffset, xlength, ylength);
                 std::cerr << " x: "  << xoffset << "->" << (xoffset+xlength-1);
                 std::cerr << "| y: " << yoffset << "->" << (yoffset+ylength-1);
                 std::cerr << std::endl;

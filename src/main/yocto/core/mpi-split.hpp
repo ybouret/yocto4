@@ -3,6 +3,7 @@
 
 #include "yocto/os.hpp"
 
+#include <iostream>
 
 namespace yocto
 {
@@ -27,37 +28,63 @@ namespace yocto
             length = todo;
         }
 
-
-        extern void find_mpi_split(size_t      &px,
-                                   size_t      &py,
-                                   const size_t nproc,
-                                   const size_t Nx,
-                                   const size_t Ny);
+        void find_mpi_split2D(size_t      &px,
+                              size_t      &py,
+                              const size_t nproc,
+                              const size_t Nx,
+                              const size_t Ny) throw();
 
         template <typename T>
-        inline void mpi_split(size_t rank,
-                              size_t size,
-                              T &xoffset,
-                              T &yoffset,
-                              T &xlength,
-                              T &ylength)
+        class mpi_split2D
         {
+        public:
+            const size_t px; //!< #procs in x direction
+            const size_t py; //!< #procs in y direction
 
-            const size_t Nx = xlength;
-            const size_t Ny = ylength;
-            // find the number of procs per dimension
-            size_t       px = 0;
-            size_t       py = 0;
-            find_mpi_split(px,py,size,Nx,Ny);
+            inline explicit mpi_split2D(const size_t size,
+                                        const T      xlength,
+                                        const T      ylength) throw() :
+            px(0),
+            py(0)
+            {
+                assert(size>0);
+                find_mpi_split2D((size_t&)px, (size_t&)py, size, xlength, ylength);
+                assert(px>0);
+                assert(py>0);
+                std::cerr << "\t#x=" << xlength << ", #y=" << ylength << std::endl;
+                std::cerr << "\tpx=" << px <<", py=" << py << std::endl;
+            }
 
-            // find the local ranks
-            const size_t rx = rank % px;
-            const size_t ry = rank / px;
-            //std::cerr << "px=" << px << ", py=" << py << ", rx=" << rx << ", ry=" << ry << std::endl;
-            mpi_split(rx,px,xoffset,xlength);
-            mpi_split(ry,py,yoffset,ylength);
-        }
-        
+            inline virtual ~mpi_split2D() throw() {}
+
+            inline size_t get_xrank(const size_t rank) const throw()
+            {
+                return rank % px;
+            }
+
+            inline size_t get_yrank(const size_t rank) const throw()
+            {
+                return rank / px;
+            }
+
+            inline void operator()(size_t rank,
+                                   T     &xoffset,
+                                   T     &yoffset,
+                                   T     &xlength,
+                                   T     &ylength) const throw()
+            {
+                const size_t rx = get_xrank(rank); assert(rx<px);
+                const size_t ry = get_yrank(rank); assert(ry<py);
+                //std::cerr << "\trx=" << rx << ", ry=" << ry << std::endl;
+                mpi_split(rx,px,xoffset,xlength);
+                mpi_split(ry,py,yoffset,ylength);
+            }
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(mpi_split2D);
+
+        };
+
         
     }
 }
