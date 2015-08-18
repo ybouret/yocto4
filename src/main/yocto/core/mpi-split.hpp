@@ -3,6 +3,8 @@
 
 #include "yocto/os.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
     namespace core
@@ -73,7 +75,7 @@ namespace yocto
             {
                 const size_t rx = get_xrank(rank); assert(rx<px);
                 const size_t ry = get_yrank(rank); assert(ry<py);
-                //std::cerr << "\trx=" << rx << ", ry=" << ry << std::endl;
+                std::cerr << "\trx=" << rx << ", ry=" << ry << std::endl;
                 mpi_split(rx,px,xoffset,xlength);
                 mpi_split(ry,py,yoffset,ylength);
             }

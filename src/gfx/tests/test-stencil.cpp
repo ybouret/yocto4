@@ -7,11 +7,11 @@
 #include "yocto/gfx/ops/gradient.hpp"
 #include "yocto/gfx/ops/split-channels.hpp"
 #include "yocto/gfx/ops/histogram.hpp"
+#include "yocto/gfx/parallel.hpp"
 
 using namespace yocto;
 using namespace gfx;
 
-#define SHOW_SIZE_OF(N,TYPE) std::cerr << "sizeof(stencil<" #N "," #TYPE ">)\t=\t" << sizeof(stencil<N,TYPE>) << std::endl
 
 YOCTO_UNIT_TEST_IMPL(stencil)
 {
@@ -23,14 +23,8 @@ YOCTO_UNIT_TEST_IMPL(stencil)
     
     const image::format &PNG = IMG["PNG"];
     
-    SHOW_SIZE_OF(0,uint8_t);
-    SHOW_SIZE_OF(1,uint8_t);
-    SHOW_SIZE_OF(2,uint8_t);
-    
-    SHOW_SIZE_OF(0,float);
-    SHOW_SIZE_OF(1,float);
-    SHOW_SIZE_OF(2,float);
-    
+    threading::SIMD simd;
+
     if(argc>1)
     {
         const string         filename = argv[1];
@@ -43,9 +37,16 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             // pxf: black and white
             pixmapf pxf(pxm,rgb2bwf<rgb_t>);
             PNG.save("imagec.png",pxf, get_rgba::from_rampf,NULL, NULL);
-            
-            
-            pixmaps<uint8_t> ch(3,pxm.w,pxm.h);
+
+            const unit_t w = pxm.w;
+            const unit_t h = pxm.h;
+
+            std::cerr << std::endl << std::endl;
+            std::cerr << "\t(*) building patches..." << std::endl;
+            setup_contexts<ipatch>(simd, w, h, true);
+            std::cerr << std::endl << std::endl;
+
+            pixmaps<uint8_t> ch(3,w,h);
             split_channels(ch,pxm);
             PNG.save("image_col_r.png",ch[0], get_rgba::from_byte_r,NULL, NULL);
             PNG.save("image_col_g.png",ch[1], get_rgba::from_byte_g,NULL, NULL);

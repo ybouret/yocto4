@@ -7,55 +7,35 @@ namespace yocto
     namespace gfx
     {
 
-        patch:: patch(bitmap &user_bmp, const rectangle &user_rect) throw() :
-        bmp(user_bmp),
-        rect(user_rect)
+        void ipatch:: setup_parallel_metrics(unit_t &xoff,
+                                             unit_t &yoff,
+                                             unit_t &xlen,
+                                             unit_t &ylen,
+                                             const unit_t w,
+                                             const unit_t h,
+                                             const bool   full)
         {
-
-        }
-
-
-        patch:: ~patch() throw() {}
-
-
-
-        void patch:: setup(threading::SIMD &simd,
-                           bitmap          &bmp,
-                           const bool       full)
-        {
-            // set up
-            unit_t xoffset=0,yoffset=0;
-            unit_t xlength=bmp.w, ylength=bmp.h;
+            xoff = 0;
+            yoff = 0;
+            xlen = w;
+            ylen = h;
             if(!full)
             {
-                xoffset =  1;
-                yoffset =  1;
-                xlength -= 2;
-                ylength -= 2;
-                if(xlength<0||ylength<0)
-                {
-                    throw exception("gfx.simd: bitmap is too small!");
-                }
+                xoff =  1;
+                yoff =  1;
+                xlen -= 2;
+                ylen -= 2;
             }
-
-            // prepare to cut
-            core::mpi_split2D<unit_t> split(simd.size,xlength,ylength);
-
-            for(size_t rank=0;rank<simd.size;++rank)
+            if(xlen<0||ylen<0)
             {
-                unit_t xoff = xoffset;
-                unit_t yoff = yoffset;
-                unit_t xlen = xlength;
-                unit_t ylen = ylength;
-                split(rank,xoff,yoff,xlen,ylen);
-                const rectangle rect(xoff,yoff,xlen,ylen);
-                threading::SIMD::Context &ctx = simd[rank];
-                ctx.build<patch,bitmap&,const rectangle&>(bmp,rect);
+                throw exception("setup_parallel_metrics: too small dimensions");
             }
-
-
-            
         }
+
+        ipatch:: ipatch(const rectangle &r) throw() : rectangle(r) {}
+
+        ipatch:: ~ipatch() throw() {}
+
         
     }
     
