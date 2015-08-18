@@ -32,7 +32,7 @@ namespace yocto
             }
         }
 
-        ipatch:: ipatch(const rectangle &r) throw() : rectangle(r) {}
+        ipatch:: ipatch(const rectangle &r) throw() : rect(r) {}
 
         ipatch:: ~ipatch() throw() {}
 

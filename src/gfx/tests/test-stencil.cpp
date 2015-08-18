@@ -12,6 +12,10 @@
 using namespace yocto;
 using namespace gfx;
 
+namespace
+{
+
+}
 
 YOCTO_UNIT_TEST_IMPL(stencil)
 {

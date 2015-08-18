@@ -71,13 +71,27 @@ namespace yocto
             virtual ~SIMD() throw();
 
             //! get a 0..size-1 context
-            Context       & operator[]( size_t rank ) throw();
+            Context       & operator[]( const size_t rank ) throw();
 
             //! get a 0..size-t const context
             const Context & operator[]( const size_t rank) const throw();
 
             //! execute #threads copy of kernel with different contexts
             void operator()( Kernel &K );
+
+            template <typename T>
+            inline T & get(const size_t rank) throw()
+            {
+                SIMD &self = *this;
+                return self[rank]. template as<T>();
+            }
+
+            template <typename T>
+            const T & get(const size_t rank) const throw()
+            {
+                const SIMD &self = *this;
+                return self[rank]. template as<T>();
+            }
 
             //! create a DATATYPE inside context::vslot, no args, no ctx
             template <typename DATATYPE>

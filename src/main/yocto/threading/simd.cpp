@@ -73,13 +73,13 @@ wksp(0)
             };
         }
         
-        SIMD::Context & SIMD:: operator[]( size_t rank ) throw()
+        SIMD::Context & SIMD:: operator[]( const size_t rank ) throw()
         {
             assert(rank<size);
             return (static_cast<member *>(wksp)+rank)->ctx;
         }
         
-        const  SIMD::Context & SIMD:: operator[]( size_t rank ) const throw()
+        const  SIMD::Context & SIMD:: operator[]( const size_t rank ) const throw()
         {
             assert(rank<size);
             return (static_cast<member *>(wksp)+rank)->ctx;
