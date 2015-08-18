@@ -29,9 +29,6 @@ namespace yocto
                 const size_t indx;   //!< rank+1, for information
                 const size_t size;   //!< the size=#threads
                 lockable    &access; //!< common lock for synchronization
-
-                //typedef functor<void,TL1(context&)> kernel;
-
                 explicit Context( size_t r, size_t s, lockable &lock_ref) throw();
                 virtual ~Context() throw();
 

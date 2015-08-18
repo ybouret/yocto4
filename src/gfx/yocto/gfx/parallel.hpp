@@ -5,18 +5,21 @@
 #include "yocto/threading/simd.hpp"
 #include "yocto/core/mpi-split.hpp"
 
-#include <iostream>
+//#include <iostream>
 
 namespace yocto
 {
     namespace gfx
     {
 
+        //! a patch interface
         class ipatch
         {
 
         public:
             const rectangle rect;
+
+            //! compute the parameters from w and h
             static void setup_parallel_metrics(unit_t      &xoff,
                                                unit_t      &yoff,
                                                unit_t      &xlen,
@@ -56,10 +59,10 @@ namespace yocto
                 unit_t ylength = ylen;
                 split(rank,xoffset,yoffset,xlength,ylength);
                 const rectangle rect(xoffset,yoffset,xlength,ylength);
-                std::cerr << "\t" << size << "." << rank << ":";
-                std::cerr << "[" << rect.x << ":" << rect.xout-1 << "] * ";
-                std::cerr << "[" << rect.y << ":" << rect.yout-1 << "]";
-                std::cerr << std::endl;
+                //std::cerr << "\t" << size << "." << rank << ":";
+                //std::cerr << "[" << rect.x << ":" << rect.xout-1 << "] * ";
+                //std::cerr << "[" << rect.y << ":" << rect.yout-1 << "]";
+                //std::cerr << std::endl;
                 threading::SIMD::Context &ctx = simd[rank];
                 ctx.build<DATATYPE,const rectangle&>(rect);
             }
