@@ -3,8 +3,6 @@
 
 #include "yocto/os.hpp"
 
-#include <iostream>
-
 namespace yocto
 {
     namespace core
@@ -51,8 +49,8 @@ namespace yocto
                 find_mpi_split2D((size_t&)px, (size_t&)py, size, xlength, ylength);
                 assert(px>0);
                 assert(py>0);
-                std::cerr << "\t#x=" << xlength << ", #y=" << ylength << std::endl;
-                std::cerr << "\tpx=" << px <<", py=" << py << std::endl;
+                //std::cerr << "\t#x=" << xlength << ", #y=" << ylength << std::endl;
+                //std::cerr << "\tpx=" << px <<", py=" << py << std::endl;
             }
 
             inline virtual ~mpi_split2D() throw() {}
