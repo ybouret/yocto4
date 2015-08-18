@@ -19,11 +19,11 @@ namespace yocto
 
         public:
             const rectangle rect;
-            void           *source;
+            const void     *source;
             void           *target;
-            void           *params;
+            const void     *params;
 
-            //! compute the parameters from w and h
+            //! compute the parameters from w, h and full
             static void setup_parallel_metrics(unit_t      &xoff,
                                                unit_t      &yoff,
                                                unit_t      &xlen,
@@ -35,10 +35,6 @@ namespace yocto
             explicit ipatch(const rectangle &r) throw();
             virtual ~ipatch() throw();
 
-            //! assuming contexts are built from ipatch
-            static void dispatch(threading::SIMD &simd, void *src,void *tgt,void *prm);
-
-
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ipatch);
         };
@@ -46,17 +42,20 @@ namespace yocto
 
         //! DATATYPE is a kind of patch...
         template <typename DATATYPE> inline
-        static void setup_contexts(threading::SIMD &simd,
-                                   const unit_t     w,
-                                   const unit_t     h,
-                                   const bool       full)
+        void setup_contexts(threading::SIMD &simd,
+                            const unit_t     w,
+                            const unit_t     h,
+                            const bool       full)
         {
             unit_t       xoff = 0;
             unit_t       yoff = 0;
             unit_t       xlen = 0;
             unit_t       ylen = 0;
             const size_t size = simd.size;
+            // get the workload
             ipatch::setup_parallel_metrics(xoff,yoff,xlen,ylen,w,h,full);
+
+            // prepare the workload balance
             core::mpi_split2D<unit_t> split(size,xlen,ylen);
 
 
@@ -77,8 +76,21 @@ namespace yocto
             }
         }
 
-
-
+        //! DATATYPE is a kind of patch...
+        template <typename DATATYPE> inline
+        void reset_contexts(threading::SIMD &simd, const void *src,void *tgt,const void *prm)
+        {
+            for(size_t i=0;i<simd.size;++i)
+            {
+                DATATYPE &p = simd.get<DATATYPE>(i);
+                p.source = src;
+                p.target = tgt;
+                p.params = prm;
+            }
+            
+        }
+        
+        
     }
 }
 

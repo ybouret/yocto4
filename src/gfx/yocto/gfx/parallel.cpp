@@ -41,17 +41,7 @@ namespace yocto
 
         ipatch:: ~ipatch() throw() {}
 
-        void ipatch::dispatch(threading::SIMD &simd, void *src,void *tgt,void *prm)
-        {
-            for(size_t i=0;i<simd.size;++i)
-            {
-                ipatch &p = simd.get<ipatch>(i);
-                p.source = src;
-                p.target = tgt;
-                p.params = prm;
-            }
-        }
-
+        
     }
 
 }

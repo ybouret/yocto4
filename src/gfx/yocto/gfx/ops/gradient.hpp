@@ -3,12 +3,15 @@
 
 #include "yocto/gfx/pixmaps.hpp"
 #include "yocto/math/types.hpp"
+#include "yocto/gfx/parallel.hpp"
 
 namespace yocto
 {
     namespace gfx
     {
-        
+
+
+
 #define YOCTO_GFX_GRADIENT_COMPUTE(VALUE)   do { \
 const double gg = math::Hypotenuse(gx, gy);      \
 VALUE           = gg;                            \
@@ -135,20 +138,20 @@ if(gg>Gmax) { Gmax = gg; }                       \
             }
             return Gmax;
         }
-        
+
         template <typename T>
         void gradient( pixmap<T> &grad, const pixmap<T> &data ) throw()
         {
-            
+
             assert(grad.w == data.w );
             assert(grad.h == data.h );
             const unit_t w = data.w;
             const unit_t h = data.h;
-            
+
             // first pass: build 'real' gradient
             pixmap<double> G(w,h);
             const double Gmax = gradient_of(data, G);
-            
+
             // second pass: convert to type
             if(Gmax<=0)
             {
@@ -160,7 +163,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 {
                     typename pixmap<T>::row         &gj  = grad[j];
                     const pixmap<double>::row       &Gj  = G[j];
-                    
+
                     for(unit_t i=0;i<w;++i)
                     {
                         gj[i] = to_unit<T>(Gj[i]/Gmax);
@@ -170,7 +173,111 @@ if(gg>Gmax) { Gmax = gg; }                       \
         }
 
 
+        template <typename T>
+        class gradient_patch : public ipatch
+        {
+        public:
+            double Gmax;
 
+            explicit gradient_patch( const rectangle &r ) throw() :
+            ipatch(r),
+            Gmax(0)
+            {
+            }
+
+            virtual ~gradient_patch() throw() {}
+
+
+            static inline
+            void call1( threading::SIMD::Context &ctx ) throw()
+            {
+                gradient_patch &self = ctx.as<gradient_patch>();
+                {
+                    YOCTO_LOCK(ctx.access);
+                    std::cerr << "@ctx#" << ctx.rank << "[" << self.rect.x << ":" << self.rect.xout-1 << "] x [" << self.rect.y << ":" << self.rect.yout-1 << "]" << std::endl;
+                }
+                self.compute1();
+            }
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(gradient_patch);
+            void compute1() throw()
+            {
+                Gmax = 0;
+                const pixmap<T> &data = *(const pixmap<T> *)(source);
+                pixmap<double>  &G    = *(pixmap<double>  *)(target);
+                const unit_t xlo = rect.x;
+                const unit_t xhi = rect.xout;
+                const unit_t xlom = xlo-1;
+                const unit_t xlop = xlo+1;
+                const unit_t ylo = rect.y;
+                const unit_t yhi = rect.yout;
+                for(unit_t jm=ylo-1,j=ylo,jp=ylo+1;j<yhi;++jm,++j,++jp)
+                {
+                    pixmap<double>::row           &Gj  = G[j];
+                    const typename pixmap<T>::row &dj  = data[j];
+                    const typename pixmap<T>::row &djm = data[jm];
+                    const typename pixmap<T>::row &djp = data[jp];
+                    for(unit_t im=xlom,i=xlo,ip=xlop;i<xhi;++im,++i,++ip)
+                    {
+                        const double gx = double(dj[ip])-double(dj[im]);
+                        const double gy = double(djp[i])-double(djm[i]);
+                        YOCTO_GFX_GRADIENT_COMPUTE(Gj[i]);
+                    }
+                }
+
+            }
+        };
+
+
+        template <typename T>
+        double gradient_of( const pixmap<T> &data, pixmap<double> &G, threading::SIMD &simd)
+        {
+            assert(data.w==G.w);
+            assert(data.h==G.h);
+            const unit_t w    = data.w;
+            const unit_t h    = data.h;
+
+            // prepare inside blocks
+            setup_contexts< gradient_patch<T> >(simd,w,h,false);
+            reset_contexts< gradient_patch<T> >(simd, &data, &G, NULL);
+            threading::SIMD::Kernel K( cfunctor(gradient_patch<T>::call1) );
+
+            // compute inside blocks
+            simd(K);
+
+            double Gmax = 0;
+
+            // compute borders
+
+
+            // compute final Gmax
+            const size_t size = simd.size;
+            for(size_t rank=0;rank<size;++rank)
+            {
+                const double tmp  = simd.get< gradient_patch<T> >(rank).Gmax;
+                if(tmp>Gmax) Gmax = tmp;
+            }
+            return Gmax;
+        }
+
+        template <typename T>
+        void gradient( pixmap<T> &grad, const pixmap<T> &data, threading::SIMD &simd) throw()
+        {
+            
+            assert(grad.w == data.w );
+            assert(grad.h == data.h );
+            const unit_t w = data.w;
+            const unit_t h = data.h;
+            
+            // first pass: build 'real' gradient
+            pixmap<double> G(w,h);
+            const double   Gmax = gradient_of(data, G,simd);
+            (void)Gmax;
+            
+            
+        }
+        
         
     }
     

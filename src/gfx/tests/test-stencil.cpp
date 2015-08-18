@@ -37,7 +37,8 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             bitmap::pointer bmp(IMG.load(filename,3, put_rgba::to_rgb,NULL,NULL));
             pixmap3         pxm(bmp,NULL);
             PNG.save("image3.png",pxm, get_rgba::from_rgb,NULL, NULL);
-            
+            pixmap3         pxm2(pxm,NULL);
+
             // pxf: black and white
             pixmapf pxf(pxm,rgb2bwf<rgb_t>);
             PNG.save("imagec.png",pxf, get_rgba::from_rampf,NULL, NULL);
@@ -45,10 +46,12 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             const unit_t w = pxm.w;
             const unit_t h = pxm.h;
 
+#if 0
             std::cerr << std::endl << std::endl;
             std::cerr << "\t(*) building patches..." << std::endl;
             setup_contexts<ipatch>(simd, w, h, true);
             std::cerr << std::endl << std::endl;
+#endif
 
             pixmaps<uint8_t> ch(3,w,h);
             split_channels(ch,pxm);
@@ -58,6 +61,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             gradient(ch[0], ch[0]);
             gradient(ch[1], ch[1]);
             gradient(ch[2], ch[2]);
+
             PNG.save("grad_image_r.png",ch[0], get_rgba::from_byte_r,NULL, NULL);
             PNG.save("grad_image_g.png",ch[1], get_rgba::from_byte_g,NULL, NULL);
             PNG.save("grad_image_b.png",ch[2], get_rgba::from_byte_b,NULL, NULL);
@@ -67,6 +71,8 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             merge_channels(ch, pxm);
             PNG.save("grad_image3.png",pxm, get_rgba::from_rgb,NULL, NULL);
 
+            split_channels(ch,pxm2);
+            gradient(ch[0], ch[0], simd);
         }
         
     }
