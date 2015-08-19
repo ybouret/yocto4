@@ -65,8 +65,27 @@ YOCTO_UNIT_TEST_IMPL(mpi_split)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/ios/ocstream.hpp"
+
 YOCTO_UNIT_TEST_IMPL(mpi_split2)
 {
+    double Lx = 1;
+    double Ly = 1;
+    for(int N=1;N<=10;++N)
+    {
+        ios::wcstream fp( vformat("tau%d.dat",N) );
+        for(int nx=1;nx<=N;++nx)
+        {
+            for(int ny=1;ny<=N;++ny)
+            {
+                if(nx*ny==N)
+                {
+                    const double Tau = nx*Ly + ny *Lx;
+                    fp("%d %g\n", nx, Tau);
+                }
+            }
+        }
+    }
     __test_split2<int>();
     __test_split2<size_t>();
 }
