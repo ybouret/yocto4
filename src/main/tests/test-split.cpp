@@ -94,3 +94,27 @@ YOCTO_UNIT_TEST_IMPL(mpi_split2)
 }
 YOCTO_UNIT_TEST_DONE()
 
+
+#include "yocto/parallel/patch.hpp"
+
+using namespace parallel;
+
+YOCTO_UNIT_TEST_IMPL(split)
+{
+    patch1D p1(1,10);
+    patch1D p1b(p1);
+    std::cerr << "p1 =" << p1  << std::endl;
+    std::cerr << "p1b=" << p1b << std::endl;
+
+
+    patch2D p2( coord2D(1,1), coord2D(10,20) );
+    patch2D p2b(p2);
+
+    std::cerr << "p2 =" << p2   << std::endl;
+    std::cerr << "p2b=" << p2b  << std::endl;
+
+}
+YOCTO_UNIT_TEST_DONE()
+
+
+
