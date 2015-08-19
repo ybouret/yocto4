@@ -71,3 +71,4 @@ YOCTO_UNIT_TEST_IMPL(mpi_split2)
     __test_split2<size_t>();
 }
 YOCTO_UNIT_TEST_DONE()
+
