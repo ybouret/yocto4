@@ -12,6 +12,7 @@ clean:
 	@${MAKE} -s -C src/gems/docs       clean
 	@${MAKE} -s -C prj                 clean
 	@${MAKE} -s -C src/R               clean
+	@${MAKE} -s -C src/mpi/docs        clean
 	@rm -f data/colors/*.hpp data/colors/*.cpp
 
 ifdef WINDIR
