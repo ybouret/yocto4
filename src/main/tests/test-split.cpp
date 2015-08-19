@@ -69,6 +69,7 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(mpi_split2)
 {
+#if 0
     double Lx = 1;
     double Ly = 1;
     for(int N=1;N<=10;++N)
@@ -80,12 +81,14 @@ YOCTO_UNIT_TEST_IMPL(mpi_split2)
             {
                 if(nx*ny==N)
                 {
-                    const double Tau = nx*Ly + ny *Lx;
+                    const double Tau = Ly/ny + Lx/nx;
                     fp("%d %g\n", nx, Tau);
                 }
             }
         }
     }
+#endif
+    
     __test_split2<int>();
     __test_split2<size_t>();
 }

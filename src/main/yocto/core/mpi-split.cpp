@@ -15,7 +15,7 @@ namespace yocto
                                       const size_t Nx,
                                       const size_t Ny) throw()
         {
-            return fabs( fabs( double(Nx)/px - double(Ny)/py) );
+            return  fabs( double(Nx)/px + double(Ny)/py);
         }
 
         void find_mpi_split2D(size_t      &px,
