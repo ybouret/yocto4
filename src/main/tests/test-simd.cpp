@@ -164,37 +164,5 @@ YOCTO_UNIT_TEST_IMPL(simd)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/threading/split.hpp"
-namespace
-{
-    template <typename T>
-    static inline
-    void __test_split1D()
-    {
-        const T global_offset(1);
-        const T global_length(100);
-
-        for(size_t size=1;size<=6;++size)
-        {
-            std::cerr << std::endl << "size=" << size << ": " << global_offset << " -> " << global_length+global_offset-1  << std::endl;
-            for(size_t rank=0;rank<size;++rank)
-            {
-                std::cerr << "\t" << size << "." << rank << ": ";
-                T offset = global_offset;
-                T length = global_length;
-                parallel_split(rank, size, offset, length);
-                std::cerr << offset << " -> " << length + offset -1 << " / length=" <<  length;
-                std::cerr << std::endl;
-            }
-        }
-    }
-
-}
-YOCTO_UNIT_TEST_IMPL(split)
-{
-    __test_split1D<int>();
-    __test_split1D<uint16_t>();
-}
-YOCTO_UNIT_TEST_DONE()
 
 
