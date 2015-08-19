@@ -101,6 +101,10 @@ using namespace parallel;
 
 YOCTO_UNIT_TEST_IMPL(split)
 {
+    std::cerr << "sizeof(patch1D)=" << sizeof(patch1D) << std::endl;
+    std::cerr << "sizeof(patch2D)=" << sizeof(patch2D) << std::endl;
+    std::cerr << "sizeof(patch3D)=" << sizeof(patch3D) << std::endl;
+
     patch1D p1(1,10);
     patch1D p1b(p1);
     std::cerr << "p1 =" << p1  << std::endl;
