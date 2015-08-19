@@ -5,8 +5,6 @@
 #include "yocto/threading/simd.hpp"
 #include "yocto/core/mpi-split.hpp"
 
-//#include <iostream>
-
 namespace yocto
 {
     namespace gfx
@@ -66,11 +64,7 @@ namespace yocto
                 unit_t xlength = xlen;
                 unit_t ylength = ylen;
                 split(rank,xoffset,yoffset,xlength,ylength);
-                const rectangle rect(xoffset,yoffset,xlength,ylength);
-                //std::cerr << "\t" << size << "." << rank << ":";
-                //std::cerr << "[" << rect.x << ":" << rect.xout-1 << "] * ";
-                //std::cerr << "[" << rect.y << ":" << rect.yout-1 << "]";
-                //std::cerr << std::endl;
+                const rectangle           rect(xoffset,yoffset,xlength,ylength);
                 threading::SIMD::Context &ctx = simd[rank];
                 ctx.build<DATATYPE,const rectangle&>(rect);
             }

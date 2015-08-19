@@ -136,7 +136,7 @@ namespace yocto {
 
 YOCTO_SUPPORT_C_STYLE_OPS(math::v2d<float>)
 YOCTO_SUPPORT_C_STYLE_OPS(math::v2d<double>)
-YOCTO_SUPPORT_C_STYLE_OPS(math::v2d<ptrdiff_t>)
+YOCTO_SUPPORT_C_STYLE_OPS(math::v2d<unit_t>)
 
 
 

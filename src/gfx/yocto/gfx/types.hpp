@@ -94,7 +94,7 @@ namespace yocto
                                             const uint8_t G,
                                             const uint8_t B) throw()
         {
-            return (unit_float[R]+unit_float[G]+unit_float[B])/3.0;
+            return (unit_float[R]+unit_float[G]+unit_float[B])/3.0f;
         }
 
         template <>

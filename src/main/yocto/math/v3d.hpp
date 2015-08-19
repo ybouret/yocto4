@@ -108,6 +108,6 @@ namespace yocto {
 
 YOCTO_SUPPORT_C_STYLE_OPS(math::v3d<float>)
 YOCTO_SUPPORT_C_STYLE_OPS(math::v3d<double>)
-YOCTO_SUPPORT_C_STYLE_OPS(math::v3d<ptrdiff_t>)
+YOCTO_SUPPORT_C_STYLE_OPS(math::v3d<unit_t>)
 
 #endif
