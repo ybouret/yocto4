@@ -42,7 +42,7 @@ $$
 	\Theta_x - \Theta_y = 2\left(L_y-L_x\right)\left(1-\dfrac{\beta}{N}\right)
 $$	
 so that splitting in the largest direction is always the best solution, under
-the obvious assumption that $\beta$ is small.
+the obvious assumption that $\beta<2$.
 
 \subsection{$XY$-splitting} 
 We assume we set $n_x,n_y$ patches so that $n_x\times n_y=N$,
@@ -51,7 +51,7 @@ The communication time is about $\Theta_{xy}=2\left(\dfrac{L_y}{n_y}+\dfrac{L_x}
 there is no local copy.
 
 \section{Choosing}
-\subsection{Speed up assumption for linear case}
+\subsection{Speed-up assumption for linear case}
 In that case, we must have a gain for $N\geq2$.
 Let us assume that $L_x>L_y$, then we must ave
 $$
@@ -73,9 +73,11 @@ Hence, we have a minimal time to beat through splitting:
 $$	
 	\Theta_m = 2  \min(L_x,L_y) + 2\beta_m \dfrac{\max(L_x,L_y)}{N}.
 $$
-And we initialize the search with the best $X$- or $Y$- splitting, 
-with the preference in the $Y$ direction in case of equality.
+And we initialise the search with the best $X$- or $Y$- splitting, 
+with the preference in the $Y$ direction in case of equality, and we name it $\Theta$.
  
 \subsection{Finding the $XY$ case}
-We compare $\Theta$
+We compare $\Theta_{x,y}$ to the current $\Theta$ value, for
+all the possible values of $x$ and $y$, with a preference for $y$ in case of equality.
+
 \end{document}

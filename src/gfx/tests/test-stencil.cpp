@@ -65,6 +65,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             merge_channels(ch, pxm);
             PNG.save("grad_image3.png",pxm, get_rgba::from_rgb,NULL, NULL);
 
+#if 0
             split_channels(ch,pxm2);
             gradient(ch[0], ch[0], simd);
             gradient(ch[1], ch[1], simd);
@@ -72,7 +73,8 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             PNG.save("para_grad_image_r.png",ch[0], get_rgba::from_byte_r,NULL, NULL);
             PNG.save("para_grad_image_g.png",ch[1], get_rgba::from_byte_g,NULL, NULL);
             PNG.save("para_grad_image_b.png",ch[2], get_rgba::from_byte_b,NULL, NULL);
-
+#endif
+            
         }
         
     }

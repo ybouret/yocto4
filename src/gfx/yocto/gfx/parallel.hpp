@@ -3,7 +3,7 @@
 
 #include "yocto/gfx/rectangle.hpp"
 #include "yocto/threading/simd.hpp"
-#include "yocto/core/mpi-split.hpp"
+#include "yocto/parallel/split.hpp"
 
 namespace yocto
 {
@@ -11,6 +11,7 @@ namespace yocto
     {
 
 
+#if 0
         //! a patch interface
         class ipatch
         {
@@ -83,7 +84,7 @@ namespace yocto
             }
             
         }
-        
+#endif
         
     }
 }

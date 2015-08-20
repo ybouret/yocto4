@@ -122,8 +122,6 @@ YOCTO_UNIT_TEST_INIT(150)
     YOCTO_UNIT_TEST_DECL(comb_io);
     YOCTO_UNIT_TEST_DECL(dispatch);
     YOCTO_UNIT_TEST_DECL(tab);
-    YOCTO_UNIT_TEST_DECL(mpi_split);
-    YOCTO_UNIT_TEST_DECL(mpi_split2);
     YOCTO_UNIT_TEST_DECL(split);
     YOCTO_UNIT_TEST_DECL(ipower);
     

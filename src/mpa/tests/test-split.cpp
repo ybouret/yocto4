@@ -1,4 +1,4 @@
-#include "yocto/core/mpi-split.hpp"
+#include "yocto/parallel/split.hpp"
 #include "yocto/mpa/rational.hpp"
 #include "yocto/utest/run.hpp"
 
@@ -21,7 +21,7 @@ namespace {
                 std::cerr << "\t" << size << "." << rank << ": ";
                 T offset = global_offset;
                 T length = global_length;
-                core::mpi_split(rank, size, offset, length);
+                parallel::split::in1D(rank, size, offset, length);
                 std::cerr << offset << " -> " << length + offset -1 << " / length=" <<  length << std::endl;
                 std::cerr << std::endl;
             }

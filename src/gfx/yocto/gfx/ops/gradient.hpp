@@ -173,6 +173,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
         }
 
 
+#if 0
         template <typename T>
         class gradient_patch : public ipatch
         {
@@ -323,7 +324,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
             }
 
         }
-
+#endif
 
     }
 

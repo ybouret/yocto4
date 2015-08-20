@@ -1,12 +1,11 @@
 #include "yocto/gfx/parallel.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/core/mpi-split.hpp"
 
 namespace yocto
 {
     namespace gfx
     {
-
+#if 0
         void ipatch:: setup_parallel_metrics(unit_t &xoff,
                                              unit_t &yoff,
                                              unit_t &xlen,
@@ -40,7 +39,7 @@ namespace yocto
         {}
 
         ipatch:: ~ipatch() throw() {}
-
+#endif
         
     }
 
