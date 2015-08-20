@@ -4,15 +4,15 @@
 namespace yocto
 {
     namespace gfx
+
     {
-#if 0
-        void ipatch:: setup_parallel_metrics(unit_t &xoff,
-                                             unit_t &yoff,
-                                             unit_t &xlen,
-                                             unit_t &ylen,
-                                             const unit_t w,
-                                             const unit_t h,
-                                             const bool   full)
+        void patch:: setup_parallel_metrics(unit_t &xoff,
+                                            unit_t &yoff,
+                                            unit_t &xlen,
+                                            unit_t &ylen,
+                                            const unit_t w,
+                                            const unit_t h,
+                                            const bool   full)
         {
             xoff = 0;
             yoff = 0;
@@ -31,16 +31,17 @@ namespace yocto
             }
         }
 
-        ipatch:: ipatch(const rectangle &r) throw() :
-        rect(r),
+        patch:: ~patch() throw() {}
+
+        patch:: patch( const patch2D &p ) throw() :
+        patch2D(p),
         source(0),
         target(0),
         params(0)
-        {}
-
-        ipatch:: ~ipatch() throw() {}
-#endif
+        {
+        }
         
-    }
 
+    }
+    
 }

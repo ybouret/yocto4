@@ -10,6 +10,35 @@ namespace yocto
     namespace gfx
     {
 
+        typedef parallel::patch2D patch2D;
+        typedef parallel::coord2D coord2D;
+
+        class patch : public patch2D
+        {
+        public:
+            //! compute the parameters from w, h and full
+            static void setup_parallel_metrics(unit_t      &xoff,
+                                               unit_t      &yoff,
+                                               unit_t      &xlen,
+                                               unit_t      &ylen,
+                                               const unit_t w,
+                                               const unit_t h,
+                                               const bool   full);
+
+            const void     *source;
+            void           *target;
+            const void     *params;
+
+            explicit patch(const patch2D &p) throw();
+            virtual ~patch() throw();
+
+
+            template <typename DATATYPE> inline
+            static void setup();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(patch);
+        };
 
 #if 0
         //! a patch interface
