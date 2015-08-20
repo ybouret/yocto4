@@ -11,7 +11,8 @@
 \title{MPI regular splitting}
 \maketitle
 	
-\textbf{Description and notations.}
+\section{Description and notations.}
+\subsection{Timings}
 Let's say we have a 2D box with lengths $L_x,L_x$ and
 we want to split the layout with $N$ cores, under the assumption
 of fully periodic boundary conditions.
@@ -21,16 +22,29 @@ a local copy time is $\beta$. The raw
 work time is $\Theta_N=\alpha\dfrac{L_xL_y}{N}$. We need
 the communication times to compare to $T_0=\alpha L_xL_y$.\\
 
+\subsection{Linear splittings}
+
 \textbf{$X$-splitting.}
-The communication time is $\theta_x=2\left(L_y + \beta \dfrac{L_x}{N}\right)$.\\
-
+The communication time is $\tau_x=2\left(L_y + \beta \dfrac{L_x}{N}\right)$.\\
 \textbf{$Y$-splitting.}
-The communication time is $\theta_y=2\left(L_x + \beta \dfrac{L_y}{N}\right)$.\\
+The communication time is $\tau_y=2\left(L_x + \beta \dfrac{L_y}{N}\right)$.\\
 
-We see that $\theta_x-\theta_y=2\left(1-\dfrac{\beta}{N}\right)\left(L_y-L_x\right)$: assuming that $\beta<1$, we
+We see that $\tau_x-\tau_y=2\left(1-\dfrac{\beta}{N}\right)\left(L_y-L_x\right)$: assuming that $\beta<1$, we
 shall cut in the larger direction.\\
 
-\textbf{$XY$-splitting.} We assume we set $n_x,n_y$ patches so that $n_x+n_y=N$,
+\subsection{$XY$-splitting} 
+We assume we set $n_x,n_y$ patches so that $n_x+n_y=N$,
 with $n_x>1$ and $n_y>1$, otherwise we are back to $X$- or $Y$-splitting.\\
 The communication time is about $\tau_{xy}=2\left(\dfrac{L_y}{n_y}+\dfrac{L_x}{n_x}\right)$.
+
+\section{Choosing}
+\subsection{Speed up assumption for linear case}
+In the case where $N=2$, and neglecting the local copies ($\beta=0$), we must have
+$$
+	\dfrac{T_0}{2} + 2 \min\left(L_x,L_y\right) \leq T_0.
+$$
+or
+$$
+	T_0 \geq 4 \min\left(L_x,L_y\right) = T_m
+$$
 \end{document}

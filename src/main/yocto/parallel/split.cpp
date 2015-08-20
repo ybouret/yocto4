@@ -10,7 +10,10 @@ namespace yocto
             unit_t offset = source.lower;
             unit_t length = source.width;
             split::in1D(rank, size, offset, length);
-            if(length<=0) throw exception("parallel.split produced empty patch!");
+
+            if(length<=0)
+                throw exception("parallel.split produced empty patch!");
+
             return patch1D(offset,offset+length-1);
         }
 
@@ -25,8 +28,27 @@ namespace yocto
     {
         split::in2D:: ~in2D() throw() {}
 
+#if 0
+        static inline
+        double computeTime(const size_t i, const size_t Nx,
+                           const size_t j, const size_t Ny)
+        {
+            assert(i>0);
+            if(i==1)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+#endif
+
         void split:: in2D:: init(const size_t Nx, const size_t Ny) throw()
         {
+            assert(Nx>0);
+            assert(Ny>0);
             size_t &nx  = (size_t &)xsize;
             size_t &ny  = (size_t &)ysize;
             double  tau = -1;
@@ -46,7 +68,6 @@ namespace yocto
                     }
                 }
             }
-
 
         }
 
