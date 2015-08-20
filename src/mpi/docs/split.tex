@@ -15,36 +15,67 @@
 \subsection{Timings}
 Let's say we have a 2D box with lengths $L_x,L_x$ and
 we want to split the layout with $N$ cores, under the assumption
-of fully periodic boundary conditions.
-The time scale is the communication time across a domain.
-The average work time per grid point is $\alpha$, and
-a local copy time is $\beta$. The raw
-work time is $\Theta_N=\alpha\dfrac{L_xL_y}{N}$. We need
-the communication times to compare to $T_0=\alpha L_xL_y$.\\
+of fully periodic boundary conditions.\\
+
+Without splitting, the local exchange time is
+$$
+	\Theta_s =  2\beta \left(L_x+L_y\right).	
+$$
+We assume that the time is normalized
+by the transer rate between two cores.
 
 \subsection{Linear splittings}
 
 \textbf{$X$-splitting.}
-The communication time is $\tau_x=2\left(L_y + \beta \dfrac{L_x}{N}\right)$.\\
-\textbf{$Y$-splitting.}
-The communication time is $\tau_y=2\left(L_x + \beta \dfrac{L_y}{N}\right)$.\\
+The communication time is
+$$
+	\Theta_x =  2 L_y + 2\beta \dfrac{L_x}{N}
+$$
 
-We see that $\tau_x-\tau_y=2\left(1-\dfrac{\beta}{N}\right)\left(L_y-L_x\right)$: assuming that $\beta<1$, we
-shall cut in the larger direction.\\
+\textbf{$Y$-splitting.}
+The communication time is
+$$
+	\Theta_y = 2 L_x + 2\beta \dfrac{L_y}{N}
+$$
+We got
+$$
+	\Theta_x - \Theta_y = 2\left(L_y-L_x\right)\left(1-\dfrac{\beta}{N}\right)
+$$	
+so that splitting in the largest direction is always the best solution, under
+the obvious assumption that $\beta$ is small.
 
 \subsection{$XY$-splitting} 
-We assume we set $n_x,n_y$ patches so that $n_x+n_y=N$,
+We assume we set $n_x,n_y$ patches so that $n_x\times n_y=N$,
 with $n_x>1$ and $n_y>1$, otherwise we are back to $X$- or $Y$-splitting.\\
-The communication time is about $\tau_{xy}=2\left(\dfrac{L_y}{n_y}+\dfrac{L_x}{n_x}\right)$.
+The communication time is about $\Theta_{xy}=2\left(\dfrac{L_y}{n_y}+\dfrac{L_x}{n_x}\right)$,
+there is no local copy.
 
 \section{Choosing}
 \subsection{Speed up assumption for linear case}
-In the case where $N=2$, and neglecting the local copies ($\beta=0$), we must have
+In that case, we must have a gain for $N\geq2$.
+Let us assume that $L_x>L_y$, then we must ave
 $$
-	\dfrac{T_0}{2} + 2 \min\left(L_x,L_y\right) \leq T_0.
+	 2 L_y + 2\beta \dfrac{L_x}{2} \leq 2\beta \left(L_x+L_y\right)
 $$
 or
 $$
-	T_0 \geq 4 \min\left(L_x,L_y\right) = T_m
+	2 L_y \leq \beta \left(L_x+2L_y\right)
 $$
+and finally
+$$
+	\beta \geq \beta_{(x>y)}= \dfrac{2L_y}{L_x+2L_y}.
+$$
+Conversely, 
+$$
+	\beta_{(y>x)}=\dfrac{2L_x}{L_y+2L_x}.
+$$
+Hence, we have a minimal time to beat through splitting:
+$$	
+	\Theta_m = 2  \min(L_x,L_y) + 2\beta_m \dfrac{\max(L_x,L_y)}{N}.
+$$
+And we initialize the search with the best $X$- or $Y$- splitting, 
+with the preference in the $Y$ direction in case of equality.
+ 
+\subsection{Finding the $XY$ case}
+We compare $\Theta$
 \end{document}

@@ -124,7 +124,7 @@ YOCTO_UNIT_TEST_IMPL(split)
     }
 
 
-    patch2D p2( coord2D(1,1), coord2D(10,20) );
+    patch2D p2( coord2D(1,1), coord2D(20,20) );
     patch2D p2b(p2);
 
     std::cerr << "p2 =" << p2   << std::endl;

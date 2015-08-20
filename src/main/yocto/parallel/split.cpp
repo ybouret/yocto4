@@ -42,38 +42,50 @@ namespace yocto
             }
             else
             {
-                // initializing with a linear split
-                const size_t T0  = 4 * min_of(Lx,Ly);
-                const size_t sLX = size * Lx;
-                const size_t sLY = size * Ly;
-                double       tau = -1;
-                if(Lx>Ly)
+                double Theta = -1;
+                double beta  = -1;
+                // compute beta, the minimal local transfert time
+                // to beat the sequential time
+                if(Ly<Lx)
                 {
-                    ny=1;
-                    nx=size;
-                    tau= double(T0+2*sLY)/size;
+                    // linear split along X
+                    nx = size;
+                    ny = 1;
+                    const double twoLy = Ly+Ly;
+                    beta  = twoLy / (Lx+twoLy);
+                    //std::cerr << "\tbeta(x>y) = " << beta << std::endl;
+                    Theta = twoLy +  ((beta+beta)*Lx)/double(size);
                 }
                 else
                 {
-                    nx=1;
-                    ny=size;
-                    tau= double(T0+2*sLX)/size;
+                    // linear split along Y, default...
+                    nx = 1;
+                    ny = size;
+                    const double twoLx = Lx+Lx;
+                    beta  = twoLx / (Ly+twoLx);
+                    //std::cerr << "\tbeta(y>=x)= " << beta << std::endl;
+                    Theta = twoLx +  ((beta+beta) * Ly)/double(size);
                 }
-                std::cerr << "\t\tnx=" << nx << ", ny=" << ny << ", tau=" << tau << std::endl;
-                // trying sub
-                for(size_t i=2;i<=size;++i)
+                //std::cerr << "\tTheta = " << Theta << std::endl;
+                //std::cerr << "\tSeqTm = " << 2*beta*(Lx+Ly) << std::endl;
+
+                for(size_t j=2;j<=size;++j)
                 {
-                    for(size_t j=2;j<=size;++j)
+                    for(size_t i=2;i<=size;++i)
                     {
                         if(i*j==size)
                         {
-                            const double tmp = ( double(T0) + 2.0 * ( double(sLX)/i + double(sLY)/j ) )/size;
-                            std::cerr << "\t\ti=" << i << ", j=" << j << ", tmp=" << tmp << std::endl;
-
+                            const double tmp = double( ( (Lx*j) + (Ly*i) ) << 1 ) / size;
+                            //std::cerr << "\t\ti=" << i << ", j=" << j << ", theta=" << tmp << std::endl;
+                            if(tmp<=Theta)
+                            {
+                                Theta = tmp;
+                                nx    = i;
+                                ny    = j;
+                            }
                         }
                     }
                 }
-
             }
         }
 
