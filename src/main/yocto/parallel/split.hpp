@@ -37,7 +37,7 @@ namespace yocto
                 const size_t xsize;
                 const size_t ysize;
                 //! compute the optimal xsize*ysize=size
-                explicit in2D(const size_t nproc, const size_t Nx, const size_t Ny) throw();
+                explicit in2D(const size_t nproc, const size_t Lx, const size_t Ly) throw();
                 explicit in2D(const size_t nproc, const patch2D &p) throw();
                 virtual ~in2D() throw();
 
@@ -48,7 +48,7 @@ namespace yocto
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(in2D);
-                void init(const size_t Nx, const size_t Ny) throw();
+                void init(const size_t Lx, const size_t Ly) throw();
             };
         };
     }

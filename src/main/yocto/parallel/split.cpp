@@ -21,6 +21,7 @@ namespace yocto
 
 }
 
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -28,47 +29,52 @@ namespace yocto
     {
         split::in2D:: ~in2D() throw() {}
 
-#if 0
-        static inline
-        double computeTime(const size_t i, const size_t Nx,
-                           const size_t j, const size_t Ny)
-        {
-            assert(i>0);
-            if(i==1)
-            {
 
+        void split:: in2D:: init(const size_t Lx, const size_t Ly) throw()
+        {
+            assert(Lx>0);
+            assert(Ly>0);
+            size_t &nx = (size_t &)xsize;
+            size_t &ny = (size_t &)ysize;
+            if(size<=1)
+            {
+                nx = ny =1;
             }
             else
             {
-
-            }
-        }
-#endif
-
-        void split:: in2D:: init(const size_t Nx, const size_t Ny) throw()
-        {
-            assert(Nx>0);
-            assert(Ny>0);
-            size_t &nx  = (size_t &)xsize;
-            size_t &ny  = (size_t &)ysize;
-            double  tau = -1;
-            for(size_t i=1;i<=size;++i)
-            {
-                for(size_t j=1;j<=size;++j)
+                // initializing with a linear split
+                const size_t T0  = 4 * min_of(Lx,Ly);
+                const size_t sLX = size * Lx;
+                const size_t sLY = size * Ly;
+                double       tau = -1;
+                if(Lx>Ly)
                 {
-                    if(i*j==size)
+                    ny=1;
+                    nx=size;
+                    tau= double(T0+2*sLY)/size;
+                }
+                else
+                {
+                    nx=1;
+                    ny=size;
+                    tau= double(T0+2*sLX)/size;
+                }
+                std::cerr << "\t\tnx=" << nx << ", ny=" << ny << ", tau=" << tau << std::endl;
+                // trying sub
+                for(size_t i=2;i<=size;++i)
+                {
+                    for(size_t j=2;j<=size;++j)
                     {
-                        const double tmp = double(Nx)/i + double(Ny)/j;
-                        if(tau<0 || tmp<tau)
+                        if(i*j==size)
                         {
-                            nx  = i;
-                            ny  = j;
-                            tau = tmp;
+                            const double tmp = ( double(T0) + 2.0 * ( double(sLX)/i + double(sLY)/j ) )/size;
+                            std::cerr << "\t\ti=" << i << ", j=" << j << ", tmp=" << tmp << std::endl;
+
                         }
                     }
                 }
-            }
 
+            }
         }
 
 #define Y_PARA_SPLIT2D_INIT() \
