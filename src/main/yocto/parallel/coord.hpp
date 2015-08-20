@@ -8,9 +8,9 @@ namespace yocto
     namespace parallel
     {
 
-        typedef unit_t            coord1D;
-        typedef math::v2d<unit_t> coord2D;
-        typedef math::v3d<unit_t> coord3D;
+        typedef unit_t            coord1D; //!< 1D logical coordinate
+        typedef math::v2d<unit_t> coord2D; //!< 2D logical coordinate
+        typedef math::v3d<unit_t> coord3D; //!< 3D logical coordinate
 
         template <size_t>
         struct coord_for;

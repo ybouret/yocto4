@@ -110,6 +110,7 @@ YOCTO_UNIT_TEST_IMPL(split)
     std::cerr << "p1 =" << p1  << std::endl;
     std::cerr << "p1b=" << p1b << std::endl;
 
+    std::cerr << "\t(*) in 1D" << std::endl;
     for(size_t size=1;size<=8;++size)
     {
         std::cerr << std::endl << "#size=" << size << std::endl;
@@ -128,6 +129,14 @@ YOCTO_UNIT_TEST_IMPL(split)
 
     std::cerr << "p2 =" << p2   << std::endl;
     std::cerr << "p2b=" << p2b  << std::endl;
+
+    std::cerr << "\t(*) in 2D" << std::endl;
+    for(size_t size=1;size<=8;++size)
+    {
+        std::cerr << std::endl << "#size=" << size << std::endl;
+        const split::in2D s2(size,p2);
+        std::cerr << "\txsize=" << s2.xsize << ", ysize=" << s2.ysize << std::endl;
+    }
 
 }
 YOCTO_UNIT_TEST_DONE()
