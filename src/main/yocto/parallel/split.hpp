@@ -33,11 +33,13 @@ namespace yocto
             class in2D
             {
             public:
-                const size_t size;
-                const size_t xsize;
-                const size_t ysize;
+                const size_t  size;
+                const size_t  xsize;
+                const size_t  ysize;
+                const coord2D offset;
+                const coord2D length;
+                
                 //! compute the optimal xsize*ysize=size
-                explicit in2D(const size_t nproc, const size_t Lx, const size_t Ly) throw();
                 explicit in2D(const size_t nproc, const patch2D &p) throw();
                 virtual ~in2D() throw();
 
@@ -45,6 +47,8 @@ namespace yocto
                 size_t get_yrank(const size_t rank) const throw();
                 size_t get_rank(const size_t rx, const size_t ry) const throw();
 
+
+                patch2D operator()(const size_t rank) const;
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(in2D);

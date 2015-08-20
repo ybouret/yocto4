@@ -136,6 +136,14 @@ YOCTO_UNIT_TEST_IMPL(split)
         std::cerr << std::endl << "#size=" << size << std::endl;
         const split::in2D s2(size,p2);
         std::cerr << "\txsize=" << s2.xsize << ", ysize=" << s2.ysize << std::endl;
+        for(size_t rank=0;rank<size;++rank)
+        {
+            std::cerr << "\t" << size << "." << rank << ":";
+            const patch2D sub = s2(rank);
+            std::cerr << sub;
+            std::cerr << std::endl;
+        }
+
     }
 
 }

@@ -89,21 +89,16 @@ namespace yocto
             }
         }
 
-#define Y_PARA_SPLIT2D_INIT() \
-size( nproc <= 0 ? 1 : nproc ), \
-xsize(0), \
-ysize(0)
 
-        split:: in2D:: in2D(const size_t nproc, const size_t Nx, const size_t Ny) throw() :
-        Y_PARA_SPLIT2D_INIT()
-        {
-            init(Nx,Ny);
-        }
 
         split:: in2D:: in2D(const size_t nproc, const patch2D &p) throw() :
-        Y_PARA_SPLIT2D_INIT()
+        size( nproc <= 0 ? 1 : nproc ),
+        xsize(0),
+        ysize(0),
+        offset(p.lower),
+        length(p.width)
         {
-            init(p.width.x,p.width.y);
+            init(length.x,length.y);
         }
 
 
@@ -128,8 +123,26 @@ ysize(0)
             assert( get_yrank(rank) == ry );
             return rank;
         }
-        
-        
+
+        patch2D split::in2D:: operator()(const size_t rank) const
+        {
+            assert(rank<size);
+            const size_t xrank = get_xrank(rank); assert(xrank<xsize);
+            const size_t yrank = get_yrank(rank); assert(yrank<ysize);
+
+            unit_t xoffset = offset.x;
+            unit_t xlength = length.x;
+
+            unit_t yoffset = offset.y;
+            unit_t ylength = length.y;
+
+            in1D(xrank, xsize,xoffset,xlength); if(xlength<=0) throw exception("parallel.split2D produce empty xlength");
+            in1D(yrank, ysize,yoffset,ylength); if(ylength<=0) throw exception("parallel.split2D produce empty ylength");
+
+            return patch2D( coord2D(xoffset,yoffset), coord2D(xoffset+xlength-1,yoffset+ylength-1) );
+        }
+
+
     }
     
 }
