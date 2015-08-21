@@ -51,9 +51,9 @@ YOCTO_UNIT_TEST_IMPL(split)
     std::cerr << "\t(*) in 2D" << std::endl;
     for(size_t size=1;size<=10;++size)
     {
-        std::cerr << std::endl << "#size=" << size << std::endl;
+        std::cerr << std::endl << "#user_size=" << size << std::endl;
         const split::in2D s2(size,p2);
-        std::cerr << "\txsize=" << s2.xsize << ", ysize=" << s2.ysize << std::endl;
+        std::cerr << "\txsize=" << s2.xsize << ", ysize=" << s2.ysize << ", SIZE = " << s2.size << ", THETA = " << s2.timing << std::endl;
         for(size_t rank=0;rank<size;++rank)
         {
             std::cerr << "\t" << size << "." << rank << ":";

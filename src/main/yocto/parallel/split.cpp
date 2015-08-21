@@ -15,6 +15,8 @@ namespace yocto
             return patch1D(offset,offset+length-1);
         }
 
+
+
     }
 
 }
@@ -25,10 +27,11 @@ namespace yocto
 {
     namespace parallel
     {
+
         split::in2D:: ~in2D() throw() {}
 
 
-        void split:: in2D:: init(const size_t Lx, const size_t Ly) throw()
+        double split:: in2D:: init(const size_t Lx, const size_t Ly) throw()
         {
             assert(Lx>0);
             assert(Ly>0);
@@ -37,6 +40,7 @@ namespace yocto
             if(size<=1)
             {
                 nx = ny =1;
+                return -1;
             }
             else
             {
@@ -47,30 +51,38 @@ namespace yocto
                 if(Ly<Lx)
                 {
                     // linear split along X
-                    nx = size;
+                    nx = min_of(size,Lx);
                     ny = 1;
+                    const size_t ntmp  = nx*ny;
                     const double twoLy = Ly+Ly;
                     beta  = twoLy / (Lx+twoLy);
                     //std::cerr << "\tbeta(x>y) = " << beta << std::endl;
-                    Theta = twoLy +  ((beta+beta)*Lx)/double(size);
+                    Theta = twoLy +  ((beta+beta)*Lx)/double(ntmp);
                 }
                 else
                 {
                     // linear split along Y, default...
                     nx = 1;
-                    ny = size;
+                    ny = min_of(size,Ly);
+                    const size_t ntmp  = nx*ny;
                     const double twoLx = Lx+Lx;
                     beta  = twoLx / (Ly+twoLx);
                     //std::cerr << "\tbeta(y>=x)= " << beta << std::endl;
-                    Theta = twoLx +  ((beta+beta) * Ly)/double(size);
+                    Theta = twoLx +  ((beta+beta) * Ly)/double(ntmp);
                 }
                 //std::cerr << "\tTheta = " << Theta << std::endl;
                 //std::cerr << "\tSeqTm = " << 2*beta*(Lx+Ly) << std::endl;
 
                 for(size_t j=2;j<=size;++j)
                 {
+                    if(j>Ly)
+                        break;
+
                     for(size_t i=2;i<=size;++i)
                     {
+                        if(i>Lx)
+                            break;
+
                         if(i*j==size)
                         {
                             const double tmp = double( ( (Lx*j) + (Ly*i) ) << 1 ) / size;
@@ -84,6 +96,8 @@ namespace yocto
                         }
                     }
                 }
+                (size_t &)size = nx*ny;
+                return Theta;
             }
         }
 
@@ -94,9 +108,10 @@ namespace yocto
         xsize(0),
         ysize(0),
         offset(p.lower),
-        length(p.width)
+        length(p.width),
+        timing(init(length.x,length.y))
         {
-            init(length.x,length.y);
+
         }
 
 

@@ -27,18 +27,20 @@ namespace yocto
                 }
                 length = todo;
             }
-
+            
             static patch1D compute(size_t rank,size_t size,const patch1D &source);
 
+            
             class in2D
             {
             public:
-                const size_t  size;
-                const size_t  xsize;
-                const size_t  ysize;
-                const coord2D offset;
-                const coord2D length;
-                
+                const size_t  size;   //!< #cores
+                const size_t  xsize;  //!< X-#cores
+                const size_t  ysize;  //!< Y-#cores
+                const coord2D offset; //!< global offsets
+                const coord2D length; //!< global lengths
+                const double  timing; //!< the comm timing
+
                 //! compute the optimal xsize*ysize=size
                 explicit in2D(const size_t nproc, const patch2D &p) throw();
                 virtual ~in2D() throw();
@@ -52,7 +54,7 @@ namespace yocto
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(in2D);
-                void init(const size_t Lx, const size_t Ly) throw();
+                double init(const size_t Lx, const size_t Ly) throw();
             };
         };
     }
