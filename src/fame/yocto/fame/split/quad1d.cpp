@@ -56,7 +56,7 @@ namespace yocto
             //
             // load balancing
             //__________________________________________________________________
-            parallel::split::in1D(rank, size, offset, length);
+            parallel::split::compute1D(rank, size, offset, length);
             assert(length>0);
             
             //__________________________________________________________________

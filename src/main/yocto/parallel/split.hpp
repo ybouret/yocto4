@@ -10,10 +10,10 @@ namespace yocto
         struct split
         {
             template <typename T> inline
-            static  void in1D(size_t rank,
-                              size_t size,
-                              T     &offset,
-                              T     &length) throw()
+            static  void compute1D(size_t rank,
+                                   size_t size,
+                                   T     &offset,
+                                   T     &length) throw()
             {
                 assert(size>0);
                 assert(rank<size);
@@ -27,10 +27,10 @@ namespace yocto
                 }
                 length = todo;
             }
-            
+
             static patch1D compute(size_t rank,size_t size,const patch1D &source);
 
-            
+
             class in2D
             {
             public:

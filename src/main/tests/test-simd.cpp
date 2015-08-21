@@ -43,7 +43,7 @@ namespace  {
             
             size_t      offset = 1;
             size_t      length = A.size();
-            parallel::split::in1D(ctx.rank, ctx.size, offset, length);
+            parallel::split::compute1D(ctx.rank, ctx.size, offset, length);
             const size_t final = offset+length;
             for(size_t i=offset;i<final;++i)
             {

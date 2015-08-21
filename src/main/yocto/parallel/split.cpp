@@ -10,7 +10,7 @@ namespace yocto
         {
             unit_t offset = source.lower;
             unit_t length = source.width;
-            split::in1D(rank, size, offset, length);
+            split::compute1D(rank, size, offset, length);
             if(length<=0) throw libc::exception( EDOM, "split::in1D produced negative length");
             return patch1D(offset,offset+length-1);
         }
@@ -149,8 +149,8 @@ namespace yocto
             unit_t yoffset = offset.y;
             unit_t ylength = length.y;
 
-            in1D(xrank, xsize,xoffset,xlength); if(xlength<=0) throw libc::exception( EDOM, "split::in2D produced negative xlength");
-            in1D(yrank, ysize,yoffset,ylength); if(ylength<=0) throw libc::exception( EDOM, "split::in2D produced negative ylength");
+            compute1D(xrank, xsize,xoffset,xlength); if(xlength<=0) throw libc::exception( EDOM, "split::in2D produced negative xlength");
+            compute1D(yrank, ysize,yoffset,ylength); if(ylength<=0) throw libc::exception( EDOM, "split::in2D produced negative ylength");
 
             return patch2D( coord2D(xoffset,yoffset), coord2D(xoffset+xlength-1,yoffset+ylength-1));
         }
