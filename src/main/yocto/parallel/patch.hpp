@@ -9,6 +9,7 @@ namespace yocto
 {
     namespace parallel
     {
+
         class patch
         {
         public:
@@ -28,6 +29,8 @@ namespace yocto
         private:
             YOCTO_DISABLE_ASSIGN(patch);
         };
+
+
 
         template <typename COORD>
         class patch_of : public patch
@@ -51,9 +54,10 @@ namespace yocto
             /**
              \param lo lower coordinates
              \param up upper coordinates
-             The coordinates are ordered.
+             may be empty if hi<lo in some coordinates
              */
-            inline  patch_of( const_coord lo, const_coord hi ) throw() :
+            inline  patch_of(const_coord lo,
+                             const_coord hi ) throw() :
             patch( DIMENSIONS ),
             lower( lo ),
             upper( hi ),
@@ -63,6 +67,8 @@ namespace yocto
             {
 
             }
+
+            
 
             //! copy patch_of
             inline patch_of( const patch_of &other ) throw() :
@@ -86,14 +92,12 @@ namespace yocto
             //! destruct patch
             inline virtual ~patch_of() throw() {}
 
-#if 1
             //! show it
             friend inline std::ostream & operator<<( std::ostream &lay_os, const patch_of &p )
             {
-                lay_os << "{ " << p.lower << " -> " << p.upper << " : width=" << p.width << " => #" << p.items << " }";
+                lay_os << "{ " << p.lower << " -> " << p.upper << " : width=" << p.width << " => #" << p.items << " pitch=" << p.pitch << " }";
                 return lay_os;
             }
-#endif
 
             //! comparison
             inline bool same_metrics_than( const patch_of &other ) const throw()

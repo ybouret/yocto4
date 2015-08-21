@@ -36,6 +36,17 @@ namespace yocto
             return *(((unit_t *)&C)+dim);
         }
 
+        template <typename COORD>
+        inline COORD __coord_dec(COORD C) throw()
+        {
+            unit_t *q = (unit_t *)&C;
+            for(size_t i=0;i<sizeof(COORD)/sizeof(unit_t);++i)
+            {
+                --q[i];
+            }
+            return C;
+        }
+
         //! compare coordinates (integral types)
         template <typename COORD>
         inline bool are_same_coord( const COORD &A, const COORD &B ) throw()
