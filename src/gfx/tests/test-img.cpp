@@ -105,8 +105,8 @@ YOCTO_UNIT_TEST_IMPL(img)
 #if 1
             {
                 histogram Hgs,Hbw;
-                Hgs.build_for(pxm,rgb2gs8);
-                Hbw.build_for(pxm,rgb2bw8);
+                Hgs.build_for(pxm,rgb2gs8<rgb_t>);
+                Hbw.build_for(pxm,rgb2bw8<rgb_t>);
 
                 {
                     ios::wcstream fp("hist.dat");
@@ -138,8 +138,8 @@ YOCTO_UNIT_TEST_IMPL(img)
 
                 {
                     pixmap3 gs_fg(pxm.w,pxm.h),gs_bg(pxm.w,pxm.h);
-                    threshold::apply(gs_fg, gs_t, pxm,rgb2gs8, threshold::keep_foreground );
-                    threshold::apply(gs_bg, gs_t, pxm,rgb2gs8, threshold::keep_background );
+                    threshold::apply(gs_fg, gs_t, pxm,rgb2gs8<rgb_t>, threshold::keep_foreground );
+                    threshold::apply(gs_bg, gs_t, pxm,rgb2gs8<rgb_t>, threshold::keep_background );
 
                     PNG.save("image_cut_gs_fg.png",gs_fg, get_rgba::from_rgb,NULL, NULL);
                     PNG.save("image_cut_gs_bg.png",gs_bg, get_rgba::from_rgb,NULL, NULL);
@@ -149,8 +149,8 @@ YOCTO_UNIT_TEST_IMPL(img)
 
                 {
                     pixmap3 bw_fg(pxm.w,pxm.h),bw_bg(pxm.w,pxm.h);
-                    threshold::apply(bw_fg, bw_t, pxm,rgb2bw8, threshold::keep_foreground );
-                    threshold::apply(bw_bg, bw_t, pxm,rgb2bw8, threshold::keep_background );
+                    threshold::apply(bw_fg, bw_t, pxm,rgb2bw8<rgb_t>, threshold::keep_foreground );
+                    threshold::apply(bw_bg, bw_t, pxm,rgb2bw8<rgb_t>, threshold::keep_background );
 
                     PNG.save("image_cut_bw_fg.png",bw_fg, get_rgba::from_rgb,NULL, NULL);
                     PNG.save("image_cut_bw_bg.png",bw_bg, get_rgba::from_rgb,NULL, NULL);
@@ -176,13 +176,13 @@ YOCTO_UNIT_TEST_IMPL(img)
 
                 {
                     pixmap1 eq_gs(pxm.w,pxm.h);
-                    Hgs.apply_lut(eq_gs, to_byte<uint8_t>,pxm,rgb2gs8);
+                    Hgs.apply_lut(eq_gs, to_byte<uint8_t>,pxm,rgb2gs8<rgb_t>);
                     save_ppm("image_lut_gs1.0.ppm",eq_gs);
                     Hgs.build_lut(0.4);
-                    Hgs.apply_lut(eq_gs, to_byte<uint8_t>,pxm,rgb2gs8);
+                    Hgs.apply_lut(eq_gs, to_byte<uint8_t>,pxm,rgb2gs8<rgb_t>);
                     save_ppm("image_lut_gs0.4.ppm",eq_gs);
                     Hgs.build_lut(2.2);
-                    Hgs.apply_lut(eq_gs, to_byte<uint8_t>,pxm,rgb2gs8);
+                    Hgs.apply_lut(eq_gs, to_byte<uint8_t>,pxm,rgb2gs8<rgb_t>);
                     save_ppm("image_lut_gs2.2.ppm",eq_gs);
 
                 }

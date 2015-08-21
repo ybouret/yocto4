@@ -46,7 +46,7 @@ namespace yocto
                 static const float vmin = 0.0f;
                 static const float vmax = 1.0f;
                 static const float dv   = vmax-vmin;
-                double R=1,G=1,B=1;
+                float R=1,G=1,B=1;
 
                 if (v <= vmin)
                 {
@@ -62,20 +62,20 @@ namespace yocto
                     }
                     else
                     {
-                        if (v < (vmin + 0.25 * dv))
+                        if (v < (vmin + 0.25f * dv))
                         {
                             R = 0;
-                            G = 4 * (v - vmin) / dv;
-                        } else if (v < (vmin + 0.5 * dv))
+                            G = 4.0f * (v - vmin) / dv;
+                        } else if (v < (vmin + 0.5f * dv))
                         {
                             R = 0;
-                            B = 1 + 4 * (vmin + 0.25 * dv - v) / dv;
-                        } else if (v < (vmin + 0.75 * dv))
+                            B = 1.0f + 4.0f * (vmin + 0.25f * dv - v) / dv;
+                        } else if (v < (vmin + 0.75f * dv))
                         {
-                            R = 4 * (v - vmin - 0.5 * dv) / dv;
+                            R = 4.0f * (v - vmin - 0.5f * dv) / dv;
                             B = 0;
                         } else {
-                            G = 1 + 4 * (vmin + 0.75 * dv - v) / dv;
+                            G = 1.0f + 4.0f * (vmin + 0.75f * dv - v) / dv;
                             B = 0;
                         }
                     }

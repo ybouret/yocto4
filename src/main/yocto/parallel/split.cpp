@@ -20,7 +20,7 @@ namespace yocto
         {
             unit_t xoff = offset;
             unit_t xlen = length;
-            assert(cores<=xlen);
+            assert(unit_t(cores)<=xlen);
             split::compute1D(rank, cores, xoff, xlen);assert(xlen>0);
             return patch1D(xoff,xoff+xlen-1);
         }

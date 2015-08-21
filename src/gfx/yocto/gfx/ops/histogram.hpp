@@ -53,7 +53,7 @@ namespace yocto
             }
 
             template <typename T>
-            void build_for(const pixmap<T> &px, uint8_t (*item2byte)(const T&) ) throw()
+            void build_for(const pixmap<T> &px, uint8_t (*item2byte)(const T&)) throw()
             {
                 reset();
                 append(px,item2byte);
