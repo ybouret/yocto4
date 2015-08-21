@@ -6,7 +6,7 @@ namespace yocto
     namespace parallel
     {
         split:: in1D:: in1D(const size_t nproc, const patch1D &p ) throw() :
-        size(clamp<size_t>(1,nproc,p.width)),
+        cores(clamp<size_t>(1,nproc,p.width)),
         offset(p.lower),
         length(p.width)
         {
@@ -20,8 +20,8 @@ namespace yocto
         {
             unit_t xoff = offset;
             unit_t xlen = length;
-            assert(size<=xlen);
-            split::compute1D(rank, size, xoff, xlen);assert(xlen>0);
+            assert(cores<=xlen);
+            split::compute1D(rank, cores, xoff, xlen);assert(xlen>0);
             return patch1D(xoff,xoff+xlen-1);
         }
 
@@ -47,12 +47,12 @@ namespace yocto
         {
             assert(Lx>0);
             assert(Ly>0);
-            size_t &N  = (size_t &)size;
+            size_t &N  = (size_t &)cores;
             size_t &nx = (size_t &)xsize;
             size_t &ny = (size_t &)ysize;
-            if(size<=1)
+            if(cores<=1)
             {
-                assert(1==size);
+                assert(1==cores);
                 nx = ny =1;
                 return -1;
             }
@@ -60,8 +60,8 @@ namespace yocto
             {
                 double Theta = -1;
                 double beta  = -1;
-                const size_t nx_max = min_of(size,Lx);
-                const size_t ny_max = min_of(size,Ly);
+                const size_t nx_max = min_of(cores,Lx);
+                const size_t ny_max = min_of(cores,Ly);
                 // compute beta, the minimal local transfert time
                 // to beat the sequential time
                 if(Ly<Lx)
@@ -96,9 +96,9 @@ namespace yocto
                         if(i>Lx)
                             break;
 
-                        if(i*j==size)
+                        if(i*j==cores)
                         {
-                            const double tmp = double( ( (Lx*j) + (Ly*i) ) << 1 ) / size;
+                            const double tmp = double( ( (Lx*j) + (Ly*i) ) << 1 ) / cores;
                             //std::cerr << "\t\ti=" << i << ", j=" << j << ", theta=" << tmp << std::endl;
                             if(tmp<=Theta)
                             {
@@ -117,7 +117,7 @@ namespace yocto
 
 
         split:: in2D:: in2D(const size_t nproc, const patch2D &p) throw() :
-        size( nproc <= 0 ? 1 : nproc ),
+        cores( nproc <= 0 ? 1 : nproc ),
         xsize(0),
         ysize(0),
         offset(p.lower),
@@ -130,13 +130,13 @@ namespace yocto
 
         size_t split::in2D::get_xrank(const size_t rank) const throw()
         {
-            assert(rank<size);
+            assert(rank<cores);
             return rank % xsize;
         }
 
         size_t split::in2D::get_yrank(const size_t rank) const throw()
         {
-            assert(rank<size);
+            assert(rank<cores);
             return rank / xsize;
         }
 
@@ -152,7 +152,7 @@ namespace yocto
 
         patch2D split::in2D:: operator()(const size_t rank) const throw()
         {
-            assert(rank<size);
+            assert(rank<cores);
             const size_t xrank = get_xrank(rank); assert(xrank<xsize);
             const size_t yrank = get_yrank(rank); assert(yrank<ysize);
 

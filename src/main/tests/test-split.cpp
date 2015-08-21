@@ -33,8 +33,8 @@ YOCTO_UNIT_TEST_IMPL(split)
     {
         std::cerr << std::endl << "#user_size=" << size << std::endl;
         const split::in1D s1(size,p1);
-        std::cerr << "SIZE=" << s1.size << std::endl;
-        for(size_t rank=0;rank<s1.size;++rank)
+        std::cerr << "#CORE=" << s1.cores << std::endl;
+        for(size_t rank=0;rank<s1.cores;++rank)
         {
             std::cerr << "\t" << size << "." << rank << ":";
             const patch1D sub = s1(rank);
@@ -55,8 +55,8 @@ YOCTO_UNIT_TEST_IMPL(split)
     {
         std::cerr << std::endl << "#user_size=" << size << std::endl;
         const split::in2D s2(size,p2);
-        std::cerr << "\txsize=" << s2.xsize << ", ysize=" << s2.ysize << ", SIZE = " << s2.size << ", THETA = " << s2.timing << std::endl;
-        for(size_t rank=0;rank<s2.size;++rank)
+        std::cerr << "\txsize=" << s2.xsize << ", ysize=" << s2.ysize << ", #cores = " << s2.cores << ", THETA = " << s2.timing << std::endl;
+        for(size_t rank=0;rank<s2.cores;++rank)
         {
             std::cerr << "\t" << size << "." << rank << ":";
             const patch2D sub = s2(rank);

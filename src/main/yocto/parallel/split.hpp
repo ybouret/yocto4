@@ -9,24 +9,6 @@ namespace yocto
     {
         struct split
         {
-
-            class in1D
-            {
-            public:
-                const size_t  size;
-                const coord1D offset;
-                const coord1D length;
-
-                //! compute 1<=size<=nproc, offset and length
-                explicit in1D(const size_t nproc, const patch1D &p) throw();
-                virtual ~in1D() throw();
-
-                patch1D operator()(const size_t rank) const throw();
-                
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(in1D);
-            };
-
             template <typename T> inline
             static  void compute1D(size_t rank,
                                    size_t size,
@@ -46,19 +28,36 @@ namespace yocto
                 length = todo;
             }
 
-            
+            //! setting up 1D splitter
+            class in1D
+            {
+            public:
+                const size_t  cores;
+                const coord1D offset;
+                const coord1D length;
 
+                //! compute 1<=size<=nproc, offset and length from patch
+                explicit in1D(const size_t nproc, const patch1D &p) throw();
+                virtual ~in1D() throw();
+
+                patch1D operator()(const size_t rank) const throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(in1D);
+            };
+            
+            //! 2D splitter
             class in2D
             {
             public:
-                const size_t  size;   //!< #cores
+                const size_t  cores;  //!< #cores
                 const size_t  xsize;  //!< X-#cores
                 const size_t  ysize;  //!< Y-#cores
                 const coord2D offset; //!< global offsets
                 const coord2D length; //!< global lengths
                 const double  timing; //!< the comm timing
 
-                //! compute the optimal xsize*ysize=maximal size
+                //! compute the optimal xsize*ysize=size from nproc and patch
                 explicit in2D(const size_t nproc, const patch2D &p) throw();
                 virtual ~in2D() throw();
 
