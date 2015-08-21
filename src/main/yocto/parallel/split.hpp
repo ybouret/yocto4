@@ -9,6 +9,24 @@ namespace yocto
     {
         struct split
         {
+
+            class in1D
+            {
+            public:
+                const size_t  size;
+                const coord1D offset;
+                const coord1D length;
+
+                //! compute 1<=size<=nproc, offset and length
+                explicit in1D(const size_t nproc, const patch1D &p) throw();
+                virtual ~in1D() throw();
+
+                patch1D operator()(const size_t rank) const throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(in1D);
+            };
+
             template <typename T> inline
             static  void compute1D(size_t rank,
                                    size_t size,
@@ -28,8 +46,7 @@ namespace yocto
                 length = todo;
             }
 
-            static patch1D compute(size_t rank,size_t size,const patch1D &source);
-
+            
 
             class in2D
             {
@@ -41,7 +58,7 @@ namespace yocto
                 const coord2D length; //!< global lengths
                 const double  timing; //!< the comm timing
 
-                //! compute the optimal xsize*ysize=size
+                //! compute the optimal xsize*ysize=maximal size
                 explicit in2D(const size_t nproc, const patch2D &p) throw();
                 virtual ~in2D() throw();
 
@@ -50,7 +67,7 @@ namespace yocto
                 size_t get_rank(const size_t rx, const size_t ry) const throw();
 
 
-                patch2D operator()(const size_t rank) const;
+                patch2D operator()(const size_t rank) const throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(in2D);

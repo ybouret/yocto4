@@ -1,19 +1,30 @@
 #include "yocto/parallel/split.hpp"
-#include "yocto/exceptions.hpp"
-#include <cerrno>
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
     namespace parallel
     {
-        patch1D split::compute(size_t rank,size_t size,const patch1D &source)
+        split:: in1D:: in1D(const size_t nproc, const patch1D &p ) throw() :
+        size(clamp<size_t>(1,nproc,p.width)),
+        offset(p.lower),
+        length(p.width)
         {
-            unit_t offset = source.lower;
-            unit_t length = source.width;
-            split::compute1D(rank, size, offset, length);
-            if(length<=0) throw libc::exception( EDOM, "split::in1D produced negative length");
-            return patch1D(offset,offset+length-1);
         }
+
+        split:: in1D:: ~in1D() throw()
+        {}
+
+
+        patch1D split::in1D:: operator()(const size_t rank) const throw()
+        {
+            unit_t xoff = offset;
+            unit_t xlen = length;
+            assert(size<=xlen);
+            split::compute1D(rank, size, xoff, xlen);assert(xlen>0);
+            return patch1D(xoff,xoff+xlen-1);
+        }
+
 
 
 
@@ -21,7 +32,8 @@ namespace yocto
 
 }
 
-#include "yocto/code/utils.hpp"
+#include "yocto/exceptions.hpp"
+#include <cerrno>
 
 namespace yocto
 {
@@ -35,10 +47,12 @@ namespace yocto
         {
             assert(Lx>0);
             assert(Ly>0);
+            size_t &N  = (size_t &)size;
             size_t &nx = (size_t &)xsize;
             size_t &ny = (size_t &)ysize;
             if(size<=1)
             {
+                assert(1==size);
                 nx = ny =1;
                 return -1;
             }
@@ -46,12 +60,14 @@ namespace yocto
             {
                 double Theta = -1;
                 double beta  = -1;
+                const size_t nx_max = min_of(size,Lx);
+                const size_t ny_max = min_of(size,Ly);
                 // compute beta, the minimal local transfert time
                 // to beat the sequential time
                 if(Ly<Lx)
                 {
                     // linear split along X
-                    nx = min_of(size,Lx);
+                    nx = nx_max;
                     ny = 1;
                     const size_t ntmp  = nx*ny;
                     const double twoLy = Ly+Ly;
@@ -63,7 +79,7 @@ namespace yocto
                 {
                     // linear split along Y, default...
                     nx = 1;
-                    ny = min_of(size,Ly);
+                    ny = ny_max;
                     const size_t ntmp  = nx*ny;
                     const double twoLx = Lx+Lx;
                     beta  = twoLx / (Ly+twoLx);
@@ -73,12 +89,9 @@ namespace yocto
                 //std::cerr << "\tTheta = " << Theta << std::endl;
                 //std::cerr << "\tSeqTm = " << 2*beta*(Lx+Ly) << std::endl;
 
-                for(size_t j=2;j<=size;++j)
+                for(size_t j=2;j<=ny_max;++j)
                 {
-                    if(j>Ly)
-                        break;
-
-                    for(size_t i=2;i<=size;++i)
+                    for(size_t i=2;i<=nx_max;++i)
                     {
                         if(i>Lx)
                             break;
@@ -96,7 +109,7 @@ namespace yocto
                         }
                     }
                 }
-                (size_t &)size = nx*ny;
+                N = nx*ny;
                 return Theta;
             }
         }
@@ -137,7 +150,7 @@ namespace yocto
             return rank;
         }
 
-        patch2D split::in2D:: operator()(const size_t rank) const
+        patch2D split::in2D:: operator()(const size_t rank) const throw()
         {
             assert(rank<size);
             const size_t xrank = get_xrank(rank); assert(xrank<xsize);
@@ -149,8 +162,8 @@ namespace yocto
             unit_t yoffset = offset.y;
             unit_t ylength = length.y;
 
-            compute1D(xrank, xsize,xoffset,xlength); if(xlength<=0) throw libc::exception( EDOM, "split::in2D produced negative xlength");
-            compute1D(yrank, ysize,yoffset,ylength); if(ylength<=0) throw libc::exception( EDOM, "split::in2D produced negative ylength");
+            compute1D(xrank, xsize,xoffset,xlength); assert(xlength>0);
+            compute1D(yrank, ysize,yoffset,ylength); assert(ylength>0);
 
             return patch2D( coord2D(xoffset,yoffset), coord2D(xoffset+xlength-1,yoffset+ylength-1));
         }
