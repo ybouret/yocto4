@@ -104,13 +104,15 @@ YOCTO_UNIT_TEST_IMPL(simd)
     
     SIMD simd;
 
+#if 0
     simd.create<int>();
     simd.create<int,int>(2);
     simd.create_from_context<DummyTask>();
     simd.create_from_context<DummyTask,int>(2);
-
-    simd.free();
-    simd.release();
+#endif
+    
+    //simd.free();
+    //simd.release();
 
     SIMD::Kernel K = cfunctor( DoSomething );
     for(size_t cycle=1+alea_leq(3);cycle>0;--cycle)
@@ -118,7 +120,7 @@ YOCTO_UNIT_TEST_IMPL(simd)
         simd(K);
     }
 
-    //return 0;
+    return 0;
 
     Sum sum;
     SIMD::Kernel kSum( &sum, & Sum::run );

@@ -8,6 +8,7 @@ namespace yocto
     namespace threading
     {
 
+#if 0
         void SIMD:: free() throw()
         {
             SIMD &self = *this;
@@ -27,6 +28,8 @@ namespace yocto
                 ctx.deallocate();
             }
         }
+#endif
+
         
 #define YOCTO_SIMD_CTOR() \
 workers( "SIMD" ),        \
@@ -72,7 +75,8 @@ wksp(0)
             private:
             };
         }
-        
+
+#if 0
         SIMD::Context & SIMD:: operator[]( const size_t rank ) throw()
         {
             assert(rank<size);
@@ -84,7 +88,7 @@ wksp(0)
             assert(rank<size);
             return (static_cast<member *>(wksp)+rank)->ctx;
         }
-        
+#endif
         
         void SIMD:: create_contexts()
         {
