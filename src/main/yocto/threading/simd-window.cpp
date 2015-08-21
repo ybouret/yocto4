@@ -5,6 +5,7 @@ namespace yocto
 
     namespace threading
     {
+#if 0
 
         SIMD:: Window:: ~Window() throw() {}
 
@@ -38,7 +39,7 @@ namespace yocto
         final(w.final)
         {
         }
-
+#endif
     }
 
 }

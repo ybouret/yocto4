@@ -6,7 +6,7 @@
 #include "yocto/sys/wtime.hpp"
 
 #include "yocto/string/conv.hpp"
-
+#include "yocto/parallel/split.hpp"
 #include <cmath>
 
 using namespace yocto;
@@ -41,8 +41,11 @@ namespace  {
             const array<double> &B = *pB;
             array<double>       &C = *pC;
             
-            const SIMD::Window win(ctx,A.size(),1);
-            for(size_t i=win.start;i<=win.final;++i)
+            size_t      offset = 1;
+            size_t      length = A.size();
+            parallel::split::in1D(ctx.rank, ctx.size, offset, length);
+            const size_t final = offset+length;
+            for(size_t i=offset;i<final;++i)
             {
                 const double a = A[i];
                 const double b = B[i];

@@ -48,20 +48,7 @@ namespace yocto
 
             typedef functor<void,TL1(Context&)> Kernel;
 
-            class Window
-            {
-            public:
-                explicit Window(const Context &, size_t length, size_t offset ) throw();
-                virtual ~Window() throw();
-                Window(const Window &w) throw();
-                const size_t start;
-                const size_t count;
-                const size_t final;
-
-            private:
-                YOCTO_DISABLE_ASSIGN(Window);
-            };
-
+            
 
             explicit SIMD(); //!< use layout API (aka YOCTO_THREADING...)
             explicit SIMD(size_t num_threads, size_t thread_offset=0); //!< manual settings
