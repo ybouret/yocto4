@@ -14,7 +14,7 @@ namespace yocto
         const size_t size;
         const size_t capacity;
 
-        inline explicit slots_of(size_t n) :
+        inline explicit slots_of(size_t n=0) :
         size(0),
         capacity(n),
         mem(n*sizeof(T)),
@@ -79,7 +79,17 @@ namespace yocto
 
         inline virtual ~slots_of() throw()
         {
-            free();
+            __free();
+        }
+
+        //! resize if EMPTY
+        inline void resize(size_t n)
+        {
+            assert(size<=0);
+            cslot tmp(n*sizeof(T));
+            mem.swap_with(tmp);
+            addr = static_cast<mutable_type *>(mem.data)-1;
+            (size_t&)capacity = n;
         }
 
     private:
@@ -88,7 +98,8 @@ namespace yocto
 
     protected:
         mutable_type *addr;
-        inline void free() throw()
+
+        inline void __free() throw()
         {
             size_t &n = (size_t&)size;
             for(;n>0;--n)
@@ -96,6 +107,8 @@ namespace yocto
                 destruct(addr+n);
             }
         }
+
+
     };
 }
 

@@ -135,6 +135,12 @@ namespace yocto
         typedef patch_of<coord2D> patch2D;
         typedef patch_of<coord3D> patch3D;
 
+        template <size_t N>
+        struct patch_for;
+        template <> struct patch_for<1> { typedef patch1D type; };
+        template <> struct patch_for<2> { typedef patch2D type; };
+        template <> struct patch_for<3> { typedef patch3D type; };
+
 
     }
 

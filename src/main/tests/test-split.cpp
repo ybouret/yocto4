@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/parallel/split.hpp"
+#include "yocto/parallel/setup.hpp"
 #include "yocto/string/conv.hpp"
 
 using namespace yocto;
@@ -23,12 +23,12 @@ YOCTO_UNIT_TEST_IMPL(split)
     std::cerr << "sizeof(patch2D)=" << sizeof(patch2D) << std::endl;
     std::cerr << "sizeof(patch3D)=" << sizeof(patch3D) << std::endl;
 
+    std::cerr << "\t(*) in 1D" << std::endl;
     patch1D p1(1,Nx);
     patch1D p1b(p1);
     std::cerr << "p1 =" << p1  << std::endl;
     std::cerr << "p1b=" << p1b << std::endl;
 
-    std::cerr << "\t(*) in 1D" << std::endl;
     for(size_t size=1;size<=10;++size)
     {
         std::cerr << std::endl << "#user_size=" << size << std::endl;
@@ -41,16 +41,25 @@ YOCTO_UNIT_TEST_IMPL(split)
             std::cerr << sub;
             std::cerr << std::endl;
         }
+
+        slots_of<patch1D> patches;
+        setup_patches(patches,size,p1);
+        std::cerr << "#PATCH=" << patches.size << std::endl;
+        for(size_t i=1;i<=patches.size;++i)
+        {
+            std::cerr << "\t" << size << "." << i-1  << " : " << patches[i] << std::endl;
+        }
+
     }
 
 
+    std::cerr << "\t(*) in 2D" << std::endl;
     patch2D p2( coord2D(1,1), coord2D(Nx,Ny) );
     patch2D p2b(p2);
 
     std::cerr << "p2 =" << p2   << std::endl;
     std::cerr << "p2b=" << p2b  << std::endl;
 
-    std::cerr << "\t(*) in 2D" << std::endl;
     for(size_t size=1;size<=10;++size)
     {
         std::cerr << std::endl << "#user_size=" << size << std::endl;
@@ -62,6 +71,14 @@ YOCTO_UNIT_TEST_IMPL(split)
             const patch2D sub = s2(rank);
             std::cerr << sub;
             std::cerr << std::endl;
+        }
+
+        slots_of<patch2D> patches;
+        setup_patches(patches,size,p2);
+        std::cerr << "#PATCH=" << patches.size << std::endl;
+        for(size_t i=1;i<=patches.size;++i)
+        {
+            std::cerr << "\t" << size << "." << i-1  << " : " << patches[i] << std::endl;
         }
 
     }

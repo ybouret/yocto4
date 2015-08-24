@@ -73,6 +73,13 @@ namespace yocto
                 double init(const size_t Lx, const size_t Ly) throw();
             };
         };
+
+        template <size_t>
+        struct split_for;
+        template <> struct split_for<1> { typedef split::in1D type; };
+        template <> struct split_for<2> { typedef split::in2D type; };
+
+
     }
 }
 
