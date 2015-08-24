@@ -36,6 +36,7 @@ namespace yocto
             return *(((unit_t *)&C)+dim);
         }
 
+        //! decrease all coordinates
         template <typename COORD>
         inline COORD __coord_dec(COORD C) throw()
         {

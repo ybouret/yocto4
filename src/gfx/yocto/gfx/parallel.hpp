@@ -13,10 +13,19 @@ namespace yocto
         typedef parallel::patch2D patch2D;
         typedef parallel::coord2D coord2D;
 
-        class patch : public patch2D
+        //! generic patch for bitmaps
+        class patch
         {
         public:
-            //! compute the parameters from w, h and full
+            //! compute the parameters
+            /**
+             \param xoff set to 0 if full=true, 1 if full=false
+             \param yoff set to 0 if full=true, 1 if full=false
+             \param xlen input value, -2 if full=false
+             \param ylen input value, -2 if full=false
+             \param full set to false if borders are to be excluded
+             Throw if xlen<=0 of ylen<=0
+             */
             static void setup_parallel_metrics(unit_t      &xoff,
                                                unit_t      &yoff,
                                                unit_t      &xlen,
@@ -24,7 +33,7 @@ namespace yocto
                                                const unit_t w,
                                                const unit_t h,
                                                const bool   full);
-
+            const rectangle area;
             const void     *source;
             void           *target;
             const void     *params;
@@ -32,9 +41,6 @@ namespace yocto
             explicit patch(const patch2D &p) throw();
             virtual ~patch() throw();
 
-
-            template <typename DATATYPE> inline
-            static void setup();
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(patch);

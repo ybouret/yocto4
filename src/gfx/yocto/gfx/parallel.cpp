@@ -25,7 +25,7 @@ namespace yocto
                 xlen -= 2;
                 ylen -= 2;
             }
-            if(xlen<0||ylen<0)
+            if(xlen<=0||ylen<=0)
             {
                 throw exception("setup_parallel_metrics: too small dimensions");
             }
@@ -34,7 +34,7 @@ namespace yocto
         patch:: ~patch() throw() {}
 
         patch:: patch( const patch2D &p ) throw() :
-        patch2D(p),
+        area(p.lower.x,p.lower.y,p.width.x,p.width.y),
         source(0),
         target(0),
         params(0)

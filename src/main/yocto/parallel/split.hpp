@@ -32,7 +32,7 @@ namespace yocto
             class in1D
             {
             public:
-                const size_t  cores;
+                const size_t  cores;  //!< maximal #cores vs the requested nproc
                 const coord1D offset;
                 const coord1D length;
 

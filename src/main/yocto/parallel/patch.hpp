@@ -10,6 +10,7 @@ namespace yocto
     namespace parallel
     {
 
+        //! a cartesian patch, base class
         class patch
         {
         public:
