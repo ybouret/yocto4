@@ -26,11 +26,15 @@ namespace yocto
 
         inline virtual ~slots_of() throw()
         {
+            free();
         }
+
+    private:
+        cslot mem;
+        YOCTO_DISABLE_COPY_AND_ASSIGN(slots_of);
 
     protected:
         mutable_type *addr;
-
         inline void free() throw()
         {
             size_t &n = (size_t&)size;
@@ -39,10 +43,6 @@ namespace yocto
                 destruct(addr+n);
             }
         }
-
-    private:
-        cslot mem;
-        YOCTO_DISABLE_COPY_AND_ASSIGN(slots_of);
     };
 }
 
