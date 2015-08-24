@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/container/slots.hpp"
-
+#include "yocto/code/rand.hpp"
 using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(slots)
@@ -9,6 +9,11 @@ YOCTO_UNIT_TEST_IMPL(slots)
     for(size_t i=1;i<=s.capacity/2;++i)
     {
         s.push_back(i);
+    }
+
+    for(size_t i=s.size+1;i<=s.capacity;++i)
+    {
+        s.append<size_t>(alea_lt(100));
     }
 
     for(size_t i=1;i<=s.size;++i)

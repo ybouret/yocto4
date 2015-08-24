@@ -57,9 +57,24 @@ namespace yocto
 
         //! append by one arg constructor
         template <typename U>
-        inline void append( typename type_traits<U>::param_type arg1 )
+        inline void append( typename type_traits<U>::parameter_type arg1 )
         {
-            
+            assert(size<capacity);
+            size_t &n = (size_t&)size;
+            new (static_cast<mutable_type *>(mem.data)+n) mutable_type(arg1);
+            ++n;
+        }
+
+        //! append by one arg constructor
+        template <typename U,typename V>
+        inline void append( typename type_traits<U>::parameter_type arg1,
+                            typename type_traits<V>::parameter_type arg2
+                           )
+        {
+            assert(size<capacity);
+            size_t &n = (size_t&)size;
+            new (static_cast<mutable_type *>(mem.data)+n) mutable_type(arg1,arg2);
+            ++n;
         }
 
         inline virtual ~slots_of() throw()
