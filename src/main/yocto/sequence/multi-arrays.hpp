@@ -45,7 +45,6 @@ namespace yocto
         
         
         
-        
         virtual array<T> & operator[](size_t ia) throw()
         {
             assert(ia<this->num_arrays());
@@ -57,7 +56,6 @@ namespace yocto
             assert(ia<this->num_arrays());
             return *(static_cast<array_type *>(arrays_addr())+ia);
         }
-        
         
         
         //! allocate memory for all
