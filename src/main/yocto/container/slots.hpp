@@ -42,9 +42,24 @@ namespace yocto
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-
             new (static_cast<mutable_type *>(mem.data)+n) mutable_type(args);
             ++n;
+        }
+
+        //! append by empty constructor
+        inline void push_back()
+        {
+            assert(size<capacity);
+            size_t &n = (size_t&)size;
+            new (static_cast<mutable_type *>(mem.data)+n) mutable_type();
+            ++n;
+        }
+
+        //! append by one arg constructor
+        template <typename U>
+        inline void append( typename type_traits<U>::param_type arg1 )
+        {
+            
         }
 
         inline virtual ~slots_of() throw()
