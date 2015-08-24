@@ -6,26 +6,24 @@ namespace yocto
     namespace gfx
 
     {
-        void patch:: setup_parallel_metrics(unit_t &xoff,
-                                            unit_t &yoff,
-                                            unit_t &xlen,
-                                            unit_t &ylen,
+        void patch:: setup_parallel_metrics(coord2D     &offset,
+                                            coord2D     &length,
                                             const unit_t w,
                                             const unit_t h,
                                             const bool   full)
         {
-            xoff = 0;
-            yoff = 0;
-            xlen = w;
-            ylen = h;
+            offset.x = 0;
+            offset.y = 0;
+            length.x = w;
+            length.y = h;
             if(!full)
             {
-                xoff =  1;
-                yoff =  1;
-                xlen -= 2;
-                ylen -= 2;
+                offset.x =  1;
+                offset.y =  1;
+                length.x -= 2;
+                length.y -= 2;
             }
-            if(xlen<=0||ylen<=0)
+            if(length.x<=0||length.y<=0)
             {
                 throw exception("setup_parallel_metrics: too small dimensions");
             }
@@ -34,14 +32,11 @@ namespace yocto
         patch:: ~patch() throw() {}
 
         patch:: patch( const patch2D &p ) throw() :
-        area(p.lower.x,p.lower.y,p.width.x,p.width.y),
-        source(0),
-        target(0),
-        params(0)
+        area(p.lower.x,p.lower.y,p.width.x,p.width.y)
         {
         }
-        
 
+        
     }
     
 }
