@@ -23,6 +23,29 @@ namespace yocto
 
         }
 
+        inline type & operator[](const size_t indx) throw()
+        {
+            assert(indx>0);
+            assert(indx<=size);
+            return addr[indx];
+        }
+
+        inline const_type operator[](const size_t indx) const throw()
+        {
+            assert(indx>0);
+            assert(indx<=size);
+            return addr[indx];
+        }
+
+        //! append by copy
+        inline void push_back( param_type args )
+        {
+            assert(size<capacity);
+            size_t &n = (size_t&)size;
+
+            new (static_cast<mutable_type *>(mem.data)+n) mutable_type(args);
+            ++n;
+        }
 
         inline virtual ~slots_of() throw()
         {
