@@ -75,12 +75,20 @@ namespace yocto
             ++n;
         }
 
+        //! dectructor
         inline virtual ~slots_of() throw()
         {
             __free();
         }
 
+        //! helper
         inline bool is_empty() const throw()
+        {
+            return (size<=0);
+        }
+
+        //! helper
+        inline bool are_empty() const throw()
         {
             return (size<=0);
         }
@@ -88,11 +96,32 @@ namespace yocto
         //! resize if EMPTY
         inline void resize_empty_to(size_t n)
         {
-            assert(size<=0);
+            assert(this->is_empty());
             cslot tmp(n*sizeof(T));
             cmem.swap_with(tmp);
             (size_t&)capacity = n;
         }
+
+        //! helper
+        template <typename S>
+        inline void build_from( const slots_of<S> &src )
+        {
+            assert(this->is_empty());
+            if(size<src.size) resize_empty_to(src.size);
+            try
+            {
+                for(size_t i=0;i<src.size;++i)
+                {
+                    append<S>(src[i]);
+                }
+            }
+            catch(...)
+            {
+                __free();
+                throw;
+            }
+        }
+
 
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(slots_of);
@@ -125,6 +154,8 @@ namespace yocto
     public:
         inline explicit dynamic_slots(size_t n=0) : slots_of<T>(n) {}
         inline virtual ~dynamic_slots() throw() {}
+        inline void free() throw() { this->__free(); }
+        inline void resize(size_t n) { free(); this->resize_empty_to(n); }
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(dynamic_slots);

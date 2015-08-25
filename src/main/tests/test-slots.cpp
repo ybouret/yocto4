@@ -8,6 +8,7 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(slots)
 {
+    std::cerr << "Testing POD" << std::endl;
     {
         slots_of<int> s(10);
         for(size_t i=1;i<=s.capacity/2;++i)
@@ -25,8 +26,11 @@ YOCTO_UNIT_TEST_IMPL(slots)
             std::cerr << "s[" << i << "]=" << s[i] << std::endl;
         }
     }
+    std::cerr << std::endl;
 
 
+
+    std::cerr << "Testing C++" << std::endl;
     {
         slots_of<string> s(19);
         for(size_t i=1;i<=s.capacity;++i)
@@ -39,7 +43,23 @@ YOCTO_UNIT_TEST_IMPL(slots)
             std::cerr << "s[" << i << "]=" << s[i] << std::endl;
         }
     }
+    std::cerr << std::endl;
 
+
+    std::cerr << "Testing Helpers..." << std::endl;
+    {
+        slots_of<double> tgt(4);
+        slots_of<int>    src(8);
+        while(src.size<src.capacity)
+        {
+            src.push_back( alea_lt(100) );
+        }
+        tgt.build_from(src);
+        for(size_t i=0;i<tgt.size;++i)
+        {
+            std::cerr << "#" << i << "\t" << src[i] << " -> \t" << tgt[i] << std::endl;
+        }
+    }
 
 }
 YOCTO_UNIT_TEST_DONE()
