@@ -87,12 +87,7 @@ namespace yocto
             return (size<=0);
         }
 
-        //! helper
-        inline bool are_empty() const throw()
-        {
-            return (size<=0);
-        }
-
+        
         //! resize if EMPTY
         inline void resize_empty_to(size_t n)
         {
@@ -102,7 +97,7 @@ namespace yocto
             (size_t&)capacity = n;
         }
 
-        //! helper
+        //! helper: sequential build from precomputed other slots
         template <typename S>
         inline void build_from( const slots_of<S> &src )
         {
@@ -121,6 +116,51 @@ namespace yocto
                 throw;
             }
         }
+
+        //! helper: sequential build from precomputed other slots
+        template <typename S,typename U>
+        inline void build_from(const    slots_of<S>                   &src,
+                               typename type_traits<U>::parameter_type arg1)
+        {
+            assert(this->is_empty());
+            if(size<src.size) resize_empty_to(src.size);
+            try
+            {
+                for(size_t i=0;i<src.size;++i)
+                {
+                    append<S,U>(src[i],arg1);
+                }
+            }
+            catch(...)
+            {
+                __free();
+                throw;
+            }
+        }
+
+        //! helper: sequential build from precomputed other slots
+        template <typename S,typename U,typename V>
+        inline void build_from(const    slots_of<S>                   &src,
+                               typename type_traits<U>::parameter_type arg1,
+                               typename type_traits<U>::parameter_type arg2)
+        {
+            assert(this->is_empty());
+            if(size<src.size) resize_empty_to(src.size);
+            try
+            {
+                for(size_t i=0;i<src.size;++i)
+                {
+                    append<S,U,V>(src[i],arg1,arg2);
+                }
+            }
+            catch(...)
+            {
+                __free();
+                throw;
+            }
+        }
+
+
 
 
     private:
@@ -159,10 +199,10 @@ namespace yocto
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(dynamic_slots);
-
+        
     };
-
-
+    
+    
 }
 
 

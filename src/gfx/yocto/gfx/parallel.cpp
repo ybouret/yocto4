@@ -36,7 +36,27 @@ namespace yocto
         {
         }
 
+
+    }
+
+}
+
+namespace yocto
+{
+    namespace gfx
+    {
+
+        patches:: ~patches() throw() {}
+
+        patches:: patches(size_t n) : dynamic_slots<patch>(n) {}
+
+        void patches:: build_for(const size_t  cpus,
+                                 const bitmap &bmp,
+                                 const bool    full)
+        {
+            free();
+            patch::setup(*this, cpus, bmp, full);
+        }
         
     }
-    
 }

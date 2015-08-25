@@ -27,7 +27,7 @@ namespace yocto
              \param full set to false if borders are to be excluded
              Throw if xlen<=0 of ylen<=0
              */
-            static void setup_parallel_metrics( coord2D     &offset,
+            static void setup_parallel_metrics(coord2D     &offset,
                                                coord2D     &length,
                                                const unit_t w,
                                                const unit_t h,
@@ -44,6 +44,7 @@ namespace yocto
                                      const bitmap    &bmp,
                                      const bool       full)
             {
+                assert(patches.is_empty());
                 coord2D offset;
                 coord2D length;
                 // construct the source patch
@@ -58,7 +59,19 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(patch);
         };
         
-        
+        //! generic patches
+        class patches : public dynamic_slots<patch>
+        {
+        public:
+            explicit patches(size_t n=0);
+            virtual ~patches() throw();
+
+            void build_for(const size_t cpus,const bitmap &bmp,const bool full);
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(patches);
+        };
+
     }
 }
 
