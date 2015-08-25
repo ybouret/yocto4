@@ -3,6 +3,7 @@
 
 #include "yocto/container/cslot.hpp"
 #include "yocto/type/args.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {
@@ -17,24 +18,21 @@ namespace yocto
         inline explicit slots_of(size_t n=0) :
         size(0),
         capacity(n),
-        mem(n*sizeof(T)),
-        addr( static_cast<mutable_type *>(mem.data)-1 )
+        cmem(n*sizeof(T))
         {
 
         }
 
         inline type & operator[](const size_t indx) throw()
         {
-            assert(indx>0);
-            assert(indx<=size);
-            return addr[indx];
+            assert(indx<size);
+            return *(static_cast<type *>(cmem.data)+indx);
         }
 
         inline const_type operator[](const size_t indx) const throw()
         {
-            assert(indx>0);
-            assert(indx<=size);
-            return addr[indx];
+            assert(indx<size);
+            return  *(static_cast<const_type *>(cmem.data)+indx);
         }
 
         //! append by copy
@@ -42,7 +40,7 @@ namespace yocto
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-            new (static_cast<mutable_type *>(mem.data)+n) mutable_type(args);
+            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(args);
             ++n;
         }
 
@@ -51,7 +49,7 @@ namespace yocto
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-            new (static_cast<mutable_type *>(mem.data)+n) mutable_type();
+            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type();
             ++n;
         }
 
@@ -61,19 +59,19 @@ namespace yocto
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-            new (static_cast<mutable_type *>(mem.data)+n) mutable_type(arg1);
+            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1);
             ++n;
         }
 
         //! append by one arg constructor
         template <typename U,typename V>
-        inline void append( typename type_traits<U>::parameter_type arg1,
-                            typename type_traits<V>::parameter_type arg2
+        inline void append(typename type_traits<U>::parameter_type arg1,
+                           typename type_traits<V>::parameter_type arg2
                            )
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-            new (static_cast<mutable_type *>(mem.data)+n) mutable_type(arg1,arg2);
+            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1,arg2);
             ++n;
         }
 
@@ -82,34 +80,58 @@ namespace yocto
             __free();
         }
 
+        inline bool is_empty() const throw()
+        {
+            return (size<=0);
+        }
+
         //! resize if EMPTY
-        inline void resize(size_t n)
+        inline void resize_empty_to(size_t n)
         {
             assert(size<=0);
             cslot tmp(n*sizeof(T));
-            mem.swap_with(tmp);
-            addr = static_cast<mutable_type *>(mem.data)-1;
+            cmem.swap_with(tmp);
             (size_t&)capacity = n;
         }
 
     private:
-        cslot mem;
         YOCTO_DISABLE_COPY_AND_ASSIGN(slots_of);
+        cslot         cmem;
 
     protected:
-        mutable_type *addr;
+        inline void __swap_with( slots_of &other ) throw()
+        {
+            cswap_const(size,     other.size);
+            cswap_const(capacity, other.capacity);
+            cmem.swap_with(other.cmem);
+        }
 
         inline void __free() throw()
         {
             size_t &n = (size_t&)size;
-            for(;n>0;--n)
+            while(n>0)
             {
-                destruct(addr+n);
+                --n;
+                destruct( static_cast<mutable_type *>(cmem.data)+n );
             }
         }
 
+    };
+
+
+    template <typename T>
+    class dynamic_slots : public slots_of<T>
+    {
+    public:
+        inline explicit dynamic_slots(size_t n=0) : slots_of<T>(n) {}
+        inline virtual ~dynamic_slots() throw() {}
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(dynamic_slots);
 
     };
+
+
 }
 
 

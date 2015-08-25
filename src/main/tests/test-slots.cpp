@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(slots)
             s.append<size_t>(alea_lt(100));
         }
 
-        for(size_t i=1;i<=s.size;++i)
+        for(size_t i=0;i<s.size;++i)
         {
             std::cerr << "s[" << i << "]=" << s[i] << std::endl;
         }
@@ -34,7 +34,7 @@ YOCTO_UNIT_TEST_IMPL(slots)
             const string tmp = gen<string>::get();
             s.push_back(tmp);
         }
-        for(size_t i=1;i<=s.size;++i)
+        for(size_t i=0;i<s.size;++i)
         {
             std::cerr << "s[" << i << "]=" << s[i] << std::endl;
         }
