@@ -2,7 +2,7 @@
 #define YOCTO_GFX_PARALLEL_INCLUDED 1
 
 #include "yocto/gfx/bitmap.hpp"
-#include "yocto/threading/simd.hpp"
+#include "yocto/threading/server.hpp"
 #include "yocto/parallel/setup.hpp"
 
 namespace yocto
@@ -58,8 +58,8 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(patch);
         };
-        
-        //! generic patches
+
+        //! generic patches, used as examples
         class patches : public dynamic_slots<patch>
         {
         public:
