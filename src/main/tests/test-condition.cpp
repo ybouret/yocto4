@@ -36,7 +36,7 @@ void inc_count( void *args ) throw()
 		count_mutex->unlock();
 		
 		//-- sleep in a while to allow other thread(s) to run
-		wtime::sleep( 0.1 * alea<double>() );
+		wtime::sleep( 0.2 * alea<double>() );
     }
 }
 

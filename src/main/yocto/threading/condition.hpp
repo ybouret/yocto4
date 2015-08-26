@@ -34,7 +34,7 @@ namespace yocto
 			explicit condition() throw();
 			virtual ~condition() throw();
 			
-			//! wait on a locked mutex, returns on  the LOCKED mutex
+			//! wait on a LOCKED mutex, returns on  the LOCKED mutex
 			void     wait( mutex & ) throw();
 			
 			//! allow one blocked thread to wake up
