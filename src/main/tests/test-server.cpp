@@ -43,7 +43,7 @@ namespace {
 YOCTO_UNIT_TEST_IMPL(server)
 {
     
-    size_t nj = 100;
+    size_t nj = 10;
     if(argc>1)
     {
         nj = strconv::to<size_t>(argv[1],"#jobs");
@@ -52,23 +52,14 @@ YOCTO_UNIT_TEST_IMPL(server)
     std::cerr << "sizeof(vslot) =" << sizeof(vslot)  << std::endl;
     std::cerr << "sizeof(thread)=" << sizeof(thread) << std::endl;
 
-    server s;
-    Work   w(0);
-    const server::job     J(w);
-    const server::task_id tid = s.enqueue(J);
-    {
-        YOCTO_LOCK(s.access);
-        std::cerr << "task_id=" << tid << std::endl;
-    }
 
-#if 0
     server s;
     {
         wtime chrono;
         chrono.start();
         for(size_t i=1;i<=nj;++i)
         {
-            Work w(i,s.access);
+            Work w(i);
             const server::job J(w);
             s.enqueue(J);
         }
@@ -77,6 +68,6 @@ YOCTO_UNIT_TEST_IMPL(server)
         const double tot = nj *  Work::secs;
         std::cerr << "SpeedUp=" << tot/ell << std::endl;
     }
-#endif
+
 }
 YOCTO_UNIT_TEST_DONE()

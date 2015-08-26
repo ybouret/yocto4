@@ -15,8 +15,8 @@ namespace yocto
         cslot(size_t n);
         void swap_with( cslot &other ) throw();
         
-        void        *data;
-        const size_t size;
+        void        *data; //!< address
+        const size_t size; //!< size in bytes
         
         void prepare(size_t n);
         void release() throw();

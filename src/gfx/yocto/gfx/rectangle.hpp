@@ -12,14 +12,17 @@ namespace yocto
         class rectangle
         {
         public:
-            rectangle(unit_t xorg, unit_t yorg, size_t width, size_t height) throw();
+            rectangle(unit_t xorg,
+                      unit_t yorg,
+                      unit_t width,
+                      unit_t height) throw();
             rectangle(const rectangle &other) throw();
             ~rectangle() throw();
             
             const unit_t x;
             const unit_t y;
-            const size_t w;
-            const size_t h;
+            const unit_t w;
+            const unit_t h;
             const unit_t xout; //!< first invalid coordinate
             const unit_t yout; //!< first invalid coordinate
             

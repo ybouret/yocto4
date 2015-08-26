@@ -20,7 +20,7 @@ namespace yocto
         capacity(n),
         cmem(n*sizeof(T))
         {
-
+            assert(cmem.size>=n*sizeof(T));
         }
 
         inline type & operator[](const size_t indx) throw()
@@ -92,9 +92,8 @@ namespace yocto
         inline void resize_empty_to(size_t n)
         {
             assert(this->is_empty());
-            cslot tmp(n*sizeof(T));
-            cmem.swap_with(tmp);
-            (size_t&)capacity = n;
+            slots_of<T> tmp(n);
+            __swap_with(tmp);
         }
 
         //! helper: sequential build from precomputed other slots

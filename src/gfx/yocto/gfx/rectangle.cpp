@@ -5,7 +5,7 @@ namespace yocto
     namespace gfx
     {
         
-        rectangle:: rectangle(unit_t xorg, unit_t yorg, size_t width, size_t height) throw() :
+        rectangle:: rectangle(unit_t xorg, unit_t yorg, unit_t width, unit_t height) throw() :
         x(xorg),
         y(yorg),
         w(width),

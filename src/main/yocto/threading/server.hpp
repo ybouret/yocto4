@@ -24,8 +24,10 @@ namespace yocto
             //! enqueue a new job
             /**
              without flush, there is no guarantee that the job is done...
+             will throw on memory failure...
              */
             task_id enqueue(const job &J);
+            void    flush() throw();
 
             bool    is_done(const task_id I) const throw();
             

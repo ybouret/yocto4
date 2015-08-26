@@ -25,13 +25,12 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 double          Gmax;
                 pixmap<double> *target;
                 const void     *source;
-                lockable       *access;
 
                 explicit ipatch( const patch2D &p ) throw();
                 virtual ~ipatch() throw();
 
                 template <typename T>
-                inline void inside() throw()
+                inline void inside(lockable &access) throw()
                 {
                     assert(source);
                     assert(target);
@@ -46,9 +45,9 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     const unit_t     xlop = xlo+1;
                     const unit_t     ylo  = area.y;
                     const unit_t     yhi  = area.yout;
-#if 0
+#if 1
                     {
-                        YOCTO_LOCK(*access);
+                        YOCTO_LOCK(access);
                         std::cerr << "xlo=" << xlo << ", xhi=" << xhi-1 << std::endl;
                         std::cerr << "ylo=" << ylo << ", yhi=" << yhi-1 << std::endl;
                     }
@@ -58,8 +57,8 @@ if(gg>Gmax) { Gmax = gg; }                       \
 #if 1
                         if(!(j>0&&j<G.h))
                         {
-                            //YOCTO_LOCK(*access);
-                            //YOCTO_GIANT_LOCK();
+
+                            YOCTO_LOCK(access);
                             std::cerr << "j=" << j << ", h=" << G.h << std::endl;
                         }
 #endif
@@ -113,11 +112,10 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     ipatch &p = input[i];
                     p.target  = &G;
                     p.source  = &data;
-                    p.access  = &psrv.access;
-                    //const threading::server::job J(&p,&ipatch::inside<T> );
-                    ///psrv.enqueue(J);
+                    const threading::server::job J(&p,&ipatch::inside<T> );
+                    psrv.enqueue(J);
                 }
-                //psrv.flush();
+                psrv.flush();
             }
 
             template <typename T>

@@ -42,6 +42,7 @@ CODE;\
 
 #define Y_THREADING_SERVER_CTOR() \
 workers("server"),                \
+process(),                        \
 access(workers.access),           \
 tasks(),                          \
 activ(),                          \
@@ -95,7 +96,7 @@ dying(false)
         ////////////////////////////////////////////////////////////////////////
         void server:: terminate() throw()
         {
-            Y_THREADING_SERVER(std::cerr<<"[server] will terminate"<<std::endl);
+            Y_THREADING_SERVER(std::cerr<<std::endl<<"[server] will terminate"<<std::endl);
 
             //__________________________________________________________________
             //
@@ -103,6 +104,7 @@ dying(false)
             //__________________________________________________________________
             {
                 YOCTO_LOCK(access);
+                std::cerr << "[server] kill pending tasks" << std::endl;
                 dying = true;
                 while(tasks.size)
                 {
@@ -114,18 +116,10 @@ dying(false)
 
             //__________________________________________________________________
             //
-            // broadcast until everybody is done
+            // broadcast until everybody left is done
             //__________________________________________________________________
-            while(true)
-            {
-                process.broadcast();
-                YOCTO_LOCK(access);
-                if(activ.size<=0)
-                {
-                    break;
-                }
-            }
-
+            flush();
+            
             //__________________________________________________________________
             //
             // wait for threads to come back
@@ -141,6 +135,25 @@ dying(false)
                 object::release1<task>(tpool.query());
             }
 
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // flushing
+        //
+        ////////////////////////////////////////////////////////////////////////
+        void server:: flush() throw()
+        {
+            Y_THREADING_SERVER(std::cerr<<"[server] flushing #all="<<activ.size+tasks.size<<std::endl);
+            while(true)
+            {
+                process.broadcast();
+                YOCTO_LOCK(access);
+                if(activ.size<=0)
+                {
+                    break;
+                }
+            }
         }
 
 
@@ -192,7 +205,7 @@ dying(false)
                             {
                                 thr->on_cpu( cpu_index_of(iThread++) );
                             }
-                            std::cerr << "[server] all threads are ready" << std::endl;
+                            std::cerr << "[server] all threads are ready" << std::endl << std::endl;
 
                             access.unlock();
                             break;
@@ -351,102 +364,7 @@ dying(false)
 
 
 #if 0
-namespace yocto
-{
-    namespace threading
-    {
-
-
-        server::task:: ~task() throw() {}
-
-        server::task:: task( const server::job &J ) :
-        next(0),
-        prev(0),
-        work(J)
-        {
-
-        }
-
-
-        server:: ~server() throw()
-        {
-            terminate();
-        }
-
-
-        server:: server() :
-        layout(),
-        workers( "server", size ),
-        process(),
-        synchro(),
-        access( workers.access  ),
-        tasks(),
-        activ(),
-        tpool(),
-        ready(0),
-        dying(false)
-        {
-            initialize();
-        }
-
-        void server:: initialize()
-        {
-            try
-            {
-                //______________________________________________________________
-                //
-                // prepare all threads
-                //______________________________________________________________
-                for(size_t i=0;i<size;++i)
-                {
-                    workers.launch(thread_entry, this);
-                }
-
-                //______________________________________________________________
-                //
-                // wait for first syncro
-                //______________________________________________________________
-                for(;;)
-                {
-                    if( access.try_lock() )
-                    {
-                        if(ready<size)
-                        {
-                            access.unlock();
-                            continue;
-                        }
-                        else
-                        {
-                            std::cerr << "[server] threads are ready" << std::endl;
-                            //__________________________________________________
-                            //
-                            // Placement
-                            //__________________________________________________
-                            std::cerr << "[server] control" << std::endl;
-                            assign_current_thread_on( cpu_index_of(0));
-
-                            std::cerr << "[server] workers" << std::endl;
-                            size_t iThread = 0;
-                            for(thread *thr = workers.head; thr; thr=thr->next)
-                            {
-                                thr->on_cpu( cpu_index_of(iThread++) );
-                            }
-
-
-                            access.unlock();
-                            break;
-                        }
-                    }
-                }
-            }
-            catch(...)
-            {
-                terminate();
-                throw;
-            }
-        }
-
-        void server:: terminate() throw()
+void server:: terminate() throw()
         {
             //------------------------------------------------------------------
             // dying time has come: kill extraneous tasks
