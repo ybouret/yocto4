@@ -109,14 +109,14 @@ namespace yocto
 		{
 		}
 		
-        size_t layout:: cpu_index_of( size_t iThread) const throw()
+        size_t layout:: cpu_index_of(size_t iThread) const throw()
         {
             
             assert(size>0);
             assert(scan>0);
             assert(root<size);
             const size_t j = root + ( iThread % scan );
-            std::cerr << "              |_ assign " << iThread << " on CPU #" << j << "/" << size << std::endl;
+            std::cerr << "              |_ assign " << iThread << " on CPU #" << j << std::endl;
             return j;
         }
 		

@@ -3,6 +3,7 @@
 
 #include "yocto/threading/mutex.hpp"
 #include "yocto/container/vslot.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {
@@ -87,11 +88,11 @@ namespace yocto
             
             
 		public:
-            vslot      code; //!< helper for execution
-			const bool stop; //!< internal flag
-			thread    *next; //!< for threads
-			thread    *prev; //!< for threads
-            
+            auto_ptr<vslot> code; //!< helper for execution
+			const bool      stop; //!< internal flag
+			thread         *next; //!< for threads
+			thread         *prev; //!< for threads
+            vslot  &check_code();
 		};
         
 		void assign_current_thread_on( size_t cpu_id );

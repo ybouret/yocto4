@@ -10,8 +10,29 @@ namespace yocto
 {
     namespace threading
     {
-        
-        
+
+        class server : public layout
+        {
+        public:
+            explicit server();
+            explicit server(size_t num_threads, size_t thread_offset = 0);
+            virtual ~server() throw();
+            
+        private:
+            threads workers; //!< internal threads, set to layout.size
+
+        public:
+            lockable &access; //!< workers.access
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(server);
+            void    initialize();
+            void    terminate() throw();
+            static  void thread_entry(void*) throw();
+        };
+
+
+#if 0
         //! a task server
         class server : public layout
         {
@@ -65,6 +86,8 @@ namespace yocto
             void terminate() throw();
             
         };
+#endif
+        
     }
 }
 

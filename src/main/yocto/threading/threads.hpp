@@ -33,7 +33,7 @@ namespace yocto
 			//! launch a generic procedure
 			void launch( thread::procedure proc, void *data);
             
-			//! finish a specific thread, removed from the list
+            //! finish a specific thread, removed from the list
 			void finish( thread *thr ) throw();
             
 			//! finish all
@@ -65,10 +65,11 @@ namespace yocto
 				thread *thr = query();
 				try
 				{
+                    vslot &code = thr->check_code();
                     const exec0<FUNCTION> todo(fn);
-					thr->code.make< exec0<FUNCTION> >( todo );
+					code.make< exec0<FUNCTION> >( todo );
                     thread::procedure proc = exec0<FUNCTION>::run;
-                    void             *data = & (thr->code.as< exec0<FUNCTION> >());
+                    void             *data = & (code.as< exec0<FUNCTION> >());
 					thr->launch(proc,data);
 					push_back(thr);
 				}
@@ -84,10 +85,11 @@ namespace yocto
 				thread *thr = query();
 				try
 				{
+                    vslot &code = thr->check_code();
                     const exec1<FUNCTION,T> todo(function,param1);
-					thr->code.make< exec1<FUNCTION,T> >( todo );
+					code.make< exec1<FUNCTION,T> >( todo );
                     thread::procedure proc = exec1<FUNCTION,T>::run;
-                    void             *data = &( thr->code.as< exec1<FUNCTION,T> >() );
+                    void             *data = &( code.as< exec1<FUNCTION,T> >() );
 					thr->launch(proc,data);
 					push_back(thr);
 				}
@@ -101,10 +103,11 @@ namespace yocto
 				thread *thr = query();
 				try
 				{
+                    vslot &code = thr->check_code();
                     const call0<OBJECT_POINTER,METHOD_POINTER> todo(host,meth);
-                    thr->code.make< call0<OBJECT_POINTER,METHOD_POINTER> >(todo);
+                    code.make< call0<OBJECT_POINTER,METHOD_POINTER> >(todo);
                     thread::procedure proc = call0<OBJECT_POINTER,METHOD_POINTER>::run;
-                    void             *data = &(thr->code.as< call0<OBJECT_POINTER,METHOD_POINTER> >() );
+                    void             *data = &(code.as< call0<OBJECT_POINTER,METHOD_POINTER> >() );
                     thr->launch(proc,data);
 					push_back(thr);
 				}

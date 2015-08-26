@@ -49,7 +49,12 @@ YOCTO_UNIT_TEST_IMPL(server)
     {
         nj = strconv::to<size_t>(argv[1],"#jobs");
     }
-    
+
+    std::cerr << "sizeof(vslot) =" << sizeof(vslot)  << std::endl;
+    std::cerr << "sizeof(thread)=" << sizeof(thread) << std::endl;
+
+
+#if 0
     server s;
     {
         wtime chrono;
@@ -65,6 +70,6 @@ YOCTO_UNIT_TEST_IMPL(server)
         const double tot = nj *  Work::secs;
         std::cerr << "SpeedUp=" << tot/ell << std::endl;
     }
-    
+#endif
 }
 YOCTO_UNIT_TEST_DONE()

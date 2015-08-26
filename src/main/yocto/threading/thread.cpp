@@ -9,137 +9,7 @@ namespace yocto
 	namespace  threading
 	{
         
-#if USE_OLD_THREAD
-        
-#if defined(YOCTO_WIN)
-		DWORD WINAPI thread::launch( LPVOID args ) throw()
-		{
-			thread *thr= static_cast<thread *>(args);
-			assert( thr );
-			thr->proc_( thr->data_ );
-			return 0;
-		}
-		
-#endif
-		
-#if defined(YOCTO_BSD)
-		void * thread::launch( void *args ) throw()
-		{
-			thread *thr= static_cast<thread *>(args);
-			assert( thr );
-			thr->proc_( thr->data_ );
-			return NULL;
-		}
-#endif
-		
-		
-		
-		
-		thread:: thread( thread::proc_t proc, void *data ) :
-		proc_( proc ),
-		data_( data ),
-#if defined(YOCTO_WIN)
-		id32_(0),
-#endif
-		handle_()
-		{
-#if	defined(YOCTO_BSD)
-			const int res = pthread_create( &handle_, NULL, thread::launch, this);
-			if( res != 0 )
-				throw libc::exception( res, "pthread_create" );
-#endif
-			
-#if defined(YOCTO_WIN)
-			YOCTO_GIANT_LOCK();
-			handle_ = ::CreateThread(0 ,
-									 0 ,
-									 thread::launch,
-									 this,
-									 0,
-									 & id32_ );
-			if( NULL == handle_ )
-			{
-				const DWORD res = ::GetLastError();
-				throw win32::exception( res, "CreateThread" );
-			}
-			
-#endif
-		}
-		
-		
-		void thread:: join() throw()
-		{
-#if defined(YOCTO_BSD)
-			const int res = pthread_join( handle_, 0 );
-			if( res != 0 )
-			{
-				libc::critical_error( res, "pthread_join" );
-			}
-#endif
-			
-#if defined(YOCTO_WIN)
-			YOCTO_GIANT_LOCK();
-			if( ::WaitForSingleObject( handle_ , INFINITE ) != WAIT_OBJECT_0 )
-			{
-				win32::critical_error( ::GetLastError(), "WaitForSingleObject" );
-			}
-#endif
-		}
-		
-		
-		thread:: ~thread() throw()
-		{
-#if defined(YOCTO_BSD)
-			
-#endif
-			
-#if defined(YOCTO_WIN)
-			::CloseHandle( handle_ );
-#endif
-		}
-		
-		thread::id_t thread::get_id() const throw()
-		{
-#if defined(YOCTO_BSD)
-			return handle_;
-#endif
-			
-#if defined(YOCTO_WIN)
-			return id32_;
-#endif
-		}
-		
-		thread::handle_t thread:: get_handle() const throw()
-		{
-			return handle_;
-		}
-		
-		thread::handle_t thread:: get_current_handle() throw()
-		{
-#if defined(YOCTO_BSD)
-			return pthread_self();
-#endif
-			
-#if defined(YOCTO_WIN)
-			return ::GetCurrentThread();
-#endif
-			
-		}
-		
-		thread::id_t thread:: get_current_id() throw()
-		{
-#if defined(YOCTO_BSD)
-			return pthread_self();
-#endif
-			
-#if defined(YOCTO_WIN)
-			return ::GetCurrentThreadId();
-#endif
-		}
-        
-        
-#else
-        
+
         //======================================================================
         //
         // thread ctor
@@ -150,11 +20,17 @@ namespace yocto
         handle(),
         proc(0),
         data(0),
-        code(),
+        code(0),
         stop(true),
         next(0),
         prev(0)
         {
+        }
+
+        vslot &thread:: check_code()
+        {
+            if(!code.is_valid()) code.reset( new vslot() );
+            return *code;
         }
         
         //======================================================================
@@ -224,7 +100,7 @@ namespace yocto
             memset( &handle, 0, sizeof(handle) );
             memset( &proc,   0, sizeof(proc)   );
             memset( &data,   0, sizeof(data)   );
-            code.free();
+            if(code.is_valid())  code->free();
             (bool&)stop = true;
         }
         
@@ -364,95 +240,8 @@ namespace yocto
             return ::GetCurrentThread();
 #endif
         }
-        
-#endif
-      
-#if 0
-        //======================================================================
-        //
-        // C++
-        //
-        //======================================================================
-        static inline void execute_code( void *args ) throw()
-        {
-            try
-            {
-                assert(args);
-                thread::callback &cb = *static_cast<thread::callback *>(args);
-                cb();
-            }
-            catch(...)
-            {
-            }
-        }
-        
-        void thread::launch(const callback &cb)
-        {
-            //__________________________________________________________________
-            //
-            // let us get the access
-            //__________________________________________________________________
-            YOCTO_LOCK(access);
-            assert(0==proc);
-            assert(0==data);
-            
-            //__________________________________________________________________
-            //
-            // register the callback
-            //__________________________________________________________________
-            code.make<callback>(cb);
-            
-            //__________________________________________________________________
-            //
-            // low level
-            //__________________________________________________________________
-            launch(execute_code, & code.as<callback>() );
-        }
-        
-        
-        
-        
-        static inline
-        void execute_proc( void *args )
-        {
-            try
-            {
-                assert(args);
-                thread::c_proc fn = thread::c_proc(args);
-                fn();
-            }
-            catch(...)
-            {
-                
-            }
-        }
-        
-        
-        void thread:: launch( const c_proc fn )
-        {
-            //__________________________________________________________________
-            //
-            // let us get the access
-            //__________________________________________________________________
-            YOCTO_LOCK(access);
-            assert(0==proc);
-            assert(0==data);
-            
-            //__________________________________________________________________
-            //
-            // register the callback
-            //__________________________________________________________________
-            code.make<c_proc>(fn);
-            
-            //__________________________________________________________________
-            //
-            // low level
-            //__________________________________________________________________
-            launch(execute_proc, (void*)code.as<c_proc>() );
 
-        }
-#endif
-        
+
 	}
     
     

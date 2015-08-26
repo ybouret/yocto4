@@ -3,8 +3,94 @@
 
 namespace yocto
 {
+
     namespace threading
     {
+
+#define Y_THREADING_SERVER(CODE) do { \
+YOCTO_LOCK(access);\
+CODE;\
+} while(false)
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // construction
+        //
+        ////////////////////////////////////////////////////////////////////////
+
+#define Y_THREADING_SERVER_CTOR() \
+workers("server"),\
+access(workers.access)
+
+        server:: server() :
+        layout(),
+        Y_THREADING_SERVER_CTOR()
+        {
+
+        }
+
+        server:: server(const size_t num_threads, const size_t threads_offset) :
+        layout(num_threads,threads_offset),
+        Y_THREADING_SERVER_CTOR()
+        {
+
+        }
+
+
+        server:: ~server() throw()
+        {
+            terminate();
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // termination
+        //
+        ////////////////////////////////////////////////////////////////////////
+        void server:: terminate() throw()
+        {
+            Y_THREADING_SERVER(std::cerr<<"[server] terminate"<<std::endl);
+
+        }
+
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // initialization
+        //
+        ////////////////////////////////////////////////////////////////////////
+        void server:: initialize()
+        {
+            Y_THREADING_SERVER(std::cerr<<"[server] initialize"<<std::endl);
+
+            try
+            {
+                //______________________________________________________________
+                //
+                // prepare all threads
+                //______________________________________________________________
+                for(size_t i=0;i<size;++i)
+                {
+                    workers.launch(thread_entry, this);
+                }
+            }
+            catch(...)
+            {
+                terminate();
+                throw;
+            }
+        }
+
+    }
+}
+
+
+
+#if 0
+namespace yocto
+{
+    namespace threading
+    {
+
 
         server::task:: ~task() throw() {}
 
@@ -218,15 +304,15 @@ namespace yocto
                 access.unlock();
                 todo->work();
                 access.lock();
-
+                
                 activ.unlink(todo);
                 todo->~task();
                 tpool.store(todo);
-
+                
                 goto CHECK_BEHAVIOR;
             }
-
-
+            
+            
             synchro.signal();
             goto PROCESS_TASKS;
         }
@@ -234,3 +320,4 @@ namespace yocto
     }
     
 }
+#endif

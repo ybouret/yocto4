@@ -114,10 +114,10 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     p.target  = &G;
                     p.source  = &data;
                     p.access  = &psrv.access;
-                    const threading::server::job J(&p,&ipatch::inside<T> );
-                    psrv.enqueue(J);
+                    //const threading::server::job J(&p,&ipatch::inside<T> );
+                    ///psrv.enqueue(J);
                 }
-                psrv.flush();
+                //psrv.flush();
             }
 
             template <typename T>

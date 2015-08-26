@@ -58,6 +58,7 @@ namespace yocto
         
         void threads:: launch( thread::procedure proc, void *data)
         {
+            YOCTO_LOCK(access);
             thread *thr = query();
             try
             {
