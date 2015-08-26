@@ -45,7 +45,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     const unit_t     xlop = xlo+1;
                     const unit_t     ylo  = area.y;
                     const unit_t     yhi  = area.yout;
-#if 1
+#if 0
                     {
                         YOCTO_LOCK(access);
                         std::cerr << "xlo=" << xlo << ", xhi=" << xhi-1 << std::endl;
@@ -73,7 +73,6 @@ if(gg>Gmax) { Gmax = gg; }                       \
                         {
                             const double gx = double(dj[ip])-double(dj[im]);
                             const double gy = double(djp[i])-double(djm[i]);
-                            continue;
                             YOCTO_GFX_GRADIENT_COMPUTE(Gj[i]);
                         }
                     }
@@ -112,7 +111,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     ipatch &p = input[i];
                     p.target  = &G;
                     p.source  = &data;
-                    const threading::server::job J(&p,&ipatch::inside<T> );
+                    const threading::server::job J(&p,&ipatch::inside<T>);
                     psrv.enqueue(J);
                 }
                 psrv.flush();

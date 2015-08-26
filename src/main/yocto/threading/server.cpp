@@ -104,7 +104,7 @@ dying(false)
             //__________________________________________________________________
             {
                 YOCTO_LOCK(access);
-                std::cerr << "[server] kill pending tasks" << std::endl;
+                std::cerr << "[server] kill #pending tasks=" << tasks.size << std::endl;
                 dying = true;
                 while(tasks.size)
                 {
@@ -118,8 +118,18 @@ dying(false)
             //
             // broadcast until everybody left is done
             //__________________________________________________________________
-            flush();
-            
+            assert(0==tasks.size);
+            Y_THREADING_SERVER(std::cerr<<"[server] finishing #active="<<activ.size<<std::endl);
+            while(true)
+            {
+                process.broadcast();
+                YOCTO_LOCK(access);
+                if(activ.size<=0)
+                {
+                    break;
+                }
+            }
+
             //__________________________________________________________________
             //
             // wait for threads to come back
@@ -149,7 +159,7 @@ dying(false)
             {
                 process.broadcast();
                 YOCTO_LOCK(access);
-                if(activ.size<=0)
+                if(activ.size<=0&&tasks.size<=0)
                 {
                     break;
                 }

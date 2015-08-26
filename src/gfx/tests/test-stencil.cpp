@@ -66,8 +66,10 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             PNG.save("image_col_b.png",ch[2], get_rgba::from_byte_b,NULL, NULL);
 
             pixmap<double> G(w,h);
-            gradient::start(gpatches,G,ch[0],psrv);
-            
+            for(size_t i=1;i<=10;++i)
+            {
+                gradient::start(gpatches,G,ch[0],psrv);
+            }
 
 
 #if 0
