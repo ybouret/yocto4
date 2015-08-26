@@ -6,6 +6,7 @@
 #include "yocto/threading/layout.hpp"
 #include "yocto/functor.hpp"
 
+
 namespace yocto
 {
     namespace threading
@@ -14,21 +15,51 @@ namespace yocto
         class server : public layout
         {
         public:
+            typedef uint64_t task_id;
             explicit server();
             explicit server(size_t num_threads, size_t thread_offset = 0);
             virtual ~server() throw();
+
+
+            typedef functor<void,TL1(lockable&)> job;
+
+            class task
+            {
+            public:
+                task         *next;
+                task         *prev;
+                const task_id uuid;
+                job           todo;
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(task);
+                task(const task_id I, const job &J);
+                ~task() throw();
+                friend class server;
+            };
+
+
             
         private:
             threads workers; //!< internal threads, set to layout.size
+
+
 
         public:
             lockable &access; //!< workers.access
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(server);
+            core::list_of<task> tasks;  //!< tasks to process
+            core::list_of<task> activ;  //!< running tasks
+            core::pool_of<task> tpool;  //!< pool of empty tasks
+            task_id             tuuid;  //!< for tasks labelling...
+            size_t              ready;  //!< for first synchro
+            
             void    initialize();
             void    terminate() throw();
-            static  void thread_entry(void*) throw();
+            void    run() throw();
+            static  void thread_run(void*) throw();
         };
 
 

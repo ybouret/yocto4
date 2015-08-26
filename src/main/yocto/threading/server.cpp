@@ -1,6 +1,28 @@
 #include "yocto/threading/server.hpp"
 #include <iostream>
 
+
+namespace yocto
+{
+    namespace threading
+    {
+
+        server:: task:: ~task() throw() {}
+        server:: task:: task( const task_id I, const job &J ) :
+        next(0),
+        prev(0),
+        uuid(I),
+        todo(J)
+        {
+
+        }
+
+    }
+
+}
+
+
+
 namespace yocto
 {
 
@@ -11,6 +33,7 @@ namespace yocto
 YOCTO_LOCK(access);\
 CODE;\
 } while(false)
+
         ////////////////////////////////////////////////////////////////////////
         //
         // construction
@@ -18,21 +41,27 @@ CODE;\
         ////////////////////////////////////////////////////////////////////////
 
 #define Y_THREADING_SERVER_CTOR() \
-workers("server"),\
-access(workers.access)
+workers("server"),                \
+access(workers.access),           \
+tasks(),                          \
+activ(),                          \
+tpool(),                          \
+tuuid(0),                         \
+ready(0)
+
 
         server:: server() :
         layout(),
         Y_THREADING_SERVER_CTOR()
         {
-
+            initialize();
         }
 
         server:: server(const size_t num_threads, const size_t threads_offset) :
         layout(num_threads,threads_offset),
         Y_THREADING_SERVER_CTOR()
         {
-
+            initialize();
         }
 
 
@@ -49,6 +78,29 @@ access(workers.access)
         void server:: terminate() throw()
         {
             Y_THREADING_SERVER(std::cerr<<"[server] terminate"<<std::endl);
+
+            //__________________________________________________________________
+            //
+            // kill pending tasks
+            //__________________________________________________________________
+            {
+                YOCTO_LOCK(access);
+                while(tasks.size)
+                {
+                    task *t = tasks.pop_back();
+                    t->~task();
+                    object::release1<task>(t);
+                }
+            }
+
+            //__________________________________________________________________
+            //
+            // kill pooled task
+            //__________________________________________________________________
+            while(tpool.size)
+            {
+                object::release1<task>(tpool.query());
+            }
 
         }
 
@@ -70,8 +122,46 @@ access(workers.access)
                 //______________________________________________________________
                 for(size_t i=0;i<size;++i)
                 {
-                    workers.launch(thread_entry, this);
+                    workers.launch(thread_run, this);
                 }
+
+                //______________________________________________________________
+                //
+                // wait for first synchronization
+                //______________________________________________________________
+                while(true)
+                {
+                    if( access.try_lock() )
+                    {
+                        if(ready<size)
+                        {
+                            access.unlock();
+                        }
+                        else
+                        {
+                            std::cerr << "[server] all threads are synchronized" << std::endl;
+                            //__________________________________________________
+                            //
+                            // thread placement
+                            //__________________________________________________
+                            std::cerr << "[server] assigning control thread" << std::endl;
+                            assign_current_thread_on( cpu_index_of(0));
+
+                            std::cerr << "[server] assigning workers thread" << std::endl;
+                            size_t iThread = 0;
+                            for(thread *thr = workers.head; thr; thr=thr->next)
+                            {
+                                thr->on_cpu( cpu_index_of(iThread++) );
+                            }
+                            std::cerr << "[server] all threads are ready" << std::endl;
+
+                            access.unlock();
+                            break;
+                        }
+                    }
+                }
+
+
             }
             catch(...)
             {
@@ -79,6 +169,33 @@ access(workers.access)
                 throw;
             }
         }
+
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // running
+        //
+        ////////////////////////////////////////////////////////////////////////
+        void server::thread_run(void *args) throw()
+        {
+            assert(args);
+            static_cast<server *>(args)->run();
+        }
+
+        void server:: run() throw()
+        {
+            Y_THREADING_SERVER(std::cerr << "[server] starting thread" << std::endl);
+
+            //__________________________________________________________________
+            //
+            // Waiting for all threads to be ready
+            //__________________________________________________________________
+            access.lock();
+            ++ready;
+            access.unlock();
+
+        }
+
 
     }
 }

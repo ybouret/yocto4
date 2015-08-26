@@ -53,6 +53,8 @@ YOCTO_UNIT_TEST_IMPL(server)
     std::cerr << "sizeof(vslot) =" << sizeof(vslot)  << std::endl;
     std::cerr << "sizeof(thread)=" << sizeof(thread) << std::endl;
 
+    server s;
+    
 
 #if 0
     server s;
