@@ -69,6 +69,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             for(size_t i=1;i<=10;++i)
             {
                 gradient::start(gpatches,G,ch[0],psrv);
+                gradient::borders(G,ch[0]);
             }
 
 
