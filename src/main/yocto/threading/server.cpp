@@ -12,7 +12,7 @@ namespace yocto
         next(0),
         prev(0),
         uuid(I),
-        todo(J)
+        work(J)
         {
 
         }
@@ -47,7 +47,8 @@ tasks(),                          \
 activ(),                          \
 tpool(),                          \
 tuuid(0),                         \
-ready(0)
+ready(0),                         \
+dying(false)
 
 
         server:: server() :
@@ -70,6 +71,23 @@ ready(0)
             terminate();
         }
 
+        bool server::is_done(const task_id I) const throw()
+        {
+            YOCTO_LOCK(access);
+            for(const task *t=tasks.head;t;t=t->next)
+            {
+                if(I==t->uuid) return false;
+            }
+
+            for(const task *t=activ.head;t;t=t->next)
+            {
+                if(I==t->uuid) return false;
+            }
+
+            return true;
+        }
+
+
         ////////////////////////////////////////////////////////////////////////
         //
         // termination
@@ -77,7 +95,7 @@ ready(0)
         ////////////////////////////////////////////////////////////////////////
         void server:: terminate() throw()
         {
-            Y_THREADING_SERVER(std::cerr<<"[server] terminate"<<std::endl);
+            Y_THREADING_SERVER(std::cerr<<"[server] will terminate"<<std::endl);
 
             //__________________________________________________________________
             //
@@ -85,6 +103,7 @@ ready(0)
             //__________________________________________________________________
             {
                 YOCTO_LOCK(access);
+                dying = true;
                 while(tasks.size)
                 {
                     task *t = tasks.pop_back();
@@ -92,6 +111,26 @@ ready(0)
                     object::release1<task>(t);
                 }
             }
+
+            //__________________________________________________________________
+            //
+            // broadcast until everybody is done
+            //__________________________________________________________________
+            while(true)
+            {
+                process.broadcast();
+                YOCTO_LOCK(access);
+                if(activ.size<=0)
+                {
+                    break;
+                }
+            }
+
+            //__________________________________________________________________
+            //
+            // wait for threads to come back
+            //__________________________________________________________________
+            workers.finish();
 
             //__________________________________________________________________
             //
@@ -188,12 +227,121 @@ ready(0)
 
             //__________________________________________________________________
             //
+            //
             // Waiting for all threads to be ready
+            //
             //__________________________________________________________________
             access.lock();
             ++ready;
-            access.unlock();
 
+            //__________________________________________________________________
+            //
+            //
+            // Waiting for a task to do or to quit
+            // wait on a LOCKED access, unlocked it for other thread
+            //
+            //__________________________________________________________________
+        WAIT_FOR_PROCESS:
+            process.wait(access);
+
+            //__________________________________________________________________
+            //
+            //
+            // we come back with a LOCKED access
+            //
+            //__________________________________________________________________
+        CHECK_BEHAVIOR:
+            if(dying)
+            {
+                std::cerr << "[server] leaving thread" << std::endl;
+                access.unlock();
+                return;
+            }
+
+            if(tasks.size>0)
+            {
+                //______________________________________________________________
+                //
+                // something to do...
+                //______________________________________________________________
+                task *curr = tasks.pop_front();
+                activ.push_back(curr);
+
+                //______________________________________________________________
+                //
+                // unlock access for other thread
+                //______________________________________________________________
+                access.unlock();
+
+                //______________________________________________________________
+                //
+                // nobody else can touch current task
+                // (but next/prev, doesn't matter yet)
+                // do the work...
+                //______________________________________________________________
+                try
+                {
+                    curr->work(access);
+                }
+                catch(...)
+                {
+                    throw;
+                }
+
+                //______________________________________________________________
+                //
+                // LOCK access to update activ status
+                //______________________________________________________________
+                access.lock();
+
+
+                (void)activ.unlink(curr);
+                curr->~task();
+                tpool.store(curr);
+
+
+                goto CHECK_BEHAVIOR; // we are LOCKED here
+            }
+
+
+            // access must be LOCKED at this point
+            goto WAIT_FOR_PROCESS;
+
+        }
+
+        server::task_id server::enqueue(const job &J)
+        {
+            //______________________________________________________________
+            //
+            // LOCK and get acquire task memory
+            //______________________________________________________________
+            YOCTO_LOCK(access);
+            task *t = tpool.size ? tpool.query() : object::acquire1<task>();
+
+            try
+            {
+                //______________________________________________________________
+                //
+                // create the new task
+                //______________________________________________________________
+                ++tuuid;
+                new (t) task(tuuid,J);
+                tasks.push_front(t);
+
+            }
+            catch(...)
+            {
+                tpool.store(t);
+                throw;
+            }
+
+            //__________________________________________________________________
+            //
+            // wake up some thread if needed
+            //__________________________________________________________________
+            process.signal();
+
+            return t->uuid;
         }
 
 

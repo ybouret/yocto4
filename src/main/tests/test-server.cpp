@@ -15,16 +15,15 @@ namespace {
     {
     public:
         int       value;
-        lockable &access;
         static   double secs;
         
-        Work( int v, lockable &l ) throw() : value(v), access(l)  {}
+        Work( int v ) throw() : value(v)  {}
         
         ~Work() throw() {}
         
-        Work( const Work &w ) throw() : value( w.value ), access( w.access ) {}
+        Work( const Work &w ) throw() : value( w.value ){}
         
-        void operator()(void)
+        void operator()(lockable &access)
         {
             {
                 YOCTO_LOCK(access);
@@ -54,7 +53,13 @@ YOCTO_UNIT_TEST_IMPL(server)
     std::cerr << "sizeof(thread)=" << sizeof(thread) << std::endl;
 
     server s;
-    
+    Work   w(0);
+    const server::job     J(w);
+    const server::task_id tid = s.enqueue(J);
+    {
+        YOCTO_LOCK(s.access);
+        std::cerr << "task_id=" << tid << std::endl;
+    }
 
 #if 0
     server s;

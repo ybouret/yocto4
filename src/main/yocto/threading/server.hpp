@@ -19,17 +19,33 @@ namespace yocto
             explicit server();
             explicit server(size_t num_threads, size_t thread_offset = 0);
             virtual ~server() throw();
-
-
             typedef functor<void,TL1(lockable&)> job;
 
+            //! enqueue a new job
+            /**
+             without flush, there is no guarantee that the job is done...
+             */
+            task_id enqueue(const job &J);
+
+            bool    is_done(const task_id I) const throw();
+            
+        private:
+            threads   workers; //!< internal threads, set to layout.size
+            condition process; //!< used to wait for job to do
+
+
+        public:
+            mutex    &access; //!< workers.access
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(server);
             class task
             {
             public:
                 task         *next;
                 task         *prev;
                 const task_id uuid;
-                job           todo;
+                job           work;
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(task);
@@ -38,23 +54,12 @@ namespace yocto
                 friend class server;
             };
 
-
-            
-        private:
-            threads workers; //!< internal threads, set to layout.size
-
-
-
-        public:
-            lockable &access; //!< workers.access
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(server);
             core::list_of<task> tasks;  //!< tasks to process
             core::list_of<task> activ;  //!< running tasks
             core::pool_of<task> tpool;  //!< pool of empty tasks
             task_id             tuuid;  //!< for tasks labelling...
             size_t              ready;  //!< for first synchro
+            bool                dying;  //!< when ending...
             
             void    initialize();
             void    terminate() throw();
