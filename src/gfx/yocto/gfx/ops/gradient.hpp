@@ -25,6 +25,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 double          Gmax;
                 pixmap<double> *target;
                 const void     *source;
+                lockable       *access;
 
                 explicit ipatch( const patch2D &p ) throw();
                 virtual ~ipatch() throw();
@@ -34,6 +35,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 {
                     assert(source);
                     assert(target);
+                    assert(access);
                     Gmax = 0;
                     const pixmap<T> &data = *(const pixmap<T> *)(source);
                     pixmap<double>  &G    = *target;
@@ -46,7 +48,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     const unit_t     ylo  = area.y;
                     const unit_t     yhi  = area.yout;
                     {
-                        YOCTO_GIANT_LOCK();
+                        YOCTO_LOCK(*access);
                         std::cerr << "xlo=" << xlo << ", xhi=" << xhi-1 << std::endl;
                         std::cerr << "ylo=" << ylo << ", yhi=" << yhi-1 << std::endl;
                     }
@@ -54,7 +56,8 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     {
                         if(!(j>0&&j<G.h))
                         {
-                            YOCTO_GIANT_LOCK();
+                            //YOCTO_LOCK(*access);
+                            //YOCTO_GIANT_LOCK();
                             std::cerr << "j=" << j << ", h=" << G.h << std::endl;
                         }
                         assert(j>0);
@@ -98,11 +101,16 @@ if(gg>Gmax) { Gmax = gg; }                       \
                               threading::server &psrv)
             {
                 // compute core
+                {
+                    YOCTO_LOCK(psrv.access);
+                    std::cerr << "Starting gradient..." << std::endl;
+                }
                 for(size_t i=0;i<input.size;++i)
                 {
                     ipatch &p = input[i];
                     p.target  = &G;
                     p.source  = &data;
+                    p.access  = &psrv.access;
                     const threading::server::job J(&p,&ipatch::compute<T> );
                     psrv.enqueue(J);
                     //break;

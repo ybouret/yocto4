@@ -5,24 +5,24 @@ namespace yocto
 {
     namespace threading
     {
-        
+
         server::task:: ~task() throw() {}
-        
+
         server::task:: task( const server::job &J ) :
         next(0),
         prev(0),
         work(J)
         {
-            
+
         }
-        
-        
+
+
         server:: ~server() throw()
         {
             terminate();
         }
-        
-        
+
+
         server:: server() :
         layout(),
         workers( "server", size ),
@@ -37,7 +37,7 @@ namespace yocto
         {
             initialize();
         }
-        
+
         void server:: initialize()
         {
             try
@@ -50,7 +50,7 @@ namespace yocto
                 {
                     workers.launch(thread_entry, this);
                 }
-                
+
                 //______________________________________________________________
                 //
                 // wait for first syncro
@@ -73,7 +73,7 @@ namespace yocto
                             //__________________________________________________
                             std::cerr << "[server] control" << std::endl;
                             assign_current_thread_on( cpu_index_of(0));
-                            
+
                             std::cerr << "[server] workers" << std::endl;
                             size_t iThread = 0;
                             for(thread *thr = workers.head; thr; thr=thr->next)
@@ -81,7 +81,7 @@ namespace yocto
                                 thr->on_cpu( cpu_index_of(iThread++) );
                             }
 
-                            
+
                             access.unlock();
                             break;
                         }
@@ -94,11 +94,11 @@ namespace yocto
                 throw;
             }
         }
-        
+
         void server:: terminate() throw()
         {
             //------------------------------------------------------------------
-            // dying time has come
+            // dying time has come: kill extraneous tasks
             //------------------------------------------------------------------
             {
                 YOCTO_LOCK(access);
@@ -110,7 +110,7 @@ namespace yocto
                     object::release1<task>(t);
                 }
             }
-            
+
             //------------------------------------------------------------------
             // broadcast until everybody is done
             //------------------------------------------------------------------
@@ -121,29 +121,31 @@ namespace yocto
                 if(activ.size<=0)
                     break;
             }
-            
+
             //------------------------------------------------------------------
             // cleanup
             //------------------------------------------------------------------
             workers.finish();
             assert(activ.size<=0);
-            
+
             while(tpool.size) object::release1<task>(tpool.query());
-            
-            
+
+
         }
-        
+
         void server:: flush() throw()
         {
             access.lock();
             std::cerr << "[server] flushing" << std::endl;
             synchro.wait(access);
+            //std::cerr << "[server] remaining tasks=" << tasks.size << std::endl;
             access.unlock();
         }
-        
+
         void server:: enqueue( const job &J )
         {
             YOCTO_LOCK(access);
+            //std::cerr << "[server] new task (in cache: " << tasks.size << ")" << std::endl;
             task *t = tpool.size ? tpool.query() : object::acquire1<task>();
             try
             {
@@ -153,36 +155,36 @@ namespace yocto
                 //______________________________________________________________
                 new (t) task(J);
                 tasks.push_front(t);
-                
+
             }
             catch(...)
             {
                 tpool.store(t);
                 throw;
             }
-            
+
             //__________________________________________________________________
             //
             // wake up some thread if needed
             //__________________________________________________________________
             process.signal();
         }
-        
-        
+
+
         void server:: thread_entry(void *args) throw()
         {
             assert(args);
             static_cast<server *>(args)->run();
         }
-        
-        
+
+
         void server:: run() throw()
         {
             {
                 YOCTO_LOCK(access);
                 std::cerr << "[server] launching thread!" << std::endl;
             }
-            
+
             access.lock();
             ++ready;
         PROCESS_TASKS:
@@ -190,7 +192,7 @@ namespace yocto
             // Wait on the LOCKED access
             //------------------------------------------------------------------
             process.wait(access); // and return an unlocked mutex
-            
+
         CHECK_BEHAVIOR:
             //------------------------------------------------------------------
             // LOCKED return
@@ -201,27 +203,30 @@ namespace yocto
                 access.unlock();
                 return;
             }
-            
+
             //------------------------------------------------------------------
             // is there a task to run
             //------------------------------------------------------------------
-            //std::cerr << "[server] #tasks=" << tasks.size << std::endl;
             if(tasks.size)
             {
+                {
+                    //YOCTO_LOCK(access);
+                    //std::cerr << "[server] running task out of " << tasks.size << std::endl;
+                }
                 task *todo = tasks.pop_back();
                 activ.push_back(todo);
                 access.unlock();
                 todo->work();
                 access.lock();
-                
+
                 activ.unlink(todo);
                 todo->~task();
                 tpool.store(todo);
-                
+
                 goto CHECK_BEHAVIOR;
             }
-            
-            
+
+
             synchro.signal();
             goto PROCESS_TASKS;
         }

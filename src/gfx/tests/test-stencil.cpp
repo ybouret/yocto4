@@ -67,7 +67,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
 
             pixmap<double> G(w,h);
             gradient::start(gpatches,G,ch[0],psrv);
-
+            
 
 
 #if 0
