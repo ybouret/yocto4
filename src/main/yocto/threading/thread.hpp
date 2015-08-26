@@ -58,9 +58,14 @@ namespace yocto
             
 			//! get system level handle without the wrapper
 			static handle_t get_current_handle() throw();
-            
-			void on_cpu( size_t cpu_id );
-			static void assign_cpu( thread::handle_t , size_t cpu_id );
+
+            //! assign to a given cpu
+			void        on_cpu( size_t cpu_id );
+
+            //! assign system thread handle to a given cpu
+			static void assign_cpu(  thread::handle_t , size_t cpu_id );
+
+            //! for debugging
 			static void foreach_cpu( thread::handle_t, void (*proc)(size_t cpu_id,void*), void *);
             
             
@@ -92,7 +97,7 @@ namespace yocto
 			const bool      stop; //!< internal flag
 			thread         *next; //!< for threads
 			thread         *prev; //!< for threads
-            vslot  &check_code();
+            vslot  &check_code(); //!< allocate code if needed
 		};
         
 		void assign_current_thread_on( size_t cpu_id );
