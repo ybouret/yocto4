@@ -31,11 +31,10 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 virtual ~ipatch() throw();
 
                 template <typename T>
-                inline void compute() throw()
+                inline void inside() throw()
                 {
                     assert(source);
                     assert(target);
-                    assert(access);
                     Gmax = 0;
                     const pixmap<T> &data = *(const pixmap<T> *)(source);
                     pixmap<double>  &G    = *target;
@@ -47,37 +46,41 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     const unit_t     xlop = xlo+1;
                     const unit_t     ylo  = area.y;
                     const unit_t     yhi  = area.yout;
+#if 0
                     {
                         YOCTO_LOCK(*access);
                         std::cerr << "xlo=" << xlo << ", xhi=" << xhi-1 << std::endl;
                         std::cerr << "ylo=" << ylo << ", yhi=" << yhi-1 << std::endl;
                     }
+#endif
                     for(unit_t jm=ylo-1,j=ylo,jp=ylo+1;j<yhi;++jm,++j,++jp)
                     {
+#if 1
                         if(!(j>0&&j<G.h))
                         {
                             //YOCTO_LOCK(*access);
                             //YOCTO_GIANT_LOCK();
                             std::cerr << "j=" << j << ", h=" << G.h << std::endl;
                         }
+#endif
                         assert(j>0);
                         assert(j<G.h);
                         pixmap<double>::row           &Gj  = G[j];
-                        continue;
                         const typename pixmap<T>::row &dj  = data[j];
                         const typename pixmap<T>::row &djm = data[jm];
                         const typename pixmap<T>::row &djp = data[jp];
-
 
                         for(unit_t im=xlom,i=xlo,ip=xlop;i<xhi;++im,++i,++ip)
                         {
                             const double gx = double(dj[ip])-double(dj[im]);
                             const double gy = double(djp[i])-double(djm[i]);
+                            continue;
                             YOCTO_GFX_GRADIENT_COMPUTE(Gj[i]);
                         }
                     }
 
                 }
+
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(ipatch);
@@ -111,13 +114,30 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     p.target  = &G;
                     p.source  = &data;
                     p.access  = &psrv.access;
-                    const threading::server::job J(&p,&ipatch::compute<T> );
+                    const threading::server::job J(&p,&ipatch::inside<T> );
                     psrv.enqueue(J);
-                    //break;
                 }
                 psrv.flush();
             }
-            
+
+            template <typename T>
+            static double borders(pixmap<double>  &G,
+                                  const pixmap<T> &data) throw()
+            {
+                double Gmax = 0;
+                assert(G.w==data.w);
+                assert(G.h==data.h);
+                const unit_t h = G.h;
+                for(unit_t jm=0,j=1,jp=2;j<h;++jm,++j,++jp)
+                {
+                     pixmap<double>::row           &Gj  = G[j];
+
+
+                }
+
+
+                return Gmax;
+            }
 
 
         };
