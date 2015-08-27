@@ -19,6 +19,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
         struct gradient
         {
 
+            //! inner patch
             class ipatch : public patch
             {
             public:
@@ -34,7 +35,6 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 {
                     assert(source);
                     assert(target);
-                    Gmax = 0;
                     const pixmap<T> &data = *(const pixmap<T> *)(source);
                     pixmap<double>  &G    = *target;
                     assert(G.w==data.w);
@@ -45,23 +45,10 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     const unit_t     xlop = xlo+1;
                     const unit_t     ylo  = area.y;
                     const unit_t     yhi  = area.yout;
-#if 0
-                    {
-                        YOCTO_LOCK(access);
-                        std::cerr << "xlo=" << xlo << ", xhi=" << xhi-1 << std::endl;
-                        std::cerr << "ylo=" << ylo << ", yhi=" << yhi-1 << std::endl;
-                    }
-#endif
+
+                    Gmax = 0;
                     for(unit_t jm=ylo-1,j=ylo,jp=ylo+1;j<yhi;++jm,++j,++jp)
                     {
-#if 0
-                        if(!(j>0&&j<G.h))
-                        {
-
-                            YOCTO_LOCK(access);
-                            std::cerr << "j=" << j << ", h=" << G.h << std::endl;
-                        }
-#endif
                         assert(j>0);
                         assert(j<G.h);
                         pixmap<double>::row           &Gj  = G[j];
@@ -79,43 +66,87 @@ if(gg>Gmax) { Gmax = gg; }                       \
 
                 }
 
-
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(ipatch);
             };
 
+            //! inner patches
             typedef dynamic_slots<ipatch> ipatches;
 
+            //! output patch
+            class opatch : public patch
+            {
+            public:
+                explicit opatch(const patch2D &p) throw();
+                virtual ~opatch() throw();
+                double                Gmax;    //!< for normalisation
+                void                 *target;  //!< pixmap<T>
+                const pixmap<double> *source;  //!< precomputed
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(opatch);
+            };
+
+            typedef dynamic_slots<opatch> opatches;
+
+
+
+            //! setup patches for at most #cpus
             inline
             static void setup(ipatches    &input,
+                              opatches    &output,
                               const size_t cpus,
                               const bitmap &bmp)
             {
                 input.free();
-                patch::setup(input, cpus,bmp,false);
+                patch::setup(input,cpus,bmp,false);
+
+                output.free();
+                patch::setup(output,cpus,bmp,true);
             }
 
+
+            //! start computing
+            /**
+             store effective gradient in G
+             sequential if NULL == psrv
+             parallel   otherwise
+             */
             template <typename T> inline
             static void start(ipatches          &input,
                               pixmap<double>    &G,
                               const pixmap<T>   &data,
-                              threading::server &psrv)
+                              threading::server *psrv)
             {
                 // compute core
+                if(psrv)
                 {
-                    YOCTO_LOCK(psrv.access);
-                    std::cerr << "Starting gradient..." << std::endl;
+                    // parallel
+                    for(size_t i=0;i<input.size;++i)
+                    {
+                        ipatch &p = input[i];
+                        p.target  = &G;
+                        p.source  = &data;
+                        const threading::server::job J(&p,&ipatch::inside<T>);
+                        psrv->enqueue(J);
+                    }
                 }
-                for(size_t i=0;i<input.size;++i)
+                else
                 {
-                    ipatch &p = input[i];
-                    p.target  = &G;
-                    p.source  = &data;
-                    const threading::server::job J(&p,&ipatch::inside<T>);
-                    psrv.enqueue(J);
+                    // sequential
+                    faked_lock access;
+                    for(size_t i=0;i<input.size;++i)
+                    {
+                        ipatch &p = input[i];
+                        p.target  = &G;
+                        p.source  = &data;
+                        p.inside<T>(access);
+                    }
                 }
             }
 
+
+            //! borders computing of effective gradient
             template <typename T> inline
             static double borders(pixmap<double>  &G,
                                   const pixmap<T> &data) throw()
@@ -222,48 +253,28 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 return Gmax;
             }
 
+            //! compute effective gradient everywhere
+            /**
+             input patches must be precomputed.
+             */
             template <typename T> inline
-            double compute1(ipatches          &input,
-                            pixmap<double>    &G,
-                            const pixmap<T>   &data,
-                            threading::server &psrv)
+            static double compute1(ipatches          &input,
+                                   pixmap<double>    &G,
+                                   const pixmap<T>   &data,
+                                   threading::server *psrv)
             {
                 start(input, G, data, psrv);
                 double Gmax = borders(G,data);
-                psrv.flush();
+                if(psrv)
+                {
+                    psrv->flush();
+                }
+                
                 for(size_t i=0;i<input.size;++i)
                 {
                     const double tmp = input[i].Gmax;
                     if(tmp>Gmax) Gmax = tmp;
                 }
-                return Gmax;
-            }
-
-            template <typename T> inline
-            double compute1(pixmap<double>    &G,
-                            const pixmap<T>   &data)
-            {
-                // prepare inside patch
-                coord2D offset;
-                coord2D length;
-                patch::setup_parallel_metrics(offset, length, G.w, G.h, false);
-                const patch2D p(offset,parallel::__coord_dec(offset+length));
-                ipatch        in(p);
-                in.target   = &G;
-                in.source   = &data;
-
-                // initialize with borders
-                double Gmax = borders(G,data);
-                faked_lock  access;
-
-                // compute inside
-                in.inside<T>(access);
-                if(in.Gmax>Gmax)
-                {
-                    Gmax = in.Gmax;
-                }
-
-                // done
                 return Gmax;
             }
 
@@ -402,7 +413,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
             assert(grad.h == data.h );
             const unit_t w = data.w;
             const unit_t h = data.h;
-
+            
             // first pass: build 'real' gradient
             pixmap<double> G(w,h);
             const double Gmax = gradient_of(data, G);

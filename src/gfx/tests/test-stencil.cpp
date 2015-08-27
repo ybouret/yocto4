@@ -45,18 +45,28 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             pixmapf pxf(pxm,rgb2bwf<rgb_t>);
             PNG.save("imagec.png",pxf, get_rgba::from_rampf,NULL, NULL);
 
-            gradient::ipatches gpatches;
-            gradient::setup(gpatches,psrv.size,pxm);
+            gradient::ipatches igrad;
+            gradient::opatches ograd;
+
+            gradient::setup(igrad,ograd,psrv.size,pxm);
             const unit_t w = pxm.w;
             const unit_t h = pxm.h;
             
-            std::cerr << "#cores=" << gpatches.size << std::endl;
+            std::cerr << "#input_cores=" << igrad.size << std::endl;
             std::cerr << "w=" << w << ", h=" << h << std::endl;
-            for(size_t i=0;i<gpatches.size;++i)
+            for(size_t i=0;i<igrad.size;++i)
             {
-                const gradient::ipatch &p = gpatches[i];
+                const gradient::ipatch &p = igrad[i];
                 std::cerr << "ipatch[" << i << "]= [" << p.area.x << ":" << p.area.y << "] \tx [" << p.area.xout-1 << ":" <<p.area.yout-1 << "], #=" << p.area.w * p.area.h << std::endl;
             }
+
+            std::cerr << "#output_cores=" << ograd.size << std::endl;
+            for(size_t i=0;i<ograd.size;++i)
+            {
+                const gradient::opatch &p = ograd[i];
+                std::cerr << "opatch[" << i << "]= [" << p.area.x << ":" << p.area.y << "] \tx [" << p.area.xout-1 << ":" <<p.area.yout-1 << "], #=" << p.area.w * p.area.h << std::endl;
+            }
+
 
 
             pixmaps<uint8_t> ch(3,w,h);
@@ -68,8 +78,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             pixmap<double> G(w,h);
             for(size_t i=1;i<=10;++i)
             {
-                gradient::start(gpatches,G,ch[0],psrv);
-                gradient::borders(G,ch[0]);
+                gradient::compute1(igrad, G,ch[0], NULL);
             }
 
 
