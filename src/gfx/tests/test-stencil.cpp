@@ -75,11 +75,15 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             PNG.save("image_col_g.png",ch[1], get_rgba::from_byte_g,NULL, NULL);
             PNG.save("image_col_b.png",ch[2], get_rgba::from_byte_b,NULL, NULL);
 
-            pixmap<double> G(w,h);
-            for(size_t i=1;i<=10;++i)
+            pixmap<double>  G(w,h);
+            pixmap<uint8_t> grad(w,h);
+
+            for(size_t i=0;i<10;++i)
             {
-                gradient::compute1(igrad, G,ch[0], &psrv);
+                const double Gmax = gradient::compute1(igrad, G,ch[0], &psrv);
+                gradient::compute2(ograd, grad, G, Gmax, NULL);
             }
+            PNG.save("grad_image_r.png",grad, get_rgba::from_byte_r,NULL, NULL);
 
 
 #if 0

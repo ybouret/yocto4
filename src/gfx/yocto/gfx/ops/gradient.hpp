@@ -31,7 +31,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 virtual ~ipatch() throw();
 
                 template <typename T>
-                inline void inside(lockable &access) throw()
+                inline void inside(lockable &) throw()
                 {
                     assert(source);
                     assert(target);
@@ -83,6 +83,31 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 void                 *target;  //!< pixmap<T>
                 const pixmap<double> *source;  //!< precomputed
 
+                template <typename T>
+                inline void finalize( lockable & ) throw()
+                {
+                    assert(source);
+                    assert(target);
+                    pixmap<T>             &grad = *(pixmap<T> *)(target);
+                    const pixmap<double>  &G    = *source;
+                    assert(G.w==grad.w);
+                    assert(G.h==grad.h);
+                    assert(Gmax>0);
+                    const unit_t     xlo  = area.x;
+                    const unit_t     xhi  = area.xout;
+                    const unit_t     ylo  = area.y;
+                    const unit_t     yhi  = area.yout;
+                    for(unit_t j=ylo;j<yhi;++j)
+                    {
+                        const typename pixmap<double>::row &Gj = G[j];
+                        typename pixmap<T>::row            &gj = grad[j];
+                        for(unit_t i=xlo;i<xhi;++i)
+                        {
+                            gj[i] = to_unit<T>(Gj[i]/Gmax);
+                        }
+                    }
+                }
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(opatch);
             };
@@ -118,11 +143,12 @@ if(gg>Gmax) { Gmax = gg; }                       \
                               const pixmap<T>   &data,
                               threading::server *psrv)
             {
+                const size_t n = input.size;
                 // compute core
                 if(psrv)
                 {
                     // parallel
-                    for(size_t i=0;i<input.size;++i)
+                    for(size_t i=0;i<n;++i)
                     {
                         ipatch &p = input[i];
                         p.target  = &G;
@@ -135,7 +161,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 {
                     // sequential
                     faked_lock access;
-                    for(size_t i=0;i<input.size;++i)
+                    for(size_t i=0;i<n;++i)
                     {
                         ipatch &p = input[i];
                         p.target  = &G;
@@ -269,13 +295,59 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 {
                     psrv->flush();
                 }
-                
-                for(size_t i=0;i<input.size;++i)
+
+                const size_t n = input.size;
+                for(size_t i=0;i<n;++i)
                 {
                     const double tmp = input[i].Gmax;
                     if(tmp>Gmax) Gmax = tmp;
                 }
                 return Gmax;
+            }
+
+
+            template <typename T> inline
+            static void compute2(opatches             &output,
+                                 pixmap<T>            &grad,
+                                 const pixmap<double> &G,
+                                 const double          Gmax,
+                                 threading::server    *psrv)
+            {
+                const size_t n = output.size;
+                if(Gmax>0)
+                {
+                    if(psrv)
+                    {
+                        // parallel
+                        for(size_t i=0;i<n;++i)
+                        {
+                            opatch &p = output[i];
+                            p.Gmax    = Gmax;
+                            p.target  = &grad;
+                            p.source  = &G;
+                            const threading::server::job J(&p,&opatch::finalize<T>);
+                            psrv->enqueue(J);
+                        }
+                        psrv->flush();
+                    }
+                    else
+                    {
+                        //sequential
+                        faked_lock access;
+                        for(size_t i=0;i<n;++i)
+                        {
+                            opatch &p = output[i];
+                            p.Gmax    = Gmax;
+                            p.target  = &grad;
+                            p.source  = &G;
+                            p.finalize<T>(access);
+                        }
+                    }
+                }
+                else
+                {
+                    grad.ldz();
+                }
             }
 
 
@@ -408,7 +480,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
         template <typename T>
         void gradient( pixmap<T> &grad, const pixmap<T> &data ) throw()
         {
-
+            
             assert(grad.w == data.w );
             assert(grad.h == data.h );
             const unit_t w = data.w;
