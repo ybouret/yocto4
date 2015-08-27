@@ -160,7 +160,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 const unit_t w2 = w-3;
 
                 const unit_t h  = G.h;
-                for(unit_t jm=0,j=1,jp=2;j<h;++jm,++j,++jp)
+                for(unit_t jm=0,j=1,jp=2;jp<h;++jm,++j,++jp)
                 {
                     pixmap<double>::row           &Gj  = G[j];
                     const typename pixmap<T>::row &dj  = data[j];

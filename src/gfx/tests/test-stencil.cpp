@@ -78,7 +78,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             pixmap<double> G(w,h);
             for(size_t i=1;i<=10;++i)
             {
-                gradient::compute1(igrad, G,ch[0], NULL);
+                gradient::compute1(igrad, G,ch[0], &psrv);
             }
 
 
