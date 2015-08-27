@@ -8,13 +8,35 @@
 #include "yocto/gfx/ops/split-channels.hpp"
 #include "yocto/gfx/ops/histogram.hpp"
 #include "yocto/gfx/parallel.hpp"
+#include "yocto/sys/wtime.hpp"
 
 using namespace yocto;
 using namespace gfx;
 
 namespace
 {
+    static inline
+    double perform_grad( pixmap<uint8_t>      &grad,
+                      const pixmap<uint8_t> &data,
+                      pixmap<double>        &G,
+                      const size_t           cpus,
+                      threading::server     *psrv)
+    {
+        wtime chrono;
+        chrono.start();
 
+        gradient::ipatches igrad;
+        gradient::opatches ograd;
+        gradient::setup(igrad,ograd,cpus,data);
+
+        for(size_t i=0;i<1;++i)
+        {
+            const double Gmax = gradient::compute1(igrad, G, data,psrv);
+            gradient::compute2(ograd, grad, G, Gmax, psrv);
+        }
+
+        return chrono.query();
+    }
 }
 
 YOCTO_UNIT_TEST_IMPL(stencil)
@@ -78,11 +100,13 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             pixmap<double>  G(w,h);
             pixmap<uint8_t> grad(w,h);
 
-            for(size_t i=0;i<10;++i)
-            {
-                const double Gmax = gradient::compute1(igrad, G,ch[0], &psrv);
-                gradient::compute2(ograd, grad, G, Gmax, NULL);
-            }
+            const double t_seq1 = perform_grad(grad, ch[0], G, 1, NULL);
+            std::cerr << "t_seq1=" << t_seq1 << std::endl;
+            const double t_seqn = perform_grad(grad, ch[0], G, psrv.size, NULL);
+            std::cerr << "t_seqn=" << t_seqn << std::endl;
+            const double t_para = perform_grad(grad, ch[0], G, psrv.size, &psrv);
+            std::cerr << "t_para=" << t_para << std::endl;
+
             PNG.save("grad_image_r.png",grad, get_rgba::from_byte_r,NULL, NULL);
 
 
