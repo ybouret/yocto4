@@ -7,7 +7,7 @@
 #include "yocto/gfx/ops/gradient.hpp"
 #include "yocto/gfx/ops/split-channels.hpp"
 #include "yocto/gfx/ops/histogram.hpp"
-#include "yocto/gfx/parallel.hpp"
+#include "yocto/gfx/ops/channels.hpp"
 #include "yocto/sys/wtime.hpp"
 
 using namespace yocto;
@@ -92,6 +92,10 @@ YOCTO_UNIT_TEST_IMPL(stencil)
 
 
             pixmaps<uint8_t> ch(3,w,h);
+            channels<>::iopatches chn;
+            chn.setup_for(psrv.size,pxm);
+            chn.split(ch, pxm,NULL);
+
             split_channels(ch,pxm);
             PNG.save("image_col_r.png",ch[0], get_rgba::from_byte_r,NULL, NULL);
             PNG.save("image_col_g.png",ch[1], get_rgba::from_byte_g,NULL, NULL);

@@ -23,7 +23,7 @@ namespace yocto
             const unit_t h   = ch.h;
             for(unit_t j=0;j<h;++j)
             {
-                const typename pixmap< rgb<T> >::row &src = px[j];
+                const typename pixmap< COLORSPACE<U> >::row &src = px[j];
                 for(unit_t i=0;i<w;++i)
                 {
                     const U *q = (const U *)& src[i];
@@ -48,7 +48,7 @@ namespace yocto
             const unit_t h   = ch.h;
             for(unit_t j=0;j<h;++j)
             {
-                typename pixmap< rgb<T> >::row &tgt = px[j];
+                typename pixmap< COLORSPACE<U> >::row &tgt = px[j];
                 for(unit_t i=0;i<w;++i)
                 {
                     U *q = ( U *)& tgt[i];
