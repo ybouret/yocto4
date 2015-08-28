@@ -118,7 +118,6 @@ dying(false)
             //
             // broadcast until everybody left is done
             //__________________________________________________________________
-            assert(0==tasks.size);
             Y_THREADING_SERVER(std::cerr<<"[server] finishing #active="<<activ.size<<std::endl);
             while(true)
             {
@@ -154,7 +153,7 @@ dying(false)
         ////////////////////////////////////////////////////////////////////////
         void server:: flush() throw()
         {
-            Y_THREADING_SERVER(std::cerr<<"[server] flushing #all="<<activ.size+tasks.size<<std::endl);
+            //Y_THREADING_SERVER(std::cerr<<"[server] flushing #all="<<activ.size+tasks.size<<std::endl);
             while(true)
             {
                 process.broadcast();

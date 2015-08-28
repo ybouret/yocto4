@@ -37,6 +37,27 @@ namespace yocto
                 {
                     assert(pch);
                     assert(ppx);
+                    const pixmap<color> &px = *ppx;
+                    pixmaps<T>          &ch = *pch;
+                    const unit_t ylo = area.y;
+                    const unit_t yhi = area.yout;
+                    const unit_t xlo = area.x;
+                    const unit_t xhi = area.xout;
+                    const size_t ini = offset;
+                    const size_t nch = length;
+                    for(unit_t j=ylo;j<yhi;++j)
+                    {
+                        const typename pixmap<color>::row &src = px[j];
+                        for(unit_t i=xlo;i<xhi;++i)
+                        {
+                            const U *q = (const U *)& src[i];
+                            q+=ini;
+                            for(size_t c=0;c<nch;++c)
+                            {
+                                ch[c][j][i] = q[c];
+                            }
+                        }
+                    }
                 }
 
             private:
