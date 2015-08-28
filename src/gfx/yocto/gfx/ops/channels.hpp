@@ -2,6 +2,7 @@
 #define YOCTO_GFX_OPS_CHANNELS_INCLUDED 1
 
 #include "yocto/gfx/pixmaps.hpp"
+#include "yocto/gfx/parallel.hpp"
 #include "yocto/code/utils.hpp"
 
 namespace yocto
@@ -34,7 +35,8 @@ namespace yocto
 
                 void split(lockable&) throw()
                 {
-
+                    assert(pch);
+                    assert(ppx);
                 }
 
             private:
