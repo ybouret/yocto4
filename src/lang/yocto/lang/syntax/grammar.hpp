@@ -52,14 +52,23 @@ namespace yocto
                 //! build GraphViZ..
                 void gramviz( const string &filename ) const;
 
-                
+                //! find rule, grammar must be UNLOCKED
                 bool  has(const string &id) const throw();
+
+                //! find rule, grammar must be UNLOCKED
                 bool  has(const char   *id) const;
+
+                //! find rule, grammar must be UNLOCKED
                 bool  has(const rule   *r ) const throw();
-                
+
+                //! get the rule, grammar must be UNLOCKED
                 rule &get_rule(const string &id);
+
+                //! get the rule, grammar must be UNLOCKED
                 rule &get_rule(const char   *id);
 
+                //! slowly fetch rule, NULL if no one found
+                const rule *fetch(const string &ID) const throw();
 
                 void append( rule *r );
 

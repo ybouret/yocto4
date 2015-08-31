@@ -101,8 +101,18 @@ namespace yocto
                 assert( rules.owns(&r) );
                 rules.move_to_front(&r);
             }
-            
-            
+
+
+            const rule * grammar:: fetch(const string &id) const throw()
+            {
+                for(const rule *r=rules.head;r;r=r->next)
+                {
+                    if(id==r->label)
+                        return r;
+                }
+                return 0;
+            }
+
         }
         
     }
