@@ -12,13 +12,14 @@ using namespace gfx;
 
 namespace
 {
+#define TMX 2
     static inline double split_speed(pixmaps<uint8_t>   &ch,
                                      const pixmap3      &px,
                                      const size_t        cpus,
                                      threading::server  *psrv)
     {
         timings tmx;
-        YOCTO_TIMINGS(tmx, 1,
+        YOCTO_TIMINGS(tmx, TMX,
                       channels<>::iopatches chn_ops;
                       chn_ops.setup_for(cpus,px);
                       chn_ops.split(ch,px,psrv)
@@ -35,7 +36,7 @@ namespace
         assert(grad.size==data.size);
         timings tmx;
         const size_t nch = grad.size;
-        YOCTO_TIMINGS(tmx, 1,
+        YOCTO_TIMINGS(tmx, TMX,
                       gradient::ipatches igr;
                       gradient::opatches ogr;
                       gradient::setup(igr, ogr, cpus, data[0]);
@@ -45,6 +46,20 @@ namespace
                           const double Gmax = gradient::compute1(igr, G, data[i], psrv);
                           gradient::compute2<uint8_t>(ogr, grad[i], G, Gmax, psrv);
                       }
+                      );
+        return tmx.speed;
+    }
+
+    static inline double merge_speed(pixmap3                  &px,
+                                     const pixmaps<uint8_t>   &ch,
+                                     const size_t              cpus,
+                                     threading::server        *psrv)
+    {
+        timings tmx;
+        YOCTO_TIMINGS(tmx, TMX,
+                      channels<>::iopatches chn_ops;
+                      chn_ops.setup_for(cpus,px);
+                      chn_ops.merge(px,ch,psrv)
                       );
         return tmx.speed;
     }
@@ -90,6 +105,8 @@ YOCTO_UNIT_TEST_IMPL(ops)
         std::cerr << "split_seqn=" << split_seqn << std::endl;
         const double split_para = split_speed(ch, pxm, psrv.size, &psrv);
         std::cerr << "split_para=" << split_para << std::endl;
+        std::cerr << "\tsplit_factor : " << split_para/min_of(split_seq1,split_seqn) << std::endl;
+
 
         PNG.save("col_image_r.png",ch[0], get_rgba::from_byte_r,NULL, NULL);
         PNG.save("col_image_g.png",ch[1], get_rgba::from_byte_g,NULL, NULL);
@@ -104,13 +121,29 @@ YOCTO_UNIT_TEST_IMPL(ops)
         std::cerr << "grad_seqn=" << grad_seqn << std::endl;
         const double grad_para = grad_speed(gr,ch,psrv.size,&psrv);
         std::cerr << "grad_para=" << grad_para << std::endl;
+        std::cerr << "\tgrad_factor : " << grad_para/min_of(grad_seq1,grad_seqn) << std::endl;
 
 
         PNG.save("grad_image_r.png",gr[0], get_rgba::from_byte_r,NULL, NULL);
         PNG.save("grad_image_g.png",gr[1], get_rgba::from_byte_g,NULL, NULL);
         PNG.save("grad_image_b.png",gr[2], get_rgba::from_byte_b,NULL, NULL);
+
+        // merging
+        std::cerr << "\tMERGING" << std::endl;
+        pixmap3 pxm2(w,h);
+        const double merge_seq1 = merge_speed(pxm2, gr, 1, NULL);
+        std::cerr << "merge_seq1=" << merge_seq1 << std::endl;
+        const double merge_seqn = merge_speed(pxm2, gr, psrv.size, NULL);
+        std::cerr << "merge_seqn=" << merge_seqn << std::endl;
+        const double merge_para = merge_speed(pxm2, gr, psrv.size, &psrv);
+        std::cerr << "merge_para=" << merge_para << std::endl;
+        std::cerr << "\tmerge_factor : " << merge_para/min_of(merge_seq1,merge_seqn) << std::endl;
+
+        PNG.save("grad_image2.png",pxm2, get_rgba::from_rgb,NULL, NULL);
+
+
     }
-    
+
     
 }
 YOCTO_UNIT_TEST_DONE()

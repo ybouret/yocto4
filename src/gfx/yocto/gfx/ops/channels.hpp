@@ -38,7 +38,7 @@ namespace yocto
 
                 inline virtual ~iopatch() throw() {}
 
-                void split(lockable&) throw()
+                inline void split(lockable&) throw()
                 {
                     assert(pch);
                     assert(ppx);
@@ -57,12 +57,41 @@ namespace yocto
                         {
                             const U *q = (const U *)& src[i];
                             q+=ini;
-                            for(size_t c=0;c<nch;++c)
+                            for(register size_t c=0;c<nch;++c)
                             {
                                 ch[c][j][i] = q[c];
                             }
                         }
                     }
+                }
+
+                inline void merge(lockable&) throw()
+                {
+                    assert(pch);
+                    assert(ppx);
+                    pixmap<color>     &px = *ppx;
+                    const pixmaps<T>  &ch = *pch;
+                    const unit_t ylo = area.y;
+                    const unit_t yhi = area.yout;
+                    const unit_t xlo = area.x;
+                    const unit_t xhi = area.xout;
+                    const size_t ini = offset;
+                    const size_t nch = length;
+                    for(unit_t j=ylo;j<yhi;++j)
+                    {
+                        typename pixmap<color>::row &tgt = px[j];
+                        for(unit_t i=xlo;i<xhi;++i)
+                        {
+                            U *q = (U *)&tgt[i];
+                            q+=ini;
+                            for(register size_t c=0;c<nch;++c)
+                            {
+                                q[c] = ch[c][j][i];
+                            }
+                        }
+
+                    }
+                    
                 }
 
             private:
@@ -119,6 +148,46 @@ namespace yocto
                     }
 
                 }
+
+                inline void merge(pixmap<color>       &px,
+                                  const pixmaps<T>    &ch,
+                                  threading::server   *psrv)
+                {
+                    dynamic_slots<iopatch> &pp = *this;
+                    assert(ch.w==px.w);
+                    assert(ch.h==px.h);
+                    const size_t np     = pp.size;
+                    const size_t offset = 0;
+                    const size_t length = min_of<size_t>(ch.size,max_count);
+                    if(psrv)
+                    {
+                        for(size_t i=0;i<np;++i)
+                        {
+                            iopatch &p = pp[i];
+                            p.offset   = offset;
+                            p.length   = length;
+                            p.pch      = (pixmaps<T> *)&ch;
+                            p.ppx      = &px;
+                            psrv->enqueue(&p,&iopatch::merge);
+                        }
+                        psrv->flush();
+                    }
+                    else
+                    {
+                        faked_lock access;
+                        for(size_t i=0;i<np;++i)
+                        {
+                            iopatch &p = pp[i];
+                            p.offset   = offset;
+                            p.length   = length;
+                            p.pch      = (pixmaps<T> *)&ch;
+                            p.ppx      = &px;
+                            p.merge(access);
+                        }
+                    }
+                }
+
+
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(iopatches);
