@@ -54,7 +54,7 @@ namespace yocto
                 xnode       *pop_tail() throw();          //!< tail of children, remove parenthood
                 const xnode *head() const throw();        //!< R/O children head
                 const xnode *tail() const throw();        //!< R/O children tail
-                size_t       size() const throw();
+                size_t       size() const throw();        //!< 0 if not terminal, ch->size otherwise
 
                 //! restore all lexemes and delete node
                 static  void restore(xnode *node, l_list &lexemes) throw();

@@ -23,6 +23,7 @@ namespace yocto
 
                 void add( rule &r );
 
+                //! syntactic sugar
                 logical & operator<<( rule &r );
 
                 //! return & operands

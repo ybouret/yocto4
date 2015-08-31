@@ -7,7 +7,8 @@ namespace yocto
 {
     namespace lang
     {
-        
+
+        //! build a parser
         class generator : public parser
         {
         public:

@@ -60,7 +60,7 @@ namespace yocto
             //! is there anyone left ?
             const lexeme *peek(source &src, ios::istream &fp);
 
-            
+            //! load a plugin without arguments
             template <typename PLUGIN> inline
             lexical::plugin & load(const char *id)
             {
@@ -69,6 +69,7 @@ namespace yocto
                 return *plg;
             }
 
+            //! load a plugin with a trigger expression
             template <typename PLUGIN> inline
             lexical::plugin & load(const char *id, const char *expr)
             {
@@ -77,6 +78,7 @@ namespace yocto
                 return *plg;
             }
 
+            //! load a plugin with a trigger and a return expression
             template <typename PLUGIN> inline
             lexical::plugin & load(const char *id, const char *ini_expr, const char *end_expr)
             {

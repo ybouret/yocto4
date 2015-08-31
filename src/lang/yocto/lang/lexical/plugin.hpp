@@ -10,6 +10,13 @@ namespace yocto
         namespace  lexical
         {
 
+            //! base class for plugin
+            /**
+             a plugin need to be loaded by
+             a lexer (and then it becomes one of
+             its scanner).
+             Then the plugin must be hooked to a former scanner.
+             */
             class plugin : public scanner
             {
             public:

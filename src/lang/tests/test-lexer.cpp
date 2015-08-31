@@ -26,7 +26,7 @@ namespace{
 
             lexical::scanner &root = get_root();
 
-            root.emit("ID","[_[:alpha:]][:word:]*");
+            root.emit("ID",  "[_[:alpha:]][:word:]*");
             root.emit("INT", "[:digit:]+");
 
             root.call("COM", "//");

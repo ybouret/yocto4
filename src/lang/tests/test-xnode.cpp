@@ -62,6 +62,7 @@ YOCTO_UNIT_TEST_IMPL(xnode)
     vfs &fs = local_fs::instance();
     fs.try_remove_file("xnode.dot");
     fs.try_remove_file("xnode.png");
+    std::cerr << "sizeof(xnode)=" << sizeof(syntax::xnode) << std::endl;
 
     Parser P;
 
