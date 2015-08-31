@@ -30,7 +30,12 @@ namespace yocto
                 size_t         length; //!< #channels for ops
 
                 inline explicit iopatch(const patch2D &p) throw() :
-                patch(p),pch(0),ppx(0),offset(0),length(0) {}
+                patch(p),
+                pch(0),
+                ppx(0),
+                offset(0),
+                length(0) {}
+
                 inline virtual ~iopatch() throw() {}
 
                 void split(lockable&) throw()
@@ -95,8 +100,7 @@ namespace yocto
                             p.length   = length;
                             p.pch      = &ch;
                             p.ppx      = (pixmap<color> *)&px;
-                            const threading::server::job J(&p, & iopatch::split);
-                            psrv->enqueue(J);
+                            psrv->enqueue(&p,&iopatch::split);
                         }
                         psrv->flush();
                     }

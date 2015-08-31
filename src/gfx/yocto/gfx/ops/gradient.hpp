@@ -154,8 +154,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                         ipatch &p = input[i];
                         p.target  = &G;
                         p.source  = &data;
-                        const threading::server::job J(&p,&ipatch::inside<T>);
-                        psrv->enqueue(J);
+                        psrv->enqueue(&p,&ipatch::inside<T>);
                     }
                 }
                 else
@@ -332,8 +331,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                             p.Gmax    = Gmax;
                             p.target  = &grad;
                             p.source  = &G;
-                            const threading::server::job J(&p,&opatch::finalize<T>);
-                            psrv->enqueue(J);
+                            psrv->enqueue(&p,&opatch::finalize<T>);
                         }
                         psrv->flush();
                     }

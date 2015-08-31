@@ -102,7 +102,10 @@ YOCTO_UNIT_TEST_IMPL(ops)
         std::cerr << "grad_seq1=" << grad_seq1 << std::endl;
         const double grad_seqn = grad_speed(gr,ch,psrv.size,NULL);
         std::cerr << "grad_seqn=" << grad_seqn << std::endl;
-        
+        const double grad_para = grad_speed(gr,ch,psrv.size,&psrv);
+        std::cerr << "grad_para=" << grad_para << std::endl;
+
+
         PNG.save("grad_image_r.png",gr[0], get_rgba::from_byte_r,NULL, NULL);
         PNG.save("grad_image_g.png",gr[1], get_rgba::from_byte_g,NULL, NULL);
         PNG.save("grad_image_b.png",gr[2], get_rgba::from_byte_b,NULL, NULL);

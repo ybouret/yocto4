@@ -331,6 +331,12 @@ dying(false)
 
         }
 
+        server::task   *server::query_task()
+        {
+            return tpool.size ? tpool.query() : object::acquire1<task>();
+        }
+
+
         server::task_id server::enqueue(const job &J)
         {
             //______________________________________________________________
@@ -338,8 +344,7 @@ dying(false)
             // LOCK and get acquire task memory
             //______________________________________________________________
             YOCTO_LOCK(access);
-            task *t = tpool.size ? tpool.query() : object::acquire1<task>();
-
+            task *t = query_task();
             try
             {
                 //______________________________________________________________
