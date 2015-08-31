@@ -83,6 +83,13 @@ namespace yocto
                     fp.viz( (const rule*)this ); fp << " -> "; fp.viz(node->addr); fp << ";\n";
                 }
             }
+
+            aggregate & aggregate:: operator+=( rule &r )
+            {
+                add(r);
+                return *this;
+            }
+
         }
     }
 }
