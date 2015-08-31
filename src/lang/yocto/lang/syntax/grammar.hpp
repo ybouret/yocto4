@@ -76,7 +76,7 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 class  dbase;
                 r_list rules;
-                dbase *db;
+                dbase *db;    //!< internal database of rules, deleted on lock()
                 
                 void check_label(const string &label) const;
                 void check_locked() const;

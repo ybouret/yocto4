@@ -11,6 +11,7 @@ namespace yocto
         namespace syntax
         {
 
+            //! a terminal rule: lexeme matches label !
             class terminal : public rule
             {
             public:
