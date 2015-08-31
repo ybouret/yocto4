@@ -19,12 +19,15 @@ if(gg>Gmax) { Gmax = gg; }                       \
         struct gradient
         {
 
+            typedef double             real_type;
+            typedef pixmap<real_type>  pixmap_t;
+
             //! inner patch
             class ipatch : public patch
             {
             public:
                 double          Gmax;
-                pixmap<double> *target;
+                pixmap_t       *target;
                 const void     *source;
 
                 explicit ipatch( const patch2D &p ) throw();
@@ -36,7 +39,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     assert(source);
                     assert(target);
                     const pixmap<T> &data = *(const pixmap<T> *)(source);
-                    pixmap<double>  &G    = *target;
+                    pixmap_t        &G    = *target;
                     assert(G.w==data.w);
                     assert(G.h==data.h);
                     const unit_t     xlo  = area.x;
@@ -51,7 +54,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     {
                         assert(j>0);
                         assert(j<G.h);
-                        pixmap<double>::row           &Gj  = G[j];
+                        pixmap_t::row                 &Gj  = G[j];
                         const typename pixmap<T>::row &dj  = data[j];
                         const typename pixmap<T>::row &djm = data[jm];
                         const typename pixmap<T>::row &djp = data[jp];
