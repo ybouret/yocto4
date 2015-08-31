@@ -3,6 +3,7 @@
 
 #include "yocto/lang/lexer.hpp"
 #include "yocto/lang/syntax/xnode.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {
@@ -17,13 +18,17 @@ namespace yocto
             class rule : public object
             {
             public:
-                rule          *next;
-                rule          *prev;
-                const string   label;
-                const uint32_t uuid;
-
+                typedef addr_node<rule> anode_t;
+                typedef addr_list<rule> alist_t;
+                
+                rule             *next;
+                rule             *prev;
+                const string      label;
+                const uint32_t    uuid;
+                auto_ptr<alist_t> following;
+                
                 virtual ~rule() throw();
-
+                
                 //! main accept routine
                 /**
                  upon success, the tree is grown
@@ -44,7 +49,9 @@ namespace yocto
                 virtual void *content() throw();
 
                 void encode_label( ios::ostream &fp ) const;
-
+                
+                alist_t &check_following();
+                
             protected:
                 explicit rule(const string &id, uint32_t uu);
                 

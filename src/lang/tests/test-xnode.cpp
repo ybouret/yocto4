@@ -57,13 +57,21 @@ namespace{
 
 }
 
+#define SHOW_SIZE_OF(TYPE) std::cerr << "sizeof("  #TYPE ")=" << sizeof(TYPE) << std::endl
+
 YOCTO_UNIT_TEST_IMPL(xnode)
 {
     vfs &fs = local_fs::instance();
     fs.try_remove_file("xnode.dot");
     fs.try_remove_file("xnode.png");
-    std::cerr << "sizeof(xnode)=" << sizeof(syntax::xnode) << std::endl;
+    SHOW_SIZE_OF(syntax::xnode);
+    SHOW_SIZE_OF(syntax::rule);
+    SHOW_SIZE_OF(addr_node<int>);
+    SHOW_SIZE_OF(addr_node<syntax::rule>);
+    SHOW_SIZE_OF(addr_list<syntax::rule>);
 
+    
+    
     Parser P;
 
 

@@ -72,11 +72,7 @@ namespace yocto
             
             grammar:: ~grammar() throw()
             {
-                if(db)
-                {
-                    delete db;
-                    db = NULL;
-                }
+                lock();
             }
             
             
@@ -308,7 +304,12 @@ namespace yocto
                 switch(lxr.size)
                 {
                     case 0:
+                    {
+                        if(root.following.is_valid())
+                        {
+                        }
                         throw exception("[[%s]]: no lexeme, expecting %s",gname,root.label.c_str());
+                    }
 
                     case 1:
                     {
