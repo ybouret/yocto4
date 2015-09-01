@@ -13,15 +13,16 @@ namespace yocto
         {
         public:
             virtual ~generator() throw();
-            explicit generator(const char *langID);
+            explicit generator(const char *langID, const bool output_files = false);
             
             
-            parser *compile( ios::istream &fp, bool output_files = false);
+            parser *compile( ios::istream &fp );
             
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(generator);
             void rewrite(syntax::xnode *node);
+            const bool output;
         };
         
     }

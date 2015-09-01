@@ -11,6 +11,13 @@ using namespace lang;
 YOCTO_UNIT_TEST_IMPL(gen)
 {
     vfs &fs = local_fs::instance();
+    const string rmDir = ".";
+    const string rmDot = "dot";
+    const string rmPng = "png";
+    fs.remove_files_with_extension_in(rmDir, rmDot);
+    fs.remove_files_with_extension_in(rmDir, rmPng);
+
+#if 0
     fs.try_remove_file("xnode.dot");
     fs.try_remove_file("xnode.png");
     fs.try_remove_file("langen.dot");
@@ -21,7 +28,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
     fs.try_remove_file("ggram.png");
     fs.try_remove_file("gen.dot");
     fs.try_remove_file("gen.png");
-
+#endif
 
 
     if(argc>1)
@@ -30,9 +37,9 @@ YOCTO_UNIT_TEST_IMPL(gen)
 
         {
             ios::icstream fp( argv[1] );
-            P.reset( parser::generate(vfs::get_base_name(argv[1]),fp) );
-            P->gramviz("gram.dot");
-            (void)system("dot -Tpng -o gram.png gram.dot");
+            P.reset( parser::generate(vfs::get_base_name(argv[1]),fp,true) );
+            //P->gramviz("gram.dot");(void)system("dot -Tpng -o gram.png gram.dot");
+
         }
 
         std::cerr << "Ready" << std::endl;

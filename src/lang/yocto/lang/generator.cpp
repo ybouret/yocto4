@@ -5,6 +5,7 @@
 #include "yocto/lang/lexical/plugin/rstring.hpp"
 #include "yocto/lang/xgen/xgen.hxx"
 
+#include "yocto/exception.hpp"
 #include <cstdlib>
 
 
@@ -17,8 +18,9 @@ namespace yocto
         {
         }
 
-        generator:: generator(const char *langID) :
-        parser(langID,"main")
+        generator:: generator(const char *langID,const bool output_files) :
+        parser(langID,"main"),
+        output(output_files)
         {
 
             //__________________________________________________________________
@@ -132,28 +134,38 @@ namespace yocto
             scanner.drop("WS", "[:blank:]");
             scanner.endl("ENDL");
 
-#if 0
-            grammar::gramviz("ggram.dot");
-            (void)system("dot -Tpng -o ggram.png ggram.dot");
-#endif
+            if(output)
+            {
+                grammar::gramviz("ygen_gram.dot");
+                (void)system("dot -Tpng -o ygen_gram.png ygen_gram.dot");
+            }
+
 
         }
 
-        parser *generator::compile( ios::istream &fp, bool output_files )
+        parser *generator::compile( ios::istream &fp )
         {
             syntax::xnode          *tree = run(fp);
+            if(!tree)
+            {
+                throw exception("parser::generator: unexpected empty source tree!");
+            }
             auto_ptr<syntax::xnode> guard(tree);
             rewrite( tree );
 
-#if 0
-            if(tree)
+            if(output)
             {
-                tree->graphviz("xnode.dot");
-                (void) system("dot -Tpng -o xnode.png xnode.dot");
+                tree->graphviz("lang_tree.dot");
+                (void) system("dot -Tpng -o lang_tree.png lang_tree.dot");
             }
-#endif
+
             syntax::xgen   xg(tree);
             xg.xprs->lock();
+            if(output)
+            {
+                xg.xprs->gramviz("lang_grammar.dot");
+                (void) system("dot -Tpng -o lang_gram.png lang_gram.dot");
+            }
             return xg.xprs.yield();
         }
 

@@ -46,8 +46,8 @@ namespace yocto
             //! clear all and accept top level rule
             syntax::xnode *run( ios::istream &fp );
 
-            static parser *generate( const char *langID, ios::istream &fp );
-            static parser *generate( const char *langID, const char *data, const size_t size);
+            static parser *generate( const char *langID, ios::istream &fp, const bool output_files=false);
+            static parser *generate( const char *langID, const char *data, const size_t size,const bool output_files=false);
 
         private:
             source src;
