@@ -163,7 +163,7 @@ namespace yocto
             xg.xprs->lock();
             if(output)
             {
-                xg.xprs->gramviz("lang_grammar.dot");
+                xg.xprs->gramviz("lang_gram.dot");
                 (void) system("dot -Tpng -o lang_gram.png lang_gram.dot");
             }
             return xg.xprs.yield();
