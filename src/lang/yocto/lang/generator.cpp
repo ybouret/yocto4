@@ -139,7 +139,7 @@ namespace yocto
 
         }
 
-        parser *generator::compile( ios::istream &fp )
+        parser *generator::compile( ios::istream &fp, bool output_files )
         {
             syntax::xnode          *tree = run(fp);
             auto_ptr<syntax::xnode> guard(tree);

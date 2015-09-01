@@ -16,7 +16,7 @@ namespace yocto
             explicit generator(const char *langID);
             
             
-            parser *compile( ios::istream &fp );
+            parser *compile( ios::istream &fp, bool output_files = false);
             
             
         private:

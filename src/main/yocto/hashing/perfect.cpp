@@ -123,7 +123,7 @@ namespace yocto
             assert(curr);
             assert(curr!=root);
             if(curr->hash>=0)
-                throw exception("multiple insertions!");
+                throw exception("hashing::perfect: multiple insertions!");
             (int &)(curr->hash) = h;
         }
 
@@ -144,7 +144,7 @@ namespace yocto
 
             const uint8_t   *C    = (const uint8_t *)data;
             const node_type *curr = root;
-            for(size_t i=0;i<size;++i)
+            for(register size_t i=0;i<size;++i)
             {
                 const uint8_t code  = C[i];
                 bool          found = false;

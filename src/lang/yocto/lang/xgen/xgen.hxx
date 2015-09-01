@@ -14,6 +14,7 @@ namespace yocto
     {
         namespace syntax
         {
+            //! internal class for parser generator
             class xgen
             {
             public:
