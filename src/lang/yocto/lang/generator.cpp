@@ -118,17 +118,24 @@ namespace yocto
 
             top_level( THE_PARSER );
 
-
+            //__________________________________________________________________
+            //
             // some comments
+            //__________________________________________________________________
             load<lexical::comment>("C++ Comment","//").hook(scanner);
             load<lexical::ccomment>("C Comment","/\\*","\\*/").hook(scanner);
 
+            //__________________________________________________________________
+            //
             // other chars
+            //__________________________________________________________________
             scanner.drop("WS", "[:blank:]");
             scanner.endl("ENDL");
 
-            //grammar::gramviz("ggram.dot");
-            //(void)system("dot -Tpng -o ggram.png ggram.dot");
+#if 0
+            grammar::gramviz("ggram.dot");
+            (void)system("dot -Tpng -o ggram.png ggram.dot");
+#endif
 
         }
 

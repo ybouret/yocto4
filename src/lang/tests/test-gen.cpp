@@ -31,6 +31,8 @@ YOCTO_UNIT_TEST_IMPL(gen)
         {
             ios::icstream fp( argv[1] );
             P.reset( parser::generate(vfs::get_base_name(argv[1]),fp) );
+            P->gramviz("gram.dot");
+            (void)system("dot -Tpng -o gram.png gram.dot");
         }
 
         std::cerr << "Ready" << std::endl;
