@@ -44,6 +44,12 @@ namespace yocto
             return grammar::decl_term(label,ppty);
         }
 
+        syntax::terminal & parser:: term_is(const char *expr,syntax::property ppty  )
+        {
+            return term(expr,expr,ppty);
+        }
+
+
         syntax::alternate & parser:: choice(Rule &r1, Rule &r2)
         {
             syntax::alternate &r = alt();

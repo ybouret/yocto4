@@ -51,6 +51,7 @@ namespace yocto
 
                 //! build GraphViZ..
                 void gramviz( const string &filename ) const;
+                void gramviz( const char   *filename ) const;
 
                 //! find rule, grammar must be UNLOCKED
                 bool  has(const string &id) const throw();

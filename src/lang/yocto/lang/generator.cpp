@@ -27,10 +27,9 @@ namespace yocto
             //
             // Terminals
             //__________________________________________________________________
-
             Rule &ID        = term("ID", "[:word:]+");
-            Rule &COLON     = term(":",":",syntax::jettison);
-            Rule &SEMICOLON = term(";",";",syntax::jettison);
+            Rule &COLON     = term_is(":",syntax::jettison);
+            Rule &SEMICOLON = term_is(";",syntax::jettison);
 
             Rule &LPAREN    = term("(","\\(",syntax::jettison);
             Rule &RPAREN    = term(")","\\)",syntax::jettison);
@@ -134,37 +133,75 @@ namespace yocto
             scanner.drop("WS", "[:blank:]");
             scanner.endl("ENDL");
 
+#if 0
+            //__________________________________________________________________
+            //
+            // saving the generator grammar
+            //__________________________________________________________________
             if(output)
             {
                 grammar::gramviz("ygen_gram.dot");
                 (void)system("dot -Tpng -o ygen_gram.png ygen_gram.dot");
             }
-
+#endif
 
         }
 
+    }
+
+}
+
+#include "yocto/ios/graphviz.hpp"
+
+namespace yocto
+{
+
+    namespace lang
+    {
+
+
         parser *generator::compile( ios::istream &fp )
         {
+            //__________________________________________________________________
+            //
+            // Parse the input
+            //__________________________________________________________________
             syntax::xnode          *tree = run(fp);
             if(!tree)
             {
                 throw exception("parser::generator: unexpected empty source tree!");
             }
             auto_ptr<syntax::xnode> guard(tree);
-            rewrite( tree );
+            if(output)
+            {
+                tree->graphviz("lang_raw.dot");
+                ios::graphviz_render("lang_raw.dot");
+                //(void) system("dot -Tpng -o lang_raw.png lang_raw.dot");
+            }
 
+            //__________________________________________________________________
+            //
+            // Rewrite for simplification
+            //__________________________________________________________________
+            rewrite( tree );
             if(output)
             {
                 tree->graphviz("lang_tree.dot");
-                (void) system("dot -Tpng -o lang_tree.png lang_tree.dot");
+                ios::graphviz_render("lang_tree.dot");
+                //(void) system("dot -Tpng -o lang_tree.png lang_tree.dot");
             }
 
+            //__________________________________________________________________
+            //
+            // generate the new parser/grammar
+            //__________________________________________________________________
             syntax::xgen   xg(tree);
             xg.xprs->lock();
             if(output)
             {
                 xg.xprs->gramviz("lang_gram.dot");
-                (void) system("dot -Tpng -o lang_gram.png lang_gram.dot");
+                ios::graphviz_render("lang_gram.dot");
+                //(void) system("dot -Tpng -o lang_gram.png lang_gram.dot");
             }
             return xg.xprs.yield();
         }

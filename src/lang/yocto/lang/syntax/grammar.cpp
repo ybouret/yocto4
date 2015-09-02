@@ -469,6 +469,12 @@ namespace yocto
                 
                 fp << "}";
             }
+
+            void grammar:: gramviz(const char *filename) const
+            {
+                const string fn(filename);
+                gramviz(fn);
+            }
             
         }
         
