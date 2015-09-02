@@ -6,10 +6,10 @@
 #include "yocto/ptr/auto.hpp"
 
 #include "yocto/ios/ocstream.hpp"
-#include "yocto/sort/merge.hpp"
 #include "yocto/comparator.hpp"
 
 #include "yocto/hashing/perfect.hpp"
+#include "yocto/ios/graphviz.hpp"
 #include <cstdlib>
 
 using namespace yocto;
@@ -18,6 +18,7 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(phash)
 {
+    std::cerr << "sizeof(hashing::perfect::node_type)=" << sizeof(hashing::perfect::node_type) << std::endl;
     vector<string> words;
     {
         string line;
@@ -43,8 +44,8 @@ YOCTO_UNIT_TEST_IMPL(phash)
     std::cerr << "mph(" << s << ")=" << mph(s) << std::endl;
 
     mph.graphviz("htree.dot");
-    (void) system("dot -Tpng -o htree.png htree.dot");
-    
+    ios::graphviz_render("htree.dot");
+    //(void) system("dot -Tpng -o htree.png htree.dot");
     
     const char *other[] =
     {

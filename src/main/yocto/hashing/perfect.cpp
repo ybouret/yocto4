@@ -1,4 +1,6 @@
 #include "yocto/hashing/perfect.hpp"
+#include "yocto/sort/merge.hpp"
+#include "yocto/comparator.hpp"
 
 namespace yocto
 {
@@ -7,9 +9,11 @@ namespace yocto
 
         perfect::node_type::node_type(const uint8_t c) throw() :
         next(0),
+        prev(0),
         hash(-1),
         chld(),
-        code(c)
+        code(c),
+        freq(1)
         {
         }
 
@@ -30,15 +34,30 @@ namespace yocto
             {
                 fp("x%02x",unsigned(code));
             }
+            fp(",#%u", unsigned(freq) );
             if(hash>=0)
             {
                 fp(",[%d]",hash);
             }
             fp << "\"];\n";
-            for(const node_type *node=chld.top;node;node=node->next)
+            for(const node_type *node=chld.head;node;node=node->next)
             {
                 node->viz(fp);
                 fp.viz(this); fp << " -> "; fp.viz(node); fp << ";\n";
+            }
+        }
+
+        static int compare_by_freq(const perfect::node_type *lhs, const perfect::node_type *rhs, void *) throw()
+        {
+            return __compare_decreasing(lhs->freq, rhs->freq);
+        }
+
+        void perfect::node_type:: optimize() throw()
+        {
+            core::merging<node_type>::sort(chld, compare_by_freq, 0);
+            for(node_type *node=chld.head;node;node=node->next)
+            {
+                node->optimize();
             }
         }
 
@@ -76,6 +95,14 @@ namespace yocto
             delete root; root=0;
         }
 
+    }
+}
+
+
+namespace yocto
+{
+    namespace hashing
+    {
         void perfect:: insert( const memory::ro_buffer &buff, const int h)
         {
             insert(buff.ro(),buff.length(),h);
@@ -102,20 +129,21 @@ namespace yocto
                 const uint8_t code  = C[i];
                 bool          found = false;
 
-                for(node_type *node = curr->chld.top;node;node=node->next)
+                for(node_type *node = curr->chld.head;node;node=node->next)
                 {
                     if(code==node->code)
                     {
                         found = true;
                         curr  = node;
+                        ++(curr->freq);
                         break;
                     }
                 }
 
                 if(!found)
                 {
-                    curr->chld.store(new node_type(code));
-                    curr = curr->chld.top;
+                    curr->chld.push_back(new node_type(code));
+                    curr = curr->chld.tail;
                     ++(size_t &)nodes;
                 }
             }
@@ -148,11 +176,11 @@ namespace yocto
             {
                 const uint8_t code  = C[i];
                 bool          found = false;
-                for(const node_type *node = curr->chld.top;node;node=node->next)
+                for(const node_type *node = curr->chld.head;node;node=node->next)
                 {
                     if(code==node->code)
                     {
-                        curr = node;
+                        curr  = node;
                         found = true;
                         break;
                     }
@@ -180,18 +208,10 @@ namespace yocto
 
         void perfect:: optimize() throw()
         {
-            reverse(root);
+            assert(root);
+            root->optimize();
         }
 
-        void perfect::reverse(node_type *node) throw()
-        {
-            assert(node);
-            node->chld.reverse();
-            for(node_type *sub=node->chld.top;sub;sub=sub->next)
-            {
-                reverse(sub);
-            }
-        }
 
     }
 

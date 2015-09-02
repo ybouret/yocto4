@@ -9,7 +9,7 @@ namespace yocto
     namespace memory
     {
         
-        
+        //! a chunk of data to hold small memory blocks
         template <typename T>
         class tChunk
         {
@@ -107,7 +107,8 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tChunk);
         };
-        
+
+        //! don't waist memory
         typedef tChunk<uint16_t> kChunk;
         
         

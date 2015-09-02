@@ -1,7 +1,7 @@
 #ifndef YOCTO_HASHING_PERFECT_INCLUDED
 #define YOCTO_HASHING_PERFECT_INCLUDED 1
 
-#include "yocto/core/pool.hpp"
+#include "yocto/core/list.hpp"
 #include "yocto/string.hpp"
 
 #include "yocto/ios/ostream.hpp"
@@ -18,16 +18,19 @@ namespace yocto
             class node_type
             {
             public:
-                typedef core::pool_of_cpp<node_type> list_type;
+                typedef core::list_of_cpp<node_type> list_type;
                 node_type     *next;
+                node_type     *prev;
                 const int      hash;
                 list_type      chld;
                 const uint8_t  code;
+                size_t         freq;
 
                 node_type(const uint8_t C) throw();
                 ~node_type() throw();
 
-                void viz( ios::ostream &fp ) const;
+                void viz( ios::ostream &fp ) const; //!< output graphviz
+                void optimize() throw(); //!< order by decreasing frequency
 
                 YOCTO_MAKE_OBJECT
 
@@ -54,9 +57,8 @@ namespace yocto
 
         private:
             node_type *root;
-            static void reverse(node_type*) throw();
-
             YOCTO_DISABLE_COPY_AND_ASSIGN(perfect);
+
         public:
             const size_t nodes;
         };
