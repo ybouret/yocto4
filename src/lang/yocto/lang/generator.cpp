@@ -6,6 +6,8 @@
 #include "yocto/lang/xgen/xgen.hxx"
 
 #include "yocto/exception.hpp"
+#include "yocto/ios/graphviz.hpp"
+
 #include <cstdlib>
 
 
@@ -29,7 +31,7 @@ namespace yocto
             //__________________________________________________________________
             Rule &ID        = term("ID", "[:word:]+");
             Rule &COLON     = text(":",syntax::jettison);
-            Rule &SEMICOLON = text(";",syntax::jettison);
+            Rule &SEMICOLON = text(';',syntax::jettison);
 
             Rule &LPAREN    = term("(","\\(",syntax::jettison);
             Rule &RPAREN    = term(")","\\)",syntax::jettison);
@@ -64,9 +66,9 @@ namespace yocto
                 Agg  &ITEM  = agg("ITEM",syntax::mergeOne);
                 ITEM << ATOM;
                 Alt  &MOD  = alt();
-                MOD  << term("+","\\+",syntax::univocal);
-                MOD  << term("*","\\*",syntax::univocal);
-                MOD  << term("?","\\?",syntax::univocal);
+                MOD  << text('+',syntax::univocal);
+                MOD  << text('*',syntax::univocal);
+                MOD  << text('?',syntax::univocal);
                 ITEM << opt(MOD);
 
                 Rule &ITEMS = one_or_more(ITEM);
@@ -140,8 +142,9 @@ namespace yocto
             //__________________________________________________________________
             if(output)
             {
+                //std::cerr << "Saving YGEN_GRAM" << std::endl;
                 grammar::gramviz("ygen_gram.dot");
-                (void)system("dot -Tpng -o ygen_gram.png ygen_gram.dot");
+                ios::gramviz("ygen_gram.dot");
             }
 #endif
 
@@ -151,7 +154,6 @@ namespace yocto
 
 }
 
-#include "yocto/ios/graphviz.hpp"
 
 namespace yocto
 {
@@ -176,7 +178,6 @@ namespace yocto
             {
                 tree->graphviz("lang_raw.dot");
                 ios::graphviz_render("lang_raw.dot");
-                //(void) system("dot -Tpng -o lang_raw.png lang_raw.dot");
             }
 
             //__________________________________________________________________
@@ -188,7 +189,6 @@ namespace yocto
             {
                 tree->graphviz("lang_tree.dot");
                 ios::graphviz_render("lang_tree.dot");
-                //(void) system("dot -Tpng -o lang_tree.png lang_tree.dot");
             }
 
             //__________________________________________________________________
@@ -201,7 +201,6 @@ namespace yocto
             {
                 xg.xprs->gramviz("lang_gram.dot");
                 ios::graphviz_render("lang_gram.dot");
-                //(void) system("dot -Tpng -o lang_gram.png lang_gram.dot");
             }
             return xg.xprs.yield();
         }

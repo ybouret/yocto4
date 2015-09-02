@@ -54,9 +54,9 @@ namespace yocto
             // make a lexical rule
             const lexical::action lcode(&scanner,&lexical::scanner::forward);
             const string          label = text;
-            pattern *p = logical::equal(text);
+            pattern              *motif = logical::equal(text);
 
-            scanner.make(label,p,lcode);
+            scanner.make(label,motif,lcode);
 
             //make a grammar rule
             return grammar::decl_term(label.c_str(),ppty);
