@@ -40,8 +40,8 @@ namespace
 
             {
                 JSON_Value
-                << term("true", "true",  syntax::univocal)
-                << term("false","false", syntax::univocal)
+                << text("true",  syntax::univocal)
+                << text("false", syntax::univocal)
                 << term("Number","[:digit:]+")
                 << STRING;
             }
