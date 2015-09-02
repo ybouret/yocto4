@@ -27,3 +27,5 @@ ASSIGN  : '=' ;
 END     : ';' ;
 LPAREN  : '(' ;
 RPAREN  : ')' ;
+
+$no_single : expr multExpr;
