@@ -28,8 +28,8 @@ namespace yocto
             // Terminals
             //__________________________________________________________________
             Rule &ID        = term("ID", "[:word:]+");
-            Rule &COLON     = term_is(":",syntax::jettison);
-            Rule &SEMICOLON = term_is(";",syntax::jettison);
+            Rule &COLON     = text(":",syntax::jettison);
+            Rule &SEMICOLON = text(";",syntax::jettison);
 
             Rule &LPAREN    = term("(","\\(",syntax::jettison);
             Rule &RPAREN    = term(")","\\)",syntax::jettison);

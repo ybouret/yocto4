@@ -25,7 +25,12 @@ namespace yocto
 
             //! a terminal
             syntax::terminal & term(const char *label, const char *expr, syntax::property ppty = syntax::standard );
-            syntax::terminal & term_is(const char *expr,syntax::property ppty = syntax::standard );
+
+            //! a terminal defined by a raw text
+            syntax::terminal & text(const char *txt,syntax::property ppty = syntax::standard );
+
+            //! a terminal defined by a single raw char
+            syntax::terminal & text(const char  C,syntax::property ppty = syntax::standard );
 
             //! a terminal from a plugin
             template <typename PLUGIN>

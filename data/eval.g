@@ -8,7 +8,7 @@ function : ID LPAREN args RPAREN;
 atom     : INT | function | ID | LPAREN term RPAREN;
 
 $no_single:   term factor args; //merge with parent if single
-$one_level:   factor;      //merge all with parents
+$one_level:   factor;           //merge all with parents
 
 PLUS   : '+';
 MINUS  : '-';

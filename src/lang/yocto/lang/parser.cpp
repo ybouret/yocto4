@@ -30,6 +30,9 @@ namespace yocto
     }
 }
 
+#include "yocto/lang/pattern/logic.hpp"
+#include "yocto/lang/pattern/basic.hpp"
+
 namespace yocto
 {
     namespace lang
@@ -44,10 +47,34 @@ namespace yocto
             return grammar::decl_term(label,ppty);
         }
 
-        syntax::terminal & parser:: term_is(const char *expr,syntax::property ppty  )
+
+
+        syntax::terminal & parser:: text(const char *text,syntax::property ppty  )
         {
-            return term(expr,expr,ppty);
+            // make a lexical rule
+            const lexical::action lcode(&scanner,&lexical::scanner::forward);
+            const string          label = text;
+            pattern *p = logical::equal(text);
+
+            scanner.make(label,p,lcode);
+
+            //make a grammar rule
+            return grammar::decl_term(label.c_str(),ppty);
         }
+
+        syntax::terminal & parser:: text(const char C,syntax::property ppty  )
+        {
+            // make a lexical rule
+            const lexical::action lcode(&scanner, & lexical::scanner::forward);
+            const string          label = C;
+            pattern *p = single::create(C);
+
+            scanner.make(label,p,lcode);
+
+            //make a grammar rule
+            return grammar::decl_term(label.c_str(),ppty);
+        }
+
 
 
         syntax::alternate & parser:: choice(Rule &r1, Rule &r2)
