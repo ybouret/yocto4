@@ -247,7 +247,8 @@ dying(false)
         void server:: run() throw()
         {
             Y_THREADING_SERVER(std::cerr << "[server] starting thread" << std::endl);
-
+            const thread::handle_t         tch = thread::get_current_handle();
+            const bin2id<thread::handle_t> tid = &tch;
             //__________________________________________________________________
             //
             //
@@ -276,13 +277,13 @@ dying(false)
         //CHECK_BEHAVIOR:
             if(dying)
             {
-                std::cerr << "[server] leaving thread $" << uint64_t(thread::get_current_handle()) << std::endl;
+                std::cerr << "[server] leaving thread $" << tid.value << std::endl;
                 access.unlock();
                 return;
             }
 			else 
 			{
-				std::cerr << "[server] #task=" << tasks.size << ", with thread $" << uint64_t(thread::get_current_handle()) << std::endl;
+				std::cerr << "[server] #task=" << tasks.size << ", with thread $" << tid.value << std::endl;
 			}
 
             if(tasks.size>0)

@@ -4,6 +4,7 @@
 #include "yocto/threading/mutex.hpp"
 #include "yocto/container/vslot.hpp"
 #include "yocto/ptr/auto.hpp"
+#include "yocto/code/bin2name.hpp"
 
 namespace yocto
 {
@@ -93,11 +94,14 @@ namespace yocto
             
             
 		public:
-            auto_ptr<vslot> code; //!< helper for execution
-			const bool      stop; //!< internal flag
-			thread         *next; //!< for threads
-			thread         *prev; //!< for threads
-            vslot  &check_code(); //!< allocate code if needed
+            auto_ptr<vslot>  code; //!< helper for execution
+			const bool       stop; //!< internal flag
+			thread          *next; //!< for threads
+            thread          *prev; //!< for threads
+            //bin2id<handle_t> hrid; //!< human-readable value
+
+            vslot  &check_code(); //!< on-the-fly allocate code if needed
+
 		};
         
 		void assign_current_thread_on( size_t cpu_id );

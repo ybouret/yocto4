@@ -23,7 +23,7 @@ namespace yocto
         code(0),
         stop(true),
         next(0),
-        prev(0)
+        prev(0) //,hrid(&handle)
         {
         }
 
@@ -102,6 +102,7 @@ namespace yocto
             memset( &data,   0, sizeof(data)   );
             if(code.is_valid())  code->free();
             (bool&)stop = true;
+            //hrid = &handle;
         }
         
         //======================================================================
@@ -173,7 +174,7 @@ namespace yocto
             //------------------------------------------------------------------
 #endif
             
-            
+            //hrid = &handle;
         }
         
         //======================================================================

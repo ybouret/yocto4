@@ -37,12 +37,21 @@ namespace yocto
             memcpy((void*)value, other.value, sizeof(value));
         }
 
+        inline bin2id & operator=(const bin2id &other) throw()
+        {
+            memmove((void*)value, other.value, sizeof(value));
+            return *this;
+        }
 
         inline ~bin2id() throw() {}
 
+        inline bin2id & operator=(const T *addr) throw()
+        {
+            fill_value_with(addr);
+            return *this;
+        }
 
     private:
-        YOCTO_DISABLE_ASSIGN(bin2id);
 
 #define YOCTO_BIN2ID(INDEX)    \
 const unsigned B = p[INDEX];   \
