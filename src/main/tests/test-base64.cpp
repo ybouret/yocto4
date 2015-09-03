@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/string/b64id.hpp"
+#include "yocto/string/base64.hpp"
 #include "yocto/ios/icstream.hpp"
 
 using namespace yocto;
@@ -15,8 +15,6 @@ static int search_char( const char C, const char *tab )
 }
 
 #define Y_B64_BYTES_FOR(INPUT_BYTES) (YOCTO_ROUND1((8*INPUT_BYTES)/6))
-
-#define SHOW_FOR(TYPE) std::cerr << "bytes for " #TYPE << "=" << b64id<TYPE>::bytes << std::endl
 
 YOCTO_UNIT_TEST_IMPL(base64)
 {
@@ -57,26 +55,7 @@ YOCTO_UNIT_TEST_IMPL(base64)
         std::cerr << "#b64_bytes_for " << i << " = " << Y_B64_BYTES_FOR(i) << std::endl;
     }
 
-    SHOW_FOR(char);
-    SHOW_FOR(int16_t);
-    SHOW_FOR(uint32_t);
-    SHOW_FOR(uint64_t);
-
-    SHOW_FOR(int);
-
-    for(int i=0;i<10;++i)
-    {
-        b64id<int> b(&i),c = b;
-        std::cerr << "b_int(" << i << ")=" << b.label << " / " << c.label << std::endl;
-    }
-
-    for(uint64_t i=0;i<10;++i)
-    {
-        b64id<uint64_t> b(&i),c = b;
-        std::cerr << "b_u64(" << i << ")=" << b.label << " / " << c.label << std::endl;
-    }
-
-
+    
     base64::encoder enc;
     ios::icstream   input( ios::cstdin );
     string          line;
