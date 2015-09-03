@@ -30,12 +30,12 @@ namespace yocto
             // Terminals
             //__________________________________________________________________
             Rule &ID        = term("ID", "[:word:]+");
-            Rule &COLON     = text(":",syntax::jettison);
+            Rule &COLON     = text(':',syntax::jettison);
             Rule &SEMICOLON = text(';',syntax::jettison);
 
-            Rule &LPAREN    = term("(","\\(",syntax::jettison);
-            Rule &RPAREN    = term(")","\\)",syntax::jettison);
-            Rule &ALTERN    = term("|","\\|",syntax::jettison);
+            Rule &LPAREN    = text('(',syntax::jettison);
+            Rule &RPAREN    = text(')',syntax::jettison);
+            Rule &ALTERN    = text('|',syntax::jettison);
             Rule &RXP       = term<lexical::cstring>("RXP");
             Rule &RAW       = term<lexical::rstring>("RAW");
 
@@ -54,9 +54,7 @@ namespace yocto
             //__________________________________________________________________
             Agg  &RULE      = agg("RULE");
 
-            RULE << ID;
-
-            RULE << COLON;
+            RULE << ID << COLON;
             {
                 Alt &ATOM = alt();
                 ATOM << ID;
