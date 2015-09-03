@@ -28,7 +28,8 @@ namespace yocto
             mutex &access;
             
         private:
-            bool dying;
+            bool   dying;
+            size_t ready;
             YOCTO_DISABLE_COPY_AND_ASSIGN(engine);
 
             void init();
@@ -36,6 +37,9 @@ namespace yocto
             
             static void worker_call(void *args) throw();
             void        worker_loop() throw();
+            
+            static void master_call(void *args) throw();
+            void        master_loop() throw();
             
         };
 
