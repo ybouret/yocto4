@@ -46,7 +46,8 @@ namespace yocto
 		return ceil_ln2_table[ I & 0xFF ];
 	}
 
-
+    //! unsafe getbit, 0 or 1
+    unsigned unsafe_getbit(const size_t i,const void *data) throw();
 
 
 }

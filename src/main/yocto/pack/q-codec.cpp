@@ -28,5 +28,16 @@ namespace yocto
         {
             Q.push_front(C);
         }
+
+        q_codec::const_iterator q_codec:: begin() const throw()
+        {
+            return Q.begin();
+        }
+
+        q_codec::const_iterator q_codec:: end() const throw()
+        {
+            return Q.end();
+        }
+
     }
 }

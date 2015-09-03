@@ -13,15 +13,20 @@ namespace yocto
         class q_codec : public ios::codec
         {
         public:
+            typedef list<char> list_type;
+            typedef list_type::const_iterator const_iterator;
+
             virtual ~q_codec() throw();
             
             virtual bool query( char &C );
             virtual void store( char  C );
-            
-            
+
+            const_iterator begin() const throw();
+            const_iterator end()   const throw();
+
         protected:
             explicit q_codec() throw();
-            list<char> Q;
+            list_type Q;
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(q_codec);
