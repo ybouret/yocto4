@@ -133,6 +133,7 @@ dying(false)
             //
             // wait for threads to come back
             //__________________________________________________________________
+            process.broadcast();
             workers.finish();
 
             //__________________________________________________________________
@@ -272,10 +273,10 @@ dying(false)
             // we come back with a LOCKED access
             //
             //__________________________________________________________________
-        CHECK_BEHAVIOR:
+        //CHECK_BEHAVIOR:
             if(dying)
             {
-                std::cerr << "[server] leaving thread" << std::endl;
+                std::cerr << "[server] leaving thread $" << uint64_t(thread::get_current_handle()) << std::endl;
                 access.unlock();
                 return;
             }
@@ -326,7 +327,7 @@ dying(false)
                 tpool.store(curr);
 
 
-                goto CHECK_BEHAVIOR; // we are LOCKED here
+                //goto CHECK_BEHAVIOR; // we are LOCKED here
             }
 
 

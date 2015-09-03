@@ -63,10 +63,12 @@ YOCTO_UNIT_TEST_IMPL(server)
             const server::job J(w);
             s.enqueue(J);
         }
+#if 0
         s.flush();
         const double ell = chrono.query();
         const double tot = nj *  Work::secs;
         std::cerr << "SpeedUp=" << tot/ell << std::endl;
+#endif
     }
 
 }
