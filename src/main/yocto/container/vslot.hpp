@@ -25,8 +25,15 @@ namespace yocto
         inline void make()
         {
             prepare_for(sizeof(T)); // free and get memory
+#if defined(_MSV_VER)
+#pragma warning (push)
+#pragma warning (disable: 4345)
+#endif
             new (slot_.data) T();   // try to construct, may throw
             activate<T>();          // activate the object
+#if defined(_MSV_VER)
+#pragma warning (pop)
+#endif
         }
         
         //! one argument copy constructor, automatic memory management

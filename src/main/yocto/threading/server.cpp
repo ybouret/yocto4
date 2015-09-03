@@ -279,6 +279,10 @@ dying(false)
                 access.unlock();
                 return;
             }
+			else 
+			{
+				std::cerr << "[server] #task=" << tasks.size << ", with thread $" << uint64_t(thread::get_current_handle()) << std::endl;
+			}
 
             if(tasks.size>0)
             {
