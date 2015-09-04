@@ -10,18 +10,21 @@ using namespace threading;
 namespace {
 
 
+    static size_t nIter = 131072;
+
     class Work
     {
     public:
-        int       value;
+        size_t    value;
         double    sum;
+        double    tmx;
         static   double secs;
 
-        Work( int v ) throw() : value(v),sum(0)  {}
+        Work( int v ) throw() : value(v),sum(0),tmx(0)  {}
 
         ~Work() throw() {}
 
-        Work( const Work &w ) throw() : value( w.value ){}
+        Work( const Work &w ) throw() : value( w.value ), sum(w.sum) {}
 
         void operator()(lockable &access)
         {
@@ -39,7 +42,7 @@ namespace {
             chrono.start();
             while(chrono.query()<secs)
             {
-                for(size_t i=0;i<131072;++i)
+                for(size_t i=0;i<nIter;++i)
                 {
                     sum += r.get<double>();
                     (void)r.next();
@@ -62,21 +65,42 @@ YOCTO_UNIT_TEST_IMPL(engine)
         nj = strconv::to<size_t>(argv[1],"#jobs");
     }
 
-    engine Q;
-    std::cerr << "Enqueue " << nj << " jobs..." << std::endl;
+    if(argc>2)
     {
+        nIter = strconv::to<size_t>(argv[2],"nIter");
+    }
+
+    engine Q;
+    wtime  chrono;
+    chrono.start();
+    // seq
+    {
+        faked_lock access;
         for(size_t i=1;i<=nj;++i)
         {
             Work w(i);
-            const engine::job J(w);
-            Q.enqueue(J);
+            w(access);
         }
-        {
-            YOCTO_LOCK(Q.access);
-            std::cerr << "\t---- Program is waiting ----" << std::endl;
-        }
-        wtime::sleep(4);
     }
+    const double tseq = chrono.query();
+
+    {
+        YOCTO_LOCK(Q.access);
+        std::cerr << "\t (*) tseq = " << tseq << std::endl;
+        std::cerr << "Enqueue " << nj << " jobs..." << std::endl;
+    }
+    chrono.start();
+    for(size_t i=1;i<=nj;++i)
+    {
+        Work w(i);
+        const engine::job J(w);
+        Q.enqueue(J);
+    }
+    Q.flush();
+    const double tpar = chrono.query();
+    std::cerr << "\t (*) tseq = " << tseq      << std::endl;
+    std::cerr << "\t (*) tpar = " << tpar      << std::endl;
+    std::cerr << "\t (*) ratio= " << tseq/tpar << std::endl;
     {
         YOCTO_LOCK(Q.access);
         std::cerr << "\t---- Program is quiting ----" << std::endl;

@@ -373,16 +373,53 @@ namespace yocto
                 return object::acquire1<task>();
             }
         }
-        
+
+        void  engine:: activate(task *t) throw()
+        {
+            ++juuid;
+            tasks.push_back(t);
+            more_work.signal();
+        }
+
+
         job_id engine:: enqueue(const job &J)
         {
             YOCTO_LOCK(access);
             task *t = query_task();
             try { new(t) task(juuid,J); } catch(...) { tpool.store(t); throw; }
-            ++juuid; tasks.push_back(t);
-            more_work.signal();
+            activate(t);
             return t->uuid;
         }
+
+        //! wait until all jobs are done
+        void engine:: flush() throw()
+        {
+            access.lock();
+            if(alive>0)
+            {
+                completed.wait(access);
+            }
+            access.unlock();
+        }
+
+        bool engine:: is_done(const job_id j) const throw()
+        {
+            YOCTO_LOCK(access);
+            for(const task *t=tasks.head;t;t=t->next)
+            {
+                if(j==t->uuid)
+                    return false;
+            }
+
+            for(const task *t=activ.head;t;t=t->next)
+            {
+                if(j==t->uuid)
+                    return false;
+            }
+            
+            return true;
+        }
+
     }
 }
 

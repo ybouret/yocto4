@@ -22,7 +22,9 @@ namespace yocto
             typedef functor<void,TL1(lockable&)> job;
 
             job_id enqueue( const job &J );
-            
+
+            //! wait until all jobs are done
+            void    flush() throw();
 
         private:
             threads   workers;    //!< list of threads, layout.size+1
@@ -54,7 +56,6 @@ namespace yocto
                 task(const job_id I, OBJECT_POINTER host, METHOD_POINTER method) :
                 next(0),prev(0),uuid(I),work(host,method) {}
 
-
                 ~task() throw();
                 friend class engine;
             };
@@ -78,6 +79,21 @@ namespace yocto
             void        master_loop() throw();
 
             task *query_task();
+            void  activate(task *t) throw();
+
+        public:
+            //! faster inline creation of job
+            template <typename OBJECT_POINTER,typename METHOD_POINTER> inline
+            job_id enqueue(OBJECT_POINTER host, METHOD_POINTER method)
+            {
+                YOCTO_LOCK(access);
+                task *t = query_task();
+                try { new(t) task(juuid,host,method); } catch(...) { tpool.store(t); throw; }
+                activate(t);
+                return t->uuid;
+            }
+
+            bool is_done(const job_id j) const throw();
         };
 
     }
