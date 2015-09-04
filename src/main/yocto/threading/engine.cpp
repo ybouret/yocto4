@@ -37,11 +37,12 @@ work_done(),                      \
 completed(),                      \
 access(workers.access),           \
 dying(false),                     \
-ready(0),                         \
 tasks(),                          \
 activ(),                          \
+alive(activ.size),                \
 tpool(),                          \
-juuid(1)
+juuid(1),                         \
+ready(0)
 
         engine:: engine() : layout(),
         Y_THREADING_ENGINE_CTOR()
@@ -107,16 +108,16 @@ juuid(1)
                             // threads placements
                             //__________________________________________________
                             std::cerr << "[engine] assigning main thread" << std::endl;
-                            assign_current_thread_on( cpu_index_of(0) );
+                            std::cerr << "[engine] "; assign_current_thread_on( cpu_index_of(0) );
 
                             std::cerr << "[engine] assigning workers thread" << std::endl;
                             size_t iThread = 0;
                             for(thread *thr = workers.head; thr->next; thr=thr->next)
                             {
-                                thr->on_cpu( cpu_index_of(iThread++) );
+                                std::cerr << "[engine] "; thr->on_cpu( cpu_index_of(iThread++) );
                             }
                             std::cerr << "[engine] assigning MASTER thread" << std::endl;
-                            workers.tail->on_cpu( cpu_index_of(0) );
+                            std::cerr << "[engine] "; workers.tail->on_cpu( cpu_index_of(0) );
 
                             std::cerr << "[engine] all threads are ready" << std::endl << std::endl;
                             //ready = size;
@@ -143,7 +144,7 @@ juuid(1)
             //
             // remove pending tasks
             //__________________________________________________________________
-            dying = true;
+            (bool&)dying = true;
             std::cerr << "[engine] kill #pending_tasks=" << tasks.size << std::endl;
             while(tasks.size>0)
             {

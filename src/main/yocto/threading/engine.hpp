@@ -25,18 +25,18 @@ namespace yocto
             
 
         private:
-            threads   workers;
-            condition more_work;
-            condition work_done;
-            condition completed;
+            threads   workers;    //!< list of threads, layout.size+1
+            condition more_work;  //!< workers waiting on it
+            condition work_done;  //!< master  waiting on it
+            condition completed;  //!< flushing mechanism
             
         public:
-            mutex &access;
+            mutex &access;        //!< workers.access
             
         private:
-            bool         dying; //!< internal flag to quit properly
-            const size_t ready; //!< internal set-up flag
-            
+            const bool dying; //!< internal flag to quit properly
+
+            //! internal linked list of tasks
             class task
             {
             public:
@@ -47,6 +47,7 @@ namespace yocto
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(task);
+
                 task(const job_id I, const job &J);
 
                 template <typename OBJECT_POINTER,typename METHOD_POINTER> inline
@@ -60,8 +61,10 @@ namespace yocto
 
             core::list_of<task> tasks;  //!< tasks to process
             core::list_of<task> activ;  //!< running tasks
+            const size_t       &alive;  //!< activ.size
             core::pool_of<task> tpool;  //!< pool of dangling tasks
             job_id              juuid;  //!< for tasks labelling...
+            const size_t        ready;  //!< internal set-up flag
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(engine);
 

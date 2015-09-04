@@ -116,7 +116,7 @@ namespace yocto
             assert(scan>0);
             assert(root<size);
             const size_t j = root + ( iThread % scan );
-            std::cerr << "              |_ assign " << iThread << " on CPU #" << j << std::endl;
+            std::cerr << "|_assign thread #" << iThread << " on CPU #" << j << std::endl;
             return j;
         }
 		
