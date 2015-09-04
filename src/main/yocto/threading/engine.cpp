@@ -119,7 +119,7 @@ juuid(1)
                             workers.tail->on_cpu( cpu_index_of(0) );
 
                             std::cerr << "[engine] all threads are ready" << std::endl << std::endl;
-                            ready = size;
+                            //ready = size;
                             access.unlock();
                             break;
                         }
@@ -159,7 +159,7 @@ juuid(1)
             // TODO: use flush mechanism...
             //__________________________________________________________________
             access.lock();
-            if(ready<size)
+            if(activ.size>0)
             {
                 // at least one thread is running...
                 completed.wait(access);
@@ -226,7 +226,7 @@ namespace yocto
             //
             //__________________________________________________________________
             access.lock();
-            ++ready;
+            ++(size_t&)ready;
             const thread::handle_t         thread_handle = thread::get_current_handle();
             const bin2id<thread::handle_t> thread_bin_id = &thread_handle;
             const char                    *thread_name   = thread_bin_id.value;
@@ -250,7 +250,7 @@ namespace yocto
             //__________________________________________________________________
             if(dying)
             {
-                if(ready<size)
+                if(activ.size>0)
                     goto WAIT_FOR_WORK_DONE;
                 std::cerr << "[engine] Master is done" << std::endl;
                 completed.broadcast();
@@ -264,7 +264,7 @@ namespace yocto
             }
             else
             {
-                if(ready>=size)
+                if(activ.size<=0)
                 {
                     std::cerr << "[engine] Completed !" << std::endl;
                     completed.broadcast();
@@ -289,7 +289,7 @@ namespace yocto
             //
             //__________________________________________________________________
             access.lock();
-            ++ready;
+            ++(size_t&)ready;
             const thread::handle_t         thread_handle = thread::get_current_handle();
             const bin2id<thread::handle_t> thread_bin_id = &thread_handle;
             const char                    *thread_name   = thread_bin_id.value;
@@ -312,7 +312,7 @@ namespace yocto
             //__________________________________________________________________
             std::cerr << "[engine] ===> " << thread_name <<  std::endl;
             assert(ready>0);
-            --ready;
+            //--ready;
             if(dying)
             {
                 std::cerr << "[engine] stop " << thread_name << std::endl;
@@ -343,7 +343,7 @@ namespace yocto
             // loop is done, access is LOCKED
             //
             //__________________________________________________________________
-            ++ready;
+            //++ready;
             work_done.signal();
             goto WAIT_FOR_MORE_WORK;
         }

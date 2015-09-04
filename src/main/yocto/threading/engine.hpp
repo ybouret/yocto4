@@ -34,8 +34,8 @@ namespace yocto
             mutex &access;
             
         private:
-            bool   dying;
-            size_t ready;
+            bool         dying; //!< internal flag to quit properly
+            const size_t ready; //!< internal set-up flag
             
             class task
             {
