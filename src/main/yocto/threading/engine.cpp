@@ -66,7 +66,11 @@ ready(0)
 
         void engine:: init()
         {
-            Y_LOCKED_ENGINE(std::cerr << "[engine] init..." << std::endl);
+
+            {
+                YOCTO_LOCK(access);
+                std::cerr << "[engine] initialize" << std::endl;
+            }
 
             try
             {
@@ -101,26 +105,30 @@ ready(0)
                         else
                         {
                             assert(1+size==ready);
-                            std::cerr << "[engine] threads are synchronized" << std::endl;
+                            std::cerr << "[engine] threads are synchronized." << std::endl;
 
                             //__________________________________________________
                             //
                             // threads placements
                             //__________________________________________________
-                            std::cerr << "[engine] assigning main thread" << std::endl;
+
+                            // main thread on root CPU
+                            std::cerr << "[engine] assigning main thread:" << std::endl;
                             std::cerr << "[engine] "; assign_current_thread_on( cpu_index_of(0) );
 
-                            std::cerr << "[engine] assigning workers thread" << std::endl;
+                            // regular dispatch of workers
+                            std::cerr << "[engine] assigning workers thread:" << std::endl;
                             size_t iThread = 0;
                             for(thread *thr = workers.head; thr->next; thr=thr->next)
                             {
                                 std::cerr << "[engine] "; thr->on_cpu( cpu_index_of(iThread++) );
                             }
-                            std::cerr << "[engine] assigning MASTER thread" << std::endl;
+
+                            // last thread is master, on root CPU, doesn't work a lot
+                            std::cerr << "[engine] assigning MASTER thread:" << std::endl;
                             std::cerr << "[engine] "; workers.tail->on_cpu( cpu_index_of(0) );
 
-                            std::cerr << "[engine] all threads are ready" << std::endl << std::endl;
-                            //ready = size;
+                            std::cerr << "[engine] ready." << std::endl << std::endl;
                             access.unlock();
                             break;
                         }
@@ -139,7 +147,8 @@ ready(0)
         {
 
             access.lock();
-            std::cerr << "[engine] quit..." << std::endl;
+            std::cerr << std::endl;
+            std::cerr << "[engine] turning off !" << std::endl;
             //__________________________________________________________________
             //
             // remove pending tasks
@@ -241,7 +250,6 @@ namespace yocto
             //
             //__________________________________________________________________
             work_done.wait(access);
-            std::cerr << "[engine] work done. Remaining #tasks=" << tasks.size << std::endl;
 
             //__________________________________________________________________
             //
@@ -251,21 +259,22 @@ namespace yocto
             //__________________________________________________________________
             if(dying)
             {
-                if(activ.size>0)
+                if(alive>0)
                     goto WAIT_FOR_WORK_DONE;
-                std::cerr << "[engine] Master is done" << std::endl;
+                std::cerr << "[engine] Master is done." << std::endl;
                 completed.broadcast();
                 access.unlock();
                 return;
             }
 
+            std::cerr << "[engine] work done. Remaining #tasks=" << tasks.size << "." << std::endl;
             if(tasks.size)
             {
                 more_work.signal();
             }
             else
             {
-                if(activ.size<=0)
+                if(alive<=0)
                 {
                     std::cerr << "[engine] Completed !" << std::endl;
                     completed.broadcast();
@@ -312,8 +321,6 @@ namespace yocto
             //
             //__________________________________________________________________
             std::cerr << "[engine] ===> " << thread_name <<  std::endl;
-            assert(ready>0);
-            //--ready;
             if(dying)
             {
                 std::cerr << "[engine] stop " << thread_name << std::endl;
@@ -344,7 +351,6 @@ namespace yocto
             // loop is done, access is LOCKED
             //
             //__________________________________________________________________
-            //++ready;
             work_done.signal();
             goto WAIT_FOR_MORE_WORK;
         }
