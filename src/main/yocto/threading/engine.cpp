@@ -259,7 +259,13 @@ namespace yocto
             {
                 more_work.signal();
             }
-
+            else
+            {
+                if(ready>=size)
+                {
+                    std::cerr << "[engine] Completed !" << std::endl;
+                }
+            }
 
             goto WAIT_FOR_WORK_DONE;
         }
