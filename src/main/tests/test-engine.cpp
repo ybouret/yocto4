@@ -14,9 +14,10 @@ namespace {
     {
     public:
         int       value;
+        double    sum;
         static   double secs;
 
-        Work( int v ) throw() : value(v)  {}
+        Work( int v ) throw() : value(v),sum(0)  {}
 
         ~Work() throw() {}
 
@@ -30,12 +31,19 @@ namespace {
                 std::cerr.flush();
             }
             rand32_kiss r;
-            r.wseed();
+            {
+                YOCTO_LOCK(access);
+                r.wseed();
+            }
             wtime chrono;
             chrono.start();
             while(chrono.query()<secs)
             {
-                (void)r.next();
+                for(size_t i=0;i<100000;++i)
+                {
+                    sum += r.get<double>();
+                    (void)r.next();
+                }
             }
         }
 
