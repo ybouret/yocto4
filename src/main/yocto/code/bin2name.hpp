@@ -15,7 +15,7 @@ namespace yocto
         static const char *get_head(const unsigned B) throw();
         static const char *get_tail(const unsigned B) throw();
 
-        typedef uint32_t key_t;
+        typedef uint16_t key_t;
         static  key_t    key_of(const void *data, const size_t size) throw();
 
         static const size_t key_size = sizeof(key_t);

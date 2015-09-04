@@ -39,7 +39,7 @@ namespace {
             chrono.start();
             while(chrono.query()<secs)
             {
-                for(size_t i=0;i<100000;++i)
+                for(size_t i=0;i<131072;++i)
                 {
                     sum += r.get<double>();
                     (void)r.next();
@@ -51,7 +51,7 @@ namespace {
         YOCTO_DISABLE_ASSIGN(Work);
     };
 
-    double Work::secs = 0.4;
+    double Work::secs = 0.5;
 }
 
 YOCTO_UNIT_TEST_IMPL(engine)
@@ -75,8 +75,11 @@ YOCTO_UNIT_TEST_IMPL(engine)
             YOCTO_LOCK(Q.access);
             std::cerr << "\t---- Program is waiting ----" << std::endl;
         }
-        wtime::sleep(2);
+        wtime::sleep(4);
     }
-    
+    {
+        YOCTO_LOCK(Q.access);
+        std::cerr << "\t---- Program is quiting ----" << std::endl;
+    }
 }
 YOCTO_UNIT_TEST_DONE()
