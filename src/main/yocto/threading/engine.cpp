@@ -37,7 +37,11 @@ work_done(),                      \
 completed(),                      \
 access(workers.access),           \
 dying(false),                     \
-ready(0)
+ready(0),                         \
+tasks(),                          \
+activ(),                          \
+tpool(),                          \
+juuid(1)
 
         engine:: engine() : layout(),
         Y_THREADING_ENGINE_CTOR()

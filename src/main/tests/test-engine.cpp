@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/sys/wtime.hpp"
 #include "yocto/string/conv.hpp"
+#include "yocto/code/rand32.hpp"
 
 using namespace yocto;
 using namespace threading;
@@ -28,14 +29,21 @@ namespace {
                 std::cerr << "Working @" << value << "..." << std::endl;
                 std::cerr.flush();
             }
-            wtime::sleep(secs);
+            rand32_kiss r;
+            r.wseed();
+            wtime chrono;
+            chrono.start();
+            while(chrono.query()<secs)
+            {
+                (void)r.next();
+            }
         }
 
     private:
         YOCTO_DISABLE_ASSIGN(Work);
     };
 
-    double Work::secs = 0.1;
+    double Work::secs = 0.4;
 }
 
 YOCTO_UNIT_TEST_IMPL(engine)
