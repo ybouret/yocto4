@@ -158,13 +158,13 @@ juuid(1)
             // waiting for active tasks to complete...
             // TODO: use flush mechanism...
             //__________________________________________________________________
-            while(true)
+            access.lock();
+            if(ready<size)
             {
-                more_work.broadcast();
-                YOCTO_LOCK(access);
-                if(activ.size<=0)
-                    break;
+                // at least one thread is running...
+                completed.wait(access);
             }
+            access.unlock();
 
             //__________________________________________________________________
             //
@@ -250,7 +250,10 @@ namespace yocto
             //__________________________________________________________________
             if(dying)
             {
+                if(ready<size)
+                    goto WAIT_FOR_WORK_DONE;
                 std::cerr << "[engine] Master is done" << std::endl;
+                completed.broadcast();
                 access.unlock();
                 return;
             }
@@ -264,6 +267,7 @@ namespace yocto
                 if(ready>=size)
                 {
                     std::cerr << "[engine] Completed !" << std::endl;
+                    completed.broadcast();
                 }
             }
 
@@ -324,7 +328,7 @@ namespace yocto
                 access.unlock();                // other threads can run
                 try
                 {
-                    todo->work(access);             // do the job, UNLOCKED...
+                    todo->work(access);         // do the job, UNLOCKED...
                 }
                 catch(...)
                 {
