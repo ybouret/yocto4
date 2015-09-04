@@ -273,7 +273,7 @@ namespace yocto
 
         ////////////////////////////////////////////////////////////////////////
         //
-        // WOrker Loop
+        // Worker Loop
         //
         ////////////////////////////////////////////////////////////////////////
         void engine:: worker_loop() throw()
@@ -316,7 +316,6 @@ namespace yocto
                 return;
             }
 
-            std::cerr << "[engine] do something" << std::endl;
             if(tasks.size>0)
             {
 
