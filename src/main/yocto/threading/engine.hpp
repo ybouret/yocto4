@@ -28,7 +28,8 @@ namespace yocto
             threads   workers;
             condition more_work;
             condition work_done;
-
+            condition completed;
+            
         public:
             mutex &access;
             

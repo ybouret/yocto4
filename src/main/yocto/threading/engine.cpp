@@ -34,6 +34,7 @@ CODE;                              \
 workers("engine"),                \
 more_work(),                      \
 work_done(),                      \
+completed(),                      \
 access(workers.access),           \
 dying(false),                     \
 ready(0)
@@ -295,12 +296,12 @@ namespace yocto
             // worker is woken up, access is LOCKED
             //
             //__________________________________________________________________
-            std::cerr << "[engine] ==> " << thread_name <<  std::endl;
+            std::cerr << "[engine] ===> " << thread_name <<  std::endl;
             assert(ready>0);
             --ready;
             if(dying)
             {
-                std::cerr << "[engine] stop worker..." << std::endl;
+                std::cerr << "[engine] stop " << thread_name << std::endl;
                 access.unlock();
                 return;
             }
