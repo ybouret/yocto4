@@ -22,7 +22,10 @@ YOCTO_UNIT_TEST_IMPL(utils)
     SHOW_FOR(int16_t);
     SHOW_FOR(uint32_t);
     SHOW_FOR(int64_t);
-    
+
+    std::cerr << "bin2name::out_size=" << bin2name::out_size << std::endl;
+    std::cerr << "bin2name::mem_size=" << bin2name::mem_size << std::endl;
+
     for(int i=0;i<10;++i)
     {
         bin2id<int> b(&i);

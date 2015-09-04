@@ -1,7 +1,7 @@
 #ifndef YOCTO_BIN2NAME_INCLUDED
 #define YOCTO_BIN2NAME_INCLUDED 1
 
-#include "yocto/code/unroll.hpp"
+#include "yocto/code/round.hpp"
 #include <cstring>
 
 namespace yocto
@@ -14,21 +14,29 @@ namespace yocto
 
         static const char *get_head(const unsigned B) throw();
         static const char *get_tail(const unsigned B) throw();
+
+        typedef uint32_t key_t;
+        static  key_t    key_of(const void *data, const size_t size) throw();
+
+        static const size_t key_size = sizeof(key_t);
+        static const size_t out_size = 3 * key_size+1;
+        static const size_t mem_size = YOCTO_ALIGN_FOR_ITEM(key_t,out_size);
+
+        static void  fill(char *value, const key_t k) throw();
+        static void  fill(char *value, const void *data, const size_t size) throw();
     };
 
     template <typename T>
     class bin2id
     {
     public:
-        static const size_t bytes = 3*sizeof(T);
-        const char value[bytes+1];
+        const char value[bin2name::mem_size];
 
         inline bin2id(const T *addr) throw() :
         value()
         {
             assert(addr);
-            memset((void*)value,0,sizeof(value));
-            fill_value_with(addr);
+            bin2name::fill((char*)value,addr,sizeof(T));
         }
 
         inline bin2id(const bin2id &other) throw() :
@@ -47,29 +55,10 @@ namespace yocto
 
         inline bin2id & operator=(const T *addr) throw()
         {
-            fill_value_with(addr);
+            bin2name::fill((char*)value,addr,sizeof(T));
             return *this;
         }
 
-    private:
-
-#define YOCTO_BIN2ID(INDEX)    \
-const unsigned B = p[INDEX];   \
-const size_t   j = 3*(INDEX);  \
-const char    *h = bin2name::get_head(B);\
-s[j+0] = h[0];\
-const char    *t = bin2name::get_tail(B);\
-s[j+1] = t[0]; \
-s[j+2] = t[1]
-
-        inline void fill_value_with(const T *addr) throw()
-        {
-            const uint8_t *p   = (const uint8_t *)addr;
-            char          *s   = (char *)value;
-            YOCTO_LOOP_FUNC_(sizeof(T), YOCTO_BIN2ID, 0);
-        }
-
-#undef YOCTO_BIN2ID
     };
 }
 

@@ -51,7 +51,7 @@ ready(0)
                 //______________________________________________________________
                 for(size_t i=0;i<size;++i)
                 {
-                    workers.launch(worker_call, this);
+                    workers.launch(worker_call,this);
                 }
                 
                 //______________________________________________________________
@@ -68,15 +68,34 @@ ready(0)
                 {
                     if(access.try_lock())
                     {
-                        if(ready>size)
+                        if(ready<=size)
                         {
-                            assert(1+size==ready);
                             access.unlock();
-                            break;
                         }
                         else
                         {
+                            assert(1+size==ready);
+                            std::cerr << "[engine] threads are synchronized" << std::endl;
+
+                            //__________________________________________________
+                            //
+                            // threads placements
+                            //__________________________________________________
+                            std::cerr << "[engine] assigning main thread" << std::endl;
+                            assign_current_thread_on( cpu_index_of(0) );
+
+                            std::cerr << "[engine] assigning workers thread" << std::endl;
+                            size_t iThread = 0;
+                            for(thread *thr = workers.head; thr->next; thr=thr->next)
+                            {
+                                thr->on_cpu( cpu_index_of(iThread++) );
+                            }
+                            std::cerr << "[engine] assigning MASTER thread" << std::endl;
+                            workers.tail->on_cpu( cpu_index_of(0) );
+
+                            std::cerr << "[engine] all threads are ready" << std::endl << std::endl;
                             access.unlock();
+                            break;
                         }
                     }
                 }
@@ -132,6 +151,7 @@ ready(0)
     
 }
 
+#include "yocto/code/bin2name.hpp"
 
 namespace yocto
 {
@@ -140,8 +160,6 @@ namespace yocto
         
         void engine:: master_loop() throw()
         {
-            Y_LOCKED_ENGINE(std::cerr << "[engine] --> start MASTER" << std::endl);
-            
             //__________________________________________________________________
             //
             //
@@ -150,7 +168,10 @@ namespace yocto
             //__________________________________________________________________
             access.lock();
             ++ready;
-            
+            const thread::handle_t         thread_handle = thread::get_current_handle();
+            const bin2id<thread::handle_t> thread_bin_id = &thread_handle;
+            const char                    *thread_name   = thread_bin_id.value;
+            std::cerr << "[engine] Master name is " << thread_name << std::endl;
             //__________________________________________________________________
             //
             //
@@ -167,7 +188,7 @@ namespace yocto
             //__________________________________________________________________
             if(dying)
             {
-                std::cerr << "[engine] MASTER is done" << std::endl;
+                std::cerr << "[engine] Master is done" << std::endl;
                 access.unlock();
                 return;
             }
@@ -177,8 +198,6 @@ namespace yocto
         
         void engine:: worker_loop() throw()
         {
-            Y_LOCKED_ENGINE(std::cerr << "[engine] --> start worker" << std::endl);
-            
             //__________________________________________________________________
             //
             //
@@ -187,6 +206,10 @@ namespace yocto
             //__________________________________________________________________
             access.lock();
             ++ready;
+            const thread::handle_t         thread_handle = thread::get_current_handle();
+            const bin2id<thread::handle_t> thread_bin_id = &thread_handle;
+            const char                    *thread_name   = thread_bin_id.value;
+            std::cerr << "[engine] Worker name is " << thread_name << std::endl;
 
             //__________________________________________________________________
             //

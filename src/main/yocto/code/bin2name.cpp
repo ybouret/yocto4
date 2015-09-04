@@ -60,5 +60,39 @@ namespace yocto
         return tail[ (B&0x0F) ];
     }
 
+    void  bin2name:: fill(char *value, key_t k) throw()
+    {
+        assert(value);
+        memset(value,0,mem_size);
+        for(size_t i=0;i<sizeof(key_t);++i)
+        {
+            const size_t   j = i*3;
+            const unsigned B = (k&0xff);
+            const char    *h = get_head(B);
+            const char    *t = get_tail(B);
+            value[j+0] = h[0];
+            value[j+1] = t[0];
+            value[j+2] = t[1];
+            k >>= 8;
+        }
+    }
+
+    void  bin2name::fill(char *value, const void *data, const size_t size) throw()
+    {
+        fill(value,key_of(data,size));
+    }
 
 }
+
+#include "yocto/hashing/sha1.hpp"
+
+namespace yocto
+{
+    bin2name::key_t bin2name::key_of(const void *data, const size_t size) throw()
+    {
+        hashing::sha1 H;
+        return H.key<key_t>(data,size);
+    }
+
+}
+
