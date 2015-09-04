@@ -206,6 +206,12 @@ namespace yocto
     namespace threading
     {
 
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Master Loop
+        //
+        ////////////////////////////////////////////////////////////////////////
         void engine:: master_loop() throw()
         {
             //__________________________________________________________________
@@ -220,6 +226,8 @@ namespace yocto
             const bin2id<thread::handle_t> thread_bin_id = &thread_handle;
             const char                    *thread_name   = thread_bin_id.value;
             std::cerr << "[engine] Master name is " << thread_name << std::endl;
+
+        WAIT_FOR_WORK_DONE:
             //__________________________________________________________________
             //
             //
@@ -227,6 +235,7 @@ namespace yocto
             //
             //__________________________________________________________________
             work_done.wait(access);
+            std::cerr << "[engine] work done. Remaining #tasks=" << tasks.size << std::endl;
 
             //__________________________________________________________________
             //
@@ -241,9 +250,21 @@ namespace yocto
                 return;
             }
 
-            access.unlock();
+            if(tasks.size)
+            {
+                more_work.signal();
+            }
+
+
+            goto WAIT_FOR_WORK_DONE;
         }
 
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // WOrker Loop
+        //
+        ////////////////////////////////////////////////////////////////////////
         void engine:: worker_loop() throw()
         {
             //__________________________________________________________________
@@ -309,6 +330,7 @@ namespace yocto
             //
             //__________________________________________________________________
             ++ready;
+            work_done.signal();
             goto WAIT_FOR_MORE_WORK;
         }
     }

@@ -104,7 +104,7 @@ dying(false)
             //__________________________________________________________________
             {
                 YOCTO_LOCK(access);
-                std::cerr << "[server] kill #pending tasks=" << tasks.size << std::endl;
+                std::cerr << "[server] kill #pending_tasks=" << tasks.size << std::endl;
                 dying = true;
                 while(tasks.size)
                 {
