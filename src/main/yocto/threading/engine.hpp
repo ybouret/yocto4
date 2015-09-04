@@ -11,6 +11,7 @@ namespace yocto
     namespace threading
     {
 
+        typedef uint32_t job_id;
         
         class engine : public layout
         {
@@ -18,6 +19,10 @@ namespace yocto
             explicit engine();
             explicit engine(const size_t num_threads, const size_t threads_offset=0);
             virtual ~engine() throw();
+            typedef functor<void,TL1(lockable&)> job;
+
+            job_id enqueue( const job &J );
+            
 
         private:
             threads   workers;
@@ -30,6 +35,33 @@ namespace yocto
         private:
             bool   dying;
             size_t ready;
+            
+            class task
+            {
+            public:
+                task         *next;
+                task         *prev;
+                const job_id  uuid;
+                job           work;
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(task);
+                task(const job_id I, const job &J);
+
+                template <typename OBJECT_POINTER,typename METHOD_POINTER> inline
+                task(const job_id I, OBJECT_POINTER host, METHOD_POINTER method) :
+                next(0),prev(0),uuid(I),work(host,method) {}
+
+
+                ~task() throw();
+                friend class engine;
+            };
+
+            core::list_of<task> tasks;  //!< tasks to process
+            core::list_of<task> activ;  //!< running tasks
+            core::pool_of<task> tpool;  //!< pool of dangling tasks
+            job_id              juuid;  //!< for tasks labelling...
+
             YOCTO_DISABLE_COPY_AND_ASSIGN(engine);
 
             void init();
@@ -40,7 +72,8 @@ namespace yocto
             
             static void master_call(void *args) throw();
             void        master_loop() throw();
-            
+
+            task *query_task();
         };
 
     }
