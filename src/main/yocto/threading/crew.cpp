@@ -232,7 +232,7 @@ namespace yocto
             }
             catch(...)
             {
-                throw;
+               //TODO: send a message ?
             }
 
             access.lock();

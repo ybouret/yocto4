@@ -242,7 +242,22 @@ namespace yocto
 #endif
         }
 
-
+		 //======================================================================
+        //
+        // get the current thread identifier
+        //
+        //======================================================================
+        thread::id_t thread:: get_current_id() throw()
+        {
+            
+#if defined(YOCTO_BSD)
+            return pthread_self();
+#endif
+            
+#if defined(YOCTO_WIN)
+            return ::GetCurrentThreadId();
+#endif
+        }
 	}
     
     

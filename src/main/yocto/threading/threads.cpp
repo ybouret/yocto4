@@ -80,14 +80,14 @@ namespace yocto
             while(n-->0) pool.store( thread::create_with(access) );
         }
 
-        int threads:: get_index_of(const thread::handle_t h)  throw()
+        int threads:: get_index_of(const thread::id_t ID)  throw()
         {
             YOCTO_LOCK(access);
-			std::cerr << "GetHandleIndex for " << h << std::endl;
+			//std::cerr << "GetHandleIndex for " << h << std::endl;
             int i = 0;
             for(const thread *t = head;t;t=t->next)
             {
-                if(h == t->handle)
+                if(ID == t->identifier)
 				{
                     return i;
 				}

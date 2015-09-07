@@ -61,6 +61,9 @@ namespace yocto
             
 			//! get system level handle without the wrapper
 			static handle_t get_current_handle() throw();
+			
+			//! get system level identifier
+			static id_t     get_current_id()     throw();
 
             //! assign to a given cpu
 			void        on_cpu( size_t cpu_id );

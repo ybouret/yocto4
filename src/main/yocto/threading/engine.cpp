@@ -234,7 +234,7 @@ namespace yocto
             // Waiting for everyone to be ready
             //
             //__________________________________________________________________
-            const int thread_name = workers.get_index_of( thread::get_current_handle() );
+            const int thread_name = workers.get_index_of( thread::get_current_id() );
             access.lock();
             ++(size_t&)ready;
             std::cerr << "[engine] Master ID=" << thread_name << std::endl;
@@ -296,7 +296,7 @@ namespace yocto
             // Waiting for all threads to be ready
             //
             //__________________________________________________________________
-            const int thread_name = workers.get_index_of( thread::get_current_handle() );
+            const int thread_name = workers.get_index_of( thread::get_current_id() );
             access.lock();
             ++(size_t&)ready;
             std::cerr << "[engine] Worker ID=" << thread_name << std::endl;

@@ -115,7 +115,7 @@ namespace yocto
                 
             }
 
-            int get_index_of(const thread::handle_t) throw();
+            int get_index_of(const thread::id_t) throw();
 
 		private:
 			thread *query();
