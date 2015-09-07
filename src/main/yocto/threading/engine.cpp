@@ -380,11 +380,9 @@ namespace yocto
 
         job_id engine:: enqueue(const job &J)
         {
-            YOCTO_LOCK(access);
-            task *t = query_task();
+            YOCTO_THREAD_ENGINE_ENQUEUE_PROLOG();
             try { new(t) task(juuid,J); } catch(...) { tpool.store(t); throw; }
-            activate(t);
-            return t->uuid;
+            YOCTO_THREAD_ENGINE_ENQUEUE_EPILOG();
         }
 
         //! wait until all jobs are done

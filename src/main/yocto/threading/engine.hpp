@@ -84,15 +84,16 @@ namespace yocto
             void  activate(task *t) throw();
 
         public:
+#define YOCTO_THREAD_ENGINE_ENQUEUE_PROLOG() YOCTO_LOCK(access); task *t = query_task()
+#define YOCTO_THREAD_ENGINE_ENQUEUE_EPILOG() activate(t); return t->uuid
+
             //! faster inline creation of job
             template <typename OBJECT_POINTER,typename METHOD_POINTER> inline
             job_id enqueue(OBJECT_POINTER host, METHOD_POINTER method)
             {
-                YOCTO_LOCK(access);
-                task *t = query_task();
+                YOCTO_THREAD_ENGINE_ENQUEUE_PROLOG();
                 try { new(t) task(juuid,host,method); } catch(...) { tpool.store(t); throw; }
-                activate(t);
-                return t->uuid;
+                YOCTO_THREAD_ENGINE_ENQUEUE_EPILOG();
             }
 
             bool is_done(const job_id j) const throw();
