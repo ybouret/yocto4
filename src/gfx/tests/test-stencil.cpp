@@ -15,10 +15,12 @@ using namespace gfx;
 
 namespace
 {
+    typedef gradient::real_type real_type;
+
     static inline
     double perform_grad( pixmap<uint8_t>      &grad,
                       const pixmap<uint8_t> &data,
-                      pixmap<double>        &G,
+                      pixmap<real_type>        &G,
                       const size_t           cpus,
                       threading::engine     *psrv)
     {
@@ -31,7 +33,7 @@ namespace
 
         for(size_t i=0;i<1;++i)
         {
-            const double Gmax = gradient::compute1(igrad, G, data,psrv);
+            const real_type Gmax = gradient::compute1(igrad, G, data,psrv);
             gradient::compute2(ograd, grad, G, Gmax, psrv);
         }
 
@@ -101,7 +103,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             PNG.save("image_col_g.png",ch[1], get_rgba::from_byte_g,NULL, NULL);
             PNG.save("image_col_b.png",ch[2], get_rgba::from_byte_b,NULL, NULL);
 
-            pixmap<double>  G(w,h);
+            pixmap<real_type>  G(w,h);
             pixmap<uint8_t> grad(w,h);
 
             const double t_seq1 = perform_grad(grad, ch[0], G, 1, NULL);

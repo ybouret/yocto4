@@ -11,7 +11,7 @@ namespace yocto
     {
 
 #define YOCTO_GFX_GRADIENT_COMPUTE(VALUE)   do { \
-const double gg = math::Hypotenuse(gx, gy);      \
+const real_type gg = math::Hypotenuse(gx, gy);   \
 VALUE           = gg;                            \
 if(gg>Gmax) { Gmax = gg; }                       \
 } while(false)
@@ -19,14 +19,14 @@ if(gg>Gmax) { Gmax = gg; }                       \
         struct gradient
         {
 
-            typedef double             real_type;
+            typedef float              real_type;
             typedef pixmap<real_type>  pixmap_t;
 
             //! inner patch
             class ipatch : public patch
             {
             public:
-                double          Gmax;
+                real_type       Gmax;
                 pixmap_t       *target;
                 const void     *source;
 
@@ -61,8 +61,8 @@ if(gg>Gmax) { Gmax = gg; }                       \
 
                         for(unit_t im=xlom,i=xlo,ip=xlop;i<xhi;++im,++i,++ip)
                         {
-                            const double gx = double(dj[ip])-double(dj[im]);
-                            const double gy = double(djp[i])-double(djm[i]);
+                            const real_type gx = real_type(dj[ip])-real_type(dj[im]);
+                            const real_type gy = real_type(djp[i])-real_type(djm[i]);
                             YOCTO_GFX_GRADIENT_COMPUTE(Gj[i]);
                         }
                     }
@@ -82,9 +82,9 @@ if(gg>Gmax) { Gmax = gg; }                       \
             public:
                 explicit opatch(const patch2D &p) throw();
                 virtual ~opatch() throw();
-                double                Gmax;    //!< for normalisation
+                real_type                Gmax;    //!< for normalisation
                 void                 *target;  //!< pixmap<T>
-                const pixmap<double> *source;  //!< precomputed
+                const pixmap_t       *source;  //!< precomputed
 
                 template <typename T>
                 inline void finalize( lockable & ) throw()
@@ -92,7 +92,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     assert(source);
                     assert(target);
                     pixmap<T>             &grad = *(pixmap<T> *)(target);
-                    const pixmap<double>  &G    = *source;
+                    const pixmap_t        &G    = *source;
                     assert(G.w==grad.w);
                     assert(G.h==grad.h);
                     assert(Gmax>0);
@@ -102,7 +102,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     const unit_t     yhi  = area.yout;
                     for(unit_t j=ylo;j<yhi;++j)
                     {
-                        const typename pixmap<double>::row &Gj = G[j];
+                        const typename pixmap<real_type>::row &Gj = G[j];
                         typename pixmap<T>::row            &gj = grad[j];
                         for(unit_t i=xlo;i<xhi;++i)
                         {
@@ -143,7 +143,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
              */
             template <typename T> inline
             static void start(ipatches          &input,
-                              pixmap<double>    &G,
+                              pixmap_t          &G,
                               const pixmap<T>   &data,
                               threading::engine *psrv)
             {
@@ -177,10 +177,10 @@ if(gg>Gmax) { Gmax = gg; }                       \
 
             //! borders computing of effective gradient
             template <typename T> inline
-            static double borders(pixmap<double>  &G,
+            static real_type borders(pixmap_t        &G,
                                   const pixmap<T> &data) throw()
             {
-                double Gmax = 0;
+                real_type Gmax = 0;
                 assert(G.w==data.w);
                 assert(G.h==data.h);
                 const unit_t w  = G.w;
@@ -191,7 +191,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 const unit_t h  = G.h;
                 for(unit_t jm=0,j=1,jp=2;jp<h;++jm,++j,++jp)
                 {
-                    pixmap<double>::row           &Gj  = G[j];
+                    pixmap_t::row           &Gj  = G[j];
                     const typename pixmap<T>::row &dj  = data[j];
                     const typename pixmap<T>::row &djm = data[jm];
                     const typename pixmap<T>::row &djp = data[jp];
@@ -201,8 +201,8 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     // left side
                     //__________________________________________________________
                     {
-                        const double gy = double(djp[0])-double(djm[0]);
-                        const double gx = 4.0 * double(dj[1]) - 3.0 * double(dj[0]) - double(dj[2]);
+                        const real_type gy = real_type(djp[0])-real_type(djm[0]);
+                        const real_type gx = real_type(4) * real_type(dj[1]) - real_type(3) * real_type(dj[0]) - real_type(dj[2]);
                         YOCTO_GFX_GRADIENT_COMPUTE(Gj[0]);
                     }
 
@@ -211,21 +211,21 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     // right side
                     //__________________________________________________________
                     {
-                        const double gy = double(djp[w0])-double(djm[w0]);
-                        const double gx = 4.0 * double(dj[w1]) - 3.0 * double(dj[w0]) - double(dj[w2]);
+                        const real_type gy = real_type(djp[w0])-real_type(djm[w0]);
+                        const real_type gx = real_type(4) * real_type(dj[w1]) - real_type(3) * real_type(dj[w0]) - real_type(dj[w2]);
                         YOCTO_GFX_GRADIENT_COMPUTE(Gj[w0]);
                     }
                 }
 
                 const typename pixmap<T>::row &d0  = data[0];
-                pixmap<double>::row           &G0  = G[0];
+                pixmap_t::row                 &G0  = G[0];
                 const unit_t h0 = h-1;
                 const unit_t h1 = h-2;
                 const unit_t h2 = h-3;
                 const typename pixmap<T>::row &dh0  = data[h0];
                 const typename pixmap<T>::row &dh1  = data[h1];
                 const typename pixmap<T>::row &dh2  = data[h2];
-                pixmap<double>::row           &Gh0  = G[h0];
+                pixmap_t::row                 &Gh0  = G[h0];
 
                 for(unit_t im=0,i=1,ip=2;ip<w;++im,++i,++ip)
                 {
@@ -235,8 +235,8 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     // down
                     //__________________________________________________________
                     {
-                        const double gx = double(d0[ip]) - double(d0[im]);
-                        const double gy = 4.0*double(data[0][i]) - 3.0 * double(data[1][i]) - double(data[2][i]);
+                        const real_type gx = real_type(d0[ip]) - real_type(d0[im]);
+                        const real_type gy = real_type(4)*real_type(data[0][i]) - real_type(3) * real_type(data[1][i]) - real_type(data[2][i]);
                         YOCTO_GFX_GRADIENT_COMPUTE(G0[i]);
                     }
 
@@ -245,8 +245,8 @@ if(gg>Gmax) { Gmax = gg; }                       \
                     // top
                     //__________________________________________________________
                     {
-                        const double gx = double(dh0[ip]) - double(dh0[im]);
-                        const double gy = 4.0*double(dh0[i]) - 3.0 * double(dh1[i]) - double(dh2[i]);
+                        const real_type gx = real_type(dh0[ip]) - real_type(dh0[im]);
+                        const real_type gy = real_type(4)*real_type(dh0[i]) - real_type(3) * real_type(dh1[i]) - real_type(dh2[i]);
                         YOCTO_GFX_GRADIENT_COMPUTE(Gh0[i]);
                     }
                 }
@@ -256,26 +256,26 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 // and corners...
                 //______________________________________________________________
                 {
-                    const double gx = 4.0 * double(data[0][0]) - 3.0 * double(data[0][1]) - double(data[0][2]);
-                    const double gy = 4.0 * double(data[0][0]) - 3.0 * double(data[1][0]) - double(data[2][0]);
+                    const real_type gx = real_type(4) * real_type(data[0][0]) - real_type(3) * real_type(data[0][1]) - real_type(data[0][2]);
+                    const real_type gy = real_type(4) * real_type(data[0][0]) - real_type(3) * real_type(data[1][0]) - real_type(data[2][0]);
                     YOCTO_GFX_GRADIENT_COMPUTE(G[0][0]);
                 }
 
                 {
-                    const double gx = 4.0 * double(data[0][w0]) - 3.0 * double(data[0][w1]) - double(data[0][w2]);
-                    const double gy = 4.0 * double(data[0][w0]) - 3.0 * double(data[1][w0]) - double(data[2][w0]);
+                    const real_type gx = real_type(4) * real_type(data[0][w0]) - real_type(3) * real_type(data[0][w1]) - real_type(data[0][w2]);
+                    const real_type gy = real_type(4) * real_type(data[0][w0]) - real_type(3) * real_type(data[1][w0]) - real_type(data[2][w0]);
                     YOCTO_GFX_GRADIENT_COMPUTE(G[0][w0]);
                 }
 
                 {
-                    const double gx = 4.0 * double(data[h0][0]) - 3.0 * double(data[h0][1]) - double(data[h0][2]);
-                    const double gy = 4.0 * double(data[h0][0]) - 3.0 * double(data[h1][0]) - double(data[h2][0]);
+                    const real_type gx = real_type(4) * real_type(data[h0][0]) - real_type(3) * real_type(data[h0][1]) - real_type(data[h0][2]);
+                    const real_type gy = real_type(4) * real_type(data[h0][0]) - real_type(3) * real_type(data[h1][0]) - real_type(data[h2][0]);
                     YOCTO_GFX_GRADIENT_COMPUTE(G[h0][0]);
                 }
 
                 {
-                    const double gx = 4.0 * double(data[h0][w0]) - 3.0 * double(data[h0][w1]) - double(data[h0][w2]);
-                    const double gy = 4.0 * double(data[h0][w0]) - 3.0 * double(data[h1][w0]) - double(data[h2][w0]);
+                    const real_type gx = real_type(4) * real_type(data[h0][w0]) - real_type(3) * real_type(data[h0][w1]) - real_type(data[h0][w2]);
+                    const real_type gy = real_type(4) * real_type(data[h0][w0]) - real_type(3) * real_type(data[h1][w0]) - real_type(data[h2][w0]);
                     YOCTO_GFX_GRADIENT_COMPUTE(G[h0][w0]);
                 }
 
@@ -288,13 +288,13 @@ if(gg>Gmax) { Gmax = gg; }                       \
              - server is flushed...
              */
             template <typename T> inline
-            static double compute1(ipatches           &input,
-                                   pixmap<double>     &G,
+            static real_type compute1(ipatches           &input,
+                                   pixmap<real_type>     &G,
                                    const pixmap<T>    &data,
                                    threading::engine  *psrv)
             {
                 start(input, G, data, psrv);
-                double Gmax = borders(G,data);
+                real_type Gmax = borders(G,data);
                 if(psrv)
                 {
                     psrv->flush();
@@ -303,7 +303,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 const size_t n = input.size;
                 for(size_t i=0;i<n;++i)
                 {
-                    const double tmp = input[i].Gmax;
+                    const real_type tmp = input[i].Gmax;
                     if(tmp>Gmax) Gmax = tmp;
                 }
                 return Gmax;
@@ -318,8 +318,8 @@ if(gg>Gmax) { Gmax = gg; }                       \
             template <typename T> inline
             static void compute2(opatches             &output,
                                  pixmap<T>            &grad,
-                                 const pixmap<double> &G,
-                                 const double          Gmax,
+                                 const pixmap<real_type> &G,
+                                 const real_type          Gmax,
                                  threading::engine    *psrv)
             {
                 const size_t n = output.size;
@@ -373,10 +373,10 @@ if(gg>Gmax) { Gmax = gg; }                       \
                 setup(igrad,ograd,cpus,data);
 
                 // effective gradient allocation
-                pixmap<double> G(data.w,data.h);
+                pixmap_t G(data.w,data.h);
 
                 // two passes gradient
-                const double Gmax =
+                const real_type Gmax =
                 compute1(igrad, G, data, psrv);
                 compute2(ograd,grad, G, Gmax,psrv);
             }

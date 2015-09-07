@@ -34,16 +34,17 @@ namespace
                                     threading::engine      *psrv)
     {
         assert(grad.size==data.size);
+        typedef gradient::real_type real_type;
         timings tmx;
         const size_t nch = grad.size;
         YOCTO_TIMINGS(tmx, TMX,
                       gradient::ipatches igr;
                       gradient::opatches ogr;
                       gradient::setup(igr, ogr, cpus, data[0]);
-                      pixmap<double> G(data.w,data.h);
+                      pixmap<real_type> G(data.w,data.h);
                       for(size_t i=0;i<nch;++i)
                       {
-                          const double Gmax = gradient::compute1(igr, G, data[i], psrv);
+                          const real_type Gmax = gradient::compute1(igr, G, data[i], psrv);
                           gradient::compute2<uint8_t>(ogr, grad[i], G, Gmax, psrv);
                       }
                       );
