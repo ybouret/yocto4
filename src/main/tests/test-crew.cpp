@@ -63,12 +63,14 @@ namespace
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(Worker);
     };
-    size_t Worker::Count = 1;
-    size_t Worker::Loops = 1;
+    size_t Worker::Count = 10000;
+    size_t Worker::Loops = 100;
 
     double Worker::tab[nTab] = {0};
 
 }
+
+#include "yocto/string/conv.hpp"
 
 YOCTO_UNIT_TEST_IMPL(crew)
 {
@@ -77,8 +79,17 @@ YOCTO_UNIT_TEST_IMPL(crew)
     crew                 team;
     Worker               W;
 
-    W.Count = 10000;
-    W.Loops = 1000;
+    if( argc > 1 )
+    {
+        Worker::Count = strconv::to<size_t>(argv[1],"Count");
+    }
+
+    if( argc > 2 )
+    {
+        Worker::Loops = strconv::to<size_t>(argv[2],"Loops");
+    }
+
+
 
     timings tmx;
 
@@ -94,9 +105,11 @@ YOCTO_UNIT_TEST_IMPL(crew)
     const double ratio     = speed_par/speed_seq;
     {
         YOCTO_LOCK(team.access);
-        std::cerr << "\t (*) speed_seq = " << speed_seq << std::endl;
-        std::cerr << "\t (*) speed_par = " << speed_par << std::endl;
-        std::cerr << "\t (*)     ratio = " << ratio << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "\t (*) speed_seq  = " << speed_seq << std::endl;
+        std::cerr << "\t (*) speed_par  = " << speed_par << std::endl;
+        std::cerr << "\t (*)     ratio  = " << ratio << std::endl;
+        std::cerr << "\t (*) efficiency = " << (100.0*ratio)/team.size << " %" << std::endl;
     }
     
 }
