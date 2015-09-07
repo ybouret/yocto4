@@ -22,11 +22,13 @@ namespace yocto
 #if defined(YOCTO_BSD)
 			//! pthread
 			typedef pthread_t handle_t;
+            typedef pthread_t id_t;
 #endif
             
 #if defined(YOCTO_WIN)
 			//! win32
 			typedef HANDLE handle_t;
+            typedef DWORD  id_t;
 #endif
             
 			//! shared access
@@ -78,6 +80,8 @@ namespace yocto
 			friend class threads;
             
 			handle_t  handle;
+            id_t      identifier;
+
 			procedure proc;    //!< routine to start
 			void     *data;    //!< arguments for the routine
             

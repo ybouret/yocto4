@@ -18,12 +18,13 @@ namespace yocto
         thread:: thread( mutex &shared_access ) throw() :
         access(shared_access),
         handle(),
+        identifier(),
         proc(0),
         data(0),
         code(0),
         stop(true),
         next(0),
-        prev(0) //,hrid(&handle)
+        prev(0)
         {
         }
 
@@ -97,12 +98,12 @@ namespace yocto
         void thread:: clear() throw()
         {
             YOCTO_LOCK(access);
-            memset( &handle, 0, sizeof(handle) );
-            memset( &proc,   0, sizeof(proc)   );
-            memset( &data,   0, sizeof(data)   );
+            memset( &handle,     0, sizeof(handle) );
+            memset( &identifier, 0, sizeof(identifier));
+            memset( &proc,       0, sizeof(proc)   );
+            memset( &data,       0, sizeof(data)   );
             if(code.is_valid())  code->free();
             (bool&)stop = true;
-            //hrid = &handle;
         }
         
         //======================================================================
@@ -146,6 +147,7 @@ namespace yocto
                 clear();
 				throw libc::exception( res, "pthread_create" );
             }
+            identifier = handle;
             //------------------------------------------------------------------
             // </pthread>
             //------------------------------------------------------------------
@@ -156,13 +158,12 @@ namespace yocto
             // <win32>
             //------------------------------------------------------------------
             YOCTO_GIANT_LOCK();
-            DWORD id32 = 0;
 			handle = ::CreateThread(0 ,
                                     0 ,
                                     thread::entry,
                                     this,
                                     0,
-                                    & id32 );
+                                    & identifier );
 			if( NULL == handle )
 			{
 				const DWORD res = ::GetLastError();
@@ -174,7 +175,6 @@ namespace yocto
             //------------------------------------------------------------------
 #endif
             
-            //hrid = &handle;
         }
         
         //======================================================================
