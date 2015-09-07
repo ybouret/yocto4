@@ -12,7 +12,8 @@ namespace yocto
     {
 
         typedef uint32_t job_id;
-        
+
+        //! manage a given number of threads
         class engine : public layout
         {
         public:

@@ -214,8 +214,6 @@ ready(0)
 
 }
 
-#include "yocto/code/bin2name.hpp"
-
 namespace yocto
 {
     namespace threading
@@ -235,11 +233,9 @@ namespace yocto
             // Waiting for everyone to be ready
             //
             //__________________________________________________________________
+            const int thread_name = workers.get_index_of( thread::get_current_handle() );
             access.lock();
             ++(size_t&)ready;
-            const thread::handle_t         thread_handle = thread::get_current_handle();
-            const bin2id<thread::handle_t> thread_bin_id = &thread_handle;
-            const char                    *thread_name   = thread_bin_id.value;
             std::cerr << "[engine] Master name is " << thread_name << std::endl;
 
         WAIT_FOR_WORK_DONE:
@@ -298,11 +294,9 @@ namespace yocto
             // Waiting for all threads to be ready
             //
             //__________________________________________________________________
+            const int thread_name = workers.get_index_of( thread::get_current_handle() );
             access.lock();
             ++(size_t&)ready;
-            const thread::handle_t         thread_handle = thread::get_current_handle();
-            const bin2id<thread::handle_t> thread_bin_id = &thread_handle;
-            const char                    *thread_name   = thread_bin_id.value;
             std::cerr << "[engine] Worker name is " << thread_name << std::endl;
 
         WAIT_FOR_MORE_WORK:

@@ -9,9 +9,9 @@ namespace yocto
         access(id),
         pool()
         {
-            
+
         }
-        
+
         threads:: threads(const char *id, size_t n) throw() :
         core::list_of<thread>(),
         access(id),
@@ -19,14 +19,14 @@ namespace yocto
         {
             reserve(n);
         }
-        
+
         threads:: ~threads() throw()
         {
             finish();
             trim();
         }
-        
-        
+
+
         void threads:: finish( thread *thr ) throw()
         {
             assert(thr);
@@ -34,8 +34,8 @@ namespace yocto
             thr->finish();
             pool.store( unlink(thr) );
         }
-        
-        
+
+
         void threads:: finish() throw()
         {
             while(size)
@@ -45,17 +45,17 @@ namespace yocto
                 pool.store(thr);
             }
         }
-        
+
         void threads:: trim() throw()
         {
             while( pool.size ) thread::destruct( pool.query() );
         }
-        
+
         thread * threads:: query()
         {
             return pool.size ? pool.query() : thread::create_with(access);
         }
-        
+
         void threads:: launch( thread::procedure proc, void *data)
         {
             YOCTO_LOCK(access);
@@ -71,20 +71,34 @@ namespace yocto
                 throw;
             }
         }
-        
-        
+
+
         void threads:: reserve(size_t n)
         {
-			YOCTO_LOCK(access);
+            YOCTO_LOCK(access);
             while(n-->0) pool.store( thread::create_with(access) );
         }
-        
+
+        int threads:: get_index_of(const thread::handle_t h)  throw()
+        {
+            YOCTO_LOCK(access);
+            int i = 0;
+            for(const thread *t = head;t;t=t->next)
+            {
+                if(h == t->handle)
+                    return i;
+                ++i;
+            }
+            return -1;
+        }
+
+
         threads:: failsafe:: failsafe( threads &host ) throw() :
         auto_clean<threads>(host, & threads::finish )
         {
-            
+
         }
-        
+
         threads:: failsafe:: ~failsafe() throw()
         {
         }

@@ -114,7 +114,9 @@ namespace yocto
 				catch(...)  { pool.store(thr); throw; }
                 
             }
-            
+
+            int get_index_of(const thread::handle_t) throw();
+
 		private:
 			thread *query();
 			core::pool_of<thread> pool;
