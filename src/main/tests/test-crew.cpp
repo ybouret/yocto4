@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand32.hpp"
 #include "yocto/parallel/split.hpp"
+#include "yocto/sys/timings.hpp"
 
 using namespace yocto;
 using namespace threading;
@@ -16,6 +17,8 @@ namespace
         double        total;
         static size_t Count;
         static size_t Loops;
+        static const size_t nTab = 1024;
+        static double tab[nTab];
 
         explicit Worker() throw() :  total(0)
         {
@@ -46,15 +49,15 @@ namespace
             rand32_kiss r;
             r.seed(ctx.rank);
             double sum = 0;
-            for(size_t i=0;i<Loops;++i)
+            for(size_t j=0;j<len;++j)
             {
-                sum += r.get<double>();
+                for(size_t i=0;i<Loops;++i)
+                {
+                    sum += r.get<double>();
+                }
             }
 
-            {
-                YOCTO_LOCK(ctx.access);
-                total += sum;
-            }
+            tab[ctx.rank] = sum;
         }
 
     private:
@@ -62,6 +65,9 @@ namespace
     };
     size_t Worker::Count = 1;
     size_t Worker::Loops = 1;
+
+    double Worker::tab[nTab] = {0};
+
 }
 
 YOCTO_UNIT_TEST_IMPL(crew)
@@ -71,14 +77,26 @@ YOCTO_UNIT_TEST_IMPL(crew)
     crew                 team;
     Worker               W;
 
-    W.Count = 1000;
-    W.Count = 0;
+    W.Count = 10000;
+    W.Loops = 1000;
 
-    W.Exec(mono);
+    timings tmx;
 
-    for(int cycle=1;cycle<=1000;++cycle)
+    YOCTO_TIMINGS(tmx,2,W.Exec(mono));
+    const double speed_seq = tmx.speed;
     {
-        team(&W,&Worker::Exec);
+        YOCTO_LOCK(team.access);
+        std::cerr << "\t (*) speed_seq=" << speed_seq << std::endl;
+    }
+
+    YOCTO_TIMINGS(tmx,2,team(&W,&Worker::Exec));
+    const double speed_par = tmx.speed;
+    const double ratio     = speed_par/speed_seq;
+    {
+        YOCTO_LOCK(team.access);
+        std::cerr << "\t (*) speed_seq = " << speed_seq << std::endl;
+        std::cerr << "\t (*) speed_par = " << speed_par << std::endl;
+        std::cerr << "\t (*)     ratio = " << ratio << std::endl;
     }
     
 }

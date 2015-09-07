@@ -260,7 +260,7 @@ namespace yocto
             access.lock();         // lock access
             assert(size==ready);   // must be true here
             kproc = &K;            // local link
-            ready = 0;
+            ready = 0;             // global counter
             cycle.broadcast();     // would start all threads
             synch.wait(access);    // unlock access => start threads => come back LOCKED
             assert(size==ready);   // must be true here
