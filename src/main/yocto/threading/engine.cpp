@@ -31,7 +31,7 @@ CODE;                              \
 } while(false)
 
 #define Y_THREADING_ENGINE_CTOR() \
-workers("engine"),                \
+workers("engine",size),           \
 more_work(),                      \
 work_done(),                      \
 completed(),                      \
