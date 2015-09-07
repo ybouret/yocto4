@@ -61,12 +61,13 @@ namespace yocto
                 friend class engine;
             };
 
-            core::list_of<task> tasks;  //!< tasks to process
-            core::list_of<task> activ;  //!< running tasks
-            const size_t       &alive;  //!< activ.size
-            core::pool_of<task> tpool;  //!< pool of dangling tasks
-            job_id              juuid;  //!< for tasks labelling...
-            const size_t        ready;  //!< internal set-up flag
+            core::list_of<task> tasks;   //!< tasks to process
+            const size_t       &pending; //!< task.size
+            core::list_of<task> activ;   //!< running tasks
+            const size_t       &running;   //!< activ.size
+            core::pool_of<task> tpool;   //!< pool of dangling tasks
+            job_id              juuid;   //!< for tasks labelling...
+            const size_t        ready;   //!< internal set-up flag
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(engine);
 

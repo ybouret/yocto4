@@ -38,8 +38,9 @@ completed(),                      \
 access(workers.access),           \
 dying(false),                     \
 tasks(),                          \
+pending(tasks.size),              \
 activ(),                          \
-alive(activ.size),                \
+running(activ.size),              \
 tpool(),                          \
 juuid(1),                         \
 ready(0)
@@ -155,7 +156,7 @@ ready(0)
             //__________________________________________________________________
             (bool&)dying = true;
             std::cerr << "[engine] kill #pending_tasks=" << tasks.size << std::endl;
-            while(tasks.size>0)
+            while(pending>0)
             {
                 task *t = tasks.pop_back();
                 t->~task();
@@ -169,7 +170,7 @@ ready(0)
             // TODO: use flush mechanism...
             //__________________________________________________________________
             access.lock();
-            if(activ.size>0)
+            if(running>0)
             {
                 // at least one thread is running...
                 completed.wait(access);
@@ -255,7 +256,7 @@ namespace yocto
             //__________________________________________________________________
             if(dying)
             {
-                if(alive>0)
+                if(running>0)
                     goto WAIT_FOR_WORK_DONE;
                 std::cerr << "[engine] Master is done." << std::endl;
                 completed.broadcast();
@@ -264,13 +265,14 @@ namespace yocto
             }
 
             std::cerr << "[engine] work done. Remaining #tasks=" << tasks.size << "." << std::endl;
-            if(tasks.size)
+            if(pending)
             {
                 more_work.signal();
             }
             else
             {
-                if(alive<=0)
+                // no more pending tasks
+                if(running<=0)
                 {
                     std::cerr << "[engine] Completed !" << std::endl;
                     completed.broadcast();
@@ -322,7 +324,7 @@ namespace yocto
                 return;
             }
 
-            if(tasks.size>0)
+            if(pending>0)
             {
 
                 task *todo = tasks.pop_front(); // extract next task
@@ -389,7 +391,7 @@ namespace yocto
         void engine:: flush() throw()
         {
             access.lock();
-            if(alive>0)
+            if(pending>0 || running>0)
             {
                 completed.wait(access);
             }
