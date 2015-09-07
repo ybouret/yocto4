@@ -79,6 +79,10 @@ namespace yocto
 
             try
             {
+                {
+                    YOCTO_LOCK(access);
+                    std::cerr << "[crew] creating #thread=" << size << ", #ready=" << ready << std::endl;
+                }
                 //______________________________________________________________
                 //
                 // initializing threads
@@ -104,6 +108,7 @@ namespace yocto
                     {
                         if(ready>=size)
                         {
+                            assert(size==workers.size);
                             std::cerr << "[crew] synchronized !" << std::endl;
                             // main thread on root CPU
                             std::cerr << "[crew] assigning main thread:" << std::endl;
@@ -112,7 +117,7 @@ namespace yocto
                             // regular dispatch of workers
                             std::cerr << "[crew] assigning workers thread:" << std::endl;
                             size_t iThread = 0;
-                            for(thread *thr = workers.head; thr->next; thr=thr->next)
+                            for(thread *thr = workers.head; thr; thr=thr->next)
                             {
                                 std::cerr << "[crew] "; thr->on_cpu( cpu_index_of(iThread++) );
                             }
@@ -126,7 +131,6 @@ namespace yocto
                         }
                     }
                 }
-
 
             }
             catch(...)
@@ -192,7 +196,7 @@ namespace yocto
             // go to first synchronization
             //__________________________________________________________________
             access.lock();
-            //std::cerr << "[crew] init " << ctx.size << "." << ctx.rank << std::endl;
+            std::cerr << "[crew] init " << ctx.size << "." << ctx.rank << std::endl;
             ++ready;
 
             //__________________________________________________________________
@@ -219,9 +223,7 @@ namespace yocto
             //
             // Execute the current kernel
             //__________________________________________________________________
-            assert(ready>0);
             assert(kproc!=NULL);
-            --ready;
             access.unlock();
 
             try
@@ -258,6 +260,7 @@ namespace yocto
             access.lock();         // lock access
             assert(size==ready);   // must be true here
             kproc = &K;            // local link
+            ready = 0;
             cycle.broadcast();     // would start all threads
             synch.wait(access);    // unlock access => start threads => come back LOCKED
             assert(size==ready);   // must be true here
