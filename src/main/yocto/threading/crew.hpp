@@ -53,11 +53,12 @@ namespace yocto
             mutex            &access;  //!< shared access
 
         private:
-            condition         cycle;   //!< waiting for work
+            size_t            ready;    //!< for synchronyzation
+            condition         cycle;    //!< waiting for cycle
+            condition         synch;    //!< waiting for synch
             slots_of<context> contexts;
             const bool        dying;
-            size_t            ready;
-            
+
             void init();
             void quit() throw();
 

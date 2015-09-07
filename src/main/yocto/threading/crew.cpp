@@ -41,10 +41,12 @@ namespace yocto
 #define Y_THREADING_CREW_CTOR() \
 workers("crew",size),           \
 access(workers.access),         \
+ready(0),                       \
+cycle(),                        \
+synch(),                        \
 contexts(size),                 \
-dying(false),                   \
-ready(0)
-
+dying(false)
+        
         crew:: crew() : layout(),
         Y_THREADING_CREW_CTOR()
         {
@@ -152,7 +154,7 @@ namespace yocto
 
             //__________________________________________________________________
             //
-            // cycle on a dying crew...
+            // last cycle: on a dying crew...
             //__________________________________________________________________
             cycle.broadcast();
 
@@ -188,7 +190,7 @@ namespace yocto
             // go to first synchronization
             //__________________________________________________________________
             access.lock();
-            std::cerr << "[crew] init " << ctx.size << "." << ctx.rank << std::endl;
+            //std::cerr << "[crew] init " << ctx.size << "." << ctx.rank << std::endl;
             ++ready;
 
             //__________________________________________________________________
@@ -196,7 +198,7 @@ namespace yocto
             // wait on a LOCKED accces
             //__________________________________________________________________
         WAIT_FOR_CYCLE:
-            std::cerr << "[crew] " << ctx.size << "." << ctx.rank << ": waiting" << std::endl;
+            std::cerr << "[crew] " << ctx.size << "." << ctx.rank << ": waiting, #ready=" << ready << std::endl;
             cycle.wait(access);
 
             //__________________________________________________________________
