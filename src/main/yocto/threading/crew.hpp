@@ -5,6 +5,7 @@
 #include "yocto/threading/layout.hpp"
 #include "yocto/container/slots.hpp"
 #include "yocto/threading/condition.hpp"
+#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -13,6 +14,8 @@ namespace yocto
         class crew : public layout
         {
         public:
+
+            //! a context = range information for a worker
             class context
             {
             public:
@@ -31,6 +34,7 @@ namespace yocto
                 void        *priv;
             };
 
+            //! for testing sequential code
             class single_context : public faked_lock, public context
             {
             public:
@@ -45,7 +49,21 @@ namespace yocto
             explicit crew();
             explicit crew(const size_t num_cpus, const size_t cpu_start=0);
             virtual ~crew() throw();
-            
+
+
+            typedef functor<void,TL1(context&)> kernel;
+            void operator()(kernel &k) throw();
+
+            template <typename OBJECT_POINTER,typename METHOD_POINTER>
+            void operator()( OBJECT_POINTER h, METHOD_POINTER m )
+            {
+                crew   &self = *this;
+                kernel  k(h,m);
+                self(k);
+            }
+
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(crew);
             threads           workers; //!< all the threads
@@ -54,17 +72,18 @@ namespace yocto
 
         private:
             size_t            ready;    //!< for synchronyzation
+            const bool        dying;    //!< flag for dying...
+            kernel           *kproc;    //!< what to do for the current cycle
             condition         cycle;    //!< waiting for cycle
             condition         synch;    //!< waiting for synch
             slots_of<context> contexts;
-            const bool        dying;
 
             void init();
             void quit() throw();
 
 
             static void worker_call(void *) throw();
-            void        worker_loop(const context &ctx) throw();
+            void        worker_loop(context &ctx) throw();
         };
     };
 }

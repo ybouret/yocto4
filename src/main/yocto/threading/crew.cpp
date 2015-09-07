@@ -42,10 +42,11 @@ namespace yocto
 workers("crew",size),           \
 access(workers.access),         \
 ready(0),                       \
+dying(false),                   \
+kproc(0),                       \
 cycle(),                        \
 synch(),                        \
-contexts(size),                 \
-dying(false)
+contexts(size)
         
         crew:: crew() : layout(),
         Y_THREADING_CREW_CTOR()
@@ -115,7 +116,7 @@ namespace yocto
                             {
                                 std::cerr << "[crew] "; thr->on_cpu( cpu_index_of(iThread++) );
                             }
-
+                            std::cerr << "[crew] is ready!" << std::endl << std::endl;
                             access.unlock();
                             break;
                         }
@@ -139,8 +140,9 @@ namespace yocto
         void crew:: quit() throw()
         {
             access.lock();
-            std::cerr << "[crew] turing off..." << std::endl;
+            std::cerr << std::endl << "[crew] shuting down..." << std::endl;
             (bool&)dying = true;
+            kproc        = NULL;
             access.unlock();
 
             //__________________________________________________________________
@@ -170,7 +172,7 @@ namespace yocto
         {
             assert(args);
             context &Cntx  = *static_cast<context *>(args); assert(Cntx.priv);
-            crew    &Crew = *static_cast<crew    *>(Cntx.priv);
+            crew    &Crew  = *static_cast<crew    *>(Cntx.priv);
             Crew.worker_loop(Cntx);
         }
 
@@ -183,7 +185,7 @@ namespace yocto
 {
     namespace threading
     {
-        void crew:: worker_loop(const context &ctx) throw()
+        void crew:: worker_loop(context &ctx) throw()
         {
             //__________________________________________________________________
             //
@@ -198,7 +200,7 @@ namespace yocto
             // wait on a LOCKED accces
             //__________________________________________________________________
         WAIT_FOR_CYCLE:
-            std::cerr << "[crew] " << ctx.size << "." << ctx.rank << ": waiting, #ready=" << ready << std::endl;
+            //std::cerr << "[crew] " << ctx.size << "." << ctx.rank << ": waiting, #ready=" << ready << std::endl;
             cycle.wait(access);
 
             //__________________________________________________________________
@@ -207,6 +209,7 @@ namespace yocto
             //__________________________________________________________________
             if(dying)
             {
+                assert(NULL==kproc);
                 std::cerr << "[crew] end " << ctx.size << "." << ctx.rank << std::endl;
                 access.unlock();
                 return;
@@ -217,10 +220,26 @@ namespace yocto
             // Execute the current kernel
             //__________________________________________________________________
             assert(ready>0);
+            assert(kproc!=NULL);
             --ready;
+            access.unlock();
 
+            try
+            {
+                (*kproc)(ctx);
+            }
+            catch(...)
+            {
+                throw;
+            }
+
+            access.lock();
             ++ready;
-
+            //std::cerr << "[crew] ok " << ctx.size << "." << ctx.rank << std::endl;
+            if(ready>=size)
+            {
+                synch.broadcast();
+            }
             goto WAIT_FOR_CYCLE;
         }
 
@@ -229,4 +248,21 @@ namespace yocto
 
 }
 
+
+namespace yocto
+{
+    namespace threading
+    {
+        void crew:: operator()( kernel &K ) throw()
+        {
+            access.lock();         // lock access
+            assert(size==ready);   // must be true here
+            kproc = &K;            // local link
+            cycle.broadcast();     // would start all threads
+            synch.wait(access);    // unlock access => start threads => come back LOCKED
+            assert(size==ready);   // must be true here
+            access.unlock();       // and unlock for next cycle...
+        }
+    }
+}
 
