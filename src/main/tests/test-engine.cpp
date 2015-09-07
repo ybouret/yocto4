@@ -17,16 +17,13 @@ namespace {
     public:
         size_t    value;
         double    sum;
-        double    tmx;
         static   double secs;
 
-        Work( int v ) throw() : value(v),sum(0),tmx(0)  {}
+        inline  Work( int v ) throw() : value(v),sum(0) {}
+        inline ~Work() throw() {}
+        inline  Work( const Work &w ) throw() : value( w.value ), sum(w.sum) {}
 
-        ~Work() throw() {}
-
-        Work( const Work &w ) throw() : value( w.value ), sum(w.sum) {}
-
-        void operator()(lockable &access)
+        inline void operator()(lockable &access)
         {
             {
                 YOCTO_LOCK(access);
