@@ -2,7 +2,7 @@
 #define YOCTO_GFX_PARALLEL_INCLUDED 1
 
 #include "yocto/gfx/bitmap.hpp"
-#include "yocto/threading/server.hpp"
+#include "yocto/threading/engine.hpp"
 #include "yocto/parallel/setup.hpp"
 
 namespace yocto

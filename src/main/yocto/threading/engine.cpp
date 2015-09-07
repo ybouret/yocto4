@@ -258,13 +258,13 @@ namespace yocto
             {
                 if(running>0)
                     goto WAIT_FOR_WORK_DONE;
-                std::cerr << "[engine] Master is done." << std::endl;
+                std::cerr << "[engine] stop Master." << std::endl;
                 completed.broadcast();
                 access.unlock();
                 return;
             }
 
-            std::cerr << "[engine] work done. Remaining #tasks=" << tasks.size << "." << std::endl;
+            //std::cerr << "[engine] work done. Remaining #tasks=" << tasks.size << "." << std::endl;
             if(pending)
             {
                 more_work.signal();
@@ -274,7 +274,7 @@ namespace yocto
                 // no more pending tasks
                 if(running<=0)
                 {
-                    std::cerr << "[engine] Completed !" << std::endl;
+                    //std::cerr << "[engine] Completed !" << std::endl;
                     completed.broadcast();
                 }
             }
@@ -316,7 +316,7 @@ namespace yocto
             // worker is woken up, access is LOCKED
             //
             //__________________________________________________________________
-            std::cerr << "[engine] ===> " << thread_name <<  std::endl;
+            //std::cerr << "[engine] ===> " << thread_name <<  std::endl;
             if(dying)
             {
                 std::cerr << "[engine] stop " << thread_name << std::endl;

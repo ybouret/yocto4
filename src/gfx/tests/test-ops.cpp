@@ -16,7 +16,7 @@ namespace
     static inline double split_speed(pixmaps<uint8_t>   &ch,
                                      const pixmap3      &px,
                                      const size_t        cpus,
-                                     threading::server  *psrv)
+                                     threading::engine  *psrv)
     {
         timings tmx;
         YOCTO_TIMINGS(tmx, TMX,
@@ -31,7 +31,7 @@ namespace
     static inline double grad_speed(pixmaps<uint8_t>       &grad,
                                     const pixmaps<uint8_t> &data,
                                     const size_t            cpus,
-                                    threading::server      *psrv)
+                                    threading::engine      *psrv)
     {
         assert(grad.size==data.size);
         timings tmx;
@@ -53,7 +53,7 @@ namespace
     static inline double merge_speed(pixmap3                  &px,
                                      const pixmaps<uint8_t>   &ch,
                                      const size_t              cpus,
-                                     threading::server        *psrv)
+                                     threading::engine        *psrv)
     {
         timings tmx;
         YOCTO_TIMINGS(tmx, TMX,
@@ -79,7 +79,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
     //threading::SIMD simd;
 
-    threading::server psrv;
+    threading::engine psrv;
     if(argc>1)
     {
         const string         filename = argv[1];

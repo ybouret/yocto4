@@ -20,7 +20,7 @@ namespace
                       const pixmap<uint8_t> &data,
                       pixmap<double>        &G,
                       const size_t           cpus,
-                      threading::server     *psrv)
+                      threading::engine     *psrv)
     {
         wtime chrono;
         chrono.start();
@@ -51,7 +51,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
     
     //threading::SIMD simd;
 
-    threading::server psrv;
+    threading::engine psrv;
 
     if(argc>1)
     {

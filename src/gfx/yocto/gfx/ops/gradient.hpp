@@ -145,7 +145,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
             static void start(ipatches          &input,
                               pixmap<double>    &G,
                               const pixmap<T>   &data,
-                              threading::server *psrv)
+                              threading::engine *psrv)
             {
                 const size_t n = input.size;
                 // compute core
@@ -288,10 +288,10 @@ if(gg>Gmax) { Gmax = gg; }                       \
              - server is flushed...
              */
             template <typename T> inline
-            static double compute1(ipatches          &input,
-                                   pixmap<double>    &G,
-                                   const pixmap<T>   &data,
-                                   threading::server *psrv)
+            static double compute1(ipatches           &input,
+                                   pixmap<double>     &G,
+                                   const pixmap<T>    &data,
+                                   threading::engine  *psrv)
             {
                 start(input, G, data, psrv);
                 double Gmax = borders(G,data);
@@ -320,7 +320,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
                                  pixmap<T>            &grad,
                                  const pixmap<double> &G,
                                  const double          Gmax,
-                                 threading::server    *psrv)
+                                 threading::engine    *psrv)
             {
                 const size_t n = output.size;
                 if(Gmax>0)
@@ -362,7 +362,7 @@ if(gg>Gmax) { Gmax = gg; }                       \
             template <typename T> inline
             static void compute(pixmap<T>         &grad,
                                 const pixmap<T>   &data,
-                                threading::server *psrv)
+                                threading::engine *psrv)
             {
                 assert(grad.w==data.w);
                 assert(grad.h==data.h);

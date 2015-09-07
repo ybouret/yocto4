@@ -112,7 +112,7 @@ namespace yocto
 
                 inline void split(pixmaps<T>          &ch,
                                   const pixmap<color> &px,
-                                  threading::server   *psrv)
+                                  threading::engine   *psrv)
                 {
                     dynamic_slots<iopatch> &pp = *this;
                     assert(ch.w==px.w);
@@ -151,7 +151,7 @@ namespace yocto
 
                 inline void merge(pixmap<color>       &px,
                                   const pixmaps<T>    &ch,
-                                  threading::server   *psrv)
+                                  threading::engine   *psrv)
                 {
                     dynamic_slots<iopatch> &pp = *this;
                     assert(ch.w==px.w);
