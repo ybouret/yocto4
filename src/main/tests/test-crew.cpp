@@ -1,7 +1,7 @@
 #include "yocto/threading/crew.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand32.hpp"
-#include "yocto/parallel/split.hpp"
+#include "yocto/parallel/basic.hpp"
 #include "yocto/sys/timings.hpp"
 
 using namespace yocto;
@@ -37,7 +37,7 @@ namespace
 
             size_t ini = 0;
             size_t len = Count;
-            parallel::split::compute1D(ctx.rank, ctx.size, ini, len);
+            ctx.split(ini,len);
 
             if(false)
             {

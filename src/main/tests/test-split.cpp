@@ -45,9 +45,9 @@ YOCTO_UNIT_TEST_IMPL(split)
         slots_of<patch1D> patches;
         setup_patches(patches,size,p1);
         std::cerr << "#PATCH=" << patches.size << std::endl;
-        for(size_t i=1;i<=patches.size;++i)
+        for(size_t i=0;i<patches.size;++i)
         {
-            std::cerr << "\t" << size << "." << i-1  << " : " << patches[i] << std::endl;
+            std::cerr << "\t" << size << "." << i  << " : " << patches[i] << std::endl;
         }
 
     }
@@ -76,9 +76,9 @@ YOCTO_UNIT_TEST_IMPL(split)
         slots_of<patch2D> patches;
         setup_patches(patches,size,p2);
         std::cerr << "#PATCH=" << patches.size << std::endl;
-        for(size_t i=1;i<=patches.size;++i)
+        for(size_t i=0;i<patches.size;++i)
         {
-            std::cerr << "\t" << size << "." << i-1  << " : " << patches[i] << std::endl;
+            std::cerr << "\t" << size << "." << i  << " : " << patches[i] << std::endl;
         }
 
     }

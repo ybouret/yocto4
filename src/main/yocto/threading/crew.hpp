@@ -6,6 +6,7 @@
 #include "yocto/container/slots.hpp"
 #include "yocto/threading/condition.hpp"
 #include "yocto/functor.hpp"
+#include "yocto/parallel/basic.hpp"
 
 namespace yocto
 {
@@ -28,6 +29,14 @@ namespace yocto
                 const size_t size;   //!< how many contextes
                 lockable    &access; //!< shared access
                 const size_t indx;   //!< 1-size
+
+                template <typename T> inline
+                void split(T &offset,T &length) const throw()
+                {
+                    parallel::basic_split<T>(rank, size, offset, length);
+                }
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(context);
                 friend class crew;

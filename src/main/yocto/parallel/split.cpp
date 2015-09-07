@@ -1,5 +1,6 @@
 #include "yocto/parallel/split.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/parallel/basic.hpp"
 
 namespace yocto
 {
@@ -21,7 +22,7 @@ namespace yocto
             unit_t xoff = offset;
             unit_t xlen = length;
             assert(unit_t(cores)<=xlen);
-            split::compute1D(rank, cores, xoff, xlen);assert(xlen>0);
+            basic_split(rank, cores, xoff, xlen);assert(xlen>0);
             return patch1D(xoff,xoff+xlen-1);
         }
 
@@ -162,8 +163,8 @@ namespace yocto
             unit_t yoffset = offset.y;
             unit_t ylength = length.y;
 
-            compute1D(xrank, xsize,xoffset,xlength); assert(xlength>0);
-            compute1D(yrank, ysize,yoffset,ylength); assert(ylength>0);
+            basic_split(xrank, xsize,xoffset,xlength); assert(xlength>0);
+            basic_split(yrank, ysize,yoffset,ylength); assert(ylength>0);
 
             return patch2D( coord2D(xoffset,yoffset), coord2D(xoffset+xlength-1,yoffset+ylength-1));
         }
