@@ -1,4 +1,5 @@
 #include "yocto/threading/threads.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -82,11 +83,14 @@ namespace yocto
         int threads:: get_index_of(const thread::handle_t h)  throw()
         {
             YOCTO_LOCK(access);
+			std::cerr << "GetHandleIndex for " << h << std::endl;
             int i = 0;
             for(const thread *t = head;t;t=t->next)
             {
                 if(h == t->handle)
+				{
                     return i;
+				}
                 ++i;
             }
             return -1;

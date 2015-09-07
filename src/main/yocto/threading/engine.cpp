@@ -300,6 +300,7 @@ namespace yocto
             access.lock();
             ++(size_t&)ready;
             std::cerr << "[engine] Worker ID=" << thread_name << std::endl;
+			
 
         WAIT_FOR_MORE_WORK:
             //__________________________________________________________________
