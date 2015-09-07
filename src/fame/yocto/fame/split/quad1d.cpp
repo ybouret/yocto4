@@ -1,5 +1,5 @@
 #include "yocto/fame/split/quad1d.hpp"
-#include "yocto/parallel/split.hpp"
+#include "yocto/parallel/basic.hpp"
 #include "yocto/exceptions.hpp"
 
 #include <cerrno>
@@ -56,7 +56,7 @@ namespace yocto
             //
             // load balancing
             //__________________________________________________________________
-            parallel::split::compute1D(rank, size, offset, length);
+            parallel::basic_split(rank, size, offset, length);
             assert(length>0);
             
             //__________________________________________________________________
