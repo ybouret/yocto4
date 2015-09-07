@@ -23,7 +23,7 @@ namespace yocto
                 context(const size_t    the_rank,
                         const size_t    the_size,
                         lockable       &the_lock) throw();
-                ~context() throw();
+                virtual ~context() throw();
                 
                 const size_t rank;   //!< 0-size-1
                 const size_t size;   //!< how many contextes
