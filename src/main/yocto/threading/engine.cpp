@@ -70,7 +70,7 @@ ready(0)
 
             {
                 YOCTO_LOCK(access);
-                std::cerr << "[engine] initialize" << std::endl;
+                std::cerr << "[engine] initializing..." << std::endl;
             }
 
             try
@@ -126,7 +126,7 @@ ready(0)
                             }
 
                             // last thread is master, on root CPU, doesn't work a lot
-                            std::cerr << "[engine] assigning MASTER thread:" << std::endl;
+                            std::cerr << "[engine] assigning Master thread:" << std::endl;
                             std::cerr << "[engine] "; workers.tail->on_cpu( cpu_index_of(0) );
 
                             std::cerr << "[engine] ready." << std::endl << std::endl;
@@ -149,13 +149,13 @@ ready(0)
 
             access.lock();
             std::cerr << std::endl;
-            std::cerr << "[engine] turning off !" << std::endl;
+            std::cerr << "[engine] turning off..." << std::endl;
             //__________________________________________________________________
             //
             // remove pending tasks
             //__________________________________________________________________
             (bool&)dying = true;
-            std::cerr << "[engine] kill #pending_tasks=" << tasks.size << std::endl;
+            std::cerr << "[engine] kill #pending=" << pending << std::endl;
             while(pending>0)
             {
                 task *t = tasks.pop_back();
@@ -194,7 +194,7 @@ ready(0)
 
             while(tpool.size>0) object::release1<task>(tpool.query());
 
-            Y_LOCKED_ENGINE(std::cerr << "[engine] ...and done!" << std::endl);
+            Y_LOCKED_ENGINE(std::cerr << "[engine] halted." << std::endl);
         }
 
 
@@ -237,7 +237,7 @@ namespace yocto
             const int thread_name = workers.get_index_of( thread::get_current_handle() );
             access.lock();
             ++(size_t&)ready;
-            std::cerr << "[engine] Master name is " << thread_name << std::endl;
+            std::cerr << "[engine] Master ID=" << thread_name << std::endl;
 
         WAIT_FOR_WORK_DONE:
             //__________________________________________________________________
@@ -299,7 +299,7 @@ namespace yocto
             const int thread_name = workers.get_index_of( thread::get_current_handle() );
             access.lock();
             ++(size_t&)ready;
-            std::cerr << "[engine] Worker name is " << thread_name << std::endl;
+            std::cerr << "[engine] Worker ID=" << thread_name << std::endl;
 
         WAIT_FOR_MORE_WORK:
             //__________________________________________________________________
@@ -319,7 +319,7 @@ namespace yocto
             //std::cerr << "[engine] ===> " << thread_name <<  std::endl;
             if(dying)
             {
-                std::cerr << "[engine] stop " << thread_name << std::endl;
+                std::cerr << "[engine] stop Worker " << thread_name << std::endl;
                 access.unlock();
                 return;
             }
