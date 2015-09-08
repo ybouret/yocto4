@@ -9,26 +9,6 @@ namespace yocto
     {
         struct split
         {
-#if 0
-            template <typename T> inline
-            static  void compute1D(size_t rank,
-                                   size_t size,
-                                   T     &offset,
-                                   T     &length) throw()
-            {
-                assert(size>0);
-                assert(rank<size);
-                //assert(length>=0);
-                T todo(length/size);
-                for(size_t r=1;r<=rank;++r)
-                {
-                    length -= todo;
-                    offset += todo;
-                    todo    = length/(size-r);
-                }
-                length = todo;
-            }
-#endif
             
             //! setting up 1D splitter
             class in1D
