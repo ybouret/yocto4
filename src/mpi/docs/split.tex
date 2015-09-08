@@ -11,28 +11,36 @@
 \title{Regular splitting of quad meshes}
 \maketitle
 We have a 2D box with lengths $L_x,L_x$ and
-we want to split the layout with $N$ cores, under the assumption
-of fully periodic boundary conditions. The computation
+we want to split the layout with $N$ regions, under the assumption
+of fully periodic boundary conditions.\\
+ The computation
 that we want to carry out depends on both the size of
-a subregion and the time to transfer information between two
-regions.
+a region and the time to transfer information between two
+regions.\\
 We assume that $\alpha$ is the time to transfer the needed data 
 between two regions \emph{per unit of length}, and
 we neglect the local copy times.
 The sequential compute time is $\tau$.
-If we split along $X$, we have a compute time of
+\begin{itemize}
+\item If we split along $X$, we have a compute time of
 \begin{equation}
-	\Theta_x = \dfrac{\tau}{N} + 4\alpha L_y.
+	\Theta_x = \dfrac{\tau}{N} + 4\alpha L_y,
 \end{equation}
-If we split along $Y$, we have a compute time of
+the factor $4$ arising from two send, two receive operations...
+
+\item If we split along $Y$, we have a compute time of
 \begin{equation}
 	\Theta_y = \dfrac{\tau}{N} + 4\alpha L_x
 \end{equation}
+\end{itemize}
+
 We remark that
 \begin{equation}
 	\Theta_x - \Theta_y = 4\alpha\left(L_y-L_x\right),
 \end{equation}
-so we would always split in the largest direction.
+so we would always split in the largest direction.\\
+
+
 If we split along $XY$ with $N=n_x \times n_y$ and $n_x>1,n_y>1$ (otherwise we are linear),
 we get the compute time of
 \begin{equation}
