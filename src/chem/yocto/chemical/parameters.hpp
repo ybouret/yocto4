@@ -18,6 +18,7 @@ namespace yocto
             explicit parameters(const library &user_lib,
                                 const char   *names[],
                                 const size_t  num_names);
+            explicit parameters(const library &user_lib,const array<string> &names);
             virtual ~parameters() throw();
             
             const size_t   count;
@@ -36,6 +37,9 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(parameters);
             index_db db;
+
+            void __create(const string &id,const size_t ii);
+            
         };
         
     }

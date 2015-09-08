@@ -10,7 +10,20 @@ namespace yocto
         {
             lib.decrease();
         }
-        
+
+
+        void parameters:: __create(const string &id,const size_t ii)
+        {
+            if(id.length()<=0)
+                throw exception("parameters: empty name #%u", unsigned(ii));
+            const size_t the_index = lib.size() + db.size() + 1;
+            if( !db.insert(id,the_index))
+            {
+                throw exception("parameters: multiple name '%s'", id.c_str());
+            }
+
+        }
+
         parameters:: parameters(const library &user_lib,
                                 const char    *names[],
                                 const size_t   num_names) :
@@ -25,19 +38,29 @@ namespace yocto
                 for(size_t i=0;i<count;++i)
                 {
                     const string id = names[i];
-                    if(id.length()<=0)
-                        throw exception("parameters: empty name #%u", unsigned(i));
-                    const size_t the_index = lib.size() + db.size() + 1;
-                    if( !db.insert(id,the_index))
-                    {
-                        throw exception("parameters: multiple name '%s'", id.c_str());
-                    }
+                    __create(id,i);
                 }
             }
-            
             lib.increase();
         }
-        
+
+        parameters:: parameters(const library &user_lib,
+                                const array<string> &names) :
+        count(names.size()),
+        lib(user_lib),
+        nvar(count+lib.size()),
+        db(count,as_capacity)
+        {
+
+            for(size_t i=1;i<=count;++i)
+            {
+                const string &id = names[i];
+                __create(id,i);
+            }
+            lib.increase();
+        }
+
+
         parameters::iterator parameters:: begin() const throw()
         {
             return db.begin();

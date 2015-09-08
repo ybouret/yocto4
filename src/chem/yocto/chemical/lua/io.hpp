@@ -16,7 +16,7 @@ namespace yocto
         struct __lua
         {
             
-            //! register Psi, EllipsoidSurface and EllipsoidVolume
+            //! register Psi, EllipsoidSurface and EllipsoidVolume, R and F
             static void register_functions(lua_State *L);
             
             //__________________________________________________________________
