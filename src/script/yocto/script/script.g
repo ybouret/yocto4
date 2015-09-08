@@ -16,12 +16,20 @@ termExpression : (PLUS|MINUS)? multExpression ((PLUS|MINUS)  multExpression)*;
 multExpression : expnExpression ( (MUL|DIV|MOD) expnExpression )*;
 expnExpression : value ( EXPN value)*;
 tuple          : termExpression ( ',' termExpression )*;
-function       : identifier LPAREN tuple RPAREN;
 
-// write value + grouping
-value : real | hexadecimal | integer | function | identifier | LPAREN termExpression RPAREN;
+$no_single : termExpression multExpression expnExpression tuple;
+$one_level : termExpression multExpression expnExpression tuple;
+//______________________________________________________________________________
+//
+// Terminals (+grouping)
+//______________________________________________________________________________
+function : identifier LPAREN tuple RPAREN;
+value    : real | hexadecimal | integer | function | identifier | LPAREN termExpression RPAREN;
 
+//______________________________________________________________________________
+//
 // symbols
+//______________________________________________________________________________
 PLUS  : '+';
 MINUS : '-';
 
@@ -39,13 +47,12 @@ SEMICOLON   : ';';
 hexadecimal : "0x[:xdigit:]+";
 integer     : "[:digit:]+";
 real        : "[:digit:]*[.][:digit:]+";
-identifier  : "[_[:word:]][:word:]*";
+identifier  : "[_[:word:]][:word:]*"   ;
 
-// modifier
-$no_single: termExpression multExpression expnExpression tuple;
-$one_level: tuple;
-
-// lexical rules
+//______________________________________________________________________________
+//
+//lexical rules
+//______________________________________________________________________________
 //@string : "cstring";
 @drop   : "[:blank:]";
 @endl   : "[:endl:]";
