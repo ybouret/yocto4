@@ -97,9 +97,10 @@ YOCTO_UNIT_TEST_IMPL(engine)
     const double tpar = chrono.query();
     {
         YOCTO_LOCK(Q.access);
-        std::cerr << "\t (*) tseq = " << tseq      << std::endl;
-        std::cerr << "\t (*) tpar = " << tpar      << std::endl;
-        std::cerr << "\t (*) ratio= " << tseq/tpar << std::endl;
+        std::cerr << "\t (*) tseq       = " << tseq      << std::endl;
+        std::cerr << "\t (*) tpar       = " << tpar      << std::endl;
+        std::cerr << "\t (*) ratio      = " << tseq/tpar << std::endl;
+        std::cerr << "\t (*) efficiency = " << (100.0*tseq)/(Q.size*tpar) << "%" << std::endl;
     }
     {
         YOCTO_LOCK(Q.access);
