@@ -19,12 +19,13 @@ namespace {
     {
     public:
         static const char  *p_names[];
-        static const size_t p_count;
+        static const char  *p_loads[];
+        static const size_t p_num;
 
         __lua::Library    lib;
         __lua::Equilibria eqs;
         __lua::Effectors  edb;
-        parameters        params;
+        variables         params;
         const size_t      nvar;
         vector<double>    C0;
         vector<double>    Cout;
@@ -37,8 +38,8 @@ namespace {
         lib( L, "species"),
         eqs( L, "eqs", lib),
         edb( L, "eff" ),
-        params(lib,p_names,p_count),
-        nvar( lib.size() + params.count ),
+        params(lib,p_names,p_loads,p_num),
+        nvar( params.count ),
         C0(nvar,0),
         Cout(nvar,0),
         diffeq(this, & ChemSys::rate ),
@@ -93,9 +94,9 @@ namespace {
             {
                 fp << " [" << (*i)->name << "]";
             }
-            for( parameters::iterator i=params.begin();i!=params.end();++i)
+            for( variables::iterator i=params.begin();i!=params.end();++i)
             {
-                fp << " " << i->key;
+                fp << " " << (**i).name;
             }
             fp("\n");
         }
@@ -133,8 +134,9 @@ namespace {
         YOCTO_DISABLE_COPY_AND_ASSIGN(ChemSys);
     };
 
-    const char * ChemSys:: p_names[] = { "zeta", "V"  };
-    const size_t ChemSys:: p_count   = sizeof(ChemSys:: p_names)/sizeof(ChemSys:: p_names[0]);
+    const char * ChemSys:: p_names[] = { "Em", "V"  };
+    const char * ChemSys:: p_loads[] = { "Em0", "volume" };
+    const size_t ChemSys:: p_num     = sizeof(ChemSys:: p_names)/sizeof(ChemSys:: p_names[0]);
 
 }
 

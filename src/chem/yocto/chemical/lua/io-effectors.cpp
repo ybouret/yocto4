@@ -33,7 +33,7 @@ namespace yocto
                           const double         t,
                           const array<double> &Cin,
                           const array<double> &Cout,
-                          const parameters    &params)
+                          const variables     &params)
                 {
                     lua_settop(L,0);
                     

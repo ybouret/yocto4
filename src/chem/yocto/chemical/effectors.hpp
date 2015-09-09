@@ -1,7 +1,8 @@
 #ifndef YOCTO_CHEMICAL_EFFECTORS_INCLUDED
 #define YOCTO_CHEMICAL_EFFECTORS_INCLUDED 1
 
-#include "yocto/chemical/parameters.hpp"
+//#include "yocto/chemical/parameters.hpp"
+#include "yocto/chemical/variables.hpp"
 #include "yocto/sequence/vector.hpp"
 
 namespace yocto
@@ -25,10 +26,10 @@ namespace yocto
                               const double         t,
                               const array<double> &Cin,
                               const array<double> &Cout,
-                              const parameters    &params) = 0;
+                              const variables     &params) = 0;
 
             //! multiply rho[1..params.lib.size] by pace
-            void update(array<double> &rho, const parameters &params) const throw();
+            void update(array<double> &rho, const variables &params) const throw();
 
             friend std::ostream & operator<<( std::ostream &, const effector &);
 
@@ -50,7 +51,7 @@ namespace yocto
                       const double         t,
                       const array<double> &Cin,
                       const array<double> &Cout,
-                      const parameters    &params);
+                      const variables     &params);
             
             effector & operator[](const string &name );
             effector & operator[](const char   *name );

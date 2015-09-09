@@ -17,7 +17,7 @@ namespace yocto
         
         const string & effector:: key() const throw() { return name; }
         
-        void effector:: update( array<double> &rho, const parameters &params) const throw()
+        void effector:: update( array<double> &rho, const variables &params) const throw()
         {
             assert(rho.size()>=params.lib.size());
             for(size_t j=params.lib.size();j>0;--j)
@@ -58,7 +58,7 @@ namespace yocto
                              const double         t,
                              const array<double> &Cin,
                              const array<double> &Cout,
-                             const parameters    &params)
+                             const variables     &params)
         {
             const size_t M = params.lib.size(); assert(rho.size()>=M);
             _rho.make(M,0.0);

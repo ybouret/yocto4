@@ -76,8 +76,11 @@ namespace yocto
             // parameters API
             //__________________________________________________________________
             //! push a table of parameters from the variables
-            static void push( lua_State *L, const array<double> &variables, const parameters &parameters);
-            
+            static void push( lua_State *L, const array<double> &A, const variables &params);
+
+            //! load values from params loading name
+            static void load( lua_State *L, array<double> &A, const variables &params);
+
             //__________________________________________________________________
             //
             // effectors API

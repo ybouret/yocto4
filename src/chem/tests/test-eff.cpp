@@ -36,7 +36,8 @@ YOCTO_UNIT_TEST_IMPL(eff)
     
     eqs.compile_for(lib);
     std::cerr << "Nu=" << eqs.Nu << std::endl;
-    
+
+#if 0
     const char *pname[] = { "zeta", "V" };
     
     parameters params(lib,pname,sizeof(pname)/sizeof(pname[0]));
@@ -76,7 +77,7 @@ YOCTO_UNIT_TEST_IMPL(eff)
     edb.rate(rho, 0.0, S, Sout, params);
     std::cerr << "rho=" << rho << std::endl;
     edb["Soude"].pace = 2.0;
-    
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()

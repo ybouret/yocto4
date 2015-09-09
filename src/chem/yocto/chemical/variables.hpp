@@ -64,6 +64,8 @@ namespace yocto
             const size_t   count; //!< lib.size() + db.size()
             const size_t   extra;
 
+            friend  std::ostream & operator<<( std::ostream &os, const variables &);
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(variables);
             variable::db db;

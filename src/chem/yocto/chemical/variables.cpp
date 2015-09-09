@@ -65,6 +65,7 @@ namespace yocto
 
 #define YCHEM_VARIABLES_CTOR(N) \
 lib(a_lib), count(lib.size()),extra(0),db(N,as_capacity)
+        
         variables:: variables(const library &a_lib,
                               const char    *names[],
                               const char    *loads[],
@@ -106,7 +107,20 @@ lib(a_lib), count(lib.size()),extra(0),db(N,as_capacity)
             ++(size_t&)count;
             ++(size_t&)extra;
         }
-        
+
+
+        std::ostream & operator<<( std::ostream &os, const variables &params)
+        {
+            os << "<" << std::endl;
+            for(variables::iterator i=params.begin();i!=params.end();++i)
+            {
+                const variable &v = **i;
+                os << " " << v.name << " @ " << v.indx << std::endl;
+            }
+            os << ">";
+            return os;
+        }
+
     }
     
 }

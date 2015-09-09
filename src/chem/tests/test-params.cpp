@@ -23,10 +23,10 @@ YOCTO_UNIT_TEST_IMPL(params)
     
     __lua::load(L, lib, "species");
     std::cerr << "lib=" << lib << std::endl;
-    
-    const char *pname[] = { "zeta", "V" };
-    
-    parameters params(lib,pname,sizeof(pname)/sizeof(pname[0]));
+
+    const char *pname[] = { "Em", "V" };
+    const char *pload[] = { "Em0", "volume" };
+    variables   params(lib,pname,pload,sizeof(pname)/sizeof(pname[0]));
     
     std::cerr << "params=" << params << std::endl;
     
@@ -52,7 +52,6 @@ YOCTO_UNIT_TEST_IMPL(params)
         if(lib.has("H+"))
             std::cerr << "pH=" << lib.pH(S) << std::endl;
     }
-
     
 }
 YOCTO_UNIT_TEST_DONE()
