@@ -25,7 +25,12 @@ namespace yocto
                 rho[j] *= pace;
             }
         }
-        
+
+        std::ostream & operator<<( std::ostream &os, const effector &eff)
+        {
+            os << " (*) " << eff.name;
+            return os;
+        }
         
     }
     
@@ -100,7 +105,20 @@ namespace yocto
             }
         }
 
+        std::ostream & operator<<( std::ostream &os, const effectors &eff)
+        {
+            os << " (************************)" << std::endl;
+            for( effectors::const_iterator i = eff.begin(); i != eff.end(); ++i)
+            {
+                os << **i << std::endl;
+            }
+            os << " (************************)";
+            return os;
+        }
+
+
+
     }
-    
+
 }
 

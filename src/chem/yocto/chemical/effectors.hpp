@@ -26,9 +26,12 @@ namespace yocto
                               const array<double> &Cin,
                               const array<double> &Cout,
                               const parameters    &params) = 0;
-            
+
+            //! multiply rho[1..params.lib.size] by pace
             void update(array<double> &rho, const parameters &params) const throw();
-            
+
+            friend std::ostream & operator<<( std::ostream &, const effector &);
+
         protected:
             explicit effector(const string &id);
             
@@ -53,7 +56,10 @@ namespace yocto
             effector & operator[](const char   *name );
 
             void rescale_pace( const double speedup ) throw();
-            
+
+            friend std::ostream & operator<<( std::ostream &, const effectors &);
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(effectors);
             vector<double> _rho;
