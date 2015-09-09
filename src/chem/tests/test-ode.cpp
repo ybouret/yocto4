@@ -134,8 +134,8 @@ namespace {
         YOCTO_DISABLE_COPY_AND_ASSIGN(ChemSys);
     };
 
-    const char * ChemSys:: p_names[] = { "Em", "V"  };
-    const char * ChemSys:: p_loads[] = { "Em0", "volume" };
+    const char * ChemSys:: p_names[] = { "zeta",  "V"  };
+    const char * ChemSys:: p_loads[] = { "zeta0", "volume" };
     const size_t ChemSys:: p_num     = sizeof(ChemSys:: p_names)/sizeof(ChemSys:: p_names[0]);
 
 }

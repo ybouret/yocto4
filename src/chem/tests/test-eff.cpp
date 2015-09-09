@@ -37,19 +37,19 @@ YOCTO_UNIT_TEST_IMPL(eff)
     eqs.compile_for(lib);
     std::cerr << "Nu=" << eqs.Nu << std::endl;
 
-#if 0
-    const char *pname[] = { "zeta", "V" };
-    
-    parameters params(lib,pname,sizeof(pname)/sizeof(pname[0]));
+#if 1
+    const char *pname[] = { "zeta",  "V" };
+    const char *pload[] = { "zeta0", "volume" };
+
+    variables params(lib,pname,pload,sizeof(pname)/sizeof(pname[0]));
     std::cerr << "params=" << params << std::endl;
 
-    const size_t nvar = params.nvar;
+    const size_t nvar = params.count;
     vector_t S(nvar,0);
     
     {
         boot loader;
         
-        loader.electroneutrality(lib);
         __lua::load(L,loader, ini_name, lib);
         
         std::cerr << loader << std::endl;
