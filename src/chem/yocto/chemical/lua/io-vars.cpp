@@ -35,13 +35,17 @@ namespace yocto
                 const variable &v  = **i;
                 const string   &ld = v.load;
                 assert(v.indx>0);assert(v.indx<=A.size());
+                std::cerr << "\t|_Loading variable '" << v.name << "' with '" << v.load << "' @" << v.indx << std::endl;
                 lua_settop(L, 0);
                 lua_getglobal(L,ld.c_str());
                 if( !lua_isnumber(L, -1) )
                 {
                     throw exception("loading '%s': '%s' is not a number", v.name.c_str(), v.load.c_str());
                 }
+                A[v.indx] = lua_tonumber(L, -1);
+                std::cerr << "\t  \\__" << A[v.indx] << std::endl;
                 lua_settop(L,0);
+
             }
         }
 
