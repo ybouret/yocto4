@@ -98,7 +98,17 @@ namespace yocto
                 YOCTO_TAO_LOOP(a.size(),SHIFT);
 #undef  Y_TAO_SHIFT
             }
-            
+
+
+            //! a *= x;
+            template <typename ARR>
+            static inline void mulby(typename ARR::param_type x, ARR &a ) throw()
+            {
+#define Y_TAO_MULBY(I) a[I] *= x
+                YOCTO_TAO_LOOP(a.size(),MULBY);
+#undef Y_TAO_MULBY
+            }
+
             //! a = x*b
             template<typename ARR, typename BRR>
             static inline void mulset( ARR &a, typename ARR::param_type x, const BRR &b ) throw()
