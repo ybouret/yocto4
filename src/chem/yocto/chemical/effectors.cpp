@@ -28,7 +28,7 @@ namespace yocto
 
         std::ostream & operator<<( std::ostream &os, const effector &eff)
         {
-            os << " (*) " << eff.name;
+            os << " (*) " << eff.name << ", pace=" << eff.pace;
             return os;
         }
         
