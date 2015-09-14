@@ -1,1 +1,2 @@
+#example
 YOCTO_EXCLUDE="lang script kr net mpa mk gems lua++ z++ bz2++ mpi ocl gfx json chem visit fltk fame python tiff++ lua lzo z bz2 png jpeg sqlite"
