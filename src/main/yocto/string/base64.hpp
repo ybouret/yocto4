@@ -75,8 +75,8 @@ namespace yocto
             mutable encoder Encoder;
             mutable decoder Decoder;
 
-            string Encode(const string &) const;
-            string Decode(const string &) const;
+            string Encode(const memory::ro_buffer &) const;
+            string Decode(const memory::ro_buffer &) const;
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(IO);

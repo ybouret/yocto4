@@ -61,8 +61,10 @@ namespace yocto
 
             //! load from input
             static pattern *load( ios::istream &fp );
-
-
+            static pattern *load( const void *data, const size_t size );
+            static pattern *load( const memory::ro_buffer &);
+            static pattern *load64( const memory::ro_buffer &);
+            
         protected:
             explicit pattern(uint32_t ID) throw();
             pattern(const pattern &) throw();

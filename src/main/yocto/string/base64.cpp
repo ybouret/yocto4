@@ -297,11 +297,12 @@ namespace yocto
 
     const char base64::IO:: name[] = "base64";
 
-    string base64::IO:: Encode(const string &s) const
+    string base64::IO:: Encode(const memory::ro_buffer &buff) const
     {
         string ans;
         Encoder.clear();
-        const size_t n = s.size();
+        const size_t n = buff.length();
+        const char  *s = (const char *)(buff.ro());
         char         C = 0;
         for(size_t i=0;i<n;++i)
         {
@@ -313,11 +314,12 @@ namespace yocto
         return ans;
     }
 
-    string base64::IO:: Decode(const string &s) const
+    string base64::IO:: Decode(const memory::ro_buffer &buff) const
     {
         string ans;
         Decoder.clear();
-        const size_t n = s.size();
+        const size_t n = buff.length();
+        const char  *s = (const char *)(buff.ro());
         char         C = 0;
         for(size_t i=0;i<n;++i)
         {
