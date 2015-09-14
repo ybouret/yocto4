@@ -55,7 +55,13 @@ namespace yocto
 
             //! get a portable binary code
             string  compiled() const;
-            
+
+            //! get a portable base64 code
+            string  toBase64() const;
+
+            //! load from input
+            static pattern *load( ios::istream &fp );
+
 
         protected:
             explicit pattern(uint32_t ID) throw();

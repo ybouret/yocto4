@@ -80,6 +80,7 @@ namespace yocto
 }
 
 #include "yocto/ios/osstream.hpp"
+#include "yocto/string/base64.hpp"
 
 namespace yocto
 {
@@ -92,6 +93,15 @@ namespace yocto
             ios::osstream fp(ans);
             this->save(fp);
             return ans;
+        }
+
+
+        string  pattern:: toBase64() const
+        {
+            static  const base64::IO &Base64 = base64::IO::instance();
+
+            const string bin = compiled();
+            return Base64.Encode(bin);
         }
 
     }
