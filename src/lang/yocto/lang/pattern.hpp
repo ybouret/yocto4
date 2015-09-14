@@ -53,6 +53,10 @@ namespace yocto
             //! output to binary
             virtual void save( ios::ostream &fp ) const = 0;
 
+            //! get a portable binary code
+            string  compiled() const;
+            
+
         protected:
             explicit pattern(uint32_t ID) throw();
             pattern(const pattern &) throw();

@@ -74,6 +74,26 @@ namespace yocto
             viz(fp);
             fp("}\n");
         }
+
+    }
+
+}
+
+#include "yocto/ios/osstream.hpp"
+
+namespace yocto
+{
+    namespace lang
+    {
+
+        string  pattern:: compiled() const
+        {
+            string ans;
+            ios::osstream fp(ans);
+            this->save(fp);
+            return ans;
+        }
+
     }
 }
 
