@@ -24,6 +24,8 @@ namespace yocto
             const_iterator begin() const throw();
             const_iterator end()   const throw();
 
+            void clear() throw();
+
         protected:
             explicit q_codec() throw();
             list_type Q;

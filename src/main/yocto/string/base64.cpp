@@ -286,6 +286,50 @@ namespace yocto
     }
     
     
+    base64::IO:: IO() throw()
+    {
+    }
+
+    base64:: IO:: ~IO() throw()
+    {
+
+    }
+
+    const char base64::IO:: name[] = "base64";
+
+    string base64::IO:: Encode(const string &s) const
+    {
+        string ans;
+        Encoder.clear();
+        const size_t n = s.size();
+        char         C = 0;
+        for(size_t i=0;i<n;++i)
+        {
+            Encoder.write(s[i]);
+            while(Encoder.query(C)) ans.append(C);
+        }
+        Encoder.flush();
+        while(Encoder.query(C)) ans.append(C);
+        return ans;
+    }
+
+    string base64::IO:: Decode(const string &s) const
+    {
+        string ans;
+        Decoder.clear();
+        const size_t n = s.size();
+        char         C = 0;
+        for(size_t i=0;i<n;++i)
+        {
+            Decoder.write(s[i]);
+            while(Decoder.query(C)) ans.append(C);
+        }
+        Decoder.flush();
+        while(Decoder.query(C)) ans.append(C);
+        return ans;
+    }
+
     
-    
+
+
 }

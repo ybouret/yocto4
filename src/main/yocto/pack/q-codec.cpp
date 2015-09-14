@@ -39,5 +39,11 @@ namespace yocto
             return Q.end();
         }
 
+
+        void q_codec:: clear() throw()
+        {
+            Q.free();
+        }
+
     }
 }

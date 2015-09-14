@@ -69,7 +69,25 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(decoder);
         };
         
-            
+        class IO : public singleton<IO>
+        {
+        public:
+            mutable encoder Encoder;
+            mutable decoder Decoder;
+
+            string Encode(const string &) const;
+            string Decode(const string &) const;
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(IO);
+            explicit IO() throw();
+            virtual ~IO() throw();
+            friend class singleton<IO>;
+
+            static const char                 name[];
+            static const threading::longevity life_time=0;
+        };
+
     };
     
 }

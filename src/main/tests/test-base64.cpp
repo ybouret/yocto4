@@ -19,6 +19,7 @@ static int search_char( const char C, const char *tab )
 YOCTO_UNIT_TEST_IMPL(base64)
 {
     
+    base64::IO &Base64 = base64::IO::instance();
     
     //--------------------------------------------------------------------------
     // generate reverse table
@@ -86,7 +87,10 @@ YOCTO_UNIT_TEST_IMPL(base64)
             std::cerr << C;
         }
         std::cerr << std::endl;
-        
+        string s2 = Base64.Encode(line);
+        std::cerr << "Embedded: '" << s2 << "'" << std::endl;
+        string d2 = Base64.Decode(s2);
+        std::cerr << "Embedded: '" << d2 << "'" << std::endl;
         line.clear();
     }
     
