@@ -23,8 +23,8 @@ YOCTO_UNIT_TEST_IMPL(regexp)
         const string ebin = p->toBase64();
         std::cerr << "ebin=" << ebin << std::endl;
         auto_ptr<pattern> q( pattern::load64(ebin) );
-        
     }
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
