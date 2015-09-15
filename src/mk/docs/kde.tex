@@ -1,0 +1,32 @@
+\documentclass[aps,onecolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+
+\begin{document}
+\title{Kernel Density Estimation}
+\maketitle
+
+\section{In 1D}
+We assume that $K(u)$ is a $\mathrm{L}_2$ function in $\mathbb{R}$ with
+\begin{equation}
+	\int_{\mathbb{R}} K(u)\,\mathrm{d}u = 1.
+\end{equation}
+We want to find the constant $h$ such that for the points $(X_1,\cdots,X_N)$ we
+approximate the density by
+\begin{equation}
+	f_h(x) = \dfrac{1}{N} \sum_{i=1}^N \dfrac{1}{h} K\left(\dfrac{x-X_i}{h}\right).
+\end{equation}
+
+This is equivalent to minimize over $h$ the quantity
+\begin{equation}
+	\mathcal{H}(h) = \int \left[\sum_{i=1}^N \dfrac{1}{h} K\left(\dfrac{x-X_i}{h}\right)\right]^2 \, \mathrm{d}x
+	 - 2 \sum_{i\not=j} \dfrac{1}{h} K\left(\dfrac{X_i-X_j}{h}\right).
+\end{equation} 
+ 
+\end{document}
