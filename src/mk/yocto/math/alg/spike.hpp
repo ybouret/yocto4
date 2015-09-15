@@ -105,8 +105,8 @@ namespace yocto
                     }
 
                     // create the index
-                    c_array<const double> ra(  data+1, size );
-                    c_array<size_t>  idx( indx+1, size );
+                    lw_array<const double> ra(  data+1, size );
+                    lw_array<size_t>       idx( indx+1, size );
                     make_index( ra, idx, __compare_decreasing<double>);
                 }
                 

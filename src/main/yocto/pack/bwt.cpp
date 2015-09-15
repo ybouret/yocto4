@@ -1,5 +1,5 @@
 #include "yocto/pack/bwt.hpp"
-#include "yocto/sequence/c-array.hpp"
+#include "yocto/sequence/lw-array.hpp"
 #include "yocto/sort/quick.hpp"
 #include "yocto/memory/global.hpp"
 
@@ -47,8 +47,8 @@ namespace yocto
 				indices[i] = i;
             if(size>0)
 			{
-                c_array<size_t>  arr( indices, size );
-                rotlexdat        cmp = { buf_in, size };
+                lw_array<size_t>  arr( indices, size );
+                rotlexdat         cmp = { buf_in, size };
                 quicksort( arr, cmp );
 			}
             

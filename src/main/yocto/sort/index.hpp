@@ -3,7 +3,7 @@
 
 #include "yocto/sequence/array.hpp"
 #include "yocto/comparator.hpp"
-#include "yocto/sequence/c-array.hpp"
+#include "yocto/sequence/lw-array.hpp"
 
 namespace yocto
 {
@@ -53,8 +53,8 @@ namespace yocto
 	template <typename T>
 	inline void make_c_index( const T *addr, size_t num_items, size_t *indx )
 	{
-		c_array<const T> ra(  addr, num_items );
-		c_array<size_t>  idx( indx, num_items );
+		lw_array<const T> ra(  addr, num_items );
+		lw_array<size_t>  idx( indx, num_items );
 		make_index( ra, idx, __compare<T> );
 		for( size_t i=1; i <= num_items; ++i ) --idx[i];
 	}

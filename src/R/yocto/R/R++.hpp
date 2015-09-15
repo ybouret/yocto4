@@ -1,11 +1,13 @@
 #ifndef YOCTO_RXX_INCLUDED
 #define YOCTO_RXX_INCLUDED 1
 
+
 #include <R.h>
 #include <Rinternals.h>
 #include <new>
 
 #include "yocto/exception.hpp"
+#include "yocto/type/args.hpp"
 
 namespace yocto
 {
@@ -49,9 +51,25 @@ namespace yocto
         RObject&operator=(const RObject &);
     };
     
+    template <typename T>
+    class RArray
+    {
+    public:
+        YOCTO_ARGUMENTS_DECL_T;
+        
+        virtual ~RArray() throw() {}
+        virtual  size_t size() const throw() = 0;
+        
+    protected:
+        inline RArray() throw() {}
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(RArray);
+    };
+    
     //! R vector
     template <typename T>
-    class RVector : public RObject
+    class RVector : public RObject, public RArray<T>
     {
     public:
         virtual ~RVector() throw()
@@ -63,9 +81,10 @@ namespace yocto
         
         explicit RVector( SEXP args ) :
         RObject(),
+        RArray<T>(),
         Rvec( coerceVector(args, RGetData<T>::Conv) ),
         data( RGetData<T>::Cast(Rvec) ),
-        size( length(Rvec) )
+        items( length(Rvec) )
         {
         }
         
@@ -73,11 +92,13 @@ namespace yocto
         RObject(),
         Rvec( allocVector(RGetData<T>::Conv,n) ),
         data( RGetData<T>::Cast(Rvec) ),
-        size( length(Rvec) )
+        items( length(Rvec) )
         {
             PROTECT(Rvec);
             set_R();
         }
+        
+        virtual size_t size() const throw() { return items; }
         
     private:
         RVector(const RVector &);
@@ -87,7 +108,7 @@ namespace yocto
         virtual SEXP get_SEXP() const throw() { return Rvec; }
         
     public:
-        const size_t size;
+        const size_t items;
         
     };
     
@@ -121,7 +142,7 @@ namespace yocto
     class RMatrix : public RObject, public CoreMatrix
     {
     public:
-        class Column
+        class Column : public RArray<T>
         {
         public:
             inline Column( T *p, size_t r) throw() :
@@ -133,11 +154,13 @@ namespace yocto
             inline T  & operator[]( size_t r ) throw()          { assert(r<rows); return data[r]; }
             inline const T & operator[](size_t r) const throw() { assert(r<rows); return data[r]; }
             
+            virtual size_t size() const throw() { return rows; }
+            
         private:
             T *data;
             Column( const Column & );
             Column&operator=(const Column &);
-            ~Column() throw();
+            virtual ~Column() throw();
         public:
             const size_t rows;
         };
@@ -197,7 +220,7 @@ namespace yocto
     class CMatrix : public CoreMatrix
     {
     public:
-        class Row
+        class Row : public RArray<T>
         {
         public:
             explicit Row( T *p, size_t c ) throw() :
@@ -211,11 +234,12 @@ namespace yocto
             inline T &       operator[](size_t c) throw()       { assert(c<cols); return data[c]; }
             inline const T & operator[](size_t c) const throw() { assert(c<cols); return data[c]; }
             
+            virtual size_t size() const throw() { return cols; }
             
         private:
             Row(const Row &);
             Row&operator=(const Row &);
-            ~Row();
+            virtual ~Row() throw();
             T *data;
         public:
             const size_t cols;
@@ -369,7 +393,7 @@ namespace yocto
     {
         return CHAR(STRING_ELT(r,0));
     }
-
+    
     
 }
 
