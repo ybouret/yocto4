@@ -173,7 +173,8 @@ SET( utest_decl yocto/utest/driver.hpp yocto/utest/run.hpp )
 INSTALL( FILES ${utest_decl} DESTINATION include/yocto/utest)
 SOURCE_GROUP( utest FILES ${utest_decl})
 
-ADD_LIBRARY(yocto STATIC ${srcs} ${utest_decl})
+SET(main_srcs ${srcs} ${utest_decl})
+ADD_LIBRARY(yocto STATIC ${main_srcs})
 
 INSTALL( TARGETS yocto ARCHIVE DESTINATION lib )
 
