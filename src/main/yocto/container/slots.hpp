@@ -29,7 +29,7 @@ namespace yocto
             return *(static_cast<type *>(cmem.data)+indx);
         }
 
-        inline const_type operator[](const size_t indx) const throw()
+        inline const_type & operator[](const size_t indx) const throw()
         {
             assert(indx<size);
             return  *(static_cast<const_type *>(cmem.data)+indx);
