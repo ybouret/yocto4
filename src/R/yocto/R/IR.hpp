@@ -32,7 +32,7 @@ inline virtual const T &operator[](const size_t indx) const throw() { assert(ind
         virtual  const T &operator[](const size_t indx) const throw() = 0;
 
     protected:
-        inline RArray() throw() {}
+        inline explicit RArray() throw() {}
 
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(RArray);
@@ -59,6 +59,7 @@ inline virtual const T &operator[](const size_t indx) const throw() { assert(ind
 
         YOCTO_R_ARRAY_IMPL(data,items)
     private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(LArray);
         T           *data;
         const size_t items;
     };
