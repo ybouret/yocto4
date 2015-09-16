@@ -9,6 +9,17 @@
 
 namespace yocto
 {
+
+#define YOCTO_R_PROLOG() try {
+
+#define YOCTO_R_EPILOG() } \
+catch(const yocto::exception &e) { \
+Rprintf("%s\n",e.what());\
+Rprintf("%s\n",e.when());\
+return R_NilValue;\
+}\
+catch(...) { Rprintf("Unhandled exception !\n"); return R_NilValue; }
+
     //! template for R data type handling
     template <typename T> struct RGetData;
     
