@@ -103,13 +103,16 @@ namespace yocto
             return (size<=0);
         }
 
-        
+
         //! resize if EMPTY
         inline void resize_empty_to(size_t n)
         {
             assert(this->is_empty());
-            slots_of<T> tmp(n);
-            __swap_with(tmp);
+            if(n!=capacity)
+            {
+                slots_of<T> tmp(n);
+                __swap_with(tmp);
+            }
         }
 
         //! helper: sequential build from precomputed other slots
