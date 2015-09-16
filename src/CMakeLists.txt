@@ -87,6 +87,7 @@ INSTALL( FILES
 	share/openmp.cmake
 	share/swig.cmake 
 	share/visit.cmake
+	share/R.cmake
 	DESTINATION share/yocto )
 
 ########################################################################
