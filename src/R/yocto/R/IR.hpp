@@ -8,6 +8,13 @@
 
 namespace yocto
 {
+
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    // RArray interface
+    //
+    ////////////////////////////////////////////////////////////////////////////
+
 #define YOCTO_R_ARRAY_IMPL(ADDR,ITEMS) \
 inline virtual size_t size() const throw() { return ITEMS; } \
 inline virtual T       &operator[](const size_t indx) throw()       { assert(indx<ITEMS); return ADDR[indx]; } \
@@ -30,6 +37,38 @@ inline virtual const T &operator[](const size_t indx) const throw() { assert(ind
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(RArray);
     };
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    // Array based on user's data
+    //
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    class LArray : public RArray<T>
+    {
+    public:
+        inline explicit LArray( T *usr_data, const size_t usr_size) throw() :
+        data(usr_data),
+        items(usr_size)
+        {
+            assert(!(data==NULL&&items>0));
+        }
+
+        inline virtual ~LArray() throw() {}
+
+        YOCTO_R_ARRAY_IMPL(data,items)
+    private:
+        T           *data;
+        const size_t items;
+    };
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    // CVector
+    //
+    ////////////////////////////////////////////////////////////////////////////
 
 #define YOCTO_R_CVECTOR_CTOR() \
 inMem(items),\
@@ -91,6 +130,12 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
     };
 
 
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    // CoreMatrix
+    //
+    ////////////////////////////////////////////////////////////////////////////
+
     //! Core Matrix
     class CoreMatrix
     {
@@ -116,6 +161,11 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         CoreMatrix&operator=(const CoreMatrix&);
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    // CMatrix
+    //
+    ////////////////////////////////////////////////////////////////////////////
 
     //! C++ Matrix, rows major
     template <typename T>
