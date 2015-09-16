@@ -1,0 +1,4 @@
+#ifndef YOCTO_RMM_INCLUDED
+#define YOCTO_RMM_INCLUDED 1
+
+#endif
