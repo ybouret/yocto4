@@ -116,7 +116,7 @@ namespace yocto
             T *data;
             Column( const Column & );
             Column&operator=(const Column &);
-            virtual ~Column() throw();
+            virtual ~Column() throw() {}
         public:
             const size_t rows;
         };

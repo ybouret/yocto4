@@ -137,7 +137,7 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         private:
             Row(const Row &);
             Row&operator=(const Row &);
-            virtual ~Row() throw();
+            virtual ~Row() throw() {}
             T *data;
         public:
             const size_t cols;
@@ -151,34 +151,7 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
             build(r,c);
         }
 
-#if 0
-        //! convert an R matrix to a C matrix
-        explicit CMatrix( SEXP args ) :
-        data(0),
-        mrow(0)
-        {
-            //-- find R parameters
-            SEXP Rmat = coerceVector(args, RGetData<T>::Conv);
-            SEXP Rdim = getAttrib(Rmat, R_DimSymbol);
-            const size_t r = INTEGER(Rdim)[0];
-            const size_t c = INTEGER(Rdim)[1];
-            const T     *p = RGetData<T>::Cast(Rmat);
 
-            //-- prepare this matrix
-            build(r,c);
-
-            //-- copy items
-            for(size_t i=0;i<rows;++i)
-            {
-                const size_t offset = i*cols;
-                for(size_t j=0;j<cols;++j)
-                {
-                    data[offset+j] = p[i+rows*j];
-                }
-            }
-        }
-#endif
-        
         virtual ~CMatrix() throw()
         {
             operator delete(mrow);
@@ -189,7 +162,6 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
 
         inline Row &       operator[](size_t r) throw()       { assert(r<rows); return mrow[r]; }
         inline const Row & operator[](size_t r) const throw() { assert(r<rows); return mrow[r]; }
-
 
 
     protected:
