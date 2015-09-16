@@ -31,7 +31,7 @@ SEXP lyre_trn(SEXP RM)
 {
     RMatrix<double> M(RM);
     
-    CMatrix<double> C(RM);
+    CMatrixR<double> C(RM);
     
     return R_NilValue;
 }

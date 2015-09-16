@@ -1,7 +1,7 @@
 #ifndef YOCTO_RXX_INCLUDED
 #define YOCTO_RXX_INCLUDED 1
 
-#include "yocto/R/R--.hpp"
+#include "yocto/R/IR.hpp"
 #include <R.h>
 #include <Rinternals.h>
 
@@ -59,9 +59,8 @@ namespace yocto
         {
         }
         
-        inline T       & operator[](size_t indx) throw()       { assert(indx<size); return data[indx]; }
-        inline const T & operator[](size_t indx) const throw() { assert(indx<size); return data[indx]; }
         
+        //! get data from R
         explicit RVector( SEXP args ) :
         RObject(),
         RArray<T>(),
@@ -70,7 +69,8 @@ namespace yocto
         items( length(Rvec) )
         {
         }
-        
+
+        //! set data for R
         explicit RVector( size_t n ) :
         RObject(),
         Rvec( allocVector(RGetData<T>::Conv,n) ),
@@ -81,8 +81,8 @@ namespace yocto
             set_R();
         }
         
-        virtual size_t size() const throw() { return items; }
-        
+        YOCTO_R_ARRAY_IMPL(data,items)
+
     private:
         RVector(const RVector &);
         RVector&operator=(const RVector &);
@@ -95,31 +95,7 @@ namespace yocto
         
     };
     
-    //! Core Matrix
-    class CoreMatrix
-    {
-    public:
-        const size_t rows;
-        const size_t cols;
-        const size_t items;
         
-        virtual ~CoreMatrix() throw()
-        {
-            (size_t&)rows  = 0;
-            (size_t&)cols  = 0;
-            (size_t&)items = 0;
-        }
-        
-    protected:
-        explicit CoreMatrix() throw() :
-        rows(0), cols(0), items(0)
-        {}
-        
-    private:
-        CoreMatrix(const CoreMatrix &);
-        CoreMatrix&operator=(const CoreMatrix&);
-    };
-    
     //! R matrix, columns major
     template <typename T>
     class RMatrix : public RObject, public CoreMatrix
@@ -134,11 +110,8 @@ namespace yocto
             {
             }
             
-            inline T  & operator[]( size_t r ) throw()          { assert(r<rows); return data[r]; }
-            inline const T & operator[](size_t r) const throw() { assert(r<rows); return data[r]; }
-            
-            virtual size_t size() const throw() { return rows; }
-            
+
+            YOCTO_R_ARRAY_IMPL(data,rows)
         private:
             T *data;
             Column( const Column & );
@@ -151,7 +124,8 @@ namespace yocto
         
         
         virtual ~RMatrix() throw() { operator delete(mcol); mcol=0; }
-        
+
+        //! get data from R
         explicit RMatrix( SEXP args ) :
         Rmat( coerceVector(args, RGetData<T>::Conv) ),
         data( RGetData<T>::Cast(Rmat) ),
@@ -159,7 +133,8 @@ namespace yocto
         {
             get_dims();
         }
-        
+
+        //! set data for R
         explicit RMatrix( size_t r, size_t c ) :
         Rmat( allocMatrix( RGetData<T>::Conv, r, c) ),
         data( RGetData<T>::Cast(Rmat) ),
@@ -197,126 +172,57 @@ namespace yocto
             }
         }
     };
-    
-    //! C++ Matrix, rows major
+
+
+    //! CMatrix directly built from R matrix
     template <typename T>
-    class CMatrix : public CoreMatrix
+    class CMatrixR : public CMatrix<T>
     {
     public:
-        class Row : public RArray<T>
+        inline explicit CMatrixR( SEXP args ) :
+        CMatrix<T>( get_dim(0,args), get_dim(1,args) )
         {
-        public:
-            explicit Row( T *p, size_t c ) throw() :
-            data(p),
-            cols(c)
+            // get data from R
+            SEXP     Rmat = coerceVector(args, RGetData<T>::Conv);
+            const T *p    = RGetData<T>::Cast(Rmat);
+
+            // make a copy
+            const size_t r = this->rows;
+            const size_t c = this->cols;
+            for(size_t i=0;i<r;++i)
             {
-                assert(data!=0);
-                assert(cols>0);
-            }
-            
-            inline T &       operator[](size_t c) throw()       { assert(c<cols); return data[c]; }
-            inline const T & operator[](size_t c) const throw() { assert(c<cols); return data[c]; }
-            
-            virtual size_t size() const throw() { return cols; }
-            
-        private:
-            Row(const Row &);
-            Row&operator=(const Row &);
-            virtual ~Row() throw();
-            T *data;
-        public:
-            const size_t cols;
-        };
-        
-        //! build a local matrix
-        explicit CMatrix(size_t r, size_t c) :
-        data(0),
-        mrow(0)
-        {
-            build(r,c);
-        }
-        
-        //! convert an R matrix to a C matrix
-        explicit CMatrix( SEXP args ) :
-        data(0),
-        mrow(0)
-        {
-            //-- find R parameters
-            SEXP Rmat = coerceVector(args, RGetData<T>::Conv);
-            SEXP Rdim = getAttrib(Rmat, R_DimSymbol);
-            const size_t r = INTEGER(Rdim)[0];
-            const size_t c = INTEGER(Rdim)[1];
-            const T     *p = RGetData<T>::Cast(Rmat);
-            
-            //-- prepare this matrix
-            build(r,c);
-            
-            //-- copy items
-            for(size_t i=0;i<rows;++i)
-            {
-                const size_t offset = i*cols;
-                for(size_t j=0;j<cols;++j)
+                const size_t offset = i*c;
+                for(size_t j=0;j<c;++j)
                 {
-                    data[offset+j] = p[i+rows*j];
+                    this->data[offset+j] = p[i+r*j];
                 }
             }
+
         }
-        
-        virtual ~CMatrix() throw()
+
+        inline virtual ~CMatrixR() throw()
         {
-            operator delete(mrow);
-            delete []data;
-            mrow = 0;
-            data = 0;
         }
-        
-        inline Row &       operator[](size_t r) throw()       { assert(r<rows); return mrow[r]; }
-        inline const Row & operator[](size_t r) const throw() { assert(r<rows); return mrow[r]; }
-        
-        
+
         inline void print() const
         {
-            for(size_t i=0; i < rows; ++i )
+            for(size_t i=0; i < this->rows; ++i )
             {
-                for(size_t j=0;j<cols;++j)
+                for(size_t j=0;j<this->cols;++j)
                     Rprintf(" %g", (*this)[i][j]);
                 Rprintf("\n");
             }
         }
-        
+
     private:
-        T   *data;
-        Row *mrow;
-        
-        CMatrix( const CMatrix & );
-        CMatrix&operator=(const CMatrix &);
-        
-        inline void build(size_t r,size_t c)
+        YOCTO_DISABLE_COPY_AND_ASSIGN(CMatrixR);
+        static inline int get_dim(size_t i, SEXP args)
         {
-            assert(r>0);
-            assert(c>0);
-            (size_t &)rows  = r;
-            (size_t &)cols  = c;
-            (size_t &)items = rows * cols;
-            data = new T[items];
-            try
-            {
-                mrow = static_cast<Row *>( operator new(rows*sizeof(Row)) );
-                T *p = data;
-                for(size_t i=0; i < rows; ++i, p += cols )
-                {
-                    new (mrow+i) Row(p,cols);
-                }
-            }
-            catch(...)
-            {
-                delete []data;
-                throw;
-            }
+            SEXP Rmat = coerceVector(args, RGetData<T>::Conv);
+            SEXP Rdim = getAttrib(Rmat, R_DimSymbol);
+            return INTEGER(Rdim)[i];
         }
-        
     };
-    
     
     //! RList wrapper
     class RList : public RObject
@@ -367,7 +273,7 @@ namespace yocto
     inline T R2Scalar( SEXP r )
     {
         const RVector<T> value(r);
-        if( value.size < 1) throw exception("R2Scalar: invalid argument");
+        if( value.size() < 1) throw exception("R2Scalar: invalid argument");
         return value[0];
     }
     

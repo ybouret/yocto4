@@ -229,7 +229,7 @@ typedef unsigned_int<N>::type word_t;\
     {
         core::bmove<sizeof(T)>(&a, &b);
     }
-    
+
 }
 
 
