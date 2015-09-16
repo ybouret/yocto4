@@ -1,13 +1,11 @@
 #ifndef YOCTO_RXX_INCLUDED
 #define YOCTO_RXX_INCLUDED 1
 
-
+#include "yocto/R/R--.hpp"
 #include <R.h>
 #include <Rinternals.h>
-#include <new>
 
 #include "yocto/exception.hpp"
-#include "yocto/type/args.hpp"
 
 namespace yocto
 {
@@ -51,22 +49,7 @@ namespace yocto
         RObject&operator=(const RObject &);
     };
     
-    template <typename T>
-    class RArray
-    {
-    public:
-        YOCTO_ARGUMENTS_DECL_T;
-        
-        virtual ~RArray() throw() {}
-        virtual  size_t size() const throw() = 0;
-        
-    protected:
-        inline RArray() throw() {}
-        
-    private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(RArray);
-    };
-    
+       
     //! R vector
     template <typename T>
     class RVector : public RObject, public RArray<T>
