@@ -33,3 +33,13 @@ lyre_sum <- function( A )
 }
 
 lyre_sum(seq(1,10));
+
+
+lyre_mat <- function(M)
+{
+    .Call("lyre_mat",M);
+}
+# 4 colums, 2 rows
+mat=replicate(4,rnorm(2));
+
+lyre_mat(mat);

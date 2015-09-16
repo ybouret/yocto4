@@ -27,10 +27,9 @@ SEXP lyre_sum(SEXP RA)
 }
 
 extern "C"
-SEXP lyre_trn(SEXP RM)
+SEXP lyre_mat(SEXP RM)
 {
-    RMatrix<double> M(RM);
-    
+    RMatrix<double>  M(RM);
     CMatrixR<double> C(RM);
     
     return R_NilValue;
