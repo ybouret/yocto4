@@ -41,5 +41,5 @@ lyre_mat <- function(M)
 }
 # 4 colums, 2 rows
 mat=replicate(4,rnorm(2));
-
+print(mat);
 lyre_mat(mat);

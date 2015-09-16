@@ -31,6 +31,6 @@ SEXP lyre_mat(SEXP RM)
 {
     RMatrix<double>  M(RM);
     CMatrixR<double> C(RM);
-    
+    C.print();
     return R_NilValue;
 }
