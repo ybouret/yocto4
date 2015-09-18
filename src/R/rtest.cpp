@@ -13,12 +13,14 @@ extern "C"
 SEXP lyre_sum(SEXP RA)
 {
     RVector<double> A(RA);
+    RQSort(A);
     double sum = 0;
     for(size_t i=0;i<A.size();++i)
     {
         sum += A[i];
     }
-    
+
+
     RVector<double> ans(1);
     
     ans[0] = sum;

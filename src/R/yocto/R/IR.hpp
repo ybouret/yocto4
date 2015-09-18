@@ -4,6 +4,7 @@
 #include "yocto/code/bswap.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/code/unroll.hpp"
+#include "yocto/sort/quick.hpp"
 #include <new>
 
 namespace yocto
@@ -38,6 +39,21 @@ inline virtual const T &operator[](const size_t indx) const throw() { assert(ind
         YOCTO_DISABLE_COPY_AND_ASSIGN(RArray);
     };
 
+    template <typename T,typename FUNC>
+    inline void RQSort( RArray<T> &arr, FUNC &cmp )
+    {
+        const size_t na = arr.size();
+        if(na>1)
+        {
+            lw_array<T> a( &arr[0], na );
+        }
+    }
+
+    template <typename T>
+    inline void RQSort( RArray<T> &arr )
+    {
+        RQSort(arr,__compare<T>);
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     //
