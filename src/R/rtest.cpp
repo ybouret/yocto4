@@ -37,9 +37,7 @@ SEXP lyre_sum(SEXP RA)
 
 
         RVector<double> ans(1);
-
         ans[0] = sum;
-
         return *ans;
     }
     YOCTO_R_EPILOG();
@@ -48,8 +46,12 @@ SEXP lyre_sum(SEXP RA)
 extern "C"
 SEXP lyre_mat(SEXP RM)
 {
-    RMatrix<double>  M(RM);
-    CMatrixR<double> C(RM);
-    C.print();
-    return R_NilValue;
+    YOCTO_R_PROLOG()
+    {
+        RMatrix<double>  M(RM);
+        CMatrixR<double> C(RM);
+        C.print();
+        return R_NilValue;
+    }
+    YOCTO_R_EPILOG()
 }
