@@ -32,7 +32,7 @@ lyre_sum <- function( A )
     .Call("lyre_sum",A);
 }
 
-lyre_sum(seq(1,10));
+lyre_sum(seq(10,1));
 
 
 lyre_mat <- function(M)

@@ -46,6 +46,7 @@ inline virtual const T &operator[](const size_t indx) const throw() { assert(ind
         if(na>1)
         {
             lw_array<T> a( &arr[0], na );
+            quicksort(a,cmp);
         }
     }
 
