@@ -99,7 +99,7 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         }
 
         inline CVector(const RArray<T> &arr) :
-        items(arr.items),
+        items(arr.size()),
         YOCTO_R_CVECTOR_CTOR()
         {
 #define YOCTO_R_CVECTOR_COPY(INDX) data[INDX] = arr[INDX]
@@ -108,7 +108,7 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
 
         inline CVector & operator=( const RArray<T> &arr )
         {
-            if(arr.items==items)
+            if(arr.size()==items)
             {
                 YOCTO_LOOP_FUNC(items,YOCTO_R_CVECTOR_COPY,0);
 #undef YOCTO_R_CVECTOR_COPY
