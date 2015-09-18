@@ -90,7 +90,6 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
             memory::kind<memory::global>::release_as<T>(data,inMem);
         }
 
-        YOCTO_R_ARRAY_IMPL(data,items)
 
         inline void swap_with(CVector &other) throw()
         {
@@ -122,6 +121,7 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
             return *this;
         }
 
+        YOCTO_R_ARRAY_IMPL(data,items)
 
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(CVector);
