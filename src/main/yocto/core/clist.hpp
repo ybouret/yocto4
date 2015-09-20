@@ -5,7 +5,7 @@
 
 namespace yocto
 {
-    
+
     namespace core
     {
         
