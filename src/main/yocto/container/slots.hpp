@@ -12,8 +12,8 @@ namespace yocto
     {
     public:
         YOCTO_ARGUMENTS_DECL_T;
-        const size_t size;
-        const size_t capacity;
+        const size_t size;       //!< variable, 0..capacity
+        const size_t capacity;   //!< max #slots
 
         inline explicit slots_of(size_t n=0) :
         size(0),
@@ -88,6 +88,19 @@ namespace yocto
             ++n;
         }
 
+        //! append by four args constructor
+        template <typename U,typename V,typename W, typename X>
+        inline void append(typename type_traits<U>::parameter_type arg1,
+                           typename type_traits<V>::parameter_type arg2,
+                           typename type_traits<W>::parameter_type arg3,
+                           typename type_traits<X>::parameter_type arg4
+                           )
+        {
+            assert(size<capacity);
+            size_t &n = (size_t&)size;
+            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1,arg2,arg3,arg4);
+            ++n;
+        }
 
 
 
