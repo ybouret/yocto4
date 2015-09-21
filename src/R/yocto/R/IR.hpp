@@ -248,8 +248,8 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
             data = 0;
         }
 
-        inline Row &       operator[](size_t r) throw()       { assert(r<rows); return mrow[r]; }
-        inline const Row & operator[](size_t r) const throw() { assert(r<rows); return mrow[r]; }
+        inline Row &       operator[](size_t r) throw()       { assert(r<this->rows); return mrow[r]; }
+        inline const Row & operator[](size_t r) const throw() { assert(r<this->rows); return mrow[r]; }
 
         inline virtual T & operator()(size_t ic, size_t ir) throw()
         {

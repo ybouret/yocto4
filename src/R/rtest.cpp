@@ -50,6 +50,14 @@ SEXP lyre_mat(SEXP RM)
     {
         RMatrix<double>  M(RM);
         CMatrixR<double> C(RM);
+        CMatrix<double>  D(M.rows,M.cols);
+        for(size_t i=0;i<M.rows;++i)
+        {
+            for(size_t j=0;j<M.cols;++j)
+            {
+                D[i][j] = M[j][i];
+            }
+        }
         C.print();
         return R_NilValue;
     }
