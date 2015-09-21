@@ -251,12 +251,12 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         inline Row &       operator[](size_t r) throw()       { assert(r<this->rows); return mrow[r]; }
         inline const Row & operator[](size_t r) const throw() { assert(r<this->rows); return mrow[r]; }
 
-        inline virtual T & operator()(size_t ic, size_t ir) throw()
+        inline virtual T & operator()(size_t ir, size_t ic) throw()
         {
             return (*this)[ir][ic];
         }
 
-        inline virtual const T & operator()(size_t ic, size_t ir) const throw()
+        inline virtual const T & operator()(size_t ir, size_t ic) const throw()
         {
             return (*this)[ir][ic];
         }
