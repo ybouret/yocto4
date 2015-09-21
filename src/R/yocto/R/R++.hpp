@@ -109,7 +109,7 @@ catch(...) { Rprintf("Unhandled exception !\n"); return R_NilValue; }
         
     //! R matrix, columns major
     template <typename T>
-    class RMatrix : public RObject, public CoreMatrix
+    class RMatrix : public RObject, public Matrix<T>
     {
     public:
         class Column : public RArray<T>
@@ -156,9 +156,19 @@ catch(...) { Rprintf("Unhandled exception !\n"); return R_NilValue; }
             get_dims();
         }
         
-        inline Column &       operator[](size_t c) throw()       { assert(c<cols); return mcol[c]; }
-        inline const Column & operator[](size_t c) const throw() { assert(c<cols); return mcol[c]; }
-        
+        inline Column &       operator[](size_t c) throw()       { assert(c<this->cols); return mcol[c]; }
+        inline const Column & operator[](size_t c) const throw() { assert(c<this->cols); return mcol[c]; }
+
+        inline virtual T & operator()(size_t ir, size_t ic) throw()
+        {
+            return (*this)[ic][ir];
+        }
+
+        inline virtual const T & operator()(size_t ir, size_t ic) const throw()
+        {
+            return (*this)[ic][ir];
+        }
+
     private:
         
         RMatrix(const RMatrix&);
@@ -171,15 +181,15 @@ catch(...) { Rprintf("Unhandled exception !\n"); return R_NilValue; }
         
         inline void get_dims()
         {
-            SEXP      Rdim  = getAttrib(Rmat, R_DimSymbol);
-            (size_t &)rows  = INTEGER(Rdim)[0];
-            (size_t &)cols  = INTEGER(Rdim)[1];
-            (size_t &)items = rows * cols;
-            mcol = static_cast<Column *>( operator new( cols*sizeof(Column) ) );
+            SEXP             Rdim   = getAttrib(Rmat, R_DimSymbol);
+            (size_t &)(this->rows)  = INTEGER(Rdim)[0];
+            (size_t &)(this->cols)  = INTEGER(Rdim)[1];
+            (size_t &)(this->items) = this->rows * this->cols;
+            mcol = static_cast<Column *>( operator new( (this->cols)*sizeof(Column) ) );
             T *p = data;
-            for( size_t i=0; i < cols; ++i, p += rows )
+            for( size_t i=0; i < this->cols; ++i, p += this->rows )
             {
-                new (mcol+i) Column(p,rows);
+                new (mcol+i) Column(p,this->rows);
             }
         }
     };

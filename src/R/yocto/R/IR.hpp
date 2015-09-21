@@ -154,7 +154,7 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
     //
     ////////////////////////////////////////////////////////////////////////////
 
-    //! Core Matrix
+    //!
     class CoreMatrix
     {
     public:
@@ -169,6 +169,7 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
             (size_t&)items = 0;
         }
 
+
     protected:
         inline explicit CoreMatrix() throw() :
         rows(0), cols(0), items(0)
@@ -179,6 +180,24 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         CoreMatrix&operator=(const CoreMatrix&);
     };
 
+    template <typename T>
+    class Matrix : public CoreMatrix
+    {
+    public:
+        inline virtual ~Matrix() throw() {}
+
+        virtual T &       operator()(size_t ir, size_t ic) throw()       = 0;
+        virtual const T & operator()(size_t ir, size_t ic) const throw() = 0;
+
+    protected:
+        inline explicit Matrix() throw() : CoreMatrix() {}
+
+    private:
+        Matrix(const Matrix &);
+        Matrix&operator=(const Matrix&);
+    };
+
+
     ////////////////////////////////////////////////////////////////////////////
     //
     // CMatrix
@@ -187,9 +206,10 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
 
     //! C++ Matrix, rows major
     template <typename T>
-    class CMatrix : public CoreMatrix
+    class CMatrix : public Matrix<T>
     {
     public:
+
         class Row : public RArray<T>
         {
         public:
@@ -231,6 +251,15 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         inline Row &       operator[](size_t r) throw()       { assert(r<rows); return mrow[r]; }
         inline const Row & operator[](size_t r) const throw() { assert(r<rows); return mrow[r]; }
 
+        inline virtual T & operator()(size_t ic, size_t ir) throw()
+        {
+            return (*this)[ir][ic];
+        }
+
+        inline virtual const T & operator()(size_t ic, size_t ir) const throw()
+        {
+            return (*this)[ir][ic];
+        }
 
     protected:
         T   *data;
@@ -244,17 +273,17 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         {
             assert(r>0);
             assert(c>0);
-            (size_t &)rows  = r;
-            (size_t &)cols  = c;
-            (size_t &)items = rows * cols;
-            data = new T[items];
+            (size_t &)(this->rows)  = r;
+            (size_t &)(this->cols)  = c;
+            (size_t &)(this->items) = r*c;
+            data = new T[this->items];
             try
             {
-                mrow = static_cast<Row *>( operator new(rows*sizeof(Row)) );
+                mrow = static_cast<Row *>( operator new(r*sizeof(Row)) );
                 T *p = data;
-                for(size_t i=0; i < rows; ++i, p += cols )
+                for(size_t i=0;i<r;++i,p+=c)
                 {
-                    new (mrow+i) Row(p,cols);
+                    new (mrow+i) Row(p,c);
                 }
             }
             catch(...)
