@@ -96,7 +96,7 @@ namespace yocto
             void        worker_loop(context &ctx) throw();
 
         public:
-            const int failure; //!< set to rank+1 if failure
+            const size_t failure; //!< set to rank+1 if failure
         };
     };
 }
