@@ -99,7 +99,7 @@ YOCTO_UNIT_TEST_IMPL(split)
         std::cerr << std::endl << "#user_size=" << size << std::endl;
         auto_arr<Box> box(size);
         basic_splitV(size,size_t(1),Nx,box);
-        for(size_t i=0;i<box.size;++i)
+        for(size_t i=0;i<size;++i)
         {
             std::cerr << "box[" << i << "] : " << box[i].start << " -> " << box[i].final << ", count=" << box[i].count << std::endl;
         }
