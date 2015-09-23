@@ -1,9 +1,18 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/parallel/setup.hpp"
+#include "yocto/parallel/basic.hpp"
+
 #include "yocto/string/conv.hpp"
+#include "yocto/ptr/auto-arr.hpp"
 
 using namespace yocto;
 using namespace parallel;
+
+namespace
+{
+    struct Box { int start,final,count; };
+}
+
 
 YOCTO_UNIT_TEST_IMPL(split)
 {
@@ -32,6 +41,7 @@ YOCTO_UNIT_TEST_IMPL(split)
     for(size_t size=1;size<=10;++size)
     {
         std::cerr << std::endl << "#user_size=" << size << std::endl;
+
         const split::in1D s1(size,p1);
         std::cerr << "#CORE=" << s1.cores << std::endl;
         for(size_t rank=0;rank<s1.cores;++rank)
@@ -81,6 +91,18 @@ YOCTO_UNIT_TEST_IMPL(split)
             std::cerr << "\t" << size << "." << i  << " : " << patches[i] << std::endl;
         }
 
+    }
+
+    std::cerr << "Split all at once..." << std::endl;
+    for(size_t size=1;size<=10;++size)
+    {
+        std::cerr << std::endl << "#user_size=" << size << std::endl;
+        auto_arr<Box> box(size);
+        basic_splitV(size,size_t(1),Nx,box);
+        for(size_t i=0;i<box.size;++i)
+        {
+            std::cerr << "box[" << i << "] : " << box[i].start << " -> " << box[i].final << ", count=" << box[i].count << std::endl;
+        }
     }
 
 }
