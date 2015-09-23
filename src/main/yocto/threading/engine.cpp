@@ -43,7 +43,8 @@ activ(),                          \
 running(activ.size),              \
 tpool(),                          \
 juuid(1),                         \
-ready(0)
+ready(0),                         \
+failed(0)
 
         engine:: engine() : layout(),
         Y_THREADING_ENGINE_CTOR()
