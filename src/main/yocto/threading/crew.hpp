@@ -94,6 +94,9 @@ namespace yocto
 
             static void worker_call(void *) throw();
             void        worker_loop(context &ctx) throw();
+
+        public:
+            const int failure; //!< set to rank+1 if failure
         };
     };
 }

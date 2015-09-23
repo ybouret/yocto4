@@ -46,7 +46,8 @@ dying(false),                   \
 kproc(0),                       \
 cycle(),                        \
 synch(),                        \
-contexts(size)
+contexts(size),                 \
+failure(0)
         
         crew:: crew() : layout(),
         Y_THREADING_CREW_CTOR()
@@ -233,6 +234,8 @@ namespace yocto
             catch(...)
             {
                //TODO: send a message ?
+                YOCTO_LOCK(access);
+                (int&)failure = ctx.rank+1;
             }
 
             access.lock();
@@ -261,6 +264,7 @@ namespace yocto
             assert(size==ready);   // must be true here
             kproc = &K;            // local link
             ready = 0;             // global counter
+            (int&)failure = 0;     // clean up flag
             cycle.broadcast();     // would start all threads
             synch.wait(access);    // unlock access => start threads => come back LOCKED
             assert(size==ready);   // must be true here
