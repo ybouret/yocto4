@@ -331,12 +331,14 @@ namespace yocto
                 task *todo = tasks.pop_front(); // extract next task
                 activ.push_back(todo);          // set it in active state
                 access.unlock();                // other threads can run
+                const job_id J = todo->uuid;
                 try
                 {
                     todo->work(access);         // do the job, UNLOCKED...
                 }
                 catch(...)
                 {
+                    failed = J;
                 }
                 access.lock();                  // lock access for ops
                 activ.unlink(todo)->~task();    // remove task

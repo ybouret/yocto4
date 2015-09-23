@@ -97,6 +97,9 @@ namespace yocto
             }
 
             bool is_done(const job_id j) const throw();
+
+            job_id  failed; //!< last failed job
+
         };
 
     }
