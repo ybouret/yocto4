@@ -61,6 +61,7 @@ namespace yocto
 
 
             typedef functor<void,TL1(context&)> kernel;
+            
             void operator()(kernel &k) throw();
 
             template <typename OBJECT_POINTER,typename METHOD_POINTER>
