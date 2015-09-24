@@ -63,3 +63,25 @@ YOCTO_UNIT_TEST_IMPL(slots)
 
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/container/slots2d.hpp"
+
+YOCTO_UNIT_TEST_IMPL(slots2D)
+{
+
+    slots2D_of<double>   sd(3,4);
+    sd.build();
+    
+    slots2D_of<int16_t>  sw(3,4);
+    sw.build_with<int>(10);
+
+    for(size_t i=0;i<sw.rows;++i)
+    {
+        for(size_t j=0;j<sw.cols;++j)
+        {
+            std::cerr << sw[i][j] << std::endl;
+        }
+    }
+
+}
+YOCTO_UNIT_TEST_DONE()
