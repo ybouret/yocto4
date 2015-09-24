@@ -8,6 +8,21 @@ YOCTO_EXPORT int sum( int a, int b ) throw()
 }
 
 
+static inline void OnEnter() throw()
+{
+    std::cerr << "[[Entering Module]]" << std::endl;
+}
+
+
+static inline void OnLeave() throw()
+{
+    std::cerr << "[[Leaving Module]]" << std::endl;
+}
+
+YOCTO_RTLD_SETUP(OnEnter,OnLeave)
+
+
+#if 0
 #if defined(YOCTO_BSD)
 
 __attribute__((constructor)) void OnInit()
@@ -20,7 +35,9 @@ __attribute__((destructor)) void OnQuit()
     std::cerr << "[[Leaving Module]]" << std::endl;
 }
 #endif
+#endif
 
+#if 0
 #if defined(YOCTO_WIN)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -57,6 +74,8 @@ extern "C" BOOL WINAPI DllMain(
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
 #endif
+#endif
+
 
 static int add( int a, int b ) throw() { return a+b; }
 static int mul( int a, int b ) throw() { return a*b; }
