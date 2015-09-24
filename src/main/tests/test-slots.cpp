@@ -71,17 +71,16 @@ YOCTO_UNIT_TEST_IMPL(slots2D)
 
     slots2D_of<double>   sd(3,4);
     sd.build();
-    
+
     slots2D_of<int16_t>  sw(3,4);
     sw.build_with<int>(10);
 
-    for(size_t i=0;i<sw.rows;++i)
-    {
-        for(size_t j=0;j<sw.cols;++j)
-        {
-            std::cerr << sw[i][j] << std::endl;
-        }
-    }
+    std::cerr << "sw=" << sw << std::endl;
 
+    slots2D_of<string> S(5,6);
+    S.build();
+    for(size_t i=0;i<S.items;++i) S(i) = gen<string>::get();
+    std::cerr << "S=" << S << std::endl;
+    
 }
 YOCTO_UNIT_TEST_DONE()

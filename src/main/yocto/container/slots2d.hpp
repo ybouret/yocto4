@@ -5,6 +5,8 @@
 #include "yocto/container/cslot.hpp"
 #include "yocto/type/args.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
 
@@ -82,7 +84,17 @@ namespace yocto
             return Rows[ir];
         }
 
+        inline type & operator()(const size_t indx) throw()
+        {
+            assert(indx<items);
+            return Data[indx];
+        }
 
+        inline const_type & operator()(const size_t indx) const throw()
+        {
+            assert(indx<items);
+            return Data[indx];
+        }
 
         inline slots2D_of(const size_t nr, const size_t nc) :
         slots2D(nr,nc,sizeof(T),sizeof(row)),
@@ -127,6 +139,22 @@ do { free(); try { PROC; } catch(...) { free(); throw; } } while(false)
                                typename type_traits<V>::parameter_type arg2)
         {
             YOCTO_SLOTS2D_BUILD_WITH( (ctor2<U,V>(arg1,arg2)) );
+        }
+
+
+        inline friend std::ostream & operator<<( std::ostream &os, const slots2D_of &s )
+        {
+            os << '[';
+            for(size_t i=0;i<s.rows;++i)
+            {
+                for(size_t j=0;j<s.cols;++j)
+                {
+                    os << ' ' << s[i][j];
+                }
+                if(i<s.rows-1) os << ';';
+            }
+            os << ']';
+            return os;
         }
 
     private:
