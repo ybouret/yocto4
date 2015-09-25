@@ -30,5 +30,5 @@ yocto/R/R++.hpp
 yocto/R/IR.hpp
 DESTINATION include/yocto/R)
 
-ADD_EXECUTABLE(test-ir test-ir.cpp IR.hpp)
+ADD_EXECUTABLE(test-ir test-ir.cpp yocto/R/IR.hpp)
 TARGET_LINK_YOCTO(test-ir mpa)
