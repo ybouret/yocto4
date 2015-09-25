@@ -189,6 +189,24 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         virtual T &       operator()(size_t ir, size_t ic) throw()       = 0;
         virtual const T & operator()(size_t ir, size_t ic) const throw() = 0;
 
+        inline friend std::ostream & operator<<( std::ostream &os, const Matrix &M )
+        {
+            assert(M.rows>0);
+            assert(M.cols>0);
+            const size_t rm1 = M.rows-1;
+            os << '[';
+            for(size_t i=0;i<M.rows;++i)
+            {
+                for(size_t j=0;j<M.cols;++j)
+                {
+                    os << ' ' << M(i,j);
+                }
+                if(i<rm1) os << ';';
+            }
+            os << ']';
+            return os;
+        }
+
     protected:
         inline explicit Matrix() throw() : CoreMatrix() {}
 
@@ -234,7 +252,9 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         //! build a local matrix
         explicit CMatrix(size_t r, size_t c) :
         data(0),
-        mrow(0)
+        mrow(0),
+        wlen(0),
+        done(0)
         {
             build(r,c);
         }
@@ -242,10 +262,7 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
 
         virtual ~CMatrix() throw()
         {
-            operator delete(mrow);
-            delete []data;
-            mrow = 0;
-            data = 0;
+            release();
         }
 
         inline Row &       operator[](size_t r) throw()       { assert(r<this->rows); return mrow[r]; }
@@ -262,40 +279,116 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         }
 
     protected:
-        T   *data;
+        T     *data;
     private:
-        Row *mrow;
+        Row   *mrow;
+        size_t wlen;
+        size_t done;
 
         CMatrix( const CMatrix & );
         CMatrix&operator=(const CMatrix &);
 
+        // kill primitive type
+        inline void kill( int2type<true> ) throw()
+        {
+            return;
+        }
+
+        // kill object type
+        inline void kill( int2type<false> ) throw()
+        {
+            while(done>0)
+            {
+                destruct(&data[--done]);
+            }
+        }
+
+        inline void cleanUp() throw() { kill( int2type< type_traits<T>::is_primitive >() ); }
+
+        void release() throw()
+        {
+            cleanUp();
+            void *base = (void *)mrow;
+            memory::kind<memory::global>::release(base,wlen);
+            mrow = 0;
+            data = 0;
+            (size_t &)(this->rows)  = 0;
+            (size_t &)(this->cols)  = 0;
+            (size_t &)(this->items) = 0;
+        }
+
         inline void build(size_t r,size_t c)
         {
+            //__________________________________________________________________
+            //
+            // compute metrics
+            //__________________________________________________________________
             assert(r>0);
             assert(c>0);
             (size_t &)(this->rows)  = r;
             (size_t &)(this->cols)  = c;
             (size_t &)(this->items) = r*c;
-            data = new T[this->items];
-            try
+
+            //__________________________________________________________________
+            //
+            // get memory
+            //__________________________________________________________________
+            const size_t row_bytes  = r*sizeof(Row);
+            const size_t data_base  = memory::align(row_bytes);
+            wlen = data_base + this->items * sizeof(T);
+            void *base = memory::kind<memory::global>::acquire(wlen);
+
+            //__________________________________________________________________
+            //
+            // prepare memory layout
+            //__________________________________________________________________
+            mrow = static_cast<Row *>(base);
+            data = (T *) (static_cast<uint8_t*>(base)+data_base);
             {
-                mrow = static_cast<Row *>( operator new(r*sizeof(Row)) );
                 T *p = data;
                 for(size_t i=0;i<r;++i,p+=c)
                 {
                     new (mrow+i) Row(p,c);
                 }
             }
+
+            //__________________________________________________________________
+            //
+            // prepare objects
+            //__________________________________________________________________
+            try
+            {
+                init( int2type< type_traits<T>::is_primitive >() );
+            }
             catch(...)
             {
-                delete []data;
+                release();
                 throw;
             }
         }
 
+        //! primitive
+        inline void init( int2type<true> ) throw()
+        {
+            //do nothing, initialized to 0
+        }
+        
+        //! primitive
+        inline void init( int2type<false> )
+        {
+            std::cerr << "done=" << done << std::endl;
+            assert(0==done);
+            const size_t n = this->items;
+            while(done<n)
+            {
+                new (data+done) T();
+                ++done;
+            }
+        }
+        
     };
-
-
+    
+    
 }
 
 #endif

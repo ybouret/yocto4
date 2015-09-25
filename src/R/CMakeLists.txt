@@ -9,7 +9,7 @@ ELSE()
 ENDIF()
 
 #How to use R to build a module...
-#INCLUDE_DIRECTORIES(. ../main)
+INCLUDE_DIRECTORIES(. ../main ../mpa)
 
 GET_TARGET_PROPERTY(yoctoLib yocto LOCATION )
 
@@ -29,3 +29,6 @@ INSTALL( FILES
 yocto/R/R++.hpp
 yocto/R/IR.hpp
 DESTINATION include/yocto/R)
+
+ADD_EXECUTABLE(test-ir test-ir.cpp IR.hpp)
+TARGET_LINK_YOCTO(test-ir mpa)
