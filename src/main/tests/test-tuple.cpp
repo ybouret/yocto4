@@ -21,7 +21,11 @@ YOCTO_DISABLE_ASSIGN(Qat);
 YOCTO_QUAD_END();
 
 
+YOCTO_PENTUPLE_DECL(Pentuple,int,a,int, b, int, c, int,d,int,e);
+YOCTO_PENTUPLE_END();
 
+YOCTO_SEXTUPLE_DECL(Sextuple,int,a,int, b, int, c, int,d,int,e,int,f);
+YOCTO_SEXTUPLE_END();
 
 YOCTO_UNIT_TEST_IMPL(tuple)
 {
