@@ -59,6 +59,7 @@ YOCTO_UNIT_TEST_IMPL(slots)
         {
             std::cerr << "#" << i << "\t" << src[i] << " -> \t" << tgt[i] << std::endl;
         }
+        std::cerr << "tgt=" << tgt << std::endl;
     }
 
 }

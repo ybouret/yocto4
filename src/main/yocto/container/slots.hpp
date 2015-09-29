@@ -4,6 +4,7 @@
 #include "yocto/container/cslot.hpp"
 #include "yocto/type/args.hpp"
 #include "yocto/code/bswap.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -192,7 +193,16 @@ namespace yocto
         }
 
 
-
+        inline friend std::ostream & operator<<( std::ostream &os, const slots_of &s )
+        {
+            os << '[';
+            for(size_t i=0;i<s.size;++i)
+            {
+                os << ' ' << s[i];
+            }
+            os << ' ' << ']';
+            return os;
+        }
 
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(slots_of);
