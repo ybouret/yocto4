@@ -4,6 +4,7 @@
 #include "yocto/hashing/elf.hpp"
 #include "yocto/hashing/sha1.hpp"
 #include "yocto/memory/pooled.hpp"
+#include "yocto/sequence/list.hpp"
 
 #include "support.hpp"
 #include <typeinfo>
@@ -42,7 +43,9 @@ namespace
 	{
 		typedef set<KEY,dummy<KEY>,KEY_HASHER,ALLOCATOR> set_t;
 		typedef typename set_t::mutable_key              key_t;
-		
+
+        list<KEY> key_seq;
+
         for(size_t iter=0;iter<1;++iter)
         {
             vector<KEY> keys;
@@ -77,8 +80,12 @@ namespace
                 const KEY &k = i->data.key();
                 if( ! S.remove( k ) ) std::cerr << "can't remove " << k << std::endl;
             }
+
+            key_seq.free();
+            S.collect_keys(key_seq);
         }
-		
+
+
 	}
 	
 }

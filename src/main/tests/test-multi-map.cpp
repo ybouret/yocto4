@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/associative/multi-map.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/sequence/list.hpp"
 #include "yocto/code/primes.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sort/heap.hpp"
@@ -49,6 +50,7 @@ YOCTO_UNIT_TEST_IMPL(multi_map)
     }
     std::cerr << "size=" << thesaurus.size() << std::endl;
     std::cerr << "keys=" << thesaurus.keys() << std::endl;
+
     for(size_t i=1;i<=gkeys.size();++i)
     {
         const string &k = gkeys[i];
@@ -64,5 +66,9 @@ YOCTO_UNIT_TEST_IMPL(multi_map)
             std::cerr << "\t" << node->get() << std::endl;
         }
     }
+
+    list<string> req;
+    thesaurus.collect_keys(req);
+    std::cerr << "req=" << req << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

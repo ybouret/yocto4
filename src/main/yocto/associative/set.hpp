@@ -2,7 +2,7 @@
 #define YOCTO_ASSOCIATIVE_SET_INCLUDED 1
 
 
-#include "yocto/container/container.hpp"
+#include "yocto/container/sequence.hpp"
 #include "yocto/associative/key-hasher.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/code/htable.hpp"
@@ -339,6 +339,14 @@ namespace yocto
 
                 destruct(klist.unlink(knode));
                 kpool.store(knode);
+            }
+        }
+
+        inline void collect_keys( sequence<KEY> &key_seq ) const
+        {
+            for(const KNode *node = klist.head; node; node=node->next )
+            {
+                key_seq.push_back(node->data.key());
             }
         }
 

@@ -6,6 +6,7 @@
 #include "yocto/core/pool.hpp"
 #include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
+#include "yocto/container/sequence.hpp"
 
 namespace yocto
 {
@@ -120,7 +121,7 @@ namespace yocto
             catch(...) { __destroy(dnode); throw; }            
         }
         
-        Group *search( const_key key ) throw()
+        inline Group *search( const_key key ) throw()
         {
             GroupPointer *ppG = groups.search(key);
             if(ppG)
@@ -133,6 +134,26 @@ namespace yocto
             }
         }
 
+        inline const Group *search( const_key key ) const throw()
+        {
+            const GroupPointer *ppG = groups.search(key);
+            if(ppG)
+            {
+                return & (**ppG);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        
+
+
+        inline
+        void collect_keys( sequence<KEY> &kseq ) const
+        {
+            groups.collect_keys(kseq);
+        }
         
 
         explicit multi_map() throw() :
