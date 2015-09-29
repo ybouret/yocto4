@@ -39,7 +39,7 @@ namespace yocto
             {
                 for(const node_type *node = other.head; node; node=node->next )
                 {
-                    push_back( new node_type(node->addr) );
+                    this->push_back( new node_type(node->addr) );
                 }
             }
             catch(...)
