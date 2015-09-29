@@ -46,7 +46,9 @@ namespace yocto
             GNode *prev;
             GNode *next;
             DNode *dnode;
-            
+
+            inline type       & get() throw()       { assert(dnode); return dnode->data; }
+            inline const_type & get() const throw() { assert(dnode); return dnode->data; }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(GNode);
@@ -118,7 +120,21 @@ namespace yocto
             catch(...) { __destroy(dnode); throw; }            
         }
         
+        Group *search( const_key key ) throw()
+        {
+            GroupPointer *ppG = groups.search(key);
+            if(ppG)
+            {
+                return & (**ppG);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         
+
         explicit multi_map() throw() :
         dlist(),
         dpool(),
