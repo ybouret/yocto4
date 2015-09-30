@@ -3,7 +3,7 @@
 
 #include "yocto/threading/threads.hpp"
 #include "yocto/threading/layout.hpp"
-#include "yocto/container/slots.hpp"
+#include "yocto/sequence/slots.hpp"
 #include "yocto/threading/condition.hpp"
 #include "yocto/functor.hpp"
 #include "yocto/parallel/basic.hpp"

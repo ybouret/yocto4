@@ -2,7 +2,7 @@
 #define YOCTO_PARALLEL_SETUP_INCLUDED 1
 
 #include "yocto/parallel/split.hpp"
-#include "yocto/container/slots.hpp"
+#include "yocto/sequence/slots.hpp"
 
 namespace yocto
 {

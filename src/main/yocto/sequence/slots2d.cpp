@@ -1,4 +1,4 @@
-#include "yocto/container/slots2d.hpp"
+#include "yocto/sequence/slots2d.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/code/round.hpp"
 

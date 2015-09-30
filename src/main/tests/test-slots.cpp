@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/container/slots.hpp"
+#include "yocto/sequence/slots.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/string.hpp"
 #include "support.hpp"
@@ -65,7 +65,7 @@ YOCTO_UNIT_TEST_IMPL(slots)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/container/slots2d.hpp"
+#include "yocto/sequence/slots2d.hpp"
 
 YOCTO_UNIT_TEST_IMPL(slots2D)
 {
