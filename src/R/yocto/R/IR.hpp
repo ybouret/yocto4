@@ -175,6 +175,15 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         rows(0), cols(0), items(0)
         {}
 
+        inline void setDimensions(const size_t nr, const size_t nc) throw()
+        {
+            assert(nr>0);
+            assert(nc>0);
+            (size_t &)rows  = nr;
+            (size_t &)cols  = nc;
+            (size_t &)items = nr*nc;
+        }
+
     private:
         CoreMatrix(const CoreMatrix &);
         CoreMatrix&operator=(const CoreMatrix&);
@@ -325,9 +334,7 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
             //__________________________________________________________________
             assert(r>0);
             assert(c>0);
-            (size_t &)(this->rows)  = r;
-            (size_t &)(this->cols)  = c;
-            (size_t &)(this->items) = r*c;
+            this->setDimensions(r,c);
 
             //__________________________________________________________________
             //

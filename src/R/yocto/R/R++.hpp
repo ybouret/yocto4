@@ -182,9 +182,7 @@ catch(...) { Rprintf("Unhandled exception !\n"); return R_NilValue; }
         inline void get_dims()
         {
             SEXP             Rdim   = getAttrib(Rmat, R_DimSymbol);
-            (size_t &)(this->rows)  = INTEGER(Rdim)[0];
-            (size_t &)(this->cols)  = INTEGER(Rdim)[1];
-            (size_t &)(this->items) = this->rows * this->cols;
+            this->setDimensions(INTEGER(Rdim)[0],INTEGER(Rdim)[1]);
             mcol = static_cast<Column *>( operator new( (this->cols)*sizeof(Column) ) );
             T *p = data;
             for( size_t i=0; i < this->cols; ++i, p += this->rows )
