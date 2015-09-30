@@ -43,9 +43,11 @@ if [ -z "$WINDIR" ];
 then
   cmake -E cmake_echo_color --magenta "-- NOT building on Windows"
   WITH_MAKEFILES="Unix Makefiles"
+  GMAKE="make"
 else
   cmake -E cmake_echo_color --magenta "-- building on Windows"
-  WITH_MAKEFILES="MSYS Makefiles"
+  WITH_MAKEFILES="Unix Makefiles"
+  GMAKE="make"
 fi
 
 ########################################################################
@@ -182,6 +184,7 @@ case `uname -s` in
 		
 	"MINGW32_NT-5.1" | "MINGW32_NT-6.1" )
 		NPROCS=`env | grep NUMBER_OF_PROCESSORS | cut -d '=' -f 2`;
+		NPROCS=1;
 		;;
 
 	"SunOS" )
@@ -197,7 +200,7 @@ if (( $NPROCS > 8 )); then
 	NPROCS=8;
 fi
 JLEVEL="-j${NPROCS}"
-cmake -E cmake_echo_color --magenta "-- using $JLEVEL";
+cmake -E cmake_echo_color --magenta "-- using $JLEVEL for $GMAKE";
 
 ################################################################################
 ## Executing Remaining Commands: WE ARE in the BUILD_DIR !!
@@ -213,7 +216,7 @@ function xtarget
     echo "-- executing [$1]";
     case $BUILD_TOOLS in
         "gnu" | "intel" | "path" | "clang"  )
-            make $JLEVEL -s $tgt || xerror "can't build [$1]"
+            $GMAKE $JLEVEL -s $tgt || xerror "can't build [$1]"
         ;;
 
         "xcode")
