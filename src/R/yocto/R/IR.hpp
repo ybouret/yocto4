@@ -5,6 +5,8 @@
 #include "yocto/memory/global.hpp"
 #include "yocto/code/unroll.hpp"
 #include "yocto/sort/quick.hpp"
+#include "yocto/type/traits.hpp"
+
 #include <new>
 
 namespace yocto
@@ -216,6 +218,18 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
             return os;
         }
 
+        inline void ld( typename type_traits<T>::parameter_type arg )
+        {
+            Matrix<T> &self = *this;
+            for(size_t r=0;r<rows;++r)
+            {
+                for(size_t c=0;c<cols;++c)
+                {
+                    self(r,c) = arg;
+                }
+            }
+        }
+
     protected:
         inline explicit Matrix() throw() : CoreMatrix() {}
 
@@ -383,7 +397,6 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         //! primitive
         inline void init( int2type<false> )
         {
-            std::cerr << "done=" << done << std::endl;
             assert(0==done);
             const size_t n = this->items;
             while(done<n)
