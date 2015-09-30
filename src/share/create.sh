@@ -216,7 +216,7 @@ function xtarget
     echo "-- executing [$1]";
     case $BUILD_TOOLS in
         "gnu" | "intel" | "path" | "clang"  )
-            $GMAKE $JLEVEL -s $tgt || xerror "can't build [$1]"
+            $GMAKE -s $JLEVEL $tgt || xerror "can't build [$1]"
         ;;
 
         "xcode")
