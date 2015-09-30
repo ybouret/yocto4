@@ -37,70 +37,76 @@ namespace yocto
         }
 
         //! append by copy
-        inline void push_back( param_type args )
+        inline type & push_back( param_type args )
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(args);
+            type   *p = new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(args);
             ++n;
+            return *p;
         }
 
         //! append by empty constructor
-        inline void push_back()
+        inline type &push_back()
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type();
+            type   *p = new (static_cast<mutable_type *>(cmem.data)+n) mutable_type();
             ++n;
+            return *p;
         }
 
         //! append by one arg constructor
         template <typename U>
-        inline void append( typename type_traits<U>::parameter_type arg1 )
+        inline type & append( typename type_traits<U>::parameter_type arg1 )
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1);
+            type   *p = new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1);
             ++n;
+            return *p;
         }
 
         //! append by two args constructor
         template <typename U,typename V>
-        inline void append(typename type_traits<U>::parameter_type arg1,
-                           typename type_traits<V>::parameter_type arg2
-                           )
+        inline type & append(typename type_traits<U>::parameter_type arg1,
+                             typename type_traits<V>::parameter_type arg2
+                             )
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1,arg2);
+            type   *p = new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1,arg2);
             ++n;
+            return *p;
         }
 
         //! append by three args constructor
         template <typename U,typename V,typename W>
-        inline void append(typename type_traits<U>::parameter_type arg1,
-                           typename type_traits<V>::parameter_type arg2,
-                           typename type_traits<W>::parameter_type arg3
-                           )
+        inline type &append(typename type_traits<U>::parameter_type arg1,
+                            typename type_traits<V>::parameter_type arg2,
+                            typename type_traits<W>::parameter_type arg3
+                            )
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1,arg2,arg3);
+            type   *p = new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1,arg2,arg3);
             ++n;
+            return *p;
         }
 
         //! append by four args constructor
         template <typename U,typename V,typename W, typename X>
-        inline void append(typename type_traits<U>::parameter_type arg1,
-                           typename type_traits<V>::parameter_type arg2,
-                           typename type_traits<W>::parameter_type arg3,
-                           typename type_traits<X>::parameter_type arg4
-                           )
+        inline type & append(typename type_traits<U>::parameter_type arg1,
+                             typename type_traits<V>::parameter_type arg2,
+                             typename type_traits<W>::parameter_type arg3,
+                             typename type_traits<X>::parameter_type arg4
+                             )
         {
             assert(size<capacity);
             size_t &n = (size_t&)size;
-            new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1,arg2,arg3,arg4);
+            type   *p = new (static_cast<mutable_type *>(cmem.data)+n) mutable_type(arg1,arg2,arg3,arg4);
             ++n;
+            return *p;
         }
 
 
