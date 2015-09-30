@@ -335,9 +335,6 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
             memory::kind<memory::global>::release(base,wlen);
             mrow = 0;
             data = 0;
-            (size_t &)(this->rows)  = 0;
-            (size_t &)(this->cols)  = 0;
-            (size_t &)(this->items) = 0;
         }
 
         inline void build(size_t r,size_t c)

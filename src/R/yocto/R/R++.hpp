@@ -2,6 +2,11 @@
 #define YOCTO_RXX_INCLUDED 1
 
 #include "yocto/R/IR.hpp"
+
+#if defined(YOCTO_WIN)
+#undef ERROR
+#endif
+
 #include <R.h>
 #include <Rinternals.h>
 
