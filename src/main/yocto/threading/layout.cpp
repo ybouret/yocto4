@@ -103,7 +103,8 @@ namespace yocto
 		size( other.size ),
 		root( other.root ),
         ncpu( other.ncpu ),
-        scan( other.scan )
+        scan( other.scan ),
+        verbose( other.verbose )
 		{
 		}
 		
