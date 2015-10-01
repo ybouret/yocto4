@@ -55,8 +55,8 @@ namespace yocto
             };
 
 
-            explicit crew(bool setVerbose=false);
-            explicit crew(const size_t num_cpus, const size_t cpu_start,bool setVerbose=false);
+            explicit crew(bool setVerbose);
+            explicit crew(const size_t num_cpus, const size_t cpu_start,bool setVerbose);
             virtual ~crew() throw();
 
 
