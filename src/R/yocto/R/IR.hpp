@@ -229,6 +229,21 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
                 }
             }
         }
+        
+        inline void neg()
+        {
+            Matrix<T> &self = *this;
+            for(size_t r=0;r<rows;++r)
+            {
+                for(size_t c=0;c<cols;++c)
+                {
+                    const T   tmp = -self(r,c);
+                    self(r,c) = tmp;
+                }
+            }
+
+        }
+        
 
     protected:
         inline explicit Matrix() throw() : CoreMatrix() {}
