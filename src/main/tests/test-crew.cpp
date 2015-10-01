@@ -76,7 +76,7 @@ YOCTO_UNIT_TEST_IMPL(crew)
 {
 
     crew::single_context mono;
-    crew                 team;
+    crew                 team(true);
     Worker               W;
 
     if( argc > 1 )

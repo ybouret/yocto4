@@ -24,6 +24,7 @@ namespace yocto
 			const size_t root; //!< #CPU to start.
 			const size_t ncpu; //!< hardware #CPU
             const size_t scan; //!< min_of(size,ncpu-root)
+            bool         verbose;
             
 			//! parse the environment variable YOCTO_THREADING=#threads[,offset]
 			/**
@@ -31,9 +32,9 @@ namespace yocto
 			 - if YOCTO_THREADING is defined, then the first field is #threads (mandatory)
 			 while the optional second field is the CPU offset.
 			 */
-			explicit layout(); 
+			explicit layout(bool setVerbose);
 			
-            explicit layout( size_t num_threads, size_t thread_offset = 0);
+            explicit layout( size_t num_threads, size_t thread_offset, bool setVerbose);
             
 			//! destructor.
 			virtual ~layout() throw();

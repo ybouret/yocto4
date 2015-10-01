@@ -41,11 +41,12 @@ namespace yocto
 			return false;
 		}
 		
-		layout:: layout( ) :
+		layout:: layout(bool setVerbose) :
 		size( hardware::nprocs() ),
 		root(0),
         ncpu(size),
-        scan(ncpu)
+        scan(ncpu),
+        verbose(setVerbose)
 		{
 			const string name = "YOCTO_THREADING";
 			string       value;
@@ -82,14 +83,15 @@ namespace yocto
 
                 
 			}
-			std::cerr << "[threading::layout=" << size << "," << root << ",scan=" << scan << "]" << std::endl;
+			if(verbose) std::cerr << "[threading::layout=" << size << "," << root << ",scan=" << scan << "]" << std::endl;
 		}
 		
-        layout:: layout( size_t num_threads, size_t thread_offset ) :
+        layout:: layout( size_t num_threads, size_t thread_offset, bool setVerbose) :
         size( num_threads   ),
         root( thread_offset ),
         ncpu( hardware::nprocs() ),
-        scan( min_of(size,ncpu-root) )
+        scan( min_of(size,ncpu-root) ),
+        verbose(setVerbose)
         {
             if(num_threads<=0)
                 throw exception("Invalid #CPU");
@@ -116,7 +118,7 @@ namespace yocto
             assert(scan>0);
             assert(root<size);
             const size_t j = root + ( iThread % scan );
-            std::cerr << "|_assign thread #" << iThread << " on CPU #" << j << std::endl;
+            if(verbose) std::cerr << "|_assign thread #" << iThread << " on CPU #" << j << std::endl;
             return j;
         }
 		

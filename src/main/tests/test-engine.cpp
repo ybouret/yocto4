@@ -67,7 +67,7 @@ YOCTO_UNIT_TEST_IMPL(engine)
         nIter = strconv::to<size_t>(argv[2],"nIter");
     }
 
-    engine Q;
+    engine Q(true);
     wtime  chrono;
     chrono.start();
     // seq

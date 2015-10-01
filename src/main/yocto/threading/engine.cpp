@@ -5,7 +5,7 @@ namespace yocto
 {
     namespace threading
     {
-
+        
         engine:: task:: ~task() throw() {}
         engine:: task:: task( const job_id I, const job &J ) :
         next(0),
@@ -13,11 +13,11 @@ namespace yocto
         uuid(I),
         work(J)
         {
-
+            
         }
-
+        
     }
-
+    
 }
 
 
@@ -29,7 +29,7 @@ namespace yocto
 YOCTO_LOCK(access);                \
 CODE;                              \
 } while(false)
-
+        
 #define Y_THREADING_ENGINE_CTOR() \
 workers("engine",size),           \
 more_work(),                      \
@@ -45,38 +45,39 @@ tpool(),                          \
 juuid(1),                         \
 ready(0),                         \
 failed(0)
-
-        engine:: engine() : layout(),
+        
+        engine:: engine(bool setVerbose) : layout(setVerbose),
         Y_THREADING_ENGINE_CTOR()
         {
             init();
         }
-
-        engine:: engine(const size_t num_threads, const size_t threads_offset) :
-        layout(num_threads,threads_offset),
+        
+        engine:: engine(const size_t num_threads, const size_t threads_offset, bool setVerbose) :
+        layout(num_threads,threads_offset,setVerbose),
         Y_THREADING_ENGINE_CTOR()
         {
             init();
         }
-
-
+        
+        
         engine:: ~engine() throw()
         {
             quit();
         }
-
-
+        
+        
         void engine:: init()
         {
-
+            
+            if(verbose)
             {
                 YOCTO_LOCK(access);
                 std::cerr << "[engine] initializing..." << std::endl;
             }
-
+            
             try
             {
-
+                
                 //______________________________________________________________
                 //
                 // prepare all worker threads:0..size-1
@@ -85,13 +86,13 @@ failed(0)
                 {
                     workers.launch(worker_call,this);
                 }
-
+                
                 //______________________________________________________________
                 //
                 // prepare master thread
                 //______________________________________________________________
                 workers.launch(master_call,this);
-
+                
                 //______________________________________________________________
                 //
                 // wait for first synchronization
@@ -107,30 +108,39 @@ failed(0)
                         else
                         {
                             assert(1+size==ready);
-                            std::cerr << "[engine] threads are synchronized." << std::endl;
-
+                            if(verbose) std::cerr << "[engine] threads are synchronized." << std::endl;
+                            
                             //__________________________________________________
                             //
                             // threads placements
                             //__________________________________________________
-
+                            
                             // main thread on root CPU
-                            std::cerr << "[engine] assigning main thread:" << std::endl;
-                            std::cerr << "[engine] "; assign_current_thread_on( cpu_index_of(0) );
-
+                            if(verbose){
+                                std::cerr << "[engine] assigning main thread:" << std::endl;
+                                std::cerr << "[engine] ";
+                            }
+                            assign_current_thread_on( cpu_index_of(0) );
+                            
                             // regular dispatch of workers
-                            std::cerr << "[engine] assigning workers thread:" << std::endl;
+                            if(verbose) std::cerr << "[engine] assigning workers thread:" << std::endl;
                             size_t iThread = 0;
                             for(thread *thr = workers.head; thr->next; thr=thr->next)
                             {
-                                std::cerr << "[engine] "; thr->on_cpu( cpu_index_of(iThread++) );
+                                if(verbose)std::cerr << "[engine] ";
+                                thr->on_cpu( cpu_index_of(iThread++) );
                             }
-
+                            
+                            
                             // last thread is master, on root CPU, doesn't work a lot
-                            std::cerr << "[engine] assigning Master thread:" << std::endl;
-                            std::cerr << "[engine] "; workers.tail->on_cpu( cpu_index_of(0) );
-
-                            std::cerr << "[engine] ready." << std::endl << std::endl;
+                            if(verbose)
+                            {
+                                std::cerr << "[engine] assigning Master thread:" << std::endl;
+                                std::cerr << "[engine] ";
+                            }
+                            workers.tail->on_cpu( cpu_index_of(0) );
+                            
+                            if(verbose) std::cerr << "[engine] ready." << std::endl << std::endl;
                             access.unlock();
                             break;
                         }
@@ -143,20 +153,23 @@ failed(0)
                 throw;
             }
         }
-
-
+        
+        
         void engine:: quit() throw()
         {
-
+            
             access.lock();
-            std::cerr << std::endl;
-            std::cerr << "[engine] turning off..." << std::endl;
+            (bool&)dying = true;
+            if(verbose)
+            {
+                std::cerr << std::endl;
+                std::cerr << "[engine] turning off..." << std::endl;
+                std::cerr << "[engine] kill #pending=" << pending << std::endl;
+            }
             //__________________________________________________________________
             //
             // remove pending tasks
             //__________________________________________________________________
-            (bool&)dying = true;
-            std::cerr << "[engine] kill #pending=" << pending << std::endl;
             while(pending>0)
             {
                 task *t = tasks.pop_back();
@@ -164,7 +177,7 @@ failed(0)
                 object::release1<task>(t);
             }
             access.unlock();
-
+            
             //__________________________________________________________________
             //
             // waiting for active tasks to complete...
@@ -177,51 +190,51 @@ failed(0)
                 completed.wait(access);
             }
             access.unlock();
-
+            
             //__________________________________________________________________
             //
             // ok, all jobs are done...
             //__________________________________________________________________
             more_work.broadcast();
             work_done.broadcast();
-
-
+            
+            
             //__________________________________________________________________
             //
             // and finally finnish all threads
             //__________________________________________________________________
-            Y_LOCKED_ENGINE(std::cerr << "[engine] wait for all threads to return..." << std::endl);
+            Y_LOCKED_ENGINE(if(verbose) std::cerr << "[engine] wait for all threads to return..." << std::endl);
             workers.finish();
-
+            
             while(tpool.size>0) object::release1<task>(tpool.query());
-
-            Y_LOCKED_ENGINE(std::cerr << "[engine] halted." << std::endl);
+            
+            Y_LOCKED_ENGINE(if(verbose) std::cerr << "[engine] halted." << std::endl);
         }
-
-
-
-
+        
+        
+        
+        
         void engine:: worker_call(void *args) throw()
         {
             assert(args);
             static_cast<engine *>(args)->worker_loop();
         }
-
+        
         void engine:: master_call(void *args) throw()
         {
             assert(args);
             static_cast<engine *>(args)->master_loop();
         }
     }
-
+    
 }
 
 namespace yocto
 {
     namespace threading
     {
-
-
+        
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // Master Loop
@@ -238,8 +251,8 @@ namespace yocto
             const int thread_name = workers.get_index_of( thread::get_current_id() );
             access.lock();
             ++(size_t&)ready;
-            std::cerr << "[engine] Master ID=" << thread_name << std::endl;
-
+            if(verbose) std::cerr << "[engine] Master ID=" << thread_name << std::endl;
+            
         WAIT_FOR_WORK_DONE:
             //__________________________________________________________________
             //
@@ -248,7 +261,7 @@ namespace yocto
             //
             //__________________________________________________________________
             work_done.wait(access);
-
+            
             //__________________________________________________________________
             //
             //
@@ -259,12 +272,12 @@ namespace yocto
             {
                 if(running>0)
                     goto WAIT_FOR_WORK_DONE;
-                std::cerr << "[engine] stop Master." << std::endl;
+                if(verbose) std::cerr << "[engine] stop Master." << std::endl;
                 completed.broadcast();
                 access.unlock();
                 return;
             }
-
+            
             //std::cerr << "[engine] work done. Remaining #tasks=" << tasks.size << "." << std::endl;
             if(pending)
             {
@@ -279,11 +292,11 @@ namespace yocto
                     completed.broadcast();
                 }
             }
-
+            
             goto WAIT_FOR_WORK_DONE;
         }
-
-
+        
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // Worker Loop
@@ -300,9 +313,9 @@ namespace yocto
             const int thread_name = workers.get_index_of( thread::get_current_id() );
             access.lock();
             ++(size_t&)ready;
-            std::cerr << "[engine] Worker ID=" << thread_name << std::endl;
-			
-
+            if(verbose) std::cerr << "[engine] Worker ID=" << thread_name << std::endl;
+            
+            
         WAIT_FOR_MORE_WORK:
             //__________________________________________________________________
             //
@@ -311,7 +324,7 @@ namespace yocto
             //
             //__________________________________________________________________
             more_work.wait(access);
-
+            
             //__________________________________________________________________
             //
             //
@@ -321,14 +334,14 @@ namespace yocto
             //std::cerr << "[engine] ===> " << thread_name <<  std::endl;
             if(dying)
             {
-                std::cerr << "[engine] stop Worker " << thread_name << std::endl;
+                if(verbose) std::cerr << "[engine] stop Worker " << thread_name << std::endl;
                 access.unlock();
                 return;
             }
-
+            
             if(pending>0)
             {
-
+                
                 task *todo = tasks.pop_front(); // extract next task
                 activ.push_back(todo);          // set it in active state
                 access.unlock();                // other threads can run
@@ -361,7 +374,7 @@ namespace yocto
 {
     namespace threading
     {
-
+        
         engine::task * engine::query_task()
         {
             if(tpool.size>0)
@@ -373,22 +386,22 @@ namespace yocto
                 return object::acquire1<task>();
             }
         }
-
+        
         void  engine:: activate(task *t) throw()
         {
             ++juuid;
             tasks.push_back(t);
             more_work.signal();
         }
-
-
+        
+        
         job_id engine:: enqueue(const job &J)
         {
             YOCTO_THREAD_ENGINE_ENQUEUE_PROLOG();
             try { new(t) task(juuid,J); } catch(...) { tpool.store(t); throw; }
             YOCTO_THREAD_ENGINE_ENQUEUE_EPILOG();
         }
-
+        
         //! wait until all jobs are done
         void engine:: flush() throw()
         {
@@ -399,7 +412,7 @@ namespace yocto
             }
             access.unlock();
         }
-
+        
         bool engine:: is_done(const job_id j) const throw()
         {
             YOCTO_LOCK(access);
@@ -408,7 +421,7 @@ namespace yocto
                 if(j==t->uuid)
                     return false;
             }
-
+            
             for(const task *t=activ.head;t;t=t->next)
             {
                 if(j==t->uuid)
@@ -417,7 +430,7 @@ namespace yocto
             
             return true;
         }
-
+        
     }
 }
 

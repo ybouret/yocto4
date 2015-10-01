@@ -17,8 +17,8 @@ namespace yocto
         class engine : public layout
         {
         public:
-            explicit engine();
-            explicit engine(const size_t num_threads, const size_t threads_offset=0);
+            explicit engine(bool setVerbose=false);
+            explicit engine(const size_t num_threads, const size_t threads_offset,bool setVerbose=false);
             virtual ~engine() throw();
             typedef functor<void,TL1(lockable&)> job;
 
