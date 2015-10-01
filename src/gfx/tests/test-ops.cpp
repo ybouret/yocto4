@@ -80,7 +80,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
     //threading::SIMD simd;
 
-    threading::engine psrv;
+    threading::engine psrv(true);
     if(argc>1)
     {
         const string         filename = argv[1];

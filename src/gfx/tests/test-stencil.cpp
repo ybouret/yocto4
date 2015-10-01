@@ -53,7 +53,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
     
     //threading::SIMD simd;
 
-    threading::engine psrv;
+    threading::engine psrv(true);
 
     if(argc>1)
     {

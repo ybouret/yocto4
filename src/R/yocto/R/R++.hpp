@@ -268,7 +268,8 @@ catch(...) { Rprintf("*** Unhandled exception !\n"); return R_NilValue; }
                 SET_STRING_ELT(list_names,i,mkChar(names[i]));
             }
             setAttrib(L, R_NamesSymbol, list_names);
-            UNPROTECT(1); //-- list_name
+            UNPROTECT(1);
+            //-- list_name
             
             set_R();
         }
