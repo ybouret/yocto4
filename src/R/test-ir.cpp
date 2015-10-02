@@ -7,7 +7,6 @@ using namespace yocto;
 
 YOCTO_PROGRAM_START()
 {
-#if 1
     CMatrix<int> iM(3,4);
     iM.ld(1);
     std::cerr << "iM=" << iM << std::endl;
@@ -23,6 +22,9 @@ YOCTO_PROGRAM_START()
     const mpq half(1,2);
     qM.ld(half);
     std::cerr << "qM=" << qM << std::endl;
-#endif
+
+
+    CMatrices<int> M(4,5,6);
+
 }
 YOCTO_PROGRAM_END()
