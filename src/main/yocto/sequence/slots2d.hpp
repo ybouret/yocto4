@@ -107,6 +107,7 @@ namespace yocto
 
         inline virtual ~slots2D_of() throw()
         {
+            std::cerr << "-slots2D" << std::endl;
             free();
         }
 
