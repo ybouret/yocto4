@@ -7,7 +7,7 @@
 #include "yocto/sort/quick.hpp"
 #include "yocto/type/traits.hpp"
 #include "yocto/sequence/slots.hpp"
-
+#include "yocto/ptr/auto.hpp"
 #include <new>
 
 namespace yocto
@@ -421,35 +421,88 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
         
     };
 
-    //! multiple matrices of same sizes
+    //! collection of matrices, derived class must create them
     template <typename T>
-    class CMatrices :
-    public CoreMatrix,
-    public slots_of< CMatrix<T> >
+    class Matrices : public CoreMatrix
     {
     public:
-        inline explicit CMatrices(const size_t nm,
-                                  const size_t nr,
-                                  const size_t nc) :
-        CoreMatrix(),
-        slots_of< CMatrix<T> >(nm)
+        inline virtual ~Matrices() throw()
         {
+        }
+
+        Matrix<T> & operator[](const size_t indx) throw()
+        {
+            assert(indx<count);
+            assert(handles[indx].is_valid());
+            return *handles[indx];
+        }
+
+        const Matrix<T> & operator[](const size_t indx) const throw()
+        {
+            assert(indx<count);
+            assert(handles[indx].is_valid());
+            return *handles[indx];
+        }
+
+    protected:
+        inline explicit Matrices(const size_t nm,
+                                 const size_t nr,
+                                 const size_t nc) :
+        CoreMatrix(),
+        handles(nm),
+        count(handles.size)
+        {
+            this->setDimensions(nr,nc);
             for(size_t i=0;i<nm;++i)
             {
-                this->template append<size_t,size_t>(nr,nc);
+                handles.template append< Matrix<T>* >(NULL);
             }
-            assert(this->size==nm);
-            this->setDimensions(nr,nc);
         }
 
-        inline virtual ~CMatrices() throw()
-        {
-        }
+        typedef auto_ptr< Matrix<T> > MatrixPtr;
+        slots_of<MatrixPtr> handles;
 
     private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(CMatrices);
+        YOCTO_DISABLE_COPY_AND_ASSIGN(Matrices);
+
+    public:
+        const size_t &count;
     };
-    
+
+    //! a templated matrices collection
+    template <
+    typename T,
+    template <typename> class MATRIX
+    >
+    class MatricesOf : public Matrices<T>
+    {
+    public:
+        typedef MATRIX<T> MatrixType;
+
+        inline explicit MatricesOf(const size_t nm,
+                                   const size_t nr,
+                                   const size_t nc) :
+        Matrices<T>(nm,nr,nc)
+        {
+            assert(this->handles.size==nm);
+            for(size_t i=0;i<nm;++i)
+            {
+                this->handles[i].reset( new MatrixType(nr,nm) );
+            }
+        }
+
+        inline virtual ~MatricesOf() throw()
+        {
+
+        }
+
+
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(MatricesOf);
+    };
+
+
+
 }
 
 #endif

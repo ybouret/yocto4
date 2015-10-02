@@ -24,7 +24,7 @@ YOCTO_PROGRAM_START()
     std::cerr << "qM=" << qM << std::endl;
 
 
-    CMatrices<int> M(4,5,6);
-
+    MatricesOf<int,CMatrix> MM(4,5,6);
+    
 }
 YOCTO_PROGRAM_END()
