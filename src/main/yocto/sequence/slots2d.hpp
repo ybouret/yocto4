@@ -141,6 +141,13 @@ do { free(); try { PROC; } catch(...) { free(); throw; } } while(false)
             YOCTO_SLOTS2D_BUILD_WITH( (ctor2<U,V>(arg1,arg2)) );
         }
 
+        template <typename U,typename V>
+        inline void procedural_build_with(const U &tableau,
+                                          typename type_traits<V>::parameter_type arg2)
+        {
+            YOCTO_SLOTS2D_BUILD_WITH( (procedural_ctor2<U,V>(tableau,arg2)) );
+        }
+
 
         inline friend std::ostream & operator<<( std::ostream &os, const slots2D_of &s )
         {
@@ -209,6 +216,22 @@ do { free(); try { PROC; } catch(...) { free(); throw; } } while(false)
                           typename type_traits<V>::parameter_type arg2)
         {
 
+        }
+
+
+        template <typename U,typename V>
+        inline void procedural_ctor2(const U                                 &tableau,
+                                     typename type_traits<V>::parameter_type arg2)
+        {
+            assert(constructed<=0);
+            for(size_t i=0;i<rows;++i)
+            {
+                for(size_t j=0;j<cols;++j)
+                {
+                    new ( &Data[constructed] ) mutable_type(tableau[i][j],arg2);
+                    ++constructed;
+                }
+            }
         }
         
     };
