@@ -15,7 +15,7 @@ namespace yocto
         class crew : public layout
         {
         public:
-
+            
             //! a context = range information for a worker
             class context
             {
@@ -43,13 +43,17 @@ namespace yocto
                 void        *priv;
             };
 
+            typedef functor<void,TL1(context&)> kernel;
+
+
             //! for testing sequential code
             class single_context : public faked_lock, public context
             {
             public:
+                const size_t failure;
                 single_context() throw();
                 virtual ~single_context() throw();
-                
+                void operator()(kernel &k) throw();
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(single_context);
             };
@@ -60,8 +64,7 @@ namespace yocto
             virtual ~crew() throw();
 
 
-            typedef functor<void,TL1(context&)> kernel;
-            
+
             void operator()(kernel &k) throw();
 
             template <typename OBJECT_POINTER,typename METHOD_POINTER>

@@ -25,7 +25,8 @@ namespace yocto
         
         crew:: single_context:: single_context() throw() :
         faked_lock(),
-        context(0,1,*this)
+        context(0,1,*this),
+        failure(0)
         {
         }
         
@@ -276,6 +277,21 @@ namespace yocto
             assert(size==ready);   // must be true here
             access.unlock();       // and unlock for next cycle...
         }
+
+
+        void crew::single_context:: operator()(kernel &k) throw()
+        {
+            (size_t&)failure = 0;
+            try
+            {
+                k(*this);
+            }
+            catch(...)
+            {
+                (size_t&)failure = 1;
+            }
+        }
+
     }
 }
 
