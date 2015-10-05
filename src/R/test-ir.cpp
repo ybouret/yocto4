@@ -27,6 +27,9 @@ YOCTO_PROGRAM_START()
     CMatrix<double> rM(100,120);
 
     MatricesOf<int,CMatrix> MM(4,5,6);
+
+    MM.ld(1);
+    MM.neg();
     
 }
 YOCTO_PROGRAM_END()

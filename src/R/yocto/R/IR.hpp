@@ -496,6 +496,18 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
 
         }
 
+        inline void ld( typename type_traits<T>::parameter_type arg )
+        {
+            const size_t nm = this->count;
+            for(size_t i=0;i<nm;++i) this->handles[i]->ld(arg);
+        }
+
+        inline void neg()
+        {
+            const size_t nm = this->count;
+            for(size_t i=0;i<nm;++i) this->handles[i]->neg();
+        }
+
 
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(MatricesOf);
