@@ -5,11 +5,11 @@ namespace yocto
 {
     namespace threading
     {
-        crew::context:: ~context() throw() {}
-        
-        crew::context:: context(const size_t the_rank,
-                                const size_t the_size,
-                                lockable    &the_lock) throw() :
+        context:: ~context() throw() {}
+
+        context:: context(const size_t the_rank,
+                          const size_t the_size,
+                          lockable    &the_lock) throw() :
         rank(the_rank),
         size(the_size),
         access(the_lock),
@@ -19,26 +19,68 @@ namespace yocto
             assert(size>0);
             assert(rank<size);
         }
-        
-        
-        crew:: single_context:: ~single_context() throw() {}
-        
-        crew:: single_context:: single_context() throw() :
-        faked_lock(),
-        context(0,1,*this),
-        failure(0)
-        {
-        }
-        
+
+
     }
-    
+
+}
+
+
+namespace yocto
+{
+    namespace threading
+    {
+        kernel_executor::  kernel_executor() throw() : failure(0) {}
+        kernel_executor:: ~kernel_executor() throw() {}
+
+        void kernel_executor:: no_failure() const throw() { (size_t&)failure = 0; }
+        void kernel_executor:: set_failure(const size_t f) const throw() { (size_t&)failure = f; }
+
+    }
+
 }
 
 namespace yocto
 {
     namespace threading
     {
-        
+
+
+        sequential_executor:: ~sequential_executor() throw() {}
+
+        sequential_executor:: sequential_executor() throw() :
+        faked_lock(),
+        context(0,1,*this),
+        kernel_executor()
+        {
+        }
+
+
+        void sequential_executor:: operator()(kernel &k) throw()
+        {
+            no_failure();
+            try
+            {
+                k(*this);
+            }
+            catch(...)
+            {
+                set_failure(1);
+            }
+        }
+
+
+    }
+
+}
+
+
+
+namespace yocto
+{
+    namespace threading
+    {
+
 #define Y_THREADING_CREW_CTOR() \
 workers("crew",size),           \
 access(workers.access),         \
@@ -55,14 +97,14 @@ failure(0)
         {
             init();
         }
-        
+
         crew:: crew(const size_t num_cpus, const size_t cpu_start,bool setVerbose) :
         layout(num_cpus,cpu_start,setVerbose),
         Y_THREADING_CREW_CTOR()
         {
             init();
         }
-        
+
         crew:: ~crew() throw()
         {
             quit();
@@ -74,11 +116,11 @@ namespace yocto
 {
     namespace threading
     {
-        
+
         void crew:: init()
         {
-            
-            
+
+
             try
             {
                 if(verbose)
@@ -96,11 +138,11 @@ namespace yocto
                     contexts.append<size_t,size_t,lockable&>(rank,size,access);
                     context &ctx = contexts[rank];
                     ctx.priv = this;
-                    
+
                     //-- create thread from context
                     workers.launch(worker_call,&ctx);
                 }
-                
+
                 //______________________________________________________________
                 //
                 // wait for first synchronization
@@ -120,7 +162,7 @@ namespace yocto
                                 std::cerr << "[crew] ";
                             }
                             assign_current_thread_on( cpu_index_of(0) );
-                            
+
                             // regular dispatch of workers
                             if(verbose) std::cerr << "[crew] assigning workers thread:" << std::endl;
                             size_t iThread = 0;
@@ -139,16 +181,16 @@ namespace yocto
                         }
                     }
                 }
-                
+
             }
             catch(...)
             {
                 quit();
                 throw;
             }
-            
+
         }
-        
+
         void crew:: quit() throw()
         {
             access.lock();
@@ -156,22 +198,22 @@ namespace yocto
             (bool&)dying = true;
             kproc        = NULL;
             access.unlock();
-            
+
             //__________________________________________________________________
             //
             // waiting for current cycle to finnish
             //__________________________________________________________________
-            
+
             access.lock();
-            
+
             access.unlock();
-            
+
             //__________________________________________________________________
             //
             // last cycle: on a dying crew...
             //__________________________________________________________________
             cycle.broadcast();
-            
+
             //__________________________________________________________________
             //
             // waiting for threads to return
@@ -179,7 +221,7 @@ namespace yocto
             workers.finish();
             if(verbose) std::cerr << "[crew] halted." << std::endl;
         }
-        
+
         void crew::worker_call(void *args) throw()
         {
             assert(args);
@@ -187,9 +229,9 @@ namespace yocto
             crew    &Crew  = *static_cast<crew    *>(Cntx.priv);
             Crew.worker_loop(Cntx);
         }
-        
+
     }
-    
+
 }
 
 
@@ -206,7 +248,7 @@ namespace yocto
             access.lock();
             if(verbose) std::cerr << "[crew] init " << ctx.size << "." << ctx.rank << std::endl;
             ++ready;
-            
+
             //__________________________________________________________________
             //
             // wait on a LOCKED accces
@@ -214,7 +256,7 @@ namespace yocto
         WAIT_FOR_CYCLE:
             //std::cerr << "[crew] " << ctx.size << "." << ctx.rank << ": waiting, #ready=" << ready << std::endl;
             cycle.wait(access);
-            
+
             //__________________________________________________________________
             //
             // woke up, access is LOCKED
@@ -226,14 +268,14 @@ namespace yocto
                 access.unlock();
                 return;
             }
-            
+
             //__________________________________________________________________
             //
             // Execute the current kernel
             //__________________________________________________________________
             assert(kproc!=NULL);
             access.unlock();
-            
+
             try
             {
                 (*kproc)(ctx);
@@ -242,22 +284,21 @@ namespace yocto
             {
                 //TODO: send a message ?
                 YOCTO_LOCK(access);
-                (size_t&)failure = ctx.indx;
+                set_failure(ctx.indx);
             }
-            
+
             access.lock();
             ++ready;
-            //std::cerr << "[crew] ok " << ctx.size << "." << ctx.rank << std::endl;
             if(ready>=size)
             {
                 synch.broadcast();
             }
             goto WAIT_FOR_CYCLE;
         }
-        
-        
+
+
     }
-    
+
 }
 
 
@@ -271,26 +312,13 @@ namespace yocto
             assert(size==ready);   // must be true here
             kproc = &K;            // local link
             ready = 0;             // global counter
-            (size_t&)failure = 0;  // clean up flag
+            no_failure();          // clean up flag
             cycle.broadcast();     // would start all threads
             synch.wait(access);    // unlock access => start threads => come back LOCKED
             assert(size==ready);   // must be true here
             access.unlock();       // and unlock for next cycle...
         }
 
-
-        void crew::single_context:: operator()(kernel &k) throw()
-        {
-            (size_t&)failure = 0;
-            try
-            {
-                k(*this);
-            }
-            catch(...)
-            {
-                (size_t&)failure = 1;
-            }
-        }
 
     }
 }

@@ -28,7 +28,7 @@ namespace
         {
         }
 
-        void Exec( crew::context &ctx )
+        void Exec( context &ctx )
         {
             {
                 YOCTO_LOCK(ctx.access);
@@ -75,7 +75,7 @@ namespace
 YOCTO_UNIT_TEST_IMPL(crew)
 {
 
-    crew::single_context mono;
+    sequential_executor  mono;
     crew                 team(true);
     Worker               W;
 
@@ -93,14 +93,14 @@ YOCTO_UNIT_TEST_IMPL(crew)
 
     timings tmx;
 
-    YOCTO_TIMINGS(tmx,2,W.Exec(mono));
+    YOCTO_TIMINGS(tmx,2,mono.call(&W,&Worker::Exec));
     const double speed_seq = tmx.speed;
     {
         YOCTO_LOCK(team.access);
         std::cerr << "\t (*) speed_seq=" << speed_seq << std::endl;
     }
 
-    YOCTO_TIMINGS(tmx,2,team(&W,&Worker::Exec));
+    YOCTO_TIMINGS(tmx,2,team.call(&W,&Worker::Exec));
     const double speed_par = tmx.speed;
     const double ratio     = speed_par/speed_seq;
     {
