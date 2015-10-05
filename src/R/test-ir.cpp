@@ -30,6 +30,6 @@ YOCTO_PROGRAM_START()
 
     MM.ld(1);
     MM.neg();
-    
+
 }
 YOCTO_PROGRAM_END()

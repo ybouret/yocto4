@@ -487,7 +487,7 @@ data(memory::kind<memory::global>::acquire_as<T>(inMem))
             assert(this->handles.size==nm);
             for(size_t i=0;i<nm;++i)
             {
-                this->handles[i].reset( new MatrixType(nr,nm) );
+                this->handles[i].reset( new MatrixType(nr,nc) );
             }
         }
 
