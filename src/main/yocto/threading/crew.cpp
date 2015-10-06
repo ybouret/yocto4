@@ -69,6 +69,8 @@ namespace yocto
             }
         }
 
+        size_t sequential_executor:: num_threads() const throw() { return 1; }
+        
 
     }
 
@@ -117,6 +119,11 @@ namespace yocto
     namespace threading
     {
 
+        size_t crew:: num_threads() const throw()
+        {
+            return this->size;
+        }
+        
         void crew:: init()
         {
 

@@ -51,8 +51,9 @@ namespace yocto
 
             virtual ~kernel_executor() throw();
 
-            virtual void operator()(kernel &) throw() = 0;
-
+            virtual void   operator()(kernel &) throw() = 0;
+            virtual size_t num_threads()  const throw() = 0;
+            
             template <typename OBJECT_POINTER,typename METHOD_POINTER>
             inline void call( OBJECT_POINTER h, METHOD_POINTER m )
             {
@@ -80,8 +81,9 @@ namespace yocto
         public:
             virtual ~sequential_executor() throw();
             explicit sequential_executor() throw();
-            virtual void operator()(kernel &) throw();
-
+            virtual void  operator()(kernel &) throw();
+            virtual size_t num_threads() const throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(sequential_executor);
         };
@@ -94,7 +96,8 @@ namespace yocto
             virtual ~crew() throw();
 
             virtual void operator()(kernel &k) throw();
-            
+            virtual size_t num_threads() const throw();
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(crew);
             threads           workers; //!< all the threads
