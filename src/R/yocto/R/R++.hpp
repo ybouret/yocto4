@@ -19,11 +19,18 @@ namespace yocto
 
 #define YOCTO_R_EPILOG() } \
 catch(const yocto::exception &e) { \
-Rprintf("*** %s\n",e.what());\
-Rprintf("*** %s\n",e.when());\
+Rprintf("\t*** %s\n",e.what());\
+Rprintf("\t*** %s\n",e.when());\
 return R_NilValue;\
 }\
-catch(...) { Rprintf("*** Unhandled exception !\n"); return R_NilValue; }
+catch(...) { Rprintf("\t*** Unhandled exception !\n"); return R_NilValue; }
+
+    //__________________________________________________________________________
+    //
+    //
+    // Data Types conversion
+    //
+    //__________________________________________________________________________
 
     //! template for R data type handling
     template <typename T> struct RGetData;
@@ -43,7 +50,14 @@ catch(...) { Rprintf("*** Unhandled exception !\n"); return R_NilValue; }
         static inline int * Cast( SEXP Rvec ) { assert(Rvec); return INTEGER(Rvec); }
         enum { Conv = INTSXP };
     };
-    
+
+    //__________________________________________________________________________
+    //
+    //
+    // Base class to communicate with R memory
+    //
+    //__________________________________________________________________________
+
     //! R Object
     class RObject
     {
@@ -65,8 +79,13 @@ catch(...) { Rprintf("*** Unhandled exception !\n"); return R_NilValue; }
         RObject&operator=(const RObject &);
     };
     
-       
-    //! R vector
+
+    //__________________________________________________________________________
+    //
+    //
+    //! A R vector, 0 based
+    //
+    //__________________________________________________________________________
     template <typename T>
     class RVector : public RObject, public RArray<T>
     {
@@ -111,8 +130,12 @@ catch(...) { Rprintf("*** Unhandled exception !\n"); return R_NilValue; }
         
     };
     
-        
+    //__________________________________________________________________________
+    //
+    //
     //! R matrix, columns major
+    //
+    //__________________________________________________________________________
     template <typename T>
     class RMatrix : public RObject, public Matrix<T>
     {
@@ -198,7 +221,12 @@ catch(...) { Rprintf("*** Unhandled exception !\n"); return R_NilValue; }
     };
 
 
+    //__________________________________________________________________________
+    //
+    //
     //! CMatrix directly built from R matrix
+    //
+    //__________________________________________________________________________
     template <typename T>
     class CMatrixR : public CMatrix<T>
     {
@@ -247,16 +275,21 @@ catch(...) { Rprintf("*** Unhandled exception !\n"); return R_NilValue; }
             return INTEGER(Rdim)[i];
         }
     };
-    
+
+    //__________________________________________________________________________
+    //
+    //
     //! RList wrapper
+    //
+    //__________________________________________________________________________
     class RList : public RObject
     {
     public:
         
         //! create a list for R
         RList(const char *names[], const size_t count) :
-        size( count ),
-        L( allocVector(VECSXP,size) )
+        size( check_list_size(count) ),
+        L( allocVector(VECSXP,size)  )
         {
             PROTECT(L);
             
@@ -291,9 +324,18 @@ catch(...) { Rprintf("*** Unhandled exception !\n"); return R_NilValue; }
         
         RList(const RList &);
         RList&operator=(const RList &);
+        static inline
+        size_t check_list_size(size_t count)
+        {
+            if(count<=0) throw exception("Empty RList creation!");
+            return count;
+        }
     };
-    
-    //! argument conversion
+
+    //__________________________________________________________________________
+    //
+    //! argument conversion, ok for double and int
+    //__________________________________________________________________________
     template <typename T>
     inline T R2Scalar( SEXP r )
     {
@@ -301,8 +343,11 @@ catch(...) { Rprintf("*** Unhandled exception !\n"); return R_NilValue; }
         if( value.size() < 1) throw exception("R2Scalar: invalid argument");
         return value[0];
     }
-    
+
+    //__________________________________________________________________________
+    //
     //! string conversion
+    //__________________________________________________________________________
     inline const char *R2String( SEXP r )
     {
         return CHAR(STRING_ELT(r,0));
