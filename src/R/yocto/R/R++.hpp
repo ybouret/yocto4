@@ -308,7 +308,7 @@ catch(...) { Rprintf("\t*** Unhandled exception !\n"); return R_NilValue; }
         }
 
         //! create a list for R
-        RList(const RArray<const char*> names) :
+        RList(const RArray<const char*> &names) :
         size( check_list_size(names.size()) ),
         L(allocVector(VECSXP,size))
         {
