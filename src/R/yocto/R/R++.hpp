@@ -306,6 +306,28 @@ catch(...) { Rprintf("\t*** Unhandled exception !\n"); return R_NilValue; }
             
             set_R();
         }
+
+        //! create a list for R
+        RList(const RArray<const char*> names) :
+        size( check_list_size(names.size()) ),
+        L(allocVector(VECSXP,size))
+        {
+            PROTECT(L);
+
+            //-- set list items name
+            SEXP list_names = 0;
+            PROTECT(list_names = allocVector(STRSXP,size));
+            for(size_t i = 0; i < size; i++)
+            {
+                SET_STRING_ELT(list_names,i,mkChar(names[i]));
+            }
+            setAttrib(L, R_NamesSymbol, list_names);
+            UNPROTECT(1);
+            //-- list_name
+
+            set_R();
+
+        }
         
         virtual ~RList() throw() {}
         
