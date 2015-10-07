@@ -129,7 +129,7 @@ memory_kind(MEMORY_KIND)
                 if(0!=(flags&YOCTO_MATRIX_TRANSPOSE))
                 {
                     build(other.cols,other.rows);
-                    
+                    YOCTO_MATRIX_BUILD_WITH(ctor1_transpose(other,int2type<is_primitive>() ) );
                 }
                 else
                 {
@@ -352,7 +352,7 @@ memory_kind(MEMORY_KIND)
                 YOCTO_LOOP_FUNC(items,YOCTO_MATRIX_COPY,0);
             }
             
-            //! primitive type
+            //! C++ type
             inline void ctor1( const YOCTO_MATRIX<T> &other, int2type<false> ) throw()
             {
                 assert(ctor<=0);
@@ -369,6 +369,35 @@ memory_kind(MEMORY_KIND)
                 }
             }
             
+            inline void ctor1_transpose( const YOCTO_MATRIX<T> &other, int2type<true> ) throw()
+            {
+                assert(ctor<=0);
+                assert(items==other.items);
+                for(size_t i=1;i<=rows;++i)
+                {
+                    for(size_t j=1;j<=cols;++j)
+                    {
+                        data[ctor] = other[j][i];
+                        ++ctor;
+                    }
+                }
+            }
+            
+            inline void ctor1_transpose( const YOCTO_MATRIX<T> &other, int2type<false> ) throw()
+            {
+                assert(ctor<=0);
+                assert(items==other.items);
+                for(size_t i=1;i<=rows;++i)
+                {
+                    for(size_t j=1;j<=cols;++j)
+                    {
+                        new (&data[ctor]) mutable_type(other[j][i]);
+                        ++ctor;
+                    }
+                }
+            }
+
+
             
             
         public:
