@@ -203,6 +203,8 @@ memory_kind(MEMORY_KIND)
                 return *this;
             }
             
+            inline size_t bytes() const throw() { return wlen; }
+            
         private:
             mutable_type *data;
             row          *pRow;

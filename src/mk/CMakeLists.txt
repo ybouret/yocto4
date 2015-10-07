@@ -107,7 +107,7 @@ ${alg_srcs}
 ${fft_srcs}
 ${wavelet_srcs})
 
-INCLUDE_DIRECTORIES( . ../main )
+INCLUDE_DIRECTORIES( . ../main ../mpa )
 
 ADD_LIBRARY( y-mk STATIC ${srcs} )
 INSTALL( TARGETS y-mk ARCHIVE DESTINATION lib )

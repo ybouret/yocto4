@@ -1,7 +1,7 @@
 
 FILE(GLOB test_srcs test-*.cpp *.hpp)
 ADD_EXECUTABLE(test-mk main.cpp ${test_srcs})
-TARGET_LINK_YOCTO( test-mk mk )
+TARGET_LINK_YOCTO( test-mk mk mpa)
 
 ENABLE_TESTING()
 
