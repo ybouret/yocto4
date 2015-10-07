@@ -233,8 +233,18 @@ namespace yocto
             return num.s == __negative ? -ans : ans;
         }
         
-        
+
+        bool operator==(const rational &lhs, const rational &rhs) throw()
+        {
+            return (lhs.den==rhs.den) && (lhs.num==rhs.num);
+        }
+
+        bool operator!=(const rational &lhs, const rational &rhs) throw()
+        {
+            return (lhs.den!=rhs.den) || (lhs.num!=rhs.num);
+        }
+
     }
-    
+
     
 }

@@ -46,7 +46,8 @@ return *this; \
 YOCTO_MPQ_COMPACT_FOR(OP,CALL,int64_t)  \
 YOCTO_MPQ_COMPACT_FOR(OP,CALL,integer&) \
 YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
-        
+
+        //! an always simplified rational
         class rational
         {
         public:
@@ -174,7 +175,11 @@ YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
             friend std::ostream & operator<<(std::ostream &, const rational &q);
             
             double to_double() const;
-            
+
+            //! equality
+            friend bool operator==(const rational &lhs, const rational &rhs) throw();
+            friend bool operator!=(const rational &lhs, const rational &rhs) throw();
+
         private:
             //! automatically called
             void simplify();

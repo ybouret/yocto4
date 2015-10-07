@@ -20,6 +20,7 @@ ADD_TEST(Pow   test-mpa pow)
 ADD_TEST(Int   test-mpa int)
 ADD_TEST(Rational test-mpa rational)
 ADD_TEST(Split   test-mpa  split)
+ADD_TEST(SQRT    test-mpa  sqrt)
 
 FIND_PACKAGE(MPI)
 
