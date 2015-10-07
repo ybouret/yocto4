@@ -6,6 +6,7 @@ TARGET_LINK_YOCTO( test-mk mk )
 ENABLE_TESTING()
 
 ADD_TEST(ZType    test-mk z)
+ADD_TEST(Mtx      test-mk mtx)
 ADD_TEST(Matrix   test-mk matrix)
 ADD_TEST(Crout    test-mk crout)
 ADD_TEST(Improve  test-mk mprove)

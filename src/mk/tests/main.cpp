@@ -6,6 +6,7 @@ using namespace yocto;
 YOCTO_UNIT_TEST_INIT(64)
 {
 	YOCTO_UNIT_TEST_DECL(z);
+    YOCTO_UNIT_TEST_DECL(mtx);
 	YOCTO_UNIT_TEST_DECL(matrix);
 	YOCTO_UNIT_TEST_DECL(jacobi);
 	
