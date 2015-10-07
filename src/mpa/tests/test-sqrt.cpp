@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/mpa/rational.hpp"
+#include <cstdlib>
 
 using namespace yocto;
 
