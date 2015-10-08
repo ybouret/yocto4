@@ -85,8 +85,10 @@ YOCTO_UNIT_TEST_IMPL(mtx)
     
     __test_access<int>();
     __test_access<double>();
+    __test_access<float>();
+    __test_access< complex<double> >();
+    __test_access< complex<float>  >();
     __test_access<string>();
-    
     __test_mp<mpn>();
     __test_mp<mpz>();
     __test_mp<mpq>();
