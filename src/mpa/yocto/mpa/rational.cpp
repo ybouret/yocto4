@@ -244,7 +244,33 @@ namespace yocto
             return (lhs.den!=rhs.den) || (lhs.num!=rhs.num);
         }
 
+        int rational:: compare(const rational &lhs, const rational &rhs)
+        {
+            const rational del = lhs-rhs;
+            switch(del.num.s)
+            {
+                case __negative:
+                    return -1;
+                case __positive:
+                    return 1;
+                case __zero:
+                    return 0;
+            }
+        }
+
+        int rational:: compare(const rational &lhs, const int64_t rhs)
+        {
+            const rational R(rhs,1);
+            return compare(lhs,R);
+        }
+
+        int rational:: compare(const int64_t lhs, const rational &rhs)
+        {
+            const rational L(lhs,1);
+            return compare(L,rhs);
+        }
+
     }
 
-    
+
 }

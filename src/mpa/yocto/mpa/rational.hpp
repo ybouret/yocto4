@@ -33,7 +33,7 @@ YOCTO_MPQ_FRIENDS_LHS(OP,CALL)     \
 YOCTO_MPQ_FRIENDS_RHS(OP,CALL)
         
         
-#define YOCTO_MPQ_COMPACT_FOR(OP,CALL,TYPE) \
+#define YOCTO_MPQ_COMPACT_FOR(OP,CALL,TYPE)      \
 inline rational & operator OP ( const TYPE rhs ) \
 {\
 const rational R(rhs); \
@@ -176,9 +176,26 @@ YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
             
             double to_double() const;
 
-            //! equality
+            //! equality, fast
             friend bool operator==(const rational &lhs, const rational &rhs) throw();
+
+            //! inequality, fast
             friend bool operator!=(const rational &lhs, const rational &rhs) throw();
+
+            static int compare(const rational &lhs, const rational &rhs );
+            static int compare(const rational &lhs, const int64_t   rhs );
+            static int compare(const int64_t   lhs, const rational &rhs );
+
+#define YOCTO_COMPARE_MPQ(OP) \
+inline friend bool operator OP (const rational &lhs, const rational &rhs) throw() { return rational::compare(lhs,rhs) OP 0; } \
+inline friend bool operator OP (const rational &lhs, const int64_t   rhs) throw() { return rational::compare(lhs,rhs) OP 0; } \
+inline friend bool operator OP (const int64_t   lhs, const rational &rhs) throw() { return rational::compare(lhs,rhs) OP 0; }
+
+            YOCTO_COMPARE_MPQ(<)
+            YOCTO_COMPARE_MPQ(<=)
+            YOCTO_COMPARE_MPQ(>)
+            YOCTO_COMPARE_MPQ(>=)
+            
 
         private:
             //! automatically called

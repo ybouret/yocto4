@@ -9,7 +9,7 @@ namespace yocto
 {
     namespace math
     {
-        
+
         //! work for: float,double, complex<float>, complex<double>, mpq
         template <typename T>
         struct LU
@@ -41,9 +41,8 @@ namespace yocto
 
                     for( size_t j=n;j>0;--j)
                     {
-                        const T       &a_ij = a_i[j];
-                        const scalar_t tmp = Fabs( a_ij );
-                        if ( false /*tmp > piv*/ )
+                        const scalar_t tmp = Fabs( a_i[j] );
+                        if (tmp>piv)
                         {
                             piv = tmp;
                         }

@@ -13,6 +13,8 @@ void __test_lu()
     for(size_t n=1;n<2;++n)
     {
         YOCTO_MATRIX<T> M(n);
+        M.ld1();
+        std::cerr << "M=" << M << std::endl;
         LU<T>::build(M);
     }
 }
