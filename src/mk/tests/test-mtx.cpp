@@ -41,6 +41,8 @@ void __test_access()
             std::cerr << "R=" << R << std::endl;
 
         YOCTO_MATRIX<T> SQ(1+alea_leq(20));
+
+        SQ.ldz();
     }
     
 }

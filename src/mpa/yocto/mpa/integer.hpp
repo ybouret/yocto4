@@ -13,15 +13,15 @@ namespace yocto
             __zero     =  0,
             __positive =  1
         };
-        
+
         sign_type int2sign(const int) throw();
         sign_type sign_neg(const sign_type) throw();
         sign_type sign_mul(const sign_type,const sign_type) throw();
-        
+
         class integer : public object
         {
         public:
-            
+
             //__________________________________________________________________
             //
             // initialisation
@@ -38,7 +38,7 @@ namespace yocto
             integer &operator=(const integer &);
             integer &operator=(const int64_t  );
             integer &operator=(const natural &);
-            
+
             //__________________________________________________________________
             //
             // addition
@@ -53,7 +53,7 @@ namespace yocto
             integer & operator++();     //!< prefix
             integer   operator++ (int); //!< postfix
             friend integer operator+(const integer &);
-            
+
             //__________________________________________________________________
             //
             // subtraction
@@ -70,7 +70,7 @@ namespace yocto
             integer & operator-=( const int64_t  rhs );
             integer & operator--();     //!< prefix
             integer   operator-- (int); //!< postfix
-            
+
             //__________________________________________________________________
             //
             // multiplication
@@ -82,7 +82,7 @@ namespace yocto
             friend integer operator*(const integer &lhs, const int64_t  rhs);
             integer operator*=( const integer &rhs );
             integer operator*=( const int64_t  rhs );
-            
+
             //__________________________________________________________________
             //
             // division
@@ -95,14 +95,14 @@ namespace yocto
             friend integer operator/(const integer &lhs, const int64_t  rhs);
             integer operator/=( const integer &rhs );
             integer operator/=( const int64_t  rhs );
-            
+
             //__________________________________________________________________
             //
             // helpers
             //__________________________________________________________________
             static sign_type sgn_of(const int64_t x) throw();
             static uint64_t  abs_of(const int64_t x) throw();
-            
+
             //__________________________________________________________________
             //
             // comparison
@@ -115,7 +115,7 @@ namespace yocto
 inline friend bool operator OP (const integer &lhs, const integer &rhs) throw() { return integer::compare(lhs,rhs) OP 0; } \
 inline friend bool operator OP (const integer &lhs, const int64_t  rhs) throw() { return integer::compare(lhs,rhs) OP 0; } \
 inline friend bool operator OP (const int64_t  lhs, const integer &rhs) throw() { return integer::compare(lhs,rhs) OP 0; }
-            
+
             YOCTO_COMPARE_MPZ(==)
             YOCTO_COMPARE_MPZ(!=)
             YOCTO_COMPARE_MPZ(<)
@@ -124,14 +124,33 @@ inline friend bool operator OP (const int64_t  lhs, const integer &rhs) throw() 
             YOCTO_COMPARE_MPZ(>=)
 
             double to_double() const;
-            
+
         private:
             void check() throw();
             integer(const sign_type S, const natural &N );
         };
     }
-    
+
     typedef mpa::integer mpz;
+
+    template <>
+    struct xnumeric<mpz>
+    {
+        inline static mpz zero() { return mpz();  }
+        inline static mpz one()  { return mpz(1); }
+    };
+
+    namespace math
+    {
+        inline mpz Fabs( const mpz &z )
+        {
+            mpz tmp(z);
+            if(tmp.s==mpa::__negative) tmp.neg();
+            return tmp;
+        }
+    }
+    
+    
 }
 
 #endif

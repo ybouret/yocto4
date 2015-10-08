@@ -189,6 +189,25 @@ YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
     }
     
     typedef mpa::rational mpq;
+    template <>
+    struct xnumeric<mpq>
+    {
+        inline static mpq zero() { return mpn();  }
+        inline static mpq one()  { return mpq(1,1); }
+    };
+
+    namespace math
+    {
+        inline mpa::rational Fabs( const  mpa::rational &q )
+        {
+             mpa::rational tmp(q);
+            if(tmp.num.s==mpa::__negative)
+            {
+                ((mpa::integer &)(tmp.num)).neg();
+            }
+            return tmp;
+        }
+    }
 }
 
 #endif

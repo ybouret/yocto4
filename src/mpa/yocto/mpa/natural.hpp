@@ -329,7 +329,13 @@ assert( ! ( (X)->size > 0 && (X)->byte[ (X)->size-1 ] == 0 ) )
     }
     
     typedef mpa::natural mpn;
-    
+    template <>
+    struct xnumeric<mpn>
+    {
+        inline static mpn zero() { return mpn();  }
+        inline static mpn one()  { return mpn(1); }
+    };
+
 }
 
 #endif

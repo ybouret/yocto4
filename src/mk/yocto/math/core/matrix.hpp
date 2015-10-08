@@ -2,6 +2,7 @@
 #define YOCTO__MATRIX_INCLUDED 1
 
 #include "yocto/math/types.hpp"
+#include "yocto/math/xtypes.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/bitwise.hpp"
 #include "yocto/code/bswap.hpp"
@@ -227,7 +228,25 @@ memory_kind(MEMORY_KIND)
                 for(size_t r=rows;r>0;--r) bswap((*this)[r][c1],(*this)[r][c2]);
             }
 
+            inline void ldz()
+            {
+                const_type __zero = xnumeric<mutable_type>::zero();
+                for(size_t i=0;i<items;++i) data[i] = __zero;
+            }
 
+            inline void ld1()
+            {
+                const_type __zero = xnumeric<mutable_type>::zero();
+                const_type __one  = xnumeric<mutable_type>::one();
+                for(size_t i=rows;i>0;--i)
+                {
+                    row &r_i = (*this)[i];
+                    for(size_t j=cols;j>0;--j)
+                    {
+                        r_i[j] = (i==j) ? __one : __zero;
+                    }
+                }
+            }
 
         private:
             mutable_type *data;
@@ -452,7 +471,7 @@ memory_kind(MEMORY_KIND)
 
         public:
             const matrix_memory memory_kind;
-#if 0
+            
             inline size_t       *__indices() const throw()
             {
                 assert(memory_kind==matrix_large_memory);
@@ -471,7 +490,6 @@ memory_kind(MEMORY_KIND)
             {
                 return (scalar_type *)scalars;
             }
-#endif
 
         };
         
