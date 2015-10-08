@@ -31,9 +31,9 @@ cols(0), \
 items(0),\
 data(0),\
 pRow(0),\
-count(0),\
+num_objects(0),\
 ctor(0), \
-nscal(0),\
+num_scalars(0),\
 stor(0), \
 wksp(0), \
 wlen(0),\
@@ -166,22 +166,23 @@ memory_kind(MEMORY_KIND)
                 return os;
             }
 
+#define YOCTO_MATRIX_XCH(FIELD) cswap_const(FIELD,M.FIELD)
             inline void swap_with( YOCTO_MATRIX<T> &M ) throw()
             {
-                cswap_const(rows,M.rows);
-                cswap_const(cols,M.cols);
-                cswap_const(items,M.items);
-                cswap(data,M.data);
-                cswap(pRow,M.pRow);
-                cswap_const(count,M.count);
+                YOCTO_MATRIX_XCH(rows);
+                YOCTO_MATRIX_XCH(cols);
+                YOCTO_MATRIX_XCH(items);
+                YOCTO_MATRIX_XCH(data);
+                YOCTO_MATRIX_XCH(pRow);
+                YOCTO_MATRIX_XCH(num_objects);
                 cswap(ctor,M.ctor);
-                cswap_const(nscal,M.nscal);
+                YOCTO_MATRIX_XCH(num_scalars);
                 cswap(stor,M.stor);
-                cswap(wksp,M.wksp);
-                cswap(wlen,M.wlen);
-                cswap(indices,M.indices);
-                cswap(scalars,M.scalars);
-                cswap_const(memory_kind,M.memory_kind);
+                YOCTO_MATRIX_XCH(wksp);
+                YOCTO_MATRIX_XCH(wlen);
+                YOCTO_MATRIX_XCH(indices);
+                YOCTO_MATRIX_XCH(scalars);
+                YOCTO_MATRIX_XCH(memory_kind);
             }
 
 #define YOCTO_MATRIX_COPY(I) data[I] = other.data[I]
@@ -213,13 +214,27 @@ memory_kind(MEMORY_KIND)
 
             inline size_t bytes() const throw() { return wlen; }
 
+            inline void swap_rows(size_t r1, size_t r2) throw()
+            {
+                row &R1 = (*this)[r1];
+                row &R2 = (*this)[r2];
+                for(size_t c=cols;c>0;--c) bswap(R1[c],R2[c]);
+            }
+
+            inline void swap_cols(size_t c1, size_t c2) throw()
+            {
+                for(size_t r=rows;r>0;--r) bswap((*this)[r][c1],(*this)[r][c2]);
+            }
+
+
+
         private:
             mutable_type *data;
             row          *pRow;
-            const size_t  count; //!< total number of types (items+other)
-            size_t        ctor;  //!< number of constructed items
-            const size_t  nscal; //!< total number of scalars
-            size_t        stor;  //!< number of constructed scalars
+            const size_t  num_objects; //!< total number of types (items+other)
+            size_t        ctor;        //!< number of constructed items
+            const size_t  num_scalars; //!< total number of scalars
+            size_t        stor;        //!< number of constructed scalars
             void         *wksp;
             size_t        wlen;
             size_t       *indices;
@@ -262,7 +277,10 @@ memory_kind(MEMORY_KIND)
                 (size_t&)rows  = 0;
                 (size_t&)cols  = 0;
                 (size_t&)items = 0;
-                (size_t&)count = 0;
+                (size_t&)num_objects = 0;
+                (size_t&)num_scalars = 0;
+                indices = 0;
+                scalars = 0;
             }
 
 
@@ -294,10 +312,10 @@ memory_kind(MEMORY_KIND)
                 //______________________________________________________________
                 const size_t n           = nr*nc;
                 const size_t nextra      = is_large ? YOCTO_MATRIX_NUM_EXTRA * nr : 0;
-                const size_t ntotal      = n+nextra; // items
+                const size_t n_objects   = n+nextra;
 
                 const size_t data_offset = 0;
-                const size_t data_length = ntotal * sizeof(T);
+                const size_t data_length = n_objects * sizeof(T);
 
                 const size_t rows_offset = memory::align(data_offset+data_length);
                 const size_t rows_length = nr * sizeof(row);
@@ -306,8 +324,8 @@ memory_kind(MEMORY_KIND)
                 const size_t indx_length = is_large ? nr * sizeof(size_t) : 0;
 
                 const size_t scal_offset = memory::align(indx_offset+indx_length);
-                const size_t scal_number = is_large ? nr : 0;
-                const size_t scal_length = scal_number * sizeof(scalar_type);
+                const size_t n_scalars   = is_large ? nr : 0;
+                const size_t scal_length = n_scalars * sizeof(scalar_type);
 
                 //______________________________________________________________
                 //
@@ -343,8 +361,8 @@ memory_kind(MEMORY_KIND)
                 (size_t &)rows  = nr;
                 (size_t &)cols  = nc;
                 (size_t &)items = n;
-                (size_t &)count = ntotal;
-                (size_t &)nscal = scal_number;
+                (size_t &)num_objects = n_objects;
+                (size_t &)num_scalars = n_scalars;
 
             }
 
@@ -358,12 +376,12 @@ memory_kind(MEMORY_KIND)
             inline void init0()
             {
                 assert(stor<=0);
-                while(ctor<count)
+                while(ctor<num_objects)
                 {
                     new (data+ctor) mutable_type();
                     ++ctor;
                 }
-                while(stor<nscal)
+                while(stor<num_scalars)
                 {
                     new (scalars+stor) scalar_type();
                     ++stor;
@@ -429,8 +447,6 @@ memory_kind(MEMORY_KIND)
                 }
                 init0();
             }
-
-
 
 
         public:
