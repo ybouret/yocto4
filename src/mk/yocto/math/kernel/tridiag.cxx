@@ -1,7 +1,7 @@
 #include "yocto/math/kernel/tridiag.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/types.hpp"
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/sequence/vector.hpp"

@@ -1,7 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "../../main/tests/support.hpp"
 #include <typeinfo>
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/math/kernel/crout.hpp"
 
 using namespace yocto;

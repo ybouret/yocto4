@@ -3,7 +3,7 @@
 #include "yocto/sequence/vector.hpp"
 
 #include "yocto/math/kernel/svd.hpp"
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/code/utils.hpp"
 
 #include "yocto/math/opt/bracket.hpp"

@@ -1,4 +1,4 @@
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"

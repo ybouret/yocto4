@@ -1,6 +1,6 @@
 #include "yocto/chemical/equilibria.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/code/ipower.hpp"
 
 namespace yocto

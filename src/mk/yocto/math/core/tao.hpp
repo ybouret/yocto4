@@ -1,5 +1,5 @@
-#ifndef YOCTO_MATH_KERNEL_TAO_INCLUDED
-#define YOCTO_MATH_KERNEL_TAO_INCLUDED 1
+#ifndef YOCTO_MATH_CORE_TAO_INCLUDED
+#define YOCTO_MATH_CORE_TAO_INCLUDED 1
 
 #include "yocto/math/types.hpp"
 #include "yocto/type/traits.hpp"

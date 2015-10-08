@@ -1,6 +1,6 @@
 #include "yocto/chemical/equilibria.hpp"
 
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/math/kernel/det.hpp"
 #include "yocto/math/kernel/crout.hpp"
 

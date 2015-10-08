@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/math/kernel/cholesky.hpp"
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
 

@@ -1,6 +1,6 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/sparse/cj.hpp"
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/math/sparse/algebra.hpp"
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"

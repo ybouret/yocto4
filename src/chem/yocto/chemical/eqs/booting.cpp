@@ -3,7 +3,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/sort/quick.hpp"
 
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/math/kernel/det.hpp"
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/math/round.hpp"

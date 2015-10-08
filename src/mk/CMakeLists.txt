@@ -6,6 +6,13 @@ SET( kernel_srcs ${kernel_decl} ${kernel_impl} )
 INSTALL( FILES ${kernel_decl} DESTINATION include/yocto/math/kernel )
 SOURCE_GROUP( math/kernel FILES ${kernel_srcs} )
 
+FILE( GLOB core_decl yocto/math/core/*.hpp)
+FILE( GLOB core_impl yocto/math/core/*.cpp)
+SET( core_srcs ${core_decl} ${core_impl} )
+INSTALL( FILES ${core_decl} DESTINATION include/yocto/math/core )
+SOURCE_GROUP( math/core FILES ${core_srcs} )
+
+
 FILE( GLOB sparse_decl yocto/math/sparse/*.hpp)
 FILE( GLOB sparse_impl yocto/math/sparse/*.cpp)
 SET( sparse_srcs ${sparse_decl} ${sparse_impl} )
@@ -91,6 +98,7 @@ INSTALL( FILES ${wavelet_decl} DESTINATION include/yocto/math/wavelet )
 SOURCE_GROUP( math/wavelet FILES ${wavelet_srcs} )
 
 SET( srcs
+${core_srcs}
 ${kernel_srcs}
 ${sparse_srcs}
 ${dat_srcs}
@@ -105,7 +113,8 @@ ${fit_srcs}
 ${stat_srcs}
 ${alg_srcs}
 ${fft_srcs}
-${wavelet_srcs})
+${wavelet_srcs}
+)
 
 INCLUDE_DIRECTORIES( . ../main ../mpa )
 

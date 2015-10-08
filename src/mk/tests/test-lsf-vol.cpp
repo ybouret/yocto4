@@ -6,7 +6,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/math/ode/explicit/driver-ck.hpp"
 
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/string/conv.hpp"
 
 using namespace yocto;
