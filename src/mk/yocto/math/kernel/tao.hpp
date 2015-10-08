@@ -3,7 +3,6 @@
 
 #include "yocto/math/types.hpp"
 #include "yocto/type/traits.hpp"
-#include "yocto/math/kernel/matrix.hpp"
 #include "yocto/code/unroll.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/code/arith.hpp"
