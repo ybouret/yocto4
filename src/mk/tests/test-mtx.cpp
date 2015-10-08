@@ -39,6 +39,8 @@ void __test_access()
         YOCTO_MATRIX<T> R(P,YOCTO_MATRIX_TRANSPOSE);
         if(iter<=0)
             std::cerr << "R=" << R << std::endl;
+
+        YOCTO_MATRIX<T> SQ(1+alea_leq(20));
     }
     
 }
@@ -69,7 +71,7 @@ void __test_mp()
         
         YOCTO_MATRIX<T> P(M);
         YOCTO_MATRIX<T> Q(M,YOCTO_MATRIX_TRANSPOSE);
-
+        YOCTO_MATRIX<T> SQ(1+alea_leq(100));
     }
     
 }

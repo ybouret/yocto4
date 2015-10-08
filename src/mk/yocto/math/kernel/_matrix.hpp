@@ -1,7 +1,7 @@
 #ifndef YOCTO__MATRIX_INCLUDED
 #define YOCTO__MATRIX_INCLUDED 1
 
-#include "yocto/sequence/array.hpp"
+#include "yocto/math/types.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/bitwise.hpp"
 #include "yocto/code/bswap.hpp"
@@ -12,18 +12,18 @@ namespace yocto
 {
     namespace math
     {
-        
+
         enum matrix_memory
         {
             matrix_tight_memory,
             matrix_large_memory
         };
-        
+
 #define YOCTO_MATRIX_TRANSPOSE 0x0001
 #define YOCTO_MATRIX_TIGHTEN   0x0100
-        
+
 #define YOCTO_MATRIX_NUM_EXTRA 2
-        
+
 #define YOCTO_MATRIX _matrix
 #define YOCTO_MATRIX_CTOR(MEMORY_KIND) \
 rows(0), \
@@ -33,11 +33,14 @@ data(0),\
 pRow(0),\
 count(0),\
 ctor(0), \
+nscal(0),\
+stor(0), \
 wksp(0), \
 wlen(0),\
 indices(0),\
+scalars(0),\
 memory_kind(MEMORY_KIND)
-        
+
         //! row-major matrix
         /**
          square matrices may have extra memory
@@ -47,11 +50,13 @@ memory_kind(MEMORY_KIND)
         {
         public:
             YOCTO_ARGUMENTS_DECL_T;
+            typedef typename real_of<mutable_type>::type scalar_type;
+
             enum
             {
                 is_primitive = type_traits<mutable_type>::is_primitive
             };
-            
+
             //! a row, acting as an array
             class row : public array<T>
             {
@@ -59,61 +64,61 @@ memory_kind(MEMORY_KIND)
                 const size_t cols;
                 inline virtual type       & operator[]( size_t c ) throw()       { assert(c>0); assert(c<=cols); return _itm[c]; }
                 inline virtual const_type & operator[]( size_t c ) const throw() { assert(c>0); assert(c<=cols); return _itm[c]; }
-                
+
                 inline friend std::ostream & operator<<( std::ostream &os, const row &r )
                 {
                     for( size_t j=1; j <= r.cols; ++j ) os << r[j] << ' ';
                     return os;
                 }
-                
+
                 inline virtual const char *name() const throw() { return "matrix::row"; }
                 inline virtual size_t size() const throw()      { return cols; }
                 inline virtual size_t capacity() const throw()  { return cols; }
                 inline virtual void   free() throw()            {}
                 inline virtual void   release() throw()         {}
                 inline virtual void   reserve(size_t)           {}
-                
-                
+
+
             private:
                 inline row( T *data, size_t nc ) throw() : cols(nc), _itm(data-1) { assert(cols>0); assert(data!=NULL); }
                 inline virtual ~row() throw() {}
-                
+
                 T *_itm; //! offset-1 pointer
                 YOCTO_DISABLE_COPY_AND_ASSIGN(row);
                 friend class YOCTO_MATRIX<T>;
                 virtual const_type * get_item() const throw() { return _itm; }
             };
-            
-            
+
+
             const size_t rows;
             const size_t cols;
             const size_t items;
-            
+
             inline bool   is_square() const throw() { return rows==cols; }
-            
+
             inline explicit YOCTO_MATRIX() throw() :
             YOCTO_MATRIX_CTOR(matrix_tight_memory)
             {
                 // do nothing
             }
-            
+
 #define YOCTO_MATRIX_BUILD_WITH(CODE) do { try { CODE; } catch(...) { release(); throw; } } while(false)
-            
+
             inline explicit YOCTO_MATRIX(const size_t nr, const size_t nc) :
             YOCTO_MATRIX_CTOR(matrix_tight_memory)
             {
                 build(nr,nc);
                 YOCTO_MATRIX_BUILD_WITH(ctor0( int2type<is_primitive>() ) );
             }
-            
+
             inline explicit YOCTO_MATRIX(const size_t n) :
             YOCTO_MATRIX_CTOR(matrix_large_memory)
             {
                 build(n,n);
                 YOCTO_MATRIX_BUILD_WITH(ctor0( int2type<is_primitive>() ) );
             }
-            
-            
+
+
             //! default copy constructor
             inline YOCTO_MATRIX(const YOCTO_MATRIX<T> &other) :
             YOCTO_MATRIX_CTOR(other.memory_kind)
@@ -121,7 +126,7 @@ memory_kind(MEMORY_KIND)
                 build(other.rows,other.cols);
                 YOCTO_MATRIX_BUILD_WITH(ctor1(other,int2type<is_primitive>() ) );
             }
-            
+
             //! constructor with options
             inline YOCTO_MATRIX(const YOCTO_MATRIX<T> &other, const int flags) :
             YOCTO_MATRIX_CTOR( (0!=(flags&YOCTO_MATRIX_TIGHTEN)) ? matrix_tight_memory : other.memory_kind )
@@ -137,18 +142,18 @@ memory_kind(MEMORY_KIND)
                     YOCTO_MATRIX_BUILD_WITH(ctor1(other,int2type<is_primitive>() ) );
                 }
             }
-            
-            
-            
-            
+
+
+
+
             inline virtual ~YOCTO_MATRIX() throw()
             {
                 release();
             }
-            
+
             inline row       & operator[](const size_t ir) throw()       { assert(ir>0); assert(ir<=rows); return pRow[ir]; }
             inline const row & operator[](const size_t ir) const throw() { assert(ir>0); assert(ir<=rows); return pRow[ir]; }
-            
+
             friend std::ostream & operator<<( std::ostream &os, const YOCTO_MATRIX<T> &M )
             {
                 os << "[ ";
@@ -160,7 +165,7 @@ memory_kind(MEMORY_KIND)
                 os << "]";
                 return os;
             }
-            
+
             inline void swap_with( YOCTO_MATRIX<T> &M ) throw()
             {
                 cswap_const(rows,M.rows);
@@ -170,12 +175,15 @@ memory_kind(MEMORY_KIND)
                 cswap(pRow,M.pRow);
                 cswap_const(count,M.count);
                 cswap(ctor,M.ctor);
+                cswap_const(nscal,M.nscal);
+                cswap(stor,M.stor);
                 cswap(wksp,M.wksp);
                 cswap(wlen,M.wlen);
                 cswap(indices,M.indices);
+                cswap(scalars,M.scalars);
                 cswap_const(memory_kind,M.memory_kind);
             }
-            
+
 #define YOCTO_MATRIX_COPY(I) data[I] = other.data[I]
             //! assign if same sizes
             inline void assign( const YOCTO_MATRIX<T> &other )
@@ -184,7 +192,7 @@ memory_kind(MEMORY_KIND)
                 assert(cols==other.cols);
                 YOCTO_LOOP_FUNC(items,YOCTO_MATRIX_COPY,0);
             }
-            
+
             //! check sizes and assign
             YOCTO_MATRIX<T> & operator=( const YOCTO_MATRIX<T> &other )
             {
@@ -202,37 +210,44 @@ memory_kind(MEMORY_KIND)
                 }
                 return *this;
             }
-            
+
             inline size_t bytes() const throw() { return wlen; }
-            
+
         private:
             mutable_type *data;
             row          *pRow;
             const size_t count; //!< total number of types (items+other)
             size_t       ctor;  //!< number of constructed items
+            const size_t nscal; //!< total number of scalars
+            size_t       stor;  //!< number of constructed scalars
             void        *wksp;
             size_t       wlen;
             size_t      *indices;
-            
+            scalar_type *scalars;
+
             //! support no destruct
             inline void __clear( int2type<true> ) throw()
             {
             }
-            
+
             //! must destruct
             inline void __clear( int2type<false> ) throw()
             {
+                while(stor>0)
+                {
+                    destruct( &scalars[--stor] );
+                }
                 while(ctor>0)
                 {
                     destruct( &data[--ctor] );
                 }
             }
-            
+
             inline void clear() throw()
             {
                 __clear( int2type< support_no_destruct<mutable_type>::value >() );
             }
-            
+
             //__________________________________________________________________
             //
             // release all memory
@@ -248,8 +263,8 @@ memory_kind(MEMORY_KIND)
                 (size_t&)items = 0;
                 (size_t&)count = 0;
             }
-            
-            
+
+
             //__________________________________________________________________
             //
             // build all memory
@@ -261,44 +276,46 @@ memory_kind(MEMORY_KIND)
                     if(nc>0) throw libc::exception( EINVAL, "matrix<%s>: no row for #colums=%u",  typeid(T).name(), unsigned(nc) );
                     return;
                 }
-                
+
                 if(nc<=0)
                 {
                     if(nr>0) throw libc::exception( EINVAL, "matrix<%s>: no column for #rows=%u", typeid(T).name(), unsigned(nr) );
                     return;
                 }
-                
+
                 assert(nc>0);
                 assert(nr>0);
                 const bool is_large = memory_kind == matrix_large_memory;
-                
+
                 //______________________________________________________________
                 //
                 // Preparing Memory Requirements
                 //______________________________________________________________
                 const size_t n           = nr*nc;
                 const size_t nextra      = is_large ? YOCTO_MATRIX_NUM_EXTRA * nr : 0;
-                const size_t nindex      = is_large ? nr     : 0;
-                
-                const size_t ntotal      = n+nextra;
-                
+                const size_t nindex      = is_large ? nr : 0;
+                const size_t ntotal      = n+nextra; // items
+
                 const size_t data_offset = 0;
                 const size_t data_length = ntotal * sizeof(T);
-                
+
                 const size_t rows_offset = memory::align(data_offset+data_length);
                 const size_t rows_length = nr * sizeof(row);
-                
+
                 const size_t indx_offset = memory::align(rows_offset+rows_length);
                 const size_t indx_length = nindex * sizeof(size_t);
-                
+
+                const size_t scal_offset = memory::align(indx_offset+indx_length);
+                const size_t scal_length = is_large ? nr * sizeof(scalar_type) : 0;
+
                 //______________________________________________________________
                 //
                 // Allocate Memory
                 //______________________________________________________________
-                wlen = memory::align(indx_offset+indx_length);
+                wlen = memory::align(scal_offset+scal_length);
                 wksp = memory::kind<memory::global>::acquire(wlen);
-                
-                
+
+
                 //______________________________________________________________
                 //
                 // Link Memory
@@ -314,9 +331,10 @@ memory_kind(MEMORY_KIND)
                         new (pRow+r) row(q,nc);
                     }
                 }
-                
-                indices = (size_t *) &p[indx_offset];
-                
+
+                indices = (size_t      *) &p[indx_offset];
+                scalars = (scalar_type *) &p[scal_offset];
+
                 //______________________________________________________________
                 //
                 // finalizing
@@ -325,27 +343,41 @@ memory_kind(MEMORY_KIND)
                 (size_t &)cols  = nc;
                 (size_t &)items = n;
                 (size_t &)count = ntotal;
-                
+                (size_t &)nscal = is_large ? nr : 0;
+
             }
-            
+
             //! primitive type
             inline void ctor0( int2type<true> ) throw()
             {
                 assert(ctor<=0);
             }
-            
-            //! compound type
-            inline void ctor0( int2type<false> )
+
+            //! C++ type: initialize other values...
+            inline void init0()
             {
-                assert(ctor<=0);
+                assert(stor<=0);
                 while(ctor<count)
                 {
                     new (data+ctor) mutable_type();
                     ++ctor;
                 }
+                while(stor<nscal)
+                {
+                    new (scalars+stor) mutable_type();
+                    ++stor;
+                }
+
             }
-            
-            
+
+            //! compound type
+            inline void ctor0( int2type<false> )
+            {
+                assert(ctor<=0);
+                init0();
+            }
+
+
             //! primitive type
             inline void ctor1( const YOCTO_MATRIX<T> &other, int2type<true> ) throw()
             {
@@ -353,7 +385,7 @@ memory_kind(MEMORY_KIND)
                 assert(items==other.items);
                 YOCTO_LOOP_FUNC(items,YOCTO_MATRIX_COPY,0);
             }
-            
+
             //! C++ type
             inline void ctor1( const YOCTO_MATRIX<T> &other, int2type<false> ) throw()
             {
@@ -364,13 +396,9 @@ memory_kind(MEMORY_KIND)
                     new (data+ctor) mutable_type(other.data[ctor]);
                     ++ctor;
                 }
-                while(ctor<count)
-                {
-                    new (data+ctor) mutable_type();
-                    ++ctor;
-                }
+                init0();
             }
-            
+
             inline void ctor1_transpose( const YOCTO_MATRIX<T> &other, int2type<true> ) throw()
             {
                 assert(ctor<=0);
@@ -384,7 +412,7 @@ memory_kind(MEMORY_KIND)
                     }
                 }
             }
-            
+
             inline void ctor1_transpose( const YOCTO_MATRIX<T> &other, int2type<false> ) throw()
             {
                 assert(ctor<=0);
@@ -397,19 +425,19 @@ memory_kind(MEMORY_KIND)
                         ++ctor;
                     }
                 }
+                init0();
             }
 
 
-            
-            
+
+
         public:
             const matrix_memory memory_kind;
             inline size_t       *__indices() const throw() {  return (size_t *)indices; }
-            inline mutable_type *__aux(const size_t k) const throw()
+            inline mutable_type *__aux() const throw()
             {
                 assert(memory_kind==matrix_large_memory);
-                assert(k<YOCTO_MATRIX_NUM_EXTRA);
-                const_type *addr = &data[items+k*rows];
+                const_type *addr = &data[items+rows];
                 return (mutable_type *)addr;
             }
         };
