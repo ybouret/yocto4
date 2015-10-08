@@ -7,6 +7,7 @@
 #include "yocto/code/bswap.hpp"
 #include "yocto/code/unroll.hpp"
 #include <cerrno>
+#include <typeinfo>
 
 namespace yocto
 {
