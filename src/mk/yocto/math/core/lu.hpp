@@ -156,7 +156,7 @@ namespace yocto
                 // first pass
                 //______________________________________________________________
                 {
-                    const lw_array<size_t>   indx( a.__indices(), n);
+                    const indices   indx( a.__indices(), n);
                     for(size_t i=1;i<=n;++i)
                     {
                         const size_t ip  = indx[i]; assert(ip>0);assert(ip<=n);

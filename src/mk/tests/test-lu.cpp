@@ -76,6 +76,12 @@ void __test_lu()
             d = c;
             tao::sub(d,b);
             std::cerr << "d=" << d << std::endl;
+            typename real_of<T>::type sum = 0;
+            for(size_t i=n;i>0;--i)
+            {
+                sum += Fabs(d[i]);
+            }
+            std::cerr << "\t\t|d|=" << sum << std::endl;
         }
 
 
