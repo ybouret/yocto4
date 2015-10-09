@@ -98,6 +98,7 @@ YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
             //
             // SUB
             //__________________________________________________________________
+            void neg() throw();
             static rational sub( const rational &lhs, const rational &rhs);
             inline friend rational operator-(const rational &lhs, const rational &rhs)
             {

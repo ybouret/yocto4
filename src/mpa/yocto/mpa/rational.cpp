@@ -27,6 +27,7 @@ namespace yocto
         {
             if(den<=0)
                 throw libc::exception(EDOM,"rational division by zero");
+            
             if(num.n.is_zero())
             {
                 natural &d = (natural&)(den);
@@ -111,7 +112,7 @@ namespace yocto
         
         rational & rational::operator++()
         {
-            const rational __one__(1);
+            const rational __one__(int64_t(1));
             rational tmp = add(*this,__one__);
             xch(tmp);
             return *this;
@@ -121,7 +122,7 @@ namespace yocto
         {
             const rational save(*this);
             
-            const rational __one__(1);
+            const rational __one__(int64_t(1));
             rational tmp = add(*this,__one__);
             xch(tmp);
             
@@ -161,7 +162,11 @@ namespace yocto
             return save;
         }
 
-        
+        void rational:: neg() throw()
+        {
+            ((integer &)num).neg();
+        }
+
         //______________________________________________________________________
         //
         // MUL
@@ -208,14 +213,17 @@ namespace yocto
         {
             if(rhs.num.s == __zero)
                 throw libc::exception( EDOM, "rational division by zero");
-            const integer Rden = rhs.den;
-            const integer Lden = lhs.den;
-            integer iN   = lhs.num * Rden;
-            integer iD   = rhs.num * Lden;
-            if(sign_mul(iN.s, iD.s) == __negative )
-                iN.neg();
             
-            return rational(iN,iD.n);
+            const natural nat_num = lhs.num.n * rhs.den;
+            const natural nat_den = rhs.num.n * lhs.den;
+            const natural int_num = nat_num;
+            rational ans(int_num,nat_den);
+            if(sign_mul(lhs.num.s,rhs.num.s) == __negative)
+            {
+                ans.neg();
+            }
+
+            return ans;
         }
         
         // conversion
