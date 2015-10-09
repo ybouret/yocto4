@@ -5,6 +5,7 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/math/core/tao.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/math/core/determinant.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -13,7 +14,8 @@ template <typename T>
 static inline
 void __test_lu()
 {
-    for(size_t n=1;n<=8;++n)
+    bool dneg = false;
+    for(size_t n=1;n<=4;++n)
     {
         std::cerr << std::endl;
         YOCTO_MATRIX<T> M(n);
@@ -38,14 +40,27 @@ void __test_lu()
         std::cerr << "M=" << M << std::endl;
         YOCTO_MATRIX<T> A(M,YOCTO_MATRIX_TIGHTEN);
 
-        if(!LU<T>::build(M))
+        const T dd = determinant(A);
+        std::cerr << "det=" << dd << std::endl;
+        
+        if(!LU<T>::build(M,&dneg))
         {
             std::cerr << "Can't build LU" << std::endl;
+            continue;
         }
         else
         {
             //std::cerr << "LU=" << M << std::endl;
         }
+
+        T ddd = xnumeric<T>::one();
+        for(size_t i=1;i<=n;++i)
+        {
+            ddd *= M[i][i];
+        }
+        if(dneg) ddd = -ddd;
+        std::cerr << "ddd=" << ddd << std::endl;
+
 
         vector<T> b(n,as_capacity);
         vector<T> x(n,as_capacity);
@@ -75,13 +90,13 @@ void __test_lu()
             std::cerr << "c=" << c << std::endl;
             d = c;
             tao::sub(d,b);
-            std::cerr << "d=" << d << std::endl;
+            //std::cerr << "d=" << d << std::endl;
             typename real_of<T>::type sum = 0;
             for(size_t i=n;i>0;--i)
             {
                 sum += Fabs(d[i]);
             }
-            std::cerr << "\t\t|d|=" << sum << std::endl;
+            std::cerr << "\t\t|diff|=" << sum << std::endl;
         }
         YOCTO_MATRIX<T> I(n,n);
         I.ld1();
