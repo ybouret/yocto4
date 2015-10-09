@@ -27,7 +27,15 @@ namespace yocto
         {
             if(den<=0)
                 throw libc::exception(EDOM,"rational division by zero");
-            natural::simplify( (natural&)(num.n),(natural &)den);
+            if(num.n.is_zero())
+            {
+                natural &d = (natural&)(den);
+                d = 1;
+            }
+            else
+            {
+                natural::simplify( (natural&)(num.n),(natural &)den);
+            }
         }
         
         rational:: rational( const int64_t __num ) :
