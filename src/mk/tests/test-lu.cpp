@@ -13,7 +13,7 @@ template <typename T>
 static inline
 void __test_lu()
 {
-    for(size_t n=1;n<=4;++n)
+    for(size_t n=1;n<=8;++n)
     {
         std::cerr << std::endl;
         YOCTO_MATRIX<T> M(n);
@@ -44,7 +44,7 @@ void __test_lu()
         }
         else
         {
-            std::cerr << "LU=" << M << std::endl;
+            //std::cerr << "LU=" << M << std::endl;
         }
 
         vector<T> b(n,as_capacity);

@@ -27,6 +27,8 @@ namespace yocto
                 assert(a.cols>0);
                 assert(a.rows>0);
                 assert(a.is_square());
+                assert(a.memory_kind==matrix_large_memory);
+
                 const scalar_t  __zero = xnumeric<scalar_t>::zero();
                 const scalar_t  __one  = xnumeric<scalar_t>::one();
                 const size_t    n      = a.rows;
@@ -47,7 +49,6 @@ namespace yocto
                     for( size_t j=n;j>0;--j)
                     {
                         const scalar_t tmp = Fabs( a_i[j] );
-                        //std::cerr << "\ttmp=" << tmp << std::endl;
                         if (tmp>piv)
                         {
                             piv = tmp;
@@ -57,9 +58,7 @@ namespace yocto
                     {
                         return false;
                     }
-                    //std::cerr << "\t\tpiv=" << piv << std::endl;
                     scal[i] = __one/piv;
-                    std::cerr << "\t\tscal=" << scal[i] << std::endl;
                 }
 
 
@@ -115,7 +114,6 @@ namespace yocto
 
                     if( Fabs(a[j][j]) <= amin )
                     {
-                        //std::cerr << "-- LU failure level-2" << std::endl;
                         return false;
                     }
 
@@ -149,8 +147,10 @@ namespace yocto
                 assert(a.rows>0);
                 assert(a.is_square());
                 assert(b.size()>=a.rows);
-                const size_t    n = a.rows;
+                assert(a.memory_kind==matrix_large_memory);
 
+                const size_t    n = a.rows;
+                
                 //______________________________________________________________
                 //
                 // first pass

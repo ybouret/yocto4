@@ -175,9 +175,9 @@ memory_kind(MEMORY_KIND)
                 YOCTO_MATRIX_XCH(data);
                 YOCTO_MATRIX_XCH(pRow);
                 YOCTO_MATRIX_XCH(num_objects);
-                cswap(ctor,M.ctor);
+                YOCTO_MATRIX_XCH(ctor);
                 YOCTO_MATRIX_XCH(num_scalars);
-                cswap(stor,M.stor);
+                YOCTO_MATRIX_XCH(stor);
                 YOCTO_MATRIX_XCH(wksp);
                 YOCTO_MATRIX_XCH(wlen);
                 YOCTO_MATRIX_XCH(indices);
@@ -218,12 +218,19 @@ memory_kind(MEMORY_KIND)
             {
                 row &R1 = (*this)[r1];
                 row &R2 = (*this)[r2];
-                for(size_t c=cols;c>0;--c) bswap(R1[c],R2[c]);
+                for(size_t c=cols;c>0;--c)
+                {
+                    bswap(R1[c],R2[c]);
+                }
+
             }
 
             inline void swap_cols(size_t c1, size_t c2) throw()
             {
-                for(size_t r=rows;r>0;--r) bswap((*this)[r][c1],(*this)[r][c2]);
+                for(size_t r=rows;r>0;--r)
+                {
+                    bswap((*this)[r][c1],(*this)[r][c2]);
+                }
             }
 
             inline void ldz()
@@ -245,6 +252,37 @@ memory_kind(MEMORY_KIND)
                     }
                 }
             }
+
+            template <typename U>
+            inline void minor_of(const YOCTO_MATRIX<U> &M,
+                                 const size_t           I,
+                                 const size_t           J) throw()
+            {
+                assert(M.rows>1);
+                assert(M.cols>1);
+                assert(rows==M.rows-1);
+                assert(cols==M.cols-1);
+
+                YOCTO_MATRIX<T> &self = *this;
+                const size_t nr = M.rows;
+                const size_t nc = M.cols;
+                for(size_t i=1,ir=1;i<=nr;++i)
+                {
+                    if(i!=I)
+                    {
+                        for(size_t j=1,jr=1;j<=nc;++j)
+                        {
+                            if(j!=J)
+                            {
+                                self[ir][jr] = T(M[i][j]);
+                                ++jr;
+                            }
+                        }
+                        ++ir;
+                    }
+                }
+            }
+
 
         private:
             mutable_type *data;
@@ -465,8 +503,8 @@ memory_kind(MEMORY_KIND)
                 }
                 init0();
             }
-
-
+            
+            
         public:
             const matrix_memory memory_kind;
             
@@ -475,7 +513,7 @@ memory_kind(MEMORY_KIND)
                 assert(memory_kind==matrix_large_memory);
                 return (size_t *)indices;
             }
-
+            
             inline mutable_type *__aux(const size_t k) const throw()
             {
                 assert(memory_kind==matrix_large_memory);
@@ -483,12 +521,12 @@ memory_kind(MEMORY_KIND)
                 const_type *addr = &data[items+k*rows];
                 return (mutable_type *)addr;
             }
-
+            
             inline scalar_type  *__scalars() const throw()
             {
                 return (scalar_type *)scalars;
             }
-
+            
         };
         
     }

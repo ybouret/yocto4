@@ -122,8 +122,8 @@ namespace yocto {
 		template <>
 		void jacobi<real_t>:: eigsrt( array<real_t> &d, matrix<real_t> &v) throw()
 		{
-			const size_t n = d.size();
-			assert( d.size() == v.rows );
+			const size_t n = v.rows;
+			assert( d.size() >= v.rows );
 			for (size_t i=1;i<n;i++) 
 			{
 				size_t k = i;
