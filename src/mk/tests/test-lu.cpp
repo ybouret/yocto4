@@ -2,6 +2,7 @@
 
 #include "yocto/mpa/rational.hpp"
 #include "yocto/math/core/lu.hpp"
+#include "yocto/code/rand.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -18,8 +19,18 @@ void __test_lu()
         {
             for(size_t j=1;j<=n;++j)
             {
-                if(i==j) M[i][j] = (n*n);
+                if(i==j)
+                {
+                    M[i][j] = (n*n);
+                }
+                else
+                {
+                    const int64_t x = -int64_t(n) + int64_t(alea_leq(2*n));
+                    //std::cerr << "x=" << x << std::endl;
+                    M[i][j] = x;
+                }
             }
+
         }
         std::cerr << "M=" << M << std::endl;
         if(!LU<T>::build(M))
