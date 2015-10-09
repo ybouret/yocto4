@@ -5,7 +5,6 @@
 #include "yocto/string/basic.hpp"
 #include "yocto/code/printf-check.hpp"
 #include "yocto/bitwise.hpp"
-#include "yocto/math/xtypes.hpp"
 
 namespace yocto
 {
@@ -18,14 +17,5 @@ namespace yocto
 YOCTO_SUPPORT_BITWISE_OPS(string)
 YOCTO_SUPPORT_BITWISE_OPS(wstring)
 
-namespace yocto
-{
-    template <>
-    struct xnumeric<string>
-    {
-        inline static string zero() { return string(); }
-    };
-
-}
 
 #endif

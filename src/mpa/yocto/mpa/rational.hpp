@@ -209,8 +209,9 @@ inline friend bool operator OP (const int64_t   lhs, const rational &rhs) throw(
     template <>
     struct xnumeric<mpq>
     {
-        inline static mpq zero() { return mpn();  }
-        inline static mpq one()  { return mpq(1,1); }
+        inline static mpq zero()    { return mpq();  }
+        inline static mpq one()     { return mpq(1,1); }
+        inline static mpq minimum() { return mpq(); }
     };
 
     namespace math

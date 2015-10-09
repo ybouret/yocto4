@@ -4,6 +4,7 @@
 #include "yocto/code/rand.hpp"
 #include "../../main/tests/support.hpp"
 #include "yocto/mpa/rational.hpp"
+#include "yocto/string/xnum.hpp"
 
 using namespace yocto;
 using namespace math;

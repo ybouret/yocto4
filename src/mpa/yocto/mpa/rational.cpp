@@ -180,7 +180,14 @@ namespace yocto
         
         std::ostream & operator<<(std::ostream &os, const rational &q)
         {
-            os << '(' << q.num << '/' << q.den << ')';
+            if(q.den.is_one())
+            {
+                os << q.num;
+            }
+            else
+            {
+                os << '(' << q.num << '/' << q.den << ')';
+            }
             return os;
         }
         

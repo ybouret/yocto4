@@ -10,12 +10,26 @@ template <typename T>
 static inline
 void __test_lu()
 {
-    for(size_t n=1;n<2;++n)
+    for(size_t n=1;n<=4;++n)
     {
         YOCTO_MATRIX<T> M(n);
         M.ld1();
+        for(size_t i=1;i<=n;++i)
+        {
+            for(size_t j=1;j<=n;++j)
+            {
+                if(i==j) M[i][j] = (n*n);
+            }
+        }
         std::cerr << "M=" << M << std::endl;
-        LU<T>::build(M);
+        if(!LU<T>::build(M))
+        {
+            std::cerr << "Can't build LU" << std::endl;
+        }
+        else
+        {
+            std::cerr << "LU=" << M << std::endl;
+        }
     }
 }
 

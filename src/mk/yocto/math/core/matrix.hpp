@@ -2,7 +2,7 @@
 #define YOCTO__MATRIX_INCLUDED 1
 
 #include "yocto/math/types.hpp"
-#include "yocto/math/xtypes.hpp"
+#include "yocto/xnumeric.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/bitwise.hpp"
 #include "yocto/code/bswap.hpp"
@@ -144,8 +144,6 @@ memory_kind(MEMORY_KIND)
                     YOCTO_MATRIX_BUILD_WITH(ctor1(other,int2type<is_primitive>() ) );
                 }
             }
-
-
 
 
             inline virtual ~YOCTO_MATRIX() throw()
@@ -294,9 +292,9 @@ memory_kind(MEMORY_KIND)
                 memory::kind<memory::global>::release(wksp,wlen);
                 data = 0;
                 pRow = 0;
-                (size_t&)rows  = 0;
-                (size_t&)cols  = 0;
-                (size_t&)items = 0;
+                (size_t&)rows        = 0;
+                (size_t&)cols        = 0;
+                (size_t&)items       = 0;
                 (size_t&)num_objects = 0;
                 (size_t&)num_scalars = 0;
                 indices = 0;

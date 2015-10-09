@@ -3,6 +3,7 @@
 
 #include "yocto/mpa/types.hpp"
 #include "yocto/string.hpp"
+#include "yocto/xnumeric.hpp"
 #include <iosfwd>
 
 namespace yocto

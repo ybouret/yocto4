@@ -171,9 +171,12 @@ namespace yocto
         template <> inline ptrdiff_t RInt<double>   (const double    &x) throw() { return ptrdiff_t( floor(x+0.5)   ); }
         template <> inline ptrdiff_t RInt<ptrdiff_t>(const ptrdiff_t &x) throw() { return x; }
 
-        
+
 	}
-	
+
+   
+
+
 }
 
 #endif
