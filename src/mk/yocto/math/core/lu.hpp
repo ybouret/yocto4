@@ -139,7 +139,7 @@ namespace yocto
             }
 
 
-            //! solve a previously LU build matrix
+            //! solve a vector using a previously LU build matrix
             static inline
             void solve( const matrix_t &a, array<T> &b ) throw()
             {
@@ -185,6 +185,56 @@ namespace yocto
                             sum -= a_i[j]*b[j];
                         }
                         b[i]=sum/a_i[i];
+                    }
+
+                }
+            }
+
+            //! solve columns of a matrix
+            static inline
+            void solve( const matrix_t &a, matrix_t &b ) throw()
+            {
+                assert(a.cols>0);
+                assert(a.rows>0);
+                assert(a.is_square());
+                assert(b.rows==a.rows);
+                assert(a.memory_kind==matrix_large_memory);
+
+                const size_t    n  = a.rows;
+                const size_t    nc = b.cols;
+                const indices   indx( a.__indices(), n);
+                for(size_t c=nc;c>0;--c)
+                {
+                    //__________________________________________________________
+                    //
+                    // first pass
+                    //__________________________________________________________
+                    for(size_t i=1;i<=n;++i)
+                    {
+                        const size_t ip  = indx[i]; assert(ip>0);assert(ip<=n);
+                        type         sum = b[ip][c];
+                        const row_t &a_i = a[i];
+                        b[ip][c] = b[i][c];
+                        for(size_t j=1;j<i;++j)
+                        {
+                            sum -= a_i[j] * b[j][c];
+                        }
+                        b[i][c] = sum;
+                    }
+
+                    //__________________________________________________________
+                    //
+                    // second pass
+                    //__________________________________________________________
+                    for(size_t i=n;i>0;--i)
+                    {
+                        const row_t &a_i = a[i];
+                        type         sum = b[i][c];
+                        for(size_t j=i+1;j<=n;++j)
+                        {
+                            sum -= a_i[j]*b[j][c];
+                        }
+                        b[i][c]=sum/a_i[i];
                     }
 
                 }

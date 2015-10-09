@@ -83,6 +83,10 @@ void __test_lu()
             }
             std::cerr << "\t\t|d|=" << sum << std::endl;
         }
+        YOCTO_MATRIX<T> I(n,n);
+        I.ld1();
+        LU<T>::solve(M,I);
+        std::cerr << "I=" << I << std::endl;
 
 
     }
