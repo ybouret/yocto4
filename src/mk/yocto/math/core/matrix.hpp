@@ -28,19 +28,19 @@ namespace yocto
 
 #define YOCTO_MATRIX _matrix
 #define YOCTO_MATRIX_CTOR(MEMORY_KIND) \
-rows(0), \
-cols(0), \
-items(0),\
-data(0),\
-pRow(0),\
+rows(0),       \
+cols(0),       \
+items(0),      \
+data(0),       \
+pRow(0),       \
 num_objects(0),\
-ctor(0), \
+ctor(0),       \
 num_scalars(0),\
-stor(0), \
-wksp(0), \
-wlen(0),\
-indices(0),\
-scalars(0),\
+stor(0),       \
+wksp(0),       \
+wlen(0),       \
+indices(0),    \
+scalars(0),    \
 memory_kind(MEMORY_KIND)
 
         //! row-major matrix
