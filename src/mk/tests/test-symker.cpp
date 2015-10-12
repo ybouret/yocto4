@@ -99,8 +99,10 @@ void do_symker()
             if(Fabs(idet)<=0)
             {
                 std::cerr << "// Found 0 determinant!!!" << std::endl;
+                d[n] = 0;
                 std::cerr << "d=diag(" << d << ")" << std::endl;
                 std::cerr << "Q=" << Q << std::endl;
+                
             }
             else
             {
