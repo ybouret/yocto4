@@ -1,8 +1,8 @@
 #include "yocto/chemical/equilibria.hpp"
 
 #include "yocto/math/core/tao.hpp"
-#include "yocto/math/kernel/det.hpp"
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/determinant.hpp"
+#include "yocto/math/core/lu.hpp"
 
 #include "yocto/exception.hpp"
 
@@ -27,7 +27,7 @@ namespace yocto
             // check validity
             computeGammaAndPhi(t);
             tao::mmul_rtrn(W, Phi, Nu);
-            if(!crout<double>::build(W))
+            if(!LU<double>::build(W))
             {
                 throw exception("equilibria.absorb(invalid concentrations)");
             }
@@ -48,7 +48,7 @@ namespace yocto
             //std::cerr << "Nu="    << Nu    << std::endl;
             
             // find -xi
-            crout<double>::solve(W,xi);
+            LU<double>::solve(W,xi);
             
             // compute delta rho
             tao::mul_trn(dC, Nu, xi);

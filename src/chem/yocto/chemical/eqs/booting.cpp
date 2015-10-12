@@ -4,8 +4,9 @@
 #include "yocto/sort/quick.hpp"
 
 #include "yocto/math/core/tao.hpp"
-#include "yocto/math/kernel/det.hpp"
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/determinant.hpp"
+#include "yocto/math/core/lu.hpp"
+#include "yocto/math/core/adjoint.hpp"
 #include "yocto/math/round.hpp"
 
 #include "yocto/code/utils.hpp"
@@ -348,12 +349,12 @@ namespace yocto
                 imatrix_t P2(Nc,Nc);
                 tao::mmul_rtrn(P2, P, P);
                 //std::cerr << "P2=" << P2 << std::endl;
-                Delta = determinant_of(P2);
+                Delta = ideterminant(P2);
                 //std::cerr << "Delta=" << Delta << std::endl;
                 if(Delta==0)
                     throw exception("unexpected singular set of constraints");
                 imatrix_t J(Nc,Nc);
-                adjoint(J, P2);
+                iadjoint(J, P2);
                 //std::cerr << "J=" << J << std::endl;
                 imatrix_t Y(M,Nc);
                 tao::mmul_ltrn(Y, P, J);
@@ -426,7 +427,7 @@ namespace yocto
             //__________________________________________________________________
             tao::mmul_rtrn(W, Phi, Q);
             A.assign(W);
-            if( !crout<double>::build(W) )
+            if( !LU<double>::build(W) )
             {
                 std::cerr << "equilibria.booting: singular composition..." << std::endl;
                 goto GENERATE_C;
@@ -438,8 +439,8 @@ namespace yocto
             //__________________________________________________________________
             tao::neg(U,Gamma);
             tao::set(V,U);
-            crout<double>::solve(W,U);
-            crout<double>::improve(U, A, W, V);
+            LU<double>::solve(W,U);
+            //crout<double>::improve(U, A, W, V);
             
             //__________________________________________________________________
             //
@@ -497,13 +498,13 @@ namespace yocto
             //__________________________________________________________________
             updateGammaAndPhi();
             tao::mmul_rtrn(W, Phi, Q);
-            if( !crout<double>::build(W) )
+            if( !LU<double>::build(W) )
             {
                 std::cerr << "-- equilibria.booting: invalid final composition..." << std::endl;
                 goto GENERATE_C;
             }
             tao::neg(xi,Gamma);
-            crout<double>::solve(W,xi);
+            LU<double>::solve(W,xi);
             tao::mul_trn(dC,W,xi);
             
             //__________________________________________________________________

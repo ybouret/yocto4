@@ -1,7 +1,7 @@
 #include "yocto/chemical/equilibria.hpp"
 
 #include "yocto/math/core/tao.hpp"
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/lu.hpp"
 
 #include "yocto/exception.hpp"
 
@@ -100,7 +100,6 @@ namespace yocto
             }
             
             
-            typedef crout<double> LU;
             size_t count = 0;
             matrix_t J(N,N);
             
@@ -113,14 +112,14 @@ namespace yocto
                 //______________________________________________________________
                 tao::mmul_rtrn(W,Phi,Nu);
                 
-                if(! LU::build(W) )
+                if(! LU<double>::build(W) )
                 {
                     std::cerr << "-- Normalize: singular concentrations" << std::endl;
                     return false;
                 }
                 
                 tao::neg(xi,Gamma);
-                LU::solve(W, xi);
+                LU<double>::solve(W, xi);
                 clip_extents();
                 
                 tao::mul_trn(dC, Nu, xi);

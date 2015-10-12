@@ -1,9 +1,10 @@
 #include "yocto/chemical/equilibria.hpp"
 
 #include "yocto/math/core/tao.hpp"
-#include "yocto/math/kernel/det.hpp"
+#include "yocto/math/core/determinant.hpp"
 
 #include "yocto/exception.hpp"
+#include "yocto/sort/quick.hpp"
 
 namespace yocto
 {

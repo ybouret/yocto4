@@ -179,7 +179,7 @@ namespace yocto
                     xi.     make(N,0.0);
                     Nu.     make(N,M);
                     Phi.    make(N,M);
-                    W.      make(N,N);
+                    W.      make(N);
                     online. ensure(N);
                     xip.    make(N,0);
                     Q.      make(N,M);
