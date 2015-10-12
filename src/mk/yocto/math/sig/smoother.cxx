@@ -148,7 +148,7 @@ namespace yocto
             //
             // prepare the momenta
             //__________________________________________________________________
-            matrix<real_t> mu(m,m);
+            matrix<real_t> mu(m);
             for(size_t r=1;r<=m;++r)
             {
                 for(size_t c=r;c<=m;++c)

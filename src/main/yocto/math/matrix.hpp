@@ -56,6 +56,7 @@ namespace yocto
 
 #define YOCTO_MATRIX_TRANSPOSE 0x0001
 #define YOCTO_MATRIX_TIGHTEN   0x0100
+#define YOCTO_MATRIX_ENLARGE   0x2000
 
 #define YOCTO_MATRIX_NUM_EXTRA 2
 
@@ -164,7 +165,7 @@ memory_kind(MEMORY_KIND)
 
             //! constructor with options
             inline matrix(const matrix<T> &other, const int flags) :
-            YOCTO_MATRIX_CTOR( (0!=(flags&YOCTO_MATRIX_TIGHTEN)) ? matrix_tight_memory : other.memory_kind )
+            YOCTO_MATRIX_CTOR( upgrade(other.memory_kind,flags) )
             {
                 if(0!=(flags&YOCTO_MATRIX_TRANSPOSE))
                 {
@@ -337,7 +338,7 @@ memory_kind(MEMORY_KIND)
 
             inline void make(size_t n)
             {
-                if(n!=rows||n!=rows)
+                if(n!=rows||n!=rows||memory_kind!=matrix_large_memory)
                 {
                     matrix<T> tmp(n);
                     swap_with(tmp);
@@ -389,6 +390,23 @@ memory_kind(MEMORY_KIND)
             size_t        wlen;
             size_t       *indices;
             scalar_type  *scalars;
+
+            static inline
+            matrix_memory upgrade(matrix_memory kind,const int flags) throw()
+            {
+                if(0!=(flags&YOCTO_MATRIX_TIGHTEN) )
+                {
+                    kind = matrix_tight_memory;
+                }
+
+                if(0!=(flags&YOCTO_MATRIX_ENLARGE) )
+                {
+                    // superseed
+                    kind = matrix_large_memory;
+                }
+
+                return kind;
+            }
 
             //! support no destruct
             inline void __clear( int2type<true> ) throw()

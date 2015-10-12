@@ -19,7 +19,7 @@ void __test_lu()
     {
 
         std::cerr << std::endl;
-        for(size_t iter=0;iter<10;++iter)
+        for(size_t iter=0;iter<5;++iter)
         {
             matrix<T> M(n);
             M.ld1();

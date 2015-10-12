@@ -194,7 +194,6 @@ namespace yocto
             {
                 throw exception("%s(invalid points)",fn);
             }
-            
             //------------------------------------------------------------------
             // beta <- transpose(Sqz)
             //------------------------------------------------------------------
@@ -221,7 +220,7 @@ namespace yocto
             //------------------------------------------------------------------
             // I <- inv(C)
             //------------------------------------------------------------------
-            matrix<real_t> I(C);
+            matrix<real_t> I(C,YOCTO_MATRIX_ENLARGE);
             //std::cerr << "C=" << I << std::endl;
             if( !LU<real_t>::build(I) )
             {
@@ -334,7 +333,7 @@ namespace yocto
                                         array<real_t> &param )
         {
             assert(param.size()>=6);
-            matrix<real_t> S(2,2);
+            matrix<real_t> S(2);
             const real_t &a = param[1];
             const real_t &b = param[2];
             const real_t &c = param[3];

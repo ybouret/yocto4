@@ -94,9 +94,9 @@ namespace yocto
             u     .make(L,0);
             dFdu  .make(L,0);
             beta  .make(L,0);
-            alpha .make(L,L);
+            alpha .make(L);
             __ag  .make(L,M);
-            Alpha .make(M,M);
+            Alpha .make(M);
 
             if(L==M)
             {

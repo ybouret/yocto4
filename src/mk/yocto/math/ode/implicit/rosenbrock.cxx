@@ -33,8 +33,8 @@ namespace yocto
             {
                 assert(nv>0);
                 allocate(nv);
-                dfdy.make(nv,nv);
-                a.make(nv,nv);
+                dfdy.make(nv);
+                a.make(nv);
             }
             
         }
