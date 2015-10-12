@@ -15,6 +15,14 @@ namespace yocto
     namespace math
     {
 
+        class matrix_dims
+        {
+        public:
+            
+        protected:
+            YOCTO_DISABLE_ASSIGN(matrix_dims);
+        };
+
         enum matrix_memory
         {
             matrix_tight_memory,

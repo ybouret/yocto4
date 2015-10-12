@@ -15,9 +15,9 @@ namespace yocto
 
             //! Jacobi reduction
             /**
-             \param a is a symetric matrix, regenerated
+             \param a is a symetric matrix, REGENERATED at the end...
              \param d are the eigenvalues
-             \param v are the eigenvectors
+             \param v columns are the eigenvectors
              \param Diag = Vt A V
              */
             static
