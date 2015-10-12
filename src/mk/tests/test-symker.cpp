@@ -102,7 +102,7 @@ void do_symker()
                 d[n] = 0;
                 std::cerr << "d=diag(" << d << ")" << std::endl;
                 std::cerr << "Q=" << Q << std::endl;
-                
+
             }
             else
             {
