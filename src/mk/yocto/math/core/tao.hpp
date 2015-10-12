@@ -26,8 +26,9 @@ namespace yocto
             // Level 1: vector/vector operations
             //
             //------------------------------------------------------------------
-#define YOCTO_TAO_LOOP(N,FUNC) YOCTO_LOOP_FUNC(N,Y_TAO_##FUNC,1)
-            
+#define YOCTO_TAO_LOOP(N,FUNC)  YOCTO_LOOP_FUNC(N,Y_TAO_##FUNC,1)
+#define YOCTO_TAO_LOOP_(N,FUNC) YOCTO_LOOP_FUNC_(N,Y_TAO_##FUNC,1)
+
             //! a = x
             template <typename ARRAY>
             static inline void ld( ARRAY &a, typename ARRAY::param_type x ) throw()
@@ -470,7 +471,7 @@ __sum += static_cast<typename ARR::type>(M[j][I]) * static_cast<typename ARR::ty
                 const size_t nr = a.rows;
                 const size_t nc = a.cols;
                 const size_t ns = b.rows;
-                for(size_t i=nr;i>0;--i)
+                for(register size_t i=nr;i>0;--i)
                 {
                     array<typename AMAT::type>       &ai = a[i];
                     for(size_t j=nc;j>0;--j)
@@ -484,6 +485,30 @@ __sum += static_cast<typename ARR::type>(M[j][I]) * static_cast<typename ARR::ty
                     }
                 }
                 
+            }
+
+            //! a = b*b';
+            template <typename AMAT,typename BMAT>
+            static inline void row_gram(AMAT &a, const BMAT &b) throw()
+            {
+                assert(a.rows==b.rows);
+                assert(a.rows==a.cols);
+                const size_t nr = a.rows;
+                const size_t nc = b.cols;
+                for(register size_t i=nr;i>0;--i)
+                {
+                    const typename BMAT::row &b_i = b[i];
+                    typename       AMAT::row &a_i = a[i];
+                    for(register size_t j=nr;j>=i;--j)
+                    {
+                        const typename BMAT::row &b_j = b[j];
+                        typename AMAT::type       __sum(0);
+#define Y_TAO_ROW_GRAM(K) __sum += static_cast<typename AMAT::type>(b_i[K]) * static_cast<typename AMAT::type>(b_j[K])
+                        YOCTO_TAO_LOOP_(nc,ROW_GRAM);
+#undef Y_TAO_ROW_GRAM
+                        a_i[j] = a[j][i] = __sum;
+                    }
+                }
             }
             
             

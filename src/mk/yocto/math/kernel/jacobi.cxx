@@ -21,7 +21,7 @@ namespace yocto {
 			assert(d.size() == a.rows);
 			
 			const size_t   n = a.rows;
-            size_t         nrot_ = 0;
+            //size_t         nrot_ = 0;
             vector<real_t> b(n,numeric<real_t>::zero);
             vector<real_t> z(n,numeric<real_t>::zero);
           			
@@ -45,7 +45,7 @@ namespace yocto {
 				z[ip]=REAL(0.0);
 			}
 			
-			nrot_ = 0;
+			//nrot_ = 0;
 			
             //==================================================================
 			// looping over sweeps
@@ -106,11 +106,13 @@ namespace yocto {
 								for(size_t j=1;j<=n;++j) {
 									_YOCTO_JACOBI(v,j,ip,j,iq);
 								}
-								++nrot_;
+								//++nrot_;
 							}
 					}
 				}
-				for(size_t ip=1;ip<=n;++ip) {
+
+                for(size_t ip=1;ip<=n;++ip)
+                {
 					b[ip] += z[ip];
 					d[ip] = b[ip];
 					z[ip] = REAL(0.0);

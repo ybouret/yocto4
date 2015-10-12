@@ -85,7 +85,7 @@ namespace yocto
             return __determinant(aa);
         }
 
-        //! determinant for signed integer types
+        //! determinant for signed integer types, or float/double
         template <typename T>
         inline T ideterminant(const YOCTO_MATRIX<T> &a )
         {

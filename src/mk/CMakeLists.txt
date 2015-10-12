@@ -12,6 +12,12 @@ SET( core_srcs ${core_decl} ${core_impl} )
 INSTALL( FILES ${core_decl} DESTINATION include/yocto/math/core )
 SOURCE_GROUP( math/core FILES ${core_srcs} )
 
+#FILE( GLOB balk_decl yocto/math/balk/*.hpp)
+#FILE( GLOB balk_impl yocto/math/balk/*.cpp)
+#SET( balk_srcs ${balk_decl} ${balk_impl} )
+#INSTALL( FILES ${balk_decl} DESTINATION include/yocto/math/balk )
+#SOURCE_GROUP( math/balk FILES ${balk_srcs} )
+
 
 FILE( GLOB sparse_decl yocto/math/sparse/*.hpp)
 FILE( GLOB sparse_impl yocto/math/sparse/*.cpp)
@@ -99,6 +105,7 @@ SOURCE_GROUP( math/wavelet FILES ${wavelet_srcs} )
 
 SET( srcs
 ${core_srcs}
+${balk_srcs}
 ${kernel_srcs}
 ${sparse_srcs}
 ${dat_srcs}

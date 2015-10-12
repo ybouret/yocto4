@@ -134,11 +134,6 @@ SET( counting_srcs ${counting_decl} ${counting_impl} )
 INSTALL( FILES ${counting_decl} DESTINATION include/yocto/counting )
 SOURCE_GROUP( counting FILES ${counting_srcs} )
 
-#FILE( GLOB ramp_decl yocto/geom/ramp/*.hpp)
-#FILE( GLOB ramp_impl yocto/geom/ramp/*.cpp)
-#SET( ramp_srcs ${ramp_decl} ${ramp_impl} )
-#INSTALL( FILES ${ramp_decl} DESTINATION include/yocto/geom/ramp )
-#SOURCE_GROUP( geom/ramp FILES ${ramp_srcs} )
 
 FILE( GLOB fs_decl yocto/fs/*.hpp)
 FILE( GLOB fs_impl yocto/fs/*.cpp)
