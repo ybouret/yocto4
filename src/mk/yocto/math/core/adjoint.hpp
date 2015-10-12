@@ -8,10 +8,10 @@ namespace yocto
     namespace math
     {
         template <typename T >
-        inline T cofactor(const YOCTO_MATRIX<T> &M,
-                          const size_t           I,
-                          const size_t           J,
-                          YOCTO_MATRIX<T>       &m )
+        inline T cofactor(const matrix<T> &M,
+                          const size_t     I,
+                          const size_t     J,
+                          matrix<T>       &m)
         {
             assert(M.is_square());
             assert(m.is_square());
@@ -32,7 +32,7 @@ namespace yocto
 
 
         template <typename T>
-        inline void adjoint(YOCTO_MATRIX<T> &A, const YOCTO_MATRIX<T> &M)
+        inline void adjoint(matrix<T> &A, const matrix<T> &M)
         {
             assert(A.rows==M.rows);
             assert(A.cols==M.cols);
@@ -51,7 +51,7 @@ namespace yocto
                     break;
             }
             assert(n>=2);
-            YOCTO_MATRIX<T> m(n-1,n-1);
+            matrix<T> m(n-1,n-1);
             for(size_t i=n;i>0;--i)
             {
                 for(size_t j=n;j>0;--j)
@@ -63,10 +63,10 @@ namespace yocto
 
         //! for signed integer type
         template <typename T >
-        inline T icofactor(const YOCTO_MATRIX<T> &M,
-                           const size_t           I,
-                           const size_t           J,
-                           YOCTO_MATRIX<double>   &m )
+        inline T icofactor(const matrix<T> &M,
+                           const size_t     I,
+                           const size_t     J,
+                           matrix<double>  &m)
         {
 
             assert(M.is_square());
@@ -88,7 +88,7 @@ namespace yocto
 
         //! adjoint of integer matrices
         template <typename T>
-        inline void iadjoint(YOCTO_MATRIX<T> &A, const YOCTO_MATRIX<T> &M)
+        inline void iadjoint(matrix<T> &A, const matrix<T> &M)
         {
             assert(A.rows==M.rows);
             assert(A.cols==M.cols);
@@ -107,7 +107,7 @@ namespace yocto
                     break;
             }
             assert(n>=2);
-            YOCTO_MATRIX<double> m(n-1,n-1);
+            matrix<double> m(n-1,n-1);
             for(size_t i=n;i>0;--i)
             {
                 for(size_t j=n;j>0;--j)

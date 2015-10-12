@@ -139,7 +139,7 @@ namespace yocto
         sp_matrix<z_type>:: sp_matrix( const matrix<z_type> &M, real_type threshold ) :
         rows(M.rows),
         cols(M.cols),
-        nmax(M.size),
+        nmax(M.items),
         items()
         {
             // first pass: count non zero

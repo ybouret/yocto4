@@ -21,7 +21,7 @@ void __test_lu()
         std::cerr << std::endl;
         for(size_t iter=0;iter<10;++iter)
         {
-            YOCTO_MATRIX<T> M(n);
+            matrix<T> M(n);
             M.ld1();
             for(size_t i=1;i<=n;++i)
             {
@@ -41,7 +41,7 @@ void __test_lu()
 
             }
             std::cerr << "M=" << M << std::endl;
-            YOCTO_MATRIX<T> A(M,YOCTO_MATRIX_TIGHTEN);
+            matrix<T> A(M,YOCTO_MATRIX_TIGHTEN);
 
             const T dd = determinant(A);
             std::cerr << "det=" << dd << std::endl;
@@ -101,7 +101,7 @@ void __test_lu()
                 }
                 std::cerr << "\t\t|diff|=" << sum << std::endl;
             }
-            YOCTO_MATRIX<T> I(n,n);
+            matrix<T> I(n,n);
             I.ld1();
             LU<T>::solve(M,I);
             std::cerr << "I=" << I << std::endl;

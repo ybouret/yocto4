@@ -2,7 +2,7 @@
 #define YOCTO_MATH_TRIGONOMETRIC_INCLUDED 1
 
 #include "yocto/math/v2d.hpp"
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/lu.hpp"
 
 namespace yocto
 {
@@ -20,7 +20,7 @@ namespace yocto
              \param theta in 0..2*pi exclusive
              \param solver to perform the LU on the matrix
              */
-            explicit trigonometric( const array<T> &theta, crout<T> &solver );
+            explicit trigonometric( const array<T> &theta, LU<T> &solver );
             virtual ~trigonometric() throw();
             
             //! compute the trigonometric coefficicents

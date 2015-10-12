@@ -266,6 +266,12 @@ memory_kind(MEMORY_KIND)
                 }
             }
 
+            inline void swap_both(size_t i,size_t j) throw()
+            {
+                swap_rows(i,j);
+                swap_cols(i,j);
+            }
+
             inline void ldz()
             {
                 const_type __zero = xnumeric<mutable_type>::zero();
@@ -316,7 +322,7 @@ memory_kind(MEMORY_KIND)
                 }
             }
 
-            void make(size_t nr, size_t nc)
+            inline void make(size_t nr, size_t nc)
             {
                 if(nr!=rows||nc!=rows)
                 {
@@ -329,7 +335,7 @@ memory_kind(MEMORY_KIND)
                 }
             }
 
-            void make(size_t n)
+            inline void make(size_t n)
             {
                 if(n!=rows||n!=rows)
                 {
@@ -342,6 +348,35 @@ memory_kind(MEMORY_KIND)
                 }
             }
 
+            //__________________________________________________________________
+            //
+            // transpose, with tighten possibility
+            //__________________________________________________________________
+            inline void transpose(int flags=0)
+            {
+                matrix<T> tmp(*this,YOCTO_MATRIX_TRANSPOSE|flags);
+                swap_with(tmp);
+            }
+
+
+            //__________________________________________________________________
+            //
+            // release all memory
+            //__________________________________________________________________
+            void release() throw()
+            {
+                clear();
+                memory::kind<memory::global>::release(wksp,wlen);
+                data = 0;
+                pRow = 0;
+                (size_t&)rows        = 0;
+                (size_t&)cols        = 0;
+                (size_t&)items       = 0;
+                (size_t&)num_objects = 0;
+                (size_t&)num_scalars = 0;
+                indices = 0;
+                scalars = 0;
+            }
 
         private:
             mutable_type *data;
@@ -379,24 +414,6 @@ memory_kind(MEMORY_KIND)
                 __clear( int2type< support_no_destruct<mutable_type>::value >() );
             }
 
-            //__________________________________________________________________
-            //
-            // release all memory
-            //__________________________________________________________________
-            void release() throw()
-            {
-                clear();
-                memory::kind<memory::global>::release(wksp,wlen);
-                data = 0;
-                pRow = 0;
-                (size_t&)rows        = 0;
-                (size_t&)cols        = 0;
-                (size_t&)items       = 0;
-                (size_t&)num_objects = 0;
-                (size_t&)num_scalars = 0;
-                indices = 0;
-                scalars = 0;
-            }
 
 
             //__________________________________________________________________

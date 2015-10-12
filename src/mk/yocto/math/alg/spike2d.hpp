@@ -7,7 +7,7 @@
 #include "yocto/core/list.hpp"
 #include "yocto/sort/quick.hpp"
 #include "yocto/math/v2d.hpp"
-#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 #include "yocto/code/utils.hpp"
 
 

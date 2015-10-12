@@ -16,8 +16,8 @@ void do_symdiag()
 {
     for(size_t n=1;n<=16;++n)
     {
-        YOCTO_MATRIX<T> a(n);
-        YOCTO_MATRIX<T> Q(n,n);
+        matrix<T> a(n);
+        matrix<T> Q(n,n);
         vector<T>       d(n,0);
         for(size_t iter=0;iter<1;++iter)
         {
@@ -29,7 +29,7 @@ void do_symdiag()
                 }
             }
             //std::cerr << "a=" << a << std::endl;
-            YOCTO_MATRIX<T> a0(a,YOCTO_MATRIX_TIGHTEN);
+            matrix<T> a0(a,YOCTO_MATRIX_TIGHTEN);
             if(!symdiag<T>::build(a,d,Q))
             {
                 std::cerr << "symdiag failure!!" << std::endl;
@@ -53,14 +53,14 @@ void do_symker()
     for(size_t n=1;n<=6;++n)
     {
         std::cerr << std::endl;
-        YOCTO_MATRIX<double> G(n);
-        YOCTO_MATRIX<double> Q(n);
-        vector<double>       d(n,0);
+        matrix<double> G(n);
+        matrix<double> Q(n);
+        vector<double> d(n,0);
 
         for(size_t iter=0;iter<2;++iter)
         {
-            const size_t m = n + alea_leq(n);
-            YOCTO_MATRIX<unit_t> J(n,m);
+            const size_t   m = n + alea_leq(n);
+            matrix<unit_t> J(n,m);
 
             const unit_t nm = m;
             for(size_t i=1;i<=n;++i)

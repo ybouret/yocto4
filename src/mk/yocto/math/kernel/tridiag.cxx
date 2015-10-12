@@ -3,7 +3,7 @@
 #include "yocto/math/types.hpp"
 #include "yocto/math/core/tao.hpp"
 
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/lu.hpp"
 #include "yocto/sequence/vector.hpp"
 
 #include <iostream>
@@ -365,11 +365,11 @@ namespace yocto {
                 return false;
             
             //-- compute the H matrix
-            matrix<z_type> H(p,p);
+            matrix<z_type> H(p);
             tao::mmul_ltrn(H, V, Z);
             for(size_t i=p;i>0;--i) H[i][i] += numeric<z_type>::one;
             
-            if( !crout<z_type>::build(H) )
+            if( !LU<z_type>::build(H) )
                 return false;
             
             //-- solve the auxiliary problem A.y = r
@@ -380,7 +380,7 @@ namespace yocto {
             //-- apply the woodbury formula
             vector<z_type> tVy(p,numeric<z_type>::zero);
             tao::mul_trn(tVy, V, y);
-            crout<z_type>::solve(H, tVy);
+            LU<z_type>::solve(H, tVy);
             tao::mul_sub(y, Z, tVy);
             return true;
         }

@@ -348,13 +348,13 @@ namespace yocto
 
 }
 
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/lu.hpp"
 #include "yocto/code/ipower.hpp"
 
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
 
-#include "yocto/math/kernel/jacobi.hpp"
+#include "yocto/math/core/symdiag.hpp"
 
 #include <iomanip>
 
@@ -469,7 +469,7 @@ namespace yocto
             {
                 curv[i][i] *= fac;
             }
-            return crout<real_t>::build(curv);
+            return LU<real_t>::build(curv);
         }
 
 
@@ -541,7 +541,7 @@ namespace yocto
             Atmp  .make(nvar,0);
             beta  .make(nvar,0);
             alpha .make(nvar,nvar);
-            curv  .make(nvar,nvar);
+            curv  .make(nvar);
             step  .make(nvar,0);
 
             //__________________________________________________________________
@@ -600,7 +600,7 @@ namespace yocto
             // compute step
             //__________________________________________________________________
             tao::set(step,beta);
-            crout<real_t>::solve(curv,step);
+            LU<real_t>::solve(curv,step);
 
             //__________________________________________________________________
             //
@@ -735,7 +735,7 @@ namespace yocto
             }
 
             alpha.ld1();
-            crout<real_t>::solve(curv, alpha);
+            LU<real_t>::solve(curv, alpha);
 
             //__________________________________________________________________
             //

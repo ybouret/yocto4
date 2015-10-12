@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_CORE_DET_INCLUDED
 #define YOCTO_MATH_CORE_DET_INCLUDED 1
 
-#include "yocto/math/core/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 
 namespace yocto
 {
@@ -9,12 +9,12 @@ namespace yocto
     {
         //! compute determinant, destructive, for float, double, complex<float/double>, mpq
         template <typename T>
-        inline T __determinant( YOCTO_MATRIX<T> &a )
+        inline T __determinant( matrix<T> &a )
         {
             assert(a.rows==a.cols);
             assert(a.rows>0);
-            typedef typename YOCTO_MATRIX<T>::scalar_type scalar_t;
-            typedef typename YOCTO_MATRIX<T>::row         row_t;
+            typedef typename matrix<T>::scalar_type scalar_t;
+            typedef typename matrix<T>::row         row_t;
 
             const scalar_t amin = xnumeric<scalar_t>::minimum();
             bool           s    = false;
@@ -79,21 +79,21 @@ namespace yocto
 
         //! non destructive determinant
         template <typename T>
-        inline T determinant( const YOCTO_MATRIX<T> &a )
+        inline T determinant( const matrix<T> &a )
         {
-            YOCTO_MATRIX<T> aa(a,YOCTO_MATRIX_TIGHTEN);
+            matrix<T> aa(a,YOCTO_MATRIX_TIGHTEN);
             return __determinant(aa);
         }
 
         //! determinant for signed integer types, or float/double
         template <typename T>
-        inline T ideterminant(const YOCTO_MATRIX<T> &a )
+        inline T ideterminant(const matrix<T> &a )
         {
-            YOCTO_MATRIX<double> aa(a.rows,a.cols);
+            matrix<double> aa(a.rows,a.cols);
             for(size_t i=a.rows;i>0;--i)
             {
-                const typename YOCTO_MATRIX<T>::row &src = a[i];
-                YOCTO_MATRIX<double>::row           &tgt = aa[i];
+                const typename matrix<T>::row &src = a[i];
+                matrix<double>::row           &tgt = aa[i];
                 for(size_t j=a.cols;j>0;--j)
                 {
                     tgt[j] = src[j];

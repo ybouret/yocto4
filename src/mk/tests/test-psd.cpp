@@ -3,7 +3,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/ios/ocstream.hpp"
-#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/math/alg/spike.hpp"
 #include "yocto/sort/quick.hpp"

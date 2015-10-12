@@ -155,7 +155,7 @@ namespace yocto {
 
 #include "yocto/code/ipower.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/lu.hpp"
 
 #include "yocto/ios/ocstream.hpp"
 
@@ -168,7 +168,7 @@ namespace yocto
         {
             assert(xa.size()==ya.size());
             const size_t n = xa.size();
-            matrix<real_t> W(n,n);
+            matrix<real_t> W(n);
             vector<real_t> a(n,0);
             const size_t q = n/2;
             const size_t p = (n&1) ? q+1 : q;
@@ -186,9 +186,9 @@ namespace yocto
                 }
             }
             std::cerr << "W=" << W << std::endl;
-            if(!crout<real_t>::build(W))
+            if(!LU<real_t>::build(W))
                 throw exception("singular matrix in zpade");
-            crout<real_t>::solve(W,a);
+            LU<real_t>::solve(W,a);
             std::cerr << "a=" << a << std::endl;
             {
                 real_t xmax = xa[1];

@@ -4,8 +4,8 @@
 #include "yocto/exception.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/code/ipower.hpp"
-#include "yocto/math/kernel/crout.hpp"
-
+#include "yocto/math/core/lu.hpp"
+#include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ocstream.hpp"
 
 
@@ -169,9 +169,9 @@ namespace yocto
             //
             // solve the polynomial coefficients
             //__________________________________________________________________
-            if( !crout<z_type>::build(mu) )
+            if( !LU<z_type>::build(mu) )
                 throw exception("singular smoothing window around X[%d]=%g", int(i), xi);
-            crout<real_t>::solve(mu,a);
+            LU<real_t>::solve(mu,a);
 
             //__________________________________________________________________
             //

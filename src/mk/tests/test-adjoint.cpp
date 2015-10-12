@@ -18,7 +18,7 @@ void __test_adjoint()
         std::cerr << std::endl;
         for(size_t iter=0;iter<4;++iter)
         {
-            YOCTO_MATRIX<T> M(n,n);
+            matrix<T> M(n,n);
             for(size_t i=1;i<=n;++i)
             {
                 for(size_t j=1;j<=n;++j)
@@ -28,10 +28,10 @@ void __test_adjoint()
                 }
             }
             std::cerr << "M=" << M << std::endl;
-            YOCTO_MATRIX<T> A(n,n);
+            matrix<T> A(n,n);
             adjoint(A,M);
             std::cerr << "A=" << A << std::endl;
-            YOCTO_MATRIX<T> P(n,n);
+            matrix<T> P(n,n);
             tao::mmul(P,A,M);
             std::cerr << "P=" << P << std::endl;
             const T d = determinant(M);
@@ -49,7 +49,7 @@ void __test_iadjoint()
         std::cerr << std::endl;
         for(size_t iter=0;iter<4;++iter)
         {
-            YOCTO_MATRIX<T> M(n,n);
+            matrix<T> M(n,n);
             for(size_t i=1;i<=n;++i)
             {
                 for(size_t j=1;j<=n;++j)
@@ -59,10 +59,10 @@ void __test_iadjoint()
                 }
             }
             std::cerr << "M=" << M << std::endl;
-            YOCTO_MATRIX<T> A(n,n);
+            matrix<T> A(n,n);
             iadjoint(A,M);
             std::cerr << "A=" << A << std::endl;
-            YOCTO_MATRIX<T> P(n,n);
+            matrix<T> P(n,n);
             tao::mmul(P,A,M);
             std::cerr << "P=" << P << std::endl;
             const T d = ideterminant(M);

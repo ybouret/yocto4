@@ -9,7 +9,7 @@
 #include "yocto/exceptions.hpp"
 #include "yocto/sequence/vector.hpp"
 
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/lu.hpp"
 #include "yocto/math/core/tao.hpp"
 
 #include "yocto/code/ipower.hpp"
@@ -149,7 +149,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 // Build the matrix of moments
                 //--------------------------------------------------------------
-                matrix<real_t> mu(K,K);
+                matrix<real_t> mu(K);
                 for( size_t j=1;j<=K;++j)
                 {
                     for( size_t k=j;k<=K;++k)
@@ -159,7 +159,7 @@ namespace yocto
                     }
                 }
                 //std::cerr << "mu=" << mu << std::endl;
-                if( !crout<real_t>::build(mu) )
+                if( !LU<real_t>::build(mu) )
                     throw exception("PSD(Invalid Momemts");
                 
                 //--------------------------------------------------------------
@@ -174,7 +174,7 @@ namespace yocto
                     }
                 }
                 //std::cerr << "sig0=" << sig << std::endl;
-                crout<real_t>::solve(mu, sig);
+                LU<real_t>::solve(mu, sig);
                 //std::cerr << "sigm=" << sig << std::endl;
             }
             

@@ -1,6 +1,6 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/fit/lsf.hpp"
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/lu.hpp"
 #include "yocto/math/core/tao.hpp"
 #include "yocto/code/ipower.hpp"
 #include "yocto/exception.hpp"
@@ -98,12 +98,12 @@ namespace yocto
             //
             // solve
             //__________________________________________________________________
-            if( !crout<real_t>::build(alpha) )
+            if( !LU<real_t>::build(alpha) )
             {
                 throw exception("Polynomial Fit is Singular");
             }
             tao::set(aorg,beta);
-            crout<real_t>::solve(alpha, aorg);
+            LU<real_t>::solve(alpha, aorg);
             
             
             //__________________________________________________________________
@@ -126,7 +126,7 @@ namespace yocto
             
             matrix<real_t> curv(n,n);
             curv.ld1();
-            crout<real_t>::solve(alpha,curv);
+            LU<real_t>::solve(alpha,curv);
             
             const real_t residue=D/(dof+1);
             for(size_t k=n;k>0;--k)
@@ -316,9 +316,9 @@ namespace yocto
             //
             // solve the system
             //__________________________________________________________________
-            if( !crout<real_t>::build(alpha) )
+            if( !LU<real_t>::build(alpha) )
                 throw exception("singular Pade approximant");
-            crout<real_t>::solve(alpha, beta);
+            LU<real_t>::solve(alpha, beta);
             
             //__________________________________________________________________
             //

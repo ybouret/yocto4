@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 #include "../../main/tests/support.hpp"
 #include "yocto/hashing/sha1.hpp"
 
@@ -48,7 +48,7 @@ static inline void test_matrix()
 			throw exception("data no match, after assign!");
 		}
         
-        matrix<T> mt(m2,matrix_transpose);
+        matrix<T> mt(m2,YOCTO_MATRIX_TRANSPOSE);
         H.set();
         for(size_t j=1; j <= mt.cols; ++j)
         {

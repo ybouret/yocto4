@@ -25,7 +25,7 @@ namespace yocto
         
         
 		template <>
-		trigonometric<real_t>:: trigonometric( const array<real_t> &theta, crout<real_t> &solver ) :
+		trigonometric<real_t>:: trigonometric( const array<real_t> &theta, LU<real_t> &solver ) :
 		n( __check_size(theta.size()) ),
         is_even( 0 == (n&1) ),
         n2( n>>1 ),
@@ -33,7 +33,7 @@ namespace yocto
         M()
 		{
 			//solver.make(n,REAL(0.0));
-			M.make(n,n);
+			M.make(n);
             
 			//------------------------------------------------------------------
 			// build the matrix to find coefficients
@@ -66,7 +66,7 @@ namespace yocto
 		void trigonometric<real_t>:: compute( array<real_t> &a ) const throw()
 		{
 			assert( a.size() == n );
-			crout<real_t>::solve(M,a);
+			LU<real_t>::solve(M,a);
 		}
         
 		template <>

@@ -2,7 +2,7 @@
 #define YOCTO_MATH_CORE_LU_INCLUDED 1
 
 
-#include "yocto/math/core/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 #include "yocto/sequence/lw-array.hpp"
 
 namespace yocto
@@ -14,7 +14,7 @@ namespace yocto
         template <typename T>
         struct LU
         {
-            typedef YOCTO_MATRIX<T>                   matrix_t;
+            typedef matrix<T>                         matrix_t;
             typedef typename matrix_t::mutable_type   type;
             typedef typename matrix_t::row            row_t;
             typedef typename real_of<T>::type         scalar_t;

@@ -9,19 +9,19 @@
 using namespace yocto;
 using namespace math;
 
-#define __SHOW_SIZEOF(TYPE) std::cerr << "sizeof(matrix<" << #TYPE << ">)=" << sizeof(YOCTO_MATRIX<TYPE>) << std::endl
+#define __SHOW_SIZEOF(TYPE) std::cerr << "sizeof(matrix<" << #TYPE << ">)=" << sizeof(matrix<TYPE>) << std::endl
 
 template <typename T>
 static inline
 void __test_access()
 {
     {
-        YOCTO_MATRIX<T> M0;
+        matrix<T> M0;
     }
     
     for(size_t iter=0;iter<1000;++iter)
     {
-        YOCTO_MATRIX<T> M(1+alea_leq(20),1+alea_leq(20));
+        matrix<T> M(1+alea_leq(20),1+alea_leq(20));
         for(size_t i=1;i<=M.rows;++i)
         {
             for(size_t j=1;j<=M.cols;++j)
@@ -33,15 +33,15 @@ void __test_access()
         {
             std::cerr << "M=" << M << std::endl;
         }
-        YOCTO_MATRIX<T> P;
+        matrix<T> P;
         P.swap_with(M);
-        YOCTO_MATRIX<T> Q(P);
+        matrix<T> Q(P);
         
-        YOCTO_MATRIX<T> R(P,YOCTO_MATRIX_TRANSPOSE);
+        matrix<T> R(P,YOCTO_MATRIX_TRANSPOSE);
         if(iter<=0)
             std::cerr << "R=" << R << std::endl;
 
-        YOCTO_MATRIX<T> SQ(1+alea_leq(20));
+        matrix<T> SQ(1+alea_leq(20));
 
         SQ.ldz();
     }
@@ -54,12 +54,12 @@ void __test_mp()
 {
     std::cerr << "Testing MP" << std::endl;
     {
-        YOCTO_MATRIX<T> M0;
+        matrix<T> M0;
     }
 
     for(size_t iter=0;iter<1;++iter)
     {
-        YOCTO_MATRIX<T> M(2+alea_leq(3),1+alea_leq(10));
+        matrix<T> M(2+alea_leq(3),1+alea_leq(10));
         for(size_t i=1;i<=M.rows;++i)
         {
             for(size_t j=1;j<=M.cols;++j)
@@ -72,9 +72,9 @@ void __test_mp()
             std::cerr << "M=" << M << std::endl;
         }
         
-        YOCTO_MATRIX<T> P(M);
-        YOCTO_MATRIX<T> Q(M,YOCTO_MATRIX_TRANSPOSE);
-        YOCTO_MATRIX<T> SQ(1+alea_leq(100));
+        matrix<T> P(M);
+        matrix<T> Q(M,YOCTO_MATRIX_TRANSPOSE);
+        matrix<T> SQ(1+alea_leq(100));
     }
     
 }

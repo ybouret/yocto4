@@ -1,7 +1,7 @@
 #ifndef YOCTO_MK_SPARSE_MATRIX_INCLUDED
 #define YOCTO_MK_SPARSE_MATRIX_INCLUDED 1
 
-#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 #include "yocto/math/sparse/item.hpp"
 #include "yocto/associative/lexicon.hpp"
 #include "yocto/math/types.hpp"

@@ -2,7 +2,7 @@
 #define YOCTO_ODE_ROSENBROCK_INCLUDED 1
 
 #include "yocto/math/ode/implicit/step.hpp"
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/lu.hpp"
 
 namespace yocto
 {

@@ -11,7 +11,6 @@ YOCTO_UNIT_TEST_INIT(64)
     YOCTO_UNIT_TEST_DECL(adjoint);
 
 	YOCTO_UNIT_TEST_DECL(matrix);
-	YOCTO_UNIT_TEST_DECL(jacobi);
     YOCTO_UNIT_TEST_DECL(symker);
     
 	YOCTO_UNIT_TEST_DECL(intg);
@@ -62,14 +61,12 @@ YOCTO_UNIT_TEST_INIT(64)
     
     YOCTO_UNIT_TEST_DECL(ode_expl);
 
-    YOCTO_UNIT_TEST_DECL(crout);
-    YOCTO_UNIT_TEST_DECL(mprove);
+    //YOCTO_UNIT_TEST_DECL(mprove);
     
 
     YOCTO_UNIT_TEST_DECL(sparse);
     YOCTO_UNIT_TEST_DECL(spcj);
     
-    YOCTO_UNIT_TEST_DECL(det);
     YOCTO_UNIT_TEST_DECL(tao);
 
 	YOCTO_UNIT_TEST_DECL(gnl);

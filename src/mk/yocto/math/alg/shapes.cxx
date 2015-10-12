@@ -109,7 +109,7 @@ namespace yocto
 }
 
 #include "yocto/math/core/tao.hpp"
-#include "yocto/math/kernel/crout.hpp"
+#include "yocto/math/core/lu.hpp"
 #include "yocto/math/kernel/diag.hpp"
 
 
@@ -123,9 +123,9 @@ namespace yocto
         
         template <>
         fit_conic<real_t>:: fit_conic() :
-        Sqq(3,3),
-        Sqz(3,3),
-        Szz(3,3)
+        Sqq(3),
+        Sqz(3),
+        Szz(3)
         {
         }
         
@@ -190,7 +190,7 @@ namespace yocto
             //------------------------------------------------------------------
             // iSzz <- inv(Szz)
             //------------------------------------------------------------------
-            if( !crout<real_t>::build(iSzz) )
+            if( !LU<real_t>::build(iSzz) )
             {
                 throw exception("%s(invalid points)",fn);
             }
@@ -198,12 +198,12 @@ namespace yocto
             //------------------------------------------------------------------
             // beta <- transpose(Sqz)
             //------------------------------------------------------------------
-            matrix<real_t> beta(Sqz,matrix_transpose);
+            matrix<real_t> beta(Sqz,YOCTO_MATRIX_TRANSPOSE|YOCTO_MATRIX_TIGHTEN);
             
             //------------------------------------------------------------------
             // beta <- inv(Szz)*transpose(Sqz)
             //------------------------------------------------------------------
-            crout<real_t>::solve(iSzz, beta);
+            LU<real_t>::solve(iSzz, beta);
             
             //------------------------------------------------------------------
             // M <- Sqq - Sqz * beta
@@ -223,7 +223,7 @@ namespace yocto
             //------------------------------------------------------------------
             matrix<real_t> I(C);
             //std::cerr << "C=" << I << std::endl;
-            if( !crout<real_t>::build(I) )
+            if( !LU<real_t>::build(I) )
             {
                 throw exception("%s(invalid constraint)", fn);
             }
@@ -231,7 +231,7 @@ namespace yocto
             //------------------------------------------------------------------
             // M <- inv(C) * M
             //------------------------------------------------------------------
-            crout<real_t>::solve(I,M);
+            LU<real_t>::solve(I,M);
             //std::cerr.precision(15);
             
             //------------------------------------------------------------------
@@ -248,7 +248,7 @@ namespace yocto
                 }
             }
             
-            if( nr <=0 )
+            if( nr<=0 )
             {
                 throw exception("%s(no real eigenvalue)", fn); // shouldn't happen in dim=3
             }
@@ -318,7 +318,7 @@ namespace yocto
 }
 
 
-#include "yocto/math/kernel/jacobi.hpp"
+#include "yocto/math/core/symdiag.hpp"
 
 namespace yocto
 {
@@ -349,7 +349,7 @@ namespace yocto
             //std::cerr << "S=" << S << std::endl;
             matrix<real_t> Q(2,2);
             vector<real_t> lam(2,numeric<real_t>::zero);
-            if( !jacobi<real_t>::build(S,lam,Q) )
+            if( !symdiag<real_t>::build(S,lam,Q) )
                 throw exception("fit_conic::reduce(invalid parameters)");
             if( lam[1] <0 && lam[2] < 0)
             {

@@ -1,6 +1,6 @@
 #include "yocto/math/alg/spike2d.hpp"
 #include "yocto/utest/run.hpp"
-#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 #include "yocto/sequence/vector.hpp"
 #include <cmath>
 

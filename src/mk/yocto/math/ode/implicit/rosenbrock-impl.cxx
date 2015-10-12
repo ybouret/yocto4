@@ -70,14 +70,14 @@ namespace yocto
                         a[i][i] += __diag;
                     }
                     
-                    if( !crout<real_t>::build(a) )
+                    if( !LU<real_t>::build(a) )
                     {
                         throw exception("%s step: singular jacobian", STIFF_NAME);
                     }
                     
                     for( size_t i=n; i>0 ; --i )
                         g1[i]=dysav[i]+h*C1X*dfdx[i];
-                    crout<real_t>::solve(a,g1);
+                    LU<real_t>::solve(a,g1);
                     for (size_t i=1;i<=n;i++)
                         y[i]=ysav[i]+A21*g1[i];
                     
@@ -85,7 +85,7 @@ namespace yocto
                     derivs(dydx,x,y);
                     for( size_t i=n; i>0 ; --i )
                         g2[i]=dydx[i]+h*C2X*dfdx[i]+C21*g1[i]/h;
-                    crout<real_t>::solve(a,g2);
+                    LU<real_t>::solve(a,g2);
                     for( size_t i=n; i>0 ; --i )
                         y[i]=ysav[i]+A31*g1[i]+A32*g2[i];
                     
@@ -93,11 +93,11 @@ namespace yocto
                     derivs(dydx,x,y);
                     for( size_t i=n; i>0 ; --i )
                         g3[i]=dydx[i]+h*C3X*dfdx[i]+(C31*g1[i]+C32*g2[i])/h;
-                    crout<real_t>::solve(a,g3);
+                    LU<real_t>::solve(a,g3);
                     
                     for( size_t i=n; i>0 ; --i )
                         g4[i]=dydx[i]+h*C4X*dfdx[i]+(C41*g1[i]+C42*g2[i]+C43*g3[i])/h;
-                    crout<real_t>::solve(a,g4);
+                    LU<real_t>::solve(a,g4);
                     
                     for( size_t i=n; i>0 ; --i )
                     {
