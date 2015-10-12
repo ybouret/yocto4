@@ -5,7 +5,7 @@
 #define YOCTO_MATH_JACOBI_INCLUDED 1
 
 
-#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/types.hpp"
 

@@ -2,7 +2,7 @@
 #define YOCTO_MATH_FCN_DRVS_INCLUDED 1
 
 #include "yocto/math/types.hpp"
-#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 
 namespace yocto
 {

@@ -2,7 +2,7 @@
 #define YOCTO_MATH_KERNEL_TRIDIAG_INCLUDED 1
 
 #include "yocto/sequence/many-arrays.hpp"
-#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 
 namespace yocto {
     

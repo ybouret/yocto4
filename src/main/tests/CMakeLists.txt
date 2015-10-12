@@ -93,5 +93,6 @@ ADD_TEST(kChunk      test-main kChunk)
 ADD_TEST(kArena      test-main kArena)
 ADD_TEST(kBlocks     test-main kBlocks)
 ADD_TEST(Slots       test-main slots)
+ADD_TEST(Matrix      test-main matrix)
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)

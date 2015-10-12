@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_CORE_SYMDIAG_INCLUDED
 #define YOCTO_MATH_CORE_SYMDIAG_INCLUDED 1
 
-#include "yocto/math/core/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 
 namespace yocto
 {
@@ -10,8 +10,8 @@ namespace yocto
         template <class T>
         struct symdiag
         {
-            typedef YOCTO_MATRIX<T> matrix_t;
-            typedef array<T>        array_t;
+            typedef matrix<T> matrix_t;
+            typedef array<T>  array_t;
 
             //! Jacobi reduction
             /**

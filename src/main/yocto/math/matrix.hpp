@@ -15,12 +15,37 @@ namespace yocto
     namespace math
     {
 
-        class matrix_dims
+        //! shared dimensions for a matrix
+        class matrix_dims : public object
         {
         public:
+            const size_t rows;
+            const size_t cols;
+            const size_t items;
+
+            virtual ~matrix_dims() throw();
             
         protected:
+            explicit matrix_dims() throw();
+            
+
+        protected:
             YOCTO_DISABLE_ASSIGN(matrix_dims);
+        };
+
+
+        //! matrix interface
+        template <typename T>
+        class matrix_of : public matrix_dims
+        {
+        public:
+            inline virtual ~matrix_of() throw() {}
+
+        protected:
+            inline explicit matrix_of() throw() : matrix_dims() {}
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(matrix_of);
         };
 
         enum matrix_memory
@@ -34,7 +59,6 @@ namespace yocto
 
 #define YOCTO_MATRIX_NUM_EXTRA 2
 
-#define YOCTO_MATRIX _matrix
 #define YOCTO_MATRIX_CTOR(MEMORY_KIND) \
 rows(0),       \
 cols(0),       \
@@ -56,7 +80,7 @@ memory_kind(MEMORY_KIND)
          square matrices may have extra memory
          */
         template <typename T>
-        class YOCTO_MATRIX : public object
+        class matrix : public matrix_of<T>
         {
         public:
             YOCTO_ARGUMENTS_DECL_T;
@@ -95,7 +119,7 @@ memory_kind(MEMORY_KIND)
 
                 T *_itm; //! offset-1 pointer
                 YOCTO_DISABLE_COPY_AND_ASSIGN(row);
-                friend class YOCTO_MATRIX<T>;
+                friend class matrix<T>;
                 virtual const_type * get_item() const throw() { return _itm; }
             };
 
@@ -106,7 +130,7 @@ memory_kind(MEMORY_KIND)
 
             inline bool   is_square() const throw() { return rows==cols; }
 
-            inline explicit YOCTO_MATRIX() throw() :
+            inline explicit matrix() throw() :
             YOCTO_MATRIX_CTOR(matrix_tight_memory)
             {
                 // do nothing
@@ -114,14 +138,15 @@ memory_kind(MEMORY_KIND)
 
 #define YOCTO_MATRIX_BUILD_WITH(CODE) do { try { CODE; } catch(...) { release(); throw; } } while(false)
 
-            inline explicit YOCTO_MATRIX(const size_t nr, const size_t nc) :
+            //! may be square, with no extra-memory
+            inline explicit matrix(const size_t nr, const size_t nc) :
             YOCTO_MATRIX_CTOR(matrix_tight_memory)
             {
                 build(nr,nc);
                 YOCTO_MATRIX_BUILD_WITH(ctor0( int2type<is_primitive>() ) );
             }
 
-            inline explicit YOCTO_MATRIX(const size_t n) :
+            inline explicit matrix(const size_t n) :
             YOCTO_MATRIX_CTOR(matrix_large_memory)
             {
                 build(n,n);
@@ -130,7 +155,7 @@ memory_kind(MEMORY_KIND)
 
 
             //! default copy constructor
-            inline YOCTO_MATRIX(const YOCTO_MATRIX<T> &other) :
+            inline matrix(const matrix<T> &other) :
             YOCTO_MATRIX_CTOR(other.memory_kind)
             {
                 build(other.rows,other.cols);
@@ -138,7 +163,7 @@ memory_kind(MEMORY_KIND)
             }
 
             //! constructor with options
-            inline YOCTO_MATRIX(const YOCTO_MATRIX<T> &other, const int flags) :
+            inline matrix(const matrix<T> &other, const int flags) :
             YOCTO_MATRIX_CTOR( (0!=(flags&YOCTO_MATRIX_TIGHTEN)) ? matrix_tight_memory : other.memory_kind )
             {
                 if(0!=(flags&YOCTO_MATRIX_TRANSPOSE))
@@ -154,7 +179,7 @@ memory_kind(MEMORY_KIND)
             }
 
 
-            inline virtual ~YOCTO_MATRIX() throw()
+            inline virtual ~matrix() throw()
             {
                 release();
             }
@@ -162,7 +187,7 @@ memory_kind(MEMORY_KIND)
             inline row       & operator[](const size_t ir) throw()       { assert(ir>0); assert(ir<=rows); return pRow[ir]; }
             inline const row & operator[](const size_t ir) const throw() { assert(ir>0); assert(ir<=rows); return pRow[ir]; }
 
-            friend std::ostream & operator<<( std::ostream &os, const YOCTO_MATRIX<T> &M )
+            friend std::ostream & operator<<( std::ostream &os, const matrix<T> &M )
             {
                 os << "[ ";
                 if( M.rows > 0 )
@@ -175,7 +200,7 @@ memory_kind(MEMORY_KIND)
             }
 
 #define YOCTO_MATRIX_XCH(FIELD) cswap_const(FIELD,M.FIELD)
-            inline void swap_with( YOCTO_MATRIX<T> &M ) throw()
+            inline void swap_with( matrix<T> &M ) throw()
             {
                 YOCTO_MATRIX_XCH(rows);
                 YOCTO_MATRIX_XCH(cols);
@@ -195,7 +220,7 @@ memory_kind(MEMORY_KIND)
 
 #define YOCTO_MATRIX_COPY(I) data[I] = other.data[I]
             //! assign if same sizes
-            inline void assign( const YOCTO_MATRIX<T> &other )
+            inline void assign( const matrix<T> &other )
             {
                 assert(rows==other.rows);
                 assert(cols==other.cols);
@@ -203,7 +228,7 @@ memory_kind(MEMORY_KIND)
             }
 
             //! check sizes and assign
-            YOCTO_MATRIX<T> & operator=( const YOCTO_MATRIX<T> &other )
+            matrix<T> & operator=( const matrix<T> &other )
             {
                 if(this!=&other)
                 {
@@ -213,7 +238,7 @@ memory_kind(MEMORY_KIND)
                     }
                     else
                     {
-                        YOCTO_MATRIX<T> tmp(other);
+                        matrix<T> tmp(other);
                         swap_with(tmp);
                     }
                 }
@@ -262,7 +287,7 @@ memory_kind(MEMORY_KIND)
             }
 
             template <typename U>
-            inline void minor_of(const YOCTO_MATRIX<U> &M,
+            inline void minor_of(const matrix<U>       &M,
                                  const size_t           I,
                                  const size_t           J) throw()
             {
@@ -271,7 +296,7 @@ memory_kind(MEMORY_KIND)
                 assert(rows==M.rows-1);
                 assert(cols==M.cols-1);
 
-                YOCTO_MATRIX<T> &self = *this;
+                matrix<T>   &self = *this;
                 const size_t nr = M.rows;
                 const size_t nc = M.cols;
                 for(size_t i=1,ir=1;i<=nr;++i)
@@ -288,6 +313,32 @@ memory_kind(MEMORY_KIND)
                         }
                         ++ir;
                     }
+                }
+            }
+
+            void make(size_t nr, size_t nc)
+            {
+                if(nr!=rows||nc!=rows)
+                {
+                    matrix<T> tmp(nr,nc);
+                    swap_with(tmp);
+                }
+                else
+                {
+                    ldz();
+                }
+            }
+
+            void make(size_t n)
+            {
+                if(n!=rows||n!=rows)
+                {
+                    matrix<T> tmp(n);
+                    swap_with(tmp);
+                }
+                else
+                {
+                    ldz();
                 }
             }
 
@@ -461,7 +512,7 @@ memory_kind(MEMORY_KIND)
 
 
             //! primitive type
-            inline void ctor1( const YOCTO_MATRIX<T> &other, int2type<true> ) throw()
+            inline void ctor1( const matrix<T> &other, int2type<true> ) throw()
             {
                 assert(ctor<=0);
                 assert(items==other.items);
@@ -469,7 +520,7 @@ memory_kind(MEMORY_KIND)
             }
 
             //! C++ type
-            inline void ctor1( const YOCTO_MATRIX<T> &other, int2type<false> ) throw()
+            inline void ctor1( const matrix<T> &other, int2type<false> ) throw()
             {
                 assert(ctor<=0);
                 assert(items==other.items);
@@ -482,7 +533,7 @@ memory_kind(MEMORY_KIND)
             }
 
             //! copy transpose, primitive type
-            inline void ctor1_transpose( const YOCTO_MATRIX<T> &other, int2type<true> ) throw()
+            inline void ctor1_transpose( const matrix<T> &other, int2type<true> ) throw()
             {
                 assert(ctor<=0);
                 assert(items==other.items);
@@ -497,7 +548,7 @@ memory_kind(MEMORY_KIND)
             }
 
             //! copy transpose, C++ type
-            inline void ctor1_transpose( const YOCTO_MATRIX<T> &other, int2type<false> ) throw()
+            inline void ctor1_transpose( const matrix<T> &other, int2type<false> ) throw()
             {
                 assert(ctor<=0);
                 assert(items==other.items);

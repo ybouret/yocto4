@@ -1,4 +1,4 @@
-#include "yocto/math/core/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/string.hpp"
 #include "yocto/code/rand.hpp"

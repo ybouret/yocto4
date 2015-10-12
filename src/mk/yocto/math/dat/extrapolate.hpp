@@ -4,7 +4,7 @@
 #ifndef _YOCTO_EXTRAPOLATE_HPP_
 #define _YOCTO_EXTRAPOLATE_HPP_ 1
 
-#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/matrix.hpp"
 
 namespace yocto {
 
