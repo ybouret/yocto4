@@ -25,7 +25,7 @@ void do_symdiag()
             {
                 for(size_t j=1;j<=n;++j)
                 {
-                    a[i][j] = a[j][i] = -T(AMPLITUDE)/2 + alea<double>() * AMPLITUDE;
+                    a[i][j] = a[j][i] = -T(AMPLITUDE)/2 + alea<T>() * AMPLITUDE;
                 }
             }
             //std::cerr << "a=" << a << std::endl;

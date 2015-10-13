@@ -279,6 +279,9 @@ namespace yocto
                 case __zero:
                     return 0;
             }
+#if defined(_MSC_VER)
+			return 0;
+#endif
         }
 
         int rational:: compare(const rational &lhs, const int64_t rhs)

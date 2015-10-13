@@ -34,7 +34,7 @@ YOCTO_UNIT_TEST_IMPL(sqrt)
     {
         const int64_t val = atoi(argv[i]);
         {
-            const int y = val;
+            const int y = int(val);
             std::cerr << "sqrt(" << y << ") = " << SQRT(y,maxIter) << std::endl;
         }
 
