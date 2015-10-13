@@ -41,11 +41,27 @@ namespace yocto
         public:
             inline virtual ~matrix_of() throw() {}
 
+            inline T & operator()(size_t ir,size_t ic) throw()
+            {
+                assert(ir>0);assert(ir<=rows);
+                assert(ic>0);assert(ic<=cols);
+                return *(T*) address_of(ir,ic);
+            }
+
+            inline const T & operator()(size_t ir,size_t ic) const throw()
+            {
+                assert(ir>0);assert(ir<=rows);
+                assert(ic>0);assert(ic<=cols);
+                return *(const T*) address_of(ir,ic);
+            }
+
+
         protected:
             inline explicit matrix_of() throw() : matrix_dims() {}
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(matrix_of);
+            virtual void *address_of(size_t ir,size_t ic) const throw() = 0;
         };
 
         enum matrix_memory
@@ -218,6 +234,7 @@ memory_kind(MEMORY_KIND)
                 YOCTO_MATRIX_XCH(scalars);
                 YOCTO_MATRIX_XCH(memory_kind);
             }
+#undef YOCTO_MATRIX_XCH
 
 #define YOCTO_MATRIX_COPY(I) data[I] = other.data[I]
             //! assign if same sizes
@@ -225,6 +242,7 @@ memory_kind(MEMORY_KIND)
             {
                 assert(rows==other.rows);
                 assert(cols==other.cols);
+                assert(items==other.items);
                 YOCTO_LOOP_FUNC(items,YOCTO_MATRIX_COPY,0);
             }
 
@@ -600,7 +618,13 @@ memory_kind(MEMORY_KIND)
                 init0();
             }
             
-            
+            virtual void *address_of(size_t ir,size_t ic) const throw()
+            {
+                const matrix<T> &self = *this;
+                const T         &addr = self[ir][ic];
+                return   (void*)&addr;
+            }
+
         public:
             const matrix_memory memory_kind;
 
