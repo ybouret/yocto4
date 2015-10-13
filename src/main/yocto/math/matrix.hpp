@@ -391,6 +391,7 @@ memory_kind(MEMORY_KIND)
             size_t       *indices;
             scalar_type  *scalars;
 
+            //! upgradeing memory flags per user request
             static inline
             matrix_memory upgrade(matrix_memory kind,const int flags) throw()
             {
@@ -427,6 +428,7 @@ memory_kind(MEMORY_KIND)
                 }
             }
 
+            //! routing call to clear
             inline void clear() throw()
             {
                 __clear( int2type< support_no_destruct<mutable_type>::value >() );
@@ -601,14 +603,14 @@ memory_kind(MEMORY_KIND)
             
         public:
             const matrix_memory memory_kind;
-            
-            inline size_t       *__indices() const throw()
+
+            inline size_t       *get_indices() const throw()
             {
                 assert(memory_kind==matrix_large_memory);
                 return (size_t *)indices;
             }
             
-            inline mutable_type *__aux(const size_t k) const throw()
+            inline mutable_type *get_aux(const size_t k) const throw()
             {
                 assert(memory_kind==matrix_large_memory);
                 assert(k<YOCTO_MATRIX_NUM_EXTRA);
@@ -616,7 +618,7 @@ memory_kind(MEMORY_KIND)
                 return (mutable_type *)addr;
             }
             
-            inline scalar_type  *__scalars() const throw()
+            inline scalar_type  *get_scalars() const throw()
             {
                 return (scalar_type *)scalars;
             }

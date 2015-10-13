@@ -4,6 +4,7 @@
 
 #include "yocto/math/matrix.hpp"
 #include "yocto/sequence/lw-array.hpp"
+#include "yocto/code/unroll.hpp"
 
 namespace yocto
 {
@@ -15,12 +16,14 @@ namespace yocto
         struct LU
         {
             typedef matrix<T>                         matrix_t;
+            typedef array<T>                          array_t;
             typedef typename matrix_t::mutable_type   type;
             typedef typename matrix_t::row            row_t;
             typedef typename real_of<T>::type         scalar_t;
             typedef lw_array<size_t>                  indices;
             typedef lw_array<scalar_t>                scalars;
 
+            //! require a matrix with extra memory
             static inline
             bool build( matrix_t &a, bool *dneg=0)
             {
@@ -32,8 +35,8 @@ namespace yocto
                 const scalar_t  __zero = xnumeric<scalar_t>::zero();
                 const scalar_t  __one  = xnumeric<scalar_t>::one();
                 const size_t    n      = a.rows;
-                indices         indx( a.__indices(), n);
-                scalars         scal( a.__scalars(), n);
+                indices         indx( a.get_indices(), n);
+                scalars         scal( a.get_scalars(), n);
                 if(dneg) *dneg = false;
 
                 //______________________________________________________________
@@ -141,7 +144,7 @@ namespace yocto
 
             //! solve a vector using a previously LU build matrix
             static inline
-            void solve( const matrix_t &a, array<T> &b ) throw()
+            void solve( const matrix_t &a, array_t &b ) throw()
             {
                 assert(a.cols>0);
                 assert(a.rows>0);
@@ -156,7 +159,7 @@ namespace yocto
                 // first pass
                 //______________________________________________________________
                 {
-                    const indices   indx( a.__indices(), n);
+                    const indices   indx( a.get_indices(), n);
                     for(size_t i=1;i<=n;++i)
                     {
                         const size_t ip  = indx[i]; assert(ip>0);assert(ip<=n);
@@ -202,7 +205,7 @@ namespace yocto
 
                 const size_t    n  = a.rows;
                 const size_t    nc = b.cols;
-                const indices   indx( a.__indices(), n);
+                const indices   indx( a.get_indices(), n);
                 for(size_t c=nc;c>0;--c)
                 {
                     //__________________________________________________________
@@ -238,6 +241,22 @@ namespace yocto
                     }
 
                 }
+            }
+
+            //! solve x = inv(a)*b, using a previously LU decomposed matrix
+            static inline
+            void solve( array_t &x, const matrix_t &a, const array_t &b ) throw()
+            {
+                assert(a.cols>0);
+                assert(a.rows>0);
+                assert(a.is_square());
+                assert(b.size()>=a.rows);
+                assert(x.size()>=a.rows);
+                assert(a.memory_kind==matrix_large_memory);
+#define YOCTO_LU_CPY(I) x[I] = b[I]
+                YOCTO_LOOP_FUNC(a.rows,YOCTO_LU_CPY,1);
+#undef  YOCTO_LU_CPY
+                LU<T>::solve(a,b);
             }
             
         };

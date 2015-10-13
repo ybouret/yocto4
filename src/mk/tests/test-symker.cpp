@@ -4,6 +4,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/math/core/determinant.hpp"
+#include "yocto/math/core/cholesky.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -71,7 +72,7 @@ void do_symker()
                 }
             }
 
-            for(size_t ncpy=1;ncpy>0;--ncpy)
+            for(size_t ncpy=alea_leq(1);ncpy>0;--ncpy)
             {
                 const int r1 = 1+alea_lt(n);
                 const int r2 = 1+alea_lt(n);
@@ -107,6 +108,15 @@ void do_symker()
             else
             {
                 std::cerr << "det(G)=" << idet << std::endl;
+                if(!cholesky<double>::build(G,G))
+                {
+                    std::cerr << "can't build cholesky.." << std::endl;
+                }
+                else
+                {
+                    std::cerr << "L=" << G << std::endl;
+                }
+
             }
 
         }
@@ -119,7 +129,7 @@ YOCTO_UNIT_TEST_IMPL(symker)
 {
     do_symdiag<float>();
     do_symdiag<double>();
-
+    
     do_symker();
 }
 YOCTO_UNIT_TEST_DONE()

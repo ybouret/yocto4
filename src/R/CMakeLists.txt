@@ -1,4 +1,5 @@
 INCLUDE(../share/R.cmake)
+INCLUDE_DIRECTORIES(. ../main ../mpa)
 
 IF(R_FOUND)
 
@@ -9,14 +10,13 @@ ELSE()
 ENDIF()
 
 #How to use R to build a module...
-INCLUDE_DIRECTORIES(. ../main ../mpa)
 
-GET_TARGET_PROPERTY(yoctoLib yocto LOCATION )
+#GET_TARGET_PROPERTY(yoctoLib yocto LOCATION )
 
 #include are in Makevars
 ADD_CUSTOM_TARGET(rtest ALL
 COMMAND
-${R_EXE} CMD SHLIB -c --preclean -o ${CMAKE_CURRENT_SOURCE_DIR}/${THE_DLL} ${CMAKE_CURRENT_SOURCE_DIR}/rtest.cpp ${yoctoLib}
+${R_EXE} CMD SHLIB -c --preclean -o ${CMAKE_CURRENT_SOURCE_DIR}/${THE_DLL} ${CMAKE_CURRENT_SOURCE_DIR}/rtest.cpp "$<TARGET_FILE:yocto>"
 	COMMENT "Building rtest .Call module: ${THE_DLL}"
 	SOURCES rtest.cpp rtest.R yocto/R/R++.hpp yocto/R/IR.hpp
 	DEPENDS yocto
