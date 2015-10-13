@@ -11,8 +11,6 @@ ENDIF()
 
 #How to use R to build a module...
 
-#GET_TARGET_PROPERTY(yoctoLib yocto LOCATION )
-
 #include are in Makevars
 ADD_CUSTOM_TARGET(rtest ALL
 COMMAND
