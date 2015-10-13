@@ -16,19 +16,21 @@ namespace yocto
             typedef matrix<T> matrix_t;
             typedef array<T>  array_t;
 
-            //! a.is_square() and diag.size() >= a.rows
+            //! a.is_square()
             /**
              only the upper part of a is required, and
              the result is stored in the lower triangle,
              but the diagonal into diag.
+             a MUST have some extra memory
              */
             static inline
-            bool build( matrix_t &a, array_t &diag ) throw()
+            bool build( matrix_t &a ) throw()
             {
                 assert(a.rows==a.cols);
-                assert(diag.size()>=a.rows);
+                assert(a.memory_kind == matrix_large_memory);
                 const T      __zero(0);
                 const size_t n = a.rows;
+                lw_array<T>  diag( a.get_aux(0), n);
                 for(size_t i=1;i<=n;++i)
                 {
                     typename matrix_t::row &a_i = a[i];
@@ -51,42 +53,46 @@ namespace yocto
                         }
                     }
                 }
+                for(size_t i=n;i>0;--i)
+                {
+                    a[i][i] = diag[i];
+                    for(size_t j=n;j>i;--j)
+                    {
+                        a[i][j] = 0;
+                    }
+                }
                 return true;
             }
 
-            //! build the matrix L, may be the same as a. a MUST be large
+            //! solve a*x=b, a was decomposed...
             static inline
-            bool build(matrix_t &L, const matrix_t &a) throw()
+            void solve( array_t &x, const matrix_t &a, const array_t &b) throw()
             {
-                assert(L.rows==a.rows);
-                assert(L.cols==a.cols);
-                assert(L.rows==L.cols);
-                assert(a.memory_kind == matrix_large_memory);
-                const T      __zero(0);
+                assert(a.rows==a.cols);
+                assert(x.size()>=a.rows);
+                assert(b.size()>=a.rows);
                 const size_t n = a.rows;
-                lw_array<T>  d( a.get_aux(0), n);
-                L.assign(a);
-                if(!build(L,d))
+
+                for( size_t i=1; i<=n; ++i )
                 {
-                    return false;
+                    T sum = b[i];
+                    for( size_t k=i-1; k>0;--k )
+                        sum -= a[i][k] * x[k];
+                    x[i] = sum / a[i][i];
                 }
-                else
+                
+                for( size_t i=n; i>0; --i )
                 {
-                    for(size_t i=1;i<=n;++i)
-                    {
-                        L[i][i] = d[i];
-                        for(size_t j=i+1;j<=n;++j)
-                        {
-                            L[i][j] = __zero;
-                        }
-                    }
-                    return true;
+                    T sum = x[i];
+                    for( size_t k=i+1; k <=n; ++k )
+                        sum -= a[k][i] * x[k];
+                    x[i] = sum / a[i][i];
                 }
+
             }
-            
 
         };
-
+        
     }
 }
 

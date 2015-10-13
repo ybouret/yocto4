@@ -57,6 +57,9 @@ void do_symker()
         matrix<double> G(n);
         matrix<double> Q(n);
         vector<double> d(n,0);
+        vector<double> x(n,0);
+        vector<double> b(n,0);
+        vector<double> u(n,0);
 
         for(size_t iter=0;iter<2;++iter)
         {
@@ -107,14 +110,22 @@ void do_symker()
             }
             else
             {
-                std::cerr << "det(G)=" << idet << std::endl;
-                if(!cholesky<double>::build(G,G))
+                matrix<double> L(G,YOCTO_MATRIX_ENLARGE);
+                if( !cholesky<double>::build(L) )
                 {
-                    std::cerr << "can't build cholesky.." << std::endl;
+                    std::cerr << "Can't build Cholesky" << std::endl;
                 }
                 else
                 {
-                    std::cerr << "L=" << G << std::endl;
+                    std::cerr << "L=" << L << std::endl;
+                    for(size_t i=1;i<=n;++i) b[i] = -nm + unit_t(alea_leq(2*nm));
+                    cholesky<double>::solve(x,L,b);
+                    tao::mul(u,G,x);
+                    std::cerr << "b=" << b << std::endl;
+                    std::cerr << "x=" << x << std::endl;
+                    std::cerr << "u=" << u << std::endl;
+                    tao::sub(u, b);
+                    std::cerr << "dif=" << tao::norm(u) << std::endl;
                 }
 
             }
