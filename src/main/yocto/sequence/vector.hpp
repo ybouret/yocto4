@@ -175,18 +175,19 @@ item_(addr_-1)
         }
 
         //! free and make 'zero' object
-        inline void make(size_t n)
+        inline void make(const size_t n)
         {
             if(n>size_)
             {
                 vector tmp(n);
-                swap_with(n);
+                swap_with(tmp);
             }
             else
             {
                 _free( int2type<no_destruct>() );
-                make0(int2type<support_c_style_ops<mutable_type>::value>(),n);
+                make0( int2type<support_c_style_ops<mutable_type>::value>(),n);
             }
+            assert(size_==n);
         }
 
 
@@ -295,7 +296,7 @@ item_(addr_-1)
         //______________________________________________________________________
 
 
-        void make0(int2type<true>(),const size_t n)
+        void make0(int2type<true>,const size_t n) throw()
         {
             assert(0==size_);
             memset(addr_,0x00,(size_=n)*sizeof(T));

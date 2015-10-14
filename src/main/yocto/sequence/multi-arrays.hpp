@@ -2,6 +2,7 @@
 #define YOCTO_SEQUENCE_MULTI_ARRAYS_INCLUDED 1
 
 #include "yocto/sequence/lw-array.hpp"
+#include "yocto/sequence/vector.hpp"
 
 namespace yocto
 {
@@ -20,7 +21,7 @@ namespace yocto
         virtual void allocate(size_t nvar) = 0;
         virtual void release(void) throw() = 0;
         
-        const size_t size;
+        const size_t size; //! current size for all arrays
         
         virtual ~arrays_manager() throw() { assert(0==size); }
 
@@ -31,7 +32,10 @@ namespace yocto
         YOCTO_DISABLE_COPY_AND_ASSIGN(arrays_manager);
     };
     
-    //! interface to a handle some arrays of same size
+    //! interface to a handle some arrays of same sizes
+    /**
+     The type must accept a zero argument constructor
+     */
     template<
     typename T,
     typename MEMORY_KIND
@@ -39,10 +43,10 @@ namespace yocto
     class multi_arrays : public arrays_manager<T>
     {
     public:
-        typedef lw_array<T>                              array_type;   //!< interface
-        typedef typename arrays_manager<T>::type         type;
-        typedef typename arrays_manager<T>::mutable_type mutable_type;
-        
+        typedef lw_array<T>                                          array_type;   //!< interface
+        typedef typename arrays_manager<T>::type                     type;
+        typedef typename arrays_manager<T>::mutable_type             mutable_type;
+        typedef vector<mutable_type,typename MEMORY_KIND::allocator> inmem_type;
         
         
         virtual array<T> & operator[](size_t ia) throw()
@@ -61,25 +65,12 @@ namespace yocto
         //! allocate memory for all
         virtual void allocate(size_t nvar)
         {
+
             if(nvar!=this->size)
             {
-                // acquire new data
-                size_t        new_count = nvar * this->num_arrays();
-                mutable_type *new_xdata = memory::kind<MEMORY_KIND>:: template acquire_as<mutable_type>( new_count );
-				
-                // release old data
-				memory::kind<MEMORY_KIND>:: template release_as<mutable_type>( xdata, count );
-                
-                // link all
-                xdata = new_xdata;
-                count = new_count;
+                inmem.make(nvar*this->num_arrays());
                 (size_t&)(this->size) = nvar;
                 link();
-            }
-            else
-            {
-                char *p = (char *)xdata;
-                for(size_t i=count*sizeof(T);i>0;--i) *(p++) = 0;
             }
         }
         
@@ -88,7 +79,7 @@ namespace yocto
         {
             if(this->size)
             {
-                memory::kind<MEMORY_KIND>:: template release_as<mutable_type>( xdata, count );
+                inmem.release();
                 (size_t&)(this->size)=0;
                 link();
             }
@@ -98,7 +89,7 @@ namespace yocto
         virtual ~multi_arrays() throw() {}
         
         
-        //! one shot helper
+        //! one shot helper, using internal indx
         inline array<T> & next_array() throw()
         {
             assert(indx<this->num_arrays());
@@ -109,8 +100,7 @@ namespace yocto
         
     protected:
         explicit multi_arrays() throw() :
-        count(0),
-        xdata(0),
+        inmem(),
         indx(0)
         {
         }
@@ -119,7 +109,7 @@ namespace yocto
         
         inline void link() throw()
         {
-            mutable_type *p = xdata;
+            mutable_type *p = inmem(0);
             array_type   *a = static_cast<array_type *>(arrays_addr());
             for(size_t i=this->num_arrays();i>0;--i)
             {
@@ -131,10 +121,9 @@ namespace yocto
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(multi_arrays);
-        size_t        count;
-        mutable_type *xdata;
+        inmem_type    inmem;
         size_t        indx;
-        
+
         virtual void *arrays_addr() const throw() = 0;
         
     };
