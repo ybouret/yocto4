@@ -19,12 +19,12 @@ void do_symdiag()
     {
         matrix<T> a(n);
         matrix<T> Q(n,n);
-        vector<T>       d(n,0);
+        vector<T> d(n,0);
         for(size_t iter=0;iter<1;++iter)
         {
             for(size_t i=1;i<=n;++i)
             {
-                for(size_t j=1;j<=n;++j)
+                for(size_t j=i;j<=n;++j)
                 {
                     a[i][j] = a[j][i] = -T(AMPLITUDE)/2 + alea<T>() * AMPLITUDE;
                 }

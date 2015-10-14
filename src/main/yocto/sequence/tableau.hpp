@@ -67,12 +67,14 @@ item_(addr_-1)
         {
         }
 
+        //! copy
         inline explicit tableau_of(const tableau_of<T> &other ) :
         YOCTO_TABLEAU_CTOR(other.size_)
         {
             YOCTO_TABLEAU_IMPL( ctor1(other) );
         }
 
+        //! copy with extra terms
         inline explicit tableau_of(const tableau_of<T> &other, size_t n) :
         YOCTO_TABLEAU_CTOR(other.size_+n)
         {
@@ -157,6 +159,7 @@ item_(addr_-1)
         {
             size_ = 0;
         }
+
 
         inline void free_( int2type<false> ) throw()
         {

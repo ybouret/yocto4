@@ -7,6 +7,8 @@
 #include "yocto/code/bswap.hpp"
 #include "yocto/container/iter-linked.hpp"
 #include "yocto/sort/merge.hpp"
+#include "yocto/bitwise.hpp"
+#include "yocto/code/bzset.hpp"
 #include <iostream>
 
 namespace yocto
@@ -111,9 +113,23 @@ namespace yocto
                 throw;
             }
         }
+
+        //! assuming an empty ctor is available
+        inline list( size_t n ) : list_(), pool_()
+        {
+            try
+            {
+                for(size_t i=n;i>0;--i)
+                    list_.push_back( make( int2type<support_c_style_ops<mutable_type>::value>() ) );
+            }
+            catch(...)
+            {
+                kill();
+                throw;
+            }
+        }
 		
-		
-		inline list & operator=( const list & other ) 
+		inline list & operator=( const list & other )
 		{
 			if( this != &other )
 			{
@@ -186,13 +202,40 @@ namespace yocto
 			node_type *node = pool_.size ? pool_.query() : node_type::acquire();
 			try
 			{
-				new ( & node->data ) mutable_type( obj ); return node;
+				new ( & node->data ) mutable_type( obj );
 			}
 			catch(...)
 			{
-				pool_.store(node); throw;
+				pool_.store(node);
+                throw;
 			}
+            return node;
 		}
+
+        //! C style ops
+        inline node_type *make( int2type<true> )
+        {
+            node_type *node = pool_.size ? pool_.query() : node_type::acquire();
+            bzset(node->data);
+            return node;
+        }
+
+        //! C style ops
+        inline node_type *make( int2type<false> )
+        {
+            node_type *node = pool_.size ? pool_.query() : node_type::acquire();
+            try
+            {
+                new ( & node->data ) mutable_type();
+            }
+            catch (...)
+            {
+                pool_.store(node);
+                throw;
+            }
+            return node;
+        }
+
 		
 		virtual const_type &get_front() const throw() { assert(list_.size>0); return list_.head->data; }
 		virtual const_type &get_back()  const throw() { assert(list_.size>0); return list_.tail->data; }
