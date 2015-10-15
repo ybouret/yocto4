@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/kernel/diag.hpp"
+#include "yocto/math/core/diag.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/string/conv.hpp"

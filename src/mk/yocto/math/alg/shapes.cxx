@@ -2,7 +2,7 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/types.hpp"
 
-#include "yocto/math/kernel/svd.hpp"
+#include "yocto/math/core/svd.hpp"
 
 #include "yocto/exception.hpp"
 
@@ -110,7 +110,7 @@ namespace yocto
 
 #include "yocto/math/core/tao.hpp"
 #include "yocto/math/core/lu.hpp"
-#include "yocto/math/kernel/diag.hpp"
+#include "yocto/math/core/diag.hpp"
 
 
 namespace yocto

@@ -1,4 +1,4 @@
-#include "yocto/math/kernel/svd.hpp"
+#include "yocto/math/core/svd.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/code/utils.hpp"

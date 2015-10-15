@@ -2,7 +2,7 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/sequence/vector.hpp"
 
-#include "yocto/math/kernel/svd.hpp"
+#include "yocto/math/core/svd.hpp"
 #include "yocto/math/core/tao.hpp"
 #include "yocto/code/utils.hpp"
 

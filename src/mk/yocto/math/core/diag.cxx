@@ -1,4 +1,4 @@
-#include "yocto/math/kernel/diag.hpp"
+#include "yocto/math/core/diag.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/types.hpp"
 
@@ -378,7 +378,7 @@ namespace yocto
 
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/math/kernel/svd.hpp"
+#include "yocto/math/core/svd.hpp"
 #include "yocto/math/core/tao.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/sort/index.hpp"
