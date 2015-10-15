@@ -4,6 +4,8 @@
 #include "yocto/sequence/many-arrays.hpp"
 #include "yocto/xnumeric.hpp"
 #include "yocto/math/matrix.hpp"
+#include "yocto/math/core/tao.hpp"
+#include "yocto/math/core/lu.hpp"
 
 namespace yocto
 {
@@ -31,9 +33,26 @@ namespace yocto
             //
             // Non-Virtual Interface
             //__________________________________________________________________
+
+            //! solve an array
             inline bool solve(array_type &x, const array_type &r)
             {
                 return __solve(x,r);
+            }
+
+            //! solve column vectors
+            inline bool solve(matrix<T> &Z)
+            {
+                assert(Z.rows>=size());
+                const size_t n  = size();
+                const size_t nc = Z.cols;
+                for(size_t j=1;j<=nc;++j)
+                {
+                    for(size_t i=n;i>0;--i) rr[i] = Z[i][j];
+                    if(!__solve(xx,rr)) return false;
+                    for(size_t i=n;i>0;--i) Z[i][j] = xx[i];
+                }
+                return true;
             }
 
 
@@ -105,15 +124,19 @@ namespace yocto
 
         protected:
             explicit inline _TriDiag(size_t na) :
-            arrays(4+na),
-            a( arrays.next_array() ),
-            b( arrays.next_array() ),
-            c( arrays.next_array() ),
-            g( arrays.next_array() )
+            arrays(6+na),
+            a(  arrays.next_array() ),
+            b(  arrays.next_array() ),
+            c(  arrays.next_array() ),
+            g(  arrays.next_array() ),
+            xx( arrays.next_array() ),
+            rr( arrays.next_array() )
             {
             }
 
             array_type &g;
+            array_type &xx;
+            array_type &rr;
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(_TriDiag);
@@ -277,6 +300,78 @@ namespace yocto
             {
                 return kernel::__tridiag<T>::solve_simple(this->a,this->b,this->c,this->g,x,r);
             }
+
+            //! solve (this + U (x) V) * x = r
+            inline bool ShermanMorrison( array_type &x, const array_type &U, const array_type &V, const array_type &r)
+            {
+                const T __one  = xnumeric<T>::one();
+                const T __min  = xnumeric< typename real_of<T>::type >::minimum();
+                array_type &Y  = this->xx;
+                array_type &Z  = this->rr;
+                if( !__tridiag(this->a, this->b, this->c, this->g, Z, U) ) return false;
+                if( !__tridiag(this->a, this->b, this->c, this->g, Y, r) ) return false;
+                const T num = tao::dot(V,Y);
+                const T den = __one +  tao::dot(V,Z);
+                if( Fabs(den) <= __min)
+                    return false;
+                const T fac = num / den;
+                for(size_t i=x.size();i>0;--i)
+                {
+                    x[i] = Y[i] - fac * Z[i];
+                }
+                return true;
+            }
+
+            //! solve (this+U.Vt) x = r
+            inline bool Woodbury( array_type &x, const matrix<T> &U, const matrix<T> &V, const array_type &r )
+            {
+                const T __one  = xnumeric<T>::one();
+
+                assert(x.size()>=this->size());
+                assert(r.size()>=this->size());
+                assert(U.rows==this->size());
+                assert(V.rows==this->size());
+                assert(U.cols==V.cols);
+
+                const size_t p = U.cols;
+                //______________________________________________________________
+                //
+                //-- solve auxiliary problems
+                //______________________________________________________________
+                matrix<T> Z(U);
+                if( ! solve(Z) )
+                    return false;
+
+                //______________________________________________________________
+                //
+                //-- compute the H matrix
+                //______________________________________________________________
+                matrix<T> H(p);
+                tao::mmul_ltrn(H, V, Z);
+                for(size_t i=p;i>0;--i) H[i][i] += __one;
+
+                if( !LU<T>::build(H) )
+                    return false;
+
+                //______________________________________________________________
+                //
+                //-- solve the auxiliary problem A.y = r
+                //______________________________________________________________
+                array<T>  &y = this->xx;
+                if( ! __solve(y,r) )
+                    return false;
+
+                //______________________________________________________________
+                //
+                //-- apply the woodbury formula
+                //______________________________________________________________
+                vector<T> tVy(p);
+                tao::mul_trn(tVy, V, y);
+                LU<T>::solve(H, tVy);
+                tao::mul_sub(y, Z, tVy);
+                return true;
+            }
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(TriDiag);
