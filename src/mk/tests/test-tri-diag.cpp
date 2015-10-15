@@ -68,7 +68,7 @@ static inline void test_td()
     }
 }
 
-YOCTO_UNIT_TEST_IMPL(triDiag)
+YOCTO_UNIT_TEST_IMPL(tridiag)
 {
     test_td<float>();
     test_td<double>();

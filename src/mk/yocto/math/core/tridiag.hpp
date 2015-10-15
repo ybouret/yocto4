@@ -40,6 +40,14 @@ namespace yocto
                 return __solve(x,r);
             }
 
+            inline bool solve(array_type &x)
+            {
+                assert(x.size()>=size());
+                const size_t n = size();
+                for(size_t i=n;i>0;--i) rr[i] = x[i];
+                return __solve(x,rr);
+            }
+
             //! solve column vectors
             inline bool solve(matrix<T> &Z)
             {

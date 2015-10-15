@@ -1,6 +1,6 @@
 #include "yocto/math/dat/spline.hpp"
 #include "yocto/math/ztype.hpp"
-#include "yocto/math/kernel/tridiag.hpp"
+#include "yocto/math/core/tridiag.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/math/types.hpp"
@@ -29,7 +29,7 @@ namespace yocto {
                 //==============================================================
                 // create the system matrix
                 //==============================================================
-                tridiag<real_t> M(n);
+                TriDiag<real_t> M(n);
                 
                 //==============================================================
                 // fill the core matrix
@@ -150,7 +150,7 @@ namespace yocto {
                 // periodic case
                 //==============================================================
                 const size_t     nm = n-1;
-                ctridiag<real_t> M(nm);
+                cTriDiag<real_t> M(nm);
                 
                 //==============================================================
                 // fill the core
