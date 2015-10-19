@@ -311,6 +311,18 @@ memory_kind(MEMORY_KIND)
                 }
             }
 
+            inline void ld( param_type args )
+            {
+                for(size_t i=0;i<items;++i) data[i] = args;
+            }
+
+            inline void neg()
+            {
+                for(size_t i=0;i<items;++i) data[i] = -data[i];
+            }
+
+            
+
             template <typename U>
             inline void minor_of(const matrix<U>       &M,
                                  const size_t           I,
