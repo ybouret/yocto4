@@ -31,6 +31,7 @@ void __test_access()
         }
         if(iter<=0)
         {
+            std::cerr << "Generated " << M.rows << "x" << M.cols << std::endl;
             std::cerr << "M=" << M << std::endl;
         }
         matrix<T> P;

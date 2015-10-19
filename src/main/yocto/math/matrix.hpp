@@ -25,10 +25,12 @@ namespace yocto
 
     protected:
         explicit matrix_dims() throw();
+        virtual void *address_of(size_t ir,size_t ic) const throw() = 0;
 
 
-    protected:
+    private:
         YOCTO_DISABLE_ASSIGN(matrix_dims);
+
     };
 
 
@@ -54,36 +56,41 @@ namespace yocto
         }
 
 
-        friend std::ostream & operator<<( std::ostream &os, const matrix_of<T> &M )
+        inline void display( std::ostream &os ) const
         {
-            os << "#" << M.rows << "x" << M.cols << std::endl;
+            const matrix_of<T> &self = *this;
             os << '[' << ' ';
-            if( M.rows > 0 )
+            if( rows > 0 )
             {
-                for( size_t i=1; i < M.rows; ++i )
+                for( size_t i=1; i <rows; ++i )
                 {
-                    for(size_t j=1;j<=M.cols;++j)
+                    for(size_t j=1;j<=cols;++j)
                     {
-                        os << ' ' << M(i,j);
+                        os << ' ' << self(i,j);
                     }
                     os << ';';
                 }
-                for(size_t j=1;j<=M.cols;++j)
+                for(size_t j=1;j<=cols;++j)
                 {
-                    os << ' ' << M(M.rows,j);
+                    os << ' ' << self(rows,j);
                 }
             }
             os << ']';
-            return os;
+
         }
 
+        inline friend std::ostream & operator<<(std::ostream       &os,
+                                                const matrix_of<T> &M )
+        {
+            M.display(os);
+            return os;
+        }
 
     protected:
         inline explicit matrix_of() throw() : matrix_dims() {}
 
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(matrix_of);
-        virtual void *address_of(size_t ir,size_t ic) const throw() = 0;
     };
 
     enum matrix_memory
@@ -99,9 +106,6 @@ namespace yocto
 #define YOCTO_MATRIX_NUM_EXTRA 2
 
 #define YOCTO_MATRIX_CTOR(MEMORY_KIND) \
-rows(0),       \
-cols(0),       \
-items(0),      \
 data(0),       \
 pRow(0),       \
 num_objects(0),\
@@ -163,11 +167,7 @@ memory_kind(MEMORY_KIND)
         };
 
 
-        const size_t rows;
-        const size_t cols;
-        const size_t items;
-
-        inline bool   is_square() const throw() { return rows==cols; }
+        inline bool   is_square() const throw() { return this->rows==this->cols; }
 
         inline explicit matrix() throw() :
         YOCTO_MATRIX_CTOR(matrix_tight_memory)
@@ -223,11 +223,11 @@ memory_kind(MEMORY_KIND)
             release();
         }
 
-        inline row       & operator[](const size_t ir) throw()       { assert(ir>0); assert(ir<=rows); return pRow[ir]; }
-        inline const row & operator[](const size_t ir) const throw() { assert(ir>0); assert(ir<=rows); return pRow[ir]; }
+        inline row       & operator[](const size_t ir) throw()       { assert(ir>0); assert(ir<=this->rows); return pRow[ir]; }
+        inline const row & operator[](const size_t ir) const throw() { assert(ir>0); assert(ir<=this->rows); return pRow[ir]; }
 
 
-#define YOCTO_MATRIX_XCH(FIELD) cswap_const(FIELD,M.FIELD)
+#define YOCTO_MATRIX_XCH(FIELD) cswap_const(this->FIELD,M.FIELD)
         inline void swap_with( matrix<T> &M ) throw()
         {
             YOCTO_MATRIX_XCH(rows);
@@ -251,10 +251,10 @@ memory_kind(MEMORY_KIND)
         //! assign if same sizes
         inline void assign( const matrix<T> &other )
         {
-            assert(rows==other.rows);
-            assert(cols==other.cols);
-            assert(items==other.items);
-            YOCTO_LOOP_FUNC(items,YOCTO_MATRIX_COPY,0);
+            assert(this->rows==other.rows);
+            assert(this->cols==other.cols);
+            assert(this->items==other.items);
+            YOCTO_LOOP_FUNC(this->items,YOCTO_MATRIX_COPY,0);
         }
 
         //! check sizes and assign
@@ -262,7 +262,7 @@ memory_kind(MEMORY_KIND)
         {
             if(this!=&other)
             {
-                if(rows==other.rows&&cols==other.cols)
+                if(this->rows==other.rows&&this->cols==other.cols)
                 {
                     assign(other);
                 }
@@ -281,7 +281,7 @@ memory_kind(MEMORY_KIND)
         {
             row &R1 = (*this)[r1];
             row &R2 = (*this)[r2];
-            for(size_t c=cols;c>0;--c)
+            for(size_t c=this->cols;c>0;--c)
             {
                 bswap(R1[c],R2[c]);
             }
@@ -290,7 +290,7 @@ memory_kind(MEMORY_KIND)
 
         inline void swap_cols(size_t c1, size_t c2) throw()
         {
-            for(size_t r=rows;r>0;--r)
+            for(size_t r=this->rows;r>0;--r)
             {
                 bswap((*this)[r][c1],(*this)[r][c2]);
             }
@@ -305,17 +305,17 @@ memory_kind(MEMORY_KIND)
         inline void ldz()
         {
             const_type __zero = xnumeric<mutable_type>::zero();
-            for(size_t i=0;i<items;++i) data[i] = __zero;
+            for(size_t i=0;i<this->items;++i) data[i] = __zero;
         }
 
         inline void ld1()
         {
             const_type __zero = xnumeric<mutable_type>::zero();
             const_type __one  = xnumeric<mutable_type>::one();
-            for(size_t i=rows;i>0;--i)
+            for(size_t i=this->rows;i>0;--i)
             {
                 row &r_i = (*this)[i];
-                for(size_t j=cols;j>0;--j)
+                for(size_t j=this->cols;j>0;--j)
                 {
                     r_i[j] = (i==j) ? __one : __zero;
                 }
@@ -324,12 +324,12 @@ memory_kind(MEMORY_KIND)
 
         inline void ld( param_type args )
         {
-            for(size_t i=0;i<items;++i) data[i] = args;
+            for(size_t i=0;i<this->items;++i) data[i] = args;
         }
 
         inline void neg()
         {
-            for(size_t i=0;i<items;++i) data[i] = -data[i];
+            for(size_t i=0;i<this->items;++i) data[i] = -data[i];
         }
 
 
@@ -341,8 +341,8 @@ memory_kind(MEMORY_KIND)
         {
             assert(M.rows>1);
             assert(M.cols>1);
-            assert(rows==M.rows-1);
-            assert(cols==M.cols-1);
+            assert(this->rows==M.rows-1);
+            assert(this->cols==M.cols-1);
 
             matrix<T>   &self = *this;
             const size_t nr = M.rows;
@@ -367,7 +367,7 @@ memory_kind(MEMORY_KIND)
         //! ensure size, return true if something was done
         inline bool make(size_t nr, size_t nc)
         {
-            if(nr!=rows||nc!=rows)
+            if(nr!=this->rows||nc!=this->cols)
             {
                 matrix<T> tmp(nr,nc);
                 swap_with(tmp);
@@ -382,7 +382,7 @@ memory_kind(MEMORY_KIND)
         //! ensure size, return true is something was done
         inline bool make(size_t n)
         {
-            if(n!=rows||n!=rows||memory_kind!=matrix_large_memory)
+            if(n!=this->rows||n!=this->cols||memory_kind!=matrix_large_memory)
             {
                 matrix<T> tmp(n);
                 swap_with(tmp);
@@ -415,14 +415,15 @@ memory_kind(MEMORY_KIND)
             memory::kind<memory::global>::release(wksp,wlen);
             data = 0;
             pRow = 0;
-            (size_t&)rows        = 0;
-            (size_t&)cols        = 0;
-            (size_t&)items       = 0;
+            (size_t&)this->rows  = 0;
+            (size_t&)this->cols  = 0;
+            (size_t&)this->items = 0;
             (size_t&)num_objects = 0;
             (size_t&)num_scalars = 0;
             indices = 0;
             scalars = 0;
         }
+
 
     private:
         mutable_type *data;
@@ -555,9 +556,9 @@ memory_kind(MEMORY_KIND)
             //
             // finalizing
             //______________________________________________________________
-            (size_t &)rows  = nr;
-            (size_t &)cols  = nc;
-            (size_t &)items = n;
+            (size_t &)this->rows  = nr;
+            (size_t &)this->cols  = nc;
+            (size_t &)this->items = n;
             (size_t &)num_objects = n_objects;
             (size_t &)num_scalars = n_scalars;
 
@@ -597,16 +598,16 @@ memory_kind(MEMORY_KIND)
         inline void ctor1( const matrix<T> &other, int2type<true> ) throw()
         {
             assert(ctor<=0);
-            assert(items==other.items);
-            YOCTO_LOOP_FUNC(items,YOCTO_MATRIX_COPY,0);
+            assert(this->items==other.items);
+            YOCTO_LOOP_FUNC(this->items,YOCTO_MATRIX_COPY,0);
         }
 
         //! C++ type
         inline void ctor1( const matrix<T> &other, int2type<false> ) throw()
         {
             assert(ctor<=0);
-            assert(items==other.items);
-            while(ctor<items)
+            assert(this->items==other.items);
+            while(ctor<this->items)
             {
                 new (data+ctor) mutable_type(other.data[ctor]);
                 ++ctor;
@@ -618,10 +619,10 @@ memory_kind(MEMORY_KIND)
         inline void ctor1_transpose( const matrix<T> &other, int2type<true> ) throw()
         {
             assert(ctor<=0);
-            assert(items==other.items);
-            for(size_t i=1;i<=rows;++i)
+            assert(this->items==other.items);
+            for(size_t i=1;i<=this->rows;++i)
             {
-                for(size_t j=1;j<=cols;++j)
+                for(size_t j=1;j<=this->cols;++j)
                 {
                     data[ctor] = other[j][i];
                     ++ctor;
@@ -633,10 +634,10 @@ memory_kind(MEMORY_KIND)
         inline void ctor1_transpose( const matrix<T> &other, int2type<false> ) throw()
         {
             assert(ctor<=0);
-            assert(items==other.items);
-            for(size_t i=1;i<=rows;++i)
+            assert(this->items==other.items);
+            for(size_t i=1;i<=this->rows;++i)
             {
-                for(size_t j=1;j<=cols;++j)
+                for(size_t j=1;j<=this->cols;++j)
                 {
                     new (&data[ctor]) mutable_type(other[j][i]);
                     ++ctor;
@@ -651,31 +652,31 @@ memory_kind(MEMORY_KIND)
             const T         &addr = self[ir][ic];
             return   (void*)&addr;
         }
-
+        
     public:
         const matrix_memory memory_kind;
-
+        
         inline size_t       *get_indices() const throw()
         {
             assert(memory_kind==matrix_large_memory);
             return (size_t *)indices;
         }
-
+        
         inline mutable_type *get_aux(const size_t k) const throw()
         {
             assert(memory_kind==matrix_large_memory);
             assert(k<YOCTO_MATRIX_NUM_EXTRA);
-            const_type *addr = &data[items+k*rows];
+            const_type *addr = &data[this->items+k*this->rows];
             return (mutable_type *)addr;
         }
-
+        
         inline scalar_type  *get_scalars() const throw()
         {
             return (scalar_type *)scalars;
         }
-
+        
     };
-
+    
 }
 
 #endif
