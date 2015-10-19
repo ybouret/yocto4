@@ -25,6 +25,8 @@ return R_NilValue;\
 }\
 catch(...) { Rprintf("\t*** Unhandled exception !\n"); return R_NilValue; }
 
+
+
     //__________________________________________________________________________
     //
     //

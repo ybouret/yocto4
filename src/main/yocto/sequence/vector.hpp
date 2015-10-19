@@ -255,6 +255,25 @@ item_(addr_-1)
             }
         }
 
+        template <typename U,typename V,typename W>
+        void append(typename type_traits<U>::parameter_type u,
+                    typename type_traits<V>::parameter_type v,
+                    typename type_traits<W>::parameter_type w)
+        {
+            if(size_<maxi_)
+            {
+                new ( &addr_[size_] ) mutable_type(u,v,w);
+                ++size_;
+            }
+            else
+            {
+                vector tmp( *this, this->next_increase(maxi_) );
+                tmp.append<U,V,W>(u,v,w);
+                swap_with(tmp);
+            }
+        }
+
+
 
 
 
