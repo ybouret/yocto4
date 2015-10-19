@@ -35,6 +35,22 @@ YOCTO_R_FUNCTION(VectorSum,(SEXP vecR))
     s[1] = ans;
     return *s;
 
+    }
+    YOCTO_R_RETURN()
+
+    
+YOCTO_R_FUNCTION(MatrixTransNeg,(SEXP matR))
+{
+    RMatrix<double> mat(matR);
+    std::cerr << "mat=" << mat << std::endl;
+    RMatrix<double> ans(mat.cols,mat.rows);
+    for(size_t j=mat.cols;j>0;--j)
+    {
+        for(size_t i=mat.rows;i>0;--i)
+        {
+            ans[i][j] = mat[j][i];
+        }
+    }
+    return *ans;
 }
 YOCTO_R_RETURN()
-

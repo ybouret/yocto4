@@ -3,6 +3,7 @@
 
 #include "yocto/math/matrix.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/sequence/lw-array.hpp"
 
 #if defined(YOCTO_WIN)
 #undef ERROR
@@ -76,14 +77,6 @@ return R_NilValue; }\
         static inline int * Cast( SEXP &Rvec ) { assert(Rvec); return INTEGER(Rvec); }
         enum { Conv = INTSXP };
     };
-
-    //__________________________________________________________________________
-    //
-    //
-    // access properties
-    //
-    //__________________________________________________________________________
-
 
     //__________________________________________________________________________
     //
@@ -193,6 +186,146 @@ return R_NilValue; }\
         inline virtual SEXP get_SEXP() const throw() { return Rvec; }
         inline virtual const_type *get_item() const throw() { return data_; }
     };
+
+
+    //__________________________________________________________________________
+    //
+    //
+    // R Matrix, Column Major
+    //
+    //__________________________________________________________________________
+    template <typename T>
+    class RMatrix : public RObject, public matrix_of<T>
+    {
+    public:
+        class Column : public lw_array<T>
+        {
+        public:
+            inline Column(T *ptr, size_t num) throw() : lw_array<T>(ptr,num) {}
+            inline virtual ~Column() throw() {}
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Column);
+        };
+
+        Column & operator[](size_t ic) throw()
+        {
+            assert(ic>0);
+            assert(ic<=this->cols);
+            return mcol[ic];
+        }
+
+        const Column & operator[](size_t ic) const throw()
+        {
+            assert(ic>0);
+            assert(ic<=this->cols);
+            return mcol[ic];
+        }
+
+
+        inline virtual ~RMatrix() throw()
+        {
+            memory::kind<memory::global>::release_as<Column>(++mcol,cnum);
+        }
+
+        inline explicit RMatrix(SEXP args) :
+        RObject(),
+        Rmat( coerceVector(args, RGetData<T>::Conv) ),
+        data( RGetData<T>::Cast(Rmat) ),
+        mcol(0),
+        cnum(0)
+        {
+            setDims();
+        }
+
+
+
+        //! set data for R
+        inline explicit RMatrix( size_t r, size_t c ) :
+        Rmat( allocMatrix( RGetData<T>::Conv, r, c) ),
+        data( RGetData<T>::Cast(Rmat) ),
+        mcol(0),
+        cnum(0)
+        {
+            PROTECT(Rmat);
+            set_R();
+            setDims();
+        }
+
+
+
+
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(RMatrix);
+        SEXP     Rmat;
+        T       *data;
+        Column  *mcol;
+        size_t   cnum;
+
+        inline void setDims()
+        {
+            // get dimensions
+            SEXP         Rdim = getAttrib(Rmat, R_DimSymbol);
+            const size_t nr   = INTEGER(Rdim)[0];
+            const size_t nc   = INTEGER(Rdim)[1];
+            const size_t ni   = nr*nc;
+
+            // get columns
+            cnum = nc;
+            mcol = memory::kind<memory::global>::acquire_as<Column>(cnum)-1;
+
+            // link
+            T *p = data;
+            for(size_t i=1;i<=nc;++i,p+=nr)
+            {
+                new (mcol+i) Column(p,nr);
+            }
+
+            (size_t &)(this->rows)  = nr;
+            (size_t &)(this->cols)  = nc;
+            (size_t &)(this->items) = ni;
+
+        }
+
+        virtual SEXP get_SEXP() const throw()
+        {
+            return Rmat;
+        }
+
+        virtual void *address_of(size_t ir,size_t ic) const throw()
+        {
+            assert(ir>0);assert(ir<=this->rows);
+            assert(ic>0);assert(ic<=this->cols);
+            const RMatrix<T> &self = *this;
+            return (void*)&self[ic][ir];
+        }
+        
+    };
+
+
+
+    //__________________________________________________________________________
+    //
+    //! argument conversion, ok for double and int
+    //__________________________________________________________________________
+    template <typename T>
+    inline T R2Scalar( SEXP r )
+    {
+        const RVector<T> value(r);
+        if( value.size() < 1) throw exception("R2Scalar: invalid argument");
+        return value[0];
+    }
+
+    //__________________________________________________________________________
+    //
+    //! string conversion
+    //__________________________________________________________________________
+    inline const char *R2String( SEXP r )
+    {
+        return CHAR(STRING_ELT(r,0));
+    }
+
+
 
 
 }

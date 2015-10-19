@@ -29,3 +29,12 @@ VectorSum <- function(v)
     .Call("VectorSum",v);
 }
 
+## matrix code
+MatrixTransNeg <- function(mat)
+{
+    .Call("MatrixTransNeg",mat);
+}
+
+mat=replicate(4,rnorm(2));
+print(mat);
+MatrixTransNeg(mat);

@@ -54,6 +54,29 @@ namespace yocto
         }
 
 
+        friend std::ostream & operator<<( std::ostream &os, const matrix_of<T> &M )
+        {
+            os << '[' << ' ';
+            if( M.rows > 0 )
+            {
+                for( size_t i=1; i < M.rows; ++i )
+                {
+                    for(size_t j=1;j<=M.cols;++j)
+                    {
+                        os << ' ' << M(i,j);
+                    }
+                    os << ';';
+                }
+                for(size_t j=1;j<=M.cols;++j)
+                {
+                    os << ' ' << M(M.rows,j);
+                }
+            }
+            os << ']';
+            return os;
+        }
+
+
     protected:
         inline explicit matrix_of() throw() : matrix_dims() {}
 
@@ -202,17 +225,6 @@ memory_kind(MEMORY_KIND)
         inline row       & operator[](const size_t ir) throw()       { assert(ir>0); assert(ir<=rows); return pRow[ir]; }
         inline const row & operator[](const size_t ir) const throw() { assert(ir>0); assert(ir<=rows); return pRow[ir]; }
 
-        friend std::ostream & operator<<( std::ostream &os, const matrix<T> &M )
-        {
-            os << "[ ";
-            if( M.rows > 0 )
-            {
-                for( size_t i=1; i < M.rows; ++i ) os << M[i] << "; ";
-                os << M[ M.rows ];
-            }
-            os << "]";
-            return os;
-        }
 
 #define YOCTO_MATRIX_XCH(FIELD) cswap_const(FIELD,M.FIELD)
         inline void swap_with( matrix<T> &M ) throw()
