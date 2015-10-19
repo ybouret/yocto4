@@ -686,6 +686,7 @@ memory_kind(MEMORY_KIND)
                 for(size_t j=1;j<=this->cols;++j)
                 {
                     new (data+ctor) mutable_type(other[i][j]);
+                    ++ctor;
                 }
             }
             init0();
@@ -703,6 +704,7 @@ memory_kind(MEMORY_KIND)
                 for(size_t j=1;j<=this->cols;++j)
                 {
                     new (data+ctor) mutable_type(other[i][j],args);
+                    ++ctor;
                 }
             }
             init0();
