@@ -326,6 +326,84 @@ return R_NilValue; }\
     }
 
 
+    //__________________________________________________________________________
+    //
+    //
+    //! RList wrapper
+    //
+    //__________________________________________________________________________
+    class RList : public RObject
+    {
+    public:
+
+        //! create a list for R
+        RList(const char *names[], const size_t count) :
+        size( check_list_size(count) ),
+        L( allocVector(VECSXP,size)  )
+        {
+            PROTECT(L);
+
+            //-- set list items name
+            SEXP list_names = 0;
+            PROTECT(list_names = allocVector(STRSXP,size));
+            for(size_t i = 0; i < size; i++)
+            {
+                SET_STRING_ELT(list_names,i,mkChar(names[i]));
+            }
+            setAttrib(L, R_NamesSymbol, list_names);
+            UNPROTECT(1);
+            //-- list_name
+
+            set_R();
+        }
+
+        //! create a list for R
+        RList(const array<const char*> &names) :
+        size( check_list_size(names.size()) ),
+        L(allocVector(VECSXP,size))
+        {
+            PROTECT(L);
+
+            //-- set list items name
+            SEXP list_names = 0;
+            PROTECT(list_names = allocVector(STRSXP,size));
+            for(size_t i = 0; i < size; i++)
+            {
+                SET_STRING_ELT(list_names,i,mkChar(names[i]));
+            }
+            setAttrib(L, R_NamesSymbol, list_names);
+            UNPROTECT(1);
+            //-- list_name
+
+            set_R();
+
+        }
+
+        virtual ~RList() throw() {}
+
+        inline void set(size_t indx, const RObject &elmt )
+        {
+            assert(indx<size);
+            SET_VECTOR_ELT(L, indx, *elmt);
+        }
+
+        const size_t size;
+
+    private:
+        SEXP         L;
+
+        virtual SEXP get_SEXP() const throw() { return L; }
+
+        RList(const RList &);
+        RList&operator=(const RList &);
+        static inline
+        size_t check_list_size(size_t count)
+        {
+            if(count<=0) throw exception("Empty RList creation!");
+            return count;
+        }
+    };
+
 
 
 }
