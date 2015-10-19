@@ -313,7 +313,7 @@ return R_NilValue; }\
     {
         const RVector<T> value(r);
         if( value.size() < 1) throw exception("R2Scalar: invalid argument");
-        return value[0];
+        return value[1];
     }
 
     //__________________________________________________________________________
