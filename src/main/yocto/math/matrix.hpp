@@ -217,6 +217,27 @@ memory_kind(MEMORY_KIND)
             }
         }
 
+        //! parametric constructor
+        template <typename U>
+        inline matrix( const matrix<U> &other, const int flags) :
+        YOCTO_MATRIX_CTOR( upgrade(other.memory_kind,flags) )
+        {
+            build(other.rows,other.cols);
+            YOCTO_MATRIX_BUILD_WITH( parametric_ctor0(other) );
+        }
+
+        //! parametric constructor
+        template <typename U,typename V>
+        inline matrix( const matrix<U> &other, const V &args, const int flags) :
+        YOCTO_MATRIX_CTOR( upgrade(other.memory_kind,flags) )
+        {
+            build(other.rows,other.cols);
+            YOCTO_MATRIX_BUILD_WITH( parametric_ctor1(other,args) );
+        }
+
+
+
+
 
         inline virtual ~matrix() throw()
         {
@@ -652,7 +673,40 @@ memory_kind(MEMORY_KIND)
             const T         &addr = self[ir][ic];
             return   (void*)&addr;
         }
-        
+
+
+        //! parametric ctor, no arg
+        template <typename U>
+        inline void parametric_ctor0(const matrix<U> &other)
+        {
+            assert(ctor<=0);
+            assert(this->items==other.items);
+            while(ctor<this->items)
+            {
+                new (data+ctor) mutable_type(other.data[ctor]);
+                ++ctor;
+            }
+            init0();
+        }
+
+
+        //! parametric ctor, one arg
+        template <typename U,typename V>
+        inline void parametric_ctor1(const matrix<U> &other, const V &args)
+        {
+            assert(ctor<=0);
+            assert(this->items==other.items);
+            while(ctor<this->items)
+            {
+                new (data+ctor) mutable_type(other.data[ctor],args);
+                ++ctor;
+            }
+            init0();
+        }
+
+
+
+
     public:
         const matrix_memory memory_kind;
         
