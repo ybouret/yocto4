@@ -56,6 +56,7 @@ namespace yocto
 
         friend std::ostream & operator<<( std::ostream &os, const matrix_of<T> &M )
         {
+            os << "#" << M.rows << "x" << M.cols << std::endl;
             os << '[' << ' ';
             if( M.rows > 0 )
             {
