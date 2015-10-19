@@ -144,6 +144,14 @@ item_(addr_-1)
             }
         }
 
+        //! push_back with enought memory
+        inline void __push_back(param_type obj)
+        {
+            assert(size_<maxi_);
+            new ( &addr_[size_] ) mutable_type(obj);
+            ++size_;
+        }
+
         //! fast pop_back
         virtual void pop_back() throw()           { assert(size_>0); destruct( &item_[size_--] ); }
 
