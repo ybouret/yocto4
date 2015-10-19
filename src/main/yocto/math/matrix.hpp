@@ -445,6 +445,21 @@ memory_kind(MEMORY_KIND)
             scalars = 0;
         }
 
+        //! direct access
+        inline type &fetch(size_t indx) throw()
+        {
+            assert(indx<this->items);
+            return data[indx];
+        }
+
+        //! direct access
+        inline const_type &fetch(size_t indx) const throw()
+        {
+            assert(indx<this->items);
+            return data[indx];
+        }
+
+
 
     private:
         mutable_type *data;
