@@ -681,10 +681,12 @@ memory_kind(MEMORY_KIND)
         {
             assert(ctor<=0);
             assert(this->items==other.items);
-            while(ctor<this->items)
+            for(size_t i=1;i<=this->rows;++i)
             {
-                new (data+ctor) mutable_type(other.data[ctor]);
-                ++ctor;
+                for(size_t j=1;j<=this->cols;++j)
+                {
+                    new (data+ctor) mutable_type(other[i][j]);
+                }
             }
             init0();
         }
@@ -696,10 +698,12 @@ memory_kind(MEMORY_KIND)
         {
             assert(ctor<=0);
             assert(this->items==other.items);
-            while(ctor<this->items)
+            for(size_t i=1;i<=this->rows;++i)
             {
-                new (data+ctor) mutable_type(other.data[ctor],args);
-                ++ctor;
+                for(size_t j=1;j<=this->cols;++j)
+                {
+                    new (data+ctor) mutable_type(other[i][j],args);
+                }
             }
             init0();
         }
