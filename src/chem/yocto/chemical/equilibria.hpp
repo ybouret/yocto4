@@ -15,12 +15,12 @@ namespace yocto
     namespace chemical
     {
         
-        typedef math::matrix<double>         matrix_t;
+        typedef matrix<double>               matrix_t;
         typedef vector<double>               vector_t;
         
         typedef vector<bool>                 bvector_t;
         typedef vector<size_t>               uvector_t;
-        typedef math::matrix<ptrdiff_t>      imatrix_t;
+        typedef matrix<ptrdiff_t>            imatrix_t;
         typedef vector<equilibrium::pointer> evector_t;
         typedef vector<ptrdiff_t>            ivector_t;
         

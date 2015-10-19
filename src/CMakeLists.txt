@@ -64,6 +64,7 @@ YOCTO_BUILD(fltk)
 YOCTO_BUILD(fame)
 YOCTO_BUILD(python)
 YOCTO_BUILD(R)
+YOCTO_BUILD(R++)
 YOCTO_BUILD(tiff++)
 
 MESSAGE( STATUS "---------------- </modules> ----------------" )
