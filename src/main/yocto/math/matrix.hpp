@@ -363,29 +363,33 @@ memory_kind(MEMORY_KIND)
             }
         }
 
-        inline void make(size_t nr, size_t nc)
+        //! ensure size, return true if something was done
+        inline bool make(size_t nr, size_t nc)
         {
             if(nr!=rows||nc!=rows)
             {
                 matrix<T> tmp(nr,nc);
                 swap_with(tmp);
+                return true;
             }
             else
             {
-                ldz();
+                return false;
             }
         }
 
-        inline void make(size_t n)
+        //! ensure size, return true is something was done
+        inline bool make(size_t n)
         {
             if(n!=rows||n!=rows||memory_kind!=matrix_large_memory)
             {
                 matrix<T> tmp(n);
                 swap_with(tmp);
+                return true;
             }
             else
             {
-                ldz();
+                return false;
             }
         }
 
