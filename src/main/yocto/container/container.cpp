@@ -3,6 +3,7 @@
 #include "yocto/exceptions.hpp"
 
 #include <cerrno>
+#include <iostream>
 
 namespace yocto
 {
@@ -37,6 +38,10 @@ namespace yocto
 	
 	void container:: ensure( size_t n )
 	{
-		if( capacity() < n ) reserve(n-capacity());
+        std::cerr << "ensure " << n << "/capacity=" << capacity() << std::endl;
+		if( capacity() < n )
+        {
+            reserve(n-capacity());
+        }
 	}
 }
