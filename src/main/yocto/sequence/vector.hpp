@@ -29,7 +29,10 @@ namespace yocto
         };
 
 
+        //! default no throw constructor
         explicit vector() throw() : hmem_(),  size_(0), maxi_(0), addr_(0), item_(addr_-1) {}
+
+        //! destructor
         virtual ~vector() throw() { _release(); }
 
 #define YOCTO_VECTOR_IMPL(COUNT) \
@@ -37,6 +40,7 @@ hmem_(), size_(0), maxi_(COUNT), \
 addr_(hmem_.template acquire_as<mutable_type>( maxi_ ) ),\
 item_(addr_-1)
 
+        //! copy constructor
         vector( const vector &other ) :
         YOCTO_VECTOR_IMPL(other.size_)
         {
@@ -44,12 +48,6 @@ item_(addr_-1)
             _duplicate(other);
         }
 
-        vector( const vector &other, size_t extra ) :
-        YOCTO_VECTOR_IMPL(other.size_+extra)
-        {
-            assert(maxi_>=other.size_+extra);
-            _duplicate(other);
-        }
 
         explicit vector(size_t n, const as_capacity_t &) :
         YOCTO_VECTOR_IMPL(n)
@@ -298,6 +296,15 @@ item_(addr_-1)
             assert(indx<=size());
             return item_[indx];
         }
+
+        //! copy with extra memory
+        vector( const vector &other, size_t extra ) :
+        YOCTO_VECTOR_IMPL(other.maxi_+extra)
+        {
+            assert(maxi_>=other.maxi_+extra);
+            _duplicate(other);
+        }
+
 
         //______________________________________________________________________
         //
