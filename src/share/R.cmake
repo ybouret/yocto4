@@ -5,7 +5,13 @@
 #####################################
 SET(R_FOUND OFF)
 
-FIND_PROGRAM(R_EXE "R")
+IF(MSVC)
+	MESSAGE( STATUS "Disabling R with MSCV")
+	SET(R_EXE "R_EXE-NOTFOUND")
+ELSE(MSVC)
+	MESSAGE( STATUS "Looking for R...")
+	FIND_PROGRAM(R_EXE "R")
+ENDIF(MSVC)
 
 IF("${R_EXE}" STREQUAL "R_EXE-NOTFOUND")
 	# no R was installed on this system
