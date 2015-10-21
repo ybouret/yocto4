@@ -1,4 +1,4 @@
-#include "yocto/math/matrix.hpp"
+#include "yocto/math/matrices.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/string/xnum.hpp"
 
@@ -17,5 +17,8 @@ YOCTO_UNIT_TEST_IMPL(matrix)
     matrix<double> f2(fd);
     fd = f2;
 
+    tableau_of<int,matrix> tab(3,10,11);
+    
 }
 YOCTO_UNIT_TEST_DONE()
+
