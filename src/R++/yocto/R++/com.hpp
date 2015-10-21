@@ -299,6 +299,12 @@ return R_NilValue; }\
             const RMatrix<T> &self = *this;
             return (void*)&self[ic][ir];
         }
+
+        virtual void *address_of(size_t it) const throw()
+        {
+            assert(it<this->items);
+            return data+it;
+        }
         
     };
 

@@ -17,8 +17,11 @@ YOCTO_UNIT_TEST_IMPL(matrix)
     matrix<double> f2(fd);
     fd = f2;
 
-    tableau_of<int,matrix> tab(3,10,11);
-    
+    matrices<int,matrix> tab(5,12,15);
+    for(size_t i=1;i<=tab.count;++i)
+    {
+        tab[i];
+    }
 }
 YOCTO_UNIT_TEST_DONE()
 

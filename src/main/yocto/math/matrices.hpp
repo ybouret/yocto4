@@ -3,42 +3,78 @@
 
 #include "yocto/math/matrix.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/ptr/shared.hpp"
 
 namespace yocto
 {
 
-    //! helper to manage a group of matrices
-    template <
-    typename T,
-    template <class> class MATRIX>
-    class tableau_of : public vector< MATRIX<T> >
+    template <typename T>
+    class matrices_of
     {
     public:
-        typedef  MATRIX<T>           matrix_type;
-        typedef  vector<matrix_type> vector_type;
+        virtual ~matrices_of() throw() {}
 
-        virtual ~tableau_of() throw()
+        inline size_t size() const throw() { return handles.size(); }
+
+        inline matrix_of<T> & operator[](const size_t i) throw()
+        {
+            assert(i>=1);
+            assert(i<=handles.size());
+            return *handles[i];
+        }
+
+        inline const matrix_of<T> & operator[](const size_t i) const throw()
+        {
+            assert(i>=1);
+            assert(i<=handles.size());
+            return *handles[i];
+        }
+
+    protected:
+        inline matrices_of(size_t nm, size_t nr, size_t nc) :
+        handles(nm,as_capacity),
+        count(nm),
+        rows(nr),
+        cols(nc)
         {
 
         }
 
-        //! generic matrices
-        explicit tableau_of(const size_t n,
-                            const size_t nr,
-                            const size_t nc) :
-        vector_type(n,as_capacity)
-        {
-            for(size_t i=1;i<=n;++i)
-            {
-                this->template append<size_t,size_t>(nr,nc);
-            }
-        }
+        typedef shared_ptr< matrix_of<T> > matptr;
+        vector<matptr> handles;
 
     private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(tableau_of);
+        YOCTO_DISABLE_COPY_AND_ASSIGN(matrices_of);
+
+    public:
+        const size_t count;
+        const size_t rows;
+        const size_t cols;
     };
 
 
+    template <
+    typename T,
+    template <typename> class MATRIX>
+    class matrices : public matrices_of<T>
+    {
+    public:
+        virtual ~matrices() throw() {}
+
+        inline explicit matrices(size_t nm,size_t nr,size_t nc) :
+        matrices_of<T>(nm,nr,nc)
+        {
+            for(size_t i=nm;i>0;--i)
+            {
+                this->handles.template append<matrix_of<T> *>( new MATRIX<T>(nr,nc) );
+            }
+        }
+        
+
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(matrices);
+    };
+    
 }
 
 

@@ -25,8 +25,11 @@ namespace yocto
 
     protected:
         explicit matrix_dims() throw();
+        //! 1<=ir<=rows, 1<=ic<=cols
         virtual void *address_of(size_t ir,size_t ic) const throw() = 0;
 
+        //!< 0<it<=items
+        virtual void *address_of(size_t it)           const throw() = 0;
 
     private:
         YOCTO_DISABLE_ASSIGN(matrix_dims);
@@ -39,21 +42,57 @@ namespace yocto
     class matrix_of : public matrix_dims
     {
     public:
+        YOCTO_ARGUMENTS_DECL_T;
+
         inline virtual ~matrix_of() throw() {}
 
-        inline T & operator()(size_t ir,size_t ic) throw()
+        inline type & operator()(size_t ir,size_t ic) throw()
         {
             assert(ir>0);assert(ir<=rows);
             assert(ic>0);assert(ic<=cols);
-            return *(T*) address_of(ir,ic);
+            return *(type*) address_of(ir,ic);
         }
 
-        inline const T & operator()(size_t ir,size_t ic) const throw()
+        inline const_type & operator()(size_t ir,size_t ic) const throw()
         {
             assert(ir>0);assert(ir<=rows);
             assert(ic>0);assert(ic<=cols);
-            return *(const T*) address_of(ir,ic);
+            return *(const_type*) address_of(ir,ic);
         }
+
+        inline type &fetch(size_t it) throw()
+        {
+            assert(it<items);
+            return *(type*) address_of(it);
+        }
+
+        inline const_type &fetch(size_t it) const throw()
+        {
+            assert(it<items);
+            return *(const_type*) address_of(it);
+        }
+
+#define YOCTO_MATRIX_LDZ(I) fetch(I) = __zero
+        inline void ldz()
+        {
+            const_type __zero = xnumeric<mutable_type>::zero();
+            YOCTO_LOOP_FUNC(this->items,YOCTO_MATRIX_LDZ,0);
+        }
+#undef YOCTO_MATRIX_LDZ
+
+#define YOCTO_MATRIX_LD(I) fetch(I) = args
+        inline void ld( param_type args )
+        {
+            YOCTO_LOOP_FUNC(this->items,YOCTO_MATRIX_LD,0);
+        }
+#undef YOCTO_MATRIX_LD
+
+#define YOCTO_MATRIX_NEG(I) fetch(I) = -fetch(I)
+        inline void neg()
+        {
+            YOCTO_LOOP_FUNC(this->items,YOCTO_MATRIX_NEG,0);
+        }
+#undef YOCTO_MATRIX_NEG
 
 
         inline void display( std::ostream &os ) const
@@ -85,6 +124,7 @@ namespace yocto
             M.display(os);
             return os;
         }
+
 
     protected:
         inline explicit matrix_of() throw() : matrix_dims() {}
@@ -236,9 +276,6 @@ memory_kind(MEMORY_KIND)
         }
 
 
-
-
-
         inline virtual ~matrix() throw()
         {
             release();
@@ -323,11 +360,6 @@ memory_kind(MEMORY_KIND)
             swap_cols(i,j);
         }
 
-        inline void ldz()
-        {
-            const_type __zero = xnumeric<mutable_type>::zero();
-            for(size_t i=0;i<this->items;++i) data[i] = __zero;
-        }
 
         inline void ld1()
         {
@@ -343,15 +375,6 @@ memory_kind(MEMORY_KIND)
             }
         }
 
-        inline void ld( param_type args )
-        {
-            for(size_t i=0;i<this->items;++i) data[i] = args;
-        }
-
-        inline void neg()
-        {
-            for(size_t i=0;i<this->items;++i) data[i] = -data[i];
-        }
 
 
 
@@ -444,22 +467,7 @@ memory_kind(MEMORY_KIND)
             indices = 0;
             scalars = 0;
         }
-
-        //! direct access
-        inline type &fetch(size_t indx) throw()
-        {
-            assert(indx<this->items);
-            return data[indx];
-        }
-
-        //! direct access
-        inline const_type &fetch(size_t indx) const throw()
-        {
-            assert(indx<this->items);
-            return data[indx];
-        }
-
-
+        
 
     private:
         mutable_type *data;
@@ -689,6 +697,11 @@ memory_kind(MEMORY_KIND)
             return   (void*)&addr;
         }
 
+        virtual void *address_of(size_t it) const throw()
+        {
+            assert(it<this->items);
+            return data+it;
+        }
 
         //! parametric ctor, no arg
         template <typename U>
