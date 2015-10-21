@@ -18,9 +18,10 @@ YOCTO_UNIT_TEST_IMPL(matrix)
     fd = f2;
 
     matrices<int,matrix> tab(5,12,15);
+    tab.ldz();
     for(size_t i=1;i<=tab.count;++i)
     {
-        tab[i];
+        tab[i].neg();
     }
 }
 YOCTO_UNIT_TEST_DONE()

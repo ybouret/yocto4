@@ -30,6 +30,23 @@ namespace yocto
             return *handles[i];
         }
 
+        inline void ldz()
+        {
+            for(size_t i=1;i<=count;++i)
+            {
+                handles[i]->ldz();
+            }
+        }
+
+        inline void neg()
+        {
+            for(size_t i=1;i<=count;++i)
+            {
+                handles[i]->neg();
+            }
+        }
+
+
     protected:
         inline matrices_of(size_t nm, size_t nr, size_t nc) :
         handles(nm,as_capacity),
@@ -68,6 +85,7 @@ namespace yocto
             {
                 this->handles.template append<matrix_of<T> *>( new MATRIX<T>(nr,nc) );
             }
+            assert(this->handles.size()==this->count);
         }
         
 
