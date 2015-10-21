@@ -48,7 +48,7 @@ namespace yocto
                 return __solve(x,rr);
             }
 
-            //! solve column vectors
+            //! solve column vectors of a matrix
             inline bool solve(matrix<T> &Z)
             {
                 assert(Z.rows>=size());
@@ -304,7 +304,7 @@ namespace yocto
                 return xnumeric<T>::zero();
             }
 
-            virtual bool __solve( array_type &x, const array_type &r) throw()
+            virtual bool __solve( array_type &x, const array_type &r)
             {
                 return kernel::__tridiag<T>::solve_simple(this->a,this->b,this->c,this->g,x,r);
             }
@@ -426,14 +426,14 @@ namespace yocto
                     case -1: return this->c[i];
                     case  0: return this->b[i];
                     case  1: return this->a[i];
-                        
+
                     default:
                         break;
                 }
                 return xnumeric<T>::zero();
             }
 
-            virtual bool __solve( array_type &x, const array_type &r) throw()
+            virtual bool __solve( array_type &x, const array_type &r)
             {
                 return kernel::__tridiag<T>::solve_cyclic(this->a,
                                                           this->b,
@@ -445,7 +445,7 @@ namespace yocto
                                                           x,
                                                           r);
             }
-
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(cTriDiag);

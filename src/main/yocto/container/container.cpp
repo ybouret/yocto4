@@ -38,10 +38,8 @@ namespace yocto
 	
 	void container:: ensure( size_t n )
 	{
-        //std::cerr << "ensure " << n << "/capacity=" << capacity() << std::endl;
 		if( capacity() < n )
         {
-            //std::cerr << "\treserving " << n-capacity() << std::endl;
             reserve(n-capacity());
         }
 	}
