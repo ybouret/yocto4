@@ -3,7 +3,7 @@
 
 #include "yocto/math/m2d.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 
 namespace yocto
 {

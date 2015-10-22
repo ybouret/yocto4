@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_MATRICES_INCLUDED
 #define YOCTO_MATH_MATRICES_INCLUDED 1
 
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ptr/shared.hpp"
 

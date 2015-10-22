@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_CHOLESKY_INCLUDED
 #define YOCTO_MATH_CHOLESKY_INCLUDED 1
 
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 #include "yocto/sequence/lw-array.hpp"
 
 namespace yocto

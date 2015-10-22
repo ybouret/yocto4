@@ -1,4 +1,4 @@
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 
 namespace yocto
 {

@@ -5,7 +5,7 @@
 #include "yocto/chemical/library.hpp"
 #include "yocto/chemical/ode.hpp"
 
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
 #include "yocto/code/rand32.hpp"

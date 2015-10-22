@@ -1,9 +1,9 @@
 #ifndef YOCTO_RXX_COM_INCLUDED
 #define YOCTO_RXX_COM_INCLUDED 1
 
-#include "yocto/math/matrix.hpp"
-#include "yocto/exception.hpp"
+#include "yocto/container/matrix.hpp"
 #include "yocto/sequence/lw-array.hpp"
+#include "yocto/exception.hpp"
 
 #if defined(YOCTO_WIN)
 #undef ERROR

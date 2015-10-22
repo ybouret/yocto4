@@ -3,7 +3,7 @@
 
 #include "yocto/sequence/many-arrays.hpp"
 #include "yocto/xnumeric.hpp"
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 #include "yocto/math/core/tao.hpp"
 #include "yocto/math/core/lu.hpp"
 

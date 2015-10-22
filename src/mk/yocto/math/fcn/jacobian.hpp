@@ -2,7 +2,7 @@
 #define YOCTO_JACOBIAN_INCLUDED 1
 
 #include "yocto/sequence/vector.hpp"
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 #include "yocto/math/types.hpp"
 
 namespace yocto

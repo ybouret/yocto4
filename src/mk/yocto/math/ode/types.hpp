@@ -4,7 +4,7 @@
 #include "yocto/functor.hpp"
 #include "yocto/sequence/many-arrays.hpp"
 #include "yocto/memory/global.hpp"
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 
 namespace yocto
 {

@@ -7,7 +7,7 @@
 #include "yocto/core/list.hpp"
 #include "yocto/sort/quick.hpp"
 #include "yocto/math/v2d.hpp"
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 #include "yocto/code/utils.hpp"
 
 
@@ -33,7 +33,7 @@ namespace yocto
                 const unit_t x,y;
                 YOCTO_MAKE_OBJECT
                 inline coord(const unit_t X, const unit_t Y) throw():
-		next(0),prev(0),
+                next(0),prev(0),
                 x(X), y(Y)
                 {
                 };
@@ -118,7 +118,7 @@ namespace yocto
 
                     // order value
                     co_qsort(val, pos, __compare_decreasing<double>);
-
+                    
                     
                 }
                 

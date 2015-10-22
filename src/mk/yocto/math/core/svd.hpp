@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_SVD_INCLUDED
 #define YOCTO_MATH_SVD_INCLUDED 1
 
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 
 namespace yocto
 {

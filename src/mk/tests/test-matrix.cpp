@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 #include "../../main/tests/support.hpp"
 #include "yocto/hashing/sha1.hpp"
 

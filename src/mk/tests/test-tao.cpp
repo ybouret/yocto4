@@ -2,7 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 
 using namespace yocto;
 using namespace math;

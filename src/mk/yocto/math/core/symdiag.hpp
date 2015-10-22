@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_CORE_SYMDIAG_INCLUDED
 #define YOCTO_MATH_CORE_SYMDIAG_INCLUDED 1
 
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 
 namespace yocto
 {

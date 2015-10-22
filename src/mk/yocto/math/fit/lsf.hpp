@@ -4,7 +4,7 @@
 #include "yocto/counted.hpp"
 #include "yocto/ptr/arc.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/math/matrix.hpp"
+#include "yocto/container/matrix.hpp"
 #include "yocto/math/fcn/drvs.hpp"
 #include "yocto/math/types.hpp"
 

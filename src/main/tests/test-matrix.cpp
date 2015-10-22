@@ -1,4 +1,4 @@
-#include "yocto/math/matrices.hpp"
+#include "yocto/container/matrices.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/string/xnum.hpp"
 
