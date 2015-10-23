@@ -98,7 +98,7 @@ namespace yocto
         inline void display( std::ostream &os ) const
         {
             const matrix_of<T> &self = *this;
-            os << '[' << ' ';
+            os << '[';
             if( rows > 0 )
             {
                 for( size_t i=1; i <rows; ++i )
