@@ -286,18 +286,20 @@ namespace yocto
     }
     
     
-    base64::IO:: IO() throw()
+    base64::base64() throw() :
+    Encoder(),
+    Decoder()
     {
     }
 
-    base64:: IO:: ~IO() throw()
+    base64:: ~base64() throw()
     {
 
     }
 
-    const char base64::IO:: name[] = "base64";
+    const char base64:: name[] = "base64";
 
-    string base64::IO:: Encode(const memory::ro_buffer &buff) const
+    string base64:: Encode(const memory::ro_buffer &buff)
     {
         string ans;
         Encoder.clear();
@@ -314,7 +316,7 @@ namespace yocto
         return ans;
     }
 
-    string base64::IO:: Decode(const memory::ro_buffer &buff) const
+    string base64::Decode(const memory::ro_buffer &buff)
     {
         string ans;
         Decoder.clear();

@@ -19,7 +19,7 @@ static int search_char( const char C, const char *tab )
 YOCTO_UNIT_TEST_IMPL(base64)
 {
     
-    base64::IO &Base64 = base64::IO::instance();
+    base64  &Base64 = base64::instance();
     
     //--------------------------------------------------------------------------
     // generate reverse table

@@ -98,7 +98,7 @@ namespace yocto
 
         string  pattern:: toBase64() const
         {
-            static  const base64::IO &Base64 = base64::IO::instance();
+            static  base64 &Base64 = base64::instance();
 
             const string bin = compiled();
             return Base64.Encode(bin);

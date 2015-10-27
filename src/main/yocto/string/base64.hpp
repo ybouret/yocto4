@@ -7,9 +7,10 @@
 namespace yocto
 {
     
-    struct base64
+    class base64 : public singleton<base64>
     {
-        
+    public:
+
         class common : public pack::q_codec
         {
         public:
@@ -68,26 +69,19 @@ namespace yocto
             void emit();
             YOCTO_DISABLE_COPY_AND_ASSIGN(decoder);
         };
+
+        encoder Encoder;
+        decoder Decoder;
         
-        class IO : public singleton<IO>
-        {
-        public:
-            mutable encoder Encoder;
-            mutable decoder Decoder;
+        string Encode(const memory::ro_buffer &buff);
+        string Decode(const memory::ro_buffer &buff);
 
-            string Encode(const memory::ro_buffer &) const;
-            string Decode(const memory::ro_buffer &) const;
-
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(IO);
-            explicit IO() throw();
-            virtual ~IO() throw();
-            friend class singleton<IO>;
-
-            static const char                 name[];
-            static const threading::longevity life_time=0;
-        };
-
+    private:
+        static const char                 name[];
+        static const threading::longevity life_time=0;
+        friend class singleton<base64>;
+        explicit base64() throw();
+        virtual ~base64() throw();
     };
     
 }

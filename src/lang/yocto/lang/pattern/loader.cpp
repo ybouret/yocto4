@@ -82,7 +82,7 @@ namespace yocto
         
         pattern *pattern:: load64( const memory::ro_buffer &buff )
         {
-            static const base64::IO &Base64 = base64::IO::instance();
+            static base64 &Base64 = base64::instance();
             const string ebin = Base64.Decode(buff);
             return load(ebin);
         }
