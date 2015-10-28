@@ -14,6 +14,7 @@ namespace yocto
             const size_t cores; //!< optimal #cores
 
             explicit split1D(const size_t num_procs,const patch1D &p);
+            explicit split1D(const split1D &other);
             virtual ~split1D() throw();
 
             patch1D operator()(size_t rank) const;

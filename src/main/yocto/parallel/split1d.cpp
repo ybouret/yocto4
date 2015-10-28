@@ -26,6 +26,12 @@ namespace yocto
             return patch1D(start,start+count-1);
         }
 
+
+        split1D:: split1D(const split1D &other) :
+        patch1D(other), cores(other.cores)
+        {
+        }
+
     }
 
 }

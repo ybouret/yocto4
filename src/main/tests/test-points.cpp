@@ -57,6 +57,7 @@ YOCTO_UNIT_TEST_DONE()
 
 
 #include "yocto/parallel/split1d.hpp"
+#include "yocto/parallel/split2d.hpp"
 
 YOCTO_UNIT_TEST_IMPL(splitting)
 {
