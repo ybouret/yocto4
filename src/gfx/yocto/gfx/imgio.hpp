@@ -104,6 +104,19 @@ namespace yocto
                 assert(addr);
                 *(float *)addr = black_and_white<float>(C.r, C.g, C.b);
             }
+            
+            static inline void to_gsu(void *addr, const rgba_t &C, void *) throw()
+            {
+                *(uint8_t *)addr = greyscale<uint8_t>(C.r,C.g, C.b);
+            }
+
+            static inline void to_bwu(void *addr, const rgba_t &C, void *) throw()
+            {
+                *(uint8_t *)addr = black_and_white<uint8_t>(C.r,C.g, C.b);
+            }
+
+
+
 
         };
 
