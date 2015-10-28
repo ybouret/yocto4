@@ -363,7 +363,7 @@ return R_NilValue; }\
             set_R();
         }
 
-        //! create a list for R
+        //! create a list for R, take care of indices...
         RList(const array<const char*> &names) :
         size( check_list_size(names.size()) ),
         L(allocVector(VECSXP,size))
@@ -375,7 +375,7 @@ return R_NilValue; }\
             PROTECT(list_names = allocVector(STRSXP,size));
             for(size_t i = 0; i < size; i++)
             {
-                SET_STRING_ELT(list_names,i,mkChar(names[i]));
+                SET_STRING_ELT(list_names,i,mkChar(names[i+1]));
             }
             setAttrib(L, R_NamesSymbol, list_names);
             UNPROTECT(1);
