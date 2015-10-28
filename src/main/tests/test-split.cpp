@@ -8,11 +8,6 @@
 using namespace yocto;
 using namespace parallel;
 
-namespace
-{
-    struct Box { int start,final,count; };
-}
-
 
 YOCTO_UNIT_TEST_IMPL(split)
 {
@@ -93,6 +88,7 @@ YOCTO_UNIT_TEST_IMPL(split)
 
     }
 
+#if 0
     std::cerr << "Split all at once..." << std::endl;
     for(size_t size=1;size<=10;++size)
     {
@@ -104,6 +100,7 @@ YOCTO_UNIT_TEST_IMPL(split)
             std::cerr << "box[" << i << "] : " << box[i].start << " -> " << box[i].final << ", count=" << box[i].count << std::endl;
         }
     }
+#endif
 
 }
 YOCTO_UNIT_TEST_DONE()

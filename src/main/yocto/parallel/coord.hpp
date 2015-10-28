@@ -1,25 +1,18 @@
 #ifndef YOCTO_PARALLEL_COORD_INCLUDED
 #define YOCTO_PARALLEL_COORD_INCLUDED 1
 
-#include "yocto/math/v3d.hpp"
+#include "yocto/math/point3d.hpp"
 
 namespace yocto
 {
     namespace parallel
     {
 
-        typedef unit_t            coord1D; //!< 1D logical coordinate
-        typedef math::v2d<unit_t> coord2D; //!< 2D logical coordinate
-        typedef math::v3d<unit_t> coord3D; //!< 3D logical coordinate
+        typedef unit_t          coord1D; //!< 1D logical coordinate
+        typedef point2d<unit_t> coord2D; //!< 2D logical coordinate
+        typedef point3d<unit_t> coord3D; //!< 3D logical coordinate
 
-        template <size_t>
-        struct coord_for;
-        template <> struct coord_for<1> { typedef coord1D type; };
-        template <> struct coord_for<2> { typedef coord2D type; };
-        template <> struct coord_for<3> { typedef coord3D type; };
-
-
-
+        
         //! extract coord from compound COORD
         template <typename COORD>
         inline unit_t & __coord( COORD &C, size_t dim ) throw()
