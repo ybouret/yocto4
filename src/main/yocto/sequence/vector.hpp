@@ -459,7 +459,7 @@ item_(addr_-1)
                 memmove( (void*)(target+1), (void*)target, nbytes );
                 try
                 {
-                    new (target) mutable_type( *_cast::from<type>(addr) );
+                    new (target) mutable_type( *_cast::from<mutable_type>(addr) );
                 }
                 catch (...) {
                     memmove( (void*)target, (void*)(target+1), nbytes );
