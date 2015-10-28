@@ -59,22 +59,36 @@ YOCTO_UNIT_TEST_DONE()
 #include "yocto/parallel/split1d.hpp"
 #include "yocto/parallel/split2d.hpp"
 
+using namespace parallel;
+
 YOCTO_UNIT_TEST_IMPL(splitting)
 {
-    parallel::patch1D p1(-10,10);
+    patch1D p1(-10,10);
     std::cerr << "p1=" << p1 << std::endl;
 
     for(size_t cpus=1;cpus<=8;++cpus)
     {
-        std::cerr << "#CPUS=" << cpus << std::endl;
-        parallel::split1D S(cpus,p1);
+        std::cerr << "\t\t#CPUS=" << cpus << std::endl;
+        split1D S(cpus,p1);
         std::cerr << "\tcores=" << S.cores << std::endl;
         for(size_t rank=0;rank<S.cores;++rank)
         {
-            const parallel::patch1D p = S(rank);
+            const patch1D p = S(rank);
             std::cerr << S.cores << "." << rank << " : " << p << std::endl;
         }
     }
+
+    patch2D p2( coord2D(1,1), coord2D(10,5) );
+    std::cerr << "p2=" << p2 << std::endl;
+    for(size_t cpus=1;cpus<=8;++cpus)
+    {
+        std::cerr << "\t\t#CPUS=" << cpus << std::endl;
+        split2D S(cpus,p2);
+        std::cerr << "\tcores  =" << S.cores << std::endl;
+        std::cerr << "\tx_cores=" << S.x_cores << std::endl;
+        std::cerr << "\ty_cores=" << S.y_cores << std::endl;
+    }
+
 
 }
 YOCTO_UNIT_TEST_DONE()
