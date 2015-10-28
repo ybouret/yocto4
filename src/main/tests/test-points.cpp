@@ -54,3 +54,26 @@ YOCTO_UNIT_TEST_IMPL(points)
 
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+#include "yocto/parallel/split1d.hpp"
+
+YOCTO_UNIT_TEST_IMPL(splitting)
+{
+    parallel::patch1D p1(-10,10);
+    std::cerr << "p1=" << p1 << std::endl;
+
+    for(size_t cpus=1;cpus<=8;++cpus)
+    {
+        std::cerr << "#CPUS=" << cpus << std::endl;
+        parallel::split1D S(cpus,p1);
+        std::cerr << "\tcores=" << S.cores << std::endl;
+        for(size_t rank=0;rank<S.cores;++rank)
+        {
+            const parallel::patch1D p = S(rank);
+            std::cerr << S.cores << "." << rank << " : " << p << std::endl;
+        }
+    }
+
+}
+YOCTO_UNIT_TEST_DONE()

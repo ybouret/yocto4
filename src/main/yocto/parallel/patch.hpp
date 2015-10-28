@@ -11,16 +11,16 @@ namespace yocto
     {
 
         //! a cartesian patch, base class
-        class patch
+        class patch_info
         {
         public:
-            virtual ~patch() throw();
+            virtual ~patch_info() throw();
             const size_t dimensions;     //!< 1 | 2 | 3
 
 
         protected:
-            explicit patch(const size_t dim) throw();
-            patch(const patch &) throw();
+            explicit patch_info(const size_t dim) throw();
+            patch_info(const patch_info &) throw();
             
             size_t setup(const void  *lower,
                          const void  *upper,
@@ -28,13 +28,13 @@ namespace yocto
                          const void  *width) throw();
 
         private:
-            YOCTO_DISABLE_ASSIGN(patch);
+            YOCTO_DISABLE_ASSIGN(patch_info);
         };
 
 
 
         template <typename COORD>
-        class patch_of : public patch
+        class patch_of : public patch_info
         {
         public:
             typedef COORD                                         coord;         //!< POD coordinate
@@ -55,16 +55,15 @@ namespace yocto
             /**
              \param lo lower coordinates
              \param up upper coordinates
-             may be empty if hi<lo in some coordinates
              */
             inline  patch_of(const_coord lo,
                              const_coord hi ) throw() :
-            patch( DIMENSIONS ),
+            patch_info( DIMENSIONS ),
             lower( lo ),
             upper( hi ),
             width(),
             pitch(),
-            items( patch::setup( &lower, &upper, &pitch, &width ) )
+            items( patch_info::setup( &lower, &upper, &pitch, &width ) )
             {
 
             }
@@ -73,7 +72,7 @@ namespace yocto
 
             //! copy patch_of
             inline patch_of( const patch_of &other ) throw() :
-            patch( other       ),
+            patch_info( other       ),
             lower( other.lower ),
             upper( other.upper ),
             width( other.width ),
@@ -124,8 +123,7 @@ namespace yocto
                 return has(sub.lower) && has(sub.upper);
             }
 
-            //! helper
-            //inline const patch_of & __layout() const throw() { return *this; }
+
 
         private:
             YOCTO_DISABLE_ASSIGN(patch_of);

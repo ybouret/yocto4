@@ -7,27 +7,27 @@ namespace yocto
     {
 
 
-        patch:: ~patch() throw()
+        patch_info:: ~patch_info() throw()
         {
         }
 
-        patch:: patch(const size_t dim) throw() :
+        patch_info:: patch_info(const size_t dim) throw() :
         dimensions(dim)
         {
             assert(dim==1||dim==2||dim==3);
         }
 
-        patch::patch(const patch &other) throw() :
+        patch_info::patch_info(const patch_info &other) throw() :
         dimensions(other.dimensions)
         {
 
         }
 
 
-        size_t patch:: setup(const void  *lower_addr,
-                             const void  *upper_addr,
-                             const void  *pitch_addr,
-                             const void  *width_addr) throw()
+        size_t patch_info:: setup(const void  *lower_addr,
+                                  const void  *upper_addr,
+                                  const void  *pitch_addr,
+                                  const void  *width_addr) throw()
 
         {
             unit_t *lower = (unit_t *)lower_addr;
