@@ -1,1 +1,0 @@
-#ifndef YOCTO_IMAGE
