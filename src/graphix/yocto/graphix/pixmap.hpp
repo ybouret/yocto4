@@ -3,6 +3,7 @@
 
 #include "yocto/graphix/bitmap.hpp"
 #include "yocto/container/cslot.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -80,6 +81,17 @@ namespace yocto
             {
                 setup_rows();
             }
+
+            inline pixmap(bitmap *bmp) :
+            bitmap(bmp),
+            rmem( h*sizeof(row) ),
+            rows( static_cast<row*>(rmem.data) )
+            {
+                if(sizeof(T)!=depth)
+                    throw exception("pixmap: invalid depth from bitmap!");
+                setup_rows();
+            }
+
 
         private:
             YOCTO_DISABLE_ASSIGN(pixmap);

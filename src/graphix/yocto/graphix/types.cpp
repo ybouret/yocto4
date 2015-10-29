@@ -10,7 +10,7 @@ namespace yocto
 
 #define U(I) (I##.0f)/255.0f
 
-        const float unit_float[256] =
+        const float gist::unit_float[256] =
         {
             U(0),  U(1),  U(2),  U(3),  U(4),  U(5),  U(6),  U(7),  U(8),  U(9),  U(10), U(11), U(12), U(13), U(14), U(15),
             U(16), U(17), U(18), U(19), U(20), U(21), U(22), U(23), U(24), U(25), U(26), U(27), U(28), U(29), U(30), U(31),
