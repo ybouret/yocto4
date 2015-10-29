@@ -6,7 +6,7 @@
 namespace yocto
 {
     
-    namespace gfx
+    namespace graphix
     {
         struct I_TIFF
         {
