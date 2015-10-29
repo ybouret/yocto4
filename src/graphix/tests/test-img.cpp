@@ -25,6 +25,7 @@ namespace
     
 }
 
+#include "yocto/graphix/parallel.hpp"
 
 YOCTO_UNIT_TEST_IMPL(img)
 {
@@ -61,7 +62,9 @@ YOCTO_UNIT_TEST_IMPL(img)
         PNG.save("image1.png",p1,NULL);
         PNG.save("imagef.png",pf,NULL);
 
-
+        vector<patch> subs;
+        prepare_patches(subs, 4, p4, true);
+        
 
     }
     
