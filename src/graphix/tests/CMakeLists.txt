@@ -8,3 +8,5 @@ IF(YOCTO_LINUX)
 ENDIF()
 
 ENABLE_TESTING()
+
+ADD_TEST(Bitmap test-graphix bitmap)
