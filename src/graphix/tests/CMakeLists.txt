@@ -10,3 +10,4 @@ ENDIF()
 ENABLE_TESTING()
 
 ADD_TEST(Bitmap test-graphix bitmap)
+ADD_TEST(Pixmap test-graphix pixmap)

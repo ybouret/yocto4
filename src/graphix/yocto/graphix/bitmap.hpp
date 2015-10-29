@@ -10,7 +10,7 @@ namespace yocto
     namespace graphix
     {
 
-        class bitmap : public counted_object
+        class bitmap : public counted_object, public patch
         {
         public:
             typedef arc_ptr<bitmap> pointer;
@@ -26,8 +26,8 @@ namespace yocto
 
 
             const unit_t      depth;  //!< 1,2,3,4,8 or 16
-            const unit_t      w;      //!< width>0
-            const unit_t      h;      //!< height>0
+            const unit_t      w;      //!< width.x
+            const unit_t      h;      //!< width.y
             const unit_t      pitch;  //!< w*d, length of ascanline in bytes
             const unit_t      stride; //!< bytes to get to next line, stride>=pitch
             void             *entry;  //!< address or first item

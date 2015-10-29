@@ -114,9 +114,10 @@ namespace yocto
 
 
         bitmap:: bitmap(const unit_t D, const unit_t W, const unit_t H) :
+        patch( vertex(0,0), vertex(check_w(W)-1,check_h(H)-1)),
         depth( check_d(D) ),
-        w(     check_w(W) ),
-        h(     check_h(H) ),
+        w( width.x ),
+        h( width.y ),
         pitch(w*depth),
         stride(pitch),
         entry(0),

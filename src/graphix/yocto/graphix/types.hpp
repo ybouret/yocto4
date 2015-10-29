@@ -8,8 +8,8 @@ namespace yocto
 {
     namespace graphix
     {
-        typedef point2d<unit_t> vertex;
-        
+        typedef point2d<unit_t>   vertex; //!< base class for operations
+        typedef parallel::patch2D patch;  //!< base class for patches
     }
 }
 

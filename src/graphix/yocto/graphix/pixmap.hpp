@@ -1,0 +1,81 @@
+#ifndef YOCTO_GRAPHIX_PIXMAP_INCLUDED
+#define YOCTO_GRAPHIX_PIXMAP_INCLUDED 1
+
+#include "yocto/graphix/bitmap.hpp"
+#include "yocto/container/cslot.hpp"
+
+namespace yocto
+{
+    namespace graphix
+    {
+
+        template <typename T>
+        class pixmap : public bitmap
+        {
+        public:
+            class row
+            {
+            public:
+                inline row(size_t W,void *P) throw() : w(W), p(static_cast<T*>(P)) {}
+
+                inline T &operator[](unit_t i) throw()
+                { assert(i>=0); assert(i<w); return p[i]; }
+
+                inline const T &operator[](unit_t i) const throw()
+                { assert(i>=0); assert(i<w); return p[i]; }
+
+                const size_t w;
+
+            private:
+                T          *p;
+                YOCTO_DISABLE_COPY_AND_ASSIGN(row);
+                ~row() throw();
+            };
+
+
+            virtual ~pixmap() throw()
+            {
+            }
+
+
+            inline pixmap(size_t W,size_t H) :
+            bitmap( sizeof(T), W,H ),
+            rmem( H*sizeof(row) ),
+            rows( static_cast<row*>(rmem.data) )
+            {
+                setup_rows();
+            }
+
+            inline row &operator[](const unit_t j) throw()
+            {
+                assert(j>=0);
+                assert(j<h);
+                return rows[j];
+            }
+
+            inline const row &operator[](const unit_t j) const throw()
+            {
+                assert(j>=0);
+                assert(j<h);
+                return rows[j];
+            }
+
+        private:
+            YOCTO_DISABLE_ASSIGN(pixmap);
+            cslot  rmem;
+            row   *rows;
+
+            inline void setup_rows() throw()
+            {
+                for(unit_t j=0;j<h;++j)
+                {
+                    new (rows+j) row(w,get_line(j));
+                }
+            }
+        };
+
+    }
+}
+
+#endif
+
