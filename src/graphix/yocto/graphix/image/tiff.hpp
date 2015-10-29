@@ -20,8 +20,7 @@ namespace yocto
 
             virtual bitmap  *load(const string          &filename,
                                   unit_t                 depth,
-                                  image::put_rgba_proc   proc,
-                                  void                  *args,
+                                  rgba2data             &proc,
                                   const void            *options) const;
             
             virtual void     save(const string        &filename,
@@ -35,8 +34,7 @@ namespace yocto
 
             bitmap *load_bitmap(const string          &filename,
                                 unit_t                 depth,
-                                image::put_rgba_proc   proc,
-                                void                  *args,
+                                rgba2data             &proc,
                                 const uint32_t         indx) const;
 
         private:

@@ -85,12 +85,10 @@ namespace yocto
         
         bitmap  *png_format:: load(const string          &filename,
                                    unit_t                 depth,
-                                   image::put_rgba_proc   proc,
-                                   void                  *args,
+                                   rgba2data             &proc,
                                    const void            *) const
         {
             static const char fn[] = "png::load";
-            assert(proc);
             YOCTO_GIANT_LOCK();
             
             //__________________________________________________________________
@@ -226,16 +224,16 @@ namespace yocto
                     {
                         case 1: {
                             const RGBA C(q[0],q[0],q[0],0xff);
-                            proc(p,C,args); }
+                            proc(p,C); }
                             break;
                         case 3: {
                             const RGBA C( q[0], q[1], q[2], 0xff);
-                            proc(p,C,args); }
+                            proc(p,C); }
                             break;
                             
                         case 4: {
                             const RGBA C( q[0], q[1], q[2], q[3]);
-                            proc(p,C,args); }
+                            proc(p,C); }
                             break;
                             
                         default:

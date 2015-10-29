@@ -90,14 +90,38 @@ namespace yocto
         
         bitmap *image::load(const string         &path,
                             unit_t                depth,
-                            image::put_rgba_proc  proc,
-                            void                 *args,
+                            rgba2data            &proc,
                             const void           *options) const
         {
             const format &fmt = get_format_for(path);
-            return fmt.load(path, depth, proc, args, options);
+            return fmt.load(path, depth, proc, options);
         }
         
+        
+        bitmap *image:: load4(const string &path, const void *options) const
+        {
+            put_rgba proc;
+            return load(path,4,proc,options);
+        }
+        
+        bitmap *image:: load3(const string &path, const void *options) const
+        {
+            put_rgb proc;
+            return load(path,3,proc,options);
+        }
+        
+        
+        bitmap *image:: loadf(const string &path, const void *options) const
+        {
+            put_gsf proc;
+            return load(path,4,proc,options);
+        }
+        
+        bitmap *image:: load1(const string &path, const void *options) const
+        {
+            put_gsu proc;
+            return load(path,1,proc,options);
+        }
     }
     
 }

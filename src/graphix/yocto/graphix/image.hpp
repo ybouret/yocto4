@@ -2,8 +2,7 @@
 #define YOCTO_GFX_IMAGE_INCLUDED 1
 
 #include "yocto/graphix/bitmap.hpp"
-#include "yocto/graphix/rgb.hpp"
-//#include "yocto/gfx/imgio.hpp"
+#include "yocto/graphix/rgba2data.hpp"
 
 #include "yocto/ptr/intr.hpp"
 #include "yocto/associative/set.hpp"
@@ -18,7 +17,6 @@ namespace yocto
         class image : public singleton<image>
         {
         public:
-            typedef void   (*put_rgba_proc)(void *addr, const RGBA &C, void *args);
             typedef RGBA   (*get_rgba_proc)(const void *, void *);
 
 
@@ -33,8 +31,7 @@ namespace yocto
                 virtual bool     lossless() const throw() = 0;
                 virtual bitmap  *load(const string         &filename,
                                       unit_t                depth,
-                                      image::put_rgba_proc  proc,
-                                      void                 *args,
+                                      rgba2data            &proc,
                                       const void           *options) const = 0;
 
                 virtual void     save(const string        &filename,
@@ -66,10 +63,15 @@ namespace yocto
             // find someone for the extension
             bitmap *load(const string         &path,
                          unit_t                depth,
-                         image::put_rgba_proc  proc,
-                         void                 *args,
+                         rgba2data            &proc,
                          const void           *options) const;
             
+            
+            bitmap *load4(const string &path, const void *options) const;
+            bitmap *load3(const string &path, const void *options) const;
+            bitmap *loadf(const string &path, const void *options) const;
+            bitmap *load1(const string &path, const void *options) const;
+
         private:
             explicit image();
             virtual ~image() throw();

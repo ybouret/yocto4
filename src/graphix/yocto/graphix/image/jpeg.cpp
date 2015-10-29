@@ -72,12 +72,10 @@ namespace yocto
         
         bitmap  * jpeg_format:: load(const string         &filename,
                                      unit_t                depth,
-                                     image::put_rgba_proc  proc,
-                                     void                  *args,
+                                     rgba2data            &proc,
                                      const void           *) const
         {
             static const char fn[] = "jpeg::load";
-            assert(proc);
             YOCTO_GIANT_LOCK();
             
             ios::icstream                 fp(filename);
@@ -172,7 +170,7 @@ namespace yocto
                         const unit_t   i3 = 3*i;
                         const JSAMPLE *b  = &buffer[i3];
                         const RGBA    C(b[0],b[1],b[2],0xff);
-                        proc(p,C,args);
+                        proc(p,C);
                         p += depth;
                     }
                     --j;

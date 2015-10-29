@@ -23,20 +23,27 @@ namespace yocto
             virtual void put(void *addr,const RGBA &c) = 0;
         };
 
-#define YOCTO_GRAPHIX_RGBA2DATA(CLASS,CODE) \
-class CLASS : public rgba2data {       \
-public:\
-inline explicit CLASS() throw() : rgba2data() {}\
-inline virtual ~CLASS() throw() {} \
-\
-private:\
-YOCTO_DISABLE_COPY_AND_ASSIGN(CLASS);\
-virtual void put(void *addr,const RGBA &C) { CODE; }\
+#define YOCTO_GRAPHIX_RGBA2DATA(CLASS,CODE)          \
+class CLASS : public rgba2data {                     \
+public:                                              \
+inline explicit CLASS() throw() : rgba2data() {}     \
+inline virtual ~CLASS() throw() {}                   \
+private:                                             \
+YOCTO_DISABLE_COPY_AND_ASSIGN(CLASS);                \
+virtual void put(void *addr,const RGBA &C) { CODE; } \
 }
 
         //! for pixmap4
         YOCTO_GRAPHIX_RGBA2DATA(put_rgba,*(RGBA *)addr=C);
 
+        //! for pixmap3
+        YOCTO_GRAPHIX_RGBA2DATA(put_rgb,new (addr) RGB(C.r,C.g,C.b));
+        
+        //! for pixmapf, greyscale
+        YOCTO_GRAPHIX_RGBA2DATA(put_gsf,new (addr)  float(   gist::greyscalef(C.r, C.g, C.b)));
+        
+        //! for pixmap1, greyscale
+         YOCTO_GRAPHIX_RGBA2DATA(put_gsu,new (addr) uint8_t( gist::greyscale1(C.r, C.g, C.b)));
     }
 }
 
