@@ -8,11 +8,11 @@ namespace yocto
 {
     namespace graphix
     {
-        typedef pixmap<uint8>  pixmap1;
-        typedef pixmap<float>  pixmapf;
-        typedef pixmap<double> pixmapd;
-        typedef pixmap<RBG>    pixmap3;
-        typedef pixmap<RGBA>   pixmap4;
+        typedef pixmap<uint8_t>  pixmap1;
+        typedef pixmap<float>    pixmapf;
+        typedef pixmap<double>   pixmapd;
+        typedef pixmap<RGB>      pixmap3;
+        typedef pixmap<RGBA>     pixmap4;
         
     }
 }

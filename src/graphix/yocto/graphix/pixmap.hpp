@@ -88,7 +88,7 @@ namespace yocto
             rows( static_cast<row*>(rmem.data) )
             {
                 if(sizeof(T)!=depth)
-                    throw exception("pixmap: invalid depth from bitmap!");
+                    throw exception("pixmap: invalid depth=%ld from bitmap, expecting %u!", long(depth), unsigned(sizeof(T)));
                 setup_rows();
             }
 
