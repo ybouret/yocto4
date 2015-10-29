@@ -87,6 +87,9 @@ namespace yocto
     
 }
 
+YOCTO_SUPPORT_C_STYLE_OPS(point3d<float>);
+YOCTO_SUPPORT_C_STYLE_OPS(point3d<double>);
+YOCTO_SUPPORT_C_STYLE_OPS(point3d<unit_t>);
 
 #endif
 

@@ -1,7 +1,7 @@
 #ifndef YOCTO_GRAPHIX_BITMAP_INCLUDED
 #define YOCTO_GRAPHIX_BITMAP_INCLUDED 1
 
-#include "yocto/graphix/types.hpp"
+#include "yocto/graphix/rectangle.hpp"
 #include "yocto/counted-object.hpp"
 #include "yocto/ptr/arc.hpp"
 
@@ -37,6 +37,16 @@ namespace yocto
             //! allocate a bitmap
             explicit bitmap(const unit_t D, const unit_t W, const unit_t H);
 
+            //! hard copy a bitmap
+            bitmap(const bitmap &bmp, const patch *area);
+
+            //! soft copy, shared data
+            bitmap(const bitmap::pointer &bmp, const patch *area);
+
+            //! map usr data
+            bitmap(void *data, const unit_t D, const unit_t W, const unit_t H, const unit_t S );
+
+
             //! clean memory
             virtual ~bitmap() throw();
             
@@ -60,7 +70,7 @@ namespace yocto
             void ldz() throw();
 
         private:
-            YOCTO_DISABLE_ASSIGN(bitmap);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(bitmap);
             union
             {
                 size_t  allocated; //!< for global data

@@ -40,7 +40,7 @@ namespace yocto
 
             inline pixmap(size_t W,size_t H) :
             bitmap( sizeof(T), W,H ),
-            rmem( H*sizeof(row) ),
+            rmem( h*sizeof(row) ),
             rows( static_cast<row*>(rmem.data) )
             {
                 setup_rows();
@@ -58,6 +58,14 @@ namespace yocto
                 assert(j>=0);
                 assert(j<h);
                 return rows[j];
+            }
+
+            inline pixmap( const pixmap &other, const patch *area) :
+            bitmap(other,area),
+            rmem( h*sizeof(row) ),
+            rows( static_cast<row*>(rmem.data) )
+            {
+                setup_rows();
             }
 
         private:
