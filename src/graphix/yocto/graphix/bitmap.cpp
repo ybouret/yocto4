@@ -1,6 +1,9 @@
 #include "yocto/graphix/bitmap.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/error.hpp"
+
 #include <cstdlib>
+#include <cerrno>
 
 namespace yocto
 {
@@ -191,76 +194,124 @@ namespace yocto
         }
 
         // hard copy
-        bitmap:: bitmap(const bitmap &bmp, const patch *area) :
-        patch( area ? *area : *this ),
+        bitmap:: bitmap(const bitmap &bmp) :
+        patch( bmp ),
         depth( bmp.depth ),
-        w(area?area->width.x : bmp.w),
-        h(area?area->width.y : bmp.h),
-        pitch(w*depth),
-        stride(pitch),
+        w(bmp.w),
+        h(bmp.h),
+        pitch(bmp.pitch),
+        stride(bmp.stride),
         entry(0),
         model(memory_is_global),
-        xshift(get_xshift(depth))
+        xshift(bmp.xshift)
         {
-            // check area
-            if(area)
-            {
-                if(!bmp.contains(*area))
-                {
-                    throw exception("bitmap: invalid area for hard copy");
-                }
-            }
 
             // allocate memory
             allocated = pitch*h;
             entry     = memory::kind<memory::global>::acquire(allocated);
 
+            // copy
+            copy(bmp);
+
+        }
+
+        // hard copy
+        bitmap:: bitmap(const bitmap &bmp, const patch &area) :
+        patch( vertex(0,0), vertex(area.width.x-1,area.width.y-1) ),
+        depth( bmp.depth ),
+        w(width.x),
+        h(width.y),
+        pitch(w*depth),
+        stride(pitch),
+        entry(0),
+        model(memory_is_global),
+        xshift(bmp.xshift)
+        {
+
+            // allocate memory
+            allocated = pitch*h;
+            entry     = memory::kind<memory::global>::acquire(allocated);
+
+            // copy
             const size_t   tgt_stride = stride;
             const size_t   src_stride = bmp.stride;
             uint8_t       *tgt_entry  = static_cast<uint8_t *>(entry);
-            const uint8_t *src_entry  = static_cast<const uint8_t *>( area ? bmp.get(area->lower.x,area->lower.y) : bmp.entry );
+            const uint8_t *src_entry  = static_cast<const uint8_t *>( bmp.get(area.lower) );
 
             for(unit_t j=0;j<h;++j,tgt_entry+=tgt_stride,src_entry+=src_stride)
             {
                 memcpy(tgt_entry, src_entry, pitch);
             }
+            
+        }
 
+        static inline bitmap *__check(bitmap *bmp) throw()
+        {
+            if(!bmp)
+            {
+                libc::critical_error(ENOMEM, "bitmap shared copy");
+            }
+            return bmp;
+        }
+
+        bitmap:: bitmap(bitmap *bmp) throw() :
+        patch( * __check(bmp) ),
+        depth(bmp->depth),
+        w(bmp->w),
+        h(bmp->h),
+        pitch(bmp->pitch),
+        stride(bmp->stride),
+        entry(bmp->entry),
+        model(memory_is_shared),
+        xshift(bmp->xshift)
+        {
+            shared = bmp;
+            shared->withhold();
         }
 
 
 
+
         //! soft copy, shared data
-        bitmap:: bitmap(const bitmap::pointer &bmp, const patch *area) :
-        patch( area ? *area : *this ),
-        depth( bmp->depth ),
-        w(area?area->width.x : bmp->w),
-        h(area?area->width.y : bmp->h),
+        bitmap:: bitmap(bitmap *bmp, const patch &area) :
+        patch( vertex(0,0), vertex(area.width.x-1,area.width.y-1) ),
+        depth( __check(bmp)->depth ),
+        w(width.x),
+        h(width.y),
         pitch(w*depth),
         stride(bmp->stride),
         entry(0),
         model(memory_is_shared),
         xshift(get_xshift(depth))
         {
-            // check area
-            if(area)
-            {
-                if(!bmp->contains(*area))
-                {
-                    throw exception("bitmap: invalid area for shared copy");
-                }
-            }
 
-            if(area)
+            if(!bmp->contains(area))
             {
-                entry = (void*)(bmp->get(area->lower.x,area->lower.y));
+                if(bmp->liberate()) delete bmp;
+                throw exception("bitmap: shared copy invalid area");
             }
-            else
-            {
-                entry = bmp->entry;
-            }
-
-            shared = (bitmap *)(bmp.__get());
+            entry = bmp->get(area.lower);
+      
+            shared = bmp;
             shared->withhold();
+
+        }
+
+        void bitmap:: copy(const bitmap &src) throw()
+        {
+            assert(src.w==w);
+            assert(src.h==h);
+            assert(src.stride==stride);
+
+            const size_t   tgt_stride = stride;
+            const size_t   src_stride = src.stride;
+            uint8_t       *tgt_entry  = static_cast<uint8_t *>(entry);
+            const uint8_t *src_entry  = static_cast<const uint8_t *>( src.entry );
+
+            for(unit_t j=0;j<h;++j,tgt_entry+=tgt_stride,src_entry+=src_stride)
+            {
+                memcpy(tgt_entry, src_entry, pitch);
+            }
 
         }
 

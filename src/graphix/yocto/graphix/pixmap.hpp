@@ -9,6 +9,10 @@ namespace yocto
     namespace graphix
     {
 
+        //______________________________________________________________________
+        //
+        // a structure of pixels over bitmaps
+        //______________________________________________________________________
         template <typename T>
         class pixmap : public bitmap
         {
@@ -39,7 +43,7 @@ namespace yocto
 
 
             inline pixmap(size_t W,size_t H) :
-            bitmap( sizeof(T), W,H ),
+            bitmap( sizeof(T),W,H ),
             rmem( h*sizeof(row) ),
             rows( static_cast<row*>(rmem.data) )
             {
@@ -60,7 +64,16 @@ namespace yocto
                 return rows[j];
             }
 
-            inline pixmap( const pixmap &other, const patch *area) :
+
+            inline pixmap( const pixmap &other ) :
+            bitmap(other),
+            rmem( h*sizeof(row) ),
+            rows( static_cast<row*>(rmem.data) )
+            {
+                setup_rows();
+            }
+
+            inline pixmap(const pixmap &other, const patch &area) :
             bitmap(other,area),
             rmem( h*sizeof(row) ),
             rows( static_cast<row*>(rmem.data) )
