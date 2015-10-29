@@ -15,11 +15,11 @@ namespace yocto
         {
         public:
             virtual ~patch_info() throw();
-            const size_t dimensions;     //!< 1 | 2 | 3
+            const size_t dim;     //!< 1 | 2 | 3
 
 
         protected:
-            explicit patch_info(const size_t dim) throw();
+            explicit patch_info(const size_t d) throw();
             patch_info(const patch_info &) throw();
             
             size_t setup(const void  *lower,
@@ -42,7 +42,7 @@ namespace yocto
             typedef typename  type_traits<COORD>::parameter_type  param_coord;   //!< coordinate as parameter
 
             //! #COORD = 1|2|3
-            static const size_t DIMENSIONS = sizeof(COORD)/sizeof(unit_t);
+            static const size_t DIM = sizeof(COORD)/sizeof(unit_t);
 
             const_coord   lower; //!< lower coordinate
             const_coord   upper; //!< upper coordinate
@@ -58,7 +58,7 @@ namespace yocto
              */
             inline  patch_of(const_coord lo,
                              const_coord hi ) throw() :
-            patch_info( DIMENSIONS ),
+            patch_info( DIM ),
             lower( lo ),
             upper( hi ),
             width(),
@@ -84,7 +84,7 @@ namespace yocto
             inline unit_t offset_of( param_coord c ) const throw()
             {
                 unit_t ans = __coord(c,0) - __coord(lower,0);
-                for( size_t i=1; i < DIMENSIONS; ++i )
+                for( size_t i=1; i < DIM; ++i )
                     ans += __coord(pitch,i) * ( __coord(c,i) - __coord(lower,i) );
                 return ans;
             }
@@ -108,7 +108,7 @@ namespace yocto
             //! contains coord ?
             inline bool has( param_coord c ) const throw()
             {
-                for(size_t dim=0;dim<DIMENSIONS;++dim)
+                for(size_t dim=0;dim<DIM;++dim)
                 {
                     const unit_t u = __coord(c,dim);
                     if( u < __coord(lower,dim) || __coord(upper,dim) < u )

@@ -23,7 +23,7 @@ namespace yocto
                            const PATCH_TYPE     &zone)
         {
             assert(patches.is_empty());
-            typename split_for<PATCH_TYPE::DIMENSIONS>::type splitter(cpus,zone);
+            typename split_for<PATCH_TYPE::DIM>::type splitter(cpus,zone);
             patches.resize_empty_to(splitter.cores);
             for(register size_t rank=0;rank<splitter.cores;++rank)
             {

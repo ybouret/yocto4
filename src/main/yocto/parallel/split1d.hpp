@@ -11,6 +11,8 @@ namespace yocto
         class split1D : public patch1D
         {
         public:
+            typedef patch1D patch_type;
+
             const size_t cores; //!< optimal #cores
 
             explicit split1D(const size_t num_procs,const patch1D &p);

@@ -11,6 +11,8 @@ namespace yocto
         class split2D : public patch2D
         {
         public:
+            typedef patch2D patch_type;
+
             const size_t cores;
             const size_t x_cores;
             const size_t y_cores;

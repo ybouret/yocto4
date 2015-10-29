@@ -11,14 +11,14 @@ namespace yocto
         {
         }
 
-        patch_info:: patch_info(const size_t dim) throw() :
-        dimensions(dim)
+        patch_info:: patch_info(const size_t d) throw() :
+        dim(d)
         {
             assert(dim==1||dim==2||dim==3);
         }
 
         patch_info::patch_info(const patch_info &other) throw() :
-        dimensions(other.dimensions)
+        dim(other.dim)
         {
 
         }
@@ -36,7 +36,7 @@ namespace yocto
             unit_t *pitch = (unit_t *)pitch_addr;
 
             size_t ans   = 1;
-            for( size_t i=0; i < dimensions; ++i )
+            for( size_t i=0; i < dim; ++i )
             {
                 unit_t &L = lower[i];
                 unit_t &U = upper[i];
@@ -48,7 +48,7 @@ namespace yocto
 
             assert(ans>0);
             pitch[0] = 1;
-            for( size_t i=1;i<dimensions; ++i )
+            for( size_t i=1;i<dim; ++i )
             {
                 pitch[i] = pitch[i-1] * width[i-1];
             }
