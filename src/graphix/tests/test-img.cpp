@@ -56,6 +56,11 @@ YOCTO_UNIT_TEST_IMPL(img)
         std::cerr << "Loading FLOAT" << std::endl;
         pixmapf pf( IMG.loadf(filename, NULL));
 
+        PNG.save("image4.png",p4,NULL);
+        PNG.save("image3.png",p3,NULL);
+        PNG.save("image1.png",p1,NULL);
+        PNG.save("imagef.png",pf,NULL);
+
 
 
     }
