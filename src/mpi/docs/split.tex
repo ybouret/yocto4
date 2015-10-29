@@ -78,6 +78,53 @@ The discriminant of the left side is
 
 \section{Finding Out}
 We use integer values.
+We define the timings relative to the cost of per item computation.
+$$ 
+	\Theta_0 = L_x \times L_y
+$$
+Assuming that we gain something by splitting in the largest direction $u$, so that the communication time is proportional
+to $L_v$ with a factor $\beta$ such that
+$$
+	\Theta_u = \dfrac{\Theta_0}{2} + \beta  L_v \leq \Theta_0
+$$
+we obtain a maximal communication rate
+$$
+	\beta \leq \dfrac{\Theta_0}{2L_v}.
+$$
+
+Let us have $N_{cpu}$ on with we can dispatch the computation.
+Then we have
+$$
+	N_{x} = \min\left(L_x,N_{cpu}\right), \; N_y = \min\left(L_y,N_{cpu}\right)
+$$
+So we initialise the algorithm with the maximum number of cores $N_u$ in the $u$ direction (with may be less than the the number of processors...).
+And we have the initial minimal time
+$$
+	\Theta_{min} = \dfrac{\Theta_0}{N_u} + \beta L_v =  \dfrac{\Theta_0}{N_u} + \dfrac{\Theta_0}{2} = \dfrac{\left(2N_u+1\right)\Theta_0}{2N_u}.
+$$
+Hence, we initialize $\Theta_{num}=\left(2N_u+1\right)$ and $\Theta_{den}=2N_u$.
+Then
+\begin{itemize}
+	\item for all $2\leq p_x \leq N_x$
+	\begin{itemize}
+	\item for all $2\leq p_y \leq N_y$
+	\item if $p=p_x \times p_y>N_{cpu}$ then break...
+	\item The time per core is
+		$$
+			\Theta_{xy} = \dfrac{\Theta_0}{p} + \beta\left(\dfrac{L_x}{p_x}+\dfrac{L_y}{p_y}\right)
+		$$
+		or
+		$$
+			\Theta_{xy} = \dfrac{2\Theta_0+2\beta\left(p_y L_x + p_x L_y\right)}{2p}
+		$$
+		and
+		$$
+			\Theta_{xy} = \dfrac{\Theta_0 \left(2L_v + p_y L_x + p_x L_y\right)}{2pL_v}
+		$$
+	\item done $p_y$
+	\end{itemize}
+	\item done $p_x$
+\end{itemize}
 
 \end{document}
 

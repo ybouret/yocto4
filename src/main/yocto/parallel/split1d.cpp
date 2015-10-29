@@ -17,7 +17,7 @@ namespace yocto
             
         }
 
-        patch1D split1D:: operator()(size_t rank) const
+        patch1D split1D:: operator()(size_t rank) const throw()
         {
             assert(rank<cores);
             unit_t start = lower;

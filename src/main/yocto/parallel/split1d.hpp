@@ -17,7 +17,7 @@ namespace yocto
             explicit split1D(const split1D &other);
             virtual ~split1D() throw();
 
-            patch1D operator()(size_t rank) const;
+            patch1D operator()(size_t rank) const throw();
 
         private:
             YOCTO_DISABLE_ASSIGN(split1D);

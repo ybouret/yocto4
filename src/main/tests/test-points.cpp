@@ -87,6 +87,11 @@ YOCTO_UNIT_TEST_IMPL(splitting)
         std::cerr << "\tcores  =" << S.cores << std::endl;
         std::cerr << "\tx_cores=" << S.x_cores << std::endl;
         std::cerr << "\ty_cores=" << S.y_cores << std::endl;
+        for(size_t rank=0;rank<S.cores;++rank)
+        {
+            const patch2D p = S(rank);
+            std::cerr << S.cores << "." << rank << " : " << p << std::endl;
+        }
     }
 
 

@@ -18,6 +18,8 @@ namespace yocto
             explicit split2D(const size_t num_procs, const patch2D &p);
             virtual ~split2D() throw();
 
+            patch2D operator()(size_t rank) const throw();
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(split2D);
 
