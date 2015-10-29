@@ -1,8 +1,9 @@
 #ifndef YOCTO_GFX_IMAGE_INCLUDED
 #define YOCTO_GFX_IMAGE_INCLUDED 1
 
-#include "yocto/graphix/bitmap.hpp"
+#include "yocto/graphix/rawpix.hpp"
 #include "yocto/graphix/rgba2data.hpp"
+#include "yocto/graphix/data2rgba.hpp"
 
 #include "yocto/ptr/intr.hpp"
 #include "yocto/associative/set.hpp"
@@ -17,17 +18,22 @@ namespace yocto
         class image : public singleton<image>
         {
         public:
-            typedef RGBA   (*get_rgba_proc)(const void *, void *);
-
 
             //! image format
             class format : public counted_object
             {
             public:
+                typedef intr_ptr<string,format> pointer;
+                typedef set<string,pointer>     db;
+
                 const string name;
 
                 virtual ~format() throw();
 
+                //______________________________________________________________
+                //
+                // virtual interface
+                //______________________________________________________________
                 virtual bool     lossless() const throw() = 0;
                 virtual bitmap  *load(const string         &filename,
                                       unit_t                depth,
@@ -36,18 +42,24 @@ namespace yocto
 
                 virtual void     save(const string        &filename,
                                       const bitmap        &bmp,
-                                      image::get_rgba_proc proc,
-                                      void                *args,
+                                      data2rgba           &proc,
                                       const void          *options) const = 0;
 
                 virtual const char **extensions() const throw() = 0;
-
-
+               
                 const string & key() const throw();
 
-                typedef intr_ptr<string,format> pointer;
-                typedef set<string,pointer>     db;
+               
+                //______________________________________________________________
+                //
+                // Non virtual interface
+                //______________________________________________________________
+                void save(const string &filename, const pixmap4 &bmp, const char *options) const;
+                void save(const string &filename, const pixmap3 &bmp, const char *options) const;
+                void save(const string &filename, const pixmap1 &bmp, const char *options) const;
+                void save(const string &filename, const pixmapf &bmp, const char *options) const;
 
+                
             protected:
                 explicit format(const char *id);
 

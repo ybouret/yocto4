@@ -198,12 +198,10 @@ namespace yocto
         
         void jpeg_format:: save(const string        &filename,
                                 const bitmap        &bmp,
-                                image::get_rgba_proc proc,
-                                void                  *args,
+                                data2rgba           &proc,
                                 const void          *options) const
         {
             static const char fn[] = "jpeg::save";
-            assert(proc);
             YOCTO_GIANT_LOCK();
             
             ios::ocstream fp(filename,false);
@@ -298,7 +296,7 @@ namespace yocto
                     for(unit_t i=0;i<width;++i)
                     {
                         JSAMPLE       *b  = &buffer[3*i];
-                        const RGBA     C  = proc(p,args);
+                        const RGBA     C  = proc(p);
                         b[0] = C.r;
                         b[1] = C.g;
                         b[2] = C.b;

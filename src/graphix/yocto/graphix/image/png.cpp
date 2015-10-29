@@ -254,8 +254,7 @@ namespace yocto
         
         void png_format:: save(const string        &filename,
                                const bitmap        &bmp,
-                               image::get_rgba_proc proc,
-                               void                *args,
+                               data2rgba           &proc,
                                const void          *options) const
         {
             static const char fn[] = "png::save";
@@ -363,7 +362,7 @@ namespace yocto
                 png_byte      *q = mem.rows[j];
                 for(unit_t i=0;i<width;++i, p+=depth, q += num_channels)
                 {
-                    const RGBA C = proc(p,args);
+                    const RGBA C = proc(p);
                     q[0] = C.r;
                     q[1] = C.g;
                     q[2] = C.b;

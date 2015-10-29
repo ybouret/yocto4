@@ -152,8 +152,7 @@ namespace yocto
         
         void tiff_format:: save(const string        &filename,
                                 const bitmap        &bmp,
-                                image::get_rgba_proc proc,
-                                void                  *args,
+                                data2rgba           &proc,
                                 const void          *options) const
         {
             

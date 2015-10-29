@@ -88,6 +88,33 @@ namespace yocto
             throw exception("no format may load '%s'", ext.c_str());
         }
         
+        void image::format::save(const string &filename, const pixmap4 &bmp,const char *options) const
+        {
+            get_rgba proc;
+            save(filename,bmp,proc,options);
+        }
+        
+
+        void image::format::save(const string &filename, const pixmap3 &bmp,const char *options) const
+        {
+            get_rgb proc;
+            save(filename,bmp,proc,options);
+        }
+        
+        void image::format::save(const string &filename, const pixmap1 &bmp,const char *options) const
+        {
+            get_gsu proc;
+            save(filename,bmp,proc,options);
+        }
+        
+        void image::format::save(const string &filename, const pixmapf &bmp,const char *options) const
+        {
+            get_gsf proc;
+            save(filename,bmp,proc,options);
+        }
+
+        
+        
         bitmap *image::load(const string         &path,
                             unit_t                depth,
                             rgba2data            &proc,
