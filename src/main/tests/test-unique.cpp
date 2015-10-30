@@ -19,7 +19,7 @@ YOCTO_UNIT_TEST_IMPL(unique)
     }
     
     std::cerr << "a1=" << a << std::endl;
-    hsort(a,__compare<int>);
+    quicksort(a,__compare<int>);
     std::cerr << "a2=" << a << std::endl;
     unique(a, __compare<int> );
     std::cerr << "a3=" << a << std::endl;

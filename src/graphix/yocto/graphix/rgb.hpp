@@ -61,7 +61,8 @@ namespace yocto
         //______________________________________________________________________
         template <typename T> bool    is_zero_pixel(const T&) throw();
         template <typename T> uint8_t project(const T&) throw();
-        
+        template <typename T> T       invert_color(const T&) throw();
+
     }
     
 }

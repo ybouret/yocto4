@@ -90,4 +90,32 @@ namespace yocto
 
 }
 
+namespace yocto
+{
+    namespace graphix
+    {
+        template <> uint8_t invert_color<uint8_t>(const uint8_t &c) throw()
+        {
+            return 255-c;
+        }
+
+        template <> float invert_color<float>(const float &c) throw()
+        {
+            return 1.0f-c;
+        }
+
+        template <> RGB invert_color<RGB>(const RGB &c) throw()
+        {
+            return RGB(255-c.r,255-c.g,255-c.b);
+        }
+
+        template <> RGBA invert_color<RGBA>(const RGBA &c) throw()
+        {
+            return RGBA(255-c.r,255-c.g,255-c.b,c.a);
+        }
+        
+
+    }
+}
+
 

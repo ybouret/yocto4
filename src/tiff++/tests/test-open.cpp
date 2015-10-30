@@ -8,7 +8,7 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(open)
 {
 
-        plugin<gfx::I_TIFF> I("y-tiff");
+        plugin<graphix::I_TIFF> I("y-tiff");
         
         if(argc>2)
         {

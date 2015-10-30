@@ -16,12 +16,15 @@ YOCTO_UNIT_TEST_IMPL(ops)
     IMG.declare( new jpeg_format() );
     IMG.declare( new tiff_format() );
 
+    const image::format &PNG = IMG["PNG"];
+
     threading::engine server(true);
 
     if(argc>1)
     {
         const string filename = argv[1];
         pixmap4      pxm( IMG.load4(filename, NULL));
+        PNG.save("image4.png",pxm,NULL);
 
         histogram H;
         H.update(pxm);
@@ -36,10 +39,20 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
         H.reset();
         histogram::create(hp,pxm,&server);
-        std::cerr << "#patches=" << hp.size() << std::endl;
         histogram::launch(hp,pxm,&server);
         H.finish(hp,&server);
         H.save("hist3.dat");
+
+
+        const size_t t = H.threshold();
+        std::cerr << "Threshold@" << t << std::endl;
+
+        pixmap4 tgt(pxm.w,pxm.h);
+        threshold::apply(tgt,t,pxm,threshold::keep_foreground);
+        PNG.save("fg.png", tgt, NULL);
+        threshold::apply(tgt,t,pxm,threshold::keep_background);
+        PNG.save("bg.png", tgt, NULL);
+
 
     }
 }
