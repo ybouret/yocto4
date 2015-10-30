@@ -7,24 +7,8 @@ namespace yocto
 {
     namespace graphix
     {
-
-#if 0
-        class vnode
-        {
-        public:
-            vnode *next;
-            vnode *prev;
-            vertex     r;
-            inline  vnode() throw();
-            inline ~vnode() throw();
-            YOCTO_MAKE_OBJECT
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(vnode);
-        };
-
-        typedef core::list_of_cpp<vnode> vlist;
-#endif
-
+        
+        
         class blob : public pixmap<int>
         {
         public:
@@ -73,15 +57,25 @@ namespace yocto
                         {
                             B = ++counter;
                         }
-
                     }
                 }
+                std::cerr << "counter=" << counter << std::endl;
             }
-
+            
+            void reduce(const size_t links) throw();
+            
+            //! return the number of blobs, ranked indices from 1
+            /**
+             assume reduce was called
+             */
+            size_t format() throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
             type         counter;
             const vertex delta[8];
+            void change(const type target, const type source) throw();
+            
         };
 
     }

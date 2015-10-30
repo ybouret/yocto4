@@ -54,12 +54,13 @@ YOCTO_UNIT_TEST_IMPL(ops)
         threshold::apply(tgt,t,pxm,threshold::keep_foreground);
         PNG.save("fg.png", tgt, NULL);
 
-
+        get_named_color<blob::type> bproc;
         blob Blob(pxm.w,pxm.h);
         Blob.detect(tgt,8);
+        PNG.save("blob_a.png",Blob, bproc, NULL);
 
-        get_named_color<blob::type> bproc;
-        PNG.save("blob.png",Blob, bproc, NULL);
+        Blob.reduce(8);
+        PNG.save("blob_b.png",Blob, bproc, NULL);
 
     }
 }
