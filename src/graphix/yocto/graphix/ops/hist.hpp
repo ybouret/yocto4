@@ -62,11 +62,12 @@ namespace yocto
                 virtual ~patch() throw();
 
                 template <typename T>
-                void compute() throw()
+                void compute(lockable &) throw()
                 {
                     assert(src);
                     histogram::__reset(count);
                     const pixmap<T> &pxm = *static_cast<const pixmap<T>*>(src);
+                    histogram::__update(count,pxm,*this);
                 }
 
 
@@ -79,19 +80,60 @@ namespace yocto
 
 
             //! create the patches of a given area/servers
-            static void create(patches           &hp,
-                               const patch       &surface,
-                               threading::engine *server)
+            /**
+             \param hp computed patches
+             \param surface the whole surface, as patch
+             */
+            static void create(patches              &hp,
+                               const graphix::patch &surface,
+                               threading::engine    *server);
+            
+
+            //! launch computation
+            /**
+             \param patches corresponding to sub areas
+             \param pxm     the pixmap
+             \param server  a server...
+             */
+            template <typename T>
+            static inline void launch(patches           &patches,
+                                     const pixmap<T>   &pxm,
+                                     threading::engine *server)
             {
-                const size_t cpus = server ? server->size : 1;
-                prepare_patches(hp,cpus,surface,true);
+                if(server)
+                {
+                    for(size_t i=patches.size();i>0;--i)
+                    {
+                        patch &sub = patches[i];
+                        sub.src    = &pxm;
+                        server->enqueue( &patches[i], & patch::compute<T> );
+                    }
+                }
+                else
+                {
+                    faked_lock access;
+                    for(size_t i=patches.size();i>0;--i)
+                    {
+                        patch &sub = patches[i];
+                        sub.src    = &pxm;
+                        patches[i].compute<T>(access);
+                    }
+                }
             }
+
+            //! finish computation, merge data into counts
+            /**
+             \param patches containing sub histograms
+             \param server  needs to be flushed before computation
+             */
+            void finish(const patches &patches,threading::engine *server);
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(histogram);
         };
-
-
+        
+        
     }
 }
 

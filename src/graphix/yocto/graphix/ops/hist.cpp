@@ -39,6 +39,25 @@ namespace yocto
         }
 
 
+        void histogram::create(patches &hp, const graphix::patch &surface, threading::engine *server)
+        {
+            const size_t cpus = server ? server->size : 1;
+            prepare_patches(hp,cpus,surface,true);
+        }
+
+        void histogram::finish(const patches &patches, threading::engine *server)
+        {
+            if(server) server->flush();
+            for(size_t i=patches.size();i>0;--i)
+            {
+                const patch &sub = patches[i];
+                for(size_t j=0;j<bins;++j)
+                {
+                    count[j] += sub.count[j];
+                }
+            }
+        }
+
     }
 
 }

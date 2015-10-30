@@ -16,6 +16,8 @@ YOCTO_UNIT_TEST_IMPL(ops)
     IMG.declare( new jpeg_format() );
     IMG.declare( new tiff_format() );
 
+    threading::engine server(true);
+
     if(argc>1)
     {
         const string filename = argv[1];
@@ -24,6 +26,21 @@ YOCTO_UNIT_TEST_IMPL(ops)
         histogram H;
         H.update(pxm);
         H.save("hist.dat");
+
+        H.reset();
+        histogram::patches hp;
+        histogram::create(hp,pxm,NULL);
+        histogram::launch(hp,pxm,NULL);
+        H.finish(hp,NULL);
+        H.save("hist2.dat");
+
+        H.reset();
+        histogram::create(hp,pxm,&server);
+        std::cerr << "#patches=" << hp.size() << std::endl;
+        histogram::launch(hp,pxm,&server);
+        H.finish(hp,&server);
+        H.save("hist3.dat");
+
     }
 }
 YOCTO_UNIT_TEST_DONE()
