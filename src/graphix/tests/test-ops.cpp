@@ -22,7 +22,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
         pixmap4      pxm( IMG.load4(filename, NULL));
 
         histogram H;
-        H.update(pxm,pxm);
+        H.update(pxm);
         H.save("hist.dat");
     }
 }

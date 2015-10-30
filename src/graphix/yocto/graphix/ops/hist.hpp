@@ -2,6 +2,7 @@
 #define YOCTO_GRAPHIX_OPS_INCLUDED 1
 
 #include "yocto/graphix/rawpix.hpp"
+#include "yocto/graphix/parallel.hpp"
 #include "yocto/string.hpp"
 
 namespace yocto
@@ -9,7 +10,8 @@ namespace yocto
     namespace graphix
     {
 
-        class histogram
+        //! one histogram of data
+        class histogram : public object
         {
         public:
             static const size_t bins=256;
@@ -22,8 +24,9 @@ namespace yocto
 
             //! for parallel code
             template <typename T>
-            inline void update(const pixmap<T> &pxm, const patch &area) throw()
+            static inline void __update(word_type *arr, const pixmap<T> &pxm, const graphix::patch &area) throw()
             {
+                assert(arr);
                 assert(pxm.contains(area));
                 for(unit_t j=area.lower.y;j<=area.upper.y;++j)
                 {
@@ -31,41 +34,62 @@ namespace yocto
                     for(unit_t i=area.lower.x;i<=area.upper.x;++i)
                     {
                         const T &px = pj[i];
-                        ++count[ project<T>(px) ];
+                        ++arr[ project<T>(px) ];
                     }
                 }
             }
 
+            //! sequential code
+            template <typename T>
+            inline void update(const pixmap<T> &pxm)
+            {
+                __update(count, pxm, pxm);
+            }
+
+            static void __reset(word_type *arr) throw();
             void reset() throw();                   //! everyting to 0
-            void merge(const histogram &h) throw(); //!< append bins to bins
             void save(const string &hname) const;   //!< save to check
+
+
+            //! a patch for histogram update
+            class patch : public graphix::patch
+            {
+            public:
+                const void *src;
+                word_type   count[bins];
+
+                explicit patch(const graphix::patch &p);
+                virtual ~patch() throw();
+
+                template <typename T>
+                void compute() throw()
+                {
+                    assert(src);
+                    histogram::__reset(count);
+                    const pixmap<T> &pxm = *static_cast<const pixmap<T>*>(src);
+                }
+
+
+            private:
+                YOCTO_DISABLE_ASSIGN(patch);
+            };
+
+            //! patches
+            typedef vector<patch> patches;
+
+
+            //! create the patches of a given area/servers
+            static void create(patches           &hp,
+                               const patch       &surface,
+                               threading::engine *server)
+            {
+                const size_t cpus = server ? server->size : 1;
+                prepare_patches(hp,cpus,surface,true);
+            }
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(histogram);
         };
-
-        class histogram_patch : public patch
-        {
-        public:
-            const void *src;
-            histogram   H;
-
-            explicit histogram_patch(const patch &p) throw();
-            virtual ~histogram_patch() throw();
-
-            template <typename T>
-            void compute() throw()
-            {
-                assert(src);
-                H.reset();
-                const pixmap<T> &pxm = *static_cast<const pixmap<T>*>(src);
-                H.update<T>(pxm,*this);
-            }
-
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(histogram_patch);
-        };
-
 
 
     }

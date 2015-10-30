@@ -16,19 +16,16 @@ namespace yocto
             reset();
         }
 
-#define Y_GFX_HIST_RESET(I) count[I] = 0
-
-        void histogram:: reset() throw()
+#define Y_GFX_HIST_RESET(I) arr[I] = 0
+        void histogram:: __reset(word_type *arr) throw()
         {
+            assert(arr);
             YOCTO_LOOP_FUNC_(bins,Y_GFX_HIST_RESET,0);
         }
 
-
-#define Y_GFX_HIST_MERGE(I) count[I] += h.count[I]
-
-        void histogram:: merge(const histogram &h) throw()
+        void histogram:: reset() throw()
         {
-            YOCTO_LOOP_FUNC_(bins,Y_GFX_HIST_MERGE,0);
+            __reset(count);
         }
 
 
@@ -52,17 +49,18 @@ namespace yocto
 {
     namespace graphix
     {
-        histogram_patch:: ~histogram_patch() throw()
+        histogram::patch:: ~patch() throw()
         {
         }
 
-        histogram_patch:: histogram_patch(const patch &p) throw() :
-        patch(p),
-        src(0)
+        histogram::patch:: patch(const graphix::patch &p):
+        graphix::patch(p),
+        src(0),
+        count()
         {
-        }
+        }        
         
     }
-
+    
 }
 
