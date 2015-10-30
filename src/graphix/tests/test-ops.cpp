@@ -2,6 +2,7 @@
 #include "yocto/graphix/image/jpeg.hpp"
 #include "yocto/graphix/image/tiff.hpp"
 #include "yocto/graphix/ops/hist.hpp"
+#include "yocto/graphix/ops/blob.hpp"
 
 #include "yocto/utest/run.hpp"
 
@@ -48,11 +49,17 @@ YOCTO_UNIT_TEST_IMPL(ops)
         std::cerr << "Threshold@" << t << std::endl;
 
         pixmap4 tgt(pxm.w,pxm.h);
-        threshold::apply(tgt,t,pxm,threshold::keep_foreground);
-        PNG.save("fg.png", tgt, NULL);
         threshold::apply(tgt,t,pxm,threshold::keep_background);
         PNG.save("bg.png", tgt, NULL);
+        threshold::apply(tgt,t,pxm,threshold::keep_foreground);
+        PNG.save("fg.png", tgt, NULL);
 
+
+        blob Blob(pxm.w,pxm.h);
+        Blob.detect(tgt,8);
+
+        get_named_color<blob::type> bproc;
+        PNG.save("blob.png",Blob, bproc, NULL);
 
     }
 }
