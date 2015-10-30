@@ -25,7 +25,7 @@ namespace yocto
                 return Y;
             }
             
-            static inline float  greyscale1(const uint8_t R,const uint8_t G,const uint8_t B) throw()
+            static inline uint8_t greyscale1(const uint8_t R,const uint8_t G,const uint8_t B) throw()
             {
                 return float2byte(greyscalef(R,G,B));
             }

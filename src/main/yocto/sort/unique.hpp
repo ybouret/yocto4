@@ -1,7 +1,8 @@
 #ifndef YOCTO_CODE_UNIQUE_INCLUDED
 #define YOCTO_CODE_UNIQUE_INCLUDED 1
 
-#include "yocto/sort/heap.hpp"
+#include "yocto/sort/quick.hpp"
+#include "yocto/sequence/lw-array.hpp"
 #include <cstring>
 
 namespace yocto
@@ -61,7 +62,8 @@ namespace yocto
     template <typename T,typename FUNC>
     inline size_t unique( T *a, const size_t n, FUNC &compare) throw()
     {
-        hsort<T>(a, n, compare);
+        lw_array<T> arr(a,n);
+        quicksort<T>(arr, compare);
         return __unique<T>(a, n, compare);
     }
     
@@ -80,7 +82,14 @@ namespace yocto
                 a.pop_back();
         }
     }
-    
+
+    //! sort and cleanup, default behavior
+    template <typename ARRAY>
+    inline void unique( ARRAY &a ) throw()
+    {
+        unique(a,__compare<typename ARRAY::type>);
+    }
+
     
 }
 

@@ -55,6 +55,13 @@ namespace yocto
         typedef rgb<uint8_t>  RGB;
         typedef rgba<uint8_t> RGBA;
 
+        //______________________________________________________________________
+        //
+        // abstract operations
+        //______________________________________________________________________
+        template <typename T> bool    is_zero_pixel(const T&) throw();
+        template <typename T> uint8_t project(const T&) throw();
+        
     }
     
 }
