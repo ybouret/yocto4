@@ -62,6 +62,8 @@ YOCTO_UNIT_TEST_IMPL(ops)
         Blob.reduce(8);
         PNG.save("blob_b.png",Blob, bproc, NULL);
 
+        const size_t nb = Blob.format();
+        std::cerr << "nb=" << nb << std::endl;
     }
 }
 YOCTO_UNIT_TEST_DONE()

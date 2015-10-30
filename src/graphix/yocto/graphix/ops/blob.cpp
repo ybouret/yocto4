@@ -69,14 +69,13 @@ namespace yocto
                 }
             }
             std::cerr << "counter=" << counter << std::endl;
-
         }
         
         
         size_t blob:: format() throw()
         {
             
-            map<type,size_t> db;
+            map<type,size_t> db(counter+1,as_capacity);
             for(unit_t j=0;j<h;++j)
             {
                 pixmap<type>::row &rj = (*this)[j];
@@ -84,10 +83,21 @@ namespace yocto
                 {
                     const   type B = rj[i];
                     size_t *pCount = db.search(B);
+                    if(pCount)
+                    {
+                        ++pCount;
+                    }
+                    else
+                    {
+                        if(!db.insert(B, 1))
+                            throw exception("unexpected blob db insert failure!");
+                    }
                 }
             }
+            const size_t nb = db.size();
             
-            return 0;
+            
+            return nb;
         }
 
         
