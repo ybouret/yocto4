@@ -18,6 +18,8 @@ namespace yocto
         class pixmap : public bitmap
         {
         public:
+            typedef T type;
+            
             class row
             {
             public:
