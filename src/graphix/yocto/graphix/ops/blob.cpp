@@ -11,9 +11,10 @@ namespace yocto
         {
         }
 
-        blob::blob(size_t W,size_t H) :
+        blob::blob(size_t W,size_t H, threading::engine *server) :
         pixmap<type>(W,H),
-        delta()
+        delta(),
+        bp()
         {
             vertex *v = (vertex *)delta;
             v[0] = vertex(-1,0);
@@ -25,6 +26,13 @@ namespace yocto
             v[5] = vertex(-1,-1);
             v[6] = vertex(1,1);
             v[7] = vertex(1,-1);
+
+            const size_t cpus = server ? server->size : 1;
+            prepare_patches(bp,cpus,*this,true);
+            for(size_t i=bp.size();i>0;--i)
+            {
+                bp[i].handle = this;
+            }
         }
 
 
@@ -42,9 +50,27 @@ namespace yocto
             }
         }
 
+        void blob:: change_to(const type target, const type source, threading::engine *server) throw()
+        {
+            if(server)
+            {
+                for(size_t i=bp.size();i>0;--i)
+                {
+                    patch &p = bp[i];
+                    p.target = target;
+                    p.source = source;
+                    server->enqueue(&p, &patch::change);
+                }
+                server->flush();
+            }
+            else
+            {
+                change_to(target, source, *this);
+            }
+        }
 
 
-        size_t blob:: __reduce(const size_t links) throw()
+        size_t blob:: __reduce(const size_t links, threading::engine *server) throw()
         {
             assert(4==links||8==links);
             blob &self = *this;
@@ -68,7 +94,7 @@ namespace yocto
                                 {
                                     if(P<B) cswap(P,B);
                                     assert(P>B);
-                                    change_to(B,P,*this);
+                                    change_to(B,P,server);
                                     assert(counter>0);
                                     --counter;
                                 }
@@ -117,7 +143,36 @@ namespace yocto
             }
 
         }
+
+
+        blob::patch:: patch(const graphix::patch &p) throw():
+        graphix::patch(p),
+        handle(0),
+        target(0),
+        source(0)
+        {
+
+        }
+
+        blob::patch:: patch(const blob::patch &p) throw():
+        graphix::patch(p),
+        handle(p.handle),
+        target(p.target),
+        source(p.source)
+        {
+        }
         
+
+        blob::patch:: ~patch() throw()
+        {
+        }
+
+        void blob:: patch::change( lockable & ) throw()
+        {
+            assert(handle);
+            static_cast<blob *>(handle)->change_to(target, source, *this);
+        }
+
         
         
     }

@@ -55,13 +55,16 @@ YOCTO_UNIT_TEST_IMPL(ops)
         PNG.save("fg.png", tgt, NULL);
 
         get_named_color<blob::type> bproc;
-        blob Blob(pxm.w,pxm.h);
+
+        blob Blob(pxm.w,pxm.h,&server);
         Blob.__detect(tgt,8);
         PNG.save("blob_a.png",Blob, bproc, NULL);
 
-        const size_t nb = Blob.__reduce(8);
+        const size_t nb = Blob.__reduce(8,&server);
         std::cerr << "nb=" << nb << std::endl;
         PNG.save("blob_b.png",Blob, bproc, NULL);
+
+
 
         vector<size_t> sizes;
         Blob.__format(sizes);

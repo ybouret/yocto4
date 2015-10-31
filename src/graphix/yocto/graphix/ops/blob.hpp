@@ -2,6 +2,7 @@
 #define YOCTO_GRAPHIX_BLOB_INCLUDED 1
 
 #include "yocto/graphix/rawpix.hpp"
+#include "yocto/graphix/parallel.hpp"
 
 namespace yocto
 {
@@ -12,10 +13,28 @@ namespace yocto
         class blob : public pixmap<size_t>
         {
         public:
-            explicit blob(size_t W,size_t H);
+            explicit blob(size_t W,size_t H, threading::engine *server);
             virtual ~blob() throw();
 
-            
+            class patch : public graphix::patch
+            {
+            public:
+                void  *handle;
+                size_t target;
+                size_t source;
+
+                explicit patch(const graphix::patch &p) throw();
+                patch(const patch &) throw();
+                virtual ~patch() throw();
+
+                void change(lockable &) throw();
+
+            private:
+                YOCTO_DISABLE_ASSIGN(patch);
+            };
+
+            typedef vector<blob::patch> patches;
+
 
             //! first pass: build neighbors
             template <typename T>
@@ -67,7 +86,7 @@ namespace yocto
                 std::cerr << "counter=" << counter << std::endl;
             }
             
-            size_t __reduce(const size_t links) throw();
+            size_t __reduce(const size_t links, threading::engine *server) throw();
             
             //! return the number of blobs, ranked indices from 1
             /**
@@ -78,10 +97,11 @@ namespace yocto
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
-            size_t         counter;
+            size_t          counter;
             const vertex    delta[8];
+            patches         bp;
             void change_to(const type target, const type source, const graphix::patch &area) throw();
-            
+            void change_to(const type target, const type source, threading::engine *server) throw();
         };
 
     }
