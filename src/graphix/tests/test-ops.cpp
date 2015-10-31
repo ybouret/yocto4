@@ -67,8 +67,10 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
 
         vector<size_t> sizes;
-        Blob.__format(sizes);
+        Blob.__format(sizes,&server,12);
         std::cerr << "sizes=" << sizes << std::endl;
+        PNG.save("blob_c.png",Blob, bproc, NULL);
+
     }
 }
 YOCTO_UNIT_TEST_DONE()

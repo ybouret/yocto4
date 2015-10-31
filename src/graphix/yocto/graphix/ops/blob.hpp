@@ -92,7 +92,7 @@ namespace yocto
             /**
              assume reduce was called
              */
-            void __format(vector<size_t> &sizes);
+            void __format(vector<size_t> &sizes, threading::engine *server, const size_t cutoff = 0);
 
 
         private:
@@ -101,7 +101,7 @@ namespace yocto
             const vertex    delta[8];
             patches         bp;
             void change_to(const type target, const type source, const graphix::patch &area) throw();
-            void change_to(const type target, const type source, threading::engine *server) throw();
+            void change_to(const type target, const type source, threading::engine *server);
         };
 
     }
