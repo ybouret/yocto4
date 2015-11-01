@@ -25,6 +25,15 @@ namespace yocto
             return fabsf(c)<=FLT_MIN;
         }
 
+        template <>
+        const double channel_info<double>::opaque = 1.0;
+
+        template <>
+        bool channel_info<double>::is_zero(const double c) throw()
+        {
+            return fabs(c)<=DBL_MIN;
+        }
+
 
 
     }
@@ -89,6 +98,33 @@ namespace yocto
     }
 
 }
+
+namespace yocto
+{
+    namespace graphix
+    {
+        template <> float   to_float<float> (const float &x) throw()
+        {
+            return x;
+        }
+
+        template <> float   to_float<uint8_t> (const uint8_t &x) throw()
+        {
+            return gist::unit_float[x];
+        }
+
+        template <> float   to_float<RGB> (const RGB &x) throw()
+        {
+            return gist::greyscalef(x.r, x.g, x.b);
+        }
+
+        template <> float   to_float<RGBA> (const RGBA &x) throw()
+        {
+            return gist::greyscalef(x.r, x.g, x.b);
+        }
+    }
+}
+
 
 namespace yocto
 {

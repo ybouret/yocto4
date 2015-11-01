@@ -15,6 +15,7 @@ namespace yocto
         public:
             const unit_t w;
             const unit_t h;
+            
             inline explicit pixmaps(const size_t n,
                                     const unit_t W,
                                     const unit_t H) :
