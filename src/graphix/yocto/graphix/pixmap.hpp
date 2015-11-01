@@ -94,6 +94,23 @@ namespace yocto
                 setup_rows();
             }
 
+            template <typename U, typename FUNC>
+            inline pixmap(const pixmap<U> &other, FUNC &func, const patch &area) :
+            bitmap( sizeof(T),area.width.x,area.width.y),
+            rmem( h*sizeof(row) ),
+            rows( static_cast<row*>(rmem.data) )
+            {
+                assert(other.contains(area));
+                setup_rows();
+                for(unit_t j=0;j<h;++j)
+                {
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        rows[j][i] = func(other[area.lower.y+j][area.lower.x+i]);
+                    }
+                }
+            }
+
 
         private:
             YOCTO_DISABLE_ASSIGN(pixmap);

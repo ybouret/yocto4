@@ -3,6 +3,7 @@
 #include "yocto/graphix/image/tiff.hpp"
 #include "yocto/graphix/ops/hist.hpp"
 #include "yocto/graphix/ops/blob.hpp"
+#include "yocto/graphix/ops/channels.hpp"
 
 #include "yocto/utest/run.hpp"
 
@@ -26,7 +27,23 @@ YOCTO_UNIT_TEST_IMPL(ops)
         const string filename = argv[1];
         pixmap4      pxm( IMG.load4(filename, NULL));
         PNG.save("image4.png",pxm,NULL);
-        
+
+        std::cerr << "SplitChannels..." << std::endl;
+        pixmaps<uint8_t>  ch(3,pxm.w,pxm.h);
+        channels::patches chp;
+        channels::create(chp,pxm, &server);
+        channels::split(ch,pxm,chp,&server);
+
+        {
+            get_red   get_r;
+            get_green get_g;
+            get_blue  get_b;
+            PNG.save("image_r.png", ch[0], get_r, NULL);
+            PNG.save("image_g.png", ch[1], get_g, NULL);
+            PNG.save("image_b.png", ch[2], get_b, NULL);
+        }
+
+        std::cerr << "Histograms" << std::endl;
         histogram H;
         H.update(pxm);
         H.save("hist.dat");
@@ -47,42 +64,56 @@ YOCTO_UNIT_TEST_IMPL(ops)
         
         const size_t t = H.threshold();
         std::cerr << "Threshold@" << t << std::endl;
-        
+
+        get_named_color<blob::type> bproc;
+        vector<size_t> blobs;
+        blob Blob(pxm.w,pxm.h,&server);
+
         pixmap4 tgt(pxm.w,pxm.h);
         threshold::apply(tgt,t,pxm,threshold::keep_background);
         PNG.save("bg.png", tgt, NULL);
-        threshold::apply(tgt,t,pxm,threshold::keep_foreground);
-        PNG.save("fg.png", tgt, NULL);
-        
-        get_named_color<blob::type> bproc;
-        
-        blob Blob(pxm.w,pxm.h,&server);
+
+        std::cerr << "BackGround Blobs.." << std::endl;
         Blob.__detect(tgt,8);
-        PNG.save("blob_a.png",Blob, bproc, NULL);
-        
+        PNG.save("bg_blob_a.png",Blob,bproc,NULL);
         Blob.__reduce(8,&server);
-        const size_t nb = Blob.__counter();
-        std::cerr << "nb=" << nb << std::endl;
-        PNG.save("blob_b.png",Blob, bproc, NULL);
-        
-        
-        
-        vector<size_t> sizes;
-        Blob.__format(sizes,&server,12);
-        std::cerr << "sizes=" << sizes << std::endl;
-        PNG.save("blob_c.png",Blob, bproc, NULL);
-        
-        if(sizes.size()>=1)
+        PNG.save("bg_blob_b.png",Blob,bproc,NULL);
+        Blob.__format(blobs,&server,1);
+        PNG.save("bg_blob_c.png",Blob,bproc,NULL);
+
+        if(blobs.size()>=1)
         {
             pixmap1 b1(pxm.w,pxm.h);
             pixmap4 b4(pxm.w,pxm.h);
             Blob.transfer<uint8_t>(1, b1, 255);
             Blob.transfer(1,b4,pxm);
-            PNG.save("blob1.png", b1, NULL);
-            PNG.save("blob4.png", b4, NULL);
+            PNG.save("bg_blob1.png", b1, NULL);
+            PNG.save("bg_blob4.png", b4, NULL);
 
         }
-        
+
+
+        threshold::apply(tgt,t,pxm,threshold::keep_foreground);
+        PNG.save("fg.png", tgt, NULL);
+        std::cerr << "ForeGround Blobs.." << std::endl;
+        Blob.__detect(tgt,8);
+        PNG.save("fg_blob_a.png",Blob,bproc,NULL);
+        Blob.__reduce(8,&server);
+        PNG.save("fg_blob_b.png",Blob,bproc,NULL);
+        Blob.__format(blobs,&server,1);
+        PNG.save("fg_blob_c.png",Blob,bproc,NULL);
+        if(blobs.size()>=1)
+        {
+            pixmap1 b1(pxm.w,pxm.h);
+            pixmap4 b4(pxm.w,pxm.h);
+            Blob.transfer<uint8_t>(1, b1, 255);
+            Blob.transfer(1,b4,pxm);
+            PNG.save("fg_blob1.png", b1, NULL);
+            PNG.save("fg_blob4.png", b4, NULL);
+
+        }
+
+
     }
 }
 YOCTO_UNIT_TEST_DONE()

@@ -17,7 +17,7 @@ namespace yocto
 
         protected:
             explicit rgba2data() throw();
-            
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rgba2data);
             virtual void put(void *addr,const RGBA &c) = 0;
@@ -38,12 +38,13 @@ virtual void put(void *addr,const RGBA &C) { CODE; } \
 
         //! for pixmap3
         YOCTO_GRAPHIX_RGBA2DATA(put_rgb,new (addr) RGB(C.r,C.g,C.b));
-        
+
         //! for pixmapf, greyscale
         YOCTO_GRAPHIX_RGBA2DATA(put_gsf,new (addr)  float(   gist::greyscalef(C.r, C.g, C.b)));
-        
+
         //! for pixmap1, greyscale
-         YOCTO_GRAPHIX_RGBA2DATA(put_gsu,new (addr) uint8_t( gist::greyscale1(C.r, C.g, C.b)));
+        YOCTO_GRAPHIX_RGBA2DATA(put_gsu,new (addr) uint8_t( gist::greyscale1(C.r, C.g, C.b)));
+        
     }
 }
 
