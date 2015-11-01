@@ -22,7 +22,8 @@ namespace yocto
                 void  *handle;
                 size_t target;
                 size_t source;
-
+                void  *output;
+                
                 explicit patch(const graphix::patch &p) throw();
                 patch(const patch &) throw();
                 virtual ~patch() throw();
@@ -78,7 +79,7 @@ namespace yocto
                         
                         if(!found)
                         {
-                            // tag another blocb
+                            // tag another blob
                             B = ++counter;
                         }
                     }
@@ -86,7 +87,7 @@ namespace yocto
                 std::cerr << "counter=" << counter << std::endl;
             }
             
-            size_t __reduce(const size_t links, threading::engine *server) throw();
+            void __reduce(const size_t links, threading::engine *server) throw();
             
             //! return the number of blobs, ranked indices from 1
             /**
@@ -94,7 +95,39 @@ namespace yocto
              */
             void __format(vector<size_t> &sizes, threading::engine *server, const size_t cutoff = 0);
 
-
+            
+            template <typename T>
+            inline void build(vector<size_t>    &sizes,
+                              const pixmap<T>   &pxm,
+                              const size_t       links,
+                              threading::engine *server,
+                              const size_t       cutoff = 0 )
+            {
+                __detect(pxm,links);
+                __reduce(links, server);
+                __format(sizes, server);
+            }
+            
+            inline size_t __counter() const throw() { return counter; }
+            
+            template <typename T>
+            inline void transfer(size_t indx, pixmap<T> &pxm , const T value) const
+            {
+                assert(w==pxm.w);
+                assert(h==pxm.h);
+                const blob &self = *this;
+                for(unit_t j=0;j<h;++j)
+                {
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        if(self[j][i]==indx)
+                        {
+                            pxm[j][i] = value;
+                        }
+                    }
+                }
+            }
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
             size_t          counter;

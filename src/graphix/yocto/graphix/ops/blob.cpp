@@ -71,7 +71,7 @@ namespace yocto
         }
         
         
-        size_t blob:: __reduce(const size_t links, threading::engine *server) throw()
+        void blob:: __reduce(const size_t links, threading::engine *server) throw()
         {
             assert(4==links||8==links);
             blob &self = *this;
@@ -105,7 +105,6 @@ namespace yocto
                 }
             }
             assert(counter>=0);
-            return counter;
         }
         
         
@@ -175,7 +174,8 @@ namespace yocto
         graphix::patch(p),
         handle(0),
         target(0),
-        source(0)
+        source(0),
+        output(0)
         {
             
         }
