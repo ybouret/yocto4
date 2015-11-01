@@ -2,16 +2,17 @@
 #include "yocto/associative/map.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/sort/quick.hpp"
+#include "yocto/sort/index.hpp"
 
 namespace yocto
 {
     namespace graphix
     {
-        
+
         blob:: ~blob() throw()
         {
         }
-        
+
         blob::blob(size_t W,size_t H, threading::engine *server) :
         pixmap<type>(W,H),
         delta(),
@@ -22,12 +23,12 @@ namespace yocto
             v[1] = vertex(1,0);
             v[2] = vertex(0,1);
             v[3] = vertex(1,0);
-            
+
             v[4] = vertex(-1,1);
             v[5] = vertex(-1,-1);
             v[6] = vertex(1,1);
             v[7] = vertex(1,-1);
-            
+
             const size_t cpus = server ? server->size : 1;
             prepare_patches(bp,cpus,*this,true);
             for(size_t i=bp.size();i>0;--i)
@@ -35,8 +36,8 @@ namespace yocto
                 bp[i].handle = this;
             }
         }
-        
-        
+
+
         void blob:: change_to(const type target, const type source, const graphix::patch &area) throw()
         {
             //std::cerr << "change " << source << " to " << target << std::endl;
@@ -50,7 +51,7 @@ namespace yocto
                 }
             }
         }
-        
+
         void blob:: change_to(const type target, const type source, threading::engine *server)
         {
             if(server)
@@ -69,8 +70,8 @@ namespace yocto
                 change_to(target, source, *this);
             }
         }
-        
-        
+
+
         void blob:: __reduce(const size_t links, threading::engine *server) throw()
         {
             assert(4==links||8==links);
@@ -80,7 +81,7 @@ namespace yocto
                 pixmap<type>::row &rj = self[j];
                 for(unit_t i=0;i<w;++i)
                 {
-                    type B = rj[i];
+                    size_t B = rj[i];
                     if(B!=0)
                     {
                         // we are in a blob
@@ -90,7 +91,7 @@ namespace yocto
                             const vertex probe = here + delta[k];
                             if(this->has(probe))
                             {
-                                type P = self[probe.y][probe.x];
+                                size_t P = self[probe.y][probe.x];
                                 if( (P!=0) && (P!=B))
                                 {
                                     if(P<B) cswap(P,B);
@@ -106,70 +107,98 @@ namespace yocto
             }
             assert(counter>=0);
         }
-        
-        
-        void blob:: __format(vector<size_t> &sizes, threading::engine *server, const size_t cutoff)
+
+
+        void blob:: __format(vector<size_t> &blobs, threading::engine *server, const size_t cutoff)
         {
-            sizes.free();
-            sizes.make(counter);
-            
-            blob &self = *this;
+            const bool  cut  = cutoff>0;
+            blob       &self = *this;
+            blobs.free();
+            blobs.make(counter,0);
+            //std::cerr << "counter=" << counter << std::endl; assert(counter==blobs.size());
             map<size_t,size_t> db(counter,as_capacity);
-            map<size_t,size_t> tag(counter,as_capacity);
-            const bool cut = cutoff>0;
-            
             for(unit_t j=0;j<h;++j)
             {
-                pixmap<size_t>::row &rj = self[j];
+                pixmap<type>::row &rj = self[j];
                 for(unit_t i=0;i<w;++i)
                 {
-                    const size_t B = rj[i];
+                    const size_t  B     = rj[i];
                     if(B!=0)
                     {
                         size_t *pIndx = db.search(B);
-                        size_t  k     = 0;
                         if(pIndx)
                         {
-                            k = *pIndx;
+                            size_t &indx = *pIndx;
+                            assert(indx>0);
+                            assert(indx<=counter);
+                            ++blobs[indx];
                         }
                         else
                         {
-                            k = db.size()+1;
-                            if(!db.insert(B,k))
-                                throw exception("blob::format unexpected database failure!");
-                            if(!tag.insert(k,B))
-                                throw exception("blob::format unexpected reverse database failure!");
+                            const size_t indx = db.size() + 1;
+                            if(!db.insert(B,indx)) throw exception("blob::format(unexpected database failure)");
+                            assert(indx>0);
+                            assert(indx<=counter);
+                            ++blobs[indx];
                         }
-                        assert(k>0);
-                        assert(k<=counter);
-                        ++sizes[k];
                     }
                 }
             }
-            
-            vector<size_t> indx(counter);
-            for(size_t i=indx.size();i>0;--i) indx[i] = i;
-            co_qsort(sizes, indx, __compare_decreasing<size_t>);
+            assert(counter==db.size());
+
+            //! collect the different blobs indices
+            vector<size_t> indx(counter,as_capacity);
+            for( map<size_t,size_t>::iterator i=db.begin();i!=db.end();++i)
+            {
+                //std::cerr << "blob #" << i->key << " => " << *i << std::endl;
+                indx.__push_back(i->key);
+            }
+            assert(counter==indx.size());
+
+            //! cosort the sizes and the indices
+            co_qsort(blobs,indx, __compare_decreasing<size_t>);
+            map<size_t,size_t> tag(counter,as_capacity);
+
+            //! compute new indices
             for(size_t i=1;i<=counter;++i)
             {
-                const size_t  j    = indx[i];
-                const size_t *pKey = tag.search(j); if(!pKey) throw exception("blob::format unexpected missing blob tag!");
-                const size_t  k    = *pKey;
-                std::cerr << "#" << i << " => blob#" << j << ", size=" << sizes[i] << ", tag=" << k << std::endl;
-                const size_t target = (cut&&sizes[i]<=cutoff) ? 0 : i;
-                change_to(target,k,server);
+                size_t target = i;
+                if(cut&&blobs[i]<=cutoff)
+                    target=0;
+                if(!tag.insert(indx[i], target))
+                    throw exception("blob::format(unexpected tags failure)");
+                //std::cerr << "blob @" << indx[i] << " => " << blobs[i] << "=> " << target << std::endl;
             }
-            
+
+            for(unit_t j=0;j<h;++j)
+            {
+                pixmap<type>::row &rj = self[j];
+                for(unit_t i=0;i<w;++i)
+                {
+                    size_t  &B = rj[i];
+                    if(B!=0)
+                    {
+                        size_t *pNewB = tag.search(B);
+                        if(!pNewB)
+                            throw exception("blob::format(unexpected missing tag)");
+                        //std::cerr << B << ":" << *pNewB << ".";
+                        B = *pNewB;
+                    }
+                }
+
+            }
+            //std::cerr << std::endl;
+
             if(cut)
             {
-                while( sizes.size() && sizes.back() <= cutoff )
+                while( blobs.size() && blobs.back() <= cutoff )
                 {
-                    sizes.pop_back();
+                    blobs.pop_back();
                 }
             }
         }
-        
-        
+
+
         blob::patch:: patch(const graphix::patch &p) throw():
         graphix::patch(p),
         handle(0),
@@ -177,9 +206,9 @@ namespace yocto
         source(0),
         output(0)
         {
-            
+
         }
-        
+
         blob::patch:: patch(const blob::patch &p) throw():
         graphix::patch(p),
         handle(p.handle),
@@ -187,12 +216,12 @@ namespace yocto
         source(p.source)
         {
         }
-        
-        
+
+
         blob::patch:: ~patch() throw()
         {
         }
-        
+
         void blob:: patch::change( lockable & ) throw()
         {
             assert(handle);

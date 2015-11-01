@@ -3,6 +3,7 @@
 
 #include "yocto/graphix/rawpix.hpp"
 #include "yocto/graphix/parallel.hpp"
+#include "yocto/code/bzset.hpp"
 
 namespace yocto
 {
@@ -37,7 +38,7 @@ namespace yocto
             typedef vector<blob::patch> patches;
 
 
-            //! first pass: build neighbors
+            //! first pass: build possible neighbors
             template <typename T>
             inline void __detect( const pixmap<T> &pxm, const size_t links)
             {
@@ -59,7 +60,7 @@ namespace yocto
                         if(is_zero_pixel(pj[i]))
                             continue;
 
-                        type        &B     = bj[i]; assert(0==B);
+                        size_t      &B     = bj[i]; assert(0==B);
                         bool         found = false;
                         const vertex here  = vertex(i,j);
                         for(size_t k=0;k<links;++k)
@@ -84,16 +85,19 @@ namespace yocto
                         }
                     }
                 }
-                std::cerr << "counter=" << counter << std::endl;
+                //std::cerr << "counter=" << counter << std::endl;
             }
-            
+
+            //! second pass: reduce blobs by merging
             void __reduce(const size_t links, threading::engine *server) throw();
             
-            //! return the number of blobs, ranked indices from 1
+            //! fill in the sizes and renumber the blobs
             /**
-             assume reduce was called
+             assume __reduce was called
              */
-            void __format(vector<size_t> &sizes, threading::engine *server, const size_t cutoff = 0);
+            void __format(vector<size_t>    &blobs,
+                          threading::engine *server,
+                          const size_t       cutoff = 0);
 
             
             template <typename T>
@@ -111,23 +115,65 @@ namespace yocto
             inline size_t __counter() const throw() { return counter; }
             
             template <typename T>
-            inline void transfer(size_t indx, pixmap<T> &pxm , const T value) const
+            inline void transfer(size_t     indx,
+                                 pixmap<T> &pxm,
+                                 const  T   value) const
             {
                 assert(w==pxm.w);
                 assert(h==pxm.h);
                 const blob &self = *this;
                 for(unit_t j=0;j<h;++j)
                 {
+                    const pixmap<size_t>::row &bj = self[j];
+                    typename pixmap<T>::row   &pj = pxm[j];
                     for(unit_t i=0;i<w;++i)
                     {
-                        if(self[j][i]==indx)
+                        T &tgt = pj[i];
+                        if(bj[i]==indx)
                         {
-                            pxm[j][i] = value;
+                            tgt = value;
+                        }
+                        else
+                        {
+                            bzset(tgt);
                         }
                     }
                 }
             }
-            
+
+            template <typename T>
+            inline void transfer(size_t           indx,
+                                 pixmap<T>       &pxm,
+                                 const pixmap<T> &src) const
+            {
+                assert(w==pxm.w);
+                assert(h==pxm.h);
+                assert(w==src.w);
+                assert(h==src.h);
+                const blob &self = *this;
+                for(unit_t j=0;j<h;++j)
+                {
+                    const pixmap<size_t>::row &bj = self[j];
+                    typename pixmap<T>::row   &pj = pxm[j];
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        T &tgt = pj[i];
+                        if(bj[i]==indx)
+                        {
+                            memcpy(&tgt,&src[j][i], sizeof(T));
+                        }
+                        else
+                        {
+                            bzset(tgt);
+                        }
+                    }
+                }
+            }
+
+
+
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
             size_t          counter;

@@ -75,9 +75,12 @@ YOCTO_UNIT_TEST_IMPL(ops)
         if(sizes.size()>=1)
         {
             pixmap1 b1(pxm.w,pxm.h);
+            pixmap4 b4(pxm.w,pxm.h);
             Blob.transfer<uint8_t>(1, b1, 255);
+            Blob.transfer(1,b4,pxm);
             PNG.save("blob1.png", b1, NULL);
-            
+            PNG.save("blob4.png", b4, NULL);
+
         }
         
     }
