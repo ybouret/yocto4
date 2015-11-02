@@ -65,7 +65,7 @@ namespace yocto
                         const vertex here  = vertex(i,j);
                         for(size_t k=0;k<links;++k)
                         {
-                            const vertex probe = here + delta[k];
+                            const vertex probe = here + gist::delta[k];
                             if(self.has(probe))
                             {
                                 const size_t value = self[probe.y][probe.x];
@@ -177,7 +177,6 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
             size_t          counter;
-            const vertex    delta[8];
             patches         bp;
             void change_to(const type target, const type source, const graphics::patch &area) throw();
             void change_to(const type target, const type source, threading::engine *server);

@@ -29,8 +29,28 @@ namespace yocto
             U(224),U(225),U(226),U(227),U(228),U(229),U(230),U(231),U(232),U(233),U(234),U(235),U(236),U(237),U(238),U(239),
             U(240),U(241),U(242),U(243),U(244),U(245),U(246),U(247),U(248),U(249),U(250),U(251),U(252),U(253),U(254),U(255)
         };
-        
 
+
+        const vertex gist::delta[8] =
+        {
+            vertex(-1,0),
+            vertex(0,1),
+            vertex(1,0),
+            vertex(0,-1),
+
+            vertex(-1,1),
+            vertex(1,1),
+            vertex(1,-1),
+            vertex(-1,-1)
+        };
+
+#if 0
+        const size_t gist:: sdel[8][2] =
+        {
+
+        };
+#endif
+        
     }
 
 }

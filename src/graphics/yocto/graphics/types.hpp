@@ -32,6 +32,11 @@ namespace yocto
                 return float2byte(greyscalef(R,G,B));
             }
 
+            //! the 4+4 coordinates around a single point
+            static const vertex delta[8];
+
+            //! the position of the delta vertices in terms of 3x3 stencil position
+            //static const size_t sdel[8][2];
 
         };
 

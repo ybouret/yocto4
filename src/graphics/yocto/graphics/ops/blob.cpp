@@ -15,19 +15,8 @@ namespace yocto
 
         blob::blob(size_t W,size_t H, threading::engine *server) :
         pixmap<type>(W,H),
-        delta(),
         bp()
         {
-            vertex *v = (vertex *)delta;
-            v[0] = vertex(-1,0);
-            v[1] = vertex(1,0);
-            v[2] = vertex(0,1);
-            v[3] = vertex(1,0);
-
-            v[4] = vertex(-1,1);
-            v[5] = vertex(-1,-1);
-            v[6] = vertex(1,1);
-            v[7] = vertex(1,-1);
 
             const size_t cpus = server ? server->size : 1;
             prepare_patches(bp,cpus,*this,true);
@@ -88,7 +77,7 @@ namespace yocto
                         const vertex here(i,j);
                         for(unit_t k=0;k<links;++k)
                         {
-                            const vertex probe = here + delta[k];
+                            const vertex probe = here + gist::delta[k];
                             if(this->has(probe))
                             {
                                 size_t P = self[probe.y][probe.x];
