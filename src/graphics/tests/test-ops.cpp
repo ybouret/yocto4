@@ -77,10 +77,14 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
         stencil::patches sp;
         stencil::create(sp, pxm, &server);
-        stencil::launch(sp, g, W, pgs, &server);
-        
+        stencil::launch(sp, g, W, pgs, gist::fill_with_zero, &server);
+        {
+            pixmapf sten(pxm.w,pxm.h);
+            stencil::finish(sp, g, sten, &server);
+            PNG.save("sten.png",sten,NULL);
+        }
 
-        
+
         std::cerr << "Histograms" << std::endl;
         histogram H;
         H.update(pxm);

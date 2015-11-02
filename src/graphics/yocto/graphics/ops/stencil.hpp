@@ -70,18 +70,44 @@ namespace yocto
                 void compute(lockable &) throw()
                 {
                     assert(handle);
+                    assert(target);
                     assert(w);
 
-                    const pixmap<T> &pxm = *static_cast<pixmap<T> *>(handle);
+                    const pixmap<T>   &pxm = *static_cast<pixmap<T> *>(handle);
+                    pixmap<real_type> &tgt = *target;
+                    const real_type   *lhs = &(w->value[0][0]);
+                    const real_type   *rhs = &(s.value[0][0]);
                     for(unit_t j=lower.y;j<=upper.y;++j)
                     {
                         for(unit_t i=lower.x;i<=upper.x;++i)
                         {
                             stencil::load<T>(s,pxm,i,j,f);
+                            real_type sum = 0;
+                            for(size_t k=0;k<9;++k)
+                            {
+                                sum += lhs[k] * rhs[k];
+                            }
+                            tgt[j][i] = sum;
                         }
                     }
                 }
 
+                template <typename T>
+                void transfer(lockable &) throw()
+                {
+                    assert(handle);
+                    assert(target);
+                    pixmap<T>               &pxm = *static_cast<pixmap<T> *>(handle);
+                    const pixmap<real_type> &tgt = *target;
+                    for(unit_t j=lower.y;j<=upper.y;++j)
+                    {
+                        for(unit_t i=lower.x;i<=upper.x;++i)
+                        {
+                            const real_type p = tgt[j][i];
+                        }
+
+                    }
+                }
 
 
             private:
@@ -140,15 +166,21 @@ namespace yocto
 
             template <typename T>
             static inline
-            void launch(patches &sp, pixmap<real_type> &tgt, const weights &w, const pixmap<T> &pxm, threading::engine *server)
+            void launch(patches            &sp,
+                        pixmap<real_type>  &field,
+                        const weights      &w,
+                        const pixmap<T>    &pxm,
+                        const gist::filling f,
+                        threading::engine  *server)
             {
                 faked_lock access;
                 for(size_t i=sp.size();i>0;--i)
                 {
                     patch &sub = sp[i];
                     sub.w      = &w;
-                    sub.target = &tgt;
+                    sub.target = &field;
                     sub.handle = (void*)&pxm;
+                    sub.f      = f;
                     if(server)
                     {
                         server->enqueue(&sub, &patch::compute<T>);
@@ -158,9 +190,33 @@ namespace yocto
                         sub.compute<T>(access);
                     }
                 }
-                if(server) server->flush();
             }
 
+            template <typename T>
+            static inline
+            void finish(patches                 &sp,
+                        pixmap<real_type>       &field,
+                        pixmap<T>               &pxm,
+                        threading::engine       *server)
+            {
+                faked_lock sequential;
+                if(server) server->flush();
+                for(size_t i=sp.size();i>0;--i)
+                {
+                    patch &sub = sp[i];
+                    sub.target = &field;
+                    sub.handle = (void*)&pxm;
+                    if(server)
+                    {
+                        server->enqueue(&sub, &patch::transfer<T>);
+                    }
+                    else
+                    {
+                        sub.compute<T>(sequential);
+                    }
+                }
+
+            }
 
         };
     }
