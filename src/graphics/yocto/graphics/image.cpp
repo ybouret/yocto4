@@ -1,4 +1,4 @@
-#include "yocto/graphix/image.hpp"
+#include "yocto/graphics/image.hpp"
 #include "yocto/exceptions.hpp"
 
 namespace yocto

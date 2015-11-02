@@ -1,4 +1,4 @@
-#include "yocto/graphix/data2rgba.hpp"
+#include "yocto/graphics/data2rgba.hpp"
 
 namespace yocto
 {

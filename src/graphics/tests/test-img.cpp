@@ -1,7 +1,7 @@
-#include "yocto/graphix/image/png.hpp"
-#include "yocto/graphix/image/jpeg.hpp"
-#include "yocto/graphix/image/tiff.hpp"
-#include "yocto/graphix/rawpix.hpp"
+#include "yocto/graphics/image/png.hpp"
+#include "yocto/graphics/image/jpeg.hpp"
+#include "yocto/graphics/image/tiff.hpp"
+#include "yocto/graphics/rawpix.hpp"
 
 #include "yocto/utest/run.hpp"
 
@@ -25,7 +25,7 @@ namespace
     
 }
 
-#include "yocto/graphix/parallel.hpp"
+#include "yocto/graphics/parallel.hpp"
 
 YOCTO_UNIT_TEST_IMPL(img)
 {

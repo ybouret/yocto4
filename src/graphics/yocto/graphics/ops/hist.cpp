@@ -1,4 +1,4 @@
-#include "yocto/graphix/ops/hist.hpp"
+#include "yocto/graphics/ops/hist.hpp"
 #include "yocto/code/unroll.hpp"
 #include "yocto/ios/ocstream.hpp"
 

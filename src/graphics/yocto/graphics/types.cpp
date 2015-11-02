@@ -1,4 +1,4 @@
-#include "yocto/graphix/types.hpp"
+#include "yocto/graphics/types.hpp"
 
 namespace yocto
 {

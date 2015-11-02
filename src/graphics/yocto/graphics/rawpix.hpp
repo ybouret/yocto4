@@ -1,8 +1,8 @@
 #ifndef YOCTO_GRAPHIX_RAWPIX_INCLUDED
 #define YOCTO_GRAPHIX_RAWPIX_INCLUDED 1
 
-#include "yocto/graphix/pixmap.hpp"
-#include "yocto/graphix/rgb.hpp"
+#include "yocto/graphics/pixmap.hpp"
+#include "yocto/graphics/rgb.hpp"
 
 namespace yocto
 {

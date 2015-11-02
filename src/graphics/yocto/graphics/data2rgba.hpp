@@ -1,7 +1,7 @@
 #ifndef YOCTO_GRAPHIX_DATA2RGBA_INCLUDED
 #define YOCTO_GRAPHIX_DATA2RGBA_INCLUDED 1
 
-#include "yocto/graphix/named-colors.hpp"
+#include "yocto/graphics/named-colors.hpp"
 
 namespace yocto
 {

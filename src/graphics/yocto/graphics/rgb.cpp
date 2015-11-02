@@ -1,4 +1,4 @@
-#include "yocto/graphix/rgb.hpp"
+#include "yocto/graphics/rgb.hpp"
 #include <cmath>
 #include <cfloat>
 

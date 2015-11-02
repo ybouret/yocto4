@@ -1,4 +1,4 @@
-#include "yocto/graphix/named-colors.hpp"
+#include "yocto/graphics/named-colors.hpp"
 #include "yocto/exception.hpp"
 #include <cstring>
 

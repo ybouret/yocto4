@@ -1,4 +1,4 @@
-#include "yocto/graphix/ops/grad.hpp"
+#include "yocto/graphics/ops/grad.hpp"
 
 namespace yocto
 {

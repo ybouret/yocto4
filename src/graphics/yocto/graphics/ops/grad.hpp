@@ -1,8 +1,8 @@
 #ifndef YOCTO_GRAPHIX_GRADIENT_INCLUDED
 #define YOCTO_GRAPHIX_GRADIENT_INCLUDED 1
 
-#include "yocto/graphix/rawpix.hpp"
-#include "yocto/graphix/parallel.hpp"
+#include "yocto/graphics/rawpix.hpp"
+#include "yocto/graphics/parallel.hpp"
 #include <cmath>
 
 namespace yocto

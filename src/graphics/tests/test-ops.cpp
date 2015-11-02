@@ -1,10 +1,10 @@
-#include "yocto/graphix/image/png.hpp"
-#include "yocto/graphix/image/jpeg.hpp"
-#include "yocto/graphix/image/tiff.hpp"
-#include "yocto/graphix/ops/hist.hpp"
-#include "yocto/graphix/ops/blob.hpp"
-#include "yocto/graphix/ops/channels.hpp"
-#include "yocto/graphix/ops/grad.hpp"
+#include "yocto/graphics/image/png.hpp"
+#include "yocto/graphics/image/jpeg.hpp"
+#include "yocto/graphics/image/tiff.hpp"
+#include "yocto/graphics/ops/hist.hpp"
+#include "yocto/graphics/ops/blob.hpp"
+#include "yocto/graphics/ops/channels.hpp"
+#include "yocto/graphics/ops/grad.hpp"
 
 #include "yocto/utest/run.hpp"
 

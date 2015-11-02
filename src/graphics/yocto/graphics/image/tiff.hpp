@@ -1,7 +1,7 @@
 #ifndef YOCTO_GFX_IMAGE_TIFF_INCLUDED
 #define YOCTO_GFX_IMAGE_TIFF_INCLUDED 1
 
-#include "yocto/graphix/image.hpp"
+#include "yocto/graphics/image.hpp"
 #include "yocto/tiff++/interface.hpp"
 #include "yocto/rtld/plugin.hpp"
 

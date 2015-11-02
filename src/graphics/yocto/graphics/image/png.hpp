@@ -1,7 +1,7 @@
 #ifndef YOCTO_GFX_IMAGE_PNG_INCLUDED
 #define YOCTO_GFX_IMAGE_PNG_INCLUDED 1
 
-#include "yocto/graphix/image.hpp"
+#include "yocto/graphics/image.hpp"
 
 namespace yocto
 {

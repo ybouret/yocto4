@@ -1,4 +1,4 @@
-#include "yocto/graphix/image/jpeg.hpp"
+#include "yocto/graphics/image/jpeg.hpp"
 extern "C"
 {
 #include "yocto/jpeg/jpeglib.h"

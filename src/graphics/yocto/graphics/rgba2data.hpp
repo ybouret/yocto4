@@ -1,7 +1,7 @@
 #ifndef YOCTO_GRAPHIX_RGBA2DATA_INCLUDED
 #define YOCTO_GRAPHIX_RGBA2DATA_INCLUDED 1
 
-#include "yocto/graphix/rgb.hpp"
+#include "yocto/graphics/rgb.hpp"
 
 namespace yocto
 {

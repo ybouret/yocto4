@@ -1,4 +1,4 @@
-#include "yocto/graphix/bitmap.hpp"
+#include "yocto/graphics/bitmap.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/error.hpp"
 

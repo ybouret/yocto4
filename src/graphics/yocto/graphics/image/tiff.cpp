@@ -1,4 +1,4 @@
-#include "yocto/graphix/image/tiff.hpp"
+#include "yocto/graphics/image/tiff.hpp"
 #include "yocto/ptr/auto.hpp"
 
 namespace yocto

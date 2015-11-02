@@ -1,7 +1,7 @@
 #ifndef YOCTO_GRAPHICS_PIXMAP_INCLUDED
 #define YOCTO_GRAPHICS_PIXMAP_INCLUDED 1
 
-#include "yocto/graphix/pixmap.hpp"
+#include "yocto/graphics/pixmap.hpp"
 #include "yocto/sequence/slots.hpp"
 
 namespace yocto

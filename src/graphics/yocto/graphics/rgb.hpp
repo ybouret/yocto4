@@ -1,7 +1,7 @@
 #ifndef YOCTO_GRAPHIX_RGB_INCLUDED
 #define YOCTO_GRAPHIX_RGB_INCLUDED 1
 
-#include "yocto/graphix/types.hpp"
+#include "yocto/graphics/types.hpp"
 
 namespace yocto
 {

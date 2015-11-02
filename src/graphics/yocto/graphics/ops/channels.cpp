@@ -1,4 +1,4 @@
-#include "yocto/graphix/ops/channels.hpp"
+#include "yocto/graphics/ops/channels.hpp"
 
 namespace yocto
 {

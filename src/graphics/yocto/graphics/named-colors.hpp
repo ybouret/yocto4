@@ -1,7 +1,7 @@
 #ifndef YOCTO_GFX_NAMED_COLORS_INCLUDED
 #define YOCTO_GFX_NAMED_COLORS_INCLUDED 1
 
-#include "yocto/graphix/rgb.hpp"
+#include "yocto/graphics/rgb.hpp"
 #include "yocto/string.hpp"
 
 namespace yocto

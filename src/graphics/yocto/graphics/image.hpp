@@ -1,9 +1,9 @@
 #ifndef YOCTO_GFX_IMAGE_INCLUDED
 #define YOCTO_GFX_IMAGE_INCLUDED 1
 
-#include "yocto/graphix/rawpix.hpp"
-#include "yocto/graphix/rgba2data.hpp"
-#include "yocto/graphix/data2rgba.hpp"
+#include "yocto/graphics/rawpix.hpp"
+#include "yocto/graphics/rgba2data.hpp"
+#include "yocto/graphics/data2rgba.hpp"
 
 #include "yocto/ptr/intr.hpp"
 #include "yocto/associative/set.hpp"

@@ -1,4 +1,4 @@
-#include "yocto/graphix/pixmap.hpp"
+#include "yocto/graphics/pixmap.hpp"
 #include "yocto/utest/run.hpp"
 
 using namespace yocto;

@@ -1,7 +1,7 @@
 #ifndef YOCTO_GRAPHIX_BITMAP_INCLUDED
 #define YOCTO_GRAPHIX_BITMAP_INCLUDED 1
 
-#include "yocto/graphix/rectangle.hpp"
+#include "yocto/graphics/rectangle.hpp"
 #include "yocto/counted-object.hpp"
 #include "yocto/ptr/arc.hpp"
 

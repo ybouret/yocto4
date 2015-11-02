@@ -1,4 +1,4 @@
-#include "yocto/graphix/rectangle.hpp"
+#include "yocto/graphics/rectangle.hpp"
 #include "yocto/exception.hpp"
 
 namespace yocto

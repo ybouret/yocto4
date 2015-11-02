@@ -1,7 +1,7 @@
 #ifndef YOCTO_GRAPHIX_PIXMAP_INCLUDED
 #define YOCTO_GRAPHIX_PIXMAP_INCLUDED 1
 
-#include "yocto/graphix/bitmap.hpp"
+#include "yocto/graphics/bitmap.hpp"
 #include "yocto/container/cslot.hpp"
 #include "yocto/exception.hpp"
 

@@ -1,4 +1,4 @@
-#include "yocto/graphix/image/png.hpp"
+#include "yocto/graphics/image/png.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/ocstream.hpp"

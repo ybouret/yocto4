@@ -1,8 +1,5 @@
-#include "yocto/graphix/types.hpp"
+#include "yocto/graphics/types.hpp"
 #include "yocto/utest/run.hpp"
-//#include "yocto/sequence/vector.hpp"
-//#include "yocto/sort/unique.hpp"
-
 #include "yocto/ordered/sorted-vector.hpp"
 
 using namespace yocto;

@@ -2,7 +2,7 @@
 #define YOCTO_GRAPHIX_PARALLEL_INCLUDED 1
 
 #include "yocto/threading/engine.hpp"
-#include "yocto/graphix/types.hpp"
+#include "yocto/graphics/types.hpp"
 #include "yocto/parallel/splitter.hpp"
 
 namespace yocto

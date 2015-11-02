@@ -1,4 +1,4 @@
-#include "yocto/graphix/ops/blob.hpp"
+#include "yocto/graphics/ops/blob.hpp"
 #include "yocto/associative/map.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/sort/quick.hpp"
