@@ -44,7 +44,7 @@ namespace yocto
                 fill_no_fluxes
             };
 
-            template <typename T,typename U>
+            template <typename T,typename U> static inline
             T get_fill(const U      &f0,
                        const U      &f1,
                        const U      &f2,
@@ -62,7 +62,7 @@ namespace yocto
                         return T(f0)+T(f0)-T(f1);
 
                     case fill_no_fluxes:
-                        return T(3) * ( T(f0) - T(f1) ) - T(f2);
+                        return T(3) * ( T(f0) - T(f1) ) + T(f2);
                         
                     case fill_with_zero:
                         break;

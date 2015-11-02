@@ -73,10 +73,14 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
         std::cerr << "Stencils..." << std::endl;
         stencil::weights W;
-        W(0,0) = 1;
-
+        W(0,0)  = -4;
+        W(1,0)  = W(0,1) = W(-1,0) = W(0,-1) = 1;
+        
+        std::cerr << "stencil=" << W << std::endl;
         stencil::patches sp;
-        stencil::create(sp, pxm, &server);
+        std::cerr << "pgs.size=" << pgs.w << "x" << pgs.h << std::endl;
+        stencil::create(sp, pgs, &server);
+        
         stencil::launch(sp, g, W, pgs, gist::fill_with_zero, &server);
         {
             pixmapf sten(pxm.w,pxm.h);

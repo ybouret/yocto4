@@ -58,13 +58,13 @@ namespace yocto
                             real_type         gx  = 0;
                             if(i<=0)
                             {
-                                gx = four*pj[i+1] - three*pji + real_type(pj[i+2]);
+                                gx = four*real_type(pj[1]) - three*pji - real_type(pj[2]);
                             }
                             else
                             {
                                 if(i>=w0)
                                 {
-                                    gx = four*pj[w1] - three*pji + real_type(pj[w2]);
+                                    gx = four*real_type(pj[w1]) - three*pji - real_type(pj[w2]);
                                 }
                                 else
                                 {
@@ -75,20 +75,19 @@ namespace yocto
                             real_type gy = 0;
                             if(at_dn)
                             {
-                                gy = four * p[j+1][i] - three*pji + real_type(p[j+2][i]);
+                                gy = four * real_type(p[j+1][i]) - three*pji - real_type(p[j+2][i]);
                             }
                             else
                             {
                                 if(at_up)
                                 {
-                                    gy = four * p[h1][i] - three*pji + real_type(p[h2][i]);
+                                    gy = four * real_type(p[h1][i]) - three*pji - real_type(p[h2][i]);
                                 }
                                 else
                                 {
                                     gy = real_type(p[j+1][i]) - real_type(p[j-1][i]);
                                 }
                             }
-
 
 
                             const real_type g = std::sqrt(gx*gx+gy*gy);
