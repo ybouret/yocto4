@@ -1,15 +1,15 @@
 FILE(GLOB test_srcs test-*.cpp)
 
-ADD_EXECUTABLE(test-graphix main.cpp ${test_srcs})
-TARGET_LINK_YOCTO(test-graphix graphix jpeg png z)
+ADD_EXECUTABLE(test-graphics main.cpp ${test_srcs})
+TARGET_LINK_YOCTO(test-graphics graphics jpeg png z)
 
 IF(YOCTO_LINUX)
-	TARGET_LINK_LIBRARIES(test-graphix dl)
+	TARGET_LINK_LIBRARIES(test-graphics dl)
 ENDIF()
 
 ENABLE_TESTING()
 
-ADD_TEST(Bitmap test-graphix bitmap)
-ADD_TEST(Pixmap test-graphix pixmap)
-ADD_TEST(Types  test-graphix types)
+ADD_TEST(Bitmap test-graphics bitmap)
+ADD_TEST(Pixmap test-graphics pixmap)
+ADD_TEST(Types  test-graphics types)
 
