@@ -5,6 +5,7 @@
 #include "yocto/graphics/ops/blob.hpp"
 #include "yocto/graphics/ops/channels.hpp"
 #include "yocto/graphics/ops/grad.hpp"
+#include "yocto/graphics/ops/stencil.hpp"
 
 #include "yocto/utest/run.hpp"
 
@@ -69,6 +70,16 @@ YOCTO_UNIT_TEST_IMPL(ops)
             channels::merge(ch,gc, chp, &server);
             PNG.save("grad3.png", gc, NULL);
         }
+
+        std::cerr << "Stencils..." << std::endl;
+        stencil::weights W;
+        W(0,0) = 1;
+
+        stencil::patches sp;
+        stencil::create(sp, pxm, &server);
+        stencil::launch(sp, g, W, pgs, &server);
+        
+
         
         std::cerr << "Histograms" << std::endl;
         histogram H;

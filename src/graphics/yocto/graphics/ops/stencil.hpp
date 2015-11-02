@@ -2,124 +2,165 @@
 #define YOCTO_STENCIL_OPS_INCLUDED 1
 
 #include "yocto/graphics/pixmaps.hpp"
+#include "yocto/graphics/parallel.hpp"
 
 namespace yocto
 {
     namespace graphics
     {
+
+
+
         //! a 3x3 stencil
-        class stencil
+        struct stencil
         {
         public:
-            static const int at_left   = 0x01;
-            static const int at_right  = 0x02;
-            static const int at_bottom = 0x04;
-            static const int at_top    = 0x08;
+            typedef float     real_type;
 
-            enum filling
+            //__________________________________________________________________
+            //
+            // handling 3x3 values
+            //__________________________________________________________________
+            class weights
             {
-                fill_with_zero,
-                fill_with_same,
-                fill_with_symm,
-                fill_with_asym,
-                fill_no_fluxes
+            public:
+                typedef float     real_type;
+                real_type         value[3][3];
+
+                inline real_type & operator()(unit_t dx,unit_t dy) throw()
+                {
+                    assert(dx>=-1); assert(dx<=1);
+                    assert(dy>=-1); assert(dy<=1);
+                    return value[++dx][++dy];
+                }
+
+                inline const real_type & operator()(unit_t dx,unit_t dy) const throw()
+                {
+                    assert(dx>=-1); assert(dx<=1);
+                    assert(dy>=-1); assert(dy<=1);
+                    return value[++dx][++dy];
+                }
+
+                weights() throw();
+                ~weights() throw();
+                weights(const weights &) throw();
+                weights & operator=(const weights&) throw();
+                void ldz() throw();
+
             };
 
-            typedef float real_type;
-            void ldz() throw();
-            
-            stencil() throw();
-            stencil(const stencil &other) throw();
-            stencil & operator=(const stencil &) throw();
-            ~stencil() throw();
-
-            filling   mode;
-            real_type weight[3][3];
-
-            inline real_type & operator()(unit_t dx, unit_t dy) throw()
+            //__________________________________________________________________
+            //
+            // a patch
+            //__________________________________________________________________
+            class patch : public graphics::patch
             {
-                assert(dx>=-1);assert(dx<=1);assert(dy>=-1);assert(dy<=1);
-                return weight[++dx][++dy];
-            }
+            public:
+                pixmap<real_type> *target;
+                void              *handle; //!< pixmap
+                gist::filling      f; //!< filling modes
+                const weights     *w; //!< user's weights
+                weights            s; //!< local stencil
 
-            inline const real_type & operator()(unit_t dx, unit_t dy) const throw()
+                explicit patch(const graphics::patch &p) throw();
+                patch(const patch &p) throw();
+                virtual ~patch() throw();
+
+                template <typename T>
+                void compute(lockable &) throw()
+                {
+                    assert(handle);
+                    assert(w);
+
+                    const pixmap<T> &pxm = *static_cast<pixmap<T> *>(handle);
+                    for(unit_t j=lower.y;j<=upper.y;++j)
+                    {
+                        for(unit_t i=lower.x;i<=upper.x;++i)
+                        {
+                            stencil::load<T>(s,pxm,i,j,f);
+                        }
+                    }
+                }
+
+
+
+            private:
+                YOCTO_DISABLE_ASSIGN(patch);
+            };
+
+            typedef vector<patch> patches;
+
+            static void create(patches &sp, const graphics::patch &surface, threading::engine *server);
+
+
+            static const int atLeft  = 0x01;
+            static const int atRight = 0x02;
+            static const int atBot   = 0x04;
+            static const int atTop   = 0x08;
+
+            template <typename T> static inline
+            void load(weights            &s,
+                      const  pixmap<T>   &p,
+                      const  unit_t       i,
+                      const  unit_t       j,
+                      const gist::filling f) throw()
             {
-                assert(dx>=-1);assert(dx<=1);assert(dy>=-1);assert(dy<=1);
-                return weight[++dx][++dy];
-            }
+                assert(i>=0);
+                assert(i<p.w);
+                assert(j>=0);
+                assert(j<p.h);
 
+                const unit_t w0    = p.upper.x;
+                const unit_t h0    = p.upper.y;
+                int          flags = 0;
+                if(i<=0) { flags |= atLeft; } else{ if(i>=w0) {flags |= atRight;} }
+                if(j<=0) { flags |= atBot;  } else{ if(j>=h0) {flags |= atTop;}   }
+
+
+                s.ldz(); //!< todo: remove
+                switch(flags)
+                {
+                    case 0:
+                        for(unit_t dy=-1;dy<=1;++dy)
+                        {
+                            for(unit_t dx=-1;dx<=1;++dx)
+                            {
+                                {
+                                    s(dx,dy) = real_type(p[j+dy][i+dx]);
+                                }
+                            }
+                        }
+                        break;
+                        
+                    default:
+                        break; // todo: remove
+                        assert(die("never get here"));
+                }
+            }
 
             template <typename T>
-            void load(const pixmap<T> &pxm,
-                      const unit_t     i,
-                      const unit_t     j) throw()
+            static inline
+            void launch(patches &sp, pixmap<real_type> &tgt, const weights &w, const pixmap<T> &pxm, threading::engine *server)
             {
-                assert(pxm.w>=3);
-                assert(pxm.h>=3);
-                stencil        &self   = *this;
-                const real_type center = real_type(pxm[j][i]);
-                const unit_t w0 = pxm.upper.x;
-                const unit_t h0 = pxm.upper.y;
-                self(0,0)       = center;
-                int flag  = 0;
-                if(i<=0)
+                faked_lock access;
+                for(size_t i=sp.size();i>0;--i)
                 {
-                    flag |= at_left;
-                }
-                else
-                {
-                    if(i>=w0)
+                    patch &sub = sp[i];
+                    sub.w      = &w;
+                    sub.target = &tgt;
+                    sub.handle = (void*)&pxm;
+                    if(server)
                     {
-                        flag |= at_right;
+                        server->enqueue(&sub, &patch::compute<T>);
+                    }
+                    else
+                    {
+                        sub.compute<T>(access);
                     }
                 }
-                if(j<=0)
-                {
-                    flag |= at_bottom;
-                }
-                else
-                {
-                    if(j>=h0)
-                    {
-                        flag |= at_top;
-                    }
-                }
-
-                switch(flag)
-                {
-                    case 0: break;
-
-                    case at_left:
-                        break;
-
-                    case at_right:
-                        break;
-
-                    case at_top:
-                        break;
-
-                    case at_bottom:
-                        break;
-
-                    case at_left | at_top:
-                        break;
-
-                    case at_left | at_bottom:
-                        break;
-
-                    case at_right | at_top:
-                        break;
-
-                    case at_right | at_bottom:
-                        break;
-
-                    default:
-                        assert(die("never get here"));
-                        break;
-                }
-
+                if(server) server->flush();
             }
-            
+
 
         };
     }
