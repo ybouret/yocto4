@@ -8,9 +8,7 @@ namespace yocto
 {
     namespace graphics
     {
-        
-        
-        
+                
         //! a 3x3 stencil
         struct stencil
         {
