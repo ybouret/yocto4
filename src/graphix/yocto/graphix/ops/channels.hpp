@@ -96,7 +96,7 @@ namespace yocto
                 assert(ch.w==src.w);
                 assert(ch.h==src.h);
                 faked_lock access;
-                for(size_t i=chp.size();i>0;--i)
+                for(size_t i=chp .size();i>0;--i)
                 {
                     patch &sub = chp[i];
                     sub.target = &ch;
