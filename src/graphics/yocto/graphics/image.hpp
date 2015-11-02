@@ -12,7 +12,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         class image : public singleton<image>

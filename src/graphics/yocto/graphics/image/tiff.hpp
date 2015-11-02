@@ -7,7 +7,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         class tiff_format : public image::format

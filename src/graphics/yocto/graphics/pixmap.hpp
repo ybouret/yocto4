@@ -7,7 +7,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         //______________________________________________________________________

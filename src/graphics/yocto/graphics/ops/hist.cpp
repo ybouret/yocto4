@@ -4,7 +4,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         histogram:: ~histogram() throw()
@@ -39,7 +39,7 @@ namespace yocto
         }
 
 
-        void histogram::create(patches &hp, const graphix::patch &surface, threading::engine *server)
+        void histogram::create(patches &hp, const graphics::patch &surface, threading::engine *server)
         {
             const size_t cpus = server ? server->size : 1;
             prepare_patches(hp,cpus,surface,true);
@@ -66,14 +66,14 @@ namespace yocto
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         histogram::patch:: ~patch() throw()
         {
         }
 
-        histogram::patch:: patch(const graphix::patch &p):
-        graphix::patch(p),
+        histogram::patch:: patch(const graphics::patch &p):
+        graphics::patch(p),
         src(0),
         count()
         {
@@ -86,7 +86,7 @@ namespace yocto
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         static inline
         double get_full_variance(const histogram::word_type *count, size_t t)

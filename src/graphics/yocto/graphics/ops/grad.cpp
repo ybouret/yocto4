@@ -3,21 +3,21 @@
 namespace yocto
 {
 
-    namespace graphix
+    namespace graphics
     {
 
         gradient:: patch:: ~patch() throw()
         {
         }
 
-        gradient::patch:: patch(const graphix::patch &p) throw() : graphix::patch(p),
+        gradient::patch:: patch(const graphics::patch &p) throw() : graphics::patch(p),
         gmax(0)
         {
         }
 
 
         gradient::patch:: patch(const patch &p) throw() :
-        graphix::patch(p),
+        graphics::patch(p),
         gmax(p.gmax)
         {
 
@@ -25,7 +25,7 @@ namespace yocto
 
 
         void gradient::create(patches              &gp,
-                              const graphix::patch &surface,
+                              const graphics::patch &surface,
                               threading::engine    *server)
         {
             const size_t cpus = server ? server->size : 1;

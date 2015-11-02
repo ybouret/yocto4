@@ -5,7 +5,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         class rectangle : public patch

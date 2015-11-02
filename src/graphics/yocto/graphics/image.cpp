@@ -3,7 +3,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         
         image::format:: format(const char *id) : name(id)
@@ -28,7 +28,7 @@ namespace yocto
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         image:: image() : formats(8,as_capacity)
         {

@@ -2,7 +2,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         rgba2data:: ~rgba2data() throw()

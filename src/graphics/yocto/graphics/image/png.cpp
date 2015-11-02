@@ -9,7 +9,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         
         png_format:: ~png_format() throw()

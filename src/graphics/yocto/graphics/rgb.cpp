@@ -4,7 +4,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         template <>
@@ -43,7 +43,7 @@ namespace yocto
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         template <> bool is_zero_pixel<float>(const float &x) throw()
         {
@@ -70,7 +70,7 @@ namespace yocto
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         template <> uint8_t project<float>(const float &x) throw()
         {
@@ -101,7 +101,7 @@ namespace yocto
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         template <> float   to_float<float> (const float &x) throw()
         {
@@ -128,7 +128,7 @@ namespace yocto
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         template <> uint8_t invert_color<uint8_t>(const uint8_t &c) throw()
         {

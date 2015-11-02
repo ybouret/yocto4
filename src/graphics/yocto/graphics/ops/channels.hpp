@@ -6,18 +6,18 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         struct channels
         {
 
-            class patch  : public graphix:: patch
+            class patch  : public graphics:: patch
             {
             public:
                 const void *source;
                 void       *target;
-                explicit patch(const graphix::patch &p) throw();
+                explicit patch(const graphics::patch &p) throw();
                 virtual ~patch() throw();
                 patch(const patch &other) throw();
 
@@ -82,9 +82,9 @@ namespace yocto
             };
 
             typedef vector<patch> patches;
-            static  void create(patches              &chp,
-                                const graphix::patch &surface,
-                                threading::engine    *server);
+            static  void create(patches               &chp,
+                                const graphics::patch &surface,
+                                threading::engine     *server);
 
 
             template <typename T,typename RGB_TYPE>

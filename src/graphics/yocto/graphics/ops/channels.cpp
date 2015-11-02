@@ -2,10 +2,10 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
-        channels::patch:: patch(const graphix::patch &p ) throw() :
-        graphix::patch(p),
+        channels::patch:: patch(const graphics::patch &p ) throw() :
+        graphics::patch(p),
         source(0),
         target(0)
         {
@@ -17,7 +17,7 @@ namespace yocto
         }
 
         channels::patch::patch(const patch &other) throw() :
-        graphix::patch(other),
+        graphics::patch(other),
         source(0),
         target(0)
         {
@@ -25,8 +25,8 @@ namespace yocto
         }
 
 
-        void channels:: create(patches              &chp,
-                               const graphix::patch &surface,
+        void channels:: create(patches               &chp,
+                               const graphics::patch &surface,
                                threading::engine    *server)
         {
             const size_t cpus = server ? server->size : 1;

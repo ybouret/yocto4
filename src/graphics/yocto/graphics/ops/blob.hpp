@@ -7,7 +7,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         
         
@@ -17,7 +17,7 @@ namespace yocto
             explicit blob(size_t W,size_t H, threading::engine *server);
             virtual ~blob() throw();
 
-            class patch : public graphix::patch
+            class patch : public graphics::patch
             {
             public:
                 void  *handle;
@@ -25,7 +25,7 @@ namespace yocto
                 size_t source;
                 void  *output;
                 
-                explicit patch(const graphix::patch &p) throw();
+                explicit patch(const graphics::patch &p) throw();
                 patch(const patch &) throw();
                 virtual ~patch() throw();
 
@@ -179,7 +179,7 @@ namespace yocto
             size_t          counter;
             const vertex    delta[8];
             patches         bp;
-            void change_to(const type target, const type source, const graphix::patch &area) throw();
+            void change_to(const type target, const type source, const graphics::patch &area) throw();
             void change_to(const type target, const type source, threading::engine *server);
         };
 

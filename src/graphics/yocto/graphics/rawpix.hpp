@@ -6,7 +6,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         typedef pixmap<uint8_t>  pixmap1;
         typedef pixmap<float>    pixmapf;

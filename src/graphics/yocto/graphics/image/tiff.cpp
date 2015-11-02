@@ -3,7 +3,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         
         tiff_format:: ~tiff_format() throw()

@@ -5,7 +5,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         class png_format : public image::format
         {

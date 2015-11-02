@@ -6,7 +6,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         blob:: ~blob() throw()
@@ -38,7 +38,7 @@ namespace yocto
         }
 
 
-        void blob:: change_to(const type target, const type source, const graphix::patch &area) throw()
+        void blob:: change_to(const type target, const type source, const graphics::patch &area) throw()
         {
             //std::cerr << "change " << source << " to " << target << std::endl;
             for(unit_t j=area.lower.y;j<=area.upper.y;++j)
@@ -199,8 +199,8 @@ namespace yocto
         }
 
 
-        blob::patch:: patch(const graphix::patch &p) throw():
-        graphix::patch(p),
+        blob::patch:: patch(const graphics::patch &p) throw():
+        graphics::patch(p),
         handle(0),
         target(0),
         source(0),
@@ -210,7 +210,7 @@ namespace yocto
         }
 
         blob::patch:: patch(const blob::patch &p) throw():
-        graphix::patch(p),
+        graphics::patch(p),
         handle(p.handle),
         target(p.target),
         source(p.source)

@@ -5,7 +5,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         //! create RGBA from data

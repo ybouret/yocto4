@@ -6,7 +6,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         struct named_color
         {

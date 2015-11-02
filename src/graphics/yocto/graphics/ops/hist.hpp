@@ -8,7 +8,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         //! one histogram of data
@@ -25,7 +25,7 @@ namespace yocto
 
             //! for parallel code
             template <typename T>
-            static inline void __update(word_type *arr, const pixmap<T> &pxm, const graphix::patch &area) throw()
+            static inline void __update(word_type *arr, const pixmap<T> &pxm, const graphics::patch &area) throw()
             {
                 assert(arr);
                 assert(pxm.contains(area));
@@ -53,13 +53,13 @@ namespace yocto
 
 
             //! a patch for histogram update
-            class patch : public graphix::patch
+            class patch : public graphics::patch
             {
             public:
                 const void *src;
                 word_type   count[bins];
 
-                explicit patch(const graphix::patch &p);
+                explicit patch(const graphics::patch &p);
                 virtual ~patch() throw();
 
                 template <typename T>
@@ -86,7 +86,7 @@ namespace yocto
              \param surface the whole surface, as patch
              */
             static void create(patches              &hp,
-                               const graphix::patch &surface,
+                               const graphics::patch &surface,
                                threading::engine    *server);
             
 

@@ -5,7 +5,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         template <typename T>
@@ -68,10 +68,10 @@ namespace yocto
     
 }
 
-YOCTO_SUPPORT_C_STYLE_OPS(graphix::rgb<uint8_t>);
-YOCTO_SUPPORT_C_STYLE_OPS(graphix::rgb<float>);
-YOCTO_SUPPORT_C_STYLE_OPS(graphix::rgba<uint8_t>);
-YOCTO_SUPPORT_C_STYLE_OPS(graphix::rgba<float>);
+YOCTO_SUPPORT_C_STYLE_OPS(graphics::rgb<uint8_t>);
+YOCTO_SUPPORT_C_STYLE_OPS(graphics::rgb<float>);
+YOCTO_SUPPORT_C_STYLE_OPS(graphics::rgba<uint8_t>);
+YOCTO_SUPPORT_C_STYLE_OPS(graphics::rgba<float>);
 
 
 

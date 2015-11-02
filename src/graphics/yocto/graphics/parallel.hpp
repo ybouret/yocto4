@@ -7,7 +7,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         
         template <typename USER_PATCH>

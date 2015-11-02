@@ -3,7 +3,7 @@
 #include "yocto/ordered/sorted-vector.hpp"
 
 using namespace yocto;
-using namespace graphix;
+using namespace graphics;
 
 YOCTO_UNIT_TEST_IMPL(types)
 {

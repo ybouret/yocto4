@@ -7,21 +7,21 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         struct gradient
         {
             typedef float real_type;
 
-            class patch : public graphix::patch
+            class patch : public graphics::patch
             {
             public:
                 real_type   gmax;
                 void       *target;
                 const void *source;
                 virtual ~patch() throw();
-                explicit patch(const graphix::patch &p) throw();
+                explicit patch(const graphics::patch &p) throw();
                 patch(const patch &p) throw();
 
                 template <typename T>
@@ -135,7 +135,7 @@ namespace yocto
             typedef vector<patch> patches;
 
             static void create(patches              &gp,
-                               const graphix::patch &surface,
+                               const graphics::patch &surface,
                                threading::engine    *server);
 
             template <typename T>

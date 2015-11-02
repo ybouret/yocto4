@@ -4,7 +4,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         
         const named_color named_color::reg[] =

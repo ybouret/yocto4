@@ -6,7 +6,7 @@
 #include "yocto/utest/run.hpp"
 
 using namespace yocto;
-using namespace graphix;
+using namespace graphics;
 
 namespace
 {

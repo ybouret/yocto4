@@ -2,7 +2,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 #if defined(U)
 #undef U

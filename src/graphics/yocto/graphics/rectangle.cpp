@@ -3,7 +3,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
 
         rectangle:: ~rectangle() throw()

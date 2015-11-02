@@ -15,7 +15,7 @@ extern "C"
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         jpeg_format:: jpeg_format() : image::format("JPEG")
         {
