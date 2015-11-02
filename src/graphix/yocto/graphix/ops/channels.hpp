@@ -48,6 +48,34 @@ namespace yocto
 
                 }
 
+                template <typename T,typename RGB_TYPE>
+                void merge(lockable &) throw()
+                {
+                    assert(source);
+                    assert(target);
+                    const pixmaps<T> &ch  = *static_cast<const pixmaps<T> *>(source);
+                    pixmap<RGB_TYPE> &src = *static_cast<pixmap<RGB_TYPE> *>(target);
+                    const size_t nch = min_of<size_t>(ch.size,sizeof(RGB_TYPE)/sizeof(T));
+
+                    assert(ch.w==src.w);
+                    assert(ch.h==src.h);
+
+                    for(unit_t j=lower.y;j<=upper.y;++j)
+                    {
+                        for(unit_t i=lower.x;i<=upper.x;++i)
+                        {
+                            const RGB_TYPE &p = src[j][i];
+                            T              *q = (T *)&p;
+                            for(size_t c=0;c<nch;++c)
+                            {
+                                q[c] = ch[c][j][i];
+                            }
+                        }
+                    }
+                    
+                }
+
+
 
             private:
                 YOCTO_DISABLE_ASSIGN(patch);
@@ -84,7 +112,33 @@ namespace yocto
                 }
                 if(server) server->flush();
             }
-            
+
+            template <typename T, typename RGB_TYPE>
+            static inline void merge(const pixmaps<T>      &ch,
+                                     pixmap<RGB_TYPE>       &src,
+                                     patches                &chp,
+                                     threading::engine      *server)
+            {
+                assert(ch.w==src.w);
+                assert(ch.h==src.h);
+                faked_lock access;
+                for(size_t i=chp.size();i>0;--i)
+                {
+                    patch &sub = chp[i];
+                    sub.target = &src;
+                    sub.source = &ch;
+                    if(server)
+                    {
+                        server->enqueue( &sub, & patch::merge<T,RGB_TYPE> );
+                    }
+                    else
+                    {
+                        sub.merge<T,RGB_TYPE>(access);
+                    }
+                }
+                if(server) server->flush();
+            }
+
             
         };
     }

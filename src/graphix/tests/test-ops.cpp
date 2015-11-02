@@ -63,6 +63,12 @@ YOCTO_UNIT_TEST_IMPL(ops)
         PNG.save("grad_r.png", ch[0], get_r, NULL);
         PNG.save("grad_g.png", ch[1], get_g, NULL);
         PNG.save("grad_b.png", ch[2], get_b, NULL);
+
+        {
+            pixmap3 gc(pxm.w,pxm.h);
+            channels::merge(ch,gc, chp, &server);
+            PNG.save("grad3.png", gc, NULL);
+        }
         
         std::cerr << "Histograms" << std::endl;
         histogram H;
