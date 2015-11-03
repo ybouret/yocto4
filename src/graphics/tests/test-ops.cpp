@@ -25,6 +25,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
     
     threading::engine server(true);
     
+    std::cerr << "blur::amplitude=" << blur::amplitude << std::endl;
     if(argc>1)
     {
         const string filename = argv[1];

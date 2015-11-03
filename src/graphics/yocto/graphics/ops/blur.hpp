@@ -12,7 +12,7 @@ namespace yocto {
         struct blur
         {
             typedef float  real_type;
-            static  size_t level;
+            static  const  real_type amplitude; //!< sqrt( -2*log(epsilon) )
             
             class patch : public graphics::patch
             {
@@ -73,8 +73,7 @@ namespace yocto {
                     
                     const real_type sig2     = sigma*sigma;
                     const real_type twoSig2  = sig2+sig2;
-                    const real_type delta_sq = sig2 * std::log( real_type(2+blur::level) );
-                    const real_type delta_r  = std::ceil(std::sqrt(delta_sq));
+                    const real_type delta_r  = std::ceil(amplitude*std::fabs(sigma));
                     const unit_t    delta    = unit_t(delta_r);
                     real_type num  = 0;
                     real_type den  = 0;
@@ -87,13 +86,13 @@ namespace yocto {
                     
                     for(unit_t v=vlo;v<=vhi;++v)
                     {
-                        const real_type dv(v-j);
-                        const real_type dv2=dv*dv;
+                        const unit_t dv(v-j);
+                        const unit_t dv2=dv*dv;
                         for(unit_t u=ulo;u<=uhi;++u)
                         {
-                            const real_type du(u-i);
-                            const real_type du2=du*du;
-                            const real_type g = std::exp(-(du2+dv2)/twoSig2);
+                            const unit_t du(u-i);
+                            const unit_t du2=du*du;
+                            const real_type g = std::exp(-real_type(du2+dv2)/twoSig2);
                             num += g*real_type(pxm[v][u]);
                             den += g;
                         }

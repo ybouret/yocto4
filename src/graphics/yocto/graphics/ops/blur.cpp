@@ -1,5 +1,6 @@
 
 #include "yocto/graphics/ops/blur.hpp"
+#include <cfloat>
 
 namespace yocto {
     
@@ -32,8 +33,7 @@ namespace yocto {
             prepare_patches(blr,cpus,surface,true);
         }
         
-        size_t blur::level = 1000;
-        
+        const blur::real_type blur::amplitude = std::sqrt( -2.0f*std::log(FLT_EPSILON) );
     }
     
 }
