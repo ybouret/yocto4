@@ -172,7 +172,8 @@ YOCTO_UNIT_TEST_IMPL(ops)
         
         vector<histogram::cbin> cdf;
         uint8_t lut[256];
-        H.build_cdf(cdf,lut);
+        memset(lut,0,sizeof(lut));
+        H.build_cdf(cdf);
         {
             ios::wcstream fp("cdf.dat");
             for(size_t i=1;i<=cdf.size();++i)

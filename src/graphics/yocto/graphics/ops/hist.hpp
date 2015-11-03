@@ -138,7 +138,7 @@ namespace yocto
             size_t threshold() const throw();
             
             typedef point2d<double> cbin;
-            bool build_cdf(vector<cbin> &cdf, uint8_t *lut) const;
+            bool build_cdf(vector<cbin> &cdf) const;
             
             
             

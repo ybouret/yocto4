@@ -64,7 +64,7 @@ namespace yocto
             }
         }
 
-        bool histogram:: build_cdf(vector<cbin> &cdf, uint8_t *lut) const
+        bool histogram:: build_cdf(vector<cbin> &cdf) const
         {
             cdf.free();
             cdf.ensure(256);
@@ -79,54 +79,7 @@ namespace yocto
                 }
             }
             const size_t n = cdf.size();
-            if(n>=2)
-            {
-                const cbin   cmin = cdf.front();
-                const cbin   cmax = cdf.back();
-                const double dy   = cmax.y-cmin.y;
-                const double dx   = cmax.x-cmin.x;
-                for(size_t i=n;i>0;--i)
-                {
-                    cbin &c = cdf[i];
-                    c.y = 255.0 * (c.y-cmin.y) / dy;
-                    c.x = 255.0 * (c.x-cmin.x) / dx;
-                }
-                
-                if(lut)
-                {
-                    ios::wcstream fp("tmplut.dat");
-                    memset(lut,0,256);
-                    lut[255] = 255;
-                    for(size_t i=254;i>0;--i)
-                    {
-                        const double yi = i;
-                        size_t jlo=1;
-                        size_t jup=n;
-                        while(jup-jlo>1)
-                        {
-                            const size_t jmid = (jup+jlo)>>1;
-                            const double ymid = cdf[jmid].y;
-                            if(ymid<yi)
-                            {
-                                jlo = jmid;
-                            }
-                            else
-                            {
-                                jup = jmid;
-                            }
-                        }
-                        assert(1==jup-jlo);
-                        const cbin clo = cdf[jlo];
-                        const cbin cup = cdf[jup];
-                        const double xi = clo.x + (cup.x-clo.x) * (yi-clo.y)/(cup.y-clo.y);
-                        lut[i] = gist::float2byte(xi/255.0);
-                        fp("%g %g\n", xi, yi);
-                    }
-                }
-                
-                return true;
-            }
-            return false;
+            return n>=2;
         }
 
     }
