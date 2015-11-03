@@ -5,7 +5,7 @@
 
 namespace yocto
 {
-    namespace graphix
+    namespace graphics
     {
         static inline
         void * __Open(const char *filename, const char *mode) throw()
