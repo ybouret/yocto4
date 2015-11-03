@@ -19,6 +19,7 @@ SOURCE_GROUP( graphics/ops FILES ${srcs_ops} )
 INCLUDE_DIRECTORIES( . ../main ../third_party/png ../third_party/jpeg ../tiff++)
 
 ADD_LIBRARY(y-graphics STATIC ${srcs} ${srcs_image} ${srcs_ops} )
+INSTALL( TARGETS y-graphics ARCHIVE DESTINATION lib)
 
 ADD_SUBDIRECTORY(tests)
 

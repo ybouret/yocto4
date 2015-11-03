@@ -23,6 +23,7 @@ IF(TIFF_FOUND)
 		TARGET_LINK_LIBRARIES(y-tiff lzma z jpeg)
 	ENDIF()
 	INSTALL( TARGETS y-tiff LIBRARY DESTINATION lib )
+	INSTALL( FILES  yocto/tiff++/interface.hpp DESTINATION include/yocto/tiff++)
 
 ADD_SUBDIRECTORY(tests)
 
