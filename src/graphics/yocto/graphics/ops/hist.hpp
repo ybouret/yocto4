@@ -63,9 +63,9 @@ namespace yocto
                 const void *src;
                 word_type   count[bins];
 
-                explicit patch(const graphics::patch &p);
+                explicit patch(const graphics::patch &p) throw();
                 virtual ~patch() throw();
-
+		patch(const patch &) throw();
                 template <typename T>
                 void compute(lockable &) throw()
                 {

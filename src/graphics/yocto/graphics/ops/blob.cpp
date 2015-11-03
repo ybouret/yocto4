@@ -15,6 +15,7 @@ namespace yocto
 
         blob::blob(size_t W,size_t H, threading::engine *server) :
         pixmap<type>(W,H),
+	counter(0),
         bp()
         {
 
@@ -75,7 +76,7 @@ namespace yocto
                     {
                         // we are in a blob
                         const vertex here(i,j);
-                        for(unit_t k=0;k<links;++k)
+                        for(size_t k=0;k<links;++k)
                         {
                             const vertex probe = here + gist::delta[k];
                             if(this->has(probe))
@@ -202,7 +203,8 @@ namespace yocto
         graphics::patch(p),
         handle(p.handle),
         target(p.target),
-        source(p.source)
+        source(p.source),
+	output(p.output)
         {
         }
 

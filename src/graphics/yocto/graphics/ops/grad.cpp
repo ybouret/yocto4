@@ -11,14 +11,18 @@ namespace yocto
         }
 
         gradient::patch:: patch(const graphics::patch &p) throw() : graphics::patch(p),
-        gmax(0)
+        gmax(0),
+	target(0),
+	source(0)
         {
         }
 
 
         gradient::patch:: patch(const patch &p) throw() :
         graphics::patch(p),
-        gmax(p.gmax)
+        gmax(p.gmax),
+	target(p.target),
+	source(p.source)
         {
 
         }

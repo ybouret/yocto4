@@ -96,12 +96,20 @@ namespace yocto
         {
         }
 
-        histogram::patch:: patch(const graphics::patch &p):
+        histogram::patch:: patch(const graphics::patch &p) throw() :
         graphics::patch(p),
         src(0),
         count()
         {
-        }        
+        }       
+	
+	histogram::patch:: patch(const patch &p) throw() :
+	graphics::patch(p),
+	src(p.src),
+	count()
+	{
+	}
+	 
         
     }
     

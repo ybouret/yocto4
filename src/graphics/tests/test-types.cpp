@@ -1,6 +1,7 @@
 #include "yocto/graphics/types.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
+#include <cstdio>
 
 using namespace yocto;
 using namespace graphics;
