@@ -49,6 +49,6 @@ YOCTO_UNIT_TEST_IMPL(linear)
         }
     }
     
-    
+
 }
 YOCTO_UNIT_TEST_DONE()
