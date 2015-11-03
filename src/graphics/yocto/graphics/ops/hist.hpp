@@ -5,12 +5,16 @@
 #include "yocto/graphics/parallel.hpp"
 #include "yocto/string.hpp"
 #include "yocto/code/bzset.hpp"
+#include "yocto/container/tuple.hpp"
+
+
 
 namespace yocto
 {
     namespace graphics
     {
 
+        
         //! one histogram of data
         class histogram : public object
         {
@@ -22,7 +26,7 @@ namespace yocto
 
             explicit histogram() throw();
             virtual ~histogram() throw();
-
+            
             //! for parallel code
             template <typename T>
             static inline void __update(word_type *arr, const pixmap<T> &pxm, const graphics::patch &area) throw()
@@ -50,7 +54,7 @@ namespace yocto
             static void __reset(word_type *arr) throw();
             void reset() throw();                   //! everyting to 0
             void save(const string &hname) const;   //!< save to check
-
+            void save(const char   *hname) const;
 
             //! a patch for histogram update
             class patch : public graphics::patch
@@ -132,7 +136,12 @@ namespace yocto
 
             //! Ostu threshold
             size_t threshold() const throw();
-
+            
+            typedef point2d<double> cbin;
+            bool build_cdf(vector<cbin> &cdf, uint8_t *lut) const;
+            
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(histogram);
         };

@@ -4,6 +4,8 @@
 #include "yocto/graphics/pixmaps.hpp"
 #include "yocto/graphics/parallel.hpp"
 #include <cmath>
+#include "yocto/container/matrix.hpp"
+
 namespace yocto {
     
     namespace graphics

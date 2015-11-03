@@ -7,6 +7,7 @@
 #include "yocto/graphics/ops/grad.hpp"
 #include "yocto/graphics/ops/stencil.hpp"
 #include "yocto/graphics/ops/blur.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 #include "yocto/utest/run.hpp"
 
@@ -169,7 +170,23 @@ YOCTO_UNIT_TEST_IMPL(ops)
             
         }
         
-        
+        vector<histogram::cbin> cdf;
+        uint8_t lut[256];
+        H.build_cdf(cdf,lut);
+        {
+            ios::wcstream fp("cdf.dat");
+            for(size_t i=1;i<=cdf.size();++i)
+            {
+                fp("%g %g\n", double(cdf[i].x), double(cdf[i].y) );
+            }
+        }
+        {
+            ios::wcstream fp("lut.dat");
+            for(size_t i=0;i<256;++i)
+            {
+                fp("%d %d\n",int(i),int(lut[i]));
+            }
+        }
     }
 }
 YOCTO_UNIT_TEST_DONE()
