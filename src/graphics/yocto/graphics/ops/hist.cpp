@@ -64,7 +64,7 @@ namespace yocto
             }
         }
 
-        bool histogram:: build_cdf(vector<cbin> &cdf) const
+        bool histogram:: build_cdf(vector<cbin> &cdf, uint8_t *lut) const
         {
             cdf.free();
             cdf.ensure(256);
@@ -75,11 +75,61 @@ namespace yocto
                 if(tmp>0)
                 {
                     curr += tmp;
-                    cdf.append<double,double>(i,curr);
+                    cdf.append<size_t,double>(i,curr);
                 }
             }
             const size_t n = cdf.size();
-            return n>=2;
+
+            if(n>=2)
+            {
+                if(lut)
+                {
+                    std::cerr << "COMPUTING LUT" << std::endl;
+                    memset(lut,0,256);
+                    lut[255] = 255;
+                    const cbin      cmin      = cdf.front();
+                    const cbin      cmax      = cdf.back();
+                    const size_t    xmin      = cmin.x;
+                    const size_t    xmax      = cmax.x;
+                    const size_t    xlen      = xmax-xmin;
+                    const double    ylen      = cmax.y-cmax.x;
+                    for(size_t x=xmin;x<=xmax;++x)
+                    {
+                        //! the should be value
+                        const double yi = cmin.y + ((x-xmin)*ylen)/xlen;
+                        size_t jlo = 1;
+                        size_t jhi = n;
+                        while(jhi-jlo>1)
+                        {
+                            const size_t jmid = (jlo+jhi)>>1;
+                            const double ymid = cdf[jmid].y;
+                            if(ymid<yi)
+                            {
+                                jlo = jmid;
+                            }
+                            else
+                            {
+                                jhi = jmid;
+                            }
+                        }
+                        assert(1==jhi-jlo);
+                        const cbin   lo = cdf[jlo];
+                        const cbin   hi = cdf[jhi];
+                        // raw corresponding fit
+                        const double xi = double(lo.x) + (yi-lo.y) * double(hi.x-lo.x) / (hi.y-lo.y);
+
+                        // expanded fit
+                        const double alpha = (xi-xmin)/xlen;
+                        const size_t xx    = gist::float2byte(alpha);
+                        //std::cerr << "yi=" << yi << "=>" << xi <<  " -> " << xx << std::endl;
+                        lut[x] = xx;
+                    }
+
+
+                }
+                return true;
+            }
+            return false;
         }
 
     }

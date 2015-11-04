@@ -136,11 +136,35 @@ namespace yocto
 
             //! Ostu threshold
             size_t threshold() const throw();
-            
-            typedef point2d<double> cbin;
-            bool build_cdf(vector<cbin> &cdf) const;
-            
-            
+
+            YOCTO_PAIR_DECL(cbin,size_t,x,double,y);
+            YOCTO_PAIR_END();
+
+            bool build_cdf(vector<cbin> &cdf, uint8_t *lut = 0) const; //!< build cdf
+
+            template <typename T> static inline
+            void applyLUT(const uint8_t   *lut,
+                          pixmap<float>   &tgt,
+                          const pixmap<T> &src)
+            {
+                assert(lut);
+                assert(tgt.w==src.w);
+                assert(tgt.h==src.h);
+                const unit_t w = tgt.w;
+                const unit_t h = tgt.h;
+
+                for(unit_t j=0;j<h;++j)
+                {
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        const uint8_t u = lut[ project(src[j][i]) ];
+                        tgt[j][i] = gist::unit_float[u];
+                    }
+                }
+
+            }
+
+
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(histogram);

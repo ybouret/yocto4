@@ -173,7 +173,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
         vector<histogram::cbin> cdf;
         uint8_t lut[256];
         memset(lut,0,sizeof(lut));
-        H.build_cdf(cdf);
+        H.build_cdf(cdf,lut);
         {
             ios::wcstream fp("cdf.dat");
             for(size_t i=1;i<=cdf.size();++i)
@@ -181,6 +181,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
                 fp("%g %g\n", double(cdf[i].x), double(cdf[i].y) );
             }
         }
+
         {
             ios::wcstream fp("lut.dat");
             for(size_t i=0;i<256;++i)
@@ -188,6 +189,13 @@ YOCTO_UNIT_TEST_IMPL(ops)
                 fp("%d %d\n",int(i),int(lut[i]));
             }
         }
+
+        pixmapf enh(pxm.w,pxm.h);
+
+        histogram::applyLUT(lut, enh, pgs);
+        PNG.save("imageENH.png", enh, NULL);
+
+
     }
 }
 YOCTO_UNIT_TEST_DONE()
