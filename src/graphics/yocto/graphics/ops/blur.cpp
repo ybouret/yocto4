@@ -6,6 +6,7 @@ namespace yocto {
     
     namespace graphics
     {
+#if 0
         blur::patch::patch(const graphics::patch &p) throw() :
         graphics::patch(p),
         handle(0),
@@ -34,6 +35,8 @@ namespace yocto {
         }
         
         const blur::real_type blur::amplitude = std::sqrt( -2.0f*std::log(FLT_EPSILON) );
+#endif
+        
     }
     
 }

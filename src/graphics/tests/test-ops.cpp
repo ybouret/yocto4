@@ -26,7 +26,6 @@ YOCTO_UNIT_TEST_IMPL(ops)
     
     threading::engine server(true);
     
-    std::cerr << "blur::amplitude=" << blur::amplitude << std::endl;
     if(argc>1)
     {
         const string filename = argv[1];
@@ -90,14 +89,16 @@ YOCTO_UNIT_TEST_IMPL(ops)
         stencil::finish(sp, g, dest, &server);
         PNG.save("sten.png",dest,NULL);
         
-        
+
+#if 0
         std::cerr << "Blur..." << std::endl;
         blur::patches blr;
         blur::create(blr,pgs,&server);
         blur::launch(blr,g,pgs,2.0f, &server);
         blur::finish(blr,g,dest,&server);
         PNG.save("blur.png",dest,NULL);
-
+#endif
+        
         
         
         std::cerr << "Histograms" << std::endl;

@@ -10,7 +10,8 @@ namespace yocto {
     
     namespace graphics
     {
-    
+
+#if 0
         struct blur
         {
             typedef float  real_type;
@@ -167,6 +168,7 @@ namespace yocto {
             
             
         };
+#endif
         
     }
 }
