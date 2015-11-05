@@ -70,3 +70,29 @@ YOCTO_UNIT_TEST_IMPL(img)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+YOCTO_UNIT_TEST_IMPL(tiff2png)
+{
+    image &IMG = image::instance();
+
+    IMG.declare( new png_format()  );
+    tiff_format *tif = new tiff_format();
+    IMG.declare( tif );
+
+    const image::format &PNG = IMG["PNG"];
+    if(argc>1)
+    {
+        const string   filename = argv[1];
+        const uint32_t nd = tif->count_directories(filename);
+        std::cerr << "Extracting " << nd << " images" << std::endl;
+        for(uint32_t i=0;i<nd;++i)
+        {
+            put_gsf proc;
+            pixmapf pxm(tif->load_bitmap(filename,4,proc,i));
+            PNG.save(vformat("toto%08x.png",unsigned(i)), pxm, NULL);
+        }
+    }
+}
+YOCTO_UNIT_TEST_DONE()
+
