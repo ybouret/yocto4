@@ -90,15 +90,16 @@ YOCTO_UNIT_TEST_IMPL(ops)
         PNG.save("sten.png",dest,NULL);
         
 
-#if 0
         std::cerr << "Blur..." << std::endl;
-        blur::patches blr;
-        blur::create(blr,pgs,&server);
-        blur::launch(blr,g,pgs,2.0f, &server);
-        blur::finish(blr,g,dest,&server);
-        PNG.save("blur.png",dest,NULL);
-#endif
-        
+        blur Blur(pgs,&server);
+        for(unsigned s=1;s<=3;++s)
+        {
+            Blur.compute(s,&server);
+            Blur.apply(g,pgs,&server);
+            PNG.save( vformat("blur%u.png",s), g, NULL);
+        }
+
+
         
         
         std::cerr << "Histograms" << std::endl;
