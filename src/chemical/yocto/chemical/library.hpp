@@ -22,7 +22,8 @@ namespace yocto
             size_t       count; //!< count
             const string key() const throw() { return label; };
 
-            group(const string &grpLabel, const size_t grpCount) :
+            group(const string &grpLabel,
+                  const size_t  grpCount) :
             label(grpLabel),
             count(grpCount)
             {
@@ -34,6 +35,14 @@ namespace yocto
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(group);
+        };
+
+        class compound
+        {
+        public:
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(compound);
         };
 
 
