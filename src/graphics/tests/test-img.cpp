@@ -76,11 +76,12 @@ YOCTO_UNIT_TEST_IMPL(tiff2png)
 {
     image &IMG = image::instance();
 
-    IMG.declare( new png_format()  );
     tiff_format *tif = new tiff_format();
     IMG.declare( tif );
+    IMG.declare( new png_format() );
 
-    const image::format &PNG = IMG["PNG"];
+    const image::format &png = IMG["PNG"];
+
     if(argc>1)
     {
         const string   filename = argv[1];
@@ -88,9 +89,8 @@ YOCTO_UNIT_TEST_IMPL(tiff2png)
         std::cerr << "Extracting " << nd << " images" << std::endl;
         for(uint32_t i=0;i<nd;++i)
         {
-            put_gsf proc;
-            pixmapf pxm(tif->load_bitmap(filename,4,proc,i));
-            PNG.save(vformat("toto%08x.png",unsigned(i)), pxm, NULL);
+            pixmapf pxm(tif->loadf(filename,&i));
+            png.save(vformat("toto%08x.png",unsigned(i)), pxm, NULL);
         }
     }
 }

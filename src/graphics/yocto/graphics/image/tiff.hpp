@@ -18,6 +18,7 @@ namespace yocto
             
             virtual bool     lossless() const throw();
 
+            //! option is &indx, uint32_t
             virtual bitmap  *load(const string          &filename,
                                   unit_t                 depth,
                                   rgba2data             &proc,
@@ -31,10 +32,13 @@ namespace yocto
 
             uint32_t count_directories(const string &filename) const;
 
+            //! load a bitmap with 0<=indx<count_directories
             bitmap *load_bitmap(const string          &filename,
                                 unit_t                 depth,
                                 rgba2data             &proc,
                                 const uint32_t         indx) const;
+            
+
 
         private:
             plugin<I_TIFF> api;

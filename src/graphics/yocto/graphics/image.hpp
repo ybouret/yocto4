@@ -1,9 +1,7 @@
 #ifndef YOCTO_GFX_IMAGE_INCLUDED
 #define YOCTO_GFX_IMAGE_INCLUDED 1
 
-#include "yocto/graphics/rawpix.hpp"
-#include "yocto/graphics/rgba2data.hpp"
-#include "yocto/graphics/data2rgba.hpp"
+#include "yocto/graphics/image-io.hpp"
 
 #include "yocto/ptr/intr.hpp"
 #include "yocto/associative/set.hpp"
@@ -15,12 +13,14 @@ namespace yocto
     namespace graphics
     {
 
-        class image : public singleton<image>
+
+
+        class image : public singleton<image>, public imageIO
         {
         public:
 
             //! image format
-            class format : public counted_object
+            class format : public counted_object, public imageIO
             {
             public:
                 typedef intr_ptr<string,format> pointer;
@@ -35,10 +35,6 @@ namespace yocto
                 // virtual interface
                 //______________________________________________________________
                 virtual bool     lossless() const throw() = 0;
-                virtual bitmap  *load(const string         &filename,
-                                      unit_t                depth,
-                                      rgba2data            &proc,
-                                      const void           *options) const = 0;
 
                 virtual void     save(const string        &filename,
                                       const bitmap        &bmp,
@@ -46,10 +42,10 @@ namespace yocto
                                       const void          *options) const = 0;
 
                 virtual const char **extensions() const throw() = 0;
-               
+
                 const string & key() const throw();
 
-               
+
                 //______________________________________________________________
                 //
                 // Non virtual interface
@@ -59,7 +55,7 @@ namespace yocto
                 void save(const string &filename, const pixmap1 &bmp, const char *options) const;
                 void save(const string &filename, const pixmapf &bmp, const char *options) const;
 
-                
+
             protected:
                 explicit format(const char *id);
 
@@ -73,16 +69,10 @@ namespace yocto
             const format & operator[](const char   *) const;
 
             // find someone for the extension
-            bitmap *load(const string         &path,
-                         unit_t                depth,
-                         rgba2data            &proc,
-                         const void           *options) const;
-            
-            
-            bitmap *load4(const string &path, const void *options) const;
-            bitmap *load3(const string &path, const void *options) const;
-            bitmap *loadf(const string &path, const void *options) const;
-            bitmap *load1(const string &path, const void *options) const;
+            virtual bitmap *load(const string         &path,
+                                 unit_t                depth,
+                                 rgba2data            &proc,
+                                 const void           *options) const;
 
         private:
             explicit image();

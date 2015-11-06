@@ -124,7 +124,7 @@ namespace yocto
             return fmt.load(path, depth, proc, options);
         }
         
-        
+#if 0
         bitmap *image:: load4(const string &path, const void *options) const
         {
             put_rgba proc;
@@ -149,6 +149,7 @@ namespace yocto
             put_gsu proc;
             return load(path,1,proc,options);
         }
+#endif
     }
     
 }
