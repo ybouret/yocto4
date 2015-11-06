@@ -79,7 +79,7 @@ YOCTO_UNIT_TEST_IMPL(ari)
             {
                 const uint64_t m = max_comb.to<uint64_t>();
                 const double   x = double(m);
-                fp("%llu %llu %g\n", n,m, log(x));
+                fp("%llu %llu %g\n", (unsigned long long)n, (unsigned long long)m, log(x));
             }
         }
     }

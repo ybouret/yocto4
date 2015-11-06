@@ -31,7 +31,7 @@ namespace yocto
                 inline const T &operator[](unit_t i) const throw()
                 { assert(i>=0); assert(i<w); return p[i]; }
 
-                const size_t w;
+                const unit_t w;
 
             private:
                 T          *p;

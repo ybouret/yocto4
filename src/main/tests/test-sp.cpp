@@ -71,7 +71,7 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(alias_ptr)
 {
-    typedef alias_ptr<uint32_t,dummy> aptr;
+    //typedef alias_ptr<uint32_t,dummy> aptr;
 
 }
 YOCTO_UNIT_TEST_DONE()
