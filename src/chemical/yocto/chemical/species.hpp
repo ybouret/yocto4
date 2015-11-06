@@ -11,14 +11,20 @@ namespace yocto
     namespace chemical
     {
 
+        //! a species
         class species : public counted_object, public vslot
         {
         public:
-            explicit species(const string &sp_name, const int sp_z);
-            virtual ~species() throw();
+            typedef arc_ptr<species> pointer;
+
 
             const string name;
             const int    z;
+            
+            explicit species(const string &sp_name, const int sp_z);
+            virtual ~species() throw();
+
+            const string key()  throw();
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(species);
