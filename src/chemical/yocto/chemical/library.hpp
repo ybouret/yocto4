@@ -11,6 +11,32 @@ namespace yocto
 
         typedef lang::syntax::xnode xnode;
 
+
+        class group : public counted_object
+        {
+        public:
+            typedef arc_ptr<group> pointer;
+            typedef set<string,group::pointer> database;
+            
+            const string label; //!< atom or residue
+            size_t       count; //!< count
+            const string key() const throw() { return label; };
+
+            group(const string &grpLabel, const size_t grpCount) :
+            label(grpLabel),
+            count(grpCount)
+            {
+            }
+
+            virtual ~group() throw()
+            {
+            }
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(group);
+        };
+
+
         class library : public object
         {
         public:

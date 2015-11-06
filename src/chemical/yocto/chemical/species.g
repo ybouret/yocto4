@@ -2,13 +2,14 @@
 .species;
 
 species   : molecule*;
-n     : "[1-9][:digit:]*";
+n         : "[1-9][:digit:]*";
 
 link  : stoi+;
 stoi  : core n?;
 core  : '(' link ')' | atom | residue;
 
-molecule  : link charge?;
+alias     : "@[:alpha:]+";
+molecule  : link charge? alias?;
 
 
 charge    : plus | minus;
