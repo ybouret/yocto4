@@ -29,32 +29,14 @@ namespace yocto
                 const string name;
 
                 virtual ~format() throw();
+                const string & key() const throw();
 
                 //______________________________________________________________
                 //
                 // virtual interface
                 //______________________________________________________________
-                virtual bool     lossless() const throw() = 0;
-
-                virtual void     save(const string        &filename,
-                                      const bitmap        &bmp,
-                                      data2rgba           &proc,
-                                      const void          *options) const = 0;
-
+                virtual bool         lossless() const throw() = 0;
                 virtual const char **extensions() const throw() = 0;
-
-                const string & key() const throw();
-
-
-                //______________________________________________________________
-                //
-                // Non virtual interface
-                //______________________________________________________________
-                void save(const string &filename, const pixmap4 &bmp, const char *options) const;
-                void save(const string &filename, const pixmap3 &bmp, const char *options) const;
-                void save(const string &filename, const pixmap1 &bmp, const char *options) const;
-                void save(const string &filename, const pixmapf &bmp, const char *options) const;
-
 
             protected:
                 explicit format(const char *id);
@@ -68,12 +50,17 @@ namespace yocto
             const format & operator[](const string &) const;
             const format & operator[](const char   *) const;
 
-            // find someone for the extension
+            //! find someone for the extension
             virtual bitmap *load(const string         &path,
                                  unit_t                depth,
                                  rgba2data            &proc,
                                  const void           *options) const;
 
+            //! find someone for the extension
+            virtual void     save(const string        &filename,
+                                  const bitmap        &bmp,
+                                  data2rgba           &proc,
+                                  const void          *options) const;
         private:
             explicit image();
             virtual ~image() throw();

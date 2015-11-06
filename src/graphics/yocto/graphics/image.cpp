@@ -5,21 +5,21 @@ namespace yocto
 {
     namespace graphics
     {
-        
+
         image::format:: format(const char *id) : name(id)
         {
         }
-        
+
         image::format:: ~format() throw()
         {
         }
-        
+
         const string & image::format:: key() const throw()
         {
             return name;
         }
-        
-        
+
+
     }
 }
 
@@ -33,13 +33,13 @@ namespace yocto
         image:: image() : formats(8,as_capacity)
         {
         }
-        
+
         image:: ~image() throw()
         {
         }
-        
+
         const char image::name[] = "image";
-        
+
         void image:: declare( format *fmt )
         {
             assert(fmt);
@@ -49,7 +49,7 @@ namespace yocto
                 throw exception("multiple image format '%s'", fmt->name.c_str());
             }
         }
-        
+
         const image::format & image:: operator[](const string &id) const
         {
             const format::pointer *pp = formats.search(id);
@@ -57,13 +57,13 @@ namespace yocto
                 throw exception("no image format '%s'", id.c_str());
             return **pp;
         }
-        
+
         const image::format & image:: operator[](const char *id) const
         {
             const string ID(id);
             return (*this)[ID];
         }
-        
+
         const image::format & image::get_format_for( const string &path ) const
         {
             string ext = vfs::get_extension(path);
@@ -85,36 +85,12 @@ namespace yocto
                     }
                 }
             }
-            throw exception("no format may load '%s'", ext.c_str());
-        }
-        
-        void image::format::save(const string &filename, const pixmap4 &bmp,const char *options) const
-        {
-            get_rgba proc;
-            save(filename,bmp,proc,options);
-        }
-        
-
-        void image::format::save(const string &filename, const pixmap3 &bmp,const char *options) const
-        {
-            get_rgb proc;
-            save(filename,bmp,proc,options);
-        }
-        
-        void image::format::save(const string &filename, const pixmap1 &bmp,const char *options) const
-        {
-            get_gsu proc;
-            save(filename,bmp,proc,options);
-        }
-        
-        void image::format::save(const string &filename, const pixmapf &bmp,const char *options) const
-        {
-            get_gsf proc;
-            save(filename,bmp,proc,options);
+            throw exception("no registered format may handle '%s'", ext.c_str());
         }
 
-        
-        
+
+
+
         bitmap *image::load(const string         &path,
                             unit_t                depth,
                             rgba2data            &proc,
@@ -123,33 +99,17 @@ namespace yocto
             const format &fmt = get_format_for(path);
             return fmt.load(path, depth, proc, options);
         }
-        
-#if 0
-        bitmap *image:: load4(const string &path, const void *options) const
+
+        void image::save(const string        &path,
+                         const bitmap        &bmp,
+                         data2rgba           &proc,
+                         const void          *options) const
         {
-            put_rgba proc;
-            return load(path,4,proc,options);
-        }
-        
-        bitmap *image:: load3(const string &path, const void *options) const
-        {
-            put_rgb proc;
-            return load(path,3,proc,options);
+            const format &fmt = get_format_for(path);
+            fmt.save(path,bmp,proc,options);
         }
         
         
-        bitmap *image:: loadf(const string &path, const void *options) const
-        {
-            put_gsf proc;
-            return load(path,4,proc,options);
-        }
-        
-        bitmap *image:: load1(const string &path, const void *options) const
-        {
-            put_gsu proc;
-            return load(path,1,proc,options);
-        }
-#endif
     }
     
 }

@@ -17,7 +17,7 @@ namespace yocto
             put_rgba proc;
             return load(path,4,proc,options);
         }
-        
+
         bitmap * imageIO:: load3(const string &path, const void *options) const
         {
             put_rgb proc;
@@ -39,3 +39,38 @@ namespace yocto
 
     }
 }
+
+namespace yocto
+{
+    namespace graphics
+    {
+        void imageIO::save(const string &filename, const pixmap4 &bmp,const char *options) const
+        {
+            get_rgba proc;
+            save(filename,bmp,proc,options);
+        }
+
+
+        void imageIO::save(const string &filename, const pixmap3 &bmp,const char *options) const
+        {
+            get_rgb proc;
+            save(filename,bmp,proc,options);
+        }
+
+        void imageIO::save(const string &filename, const pixmap1 &bmp,const char *options) const
+        {
+            get_gsu proc;
+            save(filename,bmp,proc,options);
+        }
+        
+        void imageIO::save(const string &filename, const pixmapf &bmp,const char *options) const
+        {
+            get_gsf proc;
+            save(filename,bmp,proc,options);
+        }
+        
+    }
+    
+}
+
+
