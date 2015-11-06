@@ -2,7 +2,8 @@
 .species;
 
 species  : molecule*;
-fragment : content | '(' content ')';
+coeff    : "[:digit:]+";
+group    : content | '(' content ')';
 
 
 // lexical rules
