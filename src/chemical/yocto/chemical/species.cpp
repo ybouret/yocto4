@@ -4,6 +4,7 @@ namespace yocto
 {
     namespace  chemical
     {
+#if 0
         species:: ~species() throw()
         {
         }
@@ -15,6 +16,8 @@ namespace yocto
         z(sp_z)
         {
         }
+#endif
+        
 
         
     }

@@ -6,6 +6,6 @@ using namespace chemical;
 
 YOCTO_UNIT_TEST_IMPL(species)
 {
-    std::cerr << "sizeof(species)=" << sizeof(species) << std::endl;
+    //std::cerr << "sizeof(species)=" << sizeof(species) << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

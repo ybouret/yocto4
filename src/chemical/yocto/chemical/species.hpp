@@ -11,6 +11,7 @@ namespace yocto
     namespace chemical
     {
 
+#if 0
         //! a species
         class species : public counted_object, public vslot
         {
@@ -29,7 +30,8 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(species);
         };
-
+#endif
+        
     }
 }
 

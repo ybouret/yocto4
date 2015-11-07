@@ -8,7 +8,7 @@ link  : stoi+;
 stoi  : core n?;
 core  : '(' link ')' | atom | residue;
 
-alias     : "@[:alpha:]+";
+alias     : "@[[:word:]_]+";
 molecule  : link charge? alias?;
 
 
@@ -27,4 +27,4 @@ atom    :
 'Na' | 'Mg' | 'Al' | 'Si' | 'P'  | 'Cl' |
 'K'  | 'Ca' | 'Ti' | 'Cr' | 'Mn' | 'Fe' | 'Co' | 'Ni' | 'Cu' | 'Zn' | 'Br' | 'I';
 
-residue : "'[:alpha:]+'";
+residue : "'[[:word:]_]+'";
