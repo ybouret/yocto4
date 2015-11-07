@@ -3,7 +3,7 @@
 
 #include "yocto/counted-object.hpp"
 #include "yocto/string.hpp"
-
+#include "yocto/ptr/intr.hpp"
 
 namespace yocto
 {
@@ -12,7 +12,8 @@ namespace yocto
         //! a group=(residue|label) with label/count
         class group : public counted_object
         {
-        public:            
+        public:
+            typedef intr_ptr<string,group> pointer;
             const string  label; //!< atom or residue
             int           count; //!< count
             const string &key() const throw();
@@ -24,43 +25,40 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(group);
         };
-        
-#if 0
-        //! managing groups algebra
-        class groups : public group::database
+
+    }
+
+}
+
+#include "yocto/associative/set.hpp"
+
+namespace yocto
+{
+
+    namespace chemical
+    {
+        typedef set<string,group::pointer> _groups;
+
+        //! managing groups
+        class groups : public _groups
         {
         public:
-            virtual ~groups() throw() {}
-            groups() : group::database()
-            {
-            }
-            
-            void add( const string &grpLabel, const int grpCount)
-            {
-                if(grpCount!=0)
-                {
-                    group::pointer *ppG = search(grpLabel);
-                    if(ppG)
-                    {
-                        int &count = (**ppG).count;
-                        count += grpCount;
-                    }
-                    else
-                    {
-                        const group::pointer grp( new group(grpLabel,grpCount) );
-                        if(!insert(grp))
-                        {
-                            throw exception("add new group '%s' unexpected failure!",grpLabel.c_str());
-                        }
-                    }
-                }
-            }
-            
+            virtual ~groups() throw();
+            explicit groups();
+
+            void add( const string &grpLabel, const int grpCount);
+            void add( const group &grp );
+            void sub( const group &grp );
+
+            void add( const _groups &other );
+            void sub( const _groups &other );
+
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(groups);
         };
-#endif
-        
+
     }
     
 }
