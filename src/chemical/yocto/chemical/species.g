@@ -1,15 +1,14 @@
 // grammar for species names
 .species;
 
-species   : (molecule ';')*;
+species   : molecule?;
 n         : "[1-9][:digit:]*";
 
-link  : stoi+;
-stoi  : core n?;
-core  : '(' link ')' | atom | residue;
-
-alias     : "@[[:word:]_]+";
-molecule  : link charge? alias?;
+link      : stoi+;
+stoi      : core n?;
+core      : '(' link ')' | atom | residue;
+tag       : "@[[:word:]_]+";
+molecule  : link charge? tag?;
 
 
 charge    : plus | minus;
@@ -27,4 +26,4 @@ atom    :
 'Na' | 'Mg' | 'Al' | 'Si' | 'P'  | 'S'  | 'Cl' |
 'K'  | 'Ca' | 'Ti' | 'Cr' | 'Mn' | 'Fe' | 'Co' | 'Ni' | 'Cu' | 'Zn' | 'Br' | 'I';
 
-residue : "'[[:word:]_]+'";
+residue : "\\{[[:word:]_]+\\}";

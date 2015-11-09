@@ -45,6 +45,7 @@ namespace yocto
         public:
             virtual ~groups() throw();
             explicit groups();
+            groups(const groups &other);
 
             void add( const string &grpLabel, const int grpCount);
             void add( const group &grp );
@@ -56,7 +57,7 @@ namespace yocto
             void sort() throw();
 
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(groups);
+            YOCTO_DISABLE_ASSIGN(groups);
             static  int compare_group(const group::pointer &lhs, const group::pointer &rhs) throw();
 
         };

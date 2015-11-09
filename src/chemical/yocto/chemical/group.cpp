@@ -49,6 +49,12 @@ namespace yocto
 
         groups:: ~groups() throw() {}
 
+        groups:: groups(const groups &other) : _groups(other)
+        {
+            sort();
+        }
+
+
         void groups:: add( const string &grpLabel, const int grpCount)
         {
             if(grpCount!=0)
@@ -76,6 +82,8 @@ namespace yocto
                 }
             }
         }
+
+
 
         void groups:: add( const group &grp )
         {

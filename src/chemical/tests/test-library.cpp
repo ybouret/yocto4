@@ -25,7 +25,8 @@ YOCTO_UNIT_TEST_IMPL(library)
         {
             if("molecule"==sub->label)
             {
-                
+                const string id = species::name_of(sub);
+                std::cerr << "id=" << id << std::endl;
             }
         }
     }

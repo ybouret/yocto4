@@ -20,10 +20,11 @@ namespace yocto
 
 
             virtual ~species() throw();
-            
+
+            static string name_of( const xnode *molecule );
 
         private:
-
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(species);
         };
 
