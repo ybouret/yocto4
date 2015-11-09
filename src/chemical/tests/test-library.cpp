@@ -11,7 +11,7 @@ YOCTO_UNIT_TEST_IMPL(library)
     library lib;
 
     std::cerr << "Ready" << std::endl;
-
+    
     string        line;
     ios::icstream input( ios::cstdin );
     xnode *node = lib.parse_species(input);
@@ -25,8 +25,11 @@ YOCTO_UNIT_TEST_IMPL(library)
         {
             if("molecule"==sub->label)
             {
-                const string id = species::name_of(sub);
+                const string id = species::nameOf(sub);
                 std::cerr << "id=" << id << std::endl;
+                species::pointer sp( species::create(sub) );
+                std::cerr << "sp=" << sp->name << std::endl;
+                std::cerr << "charge=" << sp->charge << std::endl;
             }
         }
     }

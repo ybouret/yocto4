@@ -21,7 +21,8 @@ namespace yocto
             explicit group(const string &grpLabel,const int grpCount);
             virtual ~group() throw();
             
-            
+            friend std::ostream & operator<<( std::ostream &os, const group &g);
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(group);
         };
@@ -54,7 +55,10 @@ namespace yocto
             void add( const _groups &other );
             void sub( const _groups &other );
 
-            void sort() throw();
+            void sort() throw(); //!< sort names
+
+            friend std::ostream & operator<<( std::ostream &os, const groups &g);
+
 
         private:
             YOCTO_DISABLE_ASSIGN(groups);

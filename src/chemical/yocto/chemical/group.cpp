@@ -1,5 +1,5 @@
 #include "yocto/chemical/group.hpp"
-
+#include <iostream>
 
 namespace yocto
 {
@@ -21,7 +21,11 @@ namespace yocto
         {
         }
 
-
+        std::ostream & operator<<( std::ostream &os, const group &g)
+        {
+            os << '(' << g.label << ':' << g.count << ')';
+            return os;
+        }
 
     }
 
@@ -120,6 +124,17 @@ namespace yocto
 
         }
 
+        std::ostream & operator<<( std::ostream &os, const groups &G)
+        {
+            os << '{';
+            for(_groups::const_iterator i=G.begin();i!=G.end();++i)
+            {
+                const group &g = **i;
+                os << ' ' << g;
+            }
+            os << ' ' << '}';
+            return os;
+        }
 
 
     }
