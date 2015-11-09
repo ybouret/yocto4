@@ -10,13 +10,24 @@ YOCTO_UNIT_TEST_IMPL(library)
 {
     library lib;
 
+    std::cerr << "Ready" << std::endl;
+
     string        line;
     ios::icstream input( ios::cstdin );
-    auto_ptr<xnode> sp( lib.parse_species(input) );
+    xnode *node = lib.parse_species(input);
+    auto_ptr<xnode> sp( node );
     if(sp.is_valid())
     {
         sp->graphviz("spec.dot");
         ios::graphviz_render("spec.dot");
+        const xnode::leaves &ch = node->children();
+        for(const xnode *sub = ch.head; sub; sub=sub->next)
+        {
+            if("molecule"==sub->label)
+            {
+                
+            }
+        }
     }
 
 

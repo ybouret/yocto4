@@ -53,10 +53,12 @@ namespace yocto
             void add( const _groups &other );
             void sub( const _groups &other );
 
-
+            void sort() throw();
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(groups);
+            static  int compare_group(const group::pointer &lhs, const group::pointer &rhs) throw();
+
         };
 
     }

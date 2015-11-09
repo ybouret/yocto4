@@ -1,7 +1,7 @@
 // grammar for species names
 .species;
 
-species   : molecule*;
+species   : (molecule ';')*;
 n         : "[1-9][:digit:]*";
 
 link  : stoi+;
@@ -16,15 +16,15 @@ charge    : plus | minus;
 plus      : "\\++";
 minus     : "-+";
 
-$no_single : link stoi;
+//$no_single : link stoi;
 
 // lexical rules
 @drop   : "[:blank:]";
 @endl   : "[:endl:]";
 
 atom    :
-'H'  | 'Li' | 'B'  | 'C'  | 'N'  | 'O'  | 'F' |
-'Na' | 'Mg' | 'Al' | 'Si' | 'P'  | 'Cl' |
+'H'  | 'Li' | 'B'  | 'C'  | 'N'  | 'O'  | 'F'  |
+'Na' | 'Mg' | 'Al' | 'Si' | 'P'  | 'S'  | 'Cl' |
 'K'  | 'Ca' | 'Ti' | 'Cr' | 'Mn' | 'Fe' | 'Co' | 'Ni' | 'Cu' | 'Zn' | 'Br' | 'I';
 
 residue : "'[[:word:]_]+'";

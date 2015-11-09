@@ -1,37 +1,32 @@
 #ifndef YOCTO_CHEMICAL_SPECIES_INCLUDED
 #define YOCTO_CHEMICAL_SPECIES_INCLUDED 1
 
-#include "yocto/ptr/arc.hpp"
-#include "yocto/counted-object.hpp"
-#include "yocto/container/vslot.hpp"
-#include "yocto/string.hpp"
+#include "yocto/chemical/group.hpp"
+#include "yocto/lang/syntax/xnode.hpp"
 
 namespace yocto
 {
     namespace chemical
     {
 
-#if 0
-        //! a species
-        class species : public counted_object, public vslot
+        typedef lang::syntax::xnode xnode;
+
+        class species : public counted_object
         {
         public:
-            typedef arc_ptr<species> pointer;
-
-
             const string name;
-            const int    z;
-            
-            explicit species(const string &sp_name, const int sp_z);
-            virtual ~species() throw();
+            const int    charge;
+            const groups formula;
 
-            const string key()  throw();
+
+            virtual ~species() throw();
+            
 
         private:
+
             YOCTO_DISABLE_COPY_AND_ASSIGN(species);
         };
-#endif
-        
+
     }
 }
 

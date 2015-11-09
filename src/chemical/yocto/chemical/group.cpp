@@ -34,6 +34,15 @@ namespace yocto
 
     namespace chemical
     {
+        int groups:: compare_group(const group::pointer &lhs, const group::pointer &rhs) throw()
+        {
+            return string::compare(lhs->key(), rhs->key());
+        }
+
+
+        void groups::sort() throw()
+        { sort_by(compare_group); }
+
         groups:: groups() : _groups(8,as_capacity)
         {
         }

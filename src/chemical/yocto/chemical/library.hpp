@@ -2,9 +2,8 @@
 #define YOCTO_CHEMICAL_LIBRARY_INCLUDED 1
 
 
-#include "yocto/chemical/group.hpp"
+#include "yocto/chemical/species.hpp"
 #include "yocto/lang/parser.hpp"
-#include "yocto/exception.hpp"
 
 namespace yocto
 {
