@@ -20,6 +20,11 @@ namespace yocto
         namespace
         {
 
+            //==================================================================
+            //
+            // base class for builders
+            //
+            //==================================================================
             static const char *core_words[] =
             {
                 "link",
@@ -54,6 +59,12 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(builder);
             };
 
+
+            //==================================================================
+            //
+            // Fast,Name-Only Builder
+            //
+            //==================================================================
             class nameBuilder : public builder
             {
             public:
@@ -75,17 +86,17 @@ namespace yocto
                         {
                             case 0: // minus
                                 assert("minus"==extra->label);
-                                std::cerr << "minus:" << str << std::endl;
+                                //std::cerr << "minus:" << str << std::endl;
                                 break;
 
                             case 1: // plus
                                 assert("plus"==extra->label);
-                                std::cerr << "plus :" << str << std::endl;
+                                //std::cerr << "plus :" << str << std::endl;
                                 break;
 
                             case 2: // tag
                                 assert("tag"==extra->label);
-                                std::cerr << "tag  :" << str << std::endl;
+                                //std::cerr << "tag  :" << str << std::endl;
                                 break;
 
                             default:
@@ -170,7 +181,18 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(nameBuilder);
             };
+
+            //==================================================================
+            //
+            // Full Builder...
+            //
+            //==================================================================
+
         }
+
+
+
+
         
         string species:: name_of( const xnode *molecule )
         {
