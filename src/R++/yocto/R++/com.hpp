@@ -4,6 +4,7 @@
 #include "yocto/container/matrix.hpp"
 #include "yocto/sequence/lw-array.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/string.hpp"
 
 #if defined(YOCTO_WIN)
 #undef ERROR
@@ -364,7 +365,7 @@ return R_NilValue; }\
         }
 
         //! create a list for R, take care of indices...
-        RList(const array<const char*> &names) :
+        RList(const array<string> &names) :
         size( check_list_size(names.size()) ),
         L(allocVector(VECSXP,size))
         {
@@ -375,7 +376,7 @@ return R_NilValue; }\
             PROTECT(list_names = allocVector(STRSXP,size));
             for(size_t i = 0; i < size; i++)
             {
-                SET_STRING_ELT(list_names,i,mkChar(names[i+1]));
+                SET_STRING_ELT(list_names,i,mkChar(names[i+1].c_str()));
             }
             setAttrib(L, R_NamesSymbol, list_names);
             UNPROTECT(1);
