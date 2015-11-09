@@ -21,9 +21,9 @@ YOCTO_R_FUNCTION(VectorSum,(SEXP vecR))
 {
     RVector<double> vec( vecR );
     Rprintf("%s: #data=%u\n", __fn, unsigned(vec.size()) );
-    std::cerr << vec << std::endl;
+    //std::cerr << vec << std::endl;
     quicksort(vec);
-    std::cerr << vec << std::endl;
+    //std::cerr << vec << std::endl;
     double ans = 0;
     for(size_t i=1;i<=vec.size();++i)
     {
@@ -35,20 +35,20 @@ YOCTO_R_FUNCTION(VectorSum,(SEXP vecR))
     s[1] = ans;
     return *s;
 
-    }
-    YOCTO_R_RETURN()
+}
+YOCTO_R_RETURN()
 
-    
+
 YOCTO_R_FUNCTION(MatrixTransNeg,(SEXP matR))
 {
     RMatrix<double> mat(matR);
-    std::cerr << "mat=" << mat << std::endl;
+    //std::cerr << "mat=" << mat << std::endl;
     RMatrix<double> ans(mat.cols,mat.rows);
     for(size_t j=mat.cols;j>0;--j)
     {
         for(size_t i=mat.rows;i>0;--i)
         {
-            ans[i][j] = mat[j][i];
+            ans[i][j] = -mat[j][i];
         }
     }
     return *ans;
