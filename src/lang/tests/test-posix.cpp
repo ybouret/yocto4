@@ -3,6 +3,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ptr/auto.hpp"
 #include <cstdlib>
+#include "yocto/ios/graphviz.hpp"
 
 using namespace yocto;
 using namespace lang;
@@ -13,10 +14,8 @@ void test_posix_for(const char *name, pattern *p )
     auto_ptr<pattern> q(p);
     string bname = name;
     const string vizname = bname + ".dot";
-    const string pngname = bname + ".png";
     q->graphviz(vizname);
-    const string cmd     = "dot -Tpng " + vizname + " -o " + pngname;
-    (void)system( cmd.c_str() );
+    ios::graphviz_render(vizname);
     std::cerr << name << " accepts emtpy = " << ( q->accept_empty() ? "TRUE" : "FALSE") << std::endl;
 }
 
@@ -40,6 +39,7 @@ YOCTO_UNIT_TEST_IMPL(posix)
     DO_TEST(dot);
     DO_TEST(cstring);
 
+    DO_TEST(base64);
 }
 YOCTO_UNIT_TEST_DONE()
 

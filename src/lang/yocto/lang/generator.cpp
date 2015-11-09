@@ -174,8 +174,8 @@ namespace yocto
             auto_ptr<syntax::xnode> guard(tree);
             if(output)
             {
-                tree->graphviz("lang_raw.dot");
-                ios::graphviz_render("lang_raw.dot");
+                tree->graphviz("usr_def.dot");
+                ios::graphviz_render("usr_def.dot");
             }
 
             //__________________________________________________________________
@@ -185,8 +185,8 @@ namespace yocto
             rewrite( tree );
             if(output)
             {
-                tree->graphviz("lang_tree.dot");
-                ios::graphviz_render("lang_tree.dot");
+                tree->graphviz("usr_tree.dot");
+                ios::graphviz_render("usr_tree.dot");
             }
 
             //__________________________________________________________________

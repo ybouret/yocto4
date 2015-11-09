@@ -143,21 +143,21 @@ namespace yocto
 
             return p.yield();
         }
-        
-        
+
+
         pattern * posix:: cstring()
         {
-            
+
             auto_ptr<logical> p( AND::create() );
-            
+
             p->append( single::create('"'));
             {
                 auto_ptr<logical> q( OR::create() );
-                
+
                 q->append(range::create(32,33));
                 q->append(range::create(35,91));
                 q->append(range::create(93,126));
-                
+
                 {
                     auto_ptr<logical> esc( AND::create() );
                     esc->append(single::create( 92 ));
@@ -176,11 +176,34 @@ namespace yocto
 
                 p->append( zero_or_more(q.yield()) );
             }
-            
+
             p->append( single::create('"'));
+
+            return p.yield();
+
+        }
+
+        pattern *posix::base64()
+        {
+            auto_ptr<logical> p( AND::create() );
+
+            {
+                logical *q = OR::create();
+                p->append(q);
+                q->append( range::create('A','B') );
+                q->append( range::create('a','b') );
+                q->append( range::create('0','9') );
+                q->append( single::create('+') );
+                q->append( single::create('/') );
+            }
+
+            {
+                pattern *q = counting::create(single::create('='),0,2);
+                p->append(q);
+            }
+            
             
             return p.yield();
-            
         }
         
         

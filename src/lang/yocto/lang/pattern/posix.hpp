@@ -30,6 +30,7 @@ namespace yocto
             static pattern *endl();    //!< \n|\r|\r\n
             static pattern *dot();     //!< [^\n\r]
             static pattern *cstring(); //!< ISO C string
+            static pattern *base64();  //!< iso base64 string
         };
         
     }

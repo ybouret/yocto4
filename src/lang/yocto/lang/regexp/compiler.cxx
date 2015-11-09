@@ -522,6 +522,7 @@ namespace yocto
             Y_RX_POSIX(endl);
             Y_RX_POSIX(dot);
             Y_RX_POSIX(cstring);
+            Y_RX_POSIX(base64);
 
             throw exception("unknown POSIX '%s'", id.c_str());
         }
