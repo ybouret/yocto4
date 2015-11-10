@@ -75,7 +75,7 @@ namespace yocto
                 if(tmp>0)
                 {
                     curr += tmp;
-                    cdf.append<size_t,double>(i,curr);
+                    cdf.append<size_t,double>(i,double(curr));
                 }
             }
             const size_t n = cdf.size();
@@ -120,7 +120,7 @@ namespace yocto
 
                         // expanded fit
                         const double alpha = (xi-xmin)/xlen;
-                        const size_t xx    = gist::float2byte(alpha);
+                        const size_t xx    = gist::float2byte(float(alpha));
                         //std::cerr << "yi=" << yi << "=>" << xi <<  " -> " << xx << std::endl;
                         lut[x] = xx;
                     }

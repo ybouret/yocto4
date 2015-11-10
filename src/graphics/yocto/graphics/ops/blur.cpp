@@ -74,7 +74,7 @@ namespace yocto {
 
         void blur:: compute(const float sigma, threading::engine *server)
         {
-            const double sig2 = sigma*sigma;
+            const float sig2 = sigma*sigma;
             scaling = sig2+sig2;
             delta   = unit_t(std::ceil( std::sqrt( -std::log(FLT_EPSILON) * scaling ) ));
             std::cerr << "delta(" << sigma << ")=" << delta << std::endl;
