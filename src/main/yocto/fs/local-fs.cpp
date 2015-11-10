@@ -9,11 +9,22 @@
 #endif
 
 #if defined(YOCTO_WIN)
+
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #include <windows.h>
 #if defined(__DMC__)
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#endif
+
+#if defined(__GNUC__)
+extern "C"
+{
+BOOL WINAPI GetFileSizeEx(
+    HANDLE         hFile,
+    PLARGE_INTEGER lpFileSize
+);
+}
 #endif
 
 #endif
@@ -190,18 +201,18 @@ namespace yocto
         {
             throw win32::exception( ::GetLastError(), "OpenExistingFile" );
         }
-        
+
         if( !::GetFileSizeEx(hFile, &nLargeInteger) )
         {
             ::CloseHandle(hFile);
             throw win32::exception( ::GetLastError(), "GetFileSizeEx" );
         }
-        
+
         ::CloseHandle(hFile);
         return uint64_t(nLargeInteger.QuadPart);
 #endif
         throw exception("get_file_size not implemented");
     }
-    
-    
+
+
 }

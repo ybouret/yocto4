@@ -38,6 +38,21 @@ extern "C" {
 }
 #	endif // __DMC__
 
+#if defined(__GNUC__)
+extern "C"
+{
+
+     int WSAAPI getaddrinfo(
+                           const char *nodename,
+                           const char *servname,
+                           const struct addrinfo *fmt,
+                           struct addrinfo **res
+                           );
+
+    void WSAAPI freeaddrinfo( struct addrinfo *ai );
+}
+#endif
+
 #endif
 
 #include <cstring>
@@ -79,15 +94,15 @@ namespace yocto {
             const net16_t p = ip.port; //-- save port
             memcpy( ip.rw(), ai0->ai_addr, ip.length() );
             ip.port = p;               //-- restore port
-            
+
             ::freeaddrinfo(ai0);
-            
+
         }
-        
-        
-        
+
+
+
     } // network
-    
+
 } // yocto
 
 
@@ -135,7 +150,7 @@ namespace yocto
                         *col = ':';
                         throw; // revert hack
                     }
-                    
+
                 }
                 else
                 {
@@ -146,7 +161,7 @@ namespace yocto
             {
                 net::instance().resolve( *this, net_name );
             }
-            
+
         }
 
     }
