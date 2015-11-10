@@ -3,6 +3,10 @@
 
 #include "yocto/graphics/types.hpp"
 
+#if defined(RGB)
+#undef RGB
+#endif
+
 namespace yocto
 {
     namespace graphics
