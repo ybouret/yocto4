@@ -3,6 +3,7 @@
 #include "yocto/hashing/perfect.hpp"
 
 #include <iostream>
+#include <cstdlib>
 
 namespace yocto
 {
