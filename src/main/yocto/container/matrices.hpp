@@ -8,6 +8,7 @@
 namespace yocto
 {
 
+    //! interface to interfaces...
     template <typename T>
     class matrices_of
     {
@@ -76,20 +77,42 @@ namespace yocto
     class matrices : public matrices_of<T>
     {
     public:
+        typedef MATRIX<T> matrix_type;
+        typedef typename  matrices_of<T>::matptr matptr;
+
         virtual ~matrices() throw() {}
 
         inline explicit matrices(size_t nm,size_t nr,size_t nc) :
-        matrices_of<T>(nm,nr,nc)
+        matrices_of<T>(nm,nr,nc),
+        impl(nm,as_capacity)
         {
             for(size_t i=nm;i>0;--i)
             {
-                this->handles.template append<matrix_of<T> *>( new MATRIX<T>(nr,nc) );
+                matrix_type *q = new matrix_type(nr,nc);
+                const matptr p(q);
+                this->handles.push_back(p);
+                impl.push_back(q);
             }
             assert(this->handles.size()==this->count);
         }
-        
+
+        inline matrix_type & operator()(const size_t im) throw()
+        {
+            assert(im>=1);
+            assert(im<=impl.size());
+            return *impl[im];
+        }
+
+        inline const matrix_type & operator()(const size_t im) const throw()
+        {
+            assert(im>=1);
+            assert(im<=impl.size());
+            return *impl[im];
+        }
+
 
     private:
+        vector<matrix_type*> impl;
         YOCTO_DISABLE_COPY_AND_ASSIGN(matrices);
     };
     
