@@ -153,6 +153,9 @@ namespace yocto
 }
 
 
+
+#include "yocto/ios/ocstream.hpp"
+#include <iostream>
 namespace yocto
 {
 
@@ -160,6 +163,86 @@ namespace yocto
     {
 
 
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        //
+        //
+        ////////////////////////////////////////////////////////////////////////
+
+        namespace
+        {
+            class grammar_emitter
+            {
+            public:
+                ios::ostream &fp;
+
+                explicit grammar_emitter(const syntax::xnode *tree, ios::ostream &tgt ) :
+                fp(tgt)
+                {
+                    emit_tree(tree);
+                }
+
+
+                inline void emit_tree(const syntax::xnode *tree )
+                {
+                    assert(tree);
+                    assert("parser"==tree->label);
+                    assert(tree->size()>0);
+                    const syntax::xnode *r    = tree->head(); assert(r); assert("NAME"==r->label);
+                    const string         name = r->content();
+                    fp << name << ";\n";
+                    for(r=r->next;r;r=r->next)
+                    {
+                        emit_new(r);
+                    }
+                }
+
+                inline void emit_new(const syntax::xnode *r )
+                {
+                    assert(r);
+                    const string &label = r->label;
+                    std::cerr << "Emit new " << label << std::endl;
+
+                    if(label=="RULE")
+                    {
+                        emit_rule(r);
+                        return;
+                    }
+
+
+                    return; // TODO: NOT !
+                    throw exception("unhandled '%s'", label.c_str());
+
+                }
+
+                inline void emit_rule(const syntax::xnode *r)
+                {
+                    assert("RULE"==r->label);
+                    assert(r->size()>0);
+                    const syntax::xnode *curr = r->head();
+                    assert("ID"==curr->label);
+                    const string ID = curr->content();
+                    fp << ID << ':';
+
+
+                    fp << ';' << '\n';
+                }
+
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(grammar_emitter);
+            };
+        }
+
+
+
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Compile from grammar
+        //
+        ////////////////////////////////////////////////////////////////////////
         parser *generator::compile( ios::istream &fp )
         {
             //__________________________________________________________________
@@ -193,7 +276,12 @@ namespace yocto
             //
             // This tree is printable
             //__________________________________________________________________
-
+            {
+                ios::wcstream fp2( "tmp.g" );
+                {
+                    grammar_emitter emit(tree,fp2);
+                }
+            }
 
             //__________________________________________________________________
             //

@@ -2,6 +2,7 @@
 #define YOCTO_LANG_GENERATOR_INCLUDED 1
 
 #include "yocto/lang/parser.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
