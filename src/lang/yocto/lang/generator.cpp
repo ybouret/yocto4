@@ -210,8 +210,18 @@ namespace yocto
                         return;
                     }
 
+                    if(label=="LXR")
+                    {
 
-                    return; // TODO: NOT !
+                        return;
+                    }
+
+                    if(label=="PTY")
+                    {
+
+                        return;
+                    }
+
                     throw exception("unhandled '%s'", label.c_str());
 
                 }
