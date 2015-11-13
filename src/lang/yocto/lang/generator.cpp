@@ -286,6 +286,7 @@ namespace yocto
             //
             // This tree is printable
             //__________________________________________________________________
+            if(false)
             {
                 ios::wcstream fp2( "tmp.g" );
                 {
