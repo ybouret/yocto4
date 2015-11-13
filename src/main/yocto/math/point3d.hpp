@@ -24,6 +24,7 @@ namespace yocto
         inline  point3d(param_type X, param_type Y, param_type Z) : x(X), y(Y), z(Z) {}
         inline ~point3d() throw() {}
         inline  point3d(const point3d &other) : x(other.x), y(other.y), z(other.z) {}
+        inline  point3d(const point3d a, const point3d b) throw() : x(b.x-a.x), y(b.y-a.y), z(b.z-a.z) {}
         inline  point3d & operator=(const point3d &other)
         {
             if(this!=&other)
@@ -76,10 +77,20 @@ namespace yocto
         //
         // vectorial
         //______________________________________________________________________
-        inline friend const_type operator*(const point3d &lhs, const point3d &rhs)
+        inline friend const_type operator*(const point3d &lhs, const point3d &rhs) throw()
         {
             return (lhs.x*rhs.x) + (lhs.y*rhs.y) + (lhs.z*rhs.z);
         }
+
+        //______________________________________________________________________
+        //
+        // cross product
+        //______________________________________________________________________
+        inline friend point3d operator^(const point3d &a, const point3d &b) throw()
+        {
+            return point3d(a.y*b.z-a.z*b.y,b.x*a.z-a.x*b.z,a.x*b.y-a.y*b.x);
+        }
+        
 
 
     };

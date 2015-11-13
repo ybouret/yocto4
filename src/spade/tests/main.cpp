@@ -2,7 +2,7 @@
 
 YOCTO_UNIT_TEST_INIT(16)
 {
-    
+    YOCTO_UNIT_TEST_DECL(stl);
 }
 YOCTO_UNIT_TEST_EXEC()
 

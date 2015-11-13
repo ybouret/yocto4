@@ -25,6 +25,7 @@ namespace yocto
         inline  point2d( param_type X, param_type Y ) : x(X), y(Y) {}
         inline ~point2d() throw() {}
         inline  point2d(const point2d &other) : x(other.x), y(other.y) {}
+        inline  point2d(const point2d a, const point2d b) throw() : x(b.x-a.x), y(b.y-a.y) {}
         inline  point2d & operator=(const point2d &other)
         {
             if(this!=&other)
