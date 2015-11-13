@@ -46,6 +46,11 @@ YOCTO_UNIT_TEST_IMPL(stl)
     const vtx top(0,0,0);
     stl::close_contour(facets,shape[1],top,inside);
 
+    for(size_t i=1;i<nz;++i)
+    {
+        stl::make_ribbon(facets, shape[i], shape[i+1], inside);
+    }
+
 
     // close the other side
     const vtx bot(0,0,Lz);

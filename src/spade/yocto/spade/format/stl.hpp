@@ -82,6 +82,31 @@ namespace yocto
                 }
             }
 
+            template <typename T> static inline
+            void make_ribbon(sequence< facet<T> >                 &facets,
+                             const array<typename facet<T>::vtx > &contour1,
+                             const array<typename facet<T>::vtx > &contour2,
+                             const typename facet<T>::vtx         &inside)
+            {
+                if(contour1.size()!=contour2.size())
+                {
+                    throw libc::exception(EINVAL,"mismatched contour1 and contour2 sizes");
+                }
+                const size_t n = contour1.size();
+                for(size_t i=1;i<=n;++i)
+                {
+                    const size_t ip = (i<n) ? i+1 : 1;
+                    const typename facet<T>::vtx &v11 = contour1[i];
+                    const typename facet<T>::vtx &v12 = contour1[ip];
+                    const typename facet<T>::vtx &v21 = contour2[i];
+                    const typename facet<T>::vtx &v22 = contour2[ip];
+                    const facet<T> f1(v11,v12,v21,inside);
+                    facets.push_back(f1);
+                    const facet<T> f2(v21,v22,v12,inside);
+                    facets.push_back(f2);
+
+                }
+            }
             
             template <typename T>
             static inline void write_vtx(ios::ostream &fp, const point3d<T> &v )
