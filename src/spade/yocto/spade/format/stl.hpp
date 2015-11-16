@@ -4,6 +4,7 @@
 #include "yocto/spade/types.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/ios/ostream.hpp"
+#include "yocto/code/endian.hpp"
 #include <cerrno>
 
 namespace yocto
@@ -136,6 +137,40 @@ namespace yocto
                     emit(fp, facets[i]);
                 }
                 fp << "endsolid\n";
+            }
+
+            template <typename T>
+            static inline void write_binary_vtx(ios::ostream &fp, const point3d<T> &v )
+            {
+                const float x = swap_le_as<float>(v.x);
+                const float y = swap_le_as<float>(v.y);
+                const float z = swap_le_as<float>(v.z);
+
+                fp.append((const  char *)&x, 4 );
+                fp.append((const  char *)&y, 4 );
+                fp.append((const  char *)&z, 4 );
+            }
+
+            template <typename T>
+            static inline void save_binary(ios::ostream &fp,const array< facet<T> > &facets )
+            {
+                for(size_t i=0;i<80;++i)
+                {
+                    fp.write(' ');
+                }
+
+                const size_t n = facets.size();
+                const uint32_t n32 = swap_le_as<uint32_t>(n);
+                fp.append( (const char*)&n32, 4 );
+                for(size_t i=1;i<=n;++i)
+                {
+                    const facet<T> &f = facets[i];
+                    write_binary_vtx(fp, f.n);
+                    write_binary_vtx(fp, *(f.v1));
+                    write_binary_vtx(fp, *(f.v2));
+                    write_binary_vtx(fp, *(f.v3));
+                    fp.emit<uint16_t>(0);
+                }
             }
         };
     }

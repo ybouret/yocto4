@@ -43,7 +43,7 @@ YOCTO_UNIT_TEST_IMPL(stl)
     vector< stl::facet<double> > facets;
 
     // close one side
-    const vtx top(0,0,0);
+    const vtx top(0,0,-alea<double>());
     stl::close_contour(facets,shape[1],top,inside);
 
     for(size_t i=1;i<nz;++i)
@@ -53,7 +53,7 @@ YOCTO_UNIT_TEST_IMPL(stl)
 
 
     // close the other side
-    const vtx bot(0,0,Lz);
+    const vtx bot(0,0,Lz+alea<double>());
     stl::close_contour(facets, shape[nz],bot,inside);
 
     std::cerr << "Got " << facets.size() << " facets" << std::endl;
@@ -61,6 +61,11 @@ YOCTO_UNIT_TEST_IMPL(stl)
     {
         ios::wcstream fp("shape.stl");
         stl::save(fp,facets);
+    }
+
+    {
+        ios::wcstream fp("bin_shape.stl");
+        stl::save_binary(fp,facets);
     }
 
 }
