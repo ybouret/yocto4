@@ -159,7 +159,7 @@ namespace yocto
                     fp.write(' ');
                 }
 
-                const size_t n = facets.size();
+                const size_t   n   = facets.size();
                 const uint32_t n32 = swap_le_as<uint32_t>(n);
                 fp.append( (const char*)&n32, 4 );
                 for(size_t i=1;i<=n;++i)
