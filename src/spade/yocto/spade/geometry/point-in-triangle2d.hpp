@@ -46,17 +46,17 @@ namespace yocto
                 const typename VTX::type b  =  ((y3 - y1)*(x - x3) + (x1 - x3)*(y - y3))/dd;
                 const typename VTX::type c  = 1-(a+b);
 
-                 return (0<=a&&a<=1) && (0<=b&&b<=1) && (0<=c&&c<=1);
+                return (0<=a&&a<=1) && (0<=b&&b<=1) && (0<=c&&c<=1);
             }
 
             template <typename VTX>
             static inline
-            typename VTX::type distance_square_to_segment( const VTX &a, const VTX &b, const VTX &p , const typename VTX::type eps_square) throw()
+            typename VTX::type distance_square_to_segment( const VTX &a, const VTX &b, const VTX &p ) throw()
             {
                 const VTX ab(a,b);
                 const VTX ap(a,p);
                 const typename VTX::type abap = ab*ap;
-                if(ab*ap<0)
+                if(abap<0)
                 {
                     //! "before" a on the a->b segment
                     return ap*ap;
@@ -73,16 +73,46 @@ namespace yocto
                     else
                     {
                         // usr the orthogonal projection
-                        return 0;
+                        const VTX app = ap - ((ab*ap)*ab)/(ap*ap);
+                        return app*app;
                     }
                 }
+            }
 
+            template <typename VTX>
+            static inline
+            bool check(const VTX &p,
+                       const VTX &v1,
+                       const VTX &v2,
+                       const VTX &v3,
+                       const typename VTX::type eps) throw()
+            {
+                if(!is_in_bounding_box(p, v1, v2, v3, eps))
+                    return false;
+
+                if(naively(p, v1,v2,v3))
+                    return true;
+
+                const typename VTX::type eps_square = eps*eps;
+
+                if( distance_square_to_segment(v1, v2, p) <= eps_square )
+                    return true;
+
+                if( distance_square_to_segment(v1, v3, p) <= eps_square )
+                    return true;
+
+                if( distance_square_to_segment(v2, v3, p) <= eps_square )
+                    return true;
+
+                return false;
 
             }
 
         };
-
+        
     }
+    
 }
+
 
 #endif
