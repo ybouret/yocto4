@@ -23,6 +23,7 @@ namespace yocto
         class rgb
         {
         public:
+            typedef T type;
             T r,g,b;
             inline rgb() throw() : r(0), g(0), b(0) {}
             inline rgb(const T R,const T G, const T B) throw() : r(R), g(G), b(B) {}
@@ -40,6 +41,8 @@ namespace yocto
         class rgba
         {
         public:
+            typedef T type;
+
             T r,g,b,a;
             inline rgba() throw() : r(0), g(0), b(0), a( channel_info<T>::opaque ) {}
             inline rgba(const T R,const T G, const T B, const T A) throw() : r(R), g(G), b(B), a(A) {}

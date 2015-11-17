@@ -8,6 +8,7 @@
 #include "yocto/graphics/ops/stencil.hpp"
 #include "yocto/graphics/ops/blur.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/graphics/ops/blend.hpp"
 
 #include "yocto/utest/run.hpp"
 
@@ -25,7 +26,10 @@ YOCTO_UNIT_TEST_IMPL(ops)
     const image::format &PNG = IMG["PNG"];
     
     threading::engine server(true);
-    
+    for(uint8_t i=0;i<10;++i)
+    {
+    std::cerr << "~" << int(i) << "=" << unsigned(~i) << std::endl;
+    }
     if(argc>1)
     {
         const string filename = argv[1];
