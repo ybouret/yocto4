@@ -19,11 +19,11 @@ namespace yocto
             if(n<=0)
                 throw libc::exception( EDOM, "invalid n=%u for combination",unsigned(n));
             const size_t ans = bytes_for(n-1);
-            
+
             return ans;
         }
     }
-    
+
     combination:: combination( size_t an, size_t ak ) :
     n(an),
     k(ak),
@@ -36,12 +36,12 @@ namespace yocto
     {
         if(k<=0||k>n)
             throw libc::exception( EDOM, "invalid combination(%u,%u)", unsigned(n), unsigned(k) );
-        
+
         comb = static_cast<size_t *>(memory::global:: __calloc(k,sizeof(size_t)));
         assert(comb);
         init();
     }
-    
+
     combination:: combination(const combination &C ) :
     n(C.n),
     k(C.k),
@@ -58,12 +58,12 @@ namespace yocto
             comb[i] = C.comb[i];
         }
     }
-    
+
     combination:: ~combination() throw()
     {
         memory::global::__free(comb);
     }
-    
+
     void combination:: init() throw()
     {
         for(size_t i=0;i<k;++i)
@@ -72,10 +72,10 @@ namespace yocto
         }
         (uint64_t&)id = 1;
     }
-    
+
     bool combination:: next() throw()
     {
-	const ptrdiff_t sk = ptrdiff_t(k);
+        const ptrdiff_t sk = ptrdiff_t(k);
         ptrdiff_t       i  = sk - 1;
         //++comb[i];
         while( (i>=0) && (ptrdiff_t(++comb[i])>=nmkp1+i) )
@@ -83,10 +83,10 @@ namespace yocto
             --i;
             //++comb[i];
         }
-        
+
         if (ptrdiff_t(comb[0])>nmk)  // Combination (n-k, n-k+1, ..., n) reached
             return false; // No more combinations can be generated
-        
+
         // comb now looks like (..., x, n, n, n, ..., n).
         // Turn it into (..., x, x + 1, x + 2, ...)
         for (++i; i<sk; ++i)
@@ -95,13 +95,13 @@ namespace yocto
         }
         ++ ( (uint64_t&)id );
         return true;
-        
+
     }
-    
-    
-    
-    
-    
+
+
+
+
+
     std::ostream & operator<<( std::ostream &os, const combination &C )
     {
         os << "[";
@@ -109,8 +109,8 @@ namespace yocto
         os << " ]'";
         return os;
     }
-    
-    
+
+
     uint64_t combination:: count_all() throw()
     {
         init();
@@ -118,7 +118,7 @@ namespace yocto
             ;
         return id;
     }
-    
+
     void * combination::save(void *addr) const
     {
         if(bytes_per_frame)
@@ -138,6 +138,6 @@ namespace yocto
             return addr;
         }
     }
-    
+
     
 }
