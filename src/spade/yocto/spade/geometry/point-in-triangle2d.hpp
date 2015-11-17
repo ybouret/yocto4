@@ -58,6 +58,7 @@ namespace yocto
                 const typename VTX::type abap = ab*ap;
                 if(ab*ap<0)
                 {
+                    //! "before" a on the a->b segment
                     return ap*ap;
                 }
                 else
@@ -66,11 +67,12 @@ namespace yocto
                     const typename VTX::type abbp = ab*bp;
                     if(abbp>0)
                     {
+                        //! "after" b on the a->b segment
                         return bp*bp;
                     }
                     else
                     {
-                        // TODO: finish this...
+                        // usr the orthogonal projection
                         return 0;
                     }
                 }
