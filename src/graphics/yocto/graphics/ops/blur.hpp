@@ -5,6 +5,7 @@
 #include "yocto/graphics/parallel.hpp"
 #include <cmath>
 #include "yocto/container/matrix.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto {
 

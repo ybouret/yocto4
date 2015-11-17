@@ -4,7 +4,6 @@
 #include "yocto/threading/mutex.hpp"
 #include "yocto/container/vslot.hpp"
 #include "yocto/ptr/auto.hpp"
-#include "yocto/code/bin2name.hpp"
 
 namespace yocto
 {

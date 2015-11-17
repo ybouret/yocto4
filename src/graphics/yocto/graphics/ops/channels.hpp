@@ -3,6 +3,7 @@
 
 #include "yocto/graphics/pixmaps.hpp"
 #include "yocto/graphics/parallel.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
