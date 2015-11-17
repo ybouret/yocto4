@@ -142,9 +142,9 @@ namespace yocto
             template <typename T>
             static inline void write_binary_vtx(ios::ostream &fp, const point3d<T> &v )
             {
-                const float x = swap_le_as<float>(v.x);
-                const float y = swap_le_as<float>(v.y);
-                const float z = swap_le_as<float>(v.z);
+                const float x = swap_le_as<float>(float(v.x));
+                const float y = swap_le_as<float>(float(v.y));
+                const float z = swap_le_as<float>(float(v.z));
 
                 fp.append((const  char *)&x, 4 );
                 fp.append((const  char *)&y, 4 );
