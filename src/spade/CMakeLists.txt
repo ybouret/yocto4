@@ -13,11 +13,19 @@ SET( format_srcs ${format_decl} ${format_impl} )
 INSTALL( FILES ${format_decl} DESTINATION include/yocto/spade/format )
 SOURCE_GROUP( spade/format FILES ${format_srcs} )
 
+FILE( GLOB geometry_decl yocto/spade/geometry/*.hpp )
+FILE( GLOB geometry_impl yocto/spade/geometry/*.cpp )
+SET( geometry_srcs ${geometry_decl} ${geometry_impl} )
+
+INSTALL( FILES ${geometry_decl} DESTINATION include/yocto/spade/geometry )
+SOURCE_GROUP( spade/geometry FILES ${geometry_srcs} )
+
 INCLUDE_DIRECTORIES( . ../main ../mk)
 
 ADD_LIBRARY(y-spade STATIC 
 	${srcs}
-	${format_srcs} 
+	${format_srcs}
+	${geometry_srcs} 
 	)
 	
 INSTALL( TARGETS y-spade ARCHIVE DESTINATION lib )
