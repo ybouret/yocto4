@@ -21,12 +21,16 @@ namespace yocto
             {
                 const typename VTX::type xmin = min_of(v1.x,min_of(v2.x,v3.x))-eps;
                 if(p.x<xmin) return false;
+
                 const typename VTX::type ymin = min_of(v1.y,min_of(v2.y,v3.y))-eps;
                 if(p.y<ymin) return false;
+
                 const typename VTX::type xmax = max_of(v1.x,max_of(v2.x,v3.x))+eps;
                 if(p.x>xmax) return false;
+
                 const typename VTX::type ymax = max_of(v1.y,max_of(v2.y,v3.y))+eps;
                 if(p.y>ymax) return false;
+
                 return true;
             }
 

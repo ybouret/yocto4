@@ -10,15 +10,22 @@ namespace yocto
 
         struct blend
         {
-            template <typename COLOR>
-            static COLOR mix( const COLOR &lhs, const COLOR &rhs, const typename COLOR::type alpha ) throw();
+            static
+            inline RGB mix( const RGB &lhs, const RGB &rhs, const RGB::type alpha ) throw()
+            {
+                const int av = alpha;
+                const int au = 255-av;
+                const RGB::type *u = &lhs.r;
+                const RGB::type *v = &rhs.r;
+                return RGB(
+                           (( int(u[0])*au + int(v[0])*av )/255),
+                           (( int(u[1])*au + int(v[1])*av )/255),
+                           (( int(u[2])*au + int(v[2])*av )/255)
+                           );
+            }
+
         };
 
-        template <>
-        inline RGB blend::mix<RGB>( const RGB &lhs, const RGB &rhs, const RGB::type alpha ) throw()
-        {
-            return RGB();
-        }
 
     }
 }

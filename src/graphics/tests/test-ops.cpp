@@ -9,6 +9,7 @@
 #include "yocto/graphics/ops/blur.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/graphics/ops/blend.hpp"
+#include "yocto/ordered/sorted-vector.hpp"
 
 #include "yocto/utest/run.hpp"
 
@@ -24,12 +25,25 @@ YOCTO_UNIT_TEST_IMPL(ops)
     IMG.declare( new tiff_format() );
     
     const image::format &PNG = IMG["PNG"];
-    
-    threading::engine server(true);
-    for(uint8_t i=0;i<10;++i)
+
+#if 0
+    sorted_vector<int> blendval(256*256*256,as_capacity);
+    for(int u=0;u<256;++u)
     {
-    std::cerr << "~" << int(i) << "=" << unsigned(~i) << std::endl;
+        for(int v=0;v<256;++v)
+        {
+            for(int alpha=0;alpha<256;++alpha)
+            {
+                const int ans = (u*(255-alpha) + v * alpha)/255;
+                (void) blendval.insert(ans);
+            }
+        }
     }
+    std::cerr << "#values=" << blendval.size() << std::endl;
+#endif
+    
+
+    threading::engine server(true);
     if(argc>1)
     {
         const string filename = argv[1];
