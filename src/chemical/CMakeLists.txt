@@ -13,9 +13,12 @@ SET(species_incl yocto/chemical/species.inc)
 #)
 
 YOCTO_FILE2DATA(${species_gram} ${species_incl})
+YOCTO_FILE2DATA(yocto/chemical/level1.g yocto/chemical/level1.inc)
 
 
-SET(srcs ${decl} ${impl} ${species_gram} ${species_incl} )
+SET(srcs ${decl} ${impl} ${species_gram} ${species_incl}
+yocto/chemical/level1.g yocto/chemical/level1.inc
+)
 SOURCE_GROUP(chemical FILES ${srcs} )
 
 INCLUDE_DIRECTORIES( . ../main ../lang ../mk ../third_party/lua/yocto/lua ../lua++ )
