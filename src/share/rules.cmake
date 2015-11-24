@@ -232,5 +232,16 @@ MACRO(TARGET_LINK_YOCTO tgt)
   
 ENDMACRO()
 
+FUNCTION(YOCTO_FILE2DATA source target)
+ADD_CUSTOM_COMMAND(
+OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${target}
+COMMAND file2data ${CMAKE_CURRENT_SOURCE_DIR}/${source} ${CMAKE_CURRENT_SOURCE_DIR}/${target}
+DEPENDS file2data ${CMAKE_CURRENT_SOURCE_DIR}/${source}
+COMMENT "[File2Data] ${source} => ${target}"
+)
+
+ENDFUNCTION(YOCTO_FILE2DATA)
+
+
 MESSAGE( STATUS "---------------- </yocto> ----------------" )
 MESSAGE( STATUS "" )
