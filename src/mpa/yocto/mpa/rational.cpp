@@ -269,7 +269,7 @@ namespace yocto
 
         int rational:: compare(const rational &lhs, const rational &rhs)
         {
-            const rational del = lhs-rhs;
+            const rational  del = lhs-rhs;
             switch(del.num.s)
             {
                 case __negative:
@@ -277,11 +277,9 @@ namespace yocto
                 case __positive:
                     return 1;
                 case __zero:
-                    return 0;
+                    break;
             }
-#if defined(_MSC_VER)
 			return 0;
-#endif
         }
 
         int rational:: compare(const rational &lhs, const int64_t rhs)
