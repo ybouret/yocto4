@@ -11,7 +11,10 @@ FILE( GLOB impl yocto/python/*.cpp )
 SET(srcs ${decl} ${impl} )
 
 ADD_LIBRARY(y-python ${srcs})
-ADD_SUBDIRECTORY(tests)
+
+IF(YOCTO_BUILD_TESTS)
+	ADD_SUBDIRECTORY(tests)
+ENDIF()
 
 ENDIF(PYTHONLIBS_FOUND)
 

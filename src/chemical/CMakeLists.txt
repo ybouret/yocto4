@@ -24,4 +24,8 @@ SOURCE_GROUP(chemical FILES ${srcs} )
 INCLUDE_DIRECTORIES( . ../main ../lang ../mk ../third_party/lua/yocto/lua ../lua++ )
 
 ADD_LIBRARY(y-chemical STATIC ${srcs} )
-ADD_SUBDIRECTORY(tests)
+
+IF(YOCTO_BUILD_TESTS)
+	ADD_SUBDIRECTORY(tests)
+ENDIF()
+

@@ -27,5 +27,7 @@ INCLUDE_DIRECTORIES( . ../main ../mk ../third_party/lua/yocto/lua ../lua++ )
 ADD_LIBRARY( y-chem STATIC ${srcs} ${srcs_lua} ${srcs_boot} ${srcs_eqs} )
 INSTALL( TARGETS y-chem ARCHIVE DESTINATION lib )
 
-ADD_SUBDIRECTORY(tests)
+IF(YOCTO_BUILD_TESTS)
+	ADD_SUBDIRECTORY(tests)
+ENDIF()
 

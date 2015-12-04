@@ -18,5 +18,6 @@ INCLUDE_DIRECTORIES( . ../main  ../third_party/lua/yocto/lua )
 ADD_LIBRARY( y-lua++ STATIC ${lua_srcs} ${xlua_srcs})
 INSTALL( TARGETS y-lua++ ARCHIVE DESTINATION lib )
 
-ADD_SUBDIRECTORY(tests)
-
+IF(YOCTO_BUILD_TESTS)
+	ADD_SUBDIRECTORY(tests)
+ENDIF()

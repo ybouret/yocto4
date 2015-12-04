@@ -26,4 +26,6 @@ INCLUDE_DIRECTORIES( . ../main ../lang)
 ADD_LIBRARY( y-script STATIC ${srcs} ${script_gram} ${script_incl})
 INSTALL( TARGETS y-script ARCHIVE DESTINATION lib )
 
-ADD_SUBDIRECTORY(tests)
+IF(YOCTO_BUILD_TESTS)
+	ADD_SUBDIRECTORY(tests)
+ENDIF()

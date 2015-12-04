@@ -3,4 +3,4 @@ if [ $# != 2 ]; then
 	exit 1;	
 fi
 cmake -E cmake_echo_color --blue "Building SDK for $1, BUILD_TYPE=$2..."
-TARGETS=install make $1 BUILD_TYPE=$2
+YOCTO_BUILD_TESTS=no TARGETS=install make $1 BUILD_TYPE=$2

@@ -12,6 +12,17 @@ INCLUDE(share/rules.cmake)
 SET(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/../sdk)
 
 ########################################################################
+##
+## would skip tests ?
+##
+########################################################################
+SET(YOCTO_BUILD_TESTS ON)
+IF( "no" STREQUAL "$ENV{YOCTO_BUILD_TESTS}" )
+	SET(YOCTO_BUILD_TESTS OFF)
+ENDIF()
+
+
+########################################################################
 # mandatory project
 ########################################################################
 ADD_SUBDIRECTORY(main)
@@ -34,7 +45,12 @@ MACRO(YOCTO_BUILD dir)
   IF( no_${dir} )
     MESSAGE( STATUS "NOT BUILDING ${dir}" )
   ELSE()
-    ADD_SUBDIRECTORY(${dir})
+	SET( dirPath "${CMAKE_CURRENT_SOURCE_DIR}/${dir}" )
+	IF(EXISTS ${dirPath})
+		ADD_SUBDIRECTORY(${dir})
+	ELSE()
+		MESSAGE( STATUS "skipping ${dir}" )
+    ENDIF()
   ENDIF()
 ENDMACRO(YOCTO_BUILD)
 
@@ -65,7 +81,6 @@ YOCTO_BUILD(fltk)
 YOCTO_BUILD(fame)
 YOCTO_BUILD(spade)
 YOCTO_BUILD(python)
-#YOCTO_BUILD(R)
 YOCTO_BUILD(R++)
 YOCTO_BUILD(tiff++)
 
@@ -77,7 +92,7 @@ MESSAGE( STATUS "" )
 ########################################################################
 MESSAGE( STATUS "" )
 MESSAGE( STATUS "---------------- <third_party>  ----------------" )
-ADD_SUBDIRECTORY(third_party)
+YOCTO_BUILD(third_party)
 MESSAGE( STATUS "---------------- </third_party>  ----------------" )
 MESSAGE( STATUS "" )
 
