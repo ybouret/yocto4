@@ -81,6 +81,8 @@ void test_tao(const size_t N, const size_t M)
         vector<T> tmp(N,0);
         tao::mul(tmp, H, X);
         const T d = tao::dot(tmp, X);
+        std::cerr << "H=" << H << std::endl;
+        std::cerr << "X=" << X << std::endl;
         std::cerr << "q=" << q << std::endl;
         std::cerr << "d=" << d << std::endl;
     }
