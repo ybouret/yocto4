@@ -47,5 +47,6 @@ ADD_TEST(Extr      test-mk extr)
 ADD_TEST(iHist     test-mk ihist)
 ADD_TEST(KDE       test-mk kde)
 ADD_TEST(SymKer    test-mk symker)
+ADD_TEST(glsf      test-mk glsf)
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )

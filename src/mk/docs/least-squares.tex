@@ -20,15 +20,15 @@
 \maketitle
 
 \section{Notations}
-We will use a scalar function with $n$ parameters $\vec{u}$
+We will use a scalar function with $L$ parameters $\vec{u}$
 \begin{equation}
 	F(x,\vec{u})
 \end{equation}
 to simultaneously fit some $S$ samples.
 A sample $S_i$ is defined by a vector of $N_i$ positions $\vec{X}_i$ and
 a vector of values $\vec{Y}_i$.
-Assuming we have a vector of $m\geq n$ unknows, there exist a
-matrix $\mymat{\Gamma}_i\in\mathcal{M}_{n,m}$
+Assuming we have a global vector $\vec{a}$ of $M$ global parameters, there exist a
+matrix $\mymat{\Gamma}_i\in\mathcal{M}_{L,M}$
 such that
 \begin{equation}
 	\vec{u}_i = \mymat{\Gamma}_i \vec{a}.
@@ -40,11 +40,12 @@ The least square value of $S_i$ is
 
 We want to minimize 
 \begin{equation}
-	D^2 = \sum_{i=1}^{S} D_i.
+	D^2 = \sum_{i=1}^{S} D^2_i.
 \end{equation}
 
 \section{Minima}
-We want to find the zero of $\vec{\beta}=-\dfrac{1}{2}\partial D^2 / \partial \vec{a}$
+We want to find the zero of the descent direction
+$$\vec{\beta}=-\dfrac{1}{2}\partial D^2 / \partial \vec{a}$$
 
 \begin{equation}
 	\beta_{i,k} = -\dfrac{1}{2}\dfrac{\partial D_i^2}{\partial a_k} 
