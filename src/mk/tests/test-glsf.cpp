@@ -80,11 +80,16 @@ YOCTO_UNIT_TEST_IMPL(glsf)
     slope2 = 0.01;
 
     samples.computeD2(F,aorg,used);
+    samples.compute_cinv(0.0);
 
+    //used[3] = false;
+    //samples.computeD2(F,aorg,used);
 
     samples.computeD2_(F,aorg);
     save("f1.dat",t1,z1);
     save("f2.dat",t2,z2);
+
+    std::cerr << "LAMBDA_MIN=" << GLS<double>::GET_LAMBDA_MIN() << " / " << GLS<float>::GET_LAMBDA_MIN() << std::endl;
 
 }
 YOCTO_UNIT_TEST_DONE()

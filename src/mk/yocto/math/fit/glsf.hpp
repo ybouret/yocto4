@@ -7,11 +7,14 @@
 #include "yocto/container/matrix.hpp"
 #include "yocto/math/fcn/drvs.hpp"
 #include "yocto/ptr/arc.hpp"
+#include "yocto/math/core/lu.hpp"
 
 namespace yocto
 {
     namespace math
     {
+
+
 
         ////////////////////////////////////////////////////////////////////////
         //
@@ -22,6 +25,11 @@ namespace yocto
         class GLS
         {
         public:
+            static int GET_LAMBDA_MIN()
+            {
+                return int( ceil(Log10(numeric<T>::epsilon)) );
+            }
+
             typedef array<T>                           Array;
             typedef vector<T>                          Vector;
             typedef functor<T,TL2(T,const Array &)>    Function;
@@ -29,7 +37,9 @@ namespace yocto
 
             //__________________________________________________________________
             //
+            //
             // a sample: holds reference to data+fit
+            //
             //__________________________________________________________________
             class Sample : public counted_object
             {
@@ -202,7 +212,9 @@ namespace yocto
 
             //__________________________________________________________________
             //
+            //
             // Samples: hold multiple samples
+            //
             //__________________________________________________________________
             typedef vector<typename Sample::Pointer> _Samples;
 
@@ -212,6 +224,7 @@ namespace yocto
                 const size_t   M;
                 Vector         beta;
                 matrix<T>      curv;
+                matrix<T>      cinv;
                 derivative<T>  drvs;
                 T              scale;
 
@@ -229,6 +242,10 @@ namespace yocto
                 {
                 }
 
+                //______________________________________________________________
+                //
+                // create and manage a new sample
+                //______________________________________________________________
                 inline
                 Sample &append( const Array &X, const Array &Y, Array &Z)
                 {
@@ -237,6 +254,10 @@ namespace yocto
                     return *p;
                 }
 
+                //______________________________________________________________
+                //
+                // prepare this and all samples
+                //______________________________________________________________
                 inline void prepare(size_t global_nvar, size_t local_nvar)
                 {
                     _Samples &self = *this;
@@ -248,6 +269,10 @@ namespace yocto
                 }
 
 
+                //______________________________________________________________
+                //
+                // prepare this and all samples
+                //______________________________________________________________
                 inline void prepare(size_t global_nvar)
                 {
                     _Samples &self = *this;
@@ -258,6 +283,10 @@ namespace yocto
                     setup(global_nvar);
                 }
 
+                //______________________________________________________________
+                //
+                // simple evaluation for all samples
+                //______________________________________________________________
                 T computeD2_(Function &F, const Array &a )
                 {
                     T D2 = 0;
@@ -270,6 +299,10 @@ namespace yocto
                 }
 
 
+                //______________________________________________________________
+                //
+                // full evaluation at aorg
+                //______________________________________________________________
                 inline T computeD2(Function          &F,
                                    const Array       &aorg,
                                    const array<bool> &used)
@@ -278,12 +311,18 @@ namespace yocto
                     assert(M==aorg.size());
                     assert(M==used.size());
 
+                    //__________________________________________________________
+                    //
                     // initialize
+                    //__________________________________________________________
                     tao::ld(beta,0);
                     curv.ldz();
                     T D2   = 0;
 
+                    //__________________________________________________________
+                    //
                     // full computation
+                    //__________________________________________________________
                     _Samples &self = *this;
                     for(size_t i=self.size();i>0;--i)
                     {
@@ -301,7 +340,10 @@ namespace yocto
                         }
                     }
 
+                    //__________________________________________________________
+                    //
                     // legalizing
+                    //__________________________________________________________
                     for(size_t j=M;j>0;--j)
                     {
                         if(used[j])
@@ -330,6 +372,24 @@ namespace yocto
                     return D2;
                 }
 
+
+                //______________________________________________________________
+                //
+                // try to approximate the inverse of curvature
+                //______________________________________________________________
+                inline bool compute_cinv(const T lambda)
+                {
+                    assert(lambda>=0);
+                    const T fac = T(1)+lambda;
+                    cinv.assign(curv);
+                    for(size_t i=M;i>0;--i)
+                    {
+                        cinv[i][i] *= fac;
+                    }
+                    return LU<T>::build(cinv);
+                }
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
                 void setup(size_t nvar)
@@ -337,7 +397,8 @@ namespace yocto
                     assert(nvar>0);
                     (size_t &)M = nvar;
                     beta.make(nvar);
-                    curv.make(nvar);
+                    curv.make(nvar,nvar);
+                    cinv.make(nvar);
                 }
             };
         };

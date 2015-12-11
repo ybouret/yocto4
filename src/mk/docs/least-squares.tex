@@ -65,33 +65,7 @@ We use
 	 \left(\dfrac{\partial F(X_{i,j},\mymat{\Gamma}_i \vec{a})}{\partial a_k}\right) \left(\dfrac{\partial F(X_{i,j},\mymat{\Gamma}_i \vec{a})}{\partial a_l}\right) 
 \end{equation}
 to approximate the curvature of $D_i^2$.
-Using the Newton's algorithm, the step $\delta\vec{a}$ leading to the minimisation is defined by
-\begin{equation}
-	\mymat{\alpha}_{[\lambda]} \delta\vec{a} = \vec{\beta}.
-\end{equation}
-where $\mymat{\alpha}_{[\lambda]}$ is the curvature matrix with the diagonal (positive) element multiplied by $1+\lambda$.
-The $\mymat{\alpha}_i$ matrix is the sum of the Gram matrices
-of
-\begin{equation}
-	\vec{\nabla}_{\vec{a}} F(X_{i,j},\mymat{\Gamma}_i \vec{a})
-	= \mytrn{\mymat{\Gamma}}_i 
-	 \vec{\nabla}_{\vec{u}} F(X_{i,j},\vec{u}_i = \mymat{\Gamma}_i \vec{a}).
-\end{equation}
 
-\section{Minimisation algorithm}
-We choose a small $\lambda$.
-
-\begin{itemize}
-\item $(\dagger)$ Compute $\mymat{\alpha}_{[\lambda]}$ and $\vec{\beta}$.
-\item Try to inverse $\mymat{\alpha}_{[\lambda]}$. If it is not invertible, then increase $\lambda$. If $\lambda>\lambda_{max}$, 
-stop, we have a singular point. We should restart with some different guest values.
-\item Compute $\delta\vec{a}=\mymat{\alpha}_{[\lambda]}^{-1}\vec{\beta}$ the approximate optimising step.
-\item If $D^2(\vec{a}+\delta\vec{a})<D^2(\vec{a})$, update $\vec{a}$, check for convergence, and decrease $\lambda$.
-Go to $(\dagger)$ is necessary.
-\item If $D^2(\vec{a}+\delta\vec{a})\geq D^2(\vec{a})$, we don't have a good step.
-But we don't know if we went to far, or if it is a roundoff error.
-We should try a local minimisation.
-\end{itemize}
 
 
 
