@@ -85,9 +85,7 @@ YOCTO_UNIT_TEST_IMPL(glsf)
     //used[3] = false;
     //samples.computeD2(F,aorg,used);
 
-    samples.computeD2_(F,aorg);
-    save("f1.dat",t1,z1);
-    save("f2.dat",t2,z2);
+
 
     std::cerr << "P10_MAX=" << GLS<double>::GET_P10_MAX()<< " / " << GLS<float>::GET_P10_MAX() << std::endl;
     for(int p=samples.p10_min-1;p<=samples.p10_max+1;++p)
@@ -97,6 +95,8 @@ YOCTO_UNIT_TEST_IMPL(glsf)
 
     samples.fit_with(F,aorg, used);
     
-
+    samples.computeD2_(F,aorg);
+    save("f1.dat",t1,z1);
+    save("f2.dat",t2,z2);
 }
 YOCTO_UNIT_TEST_DONE()

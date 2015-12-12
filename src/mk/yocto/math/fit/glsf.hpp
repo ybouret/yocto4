@@ -354,8 +354,8 @@ namespace yocto
                     {
                         Sample &S = *self[i];
                         D2 += S.computeD2(F,aorg,drvs,scale);
-                        std::cerr << "beta" << i << "=" << S.beta << std::endl;
-                        std::cerr << "curv" << i << "=" << S.curv << std::endl;
+                        //std::cerr << "beta" << i << "=" << S.beta << std::endl;
+                        //std::cerr << "curv" << i << "=" << S.curv << std::endl;
                         for(size_t j=M;j>0;--j)
                         {
                             beta[j] += S.beta[j];
@@ -460,9 +460,9 @@ namespace yocto
                     return lambda;
                 }
 
-                bool fit_with(Function         &F,
-                              Array            &aorg,
-                              const array<bool> used)
+                bool fit_with(Function          &F,
+                              Array             &aorg,
+                              const array<bool> &used)
                 {
                     assert(aorg.size()==M);
                     assert(used.size()==M);
@@ -481,8 +481,11 @@ namespace yocto
                     //
                     // main loop
                     //__________________________________________________________
+                    size_t count = 0;
                     while(true)
                     {
+                        ++count;
+                        if(count>40) break;
                         //______________________________________________________
                         //
                         // adjust p10, curvature is computed@aorg
@@ -493,17 +496,53 @@ namespace yocto
                             return false; //! no scaling...
                         }
 
+                        const T beta_sq = tao::norm_sq(beta);
+                        std::cerr << "beta=" << beta << std::endl;
+                        std::cerr << "beta_norm=" << Sqrt(beta_sq) << std::endl;
+                        if(beta_sq<=0)
+                        {
+                            // level 1 success
+                            goto EXTREMUM;
+                        }
+
                         //______________________________________________________
                         //
                         // compute step
                         //______________________________________________________
-                        LU<T>::solve(cinv,step);
-                        std::cerr << "lam=" << lam << std::endl;
+                        LU<T>::solve(step,cinv,beta);
+                        const T step_sq = tao::norm_sq(step);
+                        std::cerr << "lam =" << lam  << std::endl;
                         std::cerr << "step=" << step << std::endl;
+                        std::cerr << "step_norm=" << Sqrt(step_sq) << std::endl;
+                        if(step_sq<=0)
+                        {
+                            // level 2 success
+                            goto EXTREMUM;
+                        }
 
-                        break;
+                        //______________________________________________________
+                        //
+                        // |beta|>0, |step|>0
+                        //______________________________________________________
+                        const T Hnew = scan(1);
+                        std::cerr << "H: " << Horg << " -> " << Hnew << std::endl;
+                        if(Hnew<Horg)
+                        {
+                            std::cerr << "SUCCESS" << std::endl;
+                            Horg = Hnew;
+                            tao::set(aorg,atry);
+                            computeD2(F,aorg,used);
+                            continue;
+                        }
+                        else
+                        {
+                            std::cerr << "Failure" << std::endl;
+                        }
+
+
                     }
 
+                EXTREMUM:
                     return true;
                 }
 
