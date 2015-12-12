@@ -8,6 +8,7 @@
 #include "yocto/math/fcn/drvs.hpp"
 #include "yocto/ptr/arc.hpp"
 #include "yocto/math/core/lu.hpp"
+#include "yocto/code/ipower.hpp"
 
 namespace yocto
 {
@@ -25,9 +26,9 @@ namespace yocto
         class GLS
         {
         public:
-            static int GET_LAMBDA_MIN()
+            static int GET_P10_MAX()
             {
-                return int( ceil(Log10(numeric<T>::epsilon)) );
+                return -int( floor(Log10(numeric<T>::epsilon)) );
             }
 
             typedef array<T>                           Array;
@@ -84,6 +85,7 @@ namespace yocto
                 Vector       beta;  //!< #M descent direction
                 matrix<T>    curv;  //!< M*M local curvature
 
+                //! link global variable index to local variable index
                 inline void link( size_t iGlobal, size_t iLocal )
                 {
                     assert(iGlobal>0);
@@ -93,6 +95,7 @@ namespace yocto
                     Gamma[iLocal][iGlobal] = 1;
                 }
 
+                //!compute D2 and update the Z term
                 inline T computeD2(Function    &F,
                                    const Array &a)
                 {
@@ -112,6 +115,7 @@ namespace yocto
                     return D2;
                 }
 
+                //! compute D2 and curvature
                 inline T computeD2(Function      &F,
                                    const Array   &a,
                                    derivative<T> &drvs,
@@ -134,7 +138,10 @@ namespace yocto
                     {
                         const T Xi = X[i];
 
+                        //______________________________________________________
+                        //
                         // compute gradient along u
+                        //______________________________________________________
                         for(size_t j=L;j>0;--j)
                         {
                             ivar    = j;
@@ -142,15 +149,24 @@ namespace yocto
                             dFdu[j] = drvs(F1,u[j],du);
                         }
 
+                        //______________________________________________________
+                        //
                         // deduce gradient along a
+                        //______________________________________________________
                         tao::mul_trn(dFda, Gamma, dFdu);
 
 
+                        //______________________________________________________
+                        //
                         // compute curent D2
+                        //______________________________________________________
                         const T d  = Y[i] - F(Xi,u);
                         D2 += d*d;
 
-                        // update local descent direction
+                        //______________________________________________________
+                        //
+                        // update local descent direction and curvature
+                        //______________________________________________________
                         for(size_t j=M;j>0;--j)
                         {
                             const T dFda_j = dFda[j];
@@ -223,18 +239,28 @@ namespace yocto
             public:
                 const size_t   M;
                 Vector         beta;
+                Vector         step;
+                Vector         atry;
                 matrix<T>      curv;
                 matrix<T>      cinv;
                 derivative<T>  drvs;
                 T              scale;
+                const int      p10_min;
+                const int      p10_max;
 
                 explicit Samples(size_t n) :
                 _Samples(n,as_capacity),
                 M(0),
                 beta(),
+                step(),
                 curv(),
                 drvs(),
-                scale(1e-4)
+                scale(1e-4),
+                p10_min( -GLS<T>::GET_P10_MAX() ),
+                p10_max( -p10_min               ),
+                scan( this, & Samples::probe ),
+                hook(0),
+                pvar(0)
                 {
                 }
 
@@ -389,20 +415,127 @@ namespace yocto
                     return LU<T>::build(cinv);
                 }
 
+                //______________________________________________________________
+                //
+                // compute lambda from p10
+                //______________________________________________________________
+                inline T compute_lambda(const int p10)
+                {
+                    if(p10<=p10_min)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        const int p = min_of<int>(p10,p10_max);
+                        if(p>=0)
+                        {
+                            return ipower<T>(10,size_t(p));
+                        }
+                        else
+                        {
+                            return ipower<T>(0.1,size_t(-p));
+                        }
+                    }
+                }
+
+
+                //______________________________________________________________
+                //
+                // find acceptable lambda so that curvature is invertible
+                //______________________________________________________________
+                inline T find_acceptable_lambda(int &p10)
+                {
+                    assert(p10>=p10_min);
+                    assert(p10<=p10_max);
+                    T lambda = -1;
+                    while( !compute_cinv( (lambda=compute_lambda(p10)) ) )
+                    {
+                        ++p10;
+                        if(p10>p10_max)
+                        {
+                            return -1;
+                        }
+                    }
+                    return lambda;
+                }
+
+                bool fit_with(Function         &F,
+                              Array            &aorg,
+                              const array<bool> used)
+                {
+                    assert(aorg.size()==M);
+                    assert(used.size()==M);
+
+                    //__________________________________________________________
+                    //
+                    // initialize
+                    //__________________________________________________________
+                    hook      = &F;
+                    pvar      = &aorg;
+                    int  p10  = -4;
+                    T    lam  = -1;
+                    T    Horg = computeD2(F,aorg,used);
+
+                    //__________________________________________________________
+                    //
+                    // main loop
+                    //__________________________________________________________
+                    while(true)
+                    {
+                        //______________________________________________________
+                        //
+                        // adjust p10, curvature is computed@aorg
+                        //______________________________________________________
+                        lam = find_acceptable_lambda(p10);
+                        if(lam<0)
+                        {
+                            return false; //! no scaling...
+                        }
+
+                        //______________________________________________________
+                        //
+                        // compute step
+                        //______________________________________________________
+                        LU<T>::solve(cinv,step);
+                        std::cerr << "lam=" << lam << std::endl;
+                        std::cerr << "step=" << step << std::endl;
+
+                        break;
+                    }
+
+                    return true;
+                }
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
-                void setup(size_t nvar)
+                Function1 scan;
+
+                Function *hook;
+                Array    *pvar;
+
+                inline void setup(size_t nvar)
                 {
                     assert(nvar>0);
                     (size_t &)M = nvar;
-                    beta.make(nvar);
-                    curv.make(nvar,nvar);
-                    cinv.make(nvar);
+                    beta.make(M);
+                    step.make(M);
+                    atry.make(M);
+                    curv.make(M,M);
+                    cinv.make(M);    // large memory model for LU
                 }
+
+                inline T probe(const T u)
+                {
+                    assert(hook);
+                    assert(pvar);
+                    tao::setprobe(atry,*pvar,u,step);
+                    return computeD2_(*hook,atry);
+                }
+
             };
         };
-
+        
     }
 }
 

@@ -256,7 +256,7 @@ namespace yocto
 #define YOCTO_LU_CPY(I) x[I] = b[I]
                 YOCTO_LOOP_FUNC(a.rows,YOCTO_LU_CPY,1);
 #undef  YOCTO_LU_CPY
-                LU<T>::solve(a,b);
+                LU<T>::solve(a,x);
             }
             
         };

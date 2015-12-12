@@ -89,7 +89,14 @@ YOCTO_UNIT_TEST_IMPL(glsf)
     save("f1.dat",t1,z1);
     save("f2.dat",t2,z2);
 
-    std::cerr << "LAMBDA_MIN=" << GLS<double>::GET_LAMBDA_MIN() << " / " << GLS<float>::GET_LAMBDA_MIN() << std::endl;
+    std::cerr << "P10_MAX=" << GLS<double>::GET_P10_MAX()<< " / " << GLS<float>::GET_P10_MAX() << std::endl;
+    for(int p=samples.p10_min-1;p<=samples.p10_max+1;++p)
+    {
+        std::cerr << "lambda(" << p << ")=" << samples.compute_lambda(p) << std::endl;
+    }
+
+    samples.fit_with(F,aorg, used);
+    
 
 }
 YOCTO_UNIT_TEST_DONE()
