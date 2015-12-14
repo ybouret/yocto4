@@ -90,7 +90,7 @@ namespace yocto {
                               real_t                     ftol )
         {
             assert(x.is_ordered());
-            netsort<real_t>::co_level3<real_t>( &x.a, &f.a);
+            x.co_sort(f);
             assert(x.a<=x.b);
             assert(x.b<=x.c);
             assert(f.b<=f.a);
