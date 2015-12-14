@@ -57,7 +57,7 @@ namespace yocto
                 Vector       dFdu;  //!< #L local gradient
                 Vector       dFda;  //!< #M global gradient
                 Vector       beta;  //!< #M descent direction
-                matrix<T>    curv;  //!< M*M local curvature
+                matrix<T>    curv;  //!< M*M global curvature
 
                 //! link global variable index to local variable index
                 void link( const size_t iLocal, const size_t iGlobal);
@@ -66,7 +66,7 @@ namespace yocto
                 T computeD2(Function    &F,
                             const Array &a);
 
-                //! compute D2 and curvature
+                //! compute D2 and curvature, update Z term
                 T computeD2(Function      &F,
                             const Array   &a,
                             derivative<T> &drvs,
@@ -96,6 +96,8 @@ namespace yocto
             //
             //__________________________________________________________________
             typedef vector<typename Sample::Pointer> _Samples;
+            class Samples;
+            typedef functor<bool,TL2(const Samples &,const Array&)> Callback;
 
             class Samples : public _Samples
             {
@@ -110,7 +112,8 @@ namespace yocto
                 T              scale;    //! scaling for fit, may be important !
                 const int      p10_min;
                 const int      p10_max;
-
+                size_t         cycle;   //!< cycle index
+                
                 explicit Samples(size_t n);
                 virtual ~Samples() throw();
 
@@ -156,7 +159,8 @@ namespace yocto
                 bool fit_with(Function          &F,
                               Array             &aorg,
                               const array<bool> &used,
-                              Array             &aerr);
+                              Array             &aerr,
+                              Callback          *cb=0);
 
 
             private:

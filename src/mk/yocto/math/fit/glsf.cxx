@@ -409,7 +409,8 @@ namespace yocto
         bool GLS<real_t>:: Samples:: fit_with(Function          &F,
                                               Array             &aorg,
                                               const array<bool> &used,
-                                              Array             &aerr)
+                                              Array             &aerr,
+                                              Callback          *cb)
         {
             assert(aorg.size()==M);
             assert(used.size()==M);
@@ -429,8 +430,8 @@ namespace yocto
             bool         cvg  = false;
 
             tao::ld(aerr,0);
+            cycle = 0;
 
-            size_t count = 0;
             //__________________________________________________________________
             //
             //
@@ -438,7 +439,11 @@ namespace yocto
             //
             //__________________________________________________________________
         CYCLE:
-            ++count;
+            ++cycle;
+            if(cb && !(*cb)(*this,aorg) )
+            {
+                return false;
+            }
             //__________________________________________________________________
             //
             // At this point, beta and curv are computed @aorg
@@ -546,7 +551,7 @@ namespace yocto
             // Final evaluation
             //
             //__________________________________________________________________
-            std::cerr << "count=" << count << std::endl;
+            std::cerr << "cycle=" << cycle << std::endl;
             Horg = computeD2(F,aorg,used);
             std::cerr << "curv=" << curv << std::endl;
             if( !compute_cinv(0) )
