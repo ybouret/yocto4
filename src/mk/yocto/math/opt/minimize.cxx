@@ -6,26 +6,25 @@
 #include "yocto/ios/ocstream.hpp"
 
 namespace yocto {
-    
+
     namespace math {
-        
+
 #define XTOL numeric<real_t>::sqrt_ftol
-        
+
         static inline
         real_t __compute_ftol(real_t ftol) throw()
         {
             return max_of(Fabs(ftol),XTOL);
         }
-        
-        
-        namespace
+
+
+
+        namespace kernel
         {
-            
-            
-            static inline
-            void minstep(numeric<real_t>::function &func,
-                         triplet<real_t>           &x,
-                         triplet<real_t>           &f)
+            template <>
+            void minimize(numeric<real_t>::function &func,
+                          triplet<real_t>           &x,
+                          triplet<real_t>           &f)
             {
                 static const real_t C = REAL(0.381966011250105);
                 assert(x.a<=x.b);
@@ -81,8 +80,9 @@ namespace yocto {
                     }
                 }
             }
+
         }
-        
+
         template <>
         void minimize<real_t>(numeric<real_t>::function &func,
                               triplet<real_t>           &x,
@@ -96,16 +96,17 @@ namespace yocto {
             assert(f.b<=f.a);
             assert(f.b<=f.c);
             ftol =  __compute_ftol(ftol);
-            
+
             while( max_of<real_t>(x.c-x.a,0) > max_of(ftol*Fabs(x.b),XTOL) )
             {
-                minstep(func,x,f);
+                kernel::minimize<real_t>(func,x,f);
             }
-            
+
         }
-        
+
+#if 0
         namespace {
-            
+
             static inline
             void minstep_para(numeric<real_t>::function &func,
                               triplet<real_t>           &x,
@@ -159,7 +160,7 @@ namespace yocto {
                             {
                                 goto FAILSAFE;
                             }
-                            
+
                             const real_t fu = func(xu);
                             if(fu>f.b)
                             {
@@ -197,12 +198,12 @@ namespace yocto {
                                 x.b = xu;
                                 f.b = fu;
                             }
-                            
+
                         }
                     }
                     return;
                 }
-                
+
             FAILSAFE:
                 if(bc>ab)
                 {
@@ -251,10 +252,10 @@ namespace yocto {
                     }
                 }
             }
-            
-            
+
+
         }
-        
+
         template <>
         void minimize_para<real_t>(numeric<real_t>::function &func,
                                    triplet<real_t>           &x,
@@ -276,6 +277,7 @@ namespace yocto {
             
         }
         
+#endif
         
         
     } // math

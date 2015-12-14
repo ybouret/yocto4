@@ -51,7 +51,7 @@ YOCTO_UNIT_TEST_IMPL(opt)
  
     std::cerr << "Double: " << std::endl;
     optim<double>(minimize<double>,xtol);
-    optim<double>(minimize_para<double>,xtol);
+    //optim<double>(minimize_para<double>,xtol);
 }
 YOCTO_UNIT_TEST_DONE()
 

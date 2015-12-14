@@ -10,7 +10,15 @@
 namespace yocto {
     
     namespace math {
-        
+
+        namespace kernel
+        {
+            template <typename T>
+            void minimize(typename numeric<T>::function &func,
+                          triplet<T> &x,
+                          triplet<T> &f);
+            
+        }
         
         //! (x.a <= x.b <= x.c) || (x.a>=x.b>=x.c) and f.b <= f.a and f.b <= f.c
         /**
@@ -21,15 +29,6 @@ namespace yocto {
                       triplet<T> &x,
                       triplet<T> &f,
                       T ftol);
-        
-        
-        //! (x.a <= x.b <= x.c) || (x.a>=x.b>=x.c) and f.b <= f.a and f.b <= f.c
-        template <typename T>
-        void minimize_para(typename numeric<T>::function &func,
-                           triplet<T>                    &x,
-                           triplet<T>                    &f,
-                           T                              ftol);
-        
         
     }
     
