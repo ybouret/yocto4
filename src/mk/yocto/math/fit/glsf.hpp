@@ -67,10 +67,10 @@ namespace yocto
                             const Array &a);
 
                 //! compute D2 and curvature, update Z term
-                T computeD2(Function      &F,
-                            const Array   &a,
-                            derivative<T> &drvs,
-                            const T        du);
+                T computeD2(Function          &F,
+                            const Array       &a,
+                            derivative<T>     &drvs,
+                            const T            du);
 
                 //! prepare memory with Gamma=0
                 void prepare( size_t global_nvar, size_t local_nvar );
@@ -193,6 +193,31 @@ namespace yocto
 
 
             static void display( std::ostream &os, const Array &aorg, const Array &aerr);
+
+            class Polynomial
+            {
+            public:
+                inline  Polynomial() throw() {}
+                inline ~Polynomial() throw() {}
+                inline  T compute(const T X, const Array &aorg)
+                {
+                    const size_t n = aorg.size();
+                    if(n>0)
+                    {
+                        const T ans = aorg[n];
+                        for(size_t i=n-1;i>0;--i)
+                        {
+                            ans *= X;
+                            ans += aorg[i-1];
+                        }
+                    }
+                    else
+                        return 0;
+                }
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Polynomial);
+            };
 
         };
         
