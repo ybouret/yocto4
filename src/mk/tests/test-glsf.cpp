@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/fit/glsf.hpp"
+#include "yocto/math/fit/glsf-spec.hpp"
 #include "yocto/sequence/lw-array.hpp"
 #include "yocto/ios/ocstream.hpp"
 
@@ -106,3 +106,67 @@ YOCTO_UNIT_TEST_IMPL(glsf)
     }
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/code/rand.hpp"
+
+YOCTO_UNIT_TEST_IMPL(glsf_poly)
+{
+    GLS<float>::Function poly = _GLS::Create<float,_GLS::Polynomial>();
+
+
+    const size_t  N     = 20;
+    const float   omega = 1.0 + 0.2f*alea<float>();
+    vector<float> X(N);
+    vector<float> Y(N);
+
+    const size_t  dmax=4;
+    matrix<float> Q(dmax+1,N);
+    for(size_t i=1;i<=N;++i)
+    {
+        const float x = (3.14f*(i-1))/N;
+        X[i] = x;
+        Y[i] = sin(omega*x) + 0.02f*(0.5f-alea<float>());
+    }
+
+    GLS<float>::Samples samples(1);
+
+
+    for(size_t d=0;d<=dmax;++d)
+    {
+        const size_t m = d+1;
+        samples.free();
+        samples.append(X,Y,Q[m]);
+        vector<float> aorg(m);
+        vector<float> aerr(m);
+        vector<bool>  used(m,true);
+
+        samples.prepare(m);
+
+        if(samples.fit_with(poly, aorg, used, aerr))
+        {
+            GLS<float>::display(std::cerr,aorg, aerr);
+        }
+        else
+        {
+            std::cerr << "failure ! with d=" << d << std::endl;
+        }
+
+    }
+
+            ios::wcstream fp("fits.dat");
+            for(size_t i=1;i<=N;++i)
+            {
+                fp("%g %g", X[i], Y[i]);
+                for(size_t j=1;j<=Q.rows;++j)
+                {
+                    fp(" %g", Q[j][i]);
+                }
+                fp("\n");
+            }
+
+
+
+}
+YOCTO_UNIT_TEST_DONE()
+
+

@@ -85,7 +85,8 @@ YOCTO_UNIT_TEST_INIT(64)
     
     YOCTO_UNIT_TEST_DECL(kde);
     YOCTO_UNIT_TEST_DECL(glsf);
-    
+    YOCTO_UNIT_TEST_DECL(glsf_poly);
+
 }
 YOCTO_UNIT_TEST_EXEC()
 
