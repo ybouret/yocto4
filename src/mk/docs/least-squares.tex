@@ -8,7 +8,7 @@
 \usepackage{xfrac}
 
 %% concentration notations
-\newcommand{\mymat}[1]{\boldsymbol{#1}}
+\newcommand{\mymat}[1]{\bm{#1}}
 \newcommand{\mytrn}[1]{~^{\mathsf{t}}#1}
 \newcommand{\myvec}[1]{\overrightarrow{#1}}
 \newcommand{\mygrad}{\vec{\nabla}}
@@ -66,6 +66,16 @@ We use
 \end{equation}
 to approximate the curvature of $D_i^2$.
 
+\section{Minimization}
+Numerically, both $\vec{\beta}$ and $\mymat{\alpha}$ are approximate values.\\
+The descent direction for $D^2$ is $\vec{\beta}$. The Newton's step $\vec{h}$ that should decrease $\vec{\beta}$ is defined by
+\begin{equation}
+	 \mymat{\alpha} \vec{h} \simeq \vec{\beta}
+\end{equation}
+The Levenberq-Marquardt step consist in controlling the curvature with a parameter $\lambda$, using
+\begin{equation}
+	{\mymat{\alpha}_{[\lambda]}}_{ij} = \mymat{\alpha}_{ij} \text{ if } i\not=j, \;\; (1+\lambda) \alpha_{ii} \text{ otherwise.}
+\end{equation}
 
 
 

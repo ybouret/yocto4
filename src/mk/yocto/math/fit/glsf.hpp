@@ -9,6 +9,8 @@
 #include "yocto/ptr/arc.hpp"
 #include "yocto/math/core/lu.hpp"
 #include "yocto/code/ipower.hpp"
+#include "yocto/math/opt/bracket.hpp"
+#include "yocto/math/opt/minimize.hpp"
 
 namespace yocto
 {
@@ -241,6 +243,7 @@ namespace yocto
                 Vector         beta;
                 Vector         step;
                 Vector         atry;
+                Vector         desc;
                 matrix<T>      curv;
                 matrix<T>      cinv;
                 derivative<T>  drvs;
@@ -253,6 +256,8 @@ namespace yocto
                 M(0),
                 beta(),
                 step(),
+                atry(),
+                desc(),
                 curv(),
                 drvs(),
                 scale(1e-4),
@@ -485,7 +490,7 @@ namespace yocto
                     while(true)
                     {
                         ++count;
-                        if(count>40) break;
+                        //if(count>40) break;
                         //______________________________________________________
                         //
                         // adjust p10, curvature is computed@aorg
@@ -524,22 +529,56 @@ namespace yocto
                         //
                         // |beta|>0, |step|>0
                         //______________________________________________________
-                        const T Hnew = scan(1);
-                        std::cerr << "H: " << Horg << " -> " << Hnew << std::endl;
+                        T Hnew = scan(1);
+                        //std::cerr << "H: " << Horg << " -> " << Hnew << std::endl;
                         if(Hnew<Horg)
                         {
                             std::cerr << "SUCCESS" << std::endl;
-                            Horg = Hnew;
                             tao::set(aorg,atry);
-                            computeD2(F,aorg,used);
-                            continue;
                         }
                         else
                         {
-                            std::cerr << "Failure" << std::endl;
+                            std::cerr << "FAILURE" << std::endl;
+                            //__________________________________________________
+                            //
+                            // find a guess descent
+                            //__________________________________________________
+                            std::cerr << "step0=" << step << std::endl;
+                            for(size_t i=M;i>0;--i)
+                            {
+                                if( (beta[i]*step[i]) < 0 )
+                                {
+                                    step[i] = 0;
+                                }
+                            }
+                            std::cerr << "step1=" << step << std::endl;
+
+                            triplet<T> XX = { 0, 1 , 1 };
+                            triplet<T> HH = { Horg, scan(1), 0 };
+                            HH.c = HH.b;
+                            bracket<T>::expand(scan,XX,HH);
+                            //std::cerr << "XX=" << XX << std::endl;
+                            //std::cerr << "HH=" << HH << std::endl;
+                            minimize<T>(scan, XX, HH, 0);
+                            std::cerr << "XX=" << XX << std::endl;
+                            std::cerr << "HH=" << HH << std::endl;
+                            for(size_t i=M;i>0;--i)
+                            {
+                                aorg[i] = aorg[i] + XX.b * step[i];
+                            }
+                            if(++p10>p10_max)
+                            {
+                                std::cerr << "Max decreased reached!" << std::endl;
+                                goto EXTREMUM;
+                            }
                         }
 
-
+                        // prepare next step
+                        Hnew = computeD2(F,aorg,used);
+                        std::cerr << "H: " << Horg << " -> " << Hnew << std::endl;
+                        if(Hnew>=Horg)
+                            goto EXTREMUM;
+                        Horg = Hnew;
                     }
 
                 EXTREMUM:
@@ -560,6 +599,7 @@ namespace yocto
                     beta.make(M);
                     step.make(M);
                     atry.make(M);
+                    desc.make(M);
                     curv.make(M,M);
                     cinv.make(M);    // large memory model for LU
                 }
