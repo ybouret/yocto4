@@ -125,7 +125,7 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
     {
         const float x = (3.14f*(i-1))/N;
         X[i] = x;
-        Y[i] = sin(omega*x) + 0.02f*(0.5f-alea<float>());
+        Y[i] = sin(omega*x) + 0.05f*(0.5f-alea<float>());
     }
 
     GLS<float>::Samples samples(1);
@@ -148,21 +148,24 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
         }
         else
         {
-            std::cerr << "failure ! with d=" << d << std::endl;
+            //std::cerr << "Failed" << std::endl;
         }
 
     }
 
-            ios::wcstream fp("fits.dat");
-            for(size_t i=1;i<=N;++i)
+    {
+        ios::wcstream fp("poly.dat");
+        for(size_t i=1;i<=N;++i)
+        {
+            fp("%g %g", X[i], Y[i]);
+            for(size_t j=1;j<=Q.rows;++j)
             {
-                fp("%g %g", X[i], Y[i]);
-                for(size_t j=1;j<=Q.rows;++j)
-                {
-                    fp(" %g", Q[j][i]);
-                }
-                fp("\n");
+                fp(" %g", Q[j][i]);
             }
+            fp("\n");
+        }
+    }
+
 
 
 
@@ -170,3 +173,74 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
 YOCTO_UNIT_TEST_DONE()
 
 
+static inline double make_gauss( const double t, const double a, const double mu, const double sig)
+{
+    const double arg = (t-mu)/sig;
+    return a* exp( -0.5 * arg*arg );
+}
+
+YOCTO_UNIT_TEST_IMPL(glsf_gauss)
+{
+    GLS<double>::Function gauss = _GLS::Create<double,_GLS::Gauss>();
+
+    const size_t  N     = 200;
+    const double  Tmx   = 100;
+    const double  mu1   = 25;
+    const double  mu2   = 72;
+    const double  sig1  = 3;
+    const double  sig2  = 2.7;
+    const double  a1    = 9;
+    const double  a2    = 3.14;
+
+    vector<double> X(N);
+    vector<double> Y(N);
+    vector<double> Z(N);
+
+    for(size_t i=1;i<=N;++i)
+    {
+        const double t = (i*Tmx)/N;
+        X[i] = t;
+        Y[i] = make_gauss(t,a1, mu1, sig1) + make_gauss(t, a2, mu2, sig2) + 1*(0.5-alea<double>());
+    }
+
+    vector<double> aorg(6);
+    vector<bool>   used(6,true);
+    vector<double> aerr(6);
+
+    aorg[1] = 10;
+    aorg[2] = 1;
+    aorg[3] = 20;
+
+    aorg[4] = 5;
+    aorg[5] = 1;
+    aorg[6] = 70;
+
+    GLS<double>::Samples samples(1);
+
+    samples.append(X,Y,Z);
+    samples.prepare( aorg.size() );
+
+
+    {
+        ios::wcstream fp("gauss.dat");
+        for(size_t i=1;i<=N;++i)
+        {
+            fp("%g %g %g\n", X[i], Y[i], Z[i]);
+        }
+    }
+
+    if(samples.fit_with(gauss,aorg,used,aerr) )
+    {
+        GLS<double>::display(std::cerr, aorg, aerr);
+    }
+    
+    {
+        ios::wcstream fp("gauss.dat");
+        for(size_t i=1;i<=N;++i)
+        {
+            fp("%g %g %g\n", X[i], Y[i], Z[i]);
+        }
+    }
+    
+}
+YOCTO_UNIT_TEST_DONE()
