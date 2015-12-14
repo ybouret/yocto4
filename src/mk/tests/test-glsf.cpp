@@ -80,19 +80,11 @@ YOCTO_UNIT_TEST_IMPL(glsf)
     slope2 = 0.01;
 
     samples.computeD2(F,aorg,used);
-    samples.compute_cinv(0.0);
 
     //used[3] = false;
     //samples.computeD2(F,aorg,used);
 
-
-
-    std::cerr << "P10_MAX=" << GLS<double>::GET_P10_MAX()<< " / " << GLS<float>::GET_P10_MAX() << std::endl;
-    for(int p=samples.p10_min-1;p<=samples.p10_max+1;++p)
-    {
-        std::cerr << "lambda(" << p << ")=" << samples.compute_lambda(p) << std::endl;
-    }
-
+    
     samples.fit_with(F,aorg, used);
     
     samples.computeD2_(F,aorg);
