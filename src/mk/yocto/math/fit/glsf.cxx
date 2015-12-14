@@ -127,7 +127,7 @@ namespace yocto
                 //
                 // compute curent D2
                 //______________________________________________________
-                const real_t d  = Y[i] - F(Xi,u);
+                const real_t d  = Y[i] - (Z[i]=F(Xi,u));
                 D2 += d*d;
 
                 //______________________________________________________
@@ -422,10 +422,12 @@ namespace yocto
         template <>
         bool GLS<real_t>:: Samples:: fit_with(Function          &F,
                                               Array             &aorg,
-                                              const array<bool> &used)
+                                              const array<bool> &used,
+                                              Array             &aerr)
         {
             assert(aorg.size()==M);
             assert(used.size()==M);
+            assert(aerr.size()==M);
 
             //__________________________________________________________________
             //
@@ -440,7 +442,6 @@ namespace yocto
             real_t Horg = computeD2(F,aorg,used);
             real_t Hnew = Horg;
 
-            Vector aerr(M);
             tao::ld(aerr,0);
 
             size_t count = 0;
@@ -459,7 +460,7 @@ namespace yocto
             lam = find_acceptable_lambda(p10);
             if(lam<0)
             {
-                return false; //! no scaling...
+                return false; //! no possible scaling, singular matrix ?
             }
 
 
@@ -521,7 +522,7 @@ namespace yocto
                 triplet<real_t> HH = { Horg, scan(1), 0 };
                 HH.c = HH.b;
                 bracket<real_t>::expand(scan,XX,HH);
-                minimize<real_t>(scan, XX, HH, 0);
+                minimize<real_t>(scan, XX, HH, 1e-4);
                 tao::setprobe(aorg, aorg, XX.b, step);
                 if(++p10>p10_max)
                 {
@@ -607,6 +608,10 @@ namespace yocto
                 alpha.ld1();
                 LU<real_t>::solve(cinv,alpha);
 
+                //______________________________________________________________
+                //
+                // compute the variances..
+                //______________________________________________________________
                 const real_t dS = Horg/dof;
                 for(size_t i=M;i>0;--i)
                 {

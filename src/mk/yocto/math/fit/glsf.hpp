@@ -155,7 +155,8 @@ namespace yocto
                 //______________________________________________________________
                 bool fit_with(Function          &F,
                               Array             &aorg,
-                              const array<bool> &used);
+                              const array<bool> &used,
+                              Array             &aerr);
 
 
             private:

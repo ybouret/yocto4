@@ -20,8 +20,10 @@ namespace
     struct diffusion
     {
 
+        size_t ncall;
         double compute( double t, const array<double> &a )
         {
+            ++ncall;
             const double t0    = a[1];
             const double slope = a[2];
             return sqrt( slope*(t-t0) );
@@ -68,10 +70,12 @@ YOCTO_UNIT_TEST_IMPL(glsf)
 
 
     diffusion diff;
+    diff.ncall = 0;
     GLS<double>::Function F( &diff, & diffusion::compute );
 
     vector<double> aorg(3);
-    vector<bool>   used(3,true);
+    vector<bool>   used(aorg.size(),true);
+    vector<double> aerr(aorg.size());
     double &slope1  = aorg[1];
     double &slope2  = aorg[2];
     double &t0      = aorg[3];
@@ -85,10 +89,12 @@ YOCTO_UNIT_TEST_IMPL(glsf)
     //samples.computeD2(F,aorg,used);
 
     
-    samples.fit_with(F,aorg, used);
-    
-    samples.computeD2_(F,aorg);
-    save("f1.dat",t1,z1);
-    save("f2.dat",t2,z2);
+    if( samples.fit_with(F,aorg,used,aerr) )
+    {
+        save("f1.dat",t1,z1);
+        save("f2.dat",t2,z2);
+        std::cerr << "ncall=" << diff.ncall << std::endl;
+    }
+    std::cerr << "XTOL=" << numeric<double>::sqrt_ftol << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
