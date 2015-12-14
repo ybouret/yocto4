@@ -213,7 +213,6 @@ namespace yocto
         beta(),
         step(),
         atry(),
-        desc(),
         curv(),
         drvs(),
         scale(1e-4),
@@ -244,7 +243,6 @@ namespace yocto
             beta.make(M);
             step.make(M);
             atry.make(M);
-            desc.make(M);
             curv.make(M,M);
             cinv.make(M);    // large memory model for LU
         }
@@ -442,6 +440,8 @@ namespace yocto
             real_t Horg = computeD2(F,aorg,used);
             real_t Hnew = Horg;
 
+            Vector aerr(M);
+            tao::ld(aerr,0);
 
             size_t count = 0;
             //__________________________________________________________________
@@ -548,8 +548,15 @@ namespace yocto
             goto CYCLE;
             
         EXTREMUM:
+            //__________________________________________________________________
+            //
+            //
+            // Final evaluation
+            //
+            //__________________________________________________________________
             std::cerr << "count=" << count << std::endl;
             Horg = computeD2(F,aorg,used);
+            std::cerr << "curv=" << curv << std::endl;
             if( !compute_cinv(0) )
             {
                 std::cerr << "invalid curvature at extremum!" << std::endl;
@@ -557,18 +564,59 @@ namespace yocto
             }
             else
             {
-                matrix<real_t> &alpha = curv;
-                LU<real_t>::solve(cinv,alpha);
-                const size_t nvar = M;
+                //______________________________________________________________
+                //
+                // variables
+                //______________________________________________________________
+                size_t       nvar = M;
+                for(size_t i=M;i>0;--i)
+                {
+                    if( !used[i] )
+                    {
+                        --nvar;
+                    }
+                }
+
+                //______________________________________________________________
+                //
+                // data
+                //______________________________________________________________
                 _Samples    &self = *this;
                 size_t       ndat = 0;
                 for(size_t i=self.size();i>0;--i)
                 {
                     ndat += self[i]->N;
                 }
-                std::cerr << "ndat=" << ndat << std::endl;
-                std::cerr << "nvar=" << nvar << std::endl;
+                if(ndat<nvar)
+                {
+                    std::cerr << "too many parameters" << std::endl;
+                    return false;
+                }
 
+                //______________________________________________________________
+                //
+                // Degrees of freedom
+                //______________________________________________________________
+                const size_t  dof = 1 + (ndat-nvar);
+
+                //______________________________________________________________
+                //
+                // compute the covariance matrix
+                //______________________________________________________________
+                matrix<real_t> &alpha = curv;
+                alpha.ld1();
+                LU<real_t>::solve(cinv,alpha);
+
+                const real_t dS = Horg/dof;
+                for(size_t i=M;i>0;--i)
+                {
+                    if( used[i] )
+                    {
+                        aerr[i] = Sqrt( Fabs(alpha[i][i]) * dS );
+                    }
+                }
+                std::cerr << "aorg=" << aorg << std::endl;
+                std::cerr << "aerr=" << aerr << std::endl;
                 return true;
             }
 

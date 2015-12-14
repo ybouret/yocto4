@@ -104,11 +104,10 @@ namespace yocto
                 Vector         beta;
                 Vector         step;
                 Vector         atry;
-                Vector         desc;
                 matrix<T>      curv;
                 matrix<T>      cinv;
                 derivative<T>  drvs;
-                T              scale;
+                T              scale;    //! scaling for fit, may be important !
                 const int      p10_min;
                 const int      p10_max;
 
@@ -158,20 +157,30 @@ namespace yocto
                               Array             &aorg,
                               const array<bool> &used);
 
-                //______________________________________________________________
-                //
-                // compute lambda from p10
-                //______________________________________________________________
-                T compute_lambda(const int p10);
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
                 Function1 scan;
                 Function *hook;
                 Array    *pvar;
-                
+
+                //______________________________________________________________
+                //
+                // allocate own variables
+                //______________________________________________________________
                 void setup(size_t nvar);
-                T    probe(const T u);
+
+                //______________________________________________________________
+                //
+                // wrapper for minimisation, called in 'scan'
+                //______________________________________________________________
+                T  probe(const T u);
+
+                //______________________________________________________________
+                //
+                // compute lambda from p10
+                //______________________________________________________________
+                T compute_lambda(const int p10);
 
                 //______________________________________________________________
                 //
