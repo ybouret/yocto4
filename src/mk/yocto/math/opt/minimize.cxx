@@ -79,8 +79,8 @@ namespace yocto {
                         f.b = fu;
                     }
                 }
+                x.co_sort(f);
             }
-
         }
 
         template <>

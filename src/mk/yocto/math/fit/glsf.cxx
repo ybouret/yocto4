@@ -53,7 +53,7 @@ namespace yocto
         }
 
         template <>
-        void GLS<real_t>:: Sample:: link( size_t iGlobal, size_t iLocal )
+        void GLS<real_t>:: Sample:: link( const size_t iLocal, size_t iGlobal )
         {
             assert(iGlobal>0);
             assert(iGlobal<=Gamma.cols);
@@ -197,14 +197,6 @@ namespace yocto
             return D2;
         }
 
-        template <>
-        real_t GLS<real_t>:: Samples:: probe(const real_t u)
-        {
-            assert(hook);
-            assert(pvar);
-            tao::setprobe(atry,*pvar,u,step);
-            return computeD2_(*hook,atry);
-        }
 
         template <>
         GLS<real_t>:: Samples:: Samples(size_t n) :
@@ -217,10 +209,7 @@ namespace yocto
         drvs(),
         scale(1e-4),
         p10_min( -GLS<real_t>::GET_P10_MAX() ),
-        p10_max( -p10_min               ),
-        scan( this, & Samples::probe ),
-        hook(0),
-        pvar(0)
+        p10_max( -p10_min               )
         {
         }
 
@@ -412,9 +401,6 @@ namespace yocto
     }
 }
 
-#include "yocto/math/opt/bracket.hpp"
-#include "yocto/math/opt/minimize.hpp"
-
 namespace yocto
 {
     namespace math
@@ -435,12 +421,12 @@ namespace yocto
             // initialize
             //
             //__________________________________________________________________
-            hook        = &F;
-            pvar        = &aorg;
-            int    p10  = -4;
-            real_t lam  = -1;
-            real_t Horg = computeD2(F,aorg,used);
-            real_t Hnew = Horg;
+            const real_t ftol = numeric<real_t>::ftol;
+            int          p10  = -4;
+            real_t       lam  = -1;
+            real_t       Horg = computeD2(F,aorg,used);
+            real_t       Hnew = Horg;
+            bool         cvg  = false;
 
             tao::ld(aerr,0);
 
@@ -455,7 +441,8 @@ namespace yocto
             ++count;
             //__________________________________________________________________
             //
-            // adjust p10, then curvature is computed@aorg
+            // At this point, beta and curv are computed @aorg
+            // adjust p10, then convpute cinv
             //__________________________________________________________________
             lam = find_acceptable_lambda(p10);
             if(lam<0)
@@ -464,7 +451,6 @@ namespace yocto
             }
 
 
-            std::cerr << "beta=" << beta << std::endl;
             if(tao::norm_sq(beta)<=0)
             {
                 // level 1 success
@@ -476,8 +462,6 @@ namespace yocto
             // compute step
             //__________________________________________________________________
             LU<real_t>::solve(step,cinv,beta);
-            std::cerr << "lam  = " << lam  << std::endl;
-            std::cerr << "step = " << step << std::endl;
             if(tao::norm_sq(step)<=0)
             {
                 // level 2 success
@@ -488,82 +472,73 @@ namespace yocto
             //
             // |beta|>0, |step|>0, try full Newton's step
             //__________________________________________________________________
-            Hnew = scan(1);
+            for(size_t i=M;i>0;--i)
+            {
+                atry[i] = aorg[i] + step[i];
+            }
+            Hnew = computeD2_(F,atry);
             if(Hnew<Horg)
             {
-                std::cerr << "SUCCESS" << std::endl;
                 //______________________________________________________________
                 //
                 // we take the step
                 //______________________________________________________________
                 tao::set(aorg,atry);
+                p10 = max_of(p10-1,p10_min);
             }
             else
             {
-                std::cerr << "FAILURE" << std::endl;
                 //______________________________________________________________
                 //
-                // find a guess descent: 'towards' beta
+                // keep same parameters, decrease step through lambda
                 //______________________________________________________________
-                for(size_t i=M;i>0;--i)
-                {
-                    if( (beta[i]*step[i]) < 0 )
-                    {
-                        step[i] = 0;
-                    }
-                }
-                if(tao::norm_sq(step)<=0)
-                {
-                    // numeric noise...
-                    goto EXTREMUM;
-                }
-
-                //______________________________________________________________
-                //
-                // bracket/order
-                //______________________________________________________________
-                triplet<real_t> XX = { 0, 1 , 1 };
-                triplet<real_t> HH = { Horg, scan(1), 0 };
-                HH.c = HH.b;
-                bracket<real_t>::expand(scan,XX,HH);
-                XX.co_sort(HH);
-
-                //______________________________________________________________
-                //
-                // minimization
-                //______________________________________________________________
-                minimize<real_t>(scan, XX, HH, 1e-4);
-
-
-                //______________________________________________________________
-                //
-                // Record/check
-                //______________________________________________________________
-                tao::setprobe(aorg, aorg, XX.b, step);
                 if(++p10>p10_max)
                 {
-                    std::cerr << "Max decreased reached!" << std::endl;
                     goto EXTREMUM;
                 }
+                goto CYCLE;
             }
 
-            //__________________________________________________________________
-            //
-            //
-            // prepare next cycle
-            //
-            //__________________________________________________________________
 
-            Hnew = computeD2(F,aorg,used);
             std::cerr << "H: " << Horg << " -> " << Hnew << std::endl;
-            if(Fabs(Hnew-Horg)<= numeric<real_t>::ftol * Horg)
+
+            //__________________________________________________________________
+            //
+            // test numerical convergence on H
+            //__________________________________________________________________
+            if( Fabs(Hnew-Horg) <= ftol*Horg )
             {
                 // numerical extremum
                 goto EXTREMUM;
             }
-            Horg = Hnew;
+
+            //__________________________________________________________________
+            //
+            // test numerical convergence on variables
+            //__________________________________________________________________
+            cvg = true;
+            for(size_t i=M;i>0;--i)
+            {
+                if( Fabs(step[i]) > Fabs( numeric<real_t>::ftol * aorg[i] ) )
+                {
+                    cvg = false;
+                    break;
+                }
+            }
+            if(cvg)
+            {
+                goto EXTREMUM;
+            }
+
+            //__________________________________________________________________
+            //
+            //
+            // prepare next cycle, aorg is changed, recompute beta and curv
+            //
+            //__________________________________________________________________
+            Horg = computeD2(F,aorg,used);
             goto CYCLE;
-            
+
         EXTREMUM:
             //__________________________________________________________________
             //
@@ -606,7 +581,6 @@ namespace yocto
                 }
                 if(ndat<nvar)
                 {
-                    std::cerr << "too many parameters" << std::endl;
                     return false;
                 }
 
@@ -636,14 +610,43 @@ namespace yocto
                         aerr[i] = Sqrt( Fabs(alpha[i][i]) * dS );
                     }
                 }
-                std::cerr << "aorg=" << aorg << std::endl;
-                std::cerr << "aerr=" << aerr << std::endl;
                 return true;
             }
-
-
+            
+            
         }
-        
+
     }
-    
+
+}
+
+#include <iomanip>
+
+namespace yocto
+{
+
+    namespace math
+    {
+        template <>
+        void GLS<real_t>::display( std::ostream &os, const Array &aorg, const Array &aerr)
+        {
+            assert(aerr.size()==aorg.size());
+            const size_t n = aorg.size();
+            for(size_t i=1;i<=n;++i)
+            {
+                const real_t AA = aorg[i];
+                const real_t AE = aerr[i];
+                os << "\tparam[" << std::setw(3) << i << "]= " << std::setw(16) << AA  << " +/-" << std::setw(16) << AE;
+                if(Fabs(AA)>0)
+                {
+                    std::cerr << " (" << (REAL(100.0)*AE/Fabs(AA)) << "%)";
+                }
+                os << std::endl;
+            }
+
+            
+        }
+
+    }
+
 }

@@ -28,7 +28,7 @@ namespace
             const double slope = a[2];
             return sqrt( slope*(t-t0) );
         }
-        
+
     };
 }
 
@@ -60,12 +60,19 @@ YOCTO_UNIT_TEST_IMPL(glsf)
 
     samples.prepare(3,2);
 
-    S1.link(1,2);
-    S1.link(3,1);
+    vector<double> aorg(3);
+    vector<bool>   used(aorg.size(),true);
+    vector<double> aerr(aorg.size());
+    double &slope1  = aorg[1];
+    double &slope2  = aorg[2];
+    double &t0      = aorg[3];
+
+    S1.link(1,3);
+    S1.link(2,1);
     std::cerr << "S1.Gamma=" << S1.Gamma << std::endl;
 
+    S2.link(1,3);
     S2.link(2,2);
-    S2.link(3,1);
     std::cerr << "S2.Gamma=" << S2.Gamma << std::endl;
 
 
@@ -73,28 +80,29 @@ YOCTO_UNIT_TEST_IMPL(glsf)
     diff.ncall = 0;
     GLS<double>::Function F( &diff, & diffusion::compute );
 
-    vector<double> aorg(3);
-    vector<bool>   used(aorg.size(),true);
-    vector<double> aerr(aorg.size());
-    double &slope1  = aorg[1];
-    double &slope2  = aorg[2];
-    double &t0      = aorg[3];
-    t0     = -20;
+
+
+    t0     = -100;
     slope1 = 0.02;
     slope2 = 0.01;
 
     samples.computeD2(F,aorg,used);
 
-    //used[3] = false;
-    //samples.computeD2(F,aorg,used);
+    used[3] = false;
 
-    
+
     if( samples.fit_with(F,aorg,used,aerr) )
     {
-        save("f1.dat",t1,z1);
-        save("f2.dat",t2,z2);
         std::cerr << "ncall=" << diff.ncall << std::endl;
+        GLS<double>::display(std::cerr, aorg, aerr);
+        used[3] = true;
+        if(samples.fit_with(F,aorg,used,aerr))
+        {
+            GLS<double>::display(std::cerr, aorg, aerr);
+            save("f1.dat",t1,z1);
+            save("f2.dat",t2,z2);
+            std::cerr << "ncall=" << diff.ncall << std::endl;
+        }
     }
-    std::cerr << "XTOL=" << numeric<double>::sqrt_ftol << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

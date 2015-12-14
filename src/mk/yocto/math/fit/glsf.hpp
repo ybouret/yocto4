@@ -60,7 +60,7 @@ namespace yocto
                 matrix<T>    curv;  //!< M*M local curvature
 
                 //! link global variable index to local variable index
-                void link( size_t iGlobal, size_t iLocal );
+                void link( const size_t iLocal, const size_t iGlobal);
 
                 //!compute D2 and update the Z term
                 T computeD2(Function    &F,
@@ -161,21 +161,12 @@ namespace yocto
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
-                Function1 scan;
-                Function *hook;
-                Array    *pvar;
 
                 //______________________________________________________________
                 //
                 // allocate own variables
                 //______________________________________________________________
                 void setup(size_t nvar);
-
-                //______________________________________________________________
-                //
-                // wrapper for minimisation, called in 'scan'
-                //______________________________________________________________
-                T  probe(const T u);
 
                 //______________________________________________________________
                 //
@@ -195,6 +186,10 @@ namespace yocto
                 //______________________________________________________________
                 T find_acceptable_lambda(int &p10);
             };
+
+
+            static void display( std::ostream &os, const Array &aorg, const Array &aerr);
+
         };
         
     }
