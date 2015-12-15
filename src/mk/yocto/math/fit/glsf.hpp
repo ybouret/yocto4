@@ -45,11 +45,11 @@ namespace yocto
                 explicit Sample( const Array &XX, const Array &YY, Array &ZZ );
                 virtual ~Sample() throw();
 
-                const Array &X;
-                const Array &Y;
-                Array       &Z;
+                const Array &X; //!< ref to X data, unchanged
+                const Array &Y; //!< ref to Y data, unchanged
+                Array       &Z; //!< ref to fitted data, updated
 
-                const size_t N;     //!< current max number of points
+                const size_t N;     //!< current max number of points, recomputed
                 const size_t L;     //!< local  #variables
                 const size_t M;     //!< global #variables
                 matrix<int>  Gamma; //!< L*M matrix
@@ -66,16 +66,16 @@ namespace yocto
                 T computeD2(Function    &F,
                             const Array &a);
 
-                //! compute D2 and curvature, update Z term
+                //! compute D2, beta and curvature, update Z term
                 T computeD2(Function          &F,
                             const Array       &a,
                             derivative<T>     &drvs,
                             const T            du);
 
-                //! prepare memory with Gamma=0
+                //! prepare memory with Gamma=0 for simultaneous fit
                 void prepare( size_t global_nvar, size_t local_nvar );
 
-                //! prepare memory with Gamma=Id
+                //! prepare memory with Gamma=Id, assuming single fit...
                 void prepare( size_t global_nvar );
 
             private:
