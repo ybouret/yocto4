@@ -226,5 +226,30 @@ namespace yocto
             }
             return ker;
         }
+
+        template <>
+        void  symdiag<real_t>::compute( matrix_t &b, const array_t &d, const matrix_t &v)
+        {
+            const size_t n = d.size();
+            assert(b.cols==n);
+            assert(b.rows==n);
+            assert(v.cols==n);
+            assert(v.rows==n);
+            for(size_t i=n;i>0;--i)
+            {
+                const array<real_t> &vi = v[i];
+                for(size_t j=n;j>=i;--j)
+                {
+                    const array<real_t> &vj = v[j];
+                    real_t s = 0;
+                    for(size_t k=n;k>0;--k)
+                    {
+                        s += vi[k] * d[k] * vj[k];
+                    }
+                    b[i][j] = b[j][i] = s;
+                }
+            }
+        }
+
     }
 }

@@ -48,6 +48,10 @@ namespace yocto
              */
             static
             size_t eiginv( array_t &d ) throw();
+
+            //! compute b = V*diag(d)*V'.
+            static
+            void  compute( matrix_t &b, const array_t &d, const matrix_t &v);
         };
 
     }

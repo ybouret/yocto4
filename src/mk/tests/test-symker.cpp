@@ -44,6 +44,9 @@ void do_symdiag()
             symdiag<T>::eigsrtA(d,Q);
             //std::cerr << "dA=diag(" << d << ")" << std::endl;
             //std::cerr << "QA=" << Q << std::endl;
+            const size_t nker = symdiag<T>::eiginv(d);
+            std::cerr << "nker=" << nker << std::endl;
+
         }
     }
 }
@@ -103,7 +106,7 @@ void do_symker()
             if(Fabs(idet)<=0)
             {
                 std::cerr << "// Found 0 determinant!!!" << std::endl;
-                d[n] = 0;
+                //d[n] = 0;
                 std::cerr << "d=diag(" << d << ")" << std::endl;
                 std::cerr << "Q=" << Q << std::endl;
 
@@ -130,6 +133,12 @@ void do_symker()
 
             }
 
+            const size_t nker = symdiag<double>::eiginv(d);
+            std::cerr << "NKER=" << nker << std::endl;
+            std::cerr << "invD=diag(" << d << ")" << std::endl;
+            matrix<double> iG(n,n);
+            symdiag<double>::compute(iG, d, Q);
+            std::cerr << "iG=" << iG << std::endl;
         }
     }
 
