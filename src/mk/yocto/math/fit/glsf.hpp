@@ -114,7 +114,7 @@ namespace yocto
                 const int      p10_max;
                 size_t         cycle;   //!< cycle index
                 
-                explicit Samples(size_t n);
+                explicit Samples(size_t n=1);
                 virtual ~Samples() throw();
 
 
