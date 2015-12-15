@@ -139,6 +139,9 @@ void do_symker()
             matrix<double> iG(n,n);
             symdiag<double>::compute(iG, d, Q);
             std::cerr << "iG=" << iG << std::endl;
+            matrix<double> P(n,n);
+            tao::mmul(P,G,iG);
+            std::cerr << "Prod=" << P << std::endl;
         }
     }
 
