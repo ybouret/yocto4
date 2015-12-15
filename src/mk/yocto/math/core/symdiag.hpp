@@ -18,7 +18,7 @@ namespace yocto
              \param a is a symetric matrix, REGENERATED at the end...
              \param d are the eigenvalues
              \param v columns are the eigenvectors
-             \param Diag = Vt A V
+             \param Diag = V'* A * V
              */
             static
             bool build( matrix_t &a, array_t &d, matrix_t &v );
@@ -38,6 +38,16 @@ namespace yocto
              */
             static
             void eigsrtA( array_t &d, matrix_t &v ) throw();
+
+            //! take the inverse of the eigenvalues, with conditioning.
+            /**
+             \param d a vector of eignevalues
+             compute tol = epsilon * n * max(|d|).
+             set d[i] to to its inverse if |d[i]|>tol, 0 otherwise.
+             \return the number of 0 eigenvalues, a.k.a the numeric kernel size.
+             */
+            static
+            size_t eiginv( array_t &d ) throw();
         };
 
     }

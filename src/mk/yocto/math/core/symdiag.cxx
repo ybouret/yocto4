@@ -196,6 +196,35 @@ namespace yocto
         }
         
         
-        
+        template <>
+        size_t symdiag<real_t>:: eiginv( array_t &d ) throw()
+        {
+            const size_t n    = d.size();
+            real_t       dmax = 0;
+            for(size_t i=n;i>0;--i)
+            {
+                const real_t tmp = Fabs(d[i]);
+                if(tmp>dmax)
+                {
+                    dmax=tmp;
+                }
+            }
+            const real_t tol = numeric<real_t>::epsilon * dmax * n;
+            size_t       ker = 0;
+            for(size_t i=n;i>0;--i)
+            {
+                const real_t tmp = d[i];
+                if(Fabs(tmp)<tol)
+                {
+                    d[i] = 0;
+                    ++ker;
+                }
+                else
+                {
+                    d[i] = 1/tmp;
+                }
+            }
+            return ker;
+        }
     }
 }
