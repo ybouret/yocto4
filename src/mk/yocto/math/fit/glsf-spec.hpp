@@ -2,6 +2,7 @@
 #define YOCTO_MATH_FIT_GLSF_SPEC_INCLUDED 1
 
 #include "yocto/math/fit/glsf.hpp"
+#include "yocto/code/ipower.hpp"
 
 namespace yocto
 {
@@ -112,7 +113,29 @@ namespace yocto
 
                 inline T operator()(const T X, const array<T> &a)
                 {
-                    return 0;
+                    const size_t n = a.size();
+                    if(n>0)
+                    {
+                        const size_t nden = n/2;
+                        const size_t nnum = n-nden;
+
+                        T num = 0;
+                        for(size_t i=1;i<=nnum;++i)
+                        {
+                            num += a[i] * ipower<T>(X,i-1);
+                        }
+
+                        T den = 1;
+                        for(size_t i=1;i<=nden;++i)
+                        {
+                            num += a[i+nnum] * ipower<T>(X,i);
+                        }
+                        return num/den;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
                 }
 
             private:
