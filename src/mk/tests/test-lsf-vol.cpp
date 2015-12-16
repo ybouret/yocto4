@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/fit/lsf.hpp"
+#include "yocto/math/fit/glsf.hpp"
 
 #include "yocto/math/io/data-set.hpp"
 #include "yocto/ios/ocstream.hpp"
@@ -24,7 +24,7 @@ namespace {
 		ode::driverCK<double>::type    odeint;
 		vector<double>                 param;
 		ode::Field<double>::Equation   diffeq;
-		LeastSquares<double>::Function fitter;
+		GLS<double>::Function          fitter;
 		vector<double>                 y;
         
 		explicit Volume(const size_t npar) :
@@ -122,13 +122,7 @@ YOCTO_UNIT_TEST_IMPL(fit_vol)
 		vector<double> aerr(nvar,0);
 		vector<bool>   used(nvar,true);
         
-        
-		LeastSquares<double>          fit;
-        if(argc>3&&0==strcmp(argv[3],"fast"))
-        {
-            fit.fast = true;
-        }
-		LeastSquares<double>::Samples samples;
+        GLS<double>::Samples samples;
         
 		samples.append(t,V,Vf);
 		samples.prepare(nvar);
@@ -145,10 +139,9 @@ YOCTO_UNIT_TEST_IMPL(fit_vol)
         aorg[3] = 2.0;  // Cosm
 
         
-		fit.verbose = true;
         //fit.fast    = true;
         
-		if( !fit(samples,vol.fitter,aorg,used,aerr,NULL) )
+		if( !samples.fit_with(vol.fitter,aorg,used,aerr,NULL) )
 		{
 			throw exception("unable to fit volume");
 		}
@@ -157,7 +150,7 @@ YOCTO_UNIT_TEST_IMPL(fit_vol)
         std::cerr << "Fit Results: " << std::endl;
         std::cerr << "aorg=" << aorg << std::endl;
         std::cerr << "aerr=" << aerr << std::endl;
-        std::cerr << "corr=" << samples.corr() << std::endl;
+        //std::cerr << "corr=" << samples.corr() << std::endl;
         
 		{
 			ios::ocstream fp(vformat("outvol%u.dat",unsigned(icol)),false);

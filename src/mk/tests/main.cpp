@@ -66,10 +66,6 @@ YOCTO_UNIT_TEST_INIT(64)
 
     YOCTO_UNIT_TEST_DECL(tao);
 
-    YOCTO_UNIT_TEST_DECL(gnl);
-    YOCTO_UNIT_TEST_DECL(fit_poly);
-    YOCTO_UNIT_TEST_DECL(fit_gauss);
-    YOCTO_UNIT_TEST_DECL(fit_pade);
     YOCTO_UNIT_TEST_DECL(fit_vol);
 
     YOCTO_UNIT_TEST_DECL(grad);
