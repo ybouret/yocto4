@@ -172,12 +172,15 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/math/alg/spike.hpp"
 
 static inline double make_gauss( const double t, const double a, const double mu, const double sig)
 {
     const double arg = (t-mu)/sig;
     return a* exp( -0.5 * arg*arg );
 }
+
+#include "yocto/sort/quick.hpp"
 
 YOCTO_UNIT_TEST_IMPL(glsf_gauss)
 {
@@ -203,15 +206,44 @@ YOCTO_UNIT_TEST_IMPL(glsf_gauss)
         Y[i] = make_gauss(t,a1, mu1, sig1) + make_gauss(t, a2, mu2, sig2) + 1*(0.5-alea<double>());
     }
 
+    std::cerr << "dectecting spikes" << std::endl;
+    vector<spike::pointer> spikes;
+    spike::detect(spikes,Y);
+    std::cerr << "#spikes=" << spikes.size() << std::endl;
+    quicksort(spikes,spike::compare_by_value);
+
+    if(spikes.size()<2)
+        throw exception("Not enough spikes!");
+
+    const spike &s1 = *spikes[1];
+    const spike &s2 = *spikes[2];
+
+    {
+        ios::wcstream fp("spike1.dat");
+        for(size_t i=s1.lower;i<=s1.upper;++i)
+        {
+            fp("%g %g\n", X[i], Y[i]);
+        }
+    }
+
+    {
+        ios::wcstream fp("spike2.dat");
+        for(size_t i=s2.lower;i<=s2.upper;++i)
+        {
+            fp("%g %g\n", X[i], Y[i]);
+        }
+    }
+
+
     vector<double> aorg(6);
     vector<bool>   used(6,true);
     vector<double> aerr(6);
 
-    aorg[1] = 10;
+    aorg[1] = a1;
     aorg[2] = 1;
     aorg[3] = 20;
 
-    aorg[4] = 5;
+    aorg[4] = a2;
     aorg[5] = 1;
     aorg[6] = 70;
 
