@@ -10,6 +10,10 @@ namespace yocto
 
         struct _GLS
         {
+            //__________________________________________________________________
+            //
+            //! template creation of a fitting function
+            //__________________________________________________________________
             template <
             typename T,
             template <typename> class FN
@@ -21,6 +25,10 @@ namespace yocto
                 return typename GLS<T>::Function(fn);
             }
 
+            //__________________________________________________________________
+            //
+            //! polynomial function
+            //__________________________________________________________________
             template <typename T>
             class Polynomial
             {
@@ -43,7 +51,9 @@ namespace yocto
                         return ans;
                     }
                     else
+                    {
                         return 0;
+                    }
                 }
 
             private:
@@ -51,6 +61,10 @@ namespace yocto
             };
 
 
+            //__________________________________________________________________
+            //
+            //! Gaussian functions
+            //__________________________________________________________________
             template <typename T>
             class Gauss
             {
@@ -59,6 +73,7 @@ namespace yocto
                 inline ~Gauss() throw() {}
                 inline Gauss(const Gauss &) throw() {}
 
+                //! #coefficients = 3*gaussians: amplitude*exp( -(scaling*(x-shift))^2 )
                 inline  T operator()(const T X, const array<T> &aorg)
                 {
                     const size_t nc = aorg.size();
@@ -83,7 +98,26 @@ namespace yocto
             };
 
 
+            //__________________________________________________________________
+            //
+            //! Pade approximant
+            //__________________________________________________________________
+            template <typename T>
+            class Pade
+            {
+            public:
+                inline  Pade() throw() {}
+                inline ~Pade() throw() {}
+                inline  Pade(const Pade &) throw() {}
 
+                inline T operator()(const T X, const array<T> &a)
+                {
+                    return 0;
+                }
+
+            private:
+                YOCTO_DISABLE_ASSIGN(Pade);
+            };
 
         };
 

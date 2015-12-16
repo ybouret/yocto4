@@ -505,7 +505,7 @@ namespace yocto
             }
 
 
-            std::cerr << "H: " << Horg << " -> " << Hnew << std::endl;
+            //std::cerr << "H: " << Horg << " -> " << Hnew << std::endl;
 
             //__________________________________________________________________
             //
@@ -551,9 +551,7 @@ namespace yocto
             // Final evaluation
             //
             //__________________________________________________________________
-            std::cerr << "cycle=" << cycle << std::endl;
             Horg = computeD2(F,aorg,used);
-            std::cerr << "curv=" << curv << std::endl;
             if( !compute_cinv(0) )
             {
                 std::cerr << "invalid curvature at extremum!" << std::endl;
