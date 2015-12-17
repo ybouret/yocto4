@@ -82,14 +82,11 @@ namespace yocto
                                 }
                             }
                         }
-                        std::cerr << "mu=" << mu << std::endl;
-                        std::cerr << "w="  << a  << std::endl;
                         if( !LU<T>::build(mu) )
                         {
                             return false;
                         }
                         LU<T>::solve(mu,a);
-                        std::cerr << "a=" << a << std::endl;
                     }
                     return true;
                 }

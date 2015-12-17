@@ -144,7 +144,8 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
         samples.prepare(m);
 
         _GLS::Polynomial<float>::Start(S,aorg);
-
+        std::cerr << "predicted=" << aorg << std::endl;
+        
         if(samples.fit_with(poly, aorg, used, aerr))
         {
             GLS<float>::display(std::cerr,aorg, aerr);
