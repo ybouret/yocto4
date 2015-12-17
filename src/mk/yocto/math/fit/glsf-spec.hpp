@@ -3,6 +3,7 @@
 
 #include "yocto/math/fit/glsf.hpp"
 #include "yocto/code/ipower.hpp"
+#include "yocto/math/core/lu.hpp"
 
 namespace yocto
 {
@@ -55,6 +56,42 @@ namespace yocto
                     {
                         return 0;
                     }
+                }
+
+                static inline
+                bool Start( const typename GLS<T>::Sample &S,  array<T> &a )
+                {
+                    assert(S.X.size()==S.Y.size());
+                    assert(S.X.size()==S.Z.size());
+                    const size_t n = a.size();
+                    if( n>0 )
+                    {
+                        for(size_t i=n;i>0;--i) a[i] = 0;
+                        matrix<T> mu(n);
+                        for(size_t i=S.X.size();i>0;--i)
+                        {
+                            const T xi = S.X[i];
+                            for(size_t j=n;j>0;--j)
+                            {
+                                const T xipjm = ipower<T>(xi,j-1);
+                                a[j] += xipjm*S.Y[i];
+                                for(size_t k=n;k>=j;--k)
+                                {
+                                    const T xx = xipjm * ipower<T>(xi,k-1);
+                                    mu[k][j] = (mu[j][k] += xx);
+                                }
+                            }
+                        }
+                        std::cerr << "mu=" << mu << std::endl;
+                        std::cerr << "w="  << a  << std::endl;
+                        if( !LU<T>::build(mu) )
+                        {
+                            return false;
+                        }
+                        LU<T>::solve(mu,a);
+                        std::cerr << "a=" << a << std::endl;
+                    }
+                    return true;
                 }
 
             private:

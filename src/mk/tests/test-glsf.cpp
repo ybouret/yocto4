@@ -128,6 +128,7 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
         Y[i] = sin(omega*x) + 0.05f*(0.5f-alea<float>());
     }
 
+
     GLS<float>::Samples samples(1);
 
 
@@ -135,12 +136,14 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
     {
         const size_t m = d+1;
         samples.free();
-        samples.append(X,Y,Q[m]);
+        const GLS<float>::Sample &S = samples.append(X,Y,Q[m]);
         vector<float> aorg(m);
         vector<float> aerr(m);
         vector<bool>  used(m,true);
 
         samples.prepare(m);
+
+        _GLS::Polynomial<float>::Start(S,aorg);
 
         if(samples.fit_with(poly, aorg, used, aerr))
         {
