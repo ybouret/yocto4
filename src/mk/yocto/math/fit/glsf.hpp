@@ -151,7 +151,6 @@ namespace yocto
                             const array<bool> &used);
 
 
-
                 //______________________________________________________________
                 //
                 //! fit algorithm
