@@ -222,7 +222,7 @@ namespace yocto
         template <>
         GLS<real_t>:: Sample & GLS<real_t>:: Samples:: append( const Array &X, const Array &Y, Array &Z)
         {
-            typename Sample::Pointer p( new Sample(X,Y,Z) );
+            Sample::Pointer p( new Sample(X,Y,Z) );
             this->push_back(p);
             return *p;
         }
