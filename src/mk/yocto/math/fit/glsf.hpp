@@ -164,6 +164,9 @@ namespace yocto
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
+                Array    *pvar;
+                Function *hook;
+                T      Eval( const T z );
 
                 //______________________________________________________________
                 //
@@ -188,6 +191,8 @@ namespace yocto
                 //! find acceptable lambda so that curvature is invertible
                 //______________________________________________________________
                 T find_acceptable_lambda(int &p10);
+
+
             };
 
 

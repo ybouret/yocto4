@@ -81,27 +81,31 @@ YOCTO_UNIT_TEST_IMPL(glsf)
     GLS<double>::Function F( &diff, & diffusion::compute );
 
 
-
     t0     = -100;
     slope1 = 0.02;
     slope2 = 0.01;
 
-    samples.computeD2(F,aorg,used);
+    //samples.computeD2(F,aorg,used);
 
     used[3] = false;
 
 
     if( samples.fit_with(F,aorg,used,aerr) )
     {
-        std::cerr << "ncall=" << diff.ncall << std::endl;
+        std::cerr << "ncall_partial=" << diff.ncall << std::endl;
         GLS<double>::display(std::cerr, aorg, aerr);
         used[3] = true;
+
         if(samples.fit_with(F,aorg,used,aerr))
         {
+            std::cerr << "ncall_full=" << diff.ncall << std::endl;
             GLS<double>::display(std::cerr, aorg, aerr);
             save("f1.dat",t1,z1);
             save("f2.dat",t2,z2);
-            std::cerr << "ncall=" << diff.ncall << std::endl;
+        }
+        else
+        {
+            std::cerr << "Full fit failure..." << std::endl;
         }
     }
 }

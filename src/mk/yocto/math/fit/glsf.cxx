@@ -200,6 +200,15 @@ namespace yocto
 
 
         template <>
+        real_t GLS<real_t>:: Samples:: Eval( const real_t z )
+        {
+            assert(pvar);
+            assert(hook);
+            tao::setprobe(atry, *pvar, z, step);
+            return computeD2_(*hook,atry);
+        }
+
+        template <>
         GLS<real_t>:: Samples:: Samples(size_t n) :
         _Samples(n,as_capacity),
         M(0),
@@ -212,7 +221,9 @@ namespace yocto
         scale(1e-4),
         p10_min( -GLS<real_t>::GET_P10_MAX() ),
         p10_max( -p10_min               ),
-        cycle(0)
+        cycle(0),
+        pvar(NULL),
+        hook(NULL)
         {
         }
 
@@ -426,7 +437,7 @@ namespace yocto
             //
             //__________________________________________________________________
             const real_t ftol = numeric<real_t>::ftol;
-            int          p10  = -4;
+            int          p10  = p10_min;
             real_t       lam  = -1;
             real_t       Horg = computeD2(F,aorg,used);
             real_t       Hnew = Horg;
@@ -434,6 +445,9 @@ namespace yocto
 
             tao::ld(aerr,0);
             cycle = 0;
+
+            pvar = &aorg;
+            hook = &F;
 
             //__________________________________________________________________
             //
@@ -500,10 +514,18 @@ namespace yocto
                 //
                 // keep same parameters, decrease step through lambda
                 //______________________________________________________________
+                //std::cerr << "bad..." << std::endl;
                 if(++p10>p10_max)
                 {
                     goto EXTREMUM;
                 }
+
+                Hnew = Eval(0.5);
+                if(Hnew<Horg)
+                {
+                    std::cerr << "should move halfway!" << std::endl;
+                }
+
                 goto CYCLE;
             }
             
