@@ -40,6 +40,7 @@ namespace yocto
         dFdu(),
         dFda(),
         beta(),
+	curv(),
         F1( this, & Sample::Eval ),
         ivar(0),
         xval(0),
@@ -206,10 +207,12 @@ namespace yocto
         step(),
         atry(),
         curv(),
+	cinv(),
         drvs(),
         scale(1e-4),
         p10_min( -GLS<real_t>::GET_P10_MAX() ),
-        p10_max( -p10_min               )
+        p10_max( -p10_min               ),
+	cycle(0)
         {
         }
 
