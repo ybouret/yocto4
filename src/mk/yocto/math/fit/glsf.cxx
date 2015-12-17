@@ -40,7 +40,7 @@ namespace yocto
         dFdu(),
         dFda(),
         beta(),
-	curv(),
+        curv(),
         F1( this, & Sample::Eval ),
         ivar(0),
         xval(0),
@@ -207,12 +207,12 @@ namespace yocto
         step(),
         atry(),
         curv(),
-	cinv(),
+        cinv(),
         drvs(),
         scale(1e-4),
         p10_min( -GLS<real_t>::GET_P10_MAX() ),
         p10_max( -p10_min               ),
-	cycle(0)
+        cycle(0)
         {
         }
 
@@ -506,10 +506,7 @@ namespace yocto
                 }
                 goto CYCLE;
             }
-
-
-            //std::cerr << "H: " << Horg << " -> " << Hnew << std::endl;
-
+            
             //__________________________________________________________________
             //
             // test numerical convergence on H
@@ -618,8 +615,8 @@ namespace yocto
                 }
                 return true;
             }
-            
-            
+
+
         }
 
     }
@@ -649,10 +646,10 @@ namespace yocto
                 }
                 os << std::endl;
             }
-
+            
             
         }
-
+        
     }
-
+    
 }
