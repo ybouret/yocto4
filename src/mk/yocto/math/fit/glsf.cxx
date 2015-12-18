@@ -437,7 +437,7 @@ namespace yocto
             //
             //__________________________________________________________________
             const real_t ftol = numeric<real_t>::ftol;
-            int          p10  = p10_min;
+            int          p10  = -4;
             real_t       lam  = -1;
             real_t       Horg = computeD2(F,aorg,used);
             real_t       Hnew = Horg;
@@ -455,7 +455,14 @@ namespace yocto
             // main loop
             //
             //__________________________________________________________________
+            real_t step_sq = 0;
+            real_t beta_sq = tao::norm_sq(beta);
         CYCLE:
+            if(beta_sq<=0)
+            {
+                // level 1 success
+                goto EXTREMUM;
+            }
             ++cycle;
             if(cb && !(*cb)(*this,aorg) )
             {
@@ -472,19 +479,14 @@ namespace yocto
                 return false; //! no possible scaling, singular matrix ?
             }
 
-
-            if(tao::norm_sq(beta)<=0)
-            {
-                // level 1 success
-                goto EXTREMUM;
-            }
-
+            
             //__________________________________________________________________
             //
             // compute step
             //__________________________________________________________________
             LU<real_t>::solve(step,cinv,beta);
-            if(tao::norm_sq(step)<=0)
+            step_sq = tao::norm_sq(step);
+            if(step_sq<=0)
             {
                 // level 2 success
                 goto EXTREMUM;
@@ -520,7 +522,14 @@ namespace yocto
                     goto EXTREMUM;
                 }
 
-                Hnew = Eval(0.5);
+                //______________________________________________________________
+                //
+                // try a little out of way
+                //______________________________________________________________
+
+                tao::muladd(step, Sqrt(step_sq/beta_sq), beta);
+                Hnew = Eval(0.33);
+                
                 if(Hnew<Horg)
                 {
                     std::cerr << "should move halfway!" << std::endl;
@@ -563,7 +572,8 @@ namespace yocto
             // prepare next cycle, aorg is changed, recompute beta and curv
             //
             //__________________________________________________________________
-            Horg = computeD2(F,aorg,used);
+            Horg    = computeD2(F,aorg,used);
+            beta_sq = tao::norm_sq(beta);
             goto CYCLE;
 
         EXTREMUM:
