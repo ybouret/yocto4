@@ -223,7 +223,8 @@ namespace yocto
         p10_max( -p10_min               ),
         cycle(0),
         pvar(NULL),
-        hook(NULL)
+        hook(NULL),
+        scan( this , &Samples::Eval )
         {
         }
 
@@ -496,11 +497,7 @@ namespace yocto
             //
             // |beta|>0, |step|>0, try full Newton's step
             //__________________________________________________________________
-            for(size_t i=M;i>0;--i)
-            {
-                atry[i] = aorg[i] + step[i];
-            }
-            Hnew = computeD2_(F,atry);
+            Hnew = Eval(1.0);
             if(Hnew<Horg)
             {
                 //______________________________________________________________
@@ -522,23 +519,6 @@ namespace yocto
                     goto EXTREMUM;
                 }
 
-                //______________________________________________________________
-                //
-                // try a little out of way
-                //______________________________________________________________
-
-#if 0
-                Hnew = Eval(0.381966011250105);
-
-                if(Hnew<Horg)
-                {
-                    std::cerr << "should backtrack!" << std::endl;
-                    goto CYCLE;
-                    tao::set(aorg,atry);
-                    Horg    = computeD2(F,aorg,used);
-                    beta_sq = tao::norm_sq(beta);
-                }
-#endif
                 
                 goto CYCLE;
             }

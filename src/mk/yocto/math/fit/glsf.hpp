@@ -166,7 +166,8 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
                 Array    *pvar;
                 Function *hook;
-                T      Eval( const T z );
+                Function1 scan;
+                T         Eval( const T z );
 
                 //______________________________________________________________
                 //
