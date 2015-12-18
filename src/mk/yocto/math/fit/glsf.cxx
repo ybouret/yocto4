@@ -527,14 +527,19 @@ namespace yocto
                 // try a little out of way
                 //______________________________________________________________
 
-                tao::muladd(step, Sqrt(step_sq/beta_sq), beta);
-                Hnew = Eval(0.33);
-                
+#if 0
+                Hnew = Eval(0.381966011250105);
+
                 if(Hnew<Horg)
                 {
-                    std::cerr << "should move halfway!" << std::endl;
+                    std::cerr << "should backtrack!" << std::endl;
+                    goto CYCLE;
+                    tao::set(aorg,atry);
+                    Horg    = computeD2(F,aorg,used);
+                    beta_sq = tao::norm_sq(beta);
                 }
-
+#endif
+                
                 goto CYCLE;
             }
             
