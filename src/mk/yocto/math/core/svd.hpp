@@ -14,7 +14,7 @@ namespace yocto
             //! singular value decomposition
             /**
              Given a matrix A[1..m][1..n], this routine computes its singular value
-             decomposition, A = U.W.VT.  The matrix U replaces a on output.  The diagonal
+             decomposition, A = U.W.VT.  The matrix U replaces A on output.  The diagonal
              matrix of singular values W is output as a vector w[1..n].  The matrix V (not
              the transpose VT) is output as v[1..n][1..n].
              */
@@ -37,13 +37,25 @@ namespace yocto
                        const array<T>  &b,
                        array<T>        &x);
           
-            //! truncate singular value to ftol * max|w|
+            //! truncate singular values
             /**
-             \return the number of truncated values.
+             - compute tol = epsilon * n * max(|w|).
+             - set w[i] to to 0 if |w[i]|<=tol
+             \return the number of 0 eigenvalues, a.k.a the numeric kernel size.  
              */
             static
-            size_t truncate( array<T> &w, const T ftol );
-            
+            size_t truncate( array<T> &w );
+
+            //! inverse of diagonal values
+            /**
+             -compute tol = epsilon * n * max(|w|).
+             - set w[i] to to its inverse if |w[i]|>tol, 0 otherwise.
+             \return the number of 0 eigenvalues, a.k.a the numeric kernel size.
+             */
+            static
+            size_t inverse( array<T> &w );
+
+
             //! build a supplementary orthonormal basis
             /**
              The rows/or columns of P needs to form a free family

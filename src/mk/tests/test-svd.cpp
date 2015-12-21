@@ -30,7 +30,7 @@ YOCTO_UNIT_TEST_IMPL(svd)
         {
             std::cerr << "A=" << A << std::endl;
             std::cerr << "W=" << W << std::endl;
-            svd<double>::truncate(W, 1e-6);
+            svd<double>::truncate(W);
             std::cerr << "W0=" << W << std::endl;
             std::cerr << "U="  << U << std::endl;
             std::cerr << "V="  << V << std::endl;

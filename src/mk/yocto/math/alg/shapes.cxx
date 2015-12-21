@@ -83,7 +83,7 @@ namespace yocto
                 throw exception("%s(no SVD: bad points)", fn);
             }
             
-            if( svd<real_t>:: truncate(W, numeric<real_t>::ftol ) > 0 )
+            if( svd<real_t>:: truncate(W) > 0 )
             {
                 throw exception("%s(singular distribution)",fn);
             }

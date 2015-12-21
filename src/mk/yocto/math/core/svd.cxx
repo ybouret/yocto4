@@ -292,7 +292,7 @@ namespace yocto
         }
         
         template <>
-        size_t svd<real_t>:: truncate( array<real_t> &w, const real_t ftol )
+        size_t svd<real_t>:: truncate( array<real_t> &w )
         {
             size_t       ans = 0;
             const size_t n   = w.size();
@@ -302,10 +302,10 @@ namespace yocto
                 const real_t tmp = Fabs( w[i] );
                 if( tmp > wmax ) wmax = tmp;
             }
-            const real_t wmin = Fabs( ftol * wmax );
+            const real_t tol = n * Fabs( numeric<real_t>::epsilon * wmax );
             for( size_t i=n;i>0;--i)
             {
-                if( Fabs(w[i]) <= wmin )
+                if( Fabs(w[i]) <= tol )
                 {
                     w[i] = 0;
                     ++ans;
@@ -313,7 +313,33 @@ namespace yocto
             }
             return ans;
         }
-        
+        template <>
+        size_t svd<real_t>:: inverse( array<real_t> &w )
+        {
+            size_t ans = 0;
+            const size_t n   = w.size();
+            real_t wmax = 0;
+            for( size_t i=n;i>0;--i)
+            {
+                const real_t tmp = Fabs( w[i] );
+                if( tmp > wmax ) wmax = tmp;
+            }
+            const real_t tol = n * Fabs( numeric<real_t>::epsilon * wmax );
+            for(size_t i=n;i>0;--i)
+            {
+                if( Fabs(w[i]) <= tol )
+                {
+                    ++ans;
+                    w[i] = 0;
+                }
+                else
+                {
+                    w[i] = REAL(1.0)/w[i];
+                }
+            }
+            return ans;
+        }
+
         template <>
         bool svd<real_t>:: orthonormal(matrix<real_t>       &Q,
                                        const matrix<real_t> &P)

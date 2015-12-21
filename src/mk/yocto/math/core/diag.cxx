@@ -423,7 +423,6 @@ namespace yocto {
                                  const matrix<real_t> &A,
                                  array<real_t>        &wr )
         {
-            static const real_t ftol = numeric<real_t>::ftol;
             assert(A.is_square());
             assert( wr.size() >= ev.rows );
             
@@ -474,7 +473,7 @@ namespace yocto {
                     {
                         throw exception("diag::eigv(Bad Matrix,level-1)");
                     }
-                    nz = svd<real_t>::truncate(W, ftol);
+                    nz = svd<real_t>::truncate(W);
                     make_index(W, J, __compare_fabs);
                     
                     if(nz>0)

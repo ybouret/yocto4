@@ -21,7 +21,7 @@ Let $\vec{F}\left(\vec{X}\right)$ be a system of $n$ equations with $n$ variable
 Starting from $\vec{X}$, what is the step to take ?
 In any case, for a small step $\vec{h}$ we have
 \begin{equation}
-	\vec{F}\left(\vec{X}+\vec{h}\right) = \vec{F} + \mymat{J} \vec{h}
+	\vec{F}\left(\vec{X}+\vec{h}\right) \simeq \vec{F} + \mymat{J} \vec{h}
 \end{equation}
 We define the associated objective function
 \begin{equation}
@@ -30,12 +30,39 @@ We define the associated objective function
 We notice that
 \begin{equation}
 	\mygrad f = \mytrn{\mymat{J}}\vec{F}
-\end{equation}
-and that
+\end{equation}.
+
+\section{Predicted Step}
+We use the Singular Value Decomposition of $J$ (with is a numeric approximation of the Jacobian)
+such that
 \begin{equation}
-	\myhess_f = \mytrn{\mymat{J}}\mymat{J} + \partial_{\vec{X}}\mymat{J} \otimes \vec{F}.
+	\mymat{J} = \mymat{U} \mymat{W} \mytrn{\mymat{V}}
+\end{equation}
+where $\mymat{W}$ is a diagonal matrix.
+We define the pseudo inverse
+\begin{equation}
+	\tilde{\mymat{J}}= \mymat{U} \tilde{\mymat{W}} \mytrn{\mymat{V}}
+\end{equation}
+and we define the full Newton's step 
+\begin{equation}
+	\vec{\sigma} = -\tilde{\mymat{J}} \vec{F}
 \end{equation}
 
+\section{Descent rate control}
+We define
+\begin{equation}
+	\phi\left(\lambda\right) = f\left(\vec{X}+\lambda\vec{\sigma}\right)
+\end{equation}
+with
+\begin{equation}
+	\phi'\left(\lambda\right) = \mytrn{\mygrad f } \vec{\sigma}
+\end{equation}
+and
+\begin{equation}
+	\phi'\left(0\right)  = - \mytrn{\vec{F}} \mymat{J} \tilde{\mymat{J}} \vec{F}
+\end{equation}
+
+%\end{document}
 
 \section{Well-conditioned Jacobian}
 In that case, we can compute the full Newton's step
