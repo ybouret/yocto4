@@ -209,37 +209,7 @@ namespace yocto
             else
             {
                 std::cerr << "Need to backtrack" << std::endl;
-
-                //______________________________________________________________
-                //
-                // start @lambdaMin
-                //______________________________________________________________
-                f_new = scan(lambdaMin);
-                std::cerr << f_new << "@" << lambdaMin << std::endl;
-                if(f_new <= f_org - lambdaMin * slope )
-                {
-                    // possible backtracking
-                    std::cerr << "possible..." << std::endl;
-
-                    real_t dl    = lambdaDel;
-                    real_t lam   = lambdaMax;
-                    bool   found = false;
-                    while(lam>lambdaMin)
-                    {
-                        
-                        dl /= 2;
-                        lam = lambdaMin + dl;
-                    }
-                    return false;
-                }
-                else
-                {
-                    //__________________________________________________________
-                    //
-                    // f_new and F are computed@ xtry
-                    //__________________________________________________________
-                    std::cerr << "MUST accept spurious min step" << std::endl;
-                }
+                return false;
             }
 
             //__________________________________________________________________
