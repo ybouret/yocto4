@@ -41,7 +41,7 @@ such that
 where $\mymat{W}$ is a diagonal matrix.
 We define the pseudo inverse
 \begin{equation}
-	\tilde{\mymat{J}}= \mymat{U} \tilde{\mymat{W}} \mytrn{\mymat{V}}
+	\tilde{\mymat{J}}= \mymat{V} \tilde{\mymat{W}} \mytrn{\mymat{U}}
 \end{equation}
 and we define the full Newton's step 
 \begin{equation}
@@ -59,10 +59,17 @@ with
 \end{equation}
 and
 \begin{equation}
-	\phi'\left(0\right)  = - \mytrn{\vec{F}} \mymat{J} \tilde{\mymat{J}} \vec{F}
+	\phi'\left(0\right)  = - \mytrn{\vec{F}} \mymat{J} \tilde{\mymat{J}} \vec{F} = -\rho
 \end{equation}
+is the initial descent rate, which should be negative, (ie $\rho>0$).
 
-%\end{document}
+To avoid spurious decrease, we impose that 
+\begin{equation}
+	\phi\left(\lambda\right) \leq \phi\left(0\right) + \alpha \lambda \rho
+\end{equation}
+starting with $\lambda=1$.
+
+\end{document}
 
 \section{Well-conditioned Jacobian}
 In that case, we can compute the full Newton's step

@@ -34,11 +34,16 @@ namespace yocto
             vector<T>     w;     //!< for SVD
             vector<T>     gradf; //!< J'*F, gradient of objective function
             vector<T>     sigma; //!< full quasi-Newton's step
-            function1     scan;  //!< call eval, for Jacobian
+            vector<T>     xtry;  //!< for scanning
+            function1     eval;  //!< call _eval, for Jacobian
+            function1     scan;  //!< scan value for a fraction of step
 
-            T eval(const T X);
+            T __eval(const T X);   //!< for Jacobian, uses ivar, ifcn, hook, pvar
             void computeJ();
-            
+
+            T __scan(const T lam); //!< for step control
+
+
             YOCTO_DISABLE_COPY_AND_ASSIGN(newt);
 
         public:

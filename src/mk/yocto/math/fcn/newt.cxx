@@ -2,6 +2,7 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/core/tao.hpp"
 #include "yocto/math/core/svd.hpp"
+#include "yocto/math/triplet.hpp"
 
 namespace yocto
 {
@@ -10,14 +11,32 @@ namespace yocto
     {
 
         template <>
-        real_t newt<real_t>:: eval( const real_t u )
+        real_t newt<real_t>:: __eval( const real_t u )
         {
+            assert(pvar);
+            assert(hook);
+            assert(ivar>0);
+            assert(ivar<=nvar);
+            assert(ifcn>0);
+            assert(ifcn<=nvar);
+
             array<real_t> &xorg = *pvar;
             const real_t   xsav =  xorg[ivar];
             xorg[ivar] = u;
             (*hook)(F,xorg);
             xorg[ivar] = xsav;
             return F[ifcn];
+        }
+
+        template <>
+        real_t newt<real_t>:: __scan( const real_t lam )
+        {
+            assert(pvar);
+            assert(hook);
+            const array<real_t> &xorg = *pvar;
+            tao::setprobe(xtry, xorg, lam, sigma);
+            (*hook)(F,xtry);
+            return tao::norm_sq(F)/2;
         }
 
         template <>
@@ -34,7 +53,9 @@ namespace yocto
         w(),
         gradf(),
         sigma(),
-        scan(this, &newt<real_t>::eval),
+        xtry(),
+        eval(this, &newt<real_t>::__eval),
+        scan(this, &newt<real_t>::__scan),
         drvs(),
         scaling(1e-4)
         {
@@ -54,7 +75,7 @@ namespace yocto
             {
                 for(ivar=1;ivar<=nvar;++ivar)
                 {
-                    J[ifcn][ivar] = drvs(scan,x[ivar],scaling);
+                    J[ifcn][ivar] = drvs(eval,x[ivar],scaling);
                 }
             }
         }
@@ -62,6 +83,22 @@ namespace yocto
         template <>
         bool  newt<real_t>:: solve( field &Field, array<real_t> &x )
         {
+
+            static const real_t alpha     = 1e-4;
+            static const real_t lambdaMin = 0.1;
+            static const real_t lambdaMax = 0.5;
+            static const real_t lambdaDel = lambdaMax-lambdaMin;
+
+#if 0
+            size_t  p = 0;
+            real_t  s = lambdaDel;
+            while(lambdaMin+s>lambdaMin)
+            {
+                s/=2;
+                ++p;
+            }
+            std::cerr << "p=" << p << std::endl;
+#endif
 
             //__________________________________________________________________
             //
@@ -78,10 +115,16 @@ namespace yocto
             w.make(nvar);
             gradf.make(nvar);
             sigma.make(nvar);
+            xtry.make(nvar);
 
+            //__________________________________________________________________
+            //
+            // initialize: F and f_org must be computed
+            //__________________________________________________________________
             Field(F,x);
             real_t f_org = tao::norm_sq(F)/2;
             size_t dim_k = 0;
+            real_t f_new = f_org;
 
         CYCLE:
             std::cerr << "x=" << x     << std::endl;
@@ -112,17 +155,99 @@ namespace yocto
             dim_k = svd<real_t>::truncate(w);
             std::cerr << "dim_k=" << dim_k << std::endl;
             std::cerr << "w=" << w << std::endl;
+            std::cerr << "U=" << U << std::endl;
+            std::cerr << "V=" << V << std::endl;
+
+            //__________________________________________________________________
+            //
+            // Do we have a singular point ?
+            //__________________________________________________________________
+            if(dim_k>=nvar)
+            {
+                // singular point
+                return false;
+            }
 
             //__________________________________________________________________
             //
             // Compute full Newton's step
             //__________________________________________________________________
             svd<real_t>::solve(U,w, V,F,sigma);
+            tao::neg(sigma,sigma);
             std::cerr << "sigma=" << sigma << std::endl;
 
-            
+            //__________________________________________________________________
+            //
+            // Compute the descent rate
+            //__________________________________________________________________
+            const real_t rho = -tao::dot(sigma,gradf);
+            std::cerr << "rho=" << rho << std::endl;
 
-            return false;
+            if(rho<=0)
+            {
+                //singular point level 2
+                return false;
+            }
+
+
+            //__________________________________________________________________
+            //
+            // try Newton's step
+            //__________________________________________________________________
+            f_new = scan(1.0);
+            std::cerr << "f_new=" << f_new << std::endl;
+            const real_t slope = alpha * rho;
+            if(f_new<=f_org-slope)
+            {
+                //______________________________________________________________
+                //
+                // accept full step
+                //______________________________________________________________
+                std::cerr << "FULL" << std::endl;
+
+            }
+            else
+            {
+                std::cerr << "Need to backtrack" << std::endl;
+
+                //______________________________________________________________
+                //
+                // start @lambdaMin
+                //______________________________________________________________
+                f_new = scan(lambdaMin);
+                std::cerr << f_new << "@" << lambdaMin << std::endl;
+                if(f_new <= f_org - lambdaMin * slope )
+                {
+                    // possible backtracking
+                    std::cerr << "possible..." << std::endl;
+
+                    real_t dl    = lambdaDel;
+                    real_t lam   = lambdaMax;
+                    bool   found = false;
+                    while(lam>lambdaMin)
+                    {
+                        
+                        dl /= 2;
+                        lam = lambdaMin + dl;
+                    }
+                    return false;
+                }
+                else
+                {
+                    //__________________________________________________________
+                    //
+                    // f_new and F are computed@ xtry
+                    //__________________________________________________________
+                    std::cerr << "MUST accept spurious min step" << std::endl;
+                }
+            }
+
+            //__________________________________________________________________
+            //
+            // F must be computed @xtry, with the f_new value
+            //__________________________________________________________________
+            f_org = f_new;
+            tao::set(x,xtry);
             goto CYCLE;
 
             return false;
