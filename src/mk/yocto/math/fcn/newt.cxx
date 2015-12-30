@@ -80,6 +80,14 @@ namespace yocto
             }
         }
 
+        
+        template <>
+        bool newt<real_t>:: backtack(const real_t rho, const real_t slope)
+        {
+            
+            return true;
+        }
+        
         template <>
         bool  newt<real_t>:: solve( field &Field, array<real_t> &x )
         {
@@ -209,6 +217,7 @@ namespace yocto
             else
             {
                 std::cerr << "Need to backtrack" << std::endl;
+                (void)backtack(rho,slope);
                 return false;
             }
 

@@ -45,7 +45,9 @@ namespace yocto
 
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(newt);
-
+            
+            bool backtack(const T rho, const T slope);
+            
         public:
             derivative<T> drvs;    //!< for derivatives
             T             scaling; //!< for derivatives, initially 1e-4
