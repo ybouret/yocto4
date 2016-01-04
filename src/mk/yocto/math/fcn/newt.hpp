@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_FCN_NEWT_INCLUDED
 #define YOCTO_MATH_FCN_NEWT_INCLUDED 1
 
-#include "yocto/math/fcn/drvs.hpp"
+#include "yocto/math/fcn/jacobian.hpp"
 #include "yocto/sequence/vector.hpp"
 
 namespace yocto
@@ -14,20 +14,18 @@ namespace yocto
         class newt
         {
         public:
-            typedef typename numeric<T>::vector_field             field;
-            typedef functor<void,TL2(matrix<T>&,const array<T>&)> jacobian;
+            typedef typename numeric<T>::vector_field             Field;
             typedef typename numeric<T>::function                 function1;
+            typedef typename jacobian<T>::type                    Jacobian;
             explicit newt();
             virtual ~newt() throw();
 
-            bool solve( field &Field, array<T> &x );
+            bool solve( Field &func, Jacobian &fjac, array<T> &x );
 
 
         private:
             size_t        nvar;
-            size_t        ivar;  //!< for drvs
-            size_t        ifcn;  //!< for drvs
-            field        *hook;  //!< user's field
+            Field        *hook;  //!< user's field
             array<T>     *pvar;  //!< user's variables
             vector<T>     F;     //!< function value
             matrix<T>     J;     //!< Jacobian/ SVD
@@ -38,21 +36,16 @@ namespace yocto
             vector<T>     xtry;  //!< for scanning
             matrix<T>     M;     //!< for backtracking
             vector<T>     rhs;   //!< for backtracking
-            function1     eval;  //!< call _eval, for Jacobian
+            //function1     eval;  //!< call _eval, for Jacobian
             function1     scan;  //!< scan value for a fraction of step
 
-            T __eval(const T X);   //!< for Jacobian, uses ivar, ifcn, hook, pvar
-            void computeJ();
+            //T __eval(const T X);   //!< for Jacobian, uses ivar, ifcn, hook, pvar
+            //void computeJ();
 
             T __scan(const T lam); //!< for step control
 
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(newt);
-            
-            
-        public:
-            derivative<T> drvs;    //!< for derivatives
-            T             scaling; //!< for derivatives, initially 1e-4
         };
 
     }

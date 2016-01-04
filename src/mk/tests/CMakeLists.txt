@@ -42,5 +42,6 @@ ADD_TEST(SymKer     test-mk symker)
 ADD_TEST(glsf       test-mk glsf)
 ADD_TEST(glsf_poly  test-mk glsf_poly)
 ADD_TEST(glsf_gauss test-mk glsf_gauss)
+ADD_TEST(newt       test-mk newt)
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )

@@ -14,6 +14,7 @@ namespace yocto
     namespace math
     {
 
+#if 0
         template <>
         real_t newt<real_t>:: __eval( const real_t u )
         {
@@ -31,6 +32,7 @@ namespace yocto
             xorg[ivar] = xsav;
             return F[ifcn];
         }
+#endif
 
         template <>
         real_t newt<real_t>:: __scan( const real_t lam )
@@ -46,8 +48,6 @@ namespace yocto
         template <>
         newt<real_t>:: newt() :
         nvar(0),
-        ivar(0),
-        ifcn(0),
         hook(0),
         pvar(0),
         F(),
@@ -59,10 +59,8 @@ namespace yocto
         xtry(),
         M(2),
         rhs(2),
-        eval(this, &newt<real_t>::__eval),
-        scan(this, &newt<real_t>::__scan),
-        drvs(),
-        scaling(1e-4)
+        //eval(this, &newt<real_t>::__eval),
+        scan(this, &newt<real_t>::__scan)
         {
         }
 
@@ -71,7 +69,7 @@ namespace yocto
         {
         }
 
-
+#if 0
         template <>
         void newt<real_t>:: computeJ()
         {
@@ -84,10 +82,10 @@ namespace yocto
                 }
             }
         }
-
+#endif
 
         template <>
-        bool  newt<real_t>:: solve( field &Field, array<real_t> &x )
+        bool  newt<real_t>:: solve( Field &func, Jacobian &fjac, array<real_t> &x )
         {
 
             static const real_t alpha     = 1e-4; //!< for descent rate
@@ -100,7 +98,7 @@ namespace yocto
             // setup
             //__________________________________________________________________
             nvar = x.size(); if(nvar<=0) return true;
-            hook = &Field;
+            hook = &func;
             pvar = &x;
             
             F.make(nvar);
@@ -116,7 +114,7 @@ namespace yocto
             // initialize: F and f_org must be computed
             // before entering CYCLE.
             //__________________________________________________________________
-            Field(F,x);
+            func(F,x);
             real_t phi0   = tao::norm_sq(F)/2;
             real_t phi1   = phi0;
             size_t cycles = 0;
@@ -130,7 +128,7 @@ namespace yocto
             ++cycles; std::cerr << std::endl << "cycles=" << cycles << std::endl; //if(cycles>10) { return false; }
             std::cerr << "x="   << x      << std::endl;
             std::cerr << "F="   << F      << std::endl;
-            std::cerr << "phi=" << phi0   << std::endl;
+            //std::cerr << "phi=" << phi0   << std::endl;
 
             if( phi0 <= 0 )
             {
@@ -141,7 +139,8 @@ namespace yocto
             //
             // Jacobian and F @x, and grad(f)
             //__________________________________________________________________
-            computeJ();
+            //computeJ();
+            fjac(J,x);
             std::cerr << "J=" << J << std::endl;
             tao::mul_trn(gradf, J, F);
             std::cerr << "gradf=" << gradf << std::endl;
@@ -165,7 +164,7 @@ namespace yocto
             std::cerr << "w0=" << w << std::endl;
             const size_t dim_k = svd<real_t>::truncate(w);
             std::cerr << "dim_k=" << dim_k << std::endl;
-            std::cerr << "w=" << w << std::endl;
+            //std::cerr << "w=" << w << std::endl;
 
             //__________________________________________________________________
             //
@@ -195,7 +194,7 @@ namespace yocto
             // Compute the descent rate
             //__________________________________________________________________
             const real_t rho = -tao::dot(sigma,gradf);
-            std::cerr << "rho=" << rho << std::endl;
+            //std::cerr << "rho=" << rho << std::endl;
 
             if(rho<=0)
             {
@@ -209,7 +208,7 @@ namespace yocto
             // try full Newton's step: xtry = xorg + sigma
             //__________________________________________________________________
             phi1 = scan(1);
-            std::cerr << "phi1=" << phi1 << std::endl;
+            //std::cerr << "phi1=" << phi1 << std::endl;
             const real_t slope = alpha * rho;
             bool         is_ok = false;
             if(phi1<phi0-slope)
@@ -223,7 +222,7 @@ namespace yocto
             }
             else
             {
-                std::cerr << "Need to backtrack" << std::endl;
+                std::cerr << "BACKTRACK" << std::endl;
 
                 //______________________________________________________________
                 //
@@ -237,8 +236,8 @@ namespace yocto
 
                 while(Fabs(lam1-lam2) > lambdaTol)
                 {
-                    std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
-                    std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
+                    //std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
+                    //std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
 
 
                     rhs[1] = phi1 - (phi0-lam1*rho);
@@ -255,27 +254,31 @@ namespace yocto
                     LU<real_t>::solve(M,rhs);
                     const real_t beta = rhs[1];
                     const real_t gam3 = REAL(3.0)*rhs[2];
-                    std::cerr << "beta=" << beta << std::endl;
-                    std::cerr << "gam3=" << gam3 << std::endl;
                     const real_t dsc  = beta*beta+rho*gam3;
-                    std::cerr << "dsc=" << dsc << std::endl;
                     const real_t ltmp = (Fabs(dsc)<=0) ? (lam1+lam2)/2 : (Sqrt(dsc)-beta)/gam3;
-                    std::cerr << "ltmp=" << ltmp << std::endl;
+                    //std::cerr << "ltmp=" << ltmp << std::endl;
                     real_t alam = clamp(lambdaMin,ltmp,lambdaMax);
-                    std::cerr << "alam=" << alam << std::endl;
+                    //std::cerr << "alam=" << alam << std::endl;
                     real_t aphi = scan(alam);
-                    std::cerr << "aphi=" << aphi << std::endl;
+                    //std::cerr << "aphi=" << aphi << std::endl;
                     netsort<real_t>::co_level3<real_t>(phi1,phi2,aphi,lam1,lam2,alam);
 
-                    std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
-                    std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
-                    std::cerr << "alam=" << alam << "; aphi=" << aphi << std::endl;
+                    //std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
+                    //std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
+                    //std::cerr << "alam=" << alam << "; aphi=" << aphi << std::endl;
                 }
 
+                //______________________________________________________________
+                //
                 // recompute F@xtry=xorg+lam1*sigma
+                //______________________________________________________________
+                std::cerr << "lambda=" << lam1 << std::endl;
                 phi1  = scan(lam1);
 
+                //______________________________________________________________
+                //
                 // acceptability criterium
+                //______________________________________________________________
                 is_ok = (phi1<phi0-lam1*slope);
             }
 

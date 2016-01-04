@@ -37,7 +37,23 @@ namespace
             const double z = X[3];
             F[1] = 14 - (x*x+y*y+z*z);
             F[2] = y-x-1;
-            F[3] = 2.19317121994613 - sqrt((x-0.1)*(x-0.1)+y*y);
+            const double dx  = x-0.1;
+            F[3] = 2.19317121994613 - sqrt(dx*dx+y*y);
+        }
+
+        void jacob( matrix<double> &J, const array<double> &X)
+        {
+            assert(X.size()==3);
+            assert(J.is_square());
+            assert(J.cols==X.size());
+            const double x = X[1];
+            const double y = X[2];
+            const double z = X[3];
+            J[1][1] = -2*x; J[1][2] = -2*y; J[1][3] = -2*z;
+            J[2][1] = -1;   J[2][2] = 1;    J[2][3] = 0;
+            const double dx  = x-0.1;
+            const double den = sqrt(dx*dx+y*y);
+            J[3][1] = -dx/den; J[3][2] = -y/den; J[3][3] = 0;
         }
 
     private:
@@ -51,16 +67,26 @@ namespace
 YOCTO_UNIT_TEST_IMPL(newt)
 {
     Param p;
-    newt<double>::field Fn( &p, & Param::compute );
-    vector<double>      X(3,0);
+    newt<double>::Field    Fn( &p, & Param::compute );
+    newt<double>::Jacobian Jn( &p, & Param::jacob   );
+    vector<double>         X(3,0);
 
     X[1] = 0.1+0.1*alea<double>();
     X[2] = 0.1+0.1*alea<double>();
     X[3] = 0.1+0.1*alea<double>();
 
-    newt<double> newton;
+    vector<double> Y(X);
+    newt<double>   newton;
 
-    newton.solve(Fn,X);
+    std::cerr << "Solving With Analytic Jacobian" << std::endl;
+    newton.solve(Fn,Jn,X);
+
+    std::cerr << "Solving With Numerical Jacobian" << std::endl;
+    jacobian<double>       jac(Fn);
+    newt<double>::Jacobian J1(&jac,&jacobian<double>::compute);
+
+    newton.solve(Fn,J1,Y);
+
 
 }
 YOCTO_UNIT_TEST_DONE()
