@@ -25,8 +25,8 @@ namespace yocto
             size_t        nvar;
             size_t        ivar;  //!< for drvs
             size_t        ifcn;  //!< for drvs
-            field        *hook;  //!< field
-            array<T>     *pvar;  //!< user's var
+            field        *hook;  //!< user's field
+            array<T>     *pvar;  //!< user's variables
             vector<T>     F;     //!< function value
             matrix<T>     J;     //!< Jacobian/ SVD
             matrix<T>     V;     //!< for SVD
