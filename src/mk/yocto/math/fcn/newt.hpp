@@ -9,12 +9,14 @@ namespace yocto
     namespace math
     {
 
+        
         template <typename T>
         class newt
         {
         public:
-            typedef typename numeric<T>::vector_field field;
-            typedef typename numeric<T>::function     function1;
+            typedef typename numeric<T>::vector_field             field;
+            typedef functor<void,TL2(matrix<T>&,const array<T>&)> jacobian;
+            typedef typename numeric<T>::function                 function1;
             explicit newt();
             virtual ~newt() throw();
 
