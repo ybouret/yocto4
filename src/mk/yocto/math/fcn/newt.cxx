@@ -52,7 +52,6 @@ namespace yocto
         pvar(0),
         F(),
         J(),
-        U(),
         V(),
         w(),
         gradf(),
@@ -106,7 +105,6 @@ namespace yocto
             
             F.make(nvar);
             J.make(nvar,nvar);
-            U.make(nvar,nvar);
             V.make(nvar,nvar);
             w.make(nvar);
             gradf.make(nvar);
@@ -129,7 +127,7 @@ namespace yocto
             return true;
 
         CYCLE:
-            ++cycles; std::cerr << std::endl << "cycles=" << cycles << std::endl; if(cycles>10) { return false; }
+            ++cycles; std::cerr << std::endl << "cycles=" << cycles << std::endl; //if(cycles>10) { return false; }
             std::cerr << "x="   << x      << std::endl;
             std::cerr << "F="   << F      << std::endl;
             std::cerr << "phi=" << phi0   << std::endl;
@@ -158,8 +156,8 @@ namespace yocto
             //
             // Compute SVD and truncate, keeping track of kernel size
             //__________________________________________________________________
-            U.assign(J);
-            if(!svd<real_t>::build(U,w,V))
+            //U.assign(J);
+            if(!svd<real_t>::build(J,w,V))
             {
                 // numeric failure to svd
                 return false;
@@ -183,7 +181,7 @@ namespace yocto
             //
             // Compute full Newton's step
             //__________________________________________________________________
-            svd<real_t>::solve(U,w,V,F,sigma);
+            svd<real_t>::solve(J,w,V,F,sigma);
             tao::neg(sigma,sigma);
             std::cerr << "sigma=" << sigma << std::endl;
             if( tao::norm_sq(sigma) <= 0 )
@@ -199,13 +197,11 @@ namespace yocto
             const real_t rho = -tao::dot(sigma,gradf);
             std::cerr << "rho=" << rho << std::endl;
 
-#if 0
             if(rho<=0)
             {
-                //singular point level 2
-                return false;
+                std::cerr << "[success] zero decrease rate" << std::endl;
+                goto SUCCESS;
             }
-#endif
 
 
             //__________________________________________________________________
@@ -216,7 +212,7 @@ namespace yocto
             std::cerr << "phi1=" << phi1 << std::endl;
             const real_t slope = alpha * rho;
             bool         is_ok = false;
-            if(phi1<=phi0-slope)
+            if(phi1<phi0-slope)
             {
                 //______________________________________________________________
                 //
@@ -227,7 +223,7 @@ namespace yocto
             }
             else
             {
-                std::cerr << "Need to backtrack at delta=" << lambdaTol << std::endl;
+                std::cerr << "Need to backtrack" << std::endl;
 
                 //______________________________________________________________
                 //
@@ -239,9 +235,7 @@ namespace yocto
                 real_t lam2 = lambdaMin;
                 real_t phi2 = scan(lam2);
 
-                for(size_t iter=1;
-                    //iter <=2
-                    ;++iter)
+                while(Fabs(lam1-lam2) > lambdaTol)
                 {
                     std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
                     std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
@@ -276,20 +270,13 @@ namespace yocto
                     std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
                     std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
                     std::cerr << "alam=" << alam << "; aphi=" << aphi << std::endl;
-
-                    if( Fabs(lam1-lam2) <= lambdaTol )
-                    {
-                        break;
-                    }
-
-
                 }
 
                 // recompute F@xtry=xorg+lam1*sigma
                 phi1  = scan(lam1);
 
                 // acceptability criterium
-                is_ok = (phi1<=phi0-lam1*slope);
+                is_ok = (phi1<phi0-lam1*slope);
             }
 
             //__________________________________________________________________

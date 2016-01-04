@@ -28,8 +28,7 @@ namespace yocto
             field        *hook;  //!< field
             array<T>     *pvar;  //!< user's var
             vector<T>     F;     //!< function value
-            matrix<T>     J;     //!< Jacobian
-            matrix<T>     U;     //!< for SVD
+            matrix<T>     J;     //!< Jacobian/ SVD
             matrix<T>     V;     //!< for SVD
             vector<T>     w;     //!< for SVD
             vector<T>     gradf; //!< J'*F, gradient of objective function
