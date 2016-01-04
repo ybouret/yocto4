@@ -35,6 +35,10 @@ namespace yocto
             vector<T>     gradf; //!< J'*F, gradient of objective function
             vector<T>     sigma; //!< full quasi-Newton's step
             vector<T>     xtry;  //!< for scanning
+            vector<T>     xtmp;  //!< for scanning
+            vector<T>     Ftmp;  //!< for scanning
+            matrix<T>     M;     //!< for backtracking
+            vector<T>     rhs;   //!< for backtracking
             function1     eval;  //!< call _eval, for Jacobian
             function1     scan;  //!< scan value for a fraction of step
 
@@ -46,7 +50,6 @@ namespace yocto
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(newt);
             
-            bool backtack(const T rho, const T slope);
             
         public:
             derivative<T> drvs;    //!< for derivatives

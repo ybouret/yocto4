@@ -3,6 +3,9 @@
 #include "yocto/math/core/tao.hpp"
 #include "yocto/math/core/svd.hpp"
 #include "yocto/math/triplet.hpp"
+#include "yocto/math/core/lu.hpp"
+#include "yocto/code/ipower.hpp"
+#include "yocto/math/triplet.hpp"
 
 namespace yocto
 {
@@ -34,7 +37,7 @@ namespace yocto
             assert(pvar);
             assert(hook);
             const array<real_t> &xorg = *pvar;
-            tao::setprobe(xtry, xorg, lam, sigma);
+            tao::setprobe(xtry,xorg,lam,sigma);
             (*hook)(F,xtry);
             return tao::norm_sq(F)/2;
         }
@@ -54,6 +57,10 @@ namespace yocto
         gradf(),
         sigma(),
         xtry(),
+        xtmp(),
+        Ftmp(),
+        M(2),
+        rhs(2),
         eval(this, &newt<real_t>::__eval),
         scan(this, &newt<real_t>::__scan),
         drvs(),
@@ -80,14 +87,7 @@ namespace yocto
             }
         }
 
-        
-        template <>
-        bool newt<real_t>:: backtack(const real_t rho, const real_t slope)
-        {
-            
-            return true;
-        }
-        
+
         template <>
         bool  newt<real_t>:: solve( field &Field, array<real_t> &x )
         {
@@ -95,18 +95,6 @@ namespace yocto
             static const real_t alpha     = 1e-4;
             static const real_t lambdaMin = 0.1;
             static const real_t lambdaMax = 0.5;
-            static const real_t lambdaDel = lambdaMax-lambdaMin;
-
-#if 0
-            size_t  p = 0;
-            real_t  s = lambdaDel;
-            while(lambdaMin+s>lambdaMin)
-            {
-                s/=2;
-                ++p;
-            }
-            std::cerr << "p=" << p << std::endl;
-#endif
 
             //__________________________________________________________________
             //
@@ -124,23 +112,24 @@ namespace yocto
             gradf.make(nvar);
             sigma.make(nvar);
             xtry.make(nvar);
+            xtmp.make(nvar);
+            Ftmp.make(nvar);
 
             //__________________________________________________________________
             //
             // initialize: F and f_org must be computed
+            // before entering CYCLE.
             //__________________________________________________________________
             Field(F,x);
-            real_t f_org = tao::norm_sq(F)/2;
+            real_t phi0  = tao::norm_sq(F)/2;
             size_t dim_k = 0;
-            real_t f_new = f_org;
+            real_t phi1  = phi0;
 
         CYCLE:
-            std::cerr << "x=" << x     << std::endl;
-            std::cerr << "F=" << F     << std::endl;
-            std::cerr << "f=" << f_org << std::endl;
+            std::cerr << "x="   << x      << std::endl;
+            std::cerr << "F="   << F      << std::endl;
+            std::cerr << "phi=" << phi0   << std::endl;
             //__________________________________________________________________
-            //
-            // at this point, F and f_org must be computed
             //
             // Jacobian and F @x, and grad(f)
             //__________________________________________________________________
@@ -200,12 +189,13 @@ namespace yocto
 
             //__________________________________________________________________
             //
-            // try Newton's step
+            // try full Newton's step: xtry = xorg + sigma
             //__________________________________________________________________
-            f_new = scan(1.0);
-            std::cerr << "f_new=" << f_new << std::endl;
+            real_t lam1 = 1;
+            phi1 = scan(lam1);
+            std::cerr << "phi1=" << phi1 << std::endl;
             const real_t slope = alpha * rho;
-            if(f_new<=f_org-slope)
+            if(phi1<=phi0-slope)
             {
                 //______________________________________________________________
                 //
@@ -217,7 +207,63 @@ namespace yocto
             else
             {
                 std::cerr << "Need to backtrack" << std::endl;
-                (void)backtack(rho,slope);
+
+                //______________________________________________________________
+                //
+                // Initialize backtracking
+                //______________________________________________________________
+                const real_t beta0 = phi1 - (phi0-rho);
+                std::cerr << "beta0=" << beta0 << std::endl;
+
+                real_t lam2 = rho/(beta0+beta0);
+                real_t phi2 = scan(lam2);
+                std::cerr << "lam2=" << lam2 << std::endl;
+                std::cerr << "phi2=" << phi2 << std::endl;
+
+                for(size_t iter=1;
+                    iter <=2
+                    ;++iter)
+                {
+                    rhs[1] = phi1 - (phi0-lam1*rho);
+                    rhs[2] = phi2 - (phi0-lam2*rho);
+
+                    M[1][1] = ipower(lam1,2); M[1][2] = ipower(lam1,3);
+                    M[2][1] = ipower(lam2,2); M[2][2] = ipower(lam2,3);
+
+                    if( ! LU<real_t>::build(M) )
+                    {
+                        std::cerr << "numerical failure..." << std::endl;
+                        return false;
+                    }
+
+                    LU<real_t>::solve(M,rhs);
+                    const real_t beta = rhs[1];
+                    const real_t gam3 = REAL(3.0)*rhs[2];
+                    std::cerr << "beta=" << beta << std::endl;
+                    std::cerr << "gam3=" << gam3 << std::endl;
+                    const real_t dsc  = beta*beta+rho*gam3;
+                    std::cerr << "dsc=" << dsc << std::endl;
+                    const real_t alam = (Fabs(dsc)<=0) ? (lam1+lam2)/2 : (Sqrt(dsc)-beta)/gam3;
+                    std::cerr << "alam=" << alam << std::endl;
+                    const real_t aphi = scan(alam);
+
+                    triplet<real_t> Lam = { alam, lam2, lam1 };
+                    triplet<real_t> Phi = { aphi, phi2, phi1 };
+
+                    std::cerr << "Lam=" << Lam << std::endl;
+                    std::cerr << "Phi=" << Phi << std::endl;
+                    Phi.co_sort(Lam);
+
+
+                    std::cerr << "Lam=" << Lam << std::endl;
+                    std::cerr << "Phi=" << Phi << std::endl;
+
+                    lam1 = Lam.a; phi1 = Phi.a;
+                    lam2 = Lam.b; phi2 = Phi.b;
+
+
+                }
+
                 return false;
             }
 
@@ -225,7 +271,7 @@ namespace yocto
             //
             // F must be computed @xtry, with the f_new value
             //__________________________________________________________________
-            f_org = f_new;
+            phi0 = phi1;
             tao::set(x,xtry);
             goto CYCLE;
 
