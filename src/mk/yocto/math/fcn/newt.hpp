@@ -35,8 +35,6 @@ namespace yocto
             vector<T>     gradf; //!< J'*F, gradient of objective function
             vector<T>     sigma; //!< full quasi-Newton's step
             vector<T>     xtry;  //!< for scanning
-            vector<T>     xtmp;  //!< for scanning
-            vector<T>     Ftmp;  //!< for scanning
             matrix<T>     M;     //!< for backtracking
             vector<T>     rhs;   //!< for backtracking
             function1     eval;  //!< call _eval, for Jacobian
