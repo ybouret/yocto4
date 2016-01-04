@@ -123,6 +123,11 @@ namespace yocto
             real_t phi1   = phi0;
             size_t cycles = 0;
 
+            goto CYCLE;
+
+        SUCCESS:
+            return true;
+
         CYCLE:
             ++cycles; std::cerr << std::endl << "cycles=" << cycles << std::endl; if(cycles>10) { return false; }
             std::cerr << "x="   << x      << std::endl;
@@ -132,7 +137,7 @@ namespace yocto
             if( phi0 <= 0 )
             {
                 std::cerr << "[success] numeric zero" << std::endl;
-                return true;
+                goto SUCCESS;
             }
             //__________________________________________________________________
             //
@@ -142,10 +147,11 @@ namespace yocto
             std::cerr << "J=" << J << std::endl;
             tao::mul_trn(gradf, J, F);
             std::cerr << "gradf=" << gradf << std::endl;
+
             if( tao::norm_sq(gradf) <= 0 )
             {
-
-                //return true;
+                std::cerr << "[success] numeric zero gradient" << std::endl;
+                goto SUCCESS;
             }
 
             //__________________________________________________________________
@@ -162,8 +168,6 @@ namespace yocto
             const size_t dim_k = svd<real_t>::truncate(w);
             std::cerr << "dim_k=" << dim_k << std::endl;
             std::cerr << "w=" << w << std::endl;
-            std::cerr << "U=" << U << std::endl;
-            std::cerr << "V=" << V << std::endl;
 
             //__________________________________________________________________
             //
@@ -182,6 +186,11 @@ namespace yocto
             svd<real_t>::solve(U,w,V,F,sigma);
             tao::neg(sigma,sigma);
             std::cerr << "sigma=" << sigma << std::endl;
+            if( tao::norm_sq(sigma) <= 0 )
+            {
+                std::cerr << "[success] zero Newton's step" << std::endl;
+                goto SUCCESS;
+            }
 
             //__________________________________________________________________
             //
@@ -190,11 +199,13 @@ namespace yocto
             const real_t rho = -tao::dot(sigma,gradf);
             std::cerr << "rho=" << rho << std::endl;
 
+#if 0
             if(rho<=0)
             {
                 //singular point level 2
                 return false;
             }
+#endif
 
 
             //__________________________________________________________________
@@ -209,7 +220,7 @@ namespace yocto
             {
                 //______________________________________________________________
                 //
-                // accept full step
+                // accept full step: F is computed @xtry
                 //______________________________________________________________
                 std::cerr << "FULL" << std::endl;
                 is_ok = true;
@@ -274,9 +285,11 @@ namespace yocto
 
                 }
 
-                // recompute F@lam1
+                // recompute F@xtry=xorg+lam1*sigma
                 phi1  = scan(lam1);
-                is_ok = phi1<=phi0-lam1*slope;
+
+                // acceptability criterium
+                is_ok = (phi1<=phi0-lam1*slope);
             }
 
             //__________________________________________________________________
@@ -287,8 +300,6 @@ namespace yocto
             phi0 = phi1;
             tao::set(x,xtry);
             goto CYCLE;
-
-            return false;
         }
 
 

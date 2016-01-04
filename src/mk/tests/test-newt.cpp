@@ -35,9 +35,9 @@ namespace
             const double x = X[1];
             const double y = X[2];
             const double z = X[3];
-            F[1] = 9 - (x*x+y*y+z*z);
-            F[2] = y-x;
-            F[3] = 1 - sqrt((x-0.1)*(x-0.1)+y*y);
+            F[1] = 14 - (x*x+y*y+z*z);
+            F[2] = y-x-1;
+            F[3] = 2.19317121994613 - sqrt((x-0.1)*(x-0.1)+y*y);
         }
 
     private:
