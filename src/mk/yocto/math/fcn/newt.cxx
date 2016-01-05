@@ -197,7 +197,10 @@ namespace yocto
 
                 while(Fabs(lam1-lam2) > lambdaTol)
                 {
-
+                    //__________________________________________________________
+                    //
+                    // compute the cubic approximation
+                    //__________________________________________________________
                     rhs[1] = phi1 - (phi0-lam1*rho);
                     rhs[2] = phi2 - (phi0-lam2*rho);
 
@@ -217,6 +220,11 @@ namespace yocto
                     const real_t ltmp = (Fabs(dsc)<=0) ? (lam1+lam2)/2 : (Sqrt(dsc)-beta)/gam3;
                     real_t       alam = clamp<real_t>(0,ltmp,1);
                     real_t       aphi = scan(alam);
+
+                    //__________________________________________________________
+                    //
+                    // sort to keep lam1, phi1 and lam2, phi2 as new guests
+                    //__________________________________________________________
                     netsort<real_t>::co_level3<real_t>(phi1,phi2,aphi,lam1,lam2,alam);
 
                     //std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
@@ -229,9 +237,8 @@ namespace yocto
                 //
                 // recompute F@xtry=xorg+lam1*sigma
                 //______________________________________________________________
-                lam1 = clamp<real_t>(lambdaMin,lam1,lambdaMax);
+                lam1  = clamp<real_t>(lambdaMin,lam1,lambdaMax);
                 phi1  = scan(lam1);
-                //std::cerr << "lambda=" << lam1 << std::endl;
 
                 //______________________________________________________________
                 //
@@ -244,7 +251,7 @@ namespace yocto
             //
             // F must be computed @xtry, with the phi1 value
             //__________________________________________________________________
-            std::cerr << "is_ok=" << is_ok << std::endl;
+            //std::cerr << "is_ok=" << is_ok << std::endl;
             phi0 = phi1;
             tao::set(x,xtry);
             goto CYCLE;
