@@ -116,6 +116,7 @@ YOCTO_UNIT_TEST_DONE()
 YOCTO_UNIT_TEST_IMPL(glsf_poly)
 {
     GLS<float>::Function poly = _GLS::Create<float,_GLS::Polynomial>();
+    GLS<float>::Function pade = _GLS::Create<float,_GLS::Pade>();
 
 
     const size_t  N     = 20;
@@ -149,14 +150,14 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
 
         _GLS::Polynomial<float>::Start(S,aorg);
         std::cerr << "predicted=" << aorg << std::endl;
-        
+
         if(samples.fit_with(poly, aorg, used, aerr))
         {
             GLS<float>::display(std::cerr,aorg, aerr);
         }
         else
         {
-            //std::cerr << "Failed" << std::endl;
+            //std::cerr << "Polynomial Fit Failed" << std::endl;
         }
 
     }
@@ -174,7 +175,39 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
         }
     }
 
+    const size_t pade_max=4;
+    for(size_t m=1;m<=pade_max;++m)
+    {
+        samples.free();
+        const GLS<float>::Sample &S = samples.append(X,Y,Q[m]); (void)S;
+        vector<float> aorg(m);
+        vector<float> aerr(m);
+        vector<bool>  used(m,true);
 
+        samples.prepare(m);
+        if(samples.fit_with(pade,aorg, used, aerr))
+        {
+            std::cerr << "Pade Fit m=" << m << std::endl;
+            GLS<float>::display(std::cerr,aorg, aerr);
+        }
+        else
+        {
+            std::cerr << "Pade Fit Failure m=" << m << std::endl;
+        }
+    }
+
+        {
+            ios::wcstream fp("pade.dat");
+            for(size_t i=1;i<=N;++i)
+            {
+                fp("%g %g", X[i], Y[i]);
+                for(size_t j=1;j<=pade_max;++j)
+                {
+                    fp(" %g", Q[j][i]);
+                }
+                fp("\n");
+            }
+        }
 
 
 }
@@ -273,7 +306,7 @@ YOCTO_UNIT_TEST_IMPL(glsf_gauss)
     {
         GLS<double>::display(std::cerr, aorg, aerr);
     }
-    
+
     {
         ios::wcstream fp("gauss.dat");
         for(size_t i=1;i<=N;++i)
@@ -281,6 +314,7 @@ YOCTO_UNIT_TEST_IMPL(glsf_gauss)
             fp("%g %g %g\n", X[i], Y[i], Z[i]);
         }
     }
-    
+
 }
 YOCTO_UNIT_TEST_DONE()
+
