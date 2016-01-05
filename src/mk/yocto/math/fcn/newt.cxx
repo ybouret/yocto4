@@ -157,7 +157,7 @@ namespace yocto
             // Compute the descent rate
             //__________________________________________________________________
             const real_t rho = -tao::dot(sigma,gradf);
-            //std::cerr << "rho=" << rho << std::endl;
+            std::cerr << "rho=" << rho << std::endl;
 
             if(rho<=0)
             {
@@ -190,27 +190,15 @@ namespace yocto
                 //
                 // Initialize backtracking
                 //______________________________________________________________
-                real_t lam1 = lambdaMax;
-                phi1        = scan(lam1);
+                real_t lam1 = 1.0;
+                //phi1        = scan(lam1);
 
                 real_t lam2 = lambdaMin;
                 real_t phi2 = scan(lam2);
 
-                //______________________________________________________________
-                //
-                // arrange lam1/lam2
-                //______________________________________________________________
-                if(phi2<=phi1)
-                {
-                    cswap(phi1, phi2);
-                    cswap(lam1, lam2);
-                }
 
-                assert(phi1<=phi2);
-
-                while(Fabs(lam1-lam2) > lambdaTol)
+                while(Fabs(lam1-lam2)>lambdaTol)
                 {
-                    assert(phi1<=phi2);
                     //__________________________________________________________
                     //
                     // compute the cubic approximation
@@ -232,27 +220,17 @@ namespace yocto
                     const real_t gam3 = REAL(3.0)*rhs[2];
                     const real_t dsc  = beta*beta+rho*gam3;
                     const real_t ltmp = (Fabs(dsc)<=0) ? (lam1+lam2)/2 : (Sqrt(dsc)-beta)/gam3;
-                    const real_t alam = clamp<real_t>(0,ltmp,1);
+                    const real_t alam = clamp(lambdaMin,ltmp,lambdaMax);
                     const real_t aphi = scan(alam);
 
-                    //std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
-                    //std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
-                    //std::cerr << "alam=" << alam << "; aphi=" << aphi << std::endl;
+                    lam1 = lam2;
+                    phi1 = phi2;
 
-                    if(aphi<=phi1)
-                    {
-                        // ready for next try
-                        lam2 = lam1;
-                        phi2 = phi1;
+                    lam2 = alam;
+                    phi2 = aphi;
 
-                        lam1 = alam;
-                        phi1 = aphi;
-                    }
-                    else
-                    {
-                        break;
-                    }
-
+                    std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
+                    std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
 
                 }
 
@@ -260,24 +238,27 @@ namespace yocto
                 //
                 // recompute F@xtry=xorg+lam1*sigma
                 //______________________________________________________________
-                lam1  = clamp<real_t>(lambdaMin,lam1,lambdaMax);
-                phi1  = scan(lam1);
-
-                //______________________________________________________________
-                //
-                // acceptability criterium
-                //______________________________________________________________
-                is_ok = (phi1<phi0-lam1*slope);
+                lam1  = lam2;
+                phi1  = scan(lam2);
+                std::cerr << "--> lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
+                is_ok = (phi1<=phi0-lam1*rho);
                 std::cerr << "is_ok=" << is_ok << std::endl;
-                return false;
             }
-
             //__________________________________________________________________
             //
             // F must be computed @xtry, with the phi1 value
             //__________________________________________________________________
-            phi0 = phi1;
             tao::set(x,xtry);
+#if 0
+            if(is_ok && phi1>=phi0)
+            {
+                std::cerr << "[success] numeric minimum reached" << std::endl;
+                goto SUCCESS;
+            }
+#endif
+            std::cerr << "dphi=" << phi0 - phi1 << std::endl;
+            phi0 = phi1;
+
             goto CYCLE;
         }
 
