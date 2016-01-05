@@ -438,7 +438,7 @@ namespace yocto
             //
             //__________________________________________________________________
             const real_t ftol = numeric<real_t>::ftol;
-            int          p10  = -4;
+            int          p10  = p10_min;
             real_t       lam  = -1;
             real_t       Horg = computeD2(F,aorg,used);
             real_t       Hnew = Horg;
