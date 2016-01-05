@@ -94,6 +94,7 @@ namespace yocto
             ++cycles; std::cerr << std::endl << "cycles=" << cycles << std::endl; //if(cycles>10) { return false; }
             std::cerr << "x="   << x      << std::endl;
             std::cerr << "F="   << F      << std::endl;
+            std::cerr << "phi0=" << phi0  << std::endl;
 
             if( phi0 <= 0 )
             {
@@ -195,8 +196,21 @@ namespace yocto
                 real_t lam2 = lambdaMin;
                 real_t phi2 = scan(lam2);
 
+                //______________________________________________________________
+                //
+                // arrange lam1/lam2
+                //______________________________________________________________
+                if(phi2<=phi1)
+                {
+                    cswap(phi1, phi2);
+                    cswap(lam1, lam2);
+                }
+
+                assert(phi1<=phi2);
+
                 while(Fabs(lam1-lam2) > lambdaTol)
                 {
+                    assert(phi1<=phi2);
                     //__________________________________________________________
                     //
                     // compute the cubic approximation
@@ -218,19 +232,28 @@ namespace yocto
                     const real_t gam3 = REAL(3.0)*rhs[2];
                     const real_t dsc  = beta*beta+rho*gam3;
                     const real_t ltmp = (Fabs(dsc)<=0) ? (lam1+lam2)/2 : (Sqrt(dsc)-beta)/gam3;
-                    real_t       alam = clamp<real_t>(0,ltmp,1);
-                    real_t       aphi = scan(alam);
+                    const real_t alam = clamp<real_t>(0,ltmp,1);
+                    const real_t aphi = scan(alam);
 
-                    //__________________________________________________________
-                    //
-                    // sort to keep lam1, phi1 and lam2, phi2 as new guests
-                    //__________________________________________________________
-                    netsort<real_t>::co_level3<real_t>(phi1,phi2,aphi,lam1,lam2,alam);
+                    //std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
+                    //std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
+                    //std::cerr << "alam=" << alam << "; aphi=" << aphi << std::endl;
 
-                    std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
-                    std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
-                    std::cerr << "alam=" << alam << "; aphi=" << aphi << std::endl;
-                    std::cerr << std::endl;
+                    if(aphi<=phi1)
+                    {
+                        // ready for next try
+                        lam2 = lam1;
+                        phi2 = phi1;
+
+                        lam1 = alam;
+                        phi1 = aphi;
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+
                 }
 
                 //______________________________________________________________
@@ -245,13 +268,14 @@ namespace yocto
                 // acceptability criterium
                 //______________________________________________________________
                 is_ok = (phi1<phi0-lam1*slope);
+                std::cerr << "is_ok=" << is_ok << std::endl;
+                return false;
             }
 
             //__________________________________________________________________
             //
             // F must be computed @xtry, with the phi1 value
             //__________________________________________________________________
-            //std::cerr << "is_ok=" << is_ok << std::endl;
             phi0 = phi1;
             tao::set(x,xtry);
             goto CYCLE;
