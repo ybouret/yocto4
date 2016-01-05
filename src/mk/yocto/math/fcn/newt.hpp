@@ -3,6 +3,7 @@
 
 #include "yocto/math/fcn/jacobian.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/sequence/many-arrays.hpp"
 
 namespace yocto
 {
@@ -24,24 +25,25 @@ namespace yocto
 
 
         private:
+            typedef many_arrays<T,memory::global> arr_mgr;
             size_t        nvar;
             Field        *hook;  //!< user's field
             array<T>     *pvar;  //!< user's variables
-            vector<T>     F;     //!< function value
+
             matrix<T>     J;     //!< Jacobian/ SVD
             matrix<T>     V;     //!< for SVD
-            vector<T>     w;     //!< for SVD
-            vector<T>     gradf; //!< J'*F, gradient of objective function
-            vector<T>     sigma; //!< full quasi-Newton's step
-            vector<T>     xtry;  //!< for scanning
-            matrix<T>     M;     //!< for backtracking
-            vector<T>     rhs;   //!< for backtracking
-            //function1     eval;  //!< call _eval, for Jacobian
+            arr_mgr       arr;   //!< for little vectors
+            array<T> &    w;     //!< for SVD
+            array<T> &    F;     //!< function value
+            array<T> &    gradf; //!< J'*F, gradient of objective function
+            array<T> &    sigma; //!< full quasi-Newton's step
+            array<T> &    xtry;  //!< for scanning
+
+            matrix<T>     M;     //!< for backtracking, size=2x2
+            vector<T>     rhs;   //!< for backtracking, size=2
             function1     scan;  //!< scan value for a fraction of step
 
-            //T __eval(const T X);   //!< for Jacobian, uses ivar, ifcn, hook, pvar
-            //void computeJ();
-
+            
             T __scan(const T lam); //!< for step control
 
 

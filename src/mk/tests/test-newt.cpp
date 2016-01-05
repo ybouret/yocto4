@@ -71,9 +71,9 @@ YOCTO_UNIT_TEST_IMPL(newt)
     newt<double>::Jacobian Jn( &p, & Param::jacob   );
     vector<double>         X(3,0);
 
-    X[1] = 0.1+0.1*alea<double>();
-    X[2] = 0.1+0.1*alea<double>();
-    X[3] = 0.1+0.1*alea<double>();
+    X[1] = 10.0*(alea<double>()-0.5);
+    X[2] = 10.0*(alea<double>()-0.5);
+    X[3] = 10.0*(alea<double>()-0.5);
 
     vector<double> Y(X);
     newt<double>   newton;

@@ -14,26 +14,6 @@ namespace yocto
     namespace math
     {
 
-#if 0
-        template <>
-        real_t newt<real_t>:: __eval( const real_t u )
-        {
-            assert(pvar);
-            assert(hook);
-            assert(ivar>0);
-            assert(ivar<=nvar);
-            assert(ifcn>0);
-            assert(ifcn<=nvar);
-
-            array<real_t> &xorg = *pvar;
-            const real_t   xsav =  xorg[ivar];
-            xorg[ivar] = u;
-            (*hook)(F,xorg);
-            xorg[ivar] = xsav;
-            return F[ifcn];
-        }
-#endif
-
         template <>
         real_t newt<real_t>:: __scan( const real_t lam )
         {
@@ -42,7 +22,7 @@ namespace yocto
             const array<real_t> &xorg = *pvar;
             tao::setprobe(xtry,xorg,lam,sigma);
             (*hook)(F,xtry);
-            return tao::norm_sq(F)/2;
+            return REAL(0.5)*tao::norm_sq(F);
         }
 
         template <>
@@ -50,16 +30,16 @@ namespace yocto
         nvar(0),
         hook(0),
         pvar(0),
-        F(),
         J(),
         V(),
-        w(),
-        gradf(),
-        sigma(),
-        xtry(),
+        arr(5),
+        w(     arr.next_array() ),
+        F(     arr.next_array() ),
+        gradf( arr.next_array() ),
+        sigma( arr.next_array() ),
+        xtry(  arr.next_array() ),
         M(2),
         rhs(2),
-        //eval(this, &newt<real_t>::__eval),
         scan(this, &newt<real_t>::__scan)
         {
         }
@@ -68,21 +48,6 @@ namespace yocto
         newt<real_t>:: ~newt() throw()
         {
         }
-
-#if 0
-        template <>
-        void newt<real_t>:: computeJ()
-        {
-            array<real_t> &x = *pvar;
-            for(ifcn=1;ifcn<=nvar;++ifcn)
-            {
-                for(ivar=1;ivar<=nvar;++ivar)
-                {
-                    J[ifcn][ivar] = drvs(eval,x[ivar],scaling);
-                }
-            }
-        }
-#endif
 
         template <>
         bool  newt<real_t>:: solve( Field &func, Jacobian &fjac, array<real_t> &x )
@@ -100,22 +65,23 @@ namespace yocto
             nvar = x.size(); if(nvar<=0) return true;
             hook = &func;
             pvar = &x;
-            
-            F.make(nvar);
-            J.make(nvar,nvar);
-            V.make(nvar,nvar);
-            w.make(nvar);
-            gradf.make(nvar);
-            sigma.make(nvar);
-            xtry.make(nvar);
 
             //__________________________________________________________________
             //
-            // initialize: F and f_org must be computed
+            // allocate memory
+            //__________________________________________________________________
+            J.make(nvar,nvar);
+            V.make(nvar,nvar);
+            arr.allocate(nvar);
+
+
+            //__________________________________________________________________
+            //
+            // initialize: F and phi0 must be computed
             // before entering CYCLE.
             //__________________________________________________________________
             func(F,x);
-            real_t phi0   = tao::norm_sq(F)/2;
+            real_t phi0   = REAL(0.5)*tao::norm_sq(F);
             real_t phi1   = phi0;
             size_t cycles = 0;
 
@@ -128,22 +94,19 @@ namespace yocto
             ++cycles; std::cerr << std::endl << "cycles=" << cycles << std::endl; //if(cycles>10) { return false; }
             std::cerr << "x="   << x      << std::endl;
             std::cerr << "F="   << F      << std::endl;
-            //std::cerr << "phi=" << phi0   << std::endl;
 
             if( phi0 <= 0 )
             {
                 std::cerr << "[success] numeric zero" << std::endl;
                 goto SUCCESS;
             }
+
             //__________________________________________________________________
             //
             // Jacobian and F @x, and grad(f)
             //__________________________________________________________________
-            //computeJ();
             fjac(J,x);
-            std::cerr << "J=" << J << std::endl;
             tao::mul_trn(gradf, J, F);
-            std::cerr << "gradf=" << gradf << std::endl;
 
             if( tao::norm_sq(gradf) <= 0 )
             {
@@ -161,10 +124,9 @@ namespace yocto
                 // numeric failure to svd
                 return false;
             }
-            std::cerr << "w0=" << w << std::endl;
             const size_t dim_k = svd<real_t>::truncate(w);
-            std::cerr << "dim_k=" << dim_k << std::endl;
             //std::cerr << "w=" << w << std::endl;
+            //std::cerr << "dim_k=" << dim_k << std::endl;
 
             //__________________________________________________________________
             //
@@ -217,7 +179,6 @@ namespace yocto
                 //
                 // accept full step: F is computed @xtry
                 //______________________________________________________________
-                std::cerr << "FULL" << std::endl;
                 is_ok = true;
             }
             else
@@ -236,9 +197,6 @@ namespace yocto
 
                 while(Fabs(lam1-lam2) > lambdaTol)
                 {
-                    //std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
-                    //std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
-
 
                     rhs[1] = phi1 - (phi0-lam1*rho);
                     rhs[2] = phi2 - (phi0-lam2*rho);
@@ -246,34 +204,34 @@ namespace yocto
                     M[1][1] = ipower(lam1,2); M[1][2] = ipower(lam1,3);
                     M[2][1] = ipower(lam2,2); M[2][2] = ipower(lam2,3);
 
-                    if( ! LU<real_t>::build(M) )
+                    if( !LU<real_t>::build(M) )
                     {
                         std::cerr << "numerical failure..." << std::endl;
                         return false;
                     }
+
                     LU<real_t>::solve(M,rhs);
                     const real_t beta = rhs[1];
                     const real_t gam3 = REAL(3.0)*rhs[2];
                     const real_t dsc  = beta*beta+rho*gam3;
                     const real_t ltmp = (Fabs(dsc)<=0) ? (lam1+lam2)/2 : (Sqrt(dsc)-beta)/gam3;
-                    //std::cerr << "ltmp=" << ltmp << std::endl;
-                    real_t alam = clamp(lambdaMin,ltmp,lambdaMax);
-                    //std::cerr << "alam=" << alam << std::endl;
-                    real_t aphi = scan(alam);
-                    //std::cerr << "aphi=" << aphi << std::endl;
+                    real_t       alam = clamp<real_t>(0,ltmp,1);
+                    real_t       aphi = scan(alam);
                     netsort<real_t>::co_level3<real_t>(phi1,phi2,aphi,lam1,lam2,alam);
 
                     //std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
                     //std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
                     //std::cerr << "alam=" << alam << "; aphi=" << aphi << std::endl;
+                    //std::cerr << std::endl;
                 }
 
                 //______________________________________________________________
                 //
                 // recompute F@xtry=xorg+lam1*sigma
                 //______________________________________________________________
-                std::cerr << "lambda=" << lam1 << std::endl;
+                lam1 = clamp<real_t>(lambdaMin,lam1,lambdaMax);
                 phi1  = scan(lam1);
+                //std::cerr << "lambda=" << lam1 << std::endl;
 
                 //______________________________________________________________
                 //
