@@ -227,10 +227,10 @@ namespace yocto
                     //__________________________________________________________
                     netsort<real_t>::co_level3<real_t>(phi1,phi2,aphi,lam1,lam2,alam);
 
-                    //std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
-                    //std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
-                    //std::cerr << "alam=" << alam << "; aphi=" << aphi << std::endl;
-                    //std::cerr << std::endl;
+                    std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
+                    std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
+                    std::cerr << "alam=" << alam << "; aphi=" << aphi << std::endl;
+                    std::cerr << std::endl;
                 }
 
                 //______________________________________________________________
