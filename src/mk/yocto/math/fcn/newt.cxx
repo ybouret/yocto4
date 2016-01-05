@@ -248,15 +248,21 @@ namespace yocto
             //
             // F must be computed @xtry, with the phi1 value
             //__________________________________________________________________
-            tao::set(x,xtry);
-#if 0
-            if(is_ok && phi1>=phi0)
+            real_t dx = 0;
+            for(size_t i=nvar;i>0;--i)
             {
-                std::cerr << "[success] numeric minimum reached" << std::endl;
+                const real_t x_new = xtry[i];
+                const real_t x_old = x[i];
+                const real_t tmp   = Fabs(x_old-x_new)/max_of<real_t>(Fabs(x_new),1);
+                if(tmp>dx) dx=tmp;
+                x[i] = x_new;
+            }
+            if(dx<=0)
+            {
+                std::cerr << "[success] stuck variables" << std::endl;
                 goto SUCCESS;
             }
-#endif
-            std::cerr << "dphi=" << phi0 - phi1 << std::endl;
+
             phi0 = phi1;
 
             goto CYCLE;
