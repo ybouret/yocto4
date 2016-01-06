@@ -119,7 +119,6 @@ namespace yocto
             //
             // Compute SVD and truncate, keeping track of kernel size
             //__________________________________________________________________
-            //U.assign(J);
             if(!svd<real_t>::build(J,w,V))
             {
                 // numeric failure to svd
@@ -145,7 +144,6 @@ namespace yocto
             //__________________________________________________________________
             svd<real_t>::solve(J,w,V,F,sigma);
             tao::neg(sigma,sigma);
-            std::cerr << "sigma=" << sigma << std::endl;
             if( tao::norm_sq(sigma) <= 0 )
             {
                 std::cerr << "[success] zero Newton's step" << std::endl;
@@ -157,8 +155,7 @@ namespace yocto
             // Compute the descent rate
             //__________________________________________________________________
             const real_t rho = -tao::dot(sigma,gradf);
-            std::cerr << "rho=" << rho << std::endl;
-
+            
             if(rho<=0)
             {
                 std::cerr << "[success] zero decrease rate" << std::endl;
@@ -171,16 +168,13 @@ namespace yocto
             // try full Newton's step: xtry = xorg + sigma
             //__________________________________________________________________
             phi1 = scan(1);
-            //std::cerr << "phi1=" << phi1 << std::endl;
             const real_t slope = alpha * rho;
-            bool         is_ok = false;
             if(phi1<phi0-slope)
             {
                 //______________________________________________________________
                 //
                 // accept full step: F is computed @xtry
                 //______________________________________________________________
-                is_ok = true;
             }
             else
             {
@@ -208,7 +202,6 @@ namespace yocto
                 
                 while(Fabs(lam1-lam2)>lambdaTol)
                 {
-                    std::cerr << "delta=" << Fabs(lam1-lam2) << std::endl;
                     
                     //__________________________________________________________
                     //
@@ -240,11 +233,10 @@ namespace yocto
                     lam1 = alam;
                     phi1 = aphi;
 
-                    std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
-                    std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
+                    //std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
+                    //std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
 
                 }
-                std::cerr << "delta=" << Fabs(lam1-lam2) << std::endl;
 
                 //______________________________________________________________
                 //
@@ -252,9 +244,9 @@ namespace yocto
                 //______________________________________________________________
                 lam1  = lam2;
                 phi1  = scan(lam1);
-                std::cerr << "--> lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
-                is_ok = (phi1<=phi0-lam1*rho);
-                std::cerr << "is_ok=" << is_ok << std::endl;
+                //std::cerr << "--> lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
+                //is_ok = (phi1<=phi0-lam1*rho);
+                //std::cerr << "is_ok=" << is_ok << std::endl;
             }
             //__________________________________________________________________
             //
@@ -269,7 +261,7 @@ namespace yocto
                 if(tmp>dx) dx=tmp;
                 x[i] = x_new;
             }
-            std::cerr << "dx=" << dx << std::endl;
+            //std::cerr << "dx=" << dx << std::endl;
             if(dx<=0)
             {
                 std::cerr << "[success] stuck variables" << std::endl;
