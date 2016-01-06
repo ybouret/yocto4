@@ -54,7 +54,7 @@ namespace yocto
         {
 
             static const real_t alpha     = 1e-4; //!< for descent rate
-            static const real_t lambdaTol = 1e-4; //!< for backtracking
+            static const real_t lambdaTol = 1e-3; //!< for backtracking
             static const real_t lambdaMin = 0.1;  //!< for backtracking
             static const real_t lambdaMax = 0.5;  //!< for backtracking
 
@@ -188,17 +188,28 @@ namespace yocto
 
                 //______________________________________________________________
                 //
-                // Initialize backtracking
+                // Initialize backtracking, phi1=scan(lam1=1)
                 //______________________________________________________________
                 real_t lam1 = 1.0;
-                //phi1        = scan(lam1);
-
+                
                 real_t lam2 = lambdaMin;
                 real_t phi2 = scan(lam2);
+                
+                //______________________________________________________________
+                //
+                // assuming lam1 is the most recent "minimum" position
+                //______________________________________________________________
 
-
+                if(phi2<=phi1)
+                {
+                    cswap(phi1, phi2);
+                    cswap(lam1, lam2);
+                }
+                
                 while(Fabs(lam1-lam2)>lambdaTol)
                 {
+                    std::cerr << "delta=" << Fabs(lam1-lam2) << std::endl;
+                    
                     //__________________________________________________________
                     //
                     // compute the cubic approximation
@@ -223,23 +234,24 @@ namespace yocto
                     const real_t alam = clamp(lambdaMin,ltmp,lambdaMax);
                     const real_t aphi = scan(alam);
 
-                    lam1 = lam2;
-                    phi1 = phi2;
-
-                    lam2 = alam;
-                    phi2 = aphi;
+                    lam2 = lam1;
+                    phi2 = phi1;
+                    
+                    lam1 = alam;
+                    phi1 = aphi;
 
                     std::cerr << "lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
                     std::cerr << "lam2=" << lam2 << "; phi2=" << phi2 << std::endl;
 
                 }
+                std::cerr << "delta=" << Fabs(lam1-lam2) << std::endl;
 
                 //______________________________________________________________
                 //
                 // recompute F@xtry=xorg+lam1*sigma
                 //______________________________________________________________
                 lam1  = lam2;
-                phi1  = scan(lam2);
+                phi1  = scan(lam1);
                 std::cerr << "--> lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
                 is_ok = (phi1<=phi0-lam1*rho);
                 std::cerr << "is_ok=" << is_ok << std::endl;
@@ -257,6 +269,7 @@ namespace yocto
                 if(tmp>dx) dx=tmp;
                 x[i] = x_new;
             }
+            std::cerr << "dx=" << dx << std::endl;
             if(dx<=0)
             {
                 std::cerr << "[success] stuck variables" << std::endl;
