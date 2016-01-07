@@ -76,16 +76,28 @@ YOCTO_UNIT_TEST_IMPL(newt)
     X[3] = 10.0*(alea<double>()-0.5);
 
     vector<double> Y(X);
+    vector<double> F(X.size(),0);
     newt<double>   newton;
 
     std::cerr << "Solving With Analytic Jacobian" << std::endl;
-    newton.solve(Fn,Jn,X);
+
+    if(newton.solve(Fn,Jn,X))
+    {
+        std::cerr << "X=" << X << std::endl;
+        Fn(F,X);
+        std::cerr << "F=" << F << std::endl;
+    }
 
     std::cerr << "Solving With Numerical Jacobian" << std::endl;
     jacobian<double>       jac(Fn);
     newt<double>::Jacobian J1(&jac,&jacobian<double>::compute);
 
-    newton.solve(Fn,J1,Y);
+    if(newton.solve(Fn,J1,Y))
+    {
+        std::cerr << "Y=" << Y << std::endl;
+        Fn(F,Y);
+        std::cerr << "F=" << F << std::endl;
+    }
 
 
 }

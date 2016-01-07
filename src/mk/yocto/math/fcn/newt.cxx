@@ -91,10 +91,10 @@ namespace yocto
             return true;
 
         CYCLE:
-            ++cycles; std::cerr << std::endl << "cycles=" << cycles << std::endl; //if(cycles>10) { return false; }
-            std::cerr << "x="   << x      << std::endl;
-            std::cerr << "F="   << F      << std::endl;
-            std::cerr << "phi0=" << phi0  << std::endl;
+            ++cycles; //std::cerr << std::endl << "cycles=" << cycles << std::endl; //if(cycles>10) { return false; }
+            //std::cerr << "x="   << x      << std::endl;
+            //std::cerr << "F="   << F      << std::endl;
+            //std::cerr << "phi0=" << phi0  << std::endl;
 
             if( phi0 <= 0 )
             {
@@ -125,8 +125,6 @@ namespace yocto
                 return false;
             }
             const size_t dim_k = svd<real_t>::truncate(w);
-            //std::cerr << "w=" << w << std::endl;
-            //std::cerr << "dim_k=" << dim_k << std::endl;
 
             //__________________________________________________________________
             //
@@ -155,7 +153,6 @@ namespace yocto
             // Compute the descent rate
             //__________________________________________________________________
             const real_t rho = -tao::dot(sigma,gradf);
-            
             if(rho<=0)
             {
                 std::cerr << "[success] zero decrease rate" << std::endl;
@@ -244,13 +241,11 @@ namespace yocto
                 //______________________________________________________________
                 lam1  = lam2;
                 phi1  = scan(lam1);
-                //std::cerr << "--> lam1=" << lam1 << "; phi1=" << phi1 << std::endl;
-                //is_ok = (phi1<=phi0-lam1*rho);
-                //std::cerr << "is_ok=" << is_ok << std::endl;
             }
             //__________________________________________________________________
             //
-            // F must be computed @xtry, with the phi1 value
+            // F must be computed @xtry, with the phi1 value:
+            // copy new value and check convergence...
             //__________________________________________________________________
             real_t dx = 0;
             for(size_t i=nvar;i>0;--i)
@@ -261,7 +256,6 @@ namespace yocto
                 if(tmp>dx) dx=tmp;
                 x[i] = x_new;
             }
-            //std::cerr << "dx=" << dx << std::endl;
             if(dx<=0)
             {
                 std::cerr << "[success] stuck variables" << std::endl;
