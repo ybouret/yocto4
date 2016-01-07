@@ -53,10 +53,10 @@ namespace yocto
         bool  newt<real_t>:: solve( Field &func, Jacobian &fjac, array<real_t> &x )
         {
 
-            static const real_t alpha     = 1e-4; //!< for descent rate
-            static const real_t lambdaTol = 1e-3; //!< for backtracking
-            static const real_t lambdaMin = 0.1;  //!< for backtracking
-            static const real_t lambdaMax = 0.5;  //!< for backtracking
+            static const real_t alpha     = REAL(1e-4); //!< for descent rate
+            static const real_t lambdaTol = REAL(1e-3); //!< for backtracking
+            static const real_t lambdaMin = REAL(0.1);  //!< for backtracking
+            static const real_t lambdaMax = REAL(0.5);  //!< for backtracking
 
             //__________________________________________________________________
             //

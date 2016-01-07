@@ -114,7 +114,7 @@ namespace yocto
                 {
                     assert(handle);
                     assert(target);
-                    const double             den = vmax-vmin; assert(den>0);
+                    const T                  den = vmax-vmin; assert(den>0);
                     pixmap<T>               &pxm = *static_cast<pixmap<T> *>(handle);
                     const pixmap<real_type> &src = *target;
                     for(unit_t j=lower.y;j<=upper.y;++j)

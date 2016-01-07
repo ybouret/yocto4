@@ -26,7 +26,7 @@ static inline void test_td()
             q.b[i] = p.b[i];
             q.c[i] = p.c[i];
 
-            r[i] =  T(i);
+            r[i] =  static_cast<T>(i);
 
         }
         std::cerr << "p=" << p << std::endl;

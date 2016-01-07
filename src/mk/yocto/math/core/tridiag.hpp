@@ -25,7 +25,7 @@ namespace yocto
             //
             // Virtual Interface
             //__________________________________________________________________
-            virtual T operator()(const size_t i,const size_t j) const = 0;
+            virtual T operator()(size_t i,size_t j) const = 0;
             virtual bool __solve( array_type &x, const array_type &r) = 0;
 
 
@@ -286,7 +286,7 @@ namespace yocto
             {
             }
 
-            virtual T operator()(const size_t i,const size_t j) const
+            virtual T operator()(size_t i,size_t j) const
             {
                 assert(i>0);assert(i<=this->size());
                 assert(j>0);assert(j<=this->size());
@@ -411,7 +411,7 @@ namespace yocto
              M[1][n] = c[n]
              M[n][1] = a[1]
              */
-            virtual T operator()(size_t i, size_t j) const throw()
+            virtual T operator()(size_t i, size_t j) const
             {
                 assert(i>0);assert(i<=this->size());
                 assert(j>0);assert(j<=this->size());

@@ -218,7 +218,7 @@ namespace yocto
         curv(),
         cinv(),
         drvs(),
-        scale(1e-4),
+        scale( REAL(1e-4) ),
         p10_min( -GLS<real_t>::GET_P10_MAX() ),
         p10_max( -p10_min               ),
         cycle(0),
@@ -387,11 +387,11 @@ namespace yocto
                 const int p = min_of<int>(p10,p10_max);
                 if(p>=0)
                 {
-                    return ipower<real_t>(10,size_t(p));
+                    return ipower<real_t>(REAL(10.0),size_t(p));
                 }
                 else
                 {
-                    return ipower<real_t>(0.1,size_t(-p));
+                    return ipower<real_t>(REAL(0.1),size_t(-p));
                 }
             }
         }
