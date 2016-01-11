@@ -4,6 +4,7 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/string/conv.hpp"
+#include "yocto/math/core/tao.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -116,6 +117,26 @@ YOCTO_UNIT_TEST_IMPL(expand)
 
     }
 
-
+    std::cerr << "computing RMS..." << std::endl;
+    {
+        ios::wcstream fp("rms.dat");
+        ios::wcstream fp2("xsm.dat");
+        for(size_t i=1;i<=n/2;i+=2)
+        {
+            dt = x[i]-x[1];
+            sm.lower_range = dt/2;
+            sm.upper_range = dt/2;
+            sm(xp_odd,ys,x,z,NULL);
+            const double rms = tao::RMS(ys,z);
+            fp("%g %g\n", dt,rms);
+            for(size_t j=1;j<=n;++j)
+            {
+                fp2("%g %g %g\n", x[j], ys[j], double(i) );
+            }
+            fp2("\n");
+        }
+    }
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()

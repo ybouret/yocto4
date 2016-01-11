@@ -37,7 +37,7 @@ namespace yocto
 
             inline virtual ~smooth() throw() {}
 
-            points_t      points;
+            points_t      points;      //!< local data points
             T             lower_range; //!< how far before current value
             T             upper_range; //!< how far beyond current value
             size_t        degree;      //!< desired degreee
@@ -98,7 +98,7 @@ namespace yocto
                 //
                 // use local fit
                 //______________________________________________________________
-                poly();
+                polynomial();
                 if(dYdX)
                 {
                     *dYdX = coeff[2];
@@ -107,6 +107,11 @@ namespace yocto
             }
 
 
+            //______________________________________________________________
+            //
+            // one pass computation of smoothed data,
+            // with derivative approximation
+            //______________________________________________________________
             inline void operator()(const expand<T> &xp,
                                    array<T>        &Z,
                                    const array<T>  &X,
@@ -138,6 +143,11 @@ namespace yocto
             }
 
 
+            //______________________________________________________________
+            //
+            // two passes smoothing
+            // with derivative approximation and smoothing
+            //______________________________________________________________
             inline void operator()(const expand<T> &xp,
                                    array<T>        &Z,
                                    const array<T>  &X,
@@ -193,15 +203,25 @@ namespace yocto
             matrix<T> mu;
             vector<T> coeff;
 
-            inline void poly()
+            inline void polynomial()
             {
                 const size_t np = points.size();
                 const size_t m  = min_of<size_t>(degree+1,np);
 
+                //______________________________________________________________
+                //
+                // initialize parameters
+                //______________________________________________________________
                 mu.make(m);
                 mu.ldz();
                 coeff.make(m,0);
                 typename points_t::iterator pp = points.begin();
+
+
+                //______________________________________________________________
+                //
+                // accumulate
+                //______________________________________________________________
                 for(size_t i=np;i>0;--i,++pp)
                 {
                     const point_t p = *pp;
@@ -218,13 +238,24 @@ namespace yocto
                         }
                     }
                 }
+
+                //______________________________________________________________
+                //
+                // symetrisation
+                //______________________________________________________________
                 for(size_t j=m;j>0;--j)
                 {
+                    array<T> &mu_j = mu[j];
                     for(size_t k=j+1;k<=m;++k)
                     {
-                        mu[j][k] = mu[k][j];
+                        mu_j[k] = mu[k][j];
                     }
                 }
+
+                //______________________________________________________________
+                //
+                // compute parameters
+                //______________________________________________________________
                 if(!LU<T>::build(mu))
                 {
                     throw libc::exception( EINVAL, "invalid data to smooth" );

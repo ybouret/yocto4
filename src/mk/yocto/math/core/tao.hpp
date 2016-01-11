@@ -167,14 +167,30 @@ namespace yocto
             {
                 return Sqrt( Fabs( norm_sq(a) ) );
             }
-            
+
+
+            //! root mean square
             template <typename ARR>
             static inline typename ARR::type RMS( const ARR &a ) throw()
             {
                 assert(a.size()>0);
                 return Sqrt( Fabs(norm_sq(a))/ a.size() );
             }
-            
+
+            //! root mean square with type of first array
+            template <typename ARR, typename BRR>
+            static inline typename ARR::type RMS( const ARR &a, const BRR &b ) throw()
+            {
+                assert(a.size()>0);
+                assert(b.size()>0);
+                const size_t n = a.size();
+                typename ARR::type ans(0);
+#define Y_TAO_RMS(I) ans += (Square(a[I]-static_cast<typename ARR::type>(b[I])))
+                YOCTO_TAO_LOOP(n,RMS);
+#undef  Y_TAO_RMS
+                return Sqrt(ans/n);
+            }
+
             
             //! a*b for scalar type, a is the leading type
             template<typename ARR, typename BRR>
