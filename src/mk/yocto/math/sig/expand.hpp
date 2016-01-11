@@ -62,7 +62,7 @@ namespace yocto
             //! get a virtual X array
             inline T get_x(unit_t i, const array<T> &X, const unit_t N) const throw()
             {
-                assert(N==X.size());
+                assert(N==unit_t(X.size()));
                 assert(N>0);
                 if(i<1)
                 {
@@ -98,7 +98,7 @@ namespace yocto
             //! get a virtual Y array
             inline T get_y(unit_t i, const array<T> &Y, const unit_t N) const throw()
             {
-                assert(N==Y.size());
+                assert(N==unit_t(Y.size()));
                 assert(N>0);
                 if(i<1)
                 {
@@ -148,7 +148,8 @@ namespace yocto
                         return Y[i];
                     }
                 }
-                
+                // never get here
+                return 0;
             }
             
             
