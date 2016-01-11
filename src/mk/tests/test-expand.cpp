@@ -69,7 +69,21 @@ YOCTO_UNIT_TEST_IMPL(expand)
 
     {
         ios::wcstream fp("head_cyclic.dat");
-        
+        for( list< point2d<double> >::iterator i=sm.points.begin();i!=sm.points.end();++i)
+        {
+            const point2d<double> &p = *i;
+            fp("%g %g\n", p.x, p.y);
+        }
+    }
+
+    sm(xp_odd,1,x,z);
+    {
+        ios::wcstream fp("head_odd.dat");
+        for( list< point2d<double> >::iterator i=sm.points.begin();i!=sm.points.end();++i)
+        {
+            const point2d<double> &p = *i;
+            fp("%g %g\n", p.x, p.y);
+        }
     }
 
 }
