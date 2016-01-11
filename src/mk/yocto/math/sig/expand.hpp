@@ -19,6 +19,18 @@ namespace yocto
             expand_even      //!< even behavior w.r.t the boundary
         };
 
+        inline expand_type get_derivative_expand_type( const expand_type t ) throw()
+        {
+            switch(t)
+            {
+                case expand_cyclic: return expand_cyclic;
+                case expand_odd:    return expand_even;
+                case expand_even:   return expand_odd;
+                default:;
+            }
+            return expand_zero;
+        }
+
         template <typename T>
         class expand
         {
@@ -27,7 +39,7 @@ namespace yocto
             const expand_type upper;
 
             inline virtual ~expand() throw() {}
-            
+
             inline explicit expand(const expand_type lo, const expand_type up) throw() :
             lower(lo),upper(up)
             {
@@ -125,10 +137,10 @@ namespace yocto
 
                             case expand_odd:
                                 return Y[N] - (get_y(N+N-i,Y,N)-Y[N]);
-
+                                
                             case expand_even:
                                 return get_y(N+N-i,Y,N);
-
+                                
                         }
                     }
                     else
@@ -136,16 +148,16 @@ namespace yocto
                         return Y[i];
                     }
                 }
-
+                
             }
-
-
-
+            
+            
+            
         private:
             YOCTO_DISABLE_ASSIGN(expand);
-
+            
         };
-
+        
     }
 }
 

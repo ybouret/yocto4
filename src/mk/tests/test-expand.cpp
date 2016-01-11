@@ -3,14 +3,28 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/string/conv.hpp"
+
 using namespace yocto;
 using namespace math;
 
 
 YOCTO_UNIT_TEST_IMPL(expand)
 {
-    double       NOISE = 0.1;
-    double       dt    = 0.4;
+    double       NOISE  = 0.2;
+    double       dt     = 0.4;
+    size_t       degree = 2;
+
+    if(argc>1)
+    {
+        dt = strconv::to<double>(argv[1],"dt");
+    }
+
+    if(argc>2)
+    {
+        degree = strconv::to<size_t>(argv[2],"degree");
+    }
+
 
     const size_t    n=50+alea_leq(100);
     vector<double>  x(n,0.0);
@@ -47,8 +61,8 @@ YOCTO_UNIT_TEST_IMPL(expand)
         }
     }
 
+    const unit_t  nn = n;
     {
-        const unit_t  nn = n;
         ios::wcstream fp("xpand.dat");
         for(unit_t i=-nn;i<=nn+nn;++i)
         {
@@ -65,8 +79,10 @@ YOCTO_UNIT_TEST_IMPL(expand)
 
     smooth<double> sm;
     sm.upper_range = sm.lower_range = dt/2;
-    sm(xp_cyclic,1,x,z);
+    sm.degree      = degree;
 
+
+    sm.compute(xp_cyclic,1,x,z,nn);
     {
         ios::wcstream fp("head_cyclic.dat");
         for( list< point2d<double> >::iterator i=sm.points.begin();i!=sm.points.end();++i)
@@ -76,7 +92,7 @@ YOCTO_UNIT_TEST_IMPL(expand)
         }
     }
 
-    sm(xp_odd,1,x,z);
+    sm.compute(xp_odd,1,x,z,nn);
     {
         ios::wcstream fp("head_odd.dat");
         for( list< point2d<double> >::iterator i=sm.points.begin();i!=sm.points.end();++i)
@@ -85,6 +101,21 @@ YOCTO_UNIT_TEST_IMPL(expand)
             fp("%g %g\n", p.x, p.y);
         }
     }
+
+    vector<double> ys(n);
+    vector<double> dy(n);
+    vector<double> dy2(n);
+    sm(xp_cyclic,ys,x,z,&dy);
+    sm(xp_cyclic,ys,x,z,dy2);
+    {
+        ios::wcstream fp("sm_cyclic.dat");
+        for(size_t i=1;i<=n;++i)
+        {
+            fp("%g %g %g %g\n", x[i], ys[i], dy[i], dy2[i]);
+        }
+
+    }
+
 
 }
 YOCTO_UNIT_TEST_DONE()

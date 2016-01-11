@@ -5,6 +5,14 @@
 #include "yocto/math/point2d.hpp"
 #include "yocto/sequence/list.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/math/core/lu.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/code/ipower.hpp"
+
+#include "yocto/exceptions.hpp"
+#include <cerrno>
+
+#include "yocto/ios/ocstream.hpp"
 
 namespace yocto
 {
@@ -15,33 +23,47 @@ namespace yocto
         class smooth
         {
         public:
-            typedef point2d<T> point_t;
+            typedef point2d<T>    point_t;
+            typedef list<point_t> points_t;
 
-            inline explicit smooth() throw() : points(), lower_range(0), upper_range(0), degree(0) {}
+            inline explicit smooth() throw() :
+            points(),
+            lower_range(0),
+            upper_range(0),
+            degree(0),
+            mu(),
+            coeff()
+            {}
+
             inline virtual ~smooth() throw() {}
 
-            list<point_t> points;
+            points_t      points;
             T             lower_range; //!< how far before current value
             T             upper_range; //!< how far beyond current value
             size_t        degree;      //!< desired degreee
 
-            inline T operator()(const expand<T> &xp,
-                                const unit_t     i,
-                                const array<T>  &X,
-                                const array<T>  &Y)
+
+            //! compute the approximation of Y[i]@X[i]
+            inline T compute(const expand<T> &xp,
+                             const unit_t     i,
+                             const array<T>  &X,
+                             const array<T>  &Y,
+                             const unit_t     N,
+                             T               *dYdX=0)
             {
-                assert(X.size()>0);
+                assert(N>0);
                 assert(X.size()==Y.size());
-                const unit_t N = X.size();
+                assert(unit_t(X.size())==N);
 
                 //______________________________________________________________
                 //
                 // prepare with central point
                 //______________________________________________________________
                 const T Xc = xp.get_x(i,X,N);
+                const T Yc = xp.get_y(i,Y,N);
                 points.free();
-                push_back(Xc, xp.get_y(i,Y,N));
-                //std::cerr << "points=" << points << std::endl;
+                push_back(0,Yc);
+
                 //______________________________________________________________
                 //
                 // add next points
@@ -71,8 +93,95 @@ namespace yocto
                         push_front(Xi-Xc,xp.get_y(idn,Y,N));
                     }
                 }
-                std::cerr << "points=" << points << std::endl;
-                return 0;
+
+                //______________________________________________________________
+                //
+                // use local fit
+                //______________________________________________________________
+                poly();
+                if(dYdX)
+                {
+                    *dYdX = coeff[2];
+                }
+                return coeff[1];
+            }
+
+
+            inline void operator()(const expand<T> &xp,
+                                   array<T>        &Z,
+                                   const array<T>  &X,
+                                   const array<T>  &Y,
+                                   array<T>        *dYdX)
+            {
+                assert(X.size()==Y.size());
+                assert(Y.size()==Z.size());
+                assert(X.size()>0);
+
+
+                const unit_t N(X.size());
+                if(dYdX)
+                {
+                    assert(dYdX->size() == X.size());
+                    array<T> &dy = *dYdX;
+                    for(unit_t i=1;i<=N;++i)
+                    {
+                        Z[i] = compute(xp,i,X,Y,N, &dy[i]);
+                    }
+                }
+                else
+                {
+                    for(unit_t i=1;i<=N;++i)
+                    {
+                        Z[i] = compute(xp,i,X,Y,N,0);
+                    }
+                }
+            }
+
+
+            inline void operator()(const expand<T> &xp,
+                                   array<T>        &Z,
+                                   const array<T>  &X,
+                                   const array<T>  &Y,
+                                   array<T>        &dYdX)
+            {
+                assert(X.size()==Y.size());
+                assert(Y.size()==Z.size());
+                assert(dYdX.size()==Y.size());
+                assert(X.size()>0);
+
+                const unit_t N(X.size());
+                vector<T>    W(X.size());
+
+                //______________________________________________________________
+                //
+                // first pass: zero^th order and derivative approx
+                //______________________________________________________________
+                for(unit_t i=1;i<=N;++i)
+                {
+                    Z[i] = compute(xp,i,X,Y,N,&W[i]);
+                }
+
+
+                //______________________________________________________________
+                //
+                // second pass: resample derivative
+                //______________________________________________________________
+                const expand<T> drvs(get_derivative_expand_type(xp.lower),
+                                     get_derivative_expand_type(xp.upper));
+                const size_t  old_degree = degree;
+                if(degree>0) --degree;
+                try
+                {
+                    for(unit_t i=1;i<=N;++i)
+                    {
+                        dYdX[i] = compute(drvs,i,X,W,N,0);
+                    }
+                    degree=old_degree;
+                }
+                catch (...)
+                {
+                    degree=old_degree;
+                }
             }
 
 
@@ -80,6 +189,49 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(smooth);
             inline void push_back(  T x, T y ) { const point_t p(x,y); points.push_back(p);  }
             inline void push_front( T x, T y ) { const point_t p(x,y); points.push_front(p); }
+
+            matrix<T> mu;
+            vector<T> coeff;
+
+            inline void poly()
+            {
+                const size_t np = points.size();
+                const size_t m  = min_of<size_t>(degree+1,np);
+
+                mu.make(m);
+                mu.ldz();
+                coeff.make(m,0);
+                typename points_t::iterator pp = points.begin();
+                for(size_t i=np;i>0;--i,++pp)
+                {
+                    const point_t p = *pp;
+                    for(size_t j=m,jm=m-1;j>0;--j,--jm)
+                    {
+                        const T   xjm  = ipower<T>(p.x,jm);
+                        array<T> &mu_j = mu[j];
+
+                        coeff[j]   += xjm * p.y;
+                        for(size_t k=j,km=jm;k>0;--k,--km)
+                        {
+                            const T xkm = ipower<T>(p.x,km);
+                            mu_j[k] += xkm*xjm;
+                        }
+                    }
+                }
+                for(size_t j=m;j>0;--j)
+                {
+                    for(size_t k=j+1;k<=m;++k)
+                    {
+                        mu[j][k] = mu[k][j];
+                    }
+                }
+                if(!LU<T>::build(mu))
+                {
+                    throw libc::exception( EINVAL, "invalid data to smooth" );
+                }
+                LU<T>::solve(mu,coeff);
+            }
+            
         };
     }
 }

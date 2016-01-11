@@ -40,4 +40,7 @@ namespace yocto
 	
 }
 
+#define YOCTO_FAILSAFE(CODE,FINALIZE) do { try { CODE; FINALIZE; }catch(...){ FINALIZE; throw; } } while(false)
+
+
 #endif
