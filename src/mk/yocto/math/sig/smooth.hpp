@@ -71,10 +71,12 @@ namespace yocto
                 {
                     const T Xup = Xc + max_of<T>(0,upper_range);
                     unit_t  iup = i;
+                    size_t  cnt = 0;
                     while(true)
                     {
                         const T Xi=xp.get_x(++iup,X,N);
-                        if(Xi>Xup) break;
+                        if(Xi>Xup&&cnt>0) break;
+                        ++cnt;
                         push_back(Xi-Xc,xp.get_y(iup,Y,N));
                     }
                 }
@@ -86,10 +88,12 @@ namespace yocto
                 {
                     const T Xdn = Xc - max_of<T>(0,lower_range);
                     unit_t  idn = i;
+                    size_t  cnt = 0;
                     while(true)
                     {
                         const T Xi=xp.get_x(--idn,X,N);
-                        if(Xi<Xdn) break;
+                        if(Xi<Xdn&&cnt>0) break;
+                        ++cnt;
                         push_front(Xi-Xc,xp.get_y(idn,Y,N));
                     }
                 }
