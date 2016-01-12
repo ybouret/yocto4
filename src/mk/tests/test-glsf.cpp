@@ -116,7 +116,6 @@ YOCTO_UNIT_TEST_DONE()
 YOCTO_UNIT_TEST_IMPL(glsf_poly)
 {
     GLS<float>::Function poly = _GLS::Create<float,_GLS::Polynomial>();
-    GLS<float>::Function pade = _GLS::Create<float,_GLS::Pade>();
 
 
     const size_t  N     = 20;
@@ -147,9 +146,12 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
         vector<bool>  used(m,true);
 
         samples.prepare(m);
-
+        
         _GLS::Polynomial<float>::Start(S,aorg);
-        std::cerr << "predicted=" << aorg << std::endl;
+
+
+        std::cerr
+        << "predicted=" << aorg << std::endl;
 
         if(samples.fit_with(poly, aorg, used, aerr))
         {
@@ -183,6 +185,9 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
         vector<float> aorg(m);
         vector<float> aerr(m);
         vector<bool>  used(m,true);
+        const size_t q = m/2;
+        const size_t p = m-q;
+        GLS<float>::Function pade = _GLS::Create<float,_GLS::Pade>(p,q);
 
         samples.prepare(m);
         if(samples.fit_with(pade,aorg, used, aerr))
@@ -196,18 +201,18 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
         }
     }
 
+    {
+        ios::wcstream fp("pade.dat");
+        for(size_t i=1;i<=N;++i)
         {
-            ios::wcstream fp("pade.dat");
-            for(size_t i=1;i<=N;++i)
+            fp("%g %g", X[i], Y[i]);
+            for(size_t j=1;j<=pade_max;++j)
             {
-                fp("%g %g", X[i], Y[i]);
-                for(size_t j=1;j<=pade_max;++j)
-                {
-                    fp(" %g", Q[j][i]);
-                }
-                fp("\n");
+                fp(" %g", Q[j][i]);
             }
+            fp("\n");
         }
+    }
 
 
 }

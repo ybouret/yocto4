@@ -29,6 +29,41 @@ namespace yocto
 
             //__________________________________________________________________
             //
+            //! template creation of a fitting function, 1 arg
+            //__________________________________________________________________
+            template <
+            typename T,
+            template <typename> class FN,
+            typename U
+            >
+            static inline
+            typename GLS<T>::Function Create(const U u)
+            {
+                const FN<T> fn(u);
+                return typename GLS<T>::Function(fn);
+            }
+
+            //__________________________________________________________________
+            //
+            //! template creation of a fitting function, 1 arg
+            //__________________________________________________________________
+            template <
+            typename T,
+            template <typename> class FN,
+            typename U,
+            typename V
+            >
+            static inline
+            typename GLS<T>::Function Create(const U u, const V v)
+            {
+                const FN<T> fn(u,v);
+                return typename GLS<T>::Function(fn);
+            }
+
+
+
+            //__________________________________________________________________
+            //
             //! polynomial function
             //__________________________________________________________________
             template <typename T>
@@ -40,6 +75,12 @@ namespace yocto
                 inline ~Polynomial() throw() {}
 
                 inline  T operator()(const T X, const array<T> &aorg)
+                {
+                    return Eval(X,aorg);
+                }
+
+                static inline
+                T Eval(const T X, const array<T> &aorg) throw()
                 {
                     const size_t n = aorg.size();
                     if(n>0)
@@ -56,6 +97,7 @@ namespace yocto
                     {
                         return 0;
                     }
+
                 }
 
                 static inline
@@ -63,6 +105,7 @@ namespace yocto
                 {
                     assert(S.X.size()==S.Y.size());
                     assert(S.X.size()==S.Z.size());
+                    tao::ld(S.Z,0);
                     const size_t n = a.size();
                     if( n>0 )
                     {
@@ -87,6 +130,10 @@ namespace yocto
                             return false;
                         }
                         LU<T>::solve(mu,a);
+                        for(size_t i=S.Z.size();i>0;--i)
+                        {
+                            S.Z[i] = Eval(S.X[i],a);
+                        }
                     }
                     return true;
                 }
@@ -141,17 +188,20 @@ namespace yocto
             class Pade
             {
             public:
-                inline  Pade() throw() {}
+                size_t p;
+                size_t q;
+                inline  Pade(const size_t P, const size_t Q) throw() : p(P), q(Q) {}
                 inline ~Pade() throw() {}
-                inline  Pade(const Pade &) throw() {}
+                inline  Pade(const Pade &other) throw() : p(other.p), q(other.q) {}
 
                 inline T operator()(const T X, const array<T> &a)
                 {
                     const size_t n = a.size();
+                    assert(p+q==n);
                     if(n>0)
                     {
-                        const size_t nden = n/2;
-                        const size_t nnum = n-nden;
+                        const size_t nden = q;
+                        const size_t nnum = p;
 
                         T num = 0;
                         for(size_t i=1;i<=nnum;++i)
