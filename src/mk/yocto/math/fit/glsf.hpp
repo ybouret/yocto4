@@ -161,6 +161,10 @@ namespace yocto
                               Array             &aerr,
                               Callback          *cb=0);
 
+                inline T diff( Function1 &F, const T x)
+                {
+                    return drvs(F,x,scale);
+                }
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
@@ -199,7 +203,36 @@ namespace yocto
 
             static void display( std::ostream &os, const Array &aorg, const Array &aerr);
 
-            
+            //! wrapper for 1D function
+            class Wrapper : public object
+            {
+            public:
+                inline explicit Wrapper( const Function &userFn, const array<T> &params ) :
+                F(userFn),
+                a(params.size())
+                {
+                    for(size_t i=a.size();i>0;--i) a[i] = params[i];
+                }
+
+                inline Wrapper( const Wrapper &w ) : F(w.F), a(w.a) {}
+
+                inline virtual ~Wrapper() throw() {}
+
+                inline T operator()(const T X )
+                {
+                    return F(X,a);
+                }
+
+                inline T Compute(const T X)
+                {
+                    return F(X,a);
+                }
+
+            private:
+                Function  F;
+                vector<T> a;
+                YOCTO_DISABLE_ASSIGN(Wrapper);
+            };
         };
         
     }
