@@ -203,36 +203,53 @@ namespace yocto
 
             static void display( std::ostream &os, const Array &aorg, const Array &aerr);
 
-            //! wrapper for 1D function
-            class Wrapper : public object
+            
+            //! class to use fit function as numeric function, with own parameters
+            class Proxy : public object
             {
             public:
-                inline explicit Wrapper( const Function &userFn, const array<T> &params ) :
-                F(userFn),
-                a(params.size())
+                Function  F;
+                vector<T> a; //!< parameters
+
+
+                inline Proxy( const Function &func, const size_t nvar) :
+                F(func),
+                a(nvar)
                 {
-                    for(size_t i=a.size();i>0;--i) a[i] = params[i];
                 }
 
-                inline Wrapper( const Wrapper &w ) : F(w.F), a(w.a) {}
+                template <typename OBJECT_POINTER,typename METHOD_POINTER>
+                inline Proxy(OBJECT_POINTER &host,
+                             METHOD_POINTER &meth,
+                             const size_t    nvar) :
+                Function(host,meth),
+                a(nvar)
+                {
+                }
 
-                inline virtual ~Wrapper() throw() {}
 
+                inline Proxy(const Proxy &other) : a(other.a), F(other.F) {}
+
+                inline virtual ~Proxy() throw() {}
+
+                //! to use as functor, will copy (anf forget) parameters
                 inline T operator()(const T X )
                 {
                     return F(X,a);
                 }
 
+                //! to use with the same parameters
                 inline T Compute(const T X)
                 {
                     return F(X,a);
                 }
 
+
             private:
-                Function  F;
-                vector<T> a;
-                YOCTO_DISABLE_ASSIGN(Wrapper);
+                YOCTO_DISABLE_ASSIGN(Proxy);
             };
+
+
         };
         
     }
