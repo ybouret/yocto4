@@ -222,10 +222,10 @@ namespace yocto
                 }
 
                 template <typename OBJECT_POINTER,typename METHOD_POINTER>
-                inline Proxy(OBJECT_POINTER &host,
-                             METHOD_POINTER &meth,
-                             const size_t    nvar) :
-                Function(host,meth),
+                inline Proxy(OBJECT_POINTER host,
+                             METHOD_POINTER meth,
+                             const size_t   nvar) :
+                F(host,meth),
                 a(nvar)
                 {
                 }
