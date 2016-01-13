@@ -78,6 +78,9 @@ namespace yocto
                 //! prepare memory with Gamma=Id, assuming single fit...
                 void prepare( size_t global_nvar );
 
+                //! total sum of squares = sum( (y-<y>)^2 )
+                T compute_SStot() const;
+
             private:
                 Function1    F1;    //!< call Eval for gradient
                 size_t       ivar;  //!< for gadient

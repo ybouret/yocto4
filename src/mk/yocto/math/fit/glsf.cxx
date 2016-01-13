@@ -26,6 +26,32 @@ namespace yocto
             return ans;
         }
 
+        template <>
+        real_t GLS<real_t>:: Sample:: compute_SStot() const
+        {
+            const size_t N = Y.size();
+            if(N>0)
+            {
+                real_t ave = 0;
+                for(size_t i=N;i>0;--i)
+                {
+                    ave += Y[i];
+                }
+                ave /= N;
+
+                real_t ans = 0;
+                for(size_t i=N;i>0;--i)
+                {
+                    ans += Square(Y[i]-ave);
+                }
+                return ans;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
 
         template <>
         GLS<real_t>:: Sample:: Sample( const Array &XX, const Array &YY, Array &ZZ ) :
@@ -416,6 +442,7 @@ namespace yocto
     }
 }
 
+#include "yocto/math/fcn/functions.hpp"
 namespace yocto
 {
     namespace math
@@ -480,7 +507,7 @@ namespace yocto
                 return false; //! no possible scaling, singular matrix ?
             }
 
-            
+
             //__________________________________________________________________
             //
             // compute step
@@ -519,10 +546,10 @@ namespace yocto
                     goto EXTREMUM;
                 }
 
-                
+
                 goto CYCLE;
             }
-            
+
             //__________________________________________________________________
             //
             // test numerical convergence on H
@@ -631,11 +658,23 @@ namespace yocto
                     }
                 }
 
+                const real_t SSres = Horg;
+                real_t       SStot = 0;
+                for(size_t i=self.size();i>0;--i)
+                {
+                    const Sample &S = *self[i];
+                    SStot += S.compute_SStot();
+                }
+
+                const real_t Rsq = REAL(1.0) - (SSres/dof)/(SStot/(ndat-1));
+                std::cerr << "Rsq=" << Rsq << std::endl;
+                
+#if 0
                 //______________________________________________________________
                 //
                 // compute the approximate 'goodness of fit' ?
                 //______________________________________________________________
-                std::cerr << "S2=" << Horg << std::endl;
+                //std::cerr << "S2=" << Horg << std::endl;
                 real_t ave = 0;
                 for(size_t i=self.size();i>0;--i)
                 {
@@ -644,13 +683,13 @@ namespace yocto
                     const array<real_t> &Z = S.Z;
                     for(size_t j=Y.size();j>0;--j)
                     {
-                        const double di = Y[j]-Z[j];
+                        const real_t di = Y[j]-Z[j];
                         ave += di;
                     }
                 }
                 ave /= ndat;
 
-                real_t sig = 0;
+                real_t var = 0;
                 for(size_t i=self.size();i>0;--i)
                 {
                     Sample &S = *self[i];
@@ -658,16 +697,21 @@ namespace yocto
                     const array<real_t> &Z = S.Z;
                     for(size_t j=Y.size();j>0;--j)
                     {
-                        const double di = Y[j]-Z[j];
-                        sig += Square(di-ave);
+                        const real_t di = Y[j]-Z[j];
+                        var += Square(di-ave);
                     }
                 }
-                sig = Sqrt(sig/dof);
-                std::cerr << "average=" << ave << std::endl;
-                std::cerr << "stddev =" << sig << std::endl;
+                var /= dof;
+                //std::cerr << "average=" << ave << std::endl;
+                //std::cerr << "stddev =" << Sqrt(var) << std::endl;
 
-                std::cerr << "dof=" << dof << std::endl;
+                //std::cerr << "dof="  << dof << std::endl;
+                //std::cerr << "chi2=" << Horg/var << std::endl;
 
+                const real_t chi2 = Horg/var;
+                const real_t Q    = gamma_q( real_t(REAL(0.5)*dof), chi2*REAL(0.5) );
+                std::cerr << "Q=" << Q << std::endl;
+#endif
                 return true;
             }
 
@@ -682,7 +726,7 @@ namespace yocto
 
 namespace yocto
 {
-
+    
     namespace math
     {
         template <>
