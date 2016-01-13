@@ -599,16 +599,16 @@ namespace yocto
                 {
                     ndat += self[i]->N;
                 }
-                if(ndat<nvar)
+                if(ndat<=nvar)
                 {
                     return false;
                 }
 
                 //______________________________________________________________
                 //
-                // Degrees of freedom
+                // Degrees of freedom > 0
                 //______________________________________________________________
-                const size_t  dof = 1 + (ndat-nvar);
+                const size_t  dof = (ndat-nvar);
 
                 //______________________________________________________________
                 //
@@ -630,6 +630,44 @@ namespace yocto
                         aerr[i] = Sqrt( Fabs(alpha[i][i]) * dS );
                     }
                 }
+
+                //______________________________________________________________
+                //
+                // compute the approximate 'goodness of fit' ?
+                //______________________________________________________________
+                std::cerr << "S2=" << Horg << std::endl;
+                real_t ave = 0;
+                for(size_t i=self.size();i>0;--i)
+                {
+                    Sample &S = *self[i];
+                    const array<real_t> &Y = S.Y;
+                    const array<real_t> &Z = S.Z;
+                    for(size_t j=Y.size();j>0;--j)
+                    {
+                        const double di = Y[j]-Z[j];
+                        ave += di;
+                    }
+                }
+                ave /= ndat;
+
+                real_t sig = 0;
+                for(size_t i=self.size();i>0;--i)
+                {
+                    Sample &S = *self[i];
+                    const array<real_t> &Y = S.Y;
+                    const array<real_t> &Z = S.Z;
+                    for(size_t j=Y.size();j>0;--j)
+                    {
+                        const double di = Y[j]-Z[j];
+                        sig += Square(di-ave);
+                    }
+                }
+                sig = Sqrt(sig/dof);
+                std::cerr << "average=" << ave << std::endl;
+                std::cerr << "stddev =" << sig << std::endl;
+
+                std::cerr << "dof=" << dof << std::endl;
+
                 return true;
             }
 
