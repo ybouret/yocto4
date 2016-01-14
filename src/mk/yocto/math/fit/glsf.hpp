@@ -116,7 +116,7 @@ namespace yocto
                 const int      p10_min;
                 const int      p10_max;
                 size_t         cycle;   //!< cycle index
-                
+
                 explicit Samples(size_t n=1);
                 virtual ~Samples() throw();
 
@@ -164,6 +164,24 @@ namespace yocto
                               Array             &aerr,
                               Callback          *cb=0);
 
+
+                inline
+                bool fit_with(Function          &F,
+                              const Array       &X,
+                              const Array       &Y,
+                              Array             &Z,
+                              Array             &aorg,
+                              const array<bool> &used,
+                              Array             &aerr,
+                              Callback          *cb=0)
+                {
+                    this->release();
+                    (void) append(X,Y,Z);
+                    this->prepare(aorg.size());
+                    return fit_with(F,aorg,used,aerr,cb);
+                }
+
+
                 inline T diff( Function1 &F, const T x)
                 {
                     return drvs(F,x,scale);
@@ -206,7 +224,24 @@ namespace yocto
 
             static void display( std::ostream &os, const Array &aorg, const Array &aerr);
 
-            
+#if 0
+            static inline
+            bool FitWith(Function    &F,
+                         const Array &X,
+                         const Array &Y,
+                         Array       &Z,
+                         Array       &aorg,
+                         array<bool> &used,
+                         Array       &aerr
+                         )
+            {
+                Samples samples(1);
+                (void) samples.append(X,Y,Z);
+                samples.prepare(aorg.size());
+                return samples.fit_with(F,aorg,used,aerr);
+            }
+#endif
+
             //! class to use fit function as numeric function, with own parameters
             class Proxy : public object
             {
@@ -232,27 +267,27 @@ namespace yocto
 
 
                 inline Proxy(const Proxy &other) : a(other.a), F(other.F) {}
-
+                
                 inline virtual ~Proxy() throw() {}
-
+                
                 //! to use as functor, will copy (anf forget) parameters
                 inline T operator()(const T X )
                 {
                     return F(X,a);
                 }
-
+                
                 //! to use with the same parameters
                 inline T Compute(const T X)
                 {
                     return F(X,a);
                 }
-
-
+                
+                
             private:
                 YOCTO_DISABLE_ASSIGN(Proxy);
             };
-
-
+            
+            
         };
         
     }
