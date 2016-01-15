@@ -667,51 +667,8 @@ namespace yocto
                 }
 
                 const real_t Rsq = REAL(1.0) - (SSres/dof)/(SStot/(ndat-1));
-                std::cerr << "Rsq=" << Rsq << std::endl;
-                
-#if 0
-                //______________________________________________________________
-                //
-                // compute the approximate 'goodness of fit' ?
-                //______________________________________________________________
-                //std::cerr << "S2=" << Horg << std::endl;
-                real_t ave = 0;
-                for(size_t i=self.size();i>0;--i)
-                {
-                    Sample &S = *self[i];
-                    const array<real_t> &Y = S.Y;
-                    const array<real_t> &Z = S.Z;
-                    for(size_t j=Y.size();j>0;--j)
-                    {
-                        const real_t di = Y[j]-Z[j];
-                        ave += di;
-                    }
-                }
-                ave /= ndat;
-
-                real_t var = 0;
-                for(size_t i=self.size();i>0;--i)
-                {
-                    Sample &S = *self[i];
-                    const array<real_t> &Y = S.Y;
-                    const array<real_t> &Z = S.Z;
-                    for(size_t j=Y.size();j>0;--j)
-                    {
-                        const real_t di = Y[j]-Z[j];
-                        var += Square(di-ave);
-                    }
-                }
-                var /= dof;
-                //std::cerr << "average=" << ave << std::endl;
-                //std::cerr << "stddev =" << Sqrt(var) << std::endl;
-
-                //std::cerr << "dof="  << dof << std::endl;
-                //std::cerr << "chi2=" << Horg/var << std::endl;
-
-                const real_t chi2 = Horg/var;
-                const real_t Q    = gamma_q( real_t(REAL(0.5)*dof), chi2*REAL(0.5) );
-                std::cerr << "Q=" << Q << std::endl;
-#endif
+                //std::cerr << "Rsq=" << Rsq << std::endl;
+                (void) Rsq;
                 return true;
             }
 
