@@ -116,7 +116,8 @@ namespace yocto
                 const int      p10_min;
                 const int      p10_max;
                 size_t         cycle;   //!< cycle index
-
+                T              Rsq;     //!< last adjusted R-squared
+                
                 explicit Samples(size_t n=1);
                 virtual ~Samples() throw();
 
@@ -224,23 +225,6 @@ namespace yocto
 
             static void display( std::ostream &os, const Array &aorg, const Array &aerr);
 
-#if 0
-            static inline
-            bool FitWith(Function    &F,
-                         const Array &X,
-                         const Array &Y,
-                         Array       &Z,
-                         Array       &aorg,
-                         array<bool> &used,
-                         Array       &aerr
-                         )
-            {
-                Samples samples(1);
-                (void) samples.append(X,Y,Z);
-                samples.prepare(aorg.size());
-                return samples.fit_with(F,aorg,used,aerr);
-            }
-#endif
 
             //! class to use fit function as numeric function, with own parameters
             class Proxy : public object

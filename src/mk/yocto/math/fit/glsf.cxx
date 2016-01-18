@@ -248,6 +248,7 @@ namespace yocto
         p10_min( -GLS<real_t>::GET_P10_MAX() ),
         p10_max( -p10_min               ),
         cycle(0),
+        Rsq(0),
         pvar(NULL),
         hook(NULL),
         scan( this , &Samples::Eval )
@@ -473,6 +474,7 @@ namespace yocto
 
             tao::ld(aerr,0);
             cycle = 0;
+            Rsq   = 0;
 
             pvar = &aorg;
             hook = &F;
@@ -666,9 +668,8 @@ namespace yocto
                     SStot += S.compute_SStot();
                 }
 
-                const real_t Rsq = REAL(1.0) - (SSres/dof)/(SStot/(ndat-1));
+                Rsq = REAL(1.0) - (SSres/dof)/(SStot/(ndat-1));
                 //std::cerr << "Rsq=" << Rsq << std::endl;
-                (void) Rsq;
                 return true;
             }
 
