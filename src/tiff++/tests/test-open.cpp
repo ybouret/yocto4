@@ -32,7 +32,7 @@ YOCTO_UNIT_TEST_IMPL(open)
                     const size_t npx = w*h;
                     uint32_t *raster = new uint32_t[npx];
                     I->ReadRGBAImage(tiff,w,h,raster);
-                    delete raster;
+                    delete []raster;
                 }
                 while( I->ReadDirectory(tiff) );
                 std::cerr << "Found " << count << " entry(ies)" << std::endl;
