@@ -2,6 +2,8 @@
 #include "yocto/math/fcn/intg.hpp"
 #include "yocto/math/fcn/drvs.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/math/fcn/composition.hpp"
+
 #include <typeinfo>
 
 using namespace yocto;
@@ -80,7 +82,10 @@ YOCTO_UNIT_TEST_IMPL(drvs)
     
     const double xmax = 10;
     const double step = 0.02;
-    numeric<double>::function F = cfunctor( Cos2<double> );
+    numeric<double>::function F  = cfunctor( Cos2<double> );
+    //numeric<double>::function F2 = cfunctor(fabs);
+    numeric<double>::function F3 = composition<double>::build(fabs, F);
+
     {
         double err = 0;
         ios::ocstream fp("diff.dat",false);
