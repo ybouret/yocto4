@@ -119,7 +119,7 @@ YOCTO_UNIT_TEST_IMPL(glsf_poly)
 
 
     const size_t  N     = 20;
-    const float   omega = 1.0 + 0.2f*alea<float>();
+    const float   omega = 1.0f + 0.2f*alea<float>();
     vector<float> X(N);
     vector<float> Y(N);
 
