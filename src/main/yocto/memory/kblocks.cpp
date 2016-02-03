@@ -15,7 +15,6 @@ namespace yocto
     {
         kBlocks:: ~kBlocks() throw()
         {
-            //std::cerr << "Cleaning " << num_arenas << " arenas" << std::endl;
             while(num_arenas)
             {
                 kArena &A = arenas[--num_arenas];
