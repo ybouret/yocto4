@@ -55,6 +55,7 @@ namespace yocto
                 assert(is_a_power_of_two(n));
                 size_t m = n * sizeof(T);
                 release(p,m);
+                p = 0;
                 n = 0;
             }
 

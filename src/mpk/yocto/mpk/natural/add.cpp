@@ -1,4 +1,4 @@
-#include "yocto/mpk/natural.hpp"
+#include "yocto/mpk/word2mpn.hpp"
 #include "yocto/code/bswap.hpp"
 #include "yocto/code/unroll.hpp"
 
@@ -7,7 +7,7 @@ namespace yocto
     namespace mpk
     {
 
-        natural natural:: add(const _natural &lhs, const _natural &rhs)
+        natural natural:: add(const natural &lhs, const natural &rhs)
         {
             size_t         na = lhs.size;
             size_t         nb = rhs.size;
@@ -48,6 +48,10 @@ namespace yocto
             ans.update();
             return ans;
         }
+
+
+        YOCTO_MPN_IMPL2(natural,operator+,natural::add)
+        
     }
 
 }

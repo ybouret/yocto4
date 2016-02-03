@@ -9,21 +9,81 @@ namespace yocto
     
     namespace mpk
     {
-        _natural:: ~_natural() throw()
+
+        static inline uint8_t *build(size_t &n)
+        {
+            static manager &mgr = manager::instance();
+            return static_cast<uint8_t *>( mgr.acquire(n) );
+        }
+
+        natural:: natural() :
+        maxi(0),
+        size(0),
+        byte( build(maxi) )
         {
         }
+
+        natural:: natural(const size_t num_bytes, const as_capacity_t &) :
+        maxi(num_bytes),
+        size(0),
+        byte( build(maxi) )
+        {
+        }
+
+        natural:: natural(const natural &other ) :
+        maxi( other.size  ),
+        size( other.size  ),
+        byte( build(maxi) )
+        {
+            memcpy(byte,other.byte,size);
+        }
+
+        natural::natural(word_t w) :
+        maxi( sizeof(word_t) ),
+        size( sizeof(word_t) ),
+        byte( build(maxi) )
+        {
+            w = swap_le(w);
+            memcpy(byte, &w, sizeof(word_t) );
+            update();
+        }
+
+
+
+
+        natural & natural:: operator=(const natural &other)
+        {
+            natural tmp(other);
+            xch(tmp);
+            return *this;
+        }
+
+        natural & natural:: operator=(const word_t w)
+        {
+            natural tmp(w);
+            xch(tmp);
+            return *this;
+        }
+
+
+        natural:: ~natural() throw()
+        {
+            static manager &mgr = * manager::location();
+            mgr.release_as<uint8_t>(byte, maxi);
+            size=0;
+        }
         
-        size_t _natural:: length() const throw()
+        size_t natural:: length() const throw()
         {
             return size;
         }
         
-        const void *_natural:: get_address() const throw()
+        const void *natural:: get_address() const throw()
         {
             return byte;
         }
         
-        void _natural:: update() throw()
+        void natural:: update() throw()
         {
             assert(byte);
             assert(maxi);
@@ -37,24 +97,32 @@ namespace yocto
             YOCTO_CHECK_MPN(*this);
         }
         
-        void _natural:: rescan() throw()
+        void natural:: rescan() throw()
         {
             size = maxi;
             update();
         }
         
-        void _natural:: ldz() throw()
+        void natural:: ldz() throw()
         {
             YOCTO_CHECK_MPN(*this);
             size=0;
         }
-        
+
+        void natural::xch(natural &other) throw()
+        {
+            cswap(other.maxi, maxi);
+            cswap(other.size, size);
+            cswap(other.byte, byte);
+        }
+
+
         static inline bool is0(char C) throw()
         {
             return C == '0';
         }
         
-        std::ostream & operator<<( std::ostream &os, const _natural &n)
+        std::ostream & operator<<( std::ostream &os, const natural &n)
         {
             YOCTO_CHECK_MPN(n);
             os << '<';
@@ -74,136 +142,11 @@ namespace yocto
             os << '>';
             return os;
         }
-        
-        _natural:: _natural() throw() : maxi(0), size(0), byte(0) {}
-        
-        
+                
         
     }
 }
 
-#include "yocto/code/endian.hpp"
 
-namespace yocto
-{
-    
-    namespace mpk
-    {
-        natural_word:: ~natural_word() throw()
-        {
-            YOCTO_CHECK_MPN(*this);
-        }
-        
-        natural_word:: natural_word(const word_t x) throw() :
-        _natural(),
-        w( swap_le(x) )
-        {
-            maxi = sizeof(word_t);
-            size = sizeof(word_t);
-            byte = (uint8_t *) &w;
-            update();
-        }
-        
-        natural_word:: natural_word(const natural_word &other ) throw() :
-        _natural(),
-        w( other.w )
-        {
-            maxi = sizeof(word_t);
-            size = other.size;
-            byte = (uint8_t *) &w;
-        }
-        
-        natural_word & natural_word:: operator=(const  natural_word &other ) throw()
-        {
-            size = other.size;
-            w    = other.w;
-            return *this;
-        }
-    }
-    
-}
-
-
-#include "yocto/code/bswap.hpp"
-
-namespace yocto
-{
-    
-    namespace mpk
-    {
-        
-        natural:: natural( const size_t num_bytes, const as_capacity_t &) :
-        _natural()
-        {
-            startup(num_bytes);
-        }
-        
-        void natural:: startup(size_t num_bytes)
-        {
-            static manager &mgr = manager::instance();
-            assert(0==maxi);
-            assert(0==size);
-            assert(0==byte);
-            maxi = num_bytes;
-            byte = static_cast<uint8_t*>(mgr.acquire(maxi));
-        }
-        
-        natural:: ~natural() throw()
-        {
-            YOCTO_CHECK_MPN(*this);
-            static manager &mgr = *manager::location();
-            size = 0;
-            mgr.release_as<uint8_t>(byte,maxi);
-        }
-        
-        natural:: natural() :
-        _natural()
-        {
-            startup(0);
-        }
-        
-        void natural::xch(natural &other) throw()
-        {
-            cswap(maxi,other.maxi);
-            cswap(size,other.size);
-            cswap(byte,other.byte);
-        }
-        
-        
-        natural:: natural( const natural &other ) :
-        _natural()
-        {
-            startup(other.size);
-            memcpy(byte,other.byte,size=other.size);
-        }
-        
-        natural & natural:: operator=(const natural &other)
-        {
-            natural tmp(other);
-            xch(tmp);
-            return *this;
-        }
-        
-        natural:: natural(const word_t w) :
-        _natural()
-        {
-            startup(sizeof(w));
-            const word_t x = swap_le(w);
-            memcpy(byte,&x,size=sizeof(x));
-            update();
-        }
-        
-        natural & natural:: operator=(const word_t w)
-        {
-            natural tmp(w);
-            xch(tmp);
-            return *this;
-        }
-        
-        
-    }
-    
-    
-}
 
 

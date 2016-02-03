@@ -3,6 +3,7 @@
 
 #include "yocto/mpk/types.hpp"
 #include "yocto/memory/buffer.hpp"
+#include "yocto/code/endian.hpp"
 
 #include <iosfwd>
 
@@ -15,112 +16,99 @@ assert( (X).maxi>0 );         \
 assert( (X).size<=(X).maxi ); \
 assert( (X).byte!=NULL     ); \
 assert( !( ((X).size>0) && ( (X).byte[ (X).size-1 ] == 0) ) )
-        
-        //______________________________________________________________________
-        //
-        //! base class for natural, little endian
-        //______________________________________________________________________
-        class  _natural : public memory::ro_buffer
+
+
+#define YOCTO_MPN_DECL2_NOTHROW(RETURN_TYPE,OP,CALL) \
+inline friend RETURN_TYPE OP(const natural &lhs,const natural &rhs) throw() { return CALL(lhs,rhs); } \
+friend        RETURN_TYPE OP(const natural &lhs,const word_t   rhs) throw(); \
+friend        RETURN_TYPE OP(const word_t   lhs,const natural &rhs) throw()
+
+#define YOCTO_MPN_IMPL2_NOTHROW(RETURN_TYPE,OP,CALL)          \
+RETURN_TYPE OP(const natural &lhs,const word_t   rhs) throw() \
+{ const word2mpn RHS(rhs); return CALL(lhs,RHS.n); }          \
+RETURN_TYPE OP(const word_t lhs, const natural &rhs) throw()  \
+{ const word2mpn LHS(lhs); return CALL(LHS.n,rhs); }
+
+#define YOCTO_MPN_DECL2(RETURN_TYPE,OP,CALL) \
+inline friend RETURN_TYPE OP(const natural &lhs,const natural &rhs) { return CALL(lhs,rhs); } \
+friend        RETURN_TYPE OP(const natural &lhs,const word_t   rhs); \
+friend        RETURN_TYPE OP(const word_t   lhs,const natural &rhs)
+
+#define YOCTO_MPN_IMPL2(RETURN_TYPE,OP,CALL)            \
+RETURN_TYPE OP(const natural &lhs,const word_t   rhs)   \
+{ const word2mpn RHS(rhs); return CALL(lhs,RHS.n); }    \
+RETURN_TYPE OP(const word_t lhs, const natural &rhs)    \
+{ const word2mpn LHS(lhs); return CALL(LHS.n,rhs); }
+
+
+        class natural : public memory::ro_buffer
         {
         public:
-            virtual ~ _natural() throw(); //!< destructor, do nothing
-            virtual size_t length() const throw(); //!< ro_buffer interface
-            
-            void ldz() throw(); //!< set size to 0 => null value
-            
-            friend std::ostream & operator<<( std::ostream &os, const _natural &n);
-            
-            
-        protected:
-            size_t   maxi; //!< capacity
-            size_t   size; //!< number of active bytes: 0 => null value...
-            uint8_t *byte; //!< current bytes
-            
-            void      update() throw();  //!< check if size decreased
-            void      rescan() throw();  //!< check size from maxi
-            explicit _natural() throw(); //!< all to zero
-            
-            friend class natural;
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(_natural);
-            virtual const void *get_address() const throw();
-        };
-        
-        
-        //______________________________________________________________________
-        //
-        //! wrapper for a word_t
-        //______________________________________________________________________
-        class natural_word : public _natural
-        {
-        public:
-            natural_word(const word_t x=0) throw();
-            virtual ~natural_word() throw();
-            natural_word(const natural_word &) throw();
-            natural_word & operator=(const natural_word &) throw();
-            
-        private:
-            word_t w; //!< stored little endian value
-            friend class natural;
-        };
-        
-        
-#define YOCTO_MPN_WRAP2(RETURN_TYPE,FUNCTION,CALL)                           \
-inline  RETURN_TYPE FUNCTION(const word_t w, const _natural &rhs) \
-{ const natural_word lhs(w); return CALL(lhs,rhs); }                \
-inline  RETURN_TYPE FUNCTION(const _natural &lhs, const word_t w) \
-{ const natural_word rhs(w); return CALL(lhs,rhs); }
-        
-        //______________________________________________________________________
-        //
-        //! dynamic natural number
-        //______________________________________________________________________
-        class natural : public _natural
-        {
-        public:
+            virtual ~natural() throw();
+            virtual size_t length() const throw();
+
             //__________________________________________________________________
             //
             // canonic functions
             //__________________________________________________________________
-            virtual ~natural() throw();
-            natural();                         //!< set to 0
-            natural(const natural &other);     //!< copy
-            void xch(natural &other) throw();  //!< no throw swap
-            natural & operator=(const natural &other); //!< assign
-            
-            
+            natural(); //!< zero
+            natural(const size_t num_bytes, const as_capacity_t &);
+            natural(const natural &other);
+            natural & operator=( const natural &other);
+
             //__________________________________________________________________
             //
-            // real world helpers
+            // helpers
             //__________________________________________________________________
-            natural( const size_t num_bytes, const as_capacity_t &);
-            natural(const word_t w);
-            natural & operator=(const word_t w); //!< assign
-            
+            natural(word_t w);
+            natural & operator=(const word_t w);
+            void xch(natural &other) throw();
+            void ldz() throw();
+
+            friend std::ostream & operator<<( std::ostream &os, const natural &n);
+
             //__________________________________________________________________
             //
-            // addition
+            // comparison: are equal
             //__________________________________________________________________
-            static
-            natural add(const _natural &lhs, const _natural &rhs);
-            YOCTO_MPN_WRAP2(static natural,add,add)
-            
-            inline natural operator+()
-            {
-                return *this;
-            }
-            
-            inline friend natural operator+(const _natural &lhs, const _natural &rhs)
-            {
-                return natural::add(lhs,rhs);
-            }
-            YOCTO_MPN_WRAP2(friend natural,operator+,add)
-            
+            static bool are_equal(const natural &lhs, const natural &rhs) throw();
+            YOCTO_MPN_DECL2_NOTHROW(bool,operator==,are_equal);
+
+            //__________________________________________________________________
+            //
+            // comparison: are different
+            //__________________________________________________________________
+            static bool are_different(const natural &lhs, const natural &rhs) throw();
+            YOCTO_MPN_DECL2_NOTHROW(bool,operator!=,are_different);
+
+            //__________________________________________________________________
+            //
+            // comparison: generic case
+            //__________________________________________________________________
+            static int compare(const natural &lhs, const natural &rhs) throw();
+
+
+            //__________________________________________________________________
+            //
+            // add
+            //__________________________________________________________________
+            static natural add(const natural &lhs, const natural &rhs);
+            inline natural operator+() { return natural(*this); }
+            YOCTO_MPN_DECL2(natural,operator+,add);
+
         private:
-            void startup(size_t num_bytes);
-            void cleanup() throw();
+            size_t   maxi; //!< capacity
+            size_t   size; //!< significant bytes
+            uint8_t *byte; //!< memory
+
+            void update() throw(); //!< check size reduction
+            void rescan() throw(); //!< size=maxi and update
+
+            virtual const void * get_address() const throw();
+            friend class word2mpn;
         };
-        
+
+       
     }
 }
 
