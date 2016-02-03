@@ -1,5 +1,6 @@
 #include "yocto/mpk/types.hpp"
 #include "yocto/exceptions.hpp"
+#include <cstdlib>
 #include <cerrno>
 
 
