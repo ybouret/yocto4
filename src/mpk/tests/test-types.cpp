@@ -2,6 +2,7 @@
 #include "yocto/mpk/types.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/math/complex.hpp"
 
 using namespace yocto;
 
@@ -73,6 +74,10 @@ YOCTO_UNIT_TEST_IMPL(types)
         blocks.pop_back();
     }
 
-
+    typedef math::complex<double> cplx_t;
+    size_t  nc = 10;
+    cplx_t *C  = MPK.acquire_as<cplx_t>(nc);
+    std::cerr << "nc=" << nc << std::endl;
+    MPK.release_as<cplx_t>(C,nc);
 }
 YOCTO_UNIT_TEST_DONE()

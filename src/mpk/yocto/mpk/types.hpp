@@ -46,6 +46,17 @@ namespace yocto
                 }
             }
 
+            template <typename T>
+            inline void release_as(T * &p, size_t &n) throw()
+            {
+                assert(is_a_power_of_two(sizeof(T)));
+                assert(p!=0);
+                assert(is_a_power_of_two(n));
+                size_t m = n * sizeof(T);
+                release(p,m);
+                n = 0;
+            }
+
         private:
             friend class singleton<manager>;
             explicit manager() throw();
