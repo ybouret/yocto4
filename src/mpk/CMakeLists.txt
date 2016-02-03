@@ -8,8 +8,8 @@ SET( mpk_srcs ${mpk_decl} ${mpk_impl} )
 INSTALL( FILES ${mpk_decl} DESTINATION include/yocto/mpk )
 SOURCE_GROUP( mpk FILES ${mpk_srcs} )
 
-#FILE( GLOB mpn_srcs yocto/mpk/natural/*.cpp )
-#SOURCE_GROUP( mpk/natural FILES ${mpn_srcs} )
+FILE( GLOB mpn_srcs yocto/mpk/natural/*.cpp )
+SOURCE_GROUP( mpk/natural FILES ${mpn_srcs} )
 
 #FILE( GLOB mpz_srcs yocto/mpk/integer/*.cpp )
 #SOURCE_GROUP( mpk/integer FILES ${mpz_srcs} )

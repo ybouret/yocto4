@@ -11,6 +11,7 @@ namespace yocto
     {
 
         typedef uint64_t word_t;
+        typedef int64_t  wint_t;
 
         class manager : public singleton<manager>
         {
