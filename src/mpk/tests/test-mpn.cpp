@@ -154,8 +154,32 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         }
     }
 
+    std::cerr << "-- Multiplication Tests" << std::endl;
+    {
+        for(size_t i=0;i<10000;++i)
+        {
+            word_t  x = ran.fuzz<uint32_t>();
+            natural X = x;
+            word_t  y = ran.fuzz<uint32_t>();
+            natural Y = y;
 
+            word_t  p = x*y;
+            natural P = X*Y;
+            if(p!=P.to_word())
+            {
+                throw exception("multiplication error");
+            }
+        }
+
+        for(natural n=0;n<=10;++n)
+        {
+            const natural f = natural::factorial(n);
+            std::cerr << n.to_word() << "! = " << f << std::endl;
+        }
+
+    }
 
 
 }
+
 YOCTO_UNIT_TEST_DONE()

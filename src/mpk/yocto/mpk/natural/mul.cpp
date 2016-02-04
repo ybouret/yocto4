@@ -1,4 +1,4 @@
-#include "yocto/mpk/natural.hpp"
+#include "yocto/mpk/word2mpn.hpp"
 #include "yocto/code/xbitrev.hpp"
 #include "yocto/math/complex.hpp"
 #include <cmath>
@@ -14,9 +14,10 @@ namespace yocto
         typedef math::complex<real_t> cplx_t;
 
 
-#define YOCTO_USE_XBITREV 1
-
-        //! simultaneous FFTs
+        //______________________________________________________________________
+        //
+        // simultaneous FFTs
+        //______________________________________________________________________
         static inline
         void _xfft(real_t      *data,
                    real_t      *other,
@@ -92,7 +93,10 @@ namespace yocto
         }
 
 
-
+        //______________________________________________________________________
+        //
+        // single FFT
+        //______________________________________________________________________
         static inline
         void _fft(real_t      *data,
                   const size_t size
@@ -151,10 +155,14 @@ namespace yocto
 
         }
 
+
+        //______________________________________________________________________
+        //
+        // inverse FFT
+        //______________________________________________________________________
         static  inline
         void _ifft(real_t      *data,
-                   const size_t size
-                   ) throw()
+                   const size_t size) throw()
         {
             assert( data != NULL );
             assert( is_a_power_of_two(size) );
@@ -281,6 +289,46 @@ namespace yocto
                 return natural(); // zero...
             }
         }
+
+    }
+
+}
+
+
+namespace yocto
+{
+    namespace mpk
+    {
+        YOCTO_MPN_IMPL2(natural,operator*,natural::mul)
+
+        natural & natural:: operator*=(const word_t rhs)
+        {
+            const word2mpn RHS(rhs);
+            natural        ans = mul(*this,RHS.n);
+            xch(ans);
+            return *this;
+        }
+
+        natural natural::factorial(const natural &n)
+        {
+            natural ans = 1;
+            for(natural i=1;i<=n;++i)
+            {
+                ans *= i;
+            }
+            return ans;
+        }
+
+        natural natural::factorial(const word_t n)
+        {
+            natural ans = 1;
+            for(word_t i=1;i<=n;++i)
+            {
+                ans *= i;
+            }
+            return ans;
+        }
+
 
     }
 }

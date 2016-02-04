@@ -175,8 +175,27 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             // multiplication
             //__________________________________________________________________
 
+            //! FFT multiplication
             static natural mul(const natural &lhs, const natural &rhs);
 
+            //! binary * operator
+            YOCTO_MPN_DECL2(natural,operator*,mul);
+
+            //! in place operator
+            inline natural & operator*=( const natural &rhs )
+            {
+                natural ans = mul(*this,rhs);
+                xch(ans);
+                return *this;
+            }
+
+            natural & operator*=(const word_t rhs);
+
+            //! factorial
+            static natural factorial(const natural &);
+
+            //! factorial wrapper
+            static natural factorial(const word_t );
 
         private:
             size_t   maxi; //!< capacity
