@@ -111,7 +111,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
 
             //__________________________________________________________________
             //
-            // add
+            // addition
             //__________________________________________________________________
 
             //! addition function
@@ -134,8 +134,40 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //! in place operator
             natural & operator+=(const word_t rhs);
 
-            natural & operator++();     //!< prefix
-            natural   operator++ (int); //!< postfix
+            //! prefix increment
+            natural & operator++();
+
+            //! postfix increment
+            natural   operator++ (int);
+
+            //__________________________________________________________________
+            //
+            // subtraction
+            //__________________________________________________________________
+
+            //! subtraction function
+            static natural sub(const natural &lhs, const natural &rhs);
+
+            //! binary - operators (NO unary for natural!)
+            YOCTO_MPN_DECL2(natural,operator-,sub);
+
+            //! in place operator
+            inline natural & operator-=( const natural &rhs )
+            {
+                natural ans = sub(*this,rhs);
+                xch(ans);
+                return *this;
+            }
+
+            //! in place operator
+            natural & operator-=(const word_t rhs);
+
+            //! prefix increment
+            natural & operator--();
+
+            //! postfix increment
+            natural   operator-- (int);
+
 
         private:
             size_t   maxi; //!< capacity

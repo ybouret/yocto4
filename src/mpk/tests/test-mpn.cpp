@@ -97,5 +97,27 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         }
     }
 
+    // substraction
+    {
+        for(size_t i=0;i<1000;++i)
+        {
+            word_t  x = ran.full<word_t>();
+            natural X = x;
+            word_t  y = ran.full<word_t>();
+            natural Y = y;
+
+            if(y>x)
+            {
+                cswap(x,y);
+                X.xch(Y);
+            }
+            assert(x>=y);
+            assert(X>=Y);
+            natural s = X-Y;
+            if(x-y!=s.to_word()) throw exception("sub failure");
+        }
+
+    }
+
 }
 YOCTO_UNIT_TEST_DONE()
