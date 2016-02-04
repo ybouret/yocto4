@@ -117,6 +117,11 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             if(x-y!=s.to_word()) throw exception("sub failure");
         }
 
+        for(natural n = 100; n>0; --n)
+        {
+            
+        }
+
     }
 
 }
