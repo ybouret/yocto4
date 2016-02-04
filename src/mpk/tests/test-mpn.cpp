@@ -169,6 +169,12 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             {
                 throw exception("multiplication error");
             }
+
+            X = ran.full<word_t>();
+            Y = natural::sqr(X);
+            P = X*X;
+            if(P!=Y)
+                throw exception("Square Error");
         }
 
         for(natural n=0;n<=10;++n)

@@ -189,8 +189,12 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 return *this;
             }
 
+            //! in place operator wrapper
             natural & operator*=(const word_t rhs);
 
+            //! square
+            static natural sqr(const natural &lhs);
+            
             //! factorial
             static natural factorial(const natural &);
 

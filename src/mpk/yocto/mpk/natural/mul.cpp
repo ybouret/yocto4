@@ -236,8 +236,8 @@ namespace yocto
                 //--------------------------------------------------------------
                 __array_of<cplx_t> L(nn);
                 __array_of<cplx_t> R(nn);
-                const uint8_t   *l = lhs.byte;
-                const uint8_t   *r = rhs.byte;
+                const uint8_t     *l = lhs.byte;
+                const uint8_t     *r = rhs.byte;
 
                 //--------------------------------------------------------------
                 //-- fill workspaces
@@ -289,6 +289,62 @@ namespace yocto
                 return natural(); // zero...
             }
         }
+
+
+        natural natural:: sqr( const natural &lhs )
+        {
+            const size_t nl = lhs.size;
+            if( nl > 0  )
+            {
+                const size_t np = nl << 1;             //-- product size
+                natural       P( np, as_capacity );    //-- product value
+                //--------------------------------------------------------------
+                //-- compute power of two
+                //--------------------------------------------------------------
+                const size_t nn = next_power_of_two(np);
+
+                //--------------------------------------------------------------
+                //- compute wokspace size and create it
+                //--------------------------------------------------------------
+                __array_of<cplx_t> L( nn );
+                const uint8_t   *l = lhs.byte;
+                for(size_t i=0;i<nl;++i) L[i].re = real_t(l[i]);
+
+                //--------------------------------------------------------------
+                //-- forward
+                //--------------------------------------------------------------
+                _fft( & L[0].re,  nn  );
+
+                //--------------------------------------------------------------
+                //-- multiply in place, in L
+                //--------------------------------------------------------------
+                for(size_t i=0;i<nn;++i) L[i].in_place_squared();
+
+                //--------------------------------------------------------------
+                //-- reverse
+                //--------------------------------------------------------------
+                _ifft( & L[0].re, nn );
+
+                real_t       carry = 0.0;
+                uint8_t     *prod  = P.byte;
+                const size_t top   = np - 1;
+                for( size_t i=0; i < top; ++i )
+                {
+                    carry         +=  L[i].re/nn + 0.5;
+                    const real_t q = floor( carry / 256.0 );
+                    const real_t r = carry - 256.0 * q;
+                    prod[i]   = uint8_t(r);
+                    carry     = q;
+                }
+                prod[top] = uint8_t(carry);
+
+                P.update();
+                return P;
+            }
+            else
+                return natural();
+        }
+
 
     }
 
