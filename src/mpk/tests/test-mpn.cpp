@@ -73,5 +73,29 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         }
     }
 
+    // addition
+    {
+        for(natural i=0;i<100;++i,i++)
+        {
+            std::cerr << i << std::endl;
+        }
+
+        for(size_t i=0;i<10000;++i)
+        {
+            word_t  x = ran.fuzz<uint32_t>();
+            natural X = x;
+            word_t  y = ran.fuzz<uint32_t>();
+            natural Y = y;
+
+            word_t  s = x+y;
+            natural S = X+Y;
+            if( S.to_word() != s )
+            {
+                throw exception("addition failure");
+            }
+
+        }
+    }
+
 }
 YOCTO_UNIT_TEST_DONE()

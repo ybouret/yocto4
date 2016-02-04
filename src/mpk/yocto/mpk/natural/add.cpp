@@ -51,7 +51,33 @@ namespace yocto
 
 
         YOCTO_MPN_IMPL2(natural,operator+,natural::add)
-        
+
+        natural & natural:: operator+=(const word_t rhs)
+        {
+            const word2mpn RHS(rhs);
+            natural        ans = add(*this,RHS.n);
+            xch(ans);
+            return *this;
+        }
+
+        natural &  natural:: operator++()
+        {
+            const word2mpn __one(1);
+            natural ans = add(*this,__one.n);
+            xch(ans);
+            return *this;
+        }
+
+        natural   natural:: operator++ (int)
+        {
+            const word2mpn __one(1);
+            const natural ans = add(*this,__one.n);
+            *this = ans;
+            return ans;
+        }
+
+
+
     }
 
 }

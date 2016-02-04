@@ -41,6 +41,14 @@ RETURN_TYPE OP(const word_t lhs, const natural &rhs)    \
 { const word2mpn LHS(lhs); return CALL(LHS.n,rhs); }
 
 
+#define YOCTO_MPN_OP(OP) \
+inline friend bool operator OP (const natural &lhs, const natural &rhs) throw() \
+{ return natural::compare(lhs,rhs) OP 0; }                                      \
+inline friend bool operator OP (const natural &lhs, const word_t   rhs) throw() \
+{ return natural::compare(lhs,rhs) OP 0; }                                      \
+inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() \
+{ return natural::compare(lhs,rhs) OP 0; }
+
         class natural : public memory::ro_buffer
         {
         public:
@@ -74,7 +82,7 @@ RETURN_TYPE OP(const word_t lhs, const natural &rhs)    \
             size_t bits() const throw();
             word_t to_word() const throw();     //!< least significant bytes
             static natural randomize(size_t num_bits);
-            
+
             //__________________________________________________________________
             //
             // comparison: are equal
@@ -94,15 +102,40 @@ RETURN_TYPE OP(const word_t lhs, const natural &rhs)    \
             // comparison: generic case
             //__________________________________________________________________
             static int compare(const natural &lhs, const natural &rhs) throw();
-
+            static int compare(const natural &lhs, const word_t   rhs) throw();
+            static int compare(const word_t   lhs, const natural &rhs) throw();
+            YOCTO_MPN_OP(>)
+            YOCTO_MPN_OP(>=)
+            YOCTO_MPN_OP(<)
+            YOCTO_MPN_OP(<=)
 
             //__________________________________________________________________
             //
             // add
             //__________________________________________________________________
+
+            //! addition function
             static natural add(const natural &lhs, const natural &rhs);
+
+            //! unary + operator
             inline natural operator+() { return natural(*this); }
+
+            //! binary + operators
             YOCTO_MPN_DECL2(natural,operator+,add);
+
+            //! in place operator
+            inline natural & operator+=( const natural &rhs)
+            {
+                natural ans = add(*this,rhs);
+                xch(ans);
+                return *this;
+            }
+
+            //! in place operator
+            natural & operator+=(const word_t rhs);
+
+            natural & operator++();     //!< prefix
+            natural   operator++ (int); //!< postfix
 
         private:
             size_t   maxi; //!< capacity
@@ -111,12 +144,12 @@ RETURN_TYPE OP(const word_t lhs, const natural &rhs)    \
 
             void update() throw(); //!< check size reduction
             void rescan() throw(); //!< size=maxi and update
-
+            
             virtual const void * get_address() const throw();
             friend class word2mpn;
         };
-
-       
+        
+        
     }
 }
 

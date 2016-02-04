@@ -75,6 +75,20 @@ namespace yocto
             }
         }
 
+
+        int natural::compare(const natural &lhs, const word_t   rhs) throw()
+        {
+            const word2mpn RHS(rhs);
+            return compare(lhs,RHS.n);
+        }
+
+        int natural::compare(const word_t   lhs, const natural &rhs) throw()
+        {
+            const word2mpn LHS(lhs);
+            return compare(LHS.n,rhs);
+        }
+        
+
     }
 
 }
