@@ -31,17 +31,34 @@ namespace yocto {
 }
 
 #include "yocto/random/bits.hpp"
+#include "yocto/code/round.hpp"
+
+#include <iostream>
 
 namespace yocto
 {
 
     namespace mpk
     {
-
-        natural natural:: randomize(size_t num_bits)
+        natural natural:: shl(const natural &n, const word_t shift)
         {
-            return natural();
+            const size_t source_bits =n.bits();
+            if(source_bits)
+            {
+                const size_t target_bits  = source_bits + shift;
+                const size_t target_bytes = YOCTO_ROUND1(target_bits)>>3;
+                std::cerr << "source_bits=" << source_bits << "+" << shift << "->" << target_bytes << std::endl;
+                return natural();
+            }
+            else
+            {
+                return natural();
+            }
+
         }
+
+
+
 
     }
 

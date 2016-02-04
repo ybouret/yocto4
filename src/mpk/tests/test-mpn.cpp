@@ -185,6 +185,10 @@ YOCTO_UNIT_TEST_IMPL(mpn)
 
     }
 
+    std::cerr << "-- Bits Tests" << std::endl;
+    {
+        natural X = ran.fuzz<word_t>();
+    }
 
 }
 

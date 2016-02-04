@@ -82,7 +82,8 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //__________________________________________________________________
             size_t bits() const throw();
             word_t to_word() const throw();     //!< least significant bytes
-            static natural randomize(size_t num_bits);
+            static natural shl(const natural &n, const word_t shift);
+
 
             //__________________________________________________________________
             //
@@ -199,7 +200,9 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             static natural factorial(const natural &);
 
             //! factorial wrapper
-            static natural factorial(const word_t );
+            static natural factorial(const word_t);
+
+
 
         private:
             size_t   maxi; //!< capacity
