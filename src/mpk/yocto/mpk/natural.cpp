@@ -49,7 +49,17 @@ namespace yocto
         }
 
 
-
+        word_t natural:: to_word() const throw()
+        {
+            YOCTO_CHECK_MPN(*this);
+            word_t ans = 0;
+            for(size_t i=min_of<size_t>(sizeof(word_t),size);i>0;)
+            {
+                ans <<= 8;
+                ans |= byte[--i];
+            }
+            return ans;
+        }
 
         natural & natural:: operator=(const natural &other)
         {
@@ -130,7 +140,7 @@ namespace yocto
             string s;
             for(size_t i=0;i<n.size;++i)
             {
-                const uint8_t B  = n.byte[i]; assert(B>0);
+                const uint8_t B  = n.byte[i];
                 const uint8_t lo =  B     & 0x0f;
                 s.append( hexa_char[lo]);
                 const uint8_t hi = (B>>4) & 0x0f;

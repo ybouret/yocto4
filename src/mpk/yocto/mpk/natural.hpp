@@ -69,6 +69,14 @@ RETURN_TYPE OP(const word_t lhs, const natural &rhs)    \
 
             //__________________________________________________________________
             //
+            // bit ops
+            //__________________________________________________________________
+            size_t bits() const throw();
+            word_t to_word() const throw();     //!< least significant bytes
+            static natural randomize(size_t num_bits);
+            
+            //__________________________________________________________________
+            //
             // comparison: are equal
             //__________________________________________________________________
             static bool are_equal(const natural &lhs, const natural &rhs) throw();

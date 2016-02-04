@@ -46,6 +46,8 @@ namespace yocto
 
         int natural:: compare(const natural &lhs, const natural &rhs) throw()
         {
+            YOCTO_CHECK_MPN(lhs);
+            YOCTO_CHECK_MPN(rhs);
             const size_t nl = lhs.size;
             const size_t nr = rhs.size;
             if(nl<nr)
@@ -64,12 +66,9 @@ namespace yocto
                     const uint8_t *l = lhs.byte+nl;
                     const uint8_t *r = rhs.byte+nr;
                     YOCTO_LOOP(nl,
-                               switch( int(*(--l)) - int(*(--r)) )
-                               {
-                                   case -1: return -1;
-                                   case  1: return  1;
-                                   default:;
-                               }
+                               const int L = *(--l);
+                               const int R = *(--r);
+                               if(L<R) { return -1; } else { if(R<L) { return 1; } }
                                );
                     return 0;
                 }
