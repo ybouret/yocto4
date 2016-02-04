@@ -44,7 +44,6 @@ namespace yocto
                        );
             
             *s = uint8_t(carry);
-            ans.size = ns;
             ans.update();
             return ans;
         }

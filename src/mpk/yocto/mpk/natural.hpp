@@ -60,6 +60,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             // canonic functions
             //__________________________________________________________________
             natural(); //!< zero
+            //! size set to num_bytes, need to update after computation!
             natural(const size_t num_bytes, const as_capacity_t &);
             natural(const natural &other);
             natural & operator=( const natural &other);
@@ -167,6 +168,14 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
 
             //! postfix increment
             natural   operator-- (int);
+
+
+            //__________________________________________________________________
+            //
+            // multiplication
+            //__________________________________________________________________
+
+            static natural mul(const natural &lhs, const natural &rhs);
 
 
         private:

@@ -76,7 +76,6 @@ namespace yocto
                 throw libc::exception(EDOM,"mpk.sub(lhs>rhs) [level-2]");
             }
 
-            ans.size = nl;
             ans.update();
             return ans;
         }

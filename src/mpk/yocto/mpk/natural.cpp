@@ -25,7 +25,7 @@ namespace yocto
 
         natural:: natural(const size_t num_bytes, const as_capacity_t &) :
         maxi(num_bytes),
-        size(0),
+        size(num_bytes),
         byte( build(maxi) )
         {
         }
