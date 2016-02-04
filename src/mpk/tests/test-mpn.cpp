@@ -3,6 +3,8 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/comparator.hpp"
 #include "yocto/random/bits.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/sort/quick.hpp"
 
 using namespace yocto;
 using namespace mpk;
@@ -74,10 +76,11 @@ YOCTO_UNIT_TEST_IMPL(mpn)
     }
 
     // addition
+    std::cerr << "-- Addition Tests" << std::endl;
     {
         for(natural i=0;i<100;++i,i++)
         {
-            std::cerr << i << std::endl;
+            (void)i;
         }
 
         for(size_t i=0;i<10000;++i)
@@ -98,6 +101,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
     }
 
     // substraction
+    std::cerr << "-- Subtraction Tests" << std::endl;
     {
         for(size_t i=0;i<1000;++i)
         {
@@ -119,10 +123,39 @@ YOCTO_UNIT_TEST_IMPL(mpn)
 
         for(natural n = 100; n>0; --n)
         {
-            
+            (void)n;
         }
 
+        vector<natural> nn;
+        for(size_t i=0;i<300;++i)
+        {
+            const natural tmp = ran.full<word_t>();
+            nn.push_back(tmp);
+        }
+        quicksort(nn);
+        c_shuffle(nn(),nn.size());
+        natural seed = ran.full<word_t>();
+        natural sorg = seed;
+        _SHOW(seed);
+        for(size_t i=1;i<=nn.size();++i)
+        {
+            seed += nn[i];
+        }
+        _SHOW(seed);_SHOW_BITS(seed);
+        c_shuffle(nn(),nn.size());
+        for(size_t i=1;i<=nn.size();++i)
+        {
+            seed -= nn[i];
+        }
+        _SHOW(seed);
+        if(seed!=sorg)
+        {
+            throw exception("mismatch...");
+        }
     }
+
+
+
 
 }
 YOCTO_UNIT_TEST_DONE()
