@@ -3,6 +3,7 @@
 #include "yocto/string.hpp"
 #include "yocto/code/bswap.hpp"
 #include <iostream>
+#include <cstdlib>
 
 namespace yocto
 {
@@ -117,6 +118,17 @@ namespace yocto
         {
             YOCTO_CHECK_MPN(*this);
             size=0;
+        }
+
+        void natural:: clr() throw()
+        {
+            memset(byte,0,maxi);
+            size=0;
+        }
+
+        void natural:: __clr() const throw()
+        {
+            ( (natural &)(*this) ).clr();
         }
 
         void natural::xch(natural &other) throw()

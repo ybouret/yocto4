@@ -37,28 +37,121 @@ namespace yocto {
 
 namespace yocto
 {
+    static const uint8_t _bit[8] =
+    {
+        0x01,
+        0x02,
+        0x04,
+        0x08,
+        0x10,
+        0x20,
+        0x40,
+        0x80
+    };
 
     namespace mpk
     {
-        natural natural:: shl(const natural &n, const word_t shift)
+
+        natural natural:: exp2(const size_t n)
         {
-            const size_t source_bits =n.bits();
-            if(source_bits)
+            const size_t nbits = n+1;
+            const size_t bytes = YOCTO_ROUND8(nbits) >> 3;
+            natural ans( bytes, as_capacity );
+            ans.byte[ bytes-1 ] = _bit[ n & 7 ];
+            return ans;
+        }
+
+        
+        natural & natural:: shr() throw()
+        {
+            if( size > 0 )
             {
-                const size_t target_bits  = source_bits + shift;
-                const size_t target_bytes = YOCTO_ROUND1(target_bits)>>3;
-                std::cerr << "source_bits=" << source_bits << "+" << shift << "->" << target_bytes << std::endl;
-                return natural();
+                uint8_t     *b = byte;
+                const size_t n = size - 1;
+                for( size_t i=0; i < n; )
+                {
+                    uint8_t &B = b[i];
+                    B >>= 1;
+                    B |= ( ( b[++i] & 0x1 ) << 7 ); //!< avoids a test !
+                }
+                b[n] >>= 1;
+                update();
             }
+            return *this;
+        }
+
+        natural natural::shr( const natural &lhs,  const size_t n )
+        {
+            if( n <= 0 )
+                return lhs;
             else
             {
-                return natural();
-            }
+                const size_t l_bits = lhs.bits();
+                if( n >= l_bits )
+                {
+                    return natural();
+                }
+                else
+                {
+                    assert( n > 0      );
+                    assert( n < l_bits );
+                    const size_t t_bits = l_bits - n;
+                    const size_t t_size = YOCTO_ROUND8(t_bits) >> 3;
 
+                    natural ans( t_size, as_capacity );
+                    const  uint8_t *src = lhs.byte;
+                    uint8_t        *dst = ans.byte;
+                    size_t obit = t_bits;
+                    size_t ibit = l_bits;
+                    for( size_t i=t_bits; i>0; --i )
+                    {
+                        --ibit;
+                        --obit;
+                        if( src[ ibit >> 3 ] & _bit[ ibit & 7 ] )
+                        {
+                            dst[ obit >> 3 ] |= _bit[ obit & 7];
+                        }
+                        
+                    }
+
+                    //ans.size = t_size;
+                    assert( ans.byte[ ans.size - 1] != 0 );
+                    YOCTO_CHECK_MPN(ans);
+                    return ans;
+                }
+            }
         }
 
 
+        natural natural::shl( const natural &lhs,  size_t n )
+        {
+            if( n <= 0 )
+                return lhs;
+            else
+            {
+                const size_t l_bits = lhs.bits();
+                const size_t t_bits = l_bits + n;
+                const size_t t_size = YOCTO_ROUND8(t_bits) >> 3;
 
+                natural ans( t_size, as_capacity );
+                const  uint8_t *src = lhs.byte;
+                uint8_t        *dst = ans.byte;
+                size_t obit = t_bits;
+                size_t ibit = l_bits;
+                for( size_t i=l_bits; i>0; --i )
+                {
+                    --ibit;
+                    --obit;
+                    if( src[ ibit >> 3 ] & _bit[ ibit & 7 ] )
+                    {
+                        dst[ obit >> 3 ] |= _bit[ obit & 7];
+                    }
+                    
+                }
+                ans.rescan();
+                return ans;
+            }
+        }
 
     }
 

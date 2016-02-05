@@ -187,7 +187,22 @@ YOCTO_UNIT_TEST_IMPL(mpn)
 
     std::cerr << "-- Bits Tests" << std::endl;
     {
-        natural X = ran.fuzz<word_t>();
+        natural X;
+        for(size_t n=0;n<=30;++n)
+        {
+            X = natural::exp2(n);
+            std::cerr << "2^" << n << " = " << X << std::endl;
+            while( X > 0 )
+            {
+                std::cerr << "\t" << X.shr() << std::endl;
+            }
+            X = natural::exp2(n);
+            while(X>0)
+            {
+                X = natural::shr(X,1+alea_leq(4));
+                std::cerr << "\t\t" << X << std::endl;
+            }
+        }
     }
 
 }
