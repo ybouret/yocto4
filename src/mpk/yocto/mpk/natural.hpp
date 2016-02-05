@@ -256,6 +256,16 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //! factorial wrapper
             static natural factorial(const word_t);
 
+            //! power
+            static inline natural power(const natural &lhs, size_t n)
+            {
+                natural ans(1);
+                while(n-->0)
+                {
+                    ans *= lhs;
+                }
+                return ans;
+            }
 
             //__________________________________________________________________
             //
@@ -277,6 +287,17 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
 
             //! in place operator wrapper
             natural & operator/=(const word_t den);
+
+
+            //__________________________________________________________________
+            //
+            //
+            // modulo
+            //
+            //__________________________________________________________________
+            static natural modulo(const natural &num, const natural &den);
+            //! binary % operator
+            YOCTO_MPN_DECL2(natural,operator%,modulo);
 
         private:
             size_t   maxi; //!< capacity
