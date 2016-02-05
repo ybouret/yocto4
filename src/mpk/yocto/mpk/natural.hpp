@@ -4,6 +4,7 @@
 #include "yocto/mpk/types.hpp"
 #include "yocto/memory/buffer.hpp"
 #include "yocto/code/endian.hpp"
+#include "yocto/xnumeric.hpp"
 
 #include <iosfwd>
 
@@ -309,9 +310,22 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
 
             //! in place operator wrapper
             natural & operator%=(const word_t den);
-            
+
+            inline bool is_divisible_by(const natural &den) const { const natural ans = (*this) % den; return ans.size <= 0; }
+            inline bool is_divisible_by(const word_t   den) const { const natural ans = (*this) % den; return ans.size <= 0; }
+
+            static void split(natural &q, natural &r,const natural &num, const natural &den);
 
 
+            //__________________________________________________________________
+            //
+            //
+            // arithmetic
+            //
+            //__________________________________________________________________
+            static natural gcd(const natural &x, const natural &y);
+            static natural mod_inv( const natural &b, const natural &n );                     //!< modular inverse
+            static natural mod_exp( const natural &b, const natural &e, const natural &n );   //!< modular exponentiation (b^e)[n]
 
         private:
             size_t   maxi; //!< capacity
@@ -325,8 +339,17 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             friend class word2mpn;
         };
         
-        
     }
+
+
+    typedef mpk::natural mpn;
+    template <>
+    struct xnumeric<mpn>
+    {
+        inline static mpn zero() { return mpn();  }
+        inline static mpn one()  { return mpn(1); }
+    };
+    
 }
 
 #endif

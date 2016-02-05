@@ -247,15 +247,33 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             if(y<=0) y =1;
             natural Y = y;
 
-            const word_t  d = x%y;
-            const natural D = X%Y;
-            if( d != D )
+            const word_t  r = x%y;
+            const natural R = X%Y;
+            if( R != r )
             {
                 throw exception("modulo error");
             }
-        }
 
+            const natural Q = X/Y;
+
+            natural Q2,R2;
+            natural::split(Q2, R2, X, Y);
+            if(R2!=R)
+            {
+                throw exception("split error");
+            }
+
+        }
     }
+
+    std::cerr << "-- Arithmetic Tests" << std::endl;
+    {
+        natural x = 100;
+        natural y = 5;
+        natural g = natural::gcd(x,y);
+        std::cerr << "gcd=" << g << std::endl;
+    }
+
 }
 
 YOCTO_UNIT_TEST_DONE()

@@ -109,5 +109,91 @@ namespace yocto
             return *this;
         }
 
+        void natural:: split(natural &q, natural &r,const natural &num, const natural &den)
+        {
+            if(den.size<=0)
+            {
+                throw libc::exception(EDOM,"mpk: modulo division by zero");
+            }
+            const int cmp = natural::compare(num,den);
+            if(cmp<0)
+            {
+                // trivial case
+                q = 0;
+                r = num;
+                assert(num == q*den+r);
+            }
+            else
+            {
+                if(cmp>0)
+                {
+                    // generic case
+                    //__________________________________________________________
+                    //
+                    // bracket quotient
+                    //__________________________________________________________
+                    size_t p = 1;
+                    {
+                        natural probe = add(den,den); //! 2^(p=1) * den
+                        while( compare(probe,num) <= 0 )
+                        {
+                            ++p;
+                            probe.shl();
+                        }
+                        assert( probe > num );
+                    }
+
+                    natural hi = natural::exp2(   p );
+                    natural lo = natural::exp2( --p );
+
+                    //__________________________________________________________
+                    //
+                    // find quotient
+                    //__________________________________________________________
+
+                    while( p-- > 0 )
+                    {
+
+                        natural       mid = add( lo, hi );
+                        const natural tmp = mul( mid.shr(), den );
+                        const int     chk = natural::compare(tmp,num);
+                        if(chk<0)
+                        {
+                            lo.xch(mid);
+                        }
+                        else
+                        {
+                            if(chk>0)
+                            {
+                                hi.xch(mid);
+                            }
+                            else
+                            {
+                                lo.xch(mid);
+                                break;
+                            }
+                        }
+                    }
+
+                    //__________________________________________________________
+                    //
+                    // lo is the quotient
+                    //__________________________________________________________
+                    lo.xch(q);
+                    const natural qd = mul(q,den); assert(qd<=num);
+                    r = sub(num,qd);
+                    assert(num == q*den+r);
+                }
+                else
+                {
+                    // special case
+                    q = 1;
+                    r = 0;
+                    assert(num == q*den+r);
+                }
+            }
+        }
+
+
     }
 }
