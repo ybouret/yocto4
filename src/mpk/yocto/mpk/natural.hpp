@@ -153,6 +153,11 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             static int compare(const natural &lhs, const natural &rhs) throw();
             static int compare(const natural &lhs, const word_t   rhs) throw();
             static int compare(const word_t   lhs, const natural &rhs) throw();
+
+            //__________________________________________________________________
+            //
+            // comparison: operators
+            //__________________________________________________________________
             YOCTO_MPN_OP(>)
             YOCTO_MPN_OP(>=)
             YOCTO_MPN_OP(<)
@@ -220,7 +225,9 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
 
             //__________________________________________________________________
             //
+            //
             // multiplication
+            //
             //__________________________________________________________________
 
             //! FFT multiplication
@@ -250,6 +257,26 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             static natural factorial(const word_t);
 
 
+            //__________________________________________________________________
+            //
+            //
+            // division
+            //
+            //__________________________________________________________________
+            static natural div(const natural &num, const natural &den);
+            //! binary / operator
+            YOCTO_MPN_DECL2(natural,operator/,div);
+
+            //! in place operator
+            inline natural & operator/=(const natural &den)
+            {
+                natural ans = div(*this,den);
+                xch(ans);
+                return *this;
+            }
+
+            //! in place operator wrapper
+            natural & operator/=(const word_t den);
 
         private:
             size_t   maxi; //!< capacity

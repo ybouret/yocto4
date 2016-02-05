@@ -205,6 +205,38 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         }
     }
 
+    std::cerr << "-- Division Tests" << std::endl;
+    {
+        for(size_t i=0;i<1000;++i)
+        {
+            word_t  x = ran.full<word_t>();
+            natural X = x;
+            word_t  y = 1+ran.full<uint32_t>();
+            natural Y = y;
+
+            const word_t  d = x/y;
+            const natural D = X/Y;
+            if( d != D )
+            {
+                throw exception("division error");
+            }
+        }
+
+        vector<natural> nn;
+        for(size_t i=0;i<10;++i)
+        {
+            const natural tmp = 1+ran.full<word_t>();
+            nn.push_back(tmp);
+        }
+        natural seed = ran.full<word_t>();
+        natural sorg = seed;
+        for(size_t i=1;i<=nn.size();++i) seed *= nn[i];
+        c_shuffle(nn(), nn.size());
+        for(size_t i=1;i<=nn.size();++i) seed /= nn[i];
+        if(seed!=sorg)
+            throw exception("division error, level2");
+    }
+
 }
 
 YOCTO_UNIT_TEST_DONE()
