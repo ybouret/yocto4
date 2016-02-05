@@ -4,6 +4,7 @@
 #include "yocto/code/bswap.hpp"
 #include <iostream>
 #include <cstdlib>
+#include <cstring>
 
 namespace yocto
 {
