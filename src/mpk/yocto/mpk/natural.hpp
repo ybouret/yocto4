@@ -299,6 +299,20 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //! binary % operator
             YOCTO_MPN_DECL2(natural,operator%,modulo);
 
+            //! in place operator
+            inline natural &operator%=(const natural den)
+            {
+                natural ans = modulo(*this,den);
+                xch(ans);
+                return *this;
+            }
+
+            //! in place operator wrapper
+            natural & operator%=(const word_t den);
+            
+
+
+
         private:
             size_t   maxi; //!< capacity
             size_t   size; //!< significant bytes

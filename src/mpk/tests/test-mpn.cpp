@@ -237,6 +237,25 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             throw exception("division error, level2");
     }
 
+    std::cerr << "-- Modulo Tests" << std::endl;
+    {
+        for(size_t i=0;i<1000;++i)
+        {
+            word_t  x = ran.full<word_t>();
+            natural X = x;
+            word_t  y = ran.full<word_t>();
+            if(y<=0) y =1;
+            natural Y = y;
+
+            const word_t  d = x%y;
+            const natural D = X%Y;
+            if( d != D )
+            {
+                throw exception("modulo error");
+            }
+        }
+
+    }
 }
 
 YOCTO_UNIT_TEST_DONE()
