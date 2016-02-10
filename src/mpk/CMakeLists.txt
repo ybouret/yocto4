@@ -11,8 +11,8 @@ SOURCE_GROUP( mpk FILES ${mpk_srcs} )
 FILE( GLOB mpn_srcs yocto/mpk/natural/*.cpp )
 SOURCE_GROUP( mpk/natural FILES ${mpn_srcs} )
 
-#FILE( GLOB mpz_srcs yocto/mpk/integer/*.cpp )
-#SOURCE_GROUP( mpk/integer FILES ${mpz_srcs} )
+FILE( GLOB mpz_srcs yocto/mpk/integer/*.cpp )
+SOURCE_GROUP( mpk/integer FILES ${mpz_srcs} )
 
 #FILE( GLOB rsa_decl yocto/mpk/rsa/*.hpp)
 #FILE( GLOB rsa_impl yocto/mpk/rsa/*.cpp)

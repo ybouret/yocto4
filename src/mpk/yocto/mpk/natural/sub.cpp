@@ -102,9 +102,10 @@ namespace yocto
         natural   natural:: operator-- (int)
         {
             const word2mpn __one(1);
-            const natural ans = sub(*this,__one.n);
-            *this = ans;
-            return ans;
+            const natural sav = *this;
+            natural       ans = sub(*this,__one.n);
+            xch(ans);
+            return sav;
         }
 
 

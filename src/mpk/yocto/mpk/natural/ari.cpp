@@ -1,4 +1,6 @@
 #include "yocto/mpk/natural.hpp"
+#include "yocto/exceptions.hpp"
+#include <cerrno>
 
 namespace yocto
 {
@@ -67,5 +69,47 @@ namespace yocto
             return t;
         }
 
+        natural natural:: mod_exp( const natural &B, const natural &E, const natural &N )
+        {
+            
+            if( N.size <= 0 )
+                throw libc::exception( EDOM, "natural.exp %% 0");
+            
+            
+            natural result = 1;
+            if( E.size > 0 )
+            {
+                assert( E.bits() > 0 );
+                natural        base  = B;
+                const size_t   nbit  = E.bits()-1;
+                const uint8_t *ebit  = E.byte;
+                
+                for( size_t i=0; i < nbit; ++i )
+                {
+                    
+                    if( ebit[i>>3] & _bit[ i & 7 ] )
+                    {
+                        //result = ( result * base ) % N;
+                        natural tmp1( __mod( mul( result, base ), N ) );
+                        tmp1.xch( result );
+                    }
+                    //base = ( base * base ) % N;
+                    natural tmp2( __mod( sqr( base ), N ) );
+                    base.xch( tmp2 );
+                }
+                
+                //-- most significant bit !
+                assert( (ebit[nbit>>3] & _bit[ nbit & 7 ]) != 0 );
+                
+                //result = ( result * base ) % N;
+                natural tmp3( __mod( mul( result, base ), N ) );
+                tmp3.xch( result );
+            }
+            
+            return result;
+            
+        }
+
+        
     }
 }

@@ -11,12 +11,9 @@ namespace yocto
         
         YOCTO_MPN_IMPL2(natural,operator%,natural::modulo)
 
-        natural natural::modulo(const natural &num, const natural &den)
+        natural natural::__mod(const mpn &num, const mpn &den)
         {
-            if(den.size<=0)
-            {
-                throw libc::exception(EDOM,"mpk: modulo division by zero");
-            }
+            assert(den.size>0);
             const int cmp = natural::compare(num,den);
             if(cmp<0)
             {
@@ -34,7 +31,7 @@ namespace yocto
                     //
                     // generic case
                     //__________________________________________________________
-
+                    
                     //__________________________________________________________
                     //
                     // bracket quotient
@@ -49,10 +46,10 @@ namespace yocto
                         }
                         assert( probe > num );
                     }
-
+                    
                     natural hi = natural::exp2(   p );
                     natural lo = natural::exp2( --p );
-
+                    
                     //__________________________________________________________
                     //
                     // find quotient
@@ -60,7 +57,7 @@ namespace yocto
                     
                     while( p-- > 0 )
                     {
-
+                        
                         natural       mid = add( lo, hi );
                         const natural tmp = mul( mid.shr(), den );
                         const int     chk = natural::compare(tmp,num);
@@ -81,7 +78,7 @@ namespace yocto
                             }
                         }
                     }
-
+                    
                     //__________________________________________________________
                     //
                     // lo is the quotient
@@ -98,6 +95,19 @@ namespace yocto
                     return natural(0);
                 }
             }
+        }
+        
+        natural natural::modulo(const natural &num, const natural &den)
+        {
+            YOCTO_CHECK_MPN(num);
+            YOCTO_CHECK_MPN(den);
+            
+            if(den.size<=0)
+            {
+                throw libc::exception(EDOM,"mpk: modulo division by zero");
+            }
+            
+            return __mod(num,den);
         }
 
 

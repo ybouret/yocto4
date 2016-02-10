@@ -70,8 +70,9 @@ namespace yocto
         natural   natural:: operator++ (int)
         {
             const word2mpn __one(1);
-            const natural ans = add(*this,__one.n);
-            *this = ans;
+            const natural sav = *this;
+            natural       ans = add(*this,__one.n);
+            xch(ans);
             return ans;
         }
 

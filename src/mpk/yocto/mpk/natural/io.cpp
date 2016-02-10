@@ -48,6 +48,7 @@ namespace yocto
                 }
                 else
                 {
+                    string s;
                     const natural ten(10);
                     natural       q;
                     natural       r;
@@ -55,7 +56,13 @@ namespace yocto
                     while(x.size>0)
                     {
                         natural::split(q,r,x,ten);
+                        assert(r.size<=1);
+                        s.append('0'+r.byte[0]);
+                        x=q;
                     }
+                    s.trim(is0);
+                    mreverse((char*)(s.rw()),s.length());
+                    os << s;
                 }
             }
             return os;

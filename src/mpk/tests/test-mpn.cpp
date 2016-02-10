@@ -26,7 +26,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         n0=n1; _SHOW(n0);
         n0=0;  _SHOW(n0);
         n0=u;  _SHOW(n0);
-
+        
         for(size_t i=0;i<100;++i)
         {
             word_t x = _rand.full<word_t>();
@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             }
         }
     }
-
+    
     // comparison
     std::cerr << "-- Comparison Tests" << std::endl;
     Random::Bits &ran = Random::CryptoBits();
@@ -58,7 +58,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             {
                 throw exception("equality failure");
             }
-
+            
             const int c = __compare(x,y);
             const int C = natural::compare(n,m);
             if( c != C )
@@ -71,10 +71,10 @@ YOCTO_UNIT_TEST_IMPL(mpn)
                 if( ! natural::are_different(n,m) )
                     throw exception("difference failure");
             }
-
+            
         }
     }
-
+    
     // addition
     std::cerr << "-- Addition Tests" << std::endl;
     {
@@ -82,24 +82,24 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         {
             (void)i;
         }
-
+        
         for(size_t i=0;i<10000;++i)
         {
             word_t  x = ran.fuzz<uint32_t>();
             natural X = x;
             word_t  y = ran.fuzz<uint32_t>();
             natural Y = y;
-
+            
             word_t  s = x+y;
             natural S = X+Y;
             if( S.to_word() != s )
             {
                 throw exception("addition failure");
             }
-
+            
         }
     }
-
+    
     // substraction
     std::cerr << "-- Subtraction Tests" << std::endl;
     {
@@ -109,7 +109,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             natural X = x;
             word_t  y = ran.full<word_t>();
             natural Y = y;
-
+            
             if(y>x)
             {
                 cswap(x,y);
@@ -120,12 +120,12 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             natural s = X-Y;
             if(x-y!=s.to_word()) throw exception("sub failure");
         }
-
+        
         for(natural n = 100; n>0; --n)
         {
             (void)n;
         }
-
+        
         vector<natural> nn;
         for(size_t i=0;i<300;++i)
         {
@@ -153,7 +153,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             throw exception("mismatch...");
         }
     }
-
+    
     std::cerr << "-- Multiplication Tests" << std::endl;
     {
         for(size_t i=0;i<10000;++i)
@@ -162,29 +162,29 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             natural X = x;
             word_t  y = ran.fuzz<uint32_t>();
             natural Y = y;
-
+            
             word_t  p = x*y;
             natural P = X*Y;
             if(p!=P.to_word())
             {
                 throw exception("multiplication error");
             }
-
+            
             X = ran.full<word_t>();
             Y = natural::sqr(X);
             P = X*X;
             if(P!=Y)
                 throw exception("Square Error");
         }
-
+        
         for(natural n=0;n<=10;++n)
         {
             const natural f = natural::factorial(n);
             std::cerr << n.to_word() << "! = " << f << std::endl;
         }
-
+        
     }
-
+    
     std::cerr << "-- Bits Tests" << std::endl;
     {
         natural X;
@@ -203,8 +203,17 @@ YOCTO_UNIT_TEST_IMPL(mpn)
                 std::cerr << "\t\t" << X << std::endl;
             }
         }
+        for(size_t n=0;n<=100;++n)
+        {
+            for(size_t i=0;i<10;++i)
+            {
+                natural x = natural::rand(n);
+                if(x.bits()!=n)
+                    throw exception("invalid #bits");
+            }
+        }
     }
-
+    
     std::cerr << "-- Division Tests" << std::endl;
     {
         for(size_t i=0;i<1000;++i)
@@ -213,7 +222,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             natural X = x;
             word_t  y = 1+ran.full<uint32_t>();
             natural Y = y;
-
+            
             const word_t  d = x/y;
             const natural D = X/Y;
             if( d != D )
@@ -221,7 +230,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
                 throw exception("division error");
             }
         }
-
+        
         vector<natural> nn;
         for(size_t i=0;i<10;++i)
         {
@@ -236,7 +245,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         if(seed!=sorg)
             throw exception("division error, level2");
     }
-
+    
     std::cerr << "-- Modulo Tests" << std::endl;
     {
         for(size_t i=0;i<1000;++i)
@@ -246,34 +255,79 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             word_t  y = ran.full<word_t>();
             if(y<=0) y =1;
             natural Y = y;
-
+            
             const word_t  r = x%y;
             const natural R = X%Y;
             if( R != r )
             {
                 throw exception("modulo error");
             }
-
+            
             const natural Q = X/Y;
-
+            
             natural Q2,R2;
             natural::split(Q2, R2, X, Y);
             if(R2!=R)
             {
                 throw exception("split error");
             }
-
+            
         }
     }
-
+    
     std::cerr << "-- Arithmetic Tests" << std::endl;
     {
         natural x = 100;
         natural y = 5;
         natural g = natural::gcd(x,y);
         std::cerr << "gcd=" << g << std::endl;
+        
+        for(size_t i=0;i<10;++i)
+        {
+            natural b = natural::rand(40);
+            natural e = natural::rand(7);
+            natural n = natural::rand(20);
+            natural p = natural::mod_exp(b,e,n);
+            std::cerr << b << "^" << e << "[" << n << "]=" << p << std::endl;
+            natural q = natural::power(b,e);
+            q = q%n;
+            std::cerr << "q=" << q << std::endl;
+            if(q!=p) throw exception("mod_exp failure");
+        }
     }
-
+    
 }
 
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/sys/timings.hpp"
+#include "yocto/ios/ocstream.hpp"
+
+YOCTO_UNIT_TEST_IMPL(mul)
+{
+    const size_t    nval = 32;
+    vector<natural> values(nval,as_capacity);
+    timings         tmx;
+    ios::ocstream::overwrite("mul.dat");
+    for(size_t nbits=8;nbits<=512;nbits*=2)
+    {
+        std::cerr << "nbits=" << nbits << std::endl;
+        values.free();
+        for(size_t i=nval;i>0;--i)
+        {
+            const natural tmp = natural::rand(nbits);
+            values.push_back(tmp);
+        }
+        const size_t n  = values.size();
+        const size_t n1 = n+1;
+        natural p;
+        YOCTO_TIMINGS(tmx, 1, for(size_t i=n;i>0;--i) { p = values[i] * values[n1-i]; } (void)p );
+        tmx.speed *= n;
+        std::cerr << "speed=" << tmx.speed << std::endl;
+        ios::acstream fp("mul.dat");
+        fp("%g %g\n", double(nbits), tmx.speed);
+    }
+    
+}
+YOCTO_UNIT_TEST_DONE()
+

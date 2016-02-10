@@ -37,20 +37,21 @@ namespace yocto {
 
 namespace yocto
 {
-    static const uint8_t _bit[8] =
-    {
-        0x01,
-        0x02,
-        0x04,
-        0x08,
-        0x10,
-        0x20,
-        0x40,
-        0x80
-    };
-
+   
     namespace mpk
     {
+
+        const uint8_t natural::_bit[8] =
+        {
+            0x01,
+            0x02,
+            0x04,
+            0x08,
+            0x10,
+            0x20,
+            0x40,
+            0x80
+        };
 
         natural natural:: exp2(const size_t n)
         {
@@ -153,6 +154,19 @@ namespace yocto
             }
         }
 
+        
+        natural natural::rand(size_t nbits)
+        {
+            if(nbits<=0) return  natural();
+            Random::Bits &ran = Random::CryptoBits();
+            natural ans=1;
+            while(--nbits>0)
+            {
+                ans.shl().byte[0] |= static_cast<uint8_t>( ran() ? 1 : 0 );
+            }
+            return ans;
+        }
+        
     }
 
 }

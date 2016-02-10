@@ -53,6 +53,8 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
         class natural : public memory::ro_buffer
         {
         public:
+            static const uint8_t _bit[8];
+            
             virtual ~natural() throw();
             virtual size_t length() const throw();
 
@@ -87,7 +89,10 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //__________________________________________________________________
             size_t bits() const throw();
             word_t to_word() const throw();     //!< least significant bytes
-
+            
+            //!  highest bit is always 1
+            static natural rand(size_t nbits);
+            
             //__________________________________________________________________
             //
             //! 2^n
@@ -260,8 +265,18 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //! power
             static inline natural power(const natural &lhs, size_t n)
             {
-                natural ans(1);
+                natural ans = 1;
                 while(n-->0)
+                {
+                    ans *= lhs;
+                }
+                return ans;
+            }
+            
+            static inline natural power(const natural &lhs,const natural &p)
+            {
+                natural ans = 1;
+                for(natural n=p;n>0;--n)
                 {
                     ans *= lhs;
                 }
@@ -296,6 +311,9 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             // modulo
             //
             //__________________________________________________________________
+            //! assuming den>0
+            static natural __mod(const natural &num, const natural &den);
+            
             static natural modulo(const natural &num, const natural &den);
             //! binary % operator
             YOCTO_MPN_DECL2(natural,operator%,modulo);
@@ -327,6 +345,22 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             static natural mod_inv( const natural &b, const natural &n );                     //!< modular inverse
             static natural mod_exp( const natural &b, const natural &e, const natural &n );   //!< modular exponentiation (b^e)[n]
 
+            //__________________________________________________________________
+            //
+            //
+            // bitwise ops
+            //
+            //__________________________________________________________________
+            typedef unsigned (*bproc)(const unsigned,const unsigned);
+            static inline natural __apply(const uint8_t *l,
+                                   const size_t   nl,
+                                   const uint8_t *r,
+                                   const size_t   nr)
+            {
+                return natural();
+            }
+            
+            
         private:
             size_t   maxi; //!< capacity
             size_t   size; //!< significant bytes
