@@ -1,10 +1,10 @@
 #include "yocto/mpk/natural.hpp"
 
 namespace yocto {
-
+    
     namespace mpk
     {
-
+        
         size_t natural::bits() const throw()
         {
             YOCTO_CHECK_MPN(*this);
@@ -13,7 +13,7 @@ namespace yocto {
                 const size_t   imsb = size-1;
                 const unsigned MSB  = byte[imsb]; assert(0!=MSB);
                 const size_t   init = (imsb<<3);
-
+                
                 if(0!=(MSB&0x80)) return init+8;
                 if(0!=(MSB&0x40)) return init+7;
                 if(0!=(MSB&0x20)) return init+6;
@@ -25,9 +25,9 @@ namespace yocto {
             }
             return 0;
         }
-
+        
     }
-
+    
 }
 
 #include "yocto/random/bits.hpp"
@@ -37,10 +37,10 @@ namespace yocto {
 
 namespace yocto
 {
-   
+    
     namespace mpk
     {
-
+        
         const uint8_t natural::_bit[8] =
         {
             0x01,
@@ -52,7 +52,7 @@ namespace yocto
             0x40,
             0x80
         };
-
+        
         natural natural:: exp2(const size_t n)
         {
             const size_t nbits = n+1;
@@ -61,7 +61,7 @@ namespace yocto
             ans.byte[ bytes-1 ] = _bit[ n & 7 ];
             return ans;
         }
-
+        
         
         natural & natural:: shr() throw()
         {
@@ -80,7 +80,7 @@ namespace yocto
             }
             return *this;
         }
-
+        
         natural natural::shr( const natural &lhs,  const size_t n )
         {
             if( n <= 0 )
@@ -98,7 +98,7 @@ namespace yocto
                     assert( n < l_bits );
                     const size_t t_bits = l_bits - n;
                     const size_t t_size = YOCTO_ROUND8(t_bits) >> 3;
-
+                    
                     natural ans( t_size, as_capacity );
                     const  uint8_t *src = lhs.byte;
                     uint8_t        *dst = ans.byte;
@@ -114,7 +114,7 @@ namespace yocto
                         }
                         
                     }
-
+                    
                     //ans.size = t_size;
                     assert( ans.byte[ ans.size - 1] != 0 );
                     YOCTO_CHECK_MPN(ans);
@@ -122,8 +122,8 @@ namespace yocto
                 }
             }
         }
-
-
+        
+        
         natural natural::shl( const natural &lhs,  size_t n )
         {
             if( n <= 0 )
@@ -133,7 +133,7 @@ namespace yocto
                 const size_t l_bits = lhs.bits();
                 const size_t t_bits = l_bits + n;
                 const size_t t_size = YOCTO_ROUND8(t_bits) >> 3;
-
+                
                 natural ans( t_size, as_capacity );
                 const  uint8_t *src = lhs.byte;
                 uint8_t        *dst = ans.byte;
@@ -153,7 +153,7 @@ namespace yocto
                 return ans;
             }
         }
-
+        
         
         natural natural::rand(size_t nbits)
         {
@@ -167,6 +167,60 @@ namespace yocto
             return ans;
         }
         
+        natural natural::__apply(bproc          proc,
+                                 const uint8_t *l,
+                                 const size_t   nl,
+                                 const uint8_t *r,
+                                 const size_t   nr)
+        {
+            assert(proc);
+            if(nl>0&&nr>0)
+            {
+                if(nl<=nr)
+                {
+                    natural  ans(nr,as_capacity);
+                    uint8_t *tgt = ans.byte;
+                    // shared part
+                    for(size_t i=0;i<nl;++i)
+                    {
+                        tgt[i] = uint8_t(proc(l[i],r[i]));
+                    }
+                    
+                    //final part
+                    for(size_t i=nl;i<nr;++i)
+                    {
+                        tgt[i] = uint8_t(proc(0,r[i]));
+                    }
+                    
+                    ans.update();
+                    return ans;
+                }
+                else
+                {
+                    // nl>nr
+                    natural  ans(nl,as_capacity);
+                    uint8_t *tgt = ans.byte;
+                    
+                    //share part
+                    for(size_t i=0;i<nr;++i)
+                    {
+                        tgt[i] = uint8_t(proc(l[i],r[i]));
+                    }
+                    
+                    //final part
+                    for(size_t i=nr;i<nl;++i)
+                    {
+                        tgt[i] = uint8_t(proc(l[i],0));
+                    }
+                    ans.update();
+                    return ans;
+                }
+            }
+            else
+                return natural();
+        }
+        
+        
     }
-
+    
 }

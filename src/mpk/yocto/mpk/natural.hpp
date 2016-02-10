@@ -352,57 +352,31 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //
             //__________________________________________________________________
             typedef unsigned (*bproc)(const unsigned,const unsigned);
-            static inline natural __apply(bproc          proc,
-                                          const uint8_t *l,
-                                          const size_t   nl,
-                                          const uint8_t *r,
-                                          const size_t   nr)
+            static  natural __apply(bproc          proc,
+                                    const uint8_t *l,
+                                    const size_t   nl,
+                                    const uint8_t *r,
+                                    const size_t   nr);
+            
+            static inline natural _apply(bproc          proc,
+                                         const natural &lhs,
+                                         const natural &rhs)
             {
-                assert(proc);
-                if(nl>0&&nr>0)
-                {
-                    if(nl<=nr)
-                    {
-                        natural  ans(nr,as_capacity);
-                        uint8_t *tgt = ans.byte;
-                        // shared part
-                        for(size_t i=0;i<nl;++i)
-                        {
-                            tgt[i] = uint8_t(proc(l[i],r[i]));
-                        }
-                        
-                        //final part
-                        for(size_t i=nl;i<nr;++i)
-                        {
-                            tgt[i] = uint8_t(proc(0,r[i]));
-                        }
-                        
-                        ans.update();
-                        return ans;
-                    }
-                    else
-                    {
-                        // nl>nr
-                        natural  ans(nl,as_capacity);
-                        uint8_t *tgt = ans.byte;
-                        
-                        //share part
-                        for(size_t i=0;i<nr;++i)
-                        {
-                            tgt[i] = uint8_t(proc(l[i],r[i]));
-                        }
-                        
-                        //final part
-                        for(size_t i=nr;i<nl;++i)
-                        {
-                            tgt[i] = uint8_t(proc(l[i],0));
-                        }
-                        ans.update();
-                        return ans;
-                    }
-                }
-                else
-                    return natural();
+                return __apply(proc, lhs.byte, lhs.size, rhs.byte, rhs.size);
+            }
+            
+            static inline natural _apply(bproc          proc,
+                                         const natural &lhs,
+                                         word_t         rhs)
+            {
+                rhs = swap_le(rhs);
+                return __apply(proc, lhs.byte, lhs.size, (uint8_t *)&rhs, sizeof(word_t) );
+            }
+
+            static inline natural _apply(bproc          proc,
+                                         word_t         lhs,
+                                         const natural &rhs)
+            {
             }
             
             
