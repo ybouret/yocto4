@@ -17,31 +17,31 @@ assert( (X).maxi>0 );         \
 assert( (X).size<=(X).maxi ); \
 assert( (X).byte!=NULL     ); \
 assert( !( ((X).size>0) && ( (X).byte[ (X).size-1 ] == 0) ) )
-
-
+        
+        
 #define YOCTO_MPN_DECL2_NOTHROW(RETURN_TYPE,OP,CALL) \
 inline friend RETURN_TYPE OP(const natural &lhs,const natural &rhs) throw() { return CALL(lhs,rhs); } \
 friend        RETURN_TYPE OP(const natural &lhs,const word_t   rhs) throw(); \
 friend        RETURN_TYPE OP(const word_t   lhs,const natural &rhs) throw()
-
+        
 #define YOCTO_MPN_IMPL2_NOTHROW(RETURN_TYPE,OP,CALL)          \
 RETURN_TYPE OP(const natural &lhs,const word_t   rhs) throw() \
 { const word2mpn RHS(rhs); return CALL(lhs,RHS.n); }          \
 RETURN_TYPE OP(const word_t lhs, const natural &rhs) throw()  \
 { const word2mpn LHS(lhs); return CALL(LHS.n,rhs); }
-
+        
 #define YOCTO_MPN_DECL2(RETURN_TYPE,OP,CALL) \
 inline friend RETURN_TYPE OP(const natural &lhs,const natural &rhs) { return CALL(lhs,rhs); } \
 friend        RETURN_TYPE OP(const natural &lhs,const word_t   rhs); \
 friend        RETURN_TYPE OP(const word_t   lhs,const natural &rhs)
-
+        
 #define YOCTO_MPN_IMPL2(RETURN_TYPE,OP,CALL)            \
 RETURN_TYPE OP(const natural &lhs,const word_t   rhs)   \
 { const word2mpn RHS(rhs); return CALL(lhs,RHS.n); }    \
 RETURN_TYPE OP(const word_t lhs, const natural &rhs)    \
 { const word2mpn LHS(lhs); return CALL(LHS.n,rhs); }
-
-
+        
+        
 #define YOCTO_MPN_OP(OP) \
 inline friend bool operator OP (const natural &lhs, const natural &rhs) throw() \
 { return natural::compare(lhs,rhs) OP 0; }                                      \
@@ -49,7 +49,7 @@ inline friend bool operator OP (const natural &lhs, const word_t   rhs) throw() 
 { return natural::compare(lhs,rhs) OP 0; }                                      \
 inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() \
 { return natural::compare(lhs,rhs) OP 0; }
-
+        
         class natural : public memory::ro_buffer
         {
         public:
@@ -57,7 +57,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             
             virtual ~natural() throw();
             virtual size_t length() const throw();
-
+            
             //__________________________________________________________________
             //
             // canonic functions
@@ -67,7 +67,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             natural(const size_t num_bytes, const as_capacity_t &);
             natural(const natural &other);
             natural & operator=( const natural &other);
-
+            
             //__________________________________________________________________
             //
             // helpers
@@ -78,9 +78,9 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             void ldz() throw(); //!< size to 0
             void clr() throw(); //!< size to 0, clean memory
             void __clr() const throw(); //!< force clr()
-
+            
             friend std::ostream & operator<<( std::ostream &os, const natural &n);
-
+            
             //__________________________________________________________________
             //
             //
@@ -98,7 +98,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //! 2^n
             //__________________________________________________________________
             static natural exp2(const size_t n);
-
+            
             //__________________________________________________________________
             //
             // SHR
@@ -136,22 +136,22 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 xch(ans);
                 return *this;
             }
-
-
+            
+            
             //__________________________________________________________________
             //
             // comparison: are equal
             //__________________________________________________________________
             static bool are_equal(const natural &lhs, const natural &rhs) throw();
             YOCTO_MPN_DECL2_NOTHROW(bool,operator==,are_equal);
-
+            
             //__________________________________________________________________
             //
             // comparison: are different
             //__________________________________________________________________
             static bool are_different(const natural &lhs, const natural &rhs) throw();
             YOCTO_MPN_DECL2_NOTHROW(bool,operator!=,are_different);
-
+            
             //__________________________________________________________________
             //
             // comparison: generic case
@@ -159,7 +159,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             static int compare(const natural &lhs, const natural &rhs) throw();
             static int compare(const natural &lhs, const word_t   rhs) throw();
             static int compare(const word_t   lhs, const natural &rhs) throw();
-
+            
             //__________________________________________________________________
             //
             // comparison: operators
@@ -168,21 +168,21 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             YOCTO_MPN_OP(>=)
             YOCTO_MPN_OP(<)
             YOCTO_MPN_OP(<=)
-
+            
             //__________________________________________________________________
             //
             // addition
             //__________________________________________________________________
-
+            
             //! addition function
             static natural add(const natural &lhs, const natural &rhs);
-
+            
             //! unary + operator
             inline natural operator+() { return natural(*this); }
-
+            
             //! binary + operators
             YOCTO_MPN_DECL2(natural,operator+,add);
-
+            
             //! in place operator
             inline natural & operator+=( const natural &rhs)
             {
@@ -190,27 +190,27 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 xch(ans);
                 return *this;
             }
-
+            
             //! in place operator
             natural & operator+=(const word_t rhs);
-
+            
             //! prefix increment
             natural & operator++();
-
+            
             //! postfix increment
             natural   operator++ (int);
-
+            
             //__________________________________________________________________
             //
             // subtraction
             //__________________________________________________________________
-
+            
             //! subtraction function
             static natural sub(const natural &lhs, const natural &rhs);
-
+            
             //! binary - operators (NO unary for natural!)
             YOCTO_MPN_DECL2(natural,operator-,sub);
-
+            
             //! in place operator
             inline natural & operator-=( const natural &rhs )
             {
@@ -218,30 +218,30 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 xch(ans);
                 return *this;
             }
-
+            
             //! in place operator
             natural & operator-=(const word_t rhs);
-
+            
             //! prefix increment
             natural & operator--();
-
+            
             //! postfix increment
             natural   operator-- (int);
-
-
+            
+            
             //__________________________________________________________________
             //
             //
             // multiplication
             //
             //__________________________________________________________________
-
+            
             //! FFT multiplication
             static natural mul(const natural &lhs, const natural &rhs);
-
+            
             //! binary * operator
             YOCTO_MPN_DECL2(natural,operator*,mul);
-
+            
             //! in place operator
             inline natural & operator*=( const natural &rhs )
             {
@@ -249,19 +249,19 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 xch(ans);
                 return *this;
             }
-
+            
             //! in place operator wrapper
             natural & operator*=(const word_t rhs);
-
+            
             //! square
             static natural sqr(const natural &lhs);
             
             //! factorial
             static natural factorial(const natural &);
-
+            
             //! factorial wrapper
             static natural factorial(const word_t);
-
+            
             //! power
             static inline natural power(const natural &lhs, size_t n)
             {
@@ -282,7 +282,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 }
                 return ans;
             }
-
+            
             //__________________________________________________________________
             //
             //
@@ -292,7 +292,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             static natural div(const natural &num, const natural &den);
             //! binary / operator
             YOCTO_MPN_DECL2(natural,operator/,div);
-
+            
             //! in place operator
             inline natural & operator/=(const natural &den)
             {
@@ -300,11 +300,11 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 xch(ans);
                 return *this;
             }
-
+            
             //! in place operator wrapper
             natural & operator/=(const word_t den);
-
-
+            
+            
             //__________________________________________________________________
             //
             //
@@ -317,7 +317,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             static natural modulo(const natural &num, const natural &den);
             //! binary % operator
             YOCTO_MPN_DECL2(natural,operator%,modulo);
-
+            
             //! in place operator
             inline natural &operator%=(const natural den)
             {
@@ -325,16 +325,16 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 xch(ans);
                 return *this;
             }
-
+            
             //! in place operator wrapper
             natural & operator%=(const word_t den);
-
+            
             inline bool is_divisible_by(const natural &den) const { const natural ans = (*this) % den; return ans.size <= 0; }
             inline bool is_divisible_by(const word_t   den) const { const natural ans = (*this) % den; return ans.size <= 0; }
-
+            
             static void split(natural &q, natural &r,const natural &num, const natural &den);
-
-
+            
+            
             //__________________________________________________________________
             //
             //
@@ -344,7 +344,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             static natural gcd(const natural &x, const natural &y);
             static natural mod_inv( const natural &b, const natural &n );                     //!< modular inverse
             static natural mod_exp( const natural &b, const natural &e, const natural &n );   //!< modular exponentiation (b^e)[n]
-
+            
             //__________________________________________________________________
             //
             //
@@ -352,12 +352,57 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //
             //__________________________________________________________________
             typedef unsigned (*bproc)(const unsigned,const unsigned);
-            static inline natural __apply(const uint8_t *l,
-                                   const size_t   nl,
-                                   const uint8_t *r,
-                                   const size_t   nr)
+            static inline natural __apply(bproc          proc,
+                                          const uint8_t *l,
+                                          const size_t   nl,
+                                          const uint8_t *r,
+                                          const size_t   nr)
             {
-                return natural();
+                assert(proc);
+                if(nl>0&&nr>0)
+                {
+                    if(nl<=nr)
+                    {
+                        natural  ans(nr,as_capacity);
+                        uint8_t *tgt = ans.byte;
+                        // shared part
+                        for(size_t i=0;i<nl;++i)
+                        {
+                            tgt[i] = uint8_t(proc(l[i],r[i]));
+                        }
+                        
+                        //final part
+                        for(size_t i=nl;i<nr;++i)
+                        {
+                            tgt[i] = uint8_t(proc(0,r[i]));
+                        }
+                        
+                        ans.update();
+                        return ans;
+                    }
+                    else
+                    {
+                        // nl>nr
+                        natural  ans(nl,as_capacity);
+                        uint8_t *tgt = ans.byte;
+                        
+                        //share part
+                        for(size_t i=0;i<nr;++i)
+                        {
+                            tgt[i] = uint8_t(proc(l[i],r[i]));
+                        }
+                        
+                        //final part
+                        for(size_t i=nr;i<nl;++i)
+                        {
+                            tgt[i] = uint8_t(proc(l[i],0));
+                        }
+                        ans.update();
+                        return ans;
+                    }
+                }
+                else
+                    return natural();
             }
             
             
@@ -365,7 +410,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             size_t   maxi; //!< capacity
             size_t   size; //!< significant bytes
             uint8_t *byte; //!< memory
-
+            
             void update() throw(); //!< check size reduction
             void rescan() throw(); //!< size=maxi and update
             
@@ -374,8 +419,8 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
         };
         
     }
-
-
+    
+    
     typedef mpk::natural mpn;
     template <>
     struct xnumeric<mpn>
