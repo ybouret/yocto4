@@ -108,7 +108,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(tChunk);
         };
 
-        //! don't waist memory
+        //! don't waste memory
         typedef tChunk<uint16_t> kChunk;
         
         

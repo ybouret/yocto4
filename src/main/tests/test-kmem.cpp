@@ -17,14 +17,15 @@ namespace
     
     template <typename T>
     static inline
-    void test_tChunk(const size_t block_size, size_t chunk_size)
+    void test_tChunk(const size_t block_size, size_t chunk_size, const char *name)
     {
-        std::cerr << "block_size=" << block_size << ", sizeof(tChunk)=" << sizeof(tChunk<T>) << std::endl;
+        std::cerr << "block_size=" << block_size << ", sizeof(tChunk<" << name << ">)=" << sizeof(tChunk<T>) << std::endl;
         void *data = kind<global>::acquire(chunk_size);
         std::cerr << "\tchunk_size  = " << chunk_size << " bytes" << std::endl;
         tChunk<T> ch(data,block_size,chunk_size);
         size_t num_blocks = ch.stillAvailable;
-        std::cerr << "\tnum_blocks  = " << num_blocks << std::endl;
+        std::cerr << "\tnum_blocks     = " << num_blocks << std::endl;
+        std::cerr << "\tblockIncrement = " << int(ch.blockIncrement) << std::endl;
         block_t *blk = kind<global>::acquire_as<block_t>(num_blocks);
         
         size_t nb = 0;
@@ -92,9 +93,9 @@ YOCTO_UNIT_TEST_IMPL(kChunk)
     
     for(size_t block_size=1;block_size<=128;++block_size)
     {
-        test_tChunk<uint8_t> (block_size, chunk_size);
-        test_tChunk<uint16_t>(block_size, chunk_size);
-        test_tChunk<size_t>  (block_size, chunk_size);
+        test_tChunk<uint8_t> (block_size, chunk_size, "uint8_t");
+        test_tChunk<uint16_t>(block_size, chunk_size, "uint16_t");
+        test_tChunk<size_t>  (block_size, chunk_size, "size_t");
     }
     
     
