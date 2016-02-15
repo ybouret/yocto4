@@ -9,9 +9,9 @@ namespace yocto
 	{
 	public:
 #if defined(YOCTO_APPLE) || defined(YOCTO_WIN)
-        typedef double freq_type;
+        typedef double   freq_type;
 #else
-        typedef uint64_t fre_type;
+        typedef uint64_t freq_type;
 #endif
 		explicit rt_clock();
 		virtual ~rt_clock() throw();
