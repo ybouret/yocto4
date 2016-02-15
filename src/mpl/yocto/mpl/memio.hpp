@@ -1,0 +1,4 @@
+#ifndef YOCTO_MPL_MEMIO_INCLUDED
+#define YOCTO_MPL_MEMIO_INCLUDED 1
+
+#endif
