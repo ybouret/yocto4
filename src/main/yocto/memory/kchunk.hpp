@@ -4,16 +4,15 @@
 #include "yocto/code/round.hpp"
 #include "yocto/type/ints.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
     namespace memory
     {
         
         //! a chunk of data to hold small memory blocks
-        template <
-        typename T,
-        bool     ZEROED = true
-        >
+        template <typename T>
         class tChunk
         {
         public:
@@ -61,7 +60,7 @@ namespace yocto
             inline ~tChunk() throw() {}
 
             //! acquire a zeroed block
-            inline void *acquire( int2type<true> )
+            inline void *acquire()
             {
                 assert(stillAvailable>0);
                 assert(stillAvailable<=providedNumber);
@@ -78,24 +77,7 @@ namespace yocto
                 return p;
             }
 
-            //! acquire a dirty block
-            inline void *acquire( int2type<false> )
-            {
-                assert(stillAvailable>0);
-                assert(stillAvailable<=providedNumber);
-                word_type     *p = &data[firstAvailable*blockIncrement];
-                firstAvailable   = *p;
-                --stillAvailable;
-                return p;
-            }
 
-
-            //! acquired a zeroed piece of memory for initial block_size
-            inline void *acquire() throw()
-            {
-                return acquire(int2type<ZEROED>());
-            }
-            
             //! release a previously allocated piece of memory
             inline void release(void *addr) throw()
             {
@@ -130,7 +112,7 @@ namespace yocto
         };
 
         //! don't waste memory: use 16 bits to format
-        typedef tChunk<uint16_t,true> kChunk;
+        typedef tChunk<uint16_t> kChunk;
         
         
     }

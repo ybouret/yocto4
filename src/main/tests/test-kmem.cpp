@@ -80,7 +80,7 @@ namespace
         
     }
 
-#if defined(NDEBUG)
+#if 0
     template <bool ZEROED>
     static inline void kChunkPerf()
     {
@@ -159,7 +159,7 @@ YOCTO_UNIT_TEST_IMPL(kChunk)
         test_tChunk<size_t>  (block_size, chunk_size, "size_t");
     }
 
-#if defined(NDEBUG)
+#if 0
     kChunkPerf<true>();
     kChunkPerf<false>();
 #endif
