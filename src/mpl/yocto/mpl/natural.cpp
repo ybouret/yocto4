@@ -48,7 +48,13 @@ namespace yocto
             memcpy(byte, other.byte, size);
         }
 
-
+        natural:: natural(size_t n, const as_capacity_t &) :
+        maxi( n ),
+        size( n ),
+        byte( build(maxi) )
+        {
+            
+        }
         
     }
 }
