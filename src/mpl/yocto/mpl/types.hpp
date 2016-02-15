@@ -89,7 +89,7 @@ namespace yocto
             {
                 static manager &mgr = manager::instance();
                 addr = (T*)( mgr.acquire(bytes) );
-                size = bytes/sizeof(T);
+                (size_t&)size = bytes/sizeof(T);
             }
 
             inline ~array_of() throw()

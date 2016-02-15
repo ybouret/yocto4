@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/math/complex.hpp"
 
 using namespace yocto;
 using namespace mpl;
@@ -22,7 +23,7 @@ YOCTO_UNIT_TEST_IMPL(mem)
 
     manager &mgr = manager::instance();
 
-    for(size_t iter=0;iter<100;++iter)
+    for(size_t iter=0;iter<1000;++iter)
     {
         for(size_t i=0;i<nb;++i)
         {
@@ -36,8 +37,10 @@ YOCTO_UNIT_TEST_IMPL(mem)
         }
     }
 
-
-
     memory::kind<memory::global>::release_as(blk,nb);
+
+    array_of< math::complex<double> > cplx(100);
+    
+
 }
 YOCTO_UNIT_TEST_DONE()
