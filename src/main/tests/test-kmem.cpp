@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/sys/wtime.hpp"
 #include <cstdlib>
 
 using namespace yocto;
@@ -21,10 +22,11 @@ namespace
     {
         std::cerr << "block_size=" << block_size << ", sizeof(tChunk<" << name << ">)=" << sizeof(tChunk<T>) << std::endl;
         void *data = kind<global>::acquire(chunk_size);
-        std::cerr << "\tchunk_size  = " << chunk_size << " bytes" << std::endl;
+        std::cerr << "\tchunk_size     = " << chunk_size << " bytes" << std::endl;
         tChunk<T> ch(data,block_size,chunk_size);
         size_t num_blocks = ch.stillAvailable;
         std::cerr << "\tnum_blocks     = " << num_blocks << std::endl;
+        std::cerr << "\tword_size      = " << sizeof(typename tChunk<T>::word_type) << std::endl;
         std::cerr << "\tblockIncrement = " << int(ch.blockIncrement) << std::endl;
         block_t *blk = kind<global>::acquire_as<block_t>(num_blocks);
         
@@ -77,6 +79,65 @@ namespace
         kind<global>::release(data,   chunk_size);
         
     }
+
+#if defined(NDEBUG)
+    template <bool ZEROED>
+    static inline void kChunkPerf()
+    {
+        rt_clock chrono;
+        chrono.calibrate();
+        if(ZEROED)
+        {
+            std::cerr << "-- ZEROED blocks..." << std::endl;
+        }
+        else
+        {
+            std::cerr << "-- DIRTY blocks..." << std::endl;
+        }
+        size_t chunk_size = 4096;
+        for(size_t block_size=1;block_size<=512;block_size*=2)
+        {
+            std::cerr << "block_size=" << block_size; std::cerr.flush();
+            void *data = kind<global>::acquire(chunk_size);
+
+
+            tChunk<uint16_t,ZEROED> ch(data,block_size,chunk_size);
+            size_t   num_blocks = ch.stillAvailable;
+            block_t *blk        = kind<global>::acquire_as<block_t>(num_blocks);
+
+            size_t         cycles= 0;
+            uint64_t       t64   = 0;
+            do
+            {
+                ++cycles;
+                const uint64_t mark = rt_clock::ticks();
+                size_t nb = 0;
+                while(ch.stillAvailable)
+                {
+                    //blk[nb].size = block_size;
+                    blk[nb].addr = ch.acquire();
+                    ++nb;
+                }
+                t64 += (rt_clock::ticks()-mark);
+                c_shuffle(blk,nb);
+                while(nb--)
+                {
+                    ch.release(blk[nb].addr);
+                }
+
+                //std::cerr << "t64=" << t64 << std::endl;
+                //std::cerr << "tmx=" << chrono(t64) << std::endl;
+            }
+            while( chrono(t64) < 1.0 );
+
+            kind<global>::release_as<block_t>(blk,num_blocks);
+            kind<global>::release(data,chunk_size);
+            const double tmx = chrono(t64);
+            const double speed = 1e-6 * double(cycles)/tmx;
+            std::cerr << "\t\tspeed=" << speed << std::endl;
+        }
+    }
+#endif
     
 }
 
@@ -97,7 +158,11 @@ YOCTO_UNIT_TEST_IMPL(kChunk)
         test_tChunk<uint16_t>(block_size, chunk_size, "uint16_t");
         test_tChunk<size_t>  (block_size, chunk_size, "size_t");
     }
-    
+
+#if defined(NDEBUG)
+    kChunkPerf<true>();
+    kChunkPerf<false>();
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()
