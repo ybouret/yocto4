@@ -1,9 +1,13 @@
-#include "yocto/mpl/memio.hpp"
+#include "yocto/mpl/types.hpp"
+#include <cmath>
 
 namespace yocto
 {
     namespace mpl
     {
+        const char manager::name[] = "mpl";
+        
+
 #define SIN_OF(LN2) sin(6.28318530717958623199592693708837032318115234375/(size_t(1)<<(LN2)))
         const double manager::sin_table[32] =
         {
@@ -15,6 +19,17 @@ namespace yocto
             SIN_OF(25), SIN_OF(26), SIN_OF(27), SIN_OF(28), SIN_OF(29),
             SIN_OF(30), SIN_OF(31)
         };
+
+
+        manager:: manager() throw() :
+        blocks(max_bytes)
+        {
+        }
+
+        manager:: ~manager() throw()
+        {
+        }
+
 
     }
 }
