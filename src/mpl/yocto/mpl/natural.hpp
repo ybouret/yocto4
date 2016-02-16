@@ -162,6 +162,29 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
             }
             YOCTO_MPN_DECL(bool,operator!=,are_different)
 
+            static
+            int compare(const void *lhs, const size_t nl,
+                        const void *rhs, const size_t nr) throw();
+            static inline
+            int compare(const natural &lhs, const natural &rhs) throw()
+            {
+                return compare(lhs.byte,lhs.size,rhs.byte,rhs.size);
+            }
+
+            static inline
+            int compare(const natural &lhs, word_t rhs ) throw()
+            {
+                const size_t n = prepare(rhs);
+                return compare(lhs.byte,lhs.size,&rhs,n);
+            }
+
+            static inline
+            int compare(word_t lhs, const natural &rhs) throw()
+            {
+                const size_t n = prepare(lhs);
+                return compare(&lhs,n,rhs.byte,rhs.size);
+            }
+            
 
             //__________________________________________________________________
             //
@@ -218,7 +241,7 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
             size_t   maxi; //!< maximum #bytes
             size_t   size; //!< current #bytes
             uint8_t *byte; //!< little endian
-
+            
             static  uint8_t *   build(size_t &n);
             virtual const void *get_address() const throw() { return byte; }
             natural(size_t n, const as_capacity_t &); //!< default n bytes, must be updated

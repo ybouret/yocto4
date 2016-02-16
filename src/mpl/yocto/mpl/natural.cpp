@@ -14,11 +14,8 @@ namespace yocto
         natural:: ~natural() throw()
         {
             static manager &mgr = *manager::location();
-
-            YOCTO_CHECK_MPN(*this);
             size=0;
             mgr.release(byte,maxi);
-            
         }
 
         natural:: natural() :

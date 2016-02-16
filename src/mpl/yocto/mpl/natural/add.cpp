@@ -1,4 +1,3 @@
-
 #include "yocto/mpl/natural.hpp"
 #include "yocto/code/unroll.hpp"
 
