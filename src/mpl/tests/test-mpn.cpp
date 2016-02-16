@@ -1,6 +1,8 @@
 #include "yocto/mpl/natural.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/sequence/vector.hpp"
+
 using namespace yocto;
 using namespace mpl;
 
@@ -32,6 +34,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
 
     std::cerr << "-- Addition Tests" << std::endl;
     {
+        vector<mpn> values;
         for(size_t i=0;i<1000;++i)
         {
             word_t x = _rand.full<uint32_t>();
@@ -43,8 +46,26 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             mpn Z = X+Y;
 
             if(Z!=z) throw exception("invalid addition");
+
+            const mpn tmp = _rand.full<word_t>();
+            values.push_back(tmp);
         }
+        mpn s1 = 0;
+        for(size_t i=values.size();i>0;--i)
+        {
+            s1 += values[i];
+        }
+        c_shuffle(values(),values.size());
+        mpn s2 = 0;
+        for(size_t i=values.size();i>0;--i)
+        {
+            s2 += values[i];
+        }
+        std::cerr << "s1=" << s1 << ", s2=" << s2 << std::endl;
+        if(s1!=s2) throw exception("invalid addition");
     }
+
+
 
 
 }
