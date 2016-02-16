@@ -18,12 +18,12 @@ assert( (X).maxi >  0 );       \
 assert( (X).size <= (X).maxi );\
 assert( ! ( ((X).size>0) && (X).byte[(X).size-1] <= 0 ) )
 
-#define YOCTO_MPN_DECL(OP,CALL) \
-inline friend natural OP (const natural &lhs, const natural &rhs) \
+#define YOCTO_MPN_DECL(RET,OP,CALL) \
+inline friend RET OP (const natural &lhs, const natural &rhs) \
 { return CALL(lhs.byte,lhs.size,rhs.byte,rhs.size); } \
-inline friend natural OP (const natural &lhs, word_t rhs ) \
+inline friend RET OP (const natural &lhs, word_t rhs ) \
 { const size_t n = prepare(rhs); return CALL(lhs.byte,lhs.size,&rhs,n); } \
-inline friend natural OP (word_t lhs, const natural &rhs) \
+inline friend RET OP (word_t lhs, const natural &rhs) \
 { const size_t n = prepare(lhs); return CALL(&lhs,n,rhs.byte,rhs.size); }
 
         class natural : public memory::ro_buffer
@@ -114,10 +114,10 @@ inline friend natural OP (word_t lhs, const natural &rhs) \
             inline word_t lsw() const throw()
             {
                 word_t         ans = 0;
-                const uint8_t *b = byte;
+                const uint8_t *b   = byte+size;
                 for(size_t i=min_of<size_t>(sizeof(word_t),size);i>0;--i)
                 {
-                    (ans <<= 8) |= unsigned( *(b++) );
+                    (ans <<= 8) |= unsigned( *(--b) );
                 }
                 return ans;
             }
@@ -128,6 +128,40 @@ inline friend natural OP (word_t lhs, const natural &rhs) \
             // comparison
             //
             //__________________________________________________________________
+            static inline bool are_same(const void *lhs, const size_t nl,
+                                        const void *rhs, const size_t nr) throw()
+            {
+                if(nl!=nr)
+                {
+                    return false;
+                }
+                else
+                {
+                    const uint8_t *l = (const uint8_t *)lhs;
+                    const uint8_t *r = (const uint8_t *)rhs;
+                    YOCTO_LOOP(nl, if( *(l++) != *(r++) ) return false);
+                    return true;
+                }
+            }
+            YOCTO_MPN_DECL(bool,operator==,are_same)
+
+            static inline bool are_different(const void *lhs, const size_t nl,
+                                             const void *rhs, const size_t nr) throw()
+            {
+                if(nl!=nr)
+                {
+                    return true;
+                }
+                else
+                {
+                    const uint8_t *l = (const uint8_t *)lhs;
+                    const uint8_t *r = (const uint8_t *)rhs;
+                    YOCTO_LOOP(nl, if( *(l++) != *(r++) ) return true);
+                    return false;
+                }
+            }
+            YOCTO_MPN_DECL(bool,operator!=,are_different)
+
 
             //__________________________________________________________________
             //
@@ -141,8 +175,44 @@ inline friend natural OP (word_t lhs, const natural &rhs) \
                                const void *rhs, size_t nr);
 
             natural  operator+() { return natural(*this); }
-            YOCTO_MPN_DECL(operator+,add)
+            YOCTO_MPN_DECL(natural,operator+,add)
 
+            inline natural & operator+=( const natural &rhs )
+            {
+                natural tmp = *this + rhs;
+                xch(tmp);
+                return *this;
+            }
+
+            inline natural & operator+=(const word_t rhs)
+            {
+                natural tmp = *this + rhs;
+                xch(tmp);
+                return *this;
+            }
+
+            inline natural &inc()
+            {
+                word_t       __one = 1;
+                const size_t __len = prepare(__one);
+                natural      __ans = add(byte,size,&__one,__len);
+                xch(__ans);
+                return *this;
+            }
+
+            //! prefix increment
+            inline natural & operator++()
+            {
+                return inc();
+            }
+
+            //! postfix increment
+            natural   operator++ (int)
+            {
+                natural sav(*this);
+                (void)inc();
+                return sav;
+            }
 
         private:
             size_t   maxi; //!< maximum #bytes
@@ -153,9 +223,9 @@ inline friend natural OP (word_t lhs, const natural &rhs) \
             virtual const void *get_address() const throw() { return byte; }
             natural(size_t n, const as_capacity_t &); //!< default n bytes, must be updated
         };
-
+        
     }
-
+    
     typedef mpl::natural mpn;
 }
 
