@@ -23,11 +23,11 @@ namespace yocto
                 }
                 else
                 {
-                    const uint8_t *l = (const uint8_t *)lhs;
-                    const uint8_t *r = (const uint8_t *)rhs;
+                    const uint8_t *l = ((const uint8_t *)lhs)+nl;
+                    const uint8_t *r = ((const uint8_t *)rhs)+nl;
                     YOCTO_LOOP(nl,
-                               const unsigned L = *(l++);
-                               const unsigned R = *(r++);
+                               const unsigned L = *(--l);
+                               const unsigned R = *(--r);
                                if(L<R)
                                {
                                    return -1;
@@ -38,7 +38,7 @@ namespace yocto
                                    {
                                        return 1;
                                    }
-                                   // else equality=>continue;
+                                   // else equality --> continue;
                                }
                                );
                     return 0;
@@ -46,5 +46,5 @@ namespace yocto
             }
         }
     }
-
+    
 }

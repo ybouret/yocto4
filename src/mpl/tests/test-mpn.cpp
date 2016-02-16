@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/sort/quick.hpp"
 
 using namespace yocto;
 using namespace mpl;
@@ -29,6 +30,38 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             Y.ldz();
             Y = X;
             if(X!=Y)       throw exception("invalid assign");
+        }
+    }
+
+    std::cerr << "-- Comparison Tests" << std::endl;
+    {
+        vector<mpn> values;
+
+        for(size_t i=0;i<1000;++i)
+        {
+            word_t x = _rand.full<word_t>();
+            word_t y = _rand.full<word_t>();
+            mpn    X = x;
+            mpn    Y = y;
+            const int c = __compare(x,y);
+            const int C = __compare(X,Y);
+            if( c != C )
+            {
+                std::cerr << std::hex;
+                std::cerr << "x=" << x << "  | X=" << X << std::endl;
+                std::cerr << "y=" << y << "  | Y=" << Y << std::endl;
+                std::cerr << std::dec;
+                std::cerr << "c=" << c << "  | C=" << C << std::endl;
+                throw exception("invalid comparison");
+            }
+            mpn tmp  = _rand.full<word_t>();
+            values.push_back(tmp);
+        }
+        quicksort(values);
+        for(size_t i=1;i<values.size();++i)
+        {
+            if(values[i]>values[i+1])
+                throw exception("sort failure");
         }
     }
 

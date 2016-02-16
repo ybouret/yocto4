@@ -165,6 +165,7 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
             static
             int compare(const void *lhs, const size_t nl,
                         const void *rhs, const size_t nr) throw();
+
             static inline
             int compare(const natural &lhs, const natural &rhs) throw()
             {
@@ -184,7 +185,15 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
                 const size_t n = prepare(lhs);
                 return compare(&lhs,n,rhs.byte,rhs.size);
             }
-            
+#define YOCTO_MPN_CMP(OP) \
+inline friend bool operator OP (const natural &lhs, const natural &rhs) throw() { return natural::compare(lhs,rhs) OP 0; } \
+inline friend bool operator OP (const natural &lhs, const word_t   rhs) throw() { return natural::compare(lhs,rhs) OP 0; } \
+inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() { return natural::compare(lhs,rhs) OP 0; }
+
+            YOCTO_MPN_CMP(<)
+            YOCTO_MPN_CMP(<=)
+            YOCTO_MPN_CMP(>)
+            YOCTO_MPN_CMP(>=)
 
             //__________________________________________________________________
             //
