@@ -126,6 +126,8 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             mpn Z = X*Y;
             if( Z != z )
                 throw exception("Multiplication failure");
+            if( X*X != mpn::sqr(X) )
+                throw exception("Square Failure");
         }
     }
 

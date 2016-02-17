@@ -1,6 +1,8 @@
 #include "yocto/mpl/natural.hpp"
 #include "yocto/code/xbitrev.hpp"
 #include "yocto/math/complex.hpp"
+#include "yocto/exceptions.hpp"
+#include <cerrno>
 #include <cmath>
 
 namespace yocto
@@ -239,8 +241,10 @@ namespace yocto
                 //--------------------------------------------------------------
                 //-- fill workspaces
                 //--------------------------------------------------------------
-                for(size_t i=0;i<nl;++i) L[i].re = real_t(l[i]);
-                for(size_t i=0;i<nr;++i) R[i].re = real_t(r[i]);
+#define Y_MPN_SET_L(I) L[I].re = real_t(l[I])
+#define Y_MPN_SET_R(I) R[I].re = real_t(r[I])
+                YOCTO_LOOP_FUNC_(nl,Y_MPN_SET_L,0);
+                YOCTO_LOOP_FUNC_(nr,Y_MPN_SET_R,0);
 
                 //--------------------------------------------------------------
                 //-- forward
@@ -250,10 +254,8 @@ namespace yocto
                 //--------------------------------------------------------------
                 //-- multiply in place, in L
                 //--------------------------------------------------------------
-                for(size_t i=0;i<nn;++i)
-                {
-                    L[i] *= R[i];
-                }
+#define Y_MPN_MUL_L_BY_R(I) L[I] *= R[I]
+                YOCTO_LOOP_FUNC_(nn, Y_MPN_MUL_L_BY_R, 0);
 
                 //--------------------------------------------------------------
                 //-- reverse
@@ -266,28 +268,24 @@ namespace yocto
                 real_t       carry = 0.0;
                 uint8_t     *prod  = P.byte;
                 const size_t top   = np - 1;
-
-                for( register size_t i=0; i < top; ++i )
-                {
-                    carry         +=  L[i].re/nn + 0.5;
-                    const real_t q = floor( carry / 256.0 );
-                    const real_t r = carry - 256.0 * q;
-                    prod[i]        = uint8_t(r);
-                    carry          = q;
-                }
+#define Y_MPN_MUL_PUT(i)                      \
+carry         += L[i].re/nn + 0.5;            \
+const real_t q = floor( carry * 0.00390625 ); \
+const real_t r = carry - (256.0 * q);         \
+prod[i]        = uint8_t(r);                  \
+carry          = q;
+                YOCTO_LOOP_FUNC_(top,Y_MPN_MUL_PUT,0);
                 prod[top] = uint8_t(carry);
-                
                 P.update();
                 return P;
-                
             }
             else
             {
                 return natural(); // zero...
             }
         }
-        
-        
+
+
         natural natural:: sqr( const natural &lhs )
         {
             const size_t nl = lhs.size;
@@ -299,40 +297,34 @@ namespace yocto
                 //-- compute power of two
                 //--------------------------------------------------------------
                 const size_t nn = next_power_of_two(np);
-                
+
                 //--------------------------------------------------------------
                 //- compute wokspace size and create it
                 //--------------------------------------------------------------
                 array_of<cplx_t> L( nn );
                 const uint8_t   *l = lhs.byte;
-                for(size_t i=0;i<nl;++i) L[i].re = real_t(l[i]);
-                
+                YOCTO_LOOP_FUNC_(nl,Y_MPN_SET_L,0);
+
                 //--------------------------------------------------------------
                 //-- forward
                 //--------------------------------------------------------------
                 _fft( & L[0].re,  nn  );
-                
+
                 //--------------------------------------------------------------
                 //-- multiply in place, in L
                 //--------------------------------------------------------------
-                for(size_t i=0;i<nn;++i) L[i].in_place_squared();
-                
+#define Y_MPN_SQR_L(I) L[I].in_place_squared()
+                YOCTO_LOOP_FUNC_(nn,Y_MPN_SQR_L,0);
+
                 //--------------------------------------------------------------
                 //-- reverse
                 //--------------------------------------------------------------
                 _ifft( & L[0].re, nn );
-                
+
                 real_t       carry = 0.0;
                 uint8_t     *prod  = P.byte;
                 const size_t top   = np - 1;
-                for( size_t i=0; i < top; ++i )
-                {
-                    carry         +=  L[i].re/nn + 0.5;
-                    const real_t q = floor( carry / 256.0 );
-                    const real_t r = carry - 256.0 * q;
-                    prod[i]   = uint8_t(r);
-                    carry     = q;
-                }
+                YOCTO_LOOP_FUNC_(top,Y_MPN_MUL_PUT,0);
                 prod[top] = uint8_t(carry);
                 
                 P.update();
