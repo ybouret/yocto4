@@ -360,7 +360,32 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 return sav;
             }
 
+            //__________________________________________________________________
+            //
+            //
+            // multiplication
+            //
+            //__________________________________________________________________
+            //! universal FFT based mul function
+            static natural mul(const void *lhs, const size_t nl,
+                               const void *rhs, const size_t nr);
+            YOCTO_MPN_DECL(natural,operator*,mul)
 
+            inline natural & operator*=( const natural &rhs )
+            {
+                natural tmp = *this * rhs;
+                xch(tmp);
+                return *this;
+            }
+
+            inline natural & operator*=(const word_t rhs)
+            {
+                natural tmp = *this * rhs;
+                xch(tmp);
+                return *this;
+            }
+
+            static natural sqr(const natural &);
 
         private:
             size_t   maxi; //!< maximum #bytes
