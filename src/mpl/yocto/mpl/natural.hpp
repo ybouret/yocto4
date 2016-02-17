@@ -198,6 +198,65 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //__________________________________________________________________
             //
             //
+            // bit ops
+            //
+            //__________________________________________________________________
+            static const uint8_t  _bit[8];
+            
+            //! get the number of bits
+            size_t bits() const throw();
+
+            //!  highest bit is always 1
+            static natural rand(size_t nbits);
+
+            //__________________________________________________________________
+            //
+            //! 2^n
+            //__________________________________________________________________
+            static natural exp2(const size_t n);
+
+            //__________________________________________________________________
+            //
+            // SHR
+            //__________________________________________________________________
+            natural & shr() throw(); //!< optimized one bit right shift
+            static natural shr(const natural &lhs, const size_t n); //!< right shift n bits
+            inline friend
+            natural operator>>(const natural &lhs, const size_t n) { return natural::shr(lhs,n); }
+            inline
+            natural & operator>>=(const size_t n)
+            {
+                natural ans = natural::shr(*this,n);
+                xch(ans);
+                return *this;
+            }
+
+            //__________________________________________________________________
+            //
+            // SHL
+            //__________________________________________________________________
+            static natural shl( const natural &lhs, const size_t n  ); //!< shift left n bits
+            inline
+            natural & shl()
+            {
+                natural ans = shl(*this,1);
+                xch(ans);
+                return *this;
+            }
+            inline friend
+            natural operator<<(const natural &lhs, const size_t n) { return natural::shl(lhs,n); }
+            inline
+            natural & operator<<=(const size_t n)
+            {
+                natural ans = natural::shl(*this,n);
+                xch(ans);
+                return *this;
+            }
+
+
+            //__________________________________________________________________
+            //
+            //
             // addition
             //
             //__________________________________________________________________
