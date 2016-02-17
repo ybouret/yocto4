@@ -39,6 +39,9 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
             natural(const word_t);       //!< any word
             natural(const natural &);    //!< copy constructor
 
+            //!< default n bytes, MUST be updated
+            natural(size_t n, const as_capacity_t &);
+
             //! no throw swaps
             inline void xch( natural &other) throw()
             {
@@ -394,7 +397,6 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             
             static  uint8_t *   build(size_t &n);
             virtual const void *get_address() const throw() { return byte; }
-            natural(size_t n, const as_capacity_t &); //!< default n bytes, must be updated
         };
         
     }
