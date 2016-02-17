@@ -98,7 +98,22 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         if(s1!=s2) throw exception("invalid addition");
     }
 
-
+    std::cerr << "-- Subtraction Tests" << std::endl;
+    {
+        vector<mpn> values;
+        for(size_t i=0;i<1000;++i)
+        {
+            word_t x = _rand.full<word_t>();
+            word_t y = _rand.full<word_t>();
+            if(x<y) cswap(x,y);
+            word_t z = x-y;
+            mpn X = x;
+            mpn Y = y;
+            mpn Z = X-Y;
+            if( Z != z )
+                throw exception("Subtraction failure");
+        }
+    }
 
 
 }

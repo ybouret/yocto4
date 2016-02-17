@@ -260,14 +260,18 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             // addition
             //
             //__________________________________________________________________
+            //! helper
             inline void    ldz() throw() { size=0; }
 
+            //! unversal add function
             static natural add(const void *lhs, size_t nl,
                                const void *rhs, size_t nr);
 
+            //! unary operator
             natural  operator+() { return natural(*this); }
             YOCTO_MPN_DECL(natural,operator+,add)
 
+            //! in place
             inline natural & operator+=( const natural &rhs )
             {
                 natural tmp = *this + rhs;
@@ -275,6 +279,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 return *this;
             }
 
+            //! in place
             inline natural & operator+=(const word_t rhs)
             {
                 natural tmp = *this + rhs;
@@ -304,6 +309,58 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 (void)inc();
                 return sav;
             }
+
+            //__________________________________________________________________
+            //
+            //
+            // subtraction
+            //
+            //__________________________________________________________________
+
+            //! universal sub function
+            static natural sub(const void *lhs, const size_t nl,
+                               const void *rhs, const size_t nr);
+            // no unary operator !
+            YOCTO_MPN_DECL(natural,operator-,sub)
+
+            inline natural & operator-=( const natural &rhs )
+            {
+                natural tmp = *this - rhs;
+                xch(tmp);
+                return *this;
+            }
+
+            inline natural & operator-=(const word_t rhs)
+            {
+                natural tmp = *this - rhs;
+                xch(tmp);
+                return *this;
+            }
+
+            inline natural &dec()
+            {
+                word_t       __one = 1;
+                const size_t __len = prepare(__one);
+                natural      __ans = sub(byte,size,&__one,__len);
+                xch(__ans);
+                return *this;
+            }
+
+            //! prefix increment
+            inline natural & operator--()
+            {
+                return dec();
+            }
+
+            //! postfix increment
+            natural   operator-- (int)
+            {
+                natural sav(*this);
+                (void)dec();
+                return sav;
+            }
+
+
 
         private:
             size_t   maxi; //!< maximum #bytes
