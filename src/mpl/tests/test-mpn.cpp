@@ -166,7 +166,21 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         }
     }
 
+    std::cerr << "-- Testing Arithmetic" << std::endl;
+    {
+        mpn b = 13;
+        mpn e = 7;
+        mpn N = 9;
+        mpn x = natural::mod_exp(b,e,N);
+        mpn y = natural::power(b,e) % N;
+        std::cerr << "x=" << x << std::endl;
+        std::cerr << "y=" << y << std::endl;
+    }
 
+    std::cerr << "-- Testing RSA" << std::endl;
+    {
+        
+    }
 
 
 }

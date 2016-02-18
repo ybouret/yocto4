@@ -5,6 +5,7 @@
 #include "yocto/memory/buffers.hpp"
 #include "yocto/code/endian.hpp"
 #include "yocto/code/bswap.hpp"
+#include "yocto/xnumeric.hpp"
 #include <iosfwd>
 
 namespace yocto
@@ -392,6 +393,21 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             }
 
             static natural sqr(const natural &);
+            static inline
+            natural power(const natural &rhs,  word_t p)
+            {
+                natural ans = 1;
+                while(p-->0) { ans *= rhs; }
+                return ans;
+            }
+
+            static inline
+            natural power(const natural &rhs, const natural &p )
+            {
+                natural ans = 1;
+                for(natural i=0;i<p;++i) { ans *= rhs; }
+                return ans;
+            }
 
             //__________________________________________________________________
             //
@@ -450,7 +466,22 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 return *this;
             }
 
+            //__________________________________________________________________
+            //
+            //
+            // arithmetic
+            //
+            //__________________________________________________________________
+            static natural gcd(const natural &lhs, const natural &rhs);
+            static inline bool are_coprime(const natural &lhs, const natural &rhs)
+            {
+                const natural __gcd = natural::gcd(lhs,rhs);
+                return __gcd.is_byte(1);
+            }
+            static void simplify(natural &lhs, natural &rhs);
 
+            static natural mod_inv( const natural &b, const natural &n );                     //!< modular inverse
+            static natural mod_exp( const natural &b, const natural &e, const natural &n );   //!< modular exponentiation (b^e)[n]
 
         private:
             size_t   maxi; //!< maximum #bytes
@@ -464,6 +495,12 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
     }
     
     typedef mpl::natural mpn;
+    template <>
+    struct xnumeric<mpn>
+    {
+        inline static mpn zero() { return mpn();  }
+        inline static mpn one()  { return mpn(1); }
+    };
 }
 
 #endif
