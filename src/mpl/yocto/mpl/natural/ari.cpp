@@ -1,4 +1,5 @@
 #include "yocto/mpl/natural.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -31,6 +32,7 @@ namespace yocto
 
         natural  natural:: mod_inv( const natural &b, const natural &n )
         {
+            std::cerr << "Computing " << b << "^(-1)[" << n << "]" << std::endl;
             natural n0 = n;
             natural b0 = b;
             natural t0 = 0;

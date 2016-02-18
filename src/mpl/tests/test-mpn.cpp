@@ -187,6 +187,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
     }
 
     std::cerr << "-- Testing RSA" << std::endl;
+    for(size_t iter=1;iter<=10;++iter)
     {
         mpn p = mpn::rand(6+alea_leq(25));
         mpn q = mpn::rand(6+alea_leq(25));
@@ -196,6 +197,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         std::cerr << "\tq=" << q << std::endl;
         const mpn n = p*q;
         const mpn phi = (p-1)*(q-1);
+        std::cerr << "\tphi=" << phi << std::endl;
         mpn e = mpn::rand(5);
         e = mpn::__next_prime(e);
         std::cerr << "\te=" << e << std::endl;
@@ -205,8 +207,10 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         for(size_t i=1;i<=10;++i)
         {
             const mpn M = mpn::rand(alea_leq(bmax));
-            std::cerr << "M=" << M << std::endl;
             const mpn C = mpn::mod_exp(M,e,n);
+            const mpn P = mpn::mod_exp(C,d,n);
+            std::cerr << "M=" << M << ", C=" << C << ", P=" << P << std::endl;
+            if(P!=M) throw exception("invalid arithmetic!");
         }
 
     }
