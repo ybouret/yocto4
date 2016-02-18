@@ -60,7 +60,6 @@ namespace yocto
                     //__________________________________________________________
                     while( p-- > 0 )
                     {
-
                         natural       mid = lo+hi;
                         (void)mid.shr();
                         const natural tmp = mul( mid.byte, mid.size, den, nd);
