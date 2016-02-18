@@ -131,6 +131,32 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         }
     }
 
+    std::cerr << "-- Division Tests" << std::endl;
+    {
+        const size_t nv = 200;
+        vector<mpn> values(nv,as_capacity);
+        for(size_t i=0;i<nv;++i)
+        {
+            const mpn tmp = mpn::rand(1+alea_leq(500));
+            values.push_back(tmp);
+        }
+        for(size_t i=1;i<=nv;++i)
+        {
+            const mpn &num = values[i];
+            for(size_t j=1;j<=nv;++j)
+            {
+                const mpn &den = values[i];
+                const mpn    q = num/den;
+                const mpn   qd = q * den;
+                if(q*den>num) throw exception("invalid division!!!");
+                if(i==j)
+                {
+                    if( ! q.is_byte(1) ) throw exception("invalid auto-division!");
+                }
+            }
+        }
+    }
+
 
 }
 YOCTO_UNIT_TEST_DONE()

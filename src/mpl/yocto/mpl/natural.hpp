@@ -125,6 +125,9 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
                 return ans;
             }
 
+            inline bool is_zero() const throw() { return (size<=0); }
+            inline bool is_byte(const uint8_t x) const throw() { assert(x>0); return (1==size) && (x==byte[0]); }
+
             //__________________________________________________________________
             //
             //
@@ -389,6 +392,32 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             }
 
             static natural sqr(const natural &);
+
+            //__________________________________________________________________
+            //
+            //
+            // division
+            //
+            //__________________________________________________________________
+
+            //!universal division algorithm
+            static natural div(const void *num, const size_t nn,
+                               const void *den, const size_t nd);
+            YOCTO_MPN_DECL(natural, operator/, div)
+
+            inline natural &operator/=(const natural &den )
+            {
+                natural tmp = *this/den;
+                xch(tmp);
+                return *this;
+            }
+
+            inline natural & operator/=(const word_t den)
+            {
+                natural tmp = *this/den;
+                xch(tmp);
+                return *this;
+            }
 
         private:
             size_t   maxi; //!< maximum #bytes

@@ -17,44 +17,47 @@ YOCTO_PROGRAM_START()
     {
         mpn x = 0;
 
-        MPI.Printf0(stderr, "Dispatching a number\n");
-        if( MPI.IsFirst )
+        for(int iter=1;iter<=16;++iter)
         {
-            // send data
-            x = mpn::rand( 2 + alea_leq(100) );
-            for(int r=1;r<MPI.CommWorldSize;++r)
+            MPI.Printf0(stderr, "Dispatching numbers, iter=%d\n",iter);
+            if( MPI.IsFirst )
             {
-                mpl::send(MPI,x,r,MPI_COMM_WORLD);
-            }
-        }
-        else
-        {
-            x = mpl::recv(MPI,0,MPI_COMM_WORLD);
-        }
-
-        MPI.Printf0(stderr, "Checking...\n");
-        if(MPI.IsFirst)
-        {
-            for(int r=1;r<MPI.CommWorldSize;++r)
-            {
-                mpn y = mpl::recv(MPI,r,MPI_COMM_WORLD);
-                if(x!=y)
+                // send data
+                x = mpn::rand( 2 + alea_leq(100) );
+                for(int r=1;r<MPI.CommWorldSize;++r)
                 {
-                    MPI.Printf0(stderr, "Failure on %d\n", r);
+                    mpl::send(MPI,x,r,MPI_COMM_WORLD);
                 }
             }
-        }
-        else
-        {
-            mpl::send(MPI,x,0,MPI_COMM_WORLD);
-        }
+            else
+            {
+                x = mpl::recv(MPI,0,MPI_COMM_WORLD);
+            }
 
-        MPI.Printf0(stderr, "OK!\n");
+            MPI.Printf0(stderr, "Checking...\n");
+            if(MPI.IsFirst)
+            {
+                for(int r=1;r<MPI.CommWorldSize;++r)
+                {
+                    mpn y = mpl::recv(MPI,r,MPI_COMM_WORLD);
+                    if(x!=y)
+                    {
+                        MPI.Printf0(stderr, "Failure on %d\n", r);
+                    }
+                }
+            }
+            else
+            {
+                mpl::send(MPI,x,0,MPI_COMM_WORLD);
+            }
+
+            MPI.Printf0(stderr, "OK!\n");
+        }
     }
     else
     {
         MPI.Printf0(stderr, "Not in parallel...\n");
     }
-
+    
 }
 YOCTO_PROGRAM_END()
