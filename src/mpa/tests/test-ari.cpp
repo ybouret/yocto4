@@ -88,3 +88,13 @@ YOCTO_UNIT_TEST_IMPL(ari)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+YOCTO_UNIT_TEST_IMPL(mod_inv)
+{
+    const mpn e = 31;
+    const mpn n = 46774598620;
+    const mpn d = mpn::mod_inv(e,n);
+    std::cerr << e << "^(-1)[" <<  n << "]=" << d << std::endl;
+}
+YOCTO_UNIT_TEST_DONE()

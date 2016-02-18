@@ -195,12 +195,14 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         std::cerr << "\tp=" << p << std::endl;
         q = mpn::__next_prime(q);
         std::cerr << "\tq=" << q << std::endl;
-        const mpn n = p*q;
+        const mpn n   = p*q;
         const mpn phi = (p-1)*(q-1);
         std::cerr << "\tphi=" << phi << std::endl;
         mpn e = mpn::rand(5);
-        e = mpn::__next_prime(e);
+        while( ! mpn::are_coprime(e, phi) ) ++e;
         std::cerr << "\te=" << e << std::endl;
+        const mpn g = mpn::gcd(e,phi);
+        std::cerr << "g=" << g << std::endl;
         mpn d = mpn::mod_inv(e,phi);
         std::cerr << "\td=" << d << std::endl;
         const size_t bmax = n.bits()-1;

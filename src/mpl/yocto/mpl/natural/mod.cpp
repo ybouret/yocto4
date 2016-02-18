@@ -1,13 +1,15 @@
 #include "yocto/mpl/natural.hpp"
 #include "yocto/exceptions.hpp"
 #include <cerrno>
+#include <cstring>
 
 namespace yocto
 {
     namespace mpl
     {
 
-        natural natural:: __mod(const void *num, const size_t nn, const void *den, const size_t nd)
+        natural natural:: __mod(const void *num, const size_t nn,
+                                const void *den, const size_t nd)
         {
             assert(nd>0);
             const int cmp = natural::compare(num, nn, den, nd);
