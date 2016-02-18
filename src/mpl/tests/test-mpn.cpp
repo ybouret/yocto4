@@ -131,7 +131,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         }
     }
 
-    std::cerr << "-- Division Tests" << std::endl;
+    std::cerr << "-- Division/Modulo Tests" << std::endl;
     {
         const size_t nv = 200;
         vector<mpn> values(nv,as_capacity);
@@ -153,20 +153,20 @@ YOCTO_UNIT_TEST_IMPL(mpn)
                 {
                     if( ! q.is_byte(1) ) throw exception("invalid auto-division!");
                 }
+                const mpn   r = num%den;
+                if(q*den+r!=num)
+                    throw exception("invalid modulo");
+                mpn qq;
+                mpn rr;
+                mpn::split(qq, rr, num, den);
+                if(qq!=q) throw exception("split quotient failure!");
+                if(rr!=r) throw exception("split remain   failure!");
+                
             }
         }
     }
 
-    std::cerr << "-- Modulo Tests..." << std::endl;
-    {
-        const mpn den = mpn::rand(3+alea_leq(4));
-        std::cerr << "den=" << den << std::endl;
-        const mpn top = den * 3+1;
-        for(mpn i=0;i<=top;++i)
-        {
-            std::cerr << i.lsw() << "%" << den.lsw() << "=" << (i%den) << std::endl;
-        }
-    }
+
 
 
 }

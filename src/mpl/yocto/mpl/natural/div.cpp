@@ -96,5 +96,17 @@ namespace yocto
                 }
             }
         }
+
+        void natural:: split( natural &q, natural &r, const natural &num, const natural &den )
+        {
+            {
+                mpn tmp = num/den;
+                q.xch(tmp);
+            }
+            const natural qd = q*den;
+            natural       dd = num - qd;
+            r.xch(dd);
+        }
+
     }
 }

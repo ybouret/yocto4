@@ -419,6 +419,8 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 return *this;
             }
 
+            static void split( natural &q, natural &r, const natural &num, const natural &den );
+
             //__________________________________________________________________
             //
             //
