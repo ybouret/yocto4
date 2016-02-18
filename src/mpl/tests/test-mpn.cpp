@@ -175,11 +175,40 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         mpn y = natural::power(b,e) % N;
         std::cerr << "x=" << x << std::endl;
         std::cerr << "y=" << y << std::endl;
+        size_t n = 0;
+        mpn    p = 0;
+        while( n<100 )
+        {
+            p = natural::__next_prime(++p);
+            std::cerr << p << ' ';
+            ++n;
+        }
+        std::cerr << std::endl;
     }
 
     std::cerr << "-- Testing RSA" << std::endl;
     {
-        
+        mpn p = mpn::rand(6+alea_leq(25));
+        mpn q = mpn::rand(6+alea_leq(25));
+        p = mpn::__next_prime(p);
+        std::cerr << "\tp=" << p << std::endl;
+        q = mpn::__next_prime(q);
+        std::cerr << "\tq=" << q << std::endl;
+        const mpn n = p*q;
+        const mpn phi = (p-1)*(q-1);
+        mpn e = mpn::rand(5);
+        e = mpn::__next_prime(e);
+        std::cerr << "\te=" << e << std::endl;
+        mpn d = mpn::mod_inv(e,phi);
+        std::cerr << "\td=" << d << std::endl;
+        const size_t bmax = n.bits()-1;
+        for(size_t i=1;i<=10;++i)
+        {
+            const mpn M = mpn::rand(alea_leq(bmax));
+            std::cerr << "M=" << M << std::endl;
+            const mpn C = mpn::mod_exp(M,e,n);
+        }
+
     }
 
 

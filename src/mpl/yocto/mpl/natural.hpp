@@ -216,6 +216,16 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //!  highest bit is always 1
             static natural rand(size_t nbits);
 
+            inline bool is_odd() const throw()
+            {
+                return (size>0) ? ( 0 != (byte[0]&0x01) ) : false;
+            }
+
+            inline bool is_even() const throw()
+            {
+                return (size>0) ? ( 0 == (byte[0]&0x01) ) : true;
+            }
+
             //__________________________________________________________________
             //
             //! 2^n
@@ -482,6 +492,15 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
 
             static natural mod_inv( const natural &b, const natural &n );                     //!< modular inverse
             static natural mod_exp( const natural &b, const natural &e, const natural &n );   //!< modular exponentiation (b^e)[n]
+
+            //__________________________________________________________________
+            //
+            //
+            // primality
+            //
+            //__________________________________________________________________
+            static bool    __is_prime( const natural &n );
+            static natural __next_prime(const natural &n);
 
         private:
             size_t   maxi; //!< maximum #bytes
