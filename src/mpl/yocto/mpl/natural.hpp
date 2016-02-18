@@ -419,6 +419,37 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 return *this;
             }
 
+            //__________________________________________________________________
+            //
+            //
+            // modulo
+            //
+            //__________________________________________________________________
+            //! universal modulo
+            static natural __mod(const void *num, const size_t nn,
+                                 const void *den, const size_t nd);
+            static natural modulo(const void  *num,
+                                  const size_t nn,
+                                  const void  *den,
+                                  const size_t nd);
+            YOCTO_MPN_DECL(natural,operator%,modulo)
+
+            inline natural &operator%=(const natural &den )
+            {
+                natural tmp = *this%den;
+                xch(tmp);
+                return *this;
+            }
+
+            inline natural & operator%=(const word_t den)
+            {
+                natural tmp = *this%den;
+                xch(tmp);
+                return *this;
+            }
+
+
+
         private:
             size_t   maxi; //!< maximum #bytes
             size_t   size; //!< current #bytes
