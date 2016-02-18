@@ -76,7 +76,7 @@ namespace yocto
                             }
                             else
                             {
-                                return mid; //!< special case
+                                return natural(); // special case, 0
                             }
                         }
                     }
