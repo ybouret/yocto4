@@ -213,9 +213,9 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
                     {
                         switch(rs)
                         {
-                            case __zero:     return integer();
-                            case __negative:
-                            case __positive: return integer(rs,rb,rn);
+                            case __zero:     return integer();                 //-- LHS=0, RHS=0
+                            case __negative: return integer(__negative,rb,rn); //-- LHS=0, RHS<0
+                            case __positive: return integer(__positive,rb,rn); //-- LHS=0, RHS>0
                         }
                     }
 
