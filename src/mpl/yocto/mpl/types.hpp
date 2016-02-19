@@ -13,7 +13,8 @@ namespace yocto
     namespace mpl
     {
         typedef uint64_t word_t;
-
+        typedef int64_t  integer_t;
+        
         class manager : public singleton<manager>
         {
         public:

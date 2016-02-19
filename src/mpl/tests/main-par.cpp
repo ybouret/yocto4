@@ -15,44 +15,82 @@ YOCTO_PROGRAM_START()
 
     if(MPI.IsParallel)
     {
-        mpn x = 0;
-
-        for(int iter=1;iter<=16;++iter)
         {
-            MPI.Printf0(stderr, "Dispatching numbers, iter=%d\n",iter);
-            if( MPI.IsFirst )
+            mpn x = 0;
+            for(int iter=1;iter<=16;++iter)
             {
-                // send data
-                x = mpn::rand( 2 + alea_leq(100) );
-                for(int r=1;r<MPI.CommWorldSize;++r)
+                MPI.Printf0(stderr, "Dispatching NATURAL, iter=%d\n",iter);
+                if( MPI.IsFirst )
                 {
-                    mpl::send(MPI,x,r,MPI_COMM_WORLD);
-                }
-            }
-            else
-            {
-                x = mpl::recv(MPI,0,MPI_COMM_WORLD);
-            }
-
-            MPI.Printf0(stderr, "Checking...\n");
-            if(MPI.IsFirst)
-            {
-                for(int r=1;r<MPI.CommWorldSize;++r)
-                {
-                    mpn y = mpl::recv(MPI,r,MPI_COMM_WORLD);
-                    if(x!=y)
+                    // send data
+                    x = mpn::rand( 2 + alea_leq(100) );
+                    for(int r=1;r<MPI.CommWorldSize;++r)
                     {
-                        MPI.Printf0(stderr, "Failure on %d\n", r);
+                        mpl::send<mpn>(MPI,x,r,MPI_COMM_WORLD);
                     }
                 }
-            }
-            else
-            {
-                mpl::send(MPI,x,0,MPI_COMM_WORLD);
-            }
+                else
+                {
+                    x = mpl::recv<mpn>(MPI,0,MPI_COMM_WORLD);
+                }
 
-            MPI.Printf0(stderr, "OK!\n");
+                if(MPI.IsFirst)
+                {
+                    for(int r=1;r<MPI.CommWorldSize;++r)
+                    {
+                        mpn y = mpl::recv<mpn>(MPI,r,MPI_COMM_WORLD);
+                        if(x!=y)
+                        {
+                            MPI.Printf0(stderr, "Failure on %d\n", r);
+                        }
+                    }
+                }
+                else
+                {
+                    mpl::send<mpn>(MPI,x,0,MPI_COMM_WORLD);
+                }
+            }
         }
+
+        {
+            mpz z;
+            for(int iter=1;iter<=16;++iter)
+            {
+                MPI.Printf0(stderr, "Dispatching INTEGER, iter=%d\n",iter);
+                if( MPI.IsFirst )
+                {
+                    // send data
+                    z = _rand.full<wint_t>();
+                    for(int r=1;r<MPI.CommWorldSize;++r)
+                    {
+                        mpl::send<mpz>(MPI,z,r,MPI_COMM_WORLD);
+                    }
+                }
+                else
+                {
+                    z = mpl::recv<mpz>(MPI,0,MPI_COMM_WORLD);
+                }
+
+
+                if(MPI.IsFirst)
+                {
+                    for(int r=1;r<MPI.CommWorldSize;++r)
+                    {
+                        mpz y = mpl::recv<mpz>(MPI,r,MPI_COMM_WORLD);
+                        if(z!=y)
+                        {
+                            MPI.Printf0(stderr, "Failure on %d\n", r);
+                        }
+                    }
+                }
+                else
+                {
+                    mpl::send(MPI,z,0,MPI_COMM_WORLD);
+                }
+            }
+        }
+
+
     }
     else
     {
