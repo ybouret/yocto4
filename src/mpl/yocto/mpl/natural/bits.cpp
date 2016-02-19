@@ -69,6 +69,29 @@ namespace yocto {
             }
         }
 
+        natural natural::get(ios::bitio &Q, const size_t n)
+        {
+            assert(n<=Q.size());
+            if(n<=0)
+            {
+                return natural();
+            }
+            else
+            {
+                const size_t nb = YOCTO_ROUND8(n)>>3;
+                natural ans(nb,as_capacity);
+                for(size_t ibit=0;ibit<n;++ibit)
+                {
+                    if( Q.pop() )
+                    {
+                        ans.byte[ibit>>3] |= _bit[ibit&7];
+                    }
+                }
+                ans.update();
+                return ans;
+            }
+        }
+
 
         natural natural:: exp2(const size_t n)
         {

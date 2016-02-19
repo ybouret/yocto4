@@ -131,7 +131,8 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
             inline bool is_zero() const throw() { return (size<=0); }
             inline bool is_byte(const uint8_t x) const throw() { assert(x>0); return (1==size) && (x==byte[0]); }
 
-            void put(ios::bitio &Q) const;
+            void           put(ios::bitio &Q) const;
+            static natural get(ios::bitio &Q, const size_t n);
 
             //__________________________________________________________________
             //

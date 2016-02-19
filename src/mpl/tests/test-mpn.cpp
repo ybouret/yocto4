@@ -82,7 +82,17 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             v.put(Q);
         }
         if(count!=Q.size()) throw exception("Enqueue bits failure");
+
+        for(size_t i=1;i<=values.size();++i)
+        {
+            const mpn n = mpn::get(Q,vbits[i]);
+            if( n != values[i] )
+            {
+                throw exception("Invalid I/O!");
+            }
+        }
     }
+
 
     std::cerr << "-- Addition Tests" << std::endl;
     {
@@ -214,7 +224,9 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         std::cerr << std::endl;
     }
 
+
     std::cerr << "-- Testing RSA" << std::endl;
+    std::cerr << std::hex;
     for(size_t iter=1;iter<=10;++iter)
     {
         mpn p = mpn::rand(6+alea_leq(25));
@@ -230,7 +242,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         while( ! mpn::are_coprime(e, phi) ) ++e;
         std::cerr << "\te=" << e << std::endl;
         const mpn g = mpn::gcd(e,phi);
-        std::cerr << "g=" << g << std::endl;
+        std::cerr << "\tg=" << g << std::endl;
         mpn d = mpn::mod_inv(e,phi);
         std::cerr << "\td=" << d << std::endl;
         const size_t bmax = n.bits()-1;
@@ -239,11 +251,13 @@ YOCTO_UNIT_TEST_IMPL(mpn)
             const mpn M = mpn::rand(alea_leq(bmax));
             const mpn C = mpn::mod_exp(M,e,n);
             const mpn P = mpn::mod_exp(C,d,n);
-            std::cerr << "M=" << M << ", C=" << C << ", P=" << P << std::endl;
+            std::cerr << "M=" << M << " => C=" << C << "=> P=" << P << std::endl;
             if(P!=M) throw exception("invalid arithmetic!");
         }
 
     }
+    std::cerr << std::dec;
+
 
 
 }
