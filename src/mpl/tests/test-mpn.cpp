@@ -65,6 +65,25 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         }
     }
 
+    std::cerr << "-- I/O tests" << std::endl;
+    {
+
+        ios::bitio     Q;
+        vector<mpn>    values;
+        vector<size_t> vbits;
+        size_t count = 0;
+        for(size_t i=0;i<100;++i)
+        {
+            const size_t n = alea_leq(100);
+            const mpn    v = mpn::rand(n);
+            values.push_back(v);
+            vbits.push_back(n);
+            count += n;
+            v.put(Q);
+        }
+        if(count!=Q.size()) throw exception("Enqueue bits failure");
+    }
+
     std::cerr << "-- Addition Tests" << std::endl;
     {
         vector<mpn> values;
@@ -161,9 +180,18 @@ YOCTO_UNIT_TEST_IMPL(mpn)
                 mpn::split(qq, rr, num, den);
                 if(qq!=q) throw exception("split quotient failure!");
                 if(rr!=r) throw exception("split remain   failure!");
-                
             }
         }
+    }
+
+    std::cerr << "-- Pascal Triangle" << std::endl;
+    for(word_t n=1;n<=10;++n)
+    {
+        for(word_t k=0;k<=n+1;++k)
+        {
+            std::cerr << mpn::comb(n,k) << ' ';
+        }
+        std::cerr << std::endl;
     }
 
     std::cerr << "-- Testing Arithmetic" << std::endl;

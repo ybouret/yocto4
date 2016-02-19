@@ -6,6 +6,8 @@
 #include "yocto/code/endian.hpp"
 #include "yocto/code/bswap.hpp"
 #include "yocto/xnumeric.hpp"
+#include "yocto/ios/bitio.hpp"
+
 #include <iosfwd>
 
 namespace yocto
@@ -128,6 +130,8 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
 
             inline bool is_zero() const throw() { return (size<=0); }
             inline bool is_byte(const uint8_t x) const throw() { assert(x>0); return (1==size) && (x==byte[0]); }
+
+            void put(ios::bitio &Q) const;
 
             //__________________________________________________________________
             //

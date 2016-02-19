@@ -1,9 +1,27 @@
 #include "yocto/mpl/natural.hpp"
+#include "yocto/random/bits.hpp"
+#include "yocto/code/round.hpp"
+
+#include <iostream>
 
 namespace yocto {
 
     namespace mpl
     {
+
+        static inline
+        size_t __num_bits_for(const unsigned MSB) throw()
+        {
+            if(0!=(MSB&0x80)) return 8;
+            if(0!=(MSB&0x40)) return 7;
+            if(0!=(MSB&0x20)) return 6;
+            if(0!=(MSB&0x10)) return 5;
+            if(0!=(MSB&0x08)) return 4;
+            if(0!=(MSB&0x04)) return 3;
+            if(0!=(MSB&0x02)) return 2;
+            if(0!=(MSB&0x01)) return 1;
+            return 0;
+        }
 
         size_t natural::bits() const throw()
         {
@@ -12,34 +30,10 @@ namespace yocto {
             {
                 const size_t   imsb = size-1;
                 const unsigned MSB  = byte[imsb]; assert(0!=MSB);
-                const size_t   init = (imsb<<3);
-
-                if(0!=(MSB&0x80)) return init+8;
-                if(0!=(MSB&0x40)) return init+7;
-                if(0!=(MSB&0x20)) return init+6;
-                if(0!=(MSB&0x10)) return init+5;
-                if(0!=(MSB&0x08)) return init+4;
-                if(0!=(MSB&0x04)) return init+3;
-                if(0!=(MSB&0x02)) return init+2;
-                if(0!=(MSB&0x01)) return init+1;
+                return (imsb<<3) + __num_bits_for(MSB);
             }
             return 0;
         }
-
-    }
-
-}
-
-#include "yocto/random/bits.hpp"
-#include "yocto/code/round.hpp"
-
-#include <iostream>
-
-namespace yocto
-{
-
-    namespace mpl
-    {
 
         const uint8_t natural::_bit[8] =
         {
@@ -52,6 +46,29 @@ namespace yocto
             0x40,
             0x80
         };
+
+        void natural:: put(ios::bitio &Q) const
+        {
+            if(size>0)
+            {
+                const size_t imsb = size-1;
+                for(size_t i=0;i<imsb;++i)
+                {
+                    const unsigned B = byte[i];
+                    for(size_t j=0;j<8;++j)
+                    {
+                        Q.push(0 != (B&_bit[j]));
+                    }
+                }
+                const unsigned MSB = byte[imsb];          assert(0!=MSB);
+                const size_t   num = __num_bits_for(MSB); assert(num>0);
+                for(size_t j=0;j<num;++j)
+                {
+                    Q.push(0 != (MSB&_bit[j]));
+                }
+            }
+        }
+
 
         natural natural:: exp2(const size_t n)
         {
