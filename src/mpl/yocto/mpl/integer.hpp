@@ -206,7 +206,12 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
                 {
                     case __negative:
                     {
-
+                        switch(rs)
+                        {
+                            case __zero: return integer(__negative,lb,ln);
+                            case __negative:
+                            case __positive:;
+                        }
                     }
 
                     case __zero:
@@ -221,7 +226,12 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
 
                     case __positive:
                     {
-                        
+                        switch(rs)
+                        {
+                            case __zero:      return integer(__positive,lb,ln);
+                            case __negative:
+                            case __positive:;
+                        }
                     }
                 }
             }
