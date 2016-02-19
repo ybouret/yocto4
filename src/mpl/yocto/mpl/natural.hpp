@@ -29,6 +29,8 @@ inline friend RET OP (const natural &lhs, word_t rhs ) \
 inline friend RET OP (word_t lhs, const natural &rhs) \
 { const size_t n = prepare(lhs); return CALL(&lhs,n,rhs.byte,rhs.size); }
 
+        class integer;
+
         class natural : public memory::ro_buffer
         {
         public:
@@ -565,6 +567,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             
             static  uint8_t *   build(size_t &n);
             virtual const void *get_address() const throw() { return byte; }
+            friend class integer;
         };
         
     }
