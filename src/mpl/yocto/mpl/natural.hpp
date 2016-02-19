@@ -43,6 +43,7 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
             natural();                   //!< this is zero
             natural(const word_t);       //!< any word
             natural(const natural &);    //!< copy constructor
+            natural(const void *buf, const size_t len);
 
             //!< default n bytes, MUST be updated
             natural(size_t n, const as_capacity_t &);

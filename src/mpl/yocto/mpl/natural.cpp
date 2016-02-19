@@ -50,7 +50,17 @@ namespace yocto
         size( n ),
         byte( build(maxi) )
         {
-            
+
+        }
+
+        natural:: natural(const void *buf, const size_t len) :
+        maxi(len),
+        size(len),
+        byte( build(maxi) )
+        {
+            assert(!(NULL==buf&&len>0));
+            memcpy(byte,buf,len);
+            update();
         }
         
     }

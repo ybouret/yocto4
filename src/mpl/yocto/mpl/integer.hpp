@@ -91,7 +91,11 @@ namespace yocto
             }
 
             inline integer(const sign_type S, const natural &N) : s(S), n(N) { update(); }
-
+            inline integer(const sign_type S, const void *buf, const size_t len) :
+            s(S), n(buf,len)
+            {
+                update();
+            }
 
             //__________________________________________________________________
             //
@@ -191,6 +195,36 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
             // Addition
             //
             //__________________________________________________________________
+            static inline integer add(const sign_type ls,
+                                      const void     *lb,
+                                      const size_t    ln,
+                                      const sign_type rs,
+                                      const void     *rb,
+                                      const size_t    rn) throw()
+            {
+                switch(ls)
+                {
+                    case __negative:
+                    {
+
+                    }
+
+                    case __zero:
+                    {
+                        switch(rs)
+                        {
+                            case __zero:     return integer();
+                            case __negative:
+                            case __positive: return integer(rs,rb,rn);
+                        }
+                    }
+
+                    case __positive:
+                    {
+                        
+                    }
+                }
+            }
 
         };
         
