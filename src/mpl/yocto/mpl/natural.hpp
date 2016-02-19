@@ -513,8 +513,36 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             }
             static void simplify(natural &lhs, natural &rhs);
 
+            static inline
+            natural comb(const word_t n, const word_t k)
+            {
+                if(k<=0)
+                {
+                    return natural(1);
+                }
+                else
+                {
+                    if(k>=n)
+                    {
+                        return natural( (k>n) ? 0 : 1 );
+                    }
+                    else
+                    {
+                        assert(k>0);
+                        assert(k<n);
+                        const natural fn   = factorial(n);
+                        const natural fk   = factorial(k);
+                        const natural fnmk = factorial(n-k);
+                        const natural den  = fk * fnmk;
+                        return fn/den;
+                    }
+                }
+
+            }
+
             static natural mod_inv( const natural &b, const natural &n );                     //!< modular inverse
             static natural mod_exp( const natural &b, const natural &e, const natural &n );   //!< modular exponentiation (b^e)[n]
+
 
             //__________________________________________________________________
             //
