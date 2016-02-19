@@ -32,7 +32,7 @@ namespace yocto
 
         natural  natural:: mod_inv( const natural &b, const natural &n )
         {
-            std::cerr << "Computing " << b << "^(-1)[" << n << "]" << std::endl;
+            //std::cerr << "Computing " << b << "^(-1)[" << n << "]" << std::endl;
             natural n0 = n;
             natural b0 = b;
             natural t0 = 0;
@@ -67,7 +67,7 @@ namespace yocto
             }
             
             // normally an error if b0 != 1
-            std::cerr << b << "*" << t << "[" << n << "]=" << (b*t)%n << std::endl;
+            //std::cerr << b << "*" << t << "[" << n << "]=" << (b*t)%n << std::endl;
             return t;
         }
 
@@ -75,7 +75,7 @@ namespace yocto
         {
 
             if( N.size <= 0 )
-                throw libc::exception( EDOM, "natural.exp %% 0");
+                throw libc::exception( EDOM, "mpl.mod_exp %% 0");
 
 
             natural result = 1;

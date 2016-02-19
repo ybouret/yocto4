@@ -419,6 +419,29 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 return ans;
             }
 
+            static inline
+            natural factorial(const word_t n)
+            {
+                natural ans(1);
+                for(word_t i=2;i<=n;++i)
+                {
+                    ans *= i;
+                }
+                return ans;
+            }
+
+            static inline
+            natural factorial(const natural &n)
+            {
+                natural ans(1);
+                for(natural i=2;i<=n;++i)
+                {
+                    ans *= i;
+                }
+                return ans;
+            }
+
+
             //__________________________________________________________________
             //
             //

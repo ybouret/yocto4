@@ -11,7 +11,7 @@ namespace yocto
         {
             if(nd<=0)
             {
-                throw libc::exception(EINVAL,"mpl: division by zero");
+                throw libc::exception(EDOM,"mpl: division by zero");
             }
 
             const int cmp = natural::compare(num, nn, den, nd);
