@@ -208,8 +208,12 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
                     {
                         switch(rs)
                         {
-                            case __zero: return integer(__negative,lb,ln);
+                            case __zero:     return integer(__negative,lb,ln);
                             case __negative:
+                            {
+                                const natural nn = natural::add(lb,ln,rb, rn);
+                                return integer(__negative,nn);
+                            }
                             case __positive:;
                         }
                     }
@@ -229,8 +233,12 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
                         switch(rs)
                         {
                             case __zero:      return integer(__positive,lb,ln);
-                            case __negative:
-                            case __positive:;
+                            case __positive:
+                            {
+                                const natural nn = natural::add(lb,ln,rb, rn);
+                                return integer(__positive,nn);
+                            }
+                            case __negative:;
                         }
                     }
                 }
