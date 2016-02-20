@@ -238,7 +238,12 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
                                 const natural nn = natural::add(lb,ln,rb, rn);
                                 return integer(__positive,nn);
                             }
-                            case __negative:;
+                            case __negative:
+                            {
+                                // LHS >0, RHS < 0
+                                const int cmp = natural::compare(lb, ln, rb, rn);
+                                
+                            }
                         }
                     }
                 }
