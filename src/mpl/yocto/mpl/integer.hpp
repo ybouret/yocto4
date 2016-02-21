@@ -40,6 +40,16 @@ namespace yocto
             }
         }
         
+        inline sign_type sign_mul(const sign_type a, const sign_type b) throw()
+        {
+            switch(a)
+            {
+                case __negative: return sign_neg(b);
+                case __zero:     return __zero;
+                case __positive: return b;
+            }
+        }
+        
         
         class integer : public object
         {
@@ -387,6 +397,45 @@ return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                         
                 (void)dec();
                 return sav;
             }
+            
+            //__________________________________________________________________
+            //
+            //
+            // multiplication
+            //
+            //__________________________________________________________________
+            static inline integer mul(const sign_type ls,
+                                      const void     *lb,
+                                      const size_t    ln,
+                                      const sign_type rs,
+                                      const void     *rb,
+                                      const size_t    rn) throw()
+            {
+                if(__zero==ls||__zero==rs)
+                {
+                    return integer();
+                }
+                else
+                {
+                    const natural p = natural::mul(lb, ln, rb, rn);
+                    return integer( sign_mul(ls,rs), p );
+                }
+            }
+            YOCTO_MPZ_DECL(*,mul)
+            inline integer & operator*=( const integer &rhs )
+            {
+                integer tmp = *this * rhs;
+                xch(tmp);
+                return *this;
+            }
+            
+            inline integer & operator*=(const integer_t rhs)
+            {
+                integer tmp = *this * rhs;
+                xch(tmp);
+                return *this;
+            }
+
             
 
         };
