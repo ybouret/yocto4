@@ -334,6 +334,61 @@ return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                         
             }
             
             
+            //__________________________________________________________________
+            //
+            //
+            // subtraction
+            //
+            //__________________________________________________________________
+            static inline integer sub(const sign_type ls,
+                                      const void     *lb,
+                                      const size_t    ln,
+                                      const sign_type rs,
+                                      const void     *rb,
+                                      const size_t    rn) throw()
+            {
+                return add(ls,lb,ln, sign_neg(rs), rb, rn);
+            }
+
+            YOCTO_MPZ_DECL(-,sub)
+            inline integer & operator-=( const integer &rhs )
+            {
+                integer tmp = *this - rhs;
+                xch(tmp);
+                return *this;
+            }
+            
+            inline integer & operator-=(const integer_t rhs)
+            {
+                integer tmp = *this - rhs;
+                xch(tmp);
+                return *this;
+            }
+            
+            inline integer &dec()
+            {
+                word_t       __one = 1;
+                const size_t __len = natural::prepare(__one);
+                integer      __ans = add(s,n.ro(),n.length(),__negative,&__one,__len);
+                xch(__ans);
+                return *this;
+            }
+            
+            //! prefix increment
+            inline integer & operator--()
+            {
+                return dec();
+            }
+            
+            //! postfix increment
+            integer   operator-- (int)
+            {
+                integer sav(*this);
+                (void)dec();
+                return sav;
+            }
+            
+
         };
         
         
