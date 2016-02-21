@@ -82,6 +82,40 @@ YOCTO_UNIT_TEST_IMPL(mpz)
         }
     }
 
+    std::cerr << "-- Multiplication Tests" << std::endl;
+    {
+        for(size_t i=0;i<10000;++i)
+        {
+            const integer_t x = _rand.full<int32_t>();
+            const integer_t y = _rand.full<int32_t>();
+            const integer   X = x;
+            const integer   Y = y;
+            const integer   Z = x*y;
+            if(Z!=(x*y))
+            {
+                throw exception("invalid multiplication");
+            }
+        }
+
+    }
+    
+    std::cerr << "-- Division Tests" << std::endl;
+    {
+        for(size_t i=0;i<10000;++i)
+        {
+            const integer_t x = _rand.full<integer_t>();
+            const integer_t y = _rand.full<integer_t>();
+            if(0==y) continue;
+            const integer   X = x;
+            const integer   Y = y;
+            const integer   Z = x/y;
+            if(Z!=(x/y))
+            {
+                throw exception("invalid division");
+            }
+        }
+        
+    }
 
     
     

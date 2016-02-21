@@ -436,8 +436,23 @@ return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                         
                 return *this;
             }
 
+            //__________________________________________________________________
+            //
+            //
+            // multiplication
+            //
+            //__________________________________________________________________
+            static inline integer div(const sign_type ls,
+                                      const void     *lb,
+                                      const size_t    ln,
+                                      const sign_type rs,
+                                      const void     *rb,
+                                      const size_t    rn) throw()
+            {
+                const natural q = natural::div(lb, ln, rb, rn);
+                return integer( sign_mul(ls,rs), q );
+            }
             
-
         };
         
         
