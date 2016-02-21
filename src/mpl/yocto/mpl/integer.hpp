@@ -13,23 +13,23 @@ namespace yocto
             __zero     =  0,
             __positive =  1
         };
-
-
+        
+        
         inline sign_type int2sign(const int s) throw()
         {
             return (s<0) ? __negative : ( (0<s) ? __positive : __zero );
         }
-
+        
         inline sign_type integer2sign(const integer_t s) throw()
         {
             return (s<0) ? __negative : ( (0<s) ? __positive : __zero );
         }
-
+        
         inline word_t   integer2word(const integer_t s) throw()
         {
             return (s<0) ? word_t(-s) : word_t(s);
         }
-
+        
         inline sign_type sign_neg(const sign_type s) throw()
         {
             switch(s)
@@ -39,21 +39,21 @@ namespace yocto
                 case __positive:  return __negative;
             }
         }
-
-
+        
+        
         class integer : public object
         {
         public:
             const sign_type s;
             const natural   n;
-
+            
             //! guess validity. TODO: check !!!!
             inline void update() throw()
             {
                 YOCTO_CHECK_MPN(n);
                 if(n.is_zero()) (sign_type&)s = __zero;
             }
-
+            
             //__________________________________________________________________
             //
             // canonical
@@ -72,31 +72,31 @@ namespace yocto
                 xch(tmp);
                 return *this;
             }
-
+            
             inline integer(const integer_t   I) : s(integer2sign(I)), n(integer2word(I)) { }
             inline integer(const natural    &N) : s( N.is_zero() ? __zero : __positive ), n(N) {}
-
+            
             inline integer & operator=( const natural &N )
             {
                 integer tmp(N);
                 xch(tmp);
                 return *this;
             }
-
+            
             inline integer & operator=( const integer_t I )
             {
                 integer tmp(I);
                 xch(tmp);
                 return *this;
             }
-
+            
             inline integer(const sign_type S, const natural &N) : s(S), n(N) { update(); }
             inline integer(const sign_type S, const void *buf, const size_t len) :
             s(S), n(buf,len)
             {
                 update();
             }
-
+            
             //__________________________________________________________________
             //
             //
@@ -114,7 +114,7 @@ namespace yocto
                 os << z.n;
                 return os;
             }
-
+            
             //__________________________________________________________________
             //
             //
@@ -139,19 +139,19 @@ namespace yocto
                             case __zero    : return -1; //!< LHS<0, RHS=0
                             case __positive: return -1; //!< LHS<0, RHS>0
                         }
-
+                        
                     }
-
+                        
                     case __zero:
                     {
                         switch(rs)
                         {
-                            case __negative: return 1; //!< LHS=0, RHS<0
-                            case __zero    : return 0; //!< LHS=0, RHS=0
-                            case __positive: return 1; //!< LHS=0, RHS>0
+                            case __negative: return  1; //!< LHS=0, RHS<0
+                            case __zero    : return  0; //!< LHS=0, RHS=0
+                            case __positive: return -1; //!< LHS=0, RHS>0
                         }
                     }
-
+                        
                     case __positive:
                     {
                         switch(rs)
@@ -163,9 +163,13 @@ namespace yocto
                     }
                 }
             }
-
+            
 #define YOCTO_MPZ_CMP(OP) \
-inline friend bool operator OP(const integer &lhs, const integer  &rhs) throw() { return integer::compare(lhs.s,lhs.n.ro(),lhs.n.length(),rhs.s,rhs.n.ro(),rhs.n.length()) OP 0; } \
+inline friend bool operator OP(const integer &lhs, const integer  &rhs) throw()\
+{ return integer::compare(                                                     \
+lhs.s,lhs.n.ro(),lhs.n.length(),                                               \
+rhs.s,rhs.n.ro(),rhs.n.length()                                                \
+) OP 0; }                                                                      \
 inline friend bool operator OP(const integer &lhs, const integer_t rhs) throw()\
 {                                                                              \
 const sign_type rs = integer2sign(rhs);                                        \
@@ -178,17 +182,17 @@ inline friend bool operator OP(const integer_t lhs,const integer &rhs) throw() \
 const sign_type ls = integer2sign(lhs);                                        \
 word_t          lb = integer2word(lhs);                                        \
 const size_t    ln = natural::prepare(lb);                                     \
-return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
+return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length()) OP 0;       \
 }
-
+            
             YOCTO_MPZ_CMP(==)
             YOCTO_MPZ_CMP(!=)
             YOCTO_MPZ_CMP(<)
             YOCTO_MPZ_CMP(<=)
             YOCTO_MPZ_CMP(>)
             YOCTO_MPZ_CMP(>=)
-
-
+            
+            
             //__________________________________________________________________
             //
             //
@@ -214,10 +218,24 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
                                 const natural nn = natural::add(lb,ln,rb, rn);
                                 return integer(__negative,nn);
                             }
-                            case __positive:;
+                            case __positive:
+                            {
+                                // LHS<0, RHS>0
+                                const int cmp = natural::compare(lb, ln, rb, rn);
+                                if(cmp>=0)
+                                {
+                                    const natural nn = natural::sub(lb,ln,rb,rn);
+                                    return integer(__negative,nn);
+                                }
+                                else
+                                {
+                                    const natural nn = natural::sub(rb,rn,lb,ln);
+                                    return integer(__positive,nn);
+                                }
+                            }
                         }
                     }
-
+                        
                     case __zero:
                     {
                         switch(rs)
@@ -227,7 +245,7 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
                             case __positive: return integer(__positive,rb,rn); //-- LHS=0, RHS>0
                         }
                     }
-
+                        
                     case __positive:
                     {
                         switch(rs)
@@ -242,14 +260,84 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());            \
                             {
                                 // LHS >0, RHS < 0
                                 const int cmp = natural::compare(lb, ln, rb, rn);
-                                
+                                if(cmp>=0)
+                                {
+                                    const natural nn = natural::sub(lb,ln,rb,rn);
+                                    return integer(__positive,nn);
+                                }
+                                else
+                                {
+                                    const natural nn = natural::sub(rb,rn,lb,ln);
+                                    return integer(__negative,nn);
+                                }
                             }
                         }
                     }
                 }
             }
-
+            
+            inline integer operator+() { return integer(*this); }
+#define YOCTO_MPZ_DECL(OP,CALL) \
+inline friend integer operator OP ( const integer &lhs, const integer &rhs )      \
+{ return CALL(lhs.s,lhs.n.ro(),lhs.n.length(),rhs.s,rhs.n.ro(),rhs.n.length()); } \
+inline friend integer operator OP(const integer &lhs, const integer_t rhs)        \
+{                                                                                 \
+const sign_type rs = integer2sign(rhs);                                           \
+word_t          rb = integer2word(rhs);                                           \
+const size_t    rn = natural::prepare(rb);                                        \
+return CALL(lhs.s,lhs.n.ro(),lhs.n.length(),rs,&rb,rn);                           \
+}                                                                                 \
+inline friend integer operator OP(const integer_t lhs,const integer &rhs)         \
+{                                                                                 \
+const sign_type ls = integer2sign(lhs);                                           \
+word_t          lb = integer2word(lhs);                                           \
+const size_t    ln = natural::prepare(lb);                                        \
+return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                           \
+}
+            
+            YOCTO_MPZ_DECL(+,add)
+            inline integer & operator+=( const integer &rhs )
+            {
+                integer tmp = *this + rhs;
+                xch(tmp);
+                return *this;
+            }
+            
+            inline integer & operator+=(const integer_t rhs)
+            {
+                integer tmp = *this + rhs;
+                xch(tmp);
+                return *this;
+            }
+            
+            inline integer &inc()
+            {
+                word_t       __one = 1;
+                const size_t __len = natural::prepare(__one);
+                integer      __ans = add(s,n.ro(),n.length(),__positive,&__one,__len);
+                xch(__ans);
+                return *this;
+            }
+            
+            //! prefix increment
+            inline integer & operator++()
+            {
+                return inc();
+            }
+            
+            //! postfix increment
+            integer   operator++ (int)
+            {
+                integer sav(*this);
+                (void)inc();
+                return sav;
+            }
+            
+            
         };
+        
+        
+        
         
     }
     

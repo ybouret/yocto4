@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(mpz)
         }
     }
 
-    std::cerr << "-- Comparision tests" << std::endl;
+    std::cerr << "-- Comparision Tests" << std::endl;
     {
         vector<mpz>       Z;
         vector<integer_t> z;
@@ -37,8 +37,31 @@ YOCTO_UNIT_TEST_IMPL(mpz)
         quicksort(Z);
         for(size_t i=z.size();i>0;--i)
         {
+            //std::cerr << "z=" << z[i] << "/ Z=" << Z[i] << std::endl;
             if(z[i]!=Z[i]) throw exception("invalid comparison!");
         }
+    }
+    
+    std::cerr << "-- Addition Tests" << std::endl;
+    {
+        //const integer ten = 10;
+        for(integer i=-10;i<=10;++i)
+        {
+            std::cerr << "i=" << i << std::endl;
+        }
+        for(size_t i=0;i<10000;++i)
+        {
+            const integer_t x = _rand.full<int32_t>();
+            const integer_t y = _rand.full<int32_t>();
+            const integer   X = x;
+            const integer   Y = y;
+            const integer   Z = x+y;
+            if(Z!=(x+y))
+            {
+                throw exception("invalid addition");
+            }
+        }
+        
     }
 
 }

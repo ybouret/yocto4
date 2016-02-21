@@ -373,11 +373,6 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 return __apply(proc, lhs.byte, lhs.size, (uint8_t *)&rhs, sizeof(word_t) );
             }
 
-            static inline natural _apply(bproc          proc,
-                                         word_t         lhs,
-                                         const natural &rhs)
-            {
-            }
             
             
         private:
