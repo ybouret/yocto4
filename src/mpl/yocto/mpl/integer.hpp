@@ -436,10 +436,16 @@ return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                         
                 return *this;
             }
 
+            inline friend integer operator*(const integer &lhs, const natural &rhs)
+            {
+                const  natural p = lhs.n * rhs;
+                return integer(lhs.s,p);
+            }
+            
             //__________________________________________________________________
             //
             //
-            // multiplication
+            // division
             //
             //__________________________________________________________________
             static inline integer div(const sign_type ls,
@@ -452,7 +458,27 @@ return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                         
                 const natural q = natural::div(lb, ln, rb, rn);
                 return integer( sign_mul(ls,rs), q );
             }
+            YOCTO_MPZ_DECL(/,div)
+            inline integer & operator/=( const integer &rhs )
+            {
+                integer tmp = *this / rhs;
+                xch(tmp);
+                return *this;
+            }
             
+            inline integer & operator/=(const integer_t rhs)
+            {
+                integer tmp = *this / rhs;
+                xch(tmp);
+                return *this;
+            }
+            
+            inline friend integer operator/(const integer &lhs, const natural &rhs)
+            {
+                const  natural q = lhs.n * rhs;
+                return integer(lhs.s,q);
+            }
+
         };
         
         
