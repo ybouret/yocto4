@@ -64,7 +64,7 @@ namespace yocto
             // Addition
             //
             //__________________________________________________________________
-            inline rational add( rational &lhs, rational &rhs )
+            inline rational add( const rational &lhs, const rational &rhs )
             {
                 const integer u = lhs.num * rhs.den;
                 const integer v = rhs.num * lhs.den;
@@ -79,7 +79,7 @@ namespace yocto
             // Subtraction
             //
             //__________________________________________________________________
-            inline rational sub( rational &lhs, rational &rhs )
+            inline rational sub( const rational &lhs, const rational &rhs )
             {
                 const integer u = lhs.num * rhs.den;
                 const integer v = rhs.num * lhs.den;
@@ -87,7 +87,33 @@ namespace yocto
                 const integer w = u-v;
                 return rational(w,q);
             }
-
+            
+            //__________________________________________________________________
+            //
+            //
+            // multiplication
+            //
+            //__________________________________________________________________
+            inline rational mul(const rational &lhs, const rational &rhs )
+            {
+                const integer u = lhs.num * rhs.num;
+                const natural v = lhs.den * rhs.den;
+                return rational(u,v);
+            }
+            
+            //__________________________________________________________________
+            //
+            //
+            // division
+            //
+            //__________________________________________________________________
+            inline rational div(const rational &lhs, const rational &rhs )
+            {
+                const integer u = lhs.num * rhs.den;
+                const integer v = rhs.num * lhs.den;
+                (sign_type &)(u.s) = sign_mul(u.s,v.s);
+                return rational(u,v.n);
+            }
             
         };
     }
