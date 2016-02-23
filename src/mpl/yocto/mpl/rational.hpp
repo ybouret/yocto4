@@ -72,7 +72,8 @@ namespace yocto
                 const integer w = u+v;
                 return rational(w,q);
             }
-            
+            inline rational operator+() { return *this; }
+
             //__________________________________________________________________
             //
             //
@@ -87,6 +88,8 @@ namespace yocto
                 const integer w = u-v;
                 return rational(w,q);
             }
+            
+            inline rational operator-() { const integer nn = -num; return rational(nn,den); }
             
             //__________________________________________________________________
             //

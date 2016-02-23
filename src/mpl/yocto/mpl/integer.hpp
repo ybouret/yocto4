@@ -359,7 +359,9 @@ return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                         
             {
                 return add(ls,lb,ln, sign_neg(rs), rb, rn);
             }
-
+            
+            inline integer operator-() { return integer( sign_neg(s), n ); }
+            
             YOCTO_MPZ_DECL(-,sub)
             inline integer & operator-=( const integer &rhs )
             {
