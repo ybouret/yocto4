@@ -286,7 +286,7 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length()) OP 0;       \
                 }
             }
             
-            inline integer operator+() { return integer(*this); }
+            inline integer operator+() const { return integer(*this); }
 #define YOCTO_MPZ_DECL(OP,CALL) \
 inline friend integer operator OP ( const integer &lhs, const integer &rhs )      \
 { return CALL(lhs.s,lhs.n.ro(),lhs.n.length(),rhs.s,rhs.n.ro(),rhs.n.length()); } \
@@ -360,7 +360,7 @@ return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                         
                 return add(ls,lb,ln, sign_neg(rs), rb, rn);
             }
             
-            inline integer operator-() { return integer( sign_neg(s), n ); }
+            inline integer operator-() const { return integer( sign_neg(s), n ); }
             
             YOCTO_MPZ_DECL(-,sub)
             inline integer & operator-=( const integer &rhs )

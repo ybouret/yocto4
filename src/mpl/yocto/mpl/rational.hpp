@@ -58,13 +58,18 @@ namespace yocto
                 return os;
             }
             
+#define YOCTO_MPQ_DECL(OP,OP1,CALL) \
+inline friend rational operator OP ( const rational &lhs, const rational &rhs ) \
+{ return CALL(lhs,rhs); }\
+inline  rational & operator OP1(const rational &rhs) { rational r = *this OP rhs; xch(r); return *this; }
+            
             //__________________________________________________________________
             //
             //
             // Addition
             //
             //__________________________________________________________________
-            inline rational add( const rational &lhs, const rational &rhs )
+            inline static rational add( const rational &lhs, const rational &rhs )
             {
                 const integer u = lhs.num * rhs.den;
                 const integer v = rhs.num * lhs.den;
@@ -72,15 +77,16 @@ namespace yocto
                 const integer w = u+v;
                 return rational(w,q);
             }
-            inline rational operator+() { return *this; }
-
+            inline rational operator+() const { return *this; }
+            YOCTO_MPQ_DECL(+,+=,add)
+            
             //__________________________________________________________________
             //
             //
             // Subtraction
             //
             //__________________________________________________________________
-            inline rational sub( const rational &lhs, const rational &rhs )
+            inline static rational sub( const rational &lhs, const rational &rhs )
             {
                 const integer u = lhs.num * rhs.den;
                 const integer v = rhs.num * lhs.den;
@@ -89,35 +95,38 @@ namespace yocto
                 return rational(w,q);
             }
             
-            inline rational operator-() { const integer nn = -num; return rational(nn,den); }
-            
+            inline rational operator-() const { const integer nn = -num; return rational(nn,den); }
+            YOCTO_MPQ_DECL(-,-=,sub)
+
             //__________________________________________________________________
             //
             //
             // multiplication
             //
             //__________________________________________________________________
-            inline rational mul(const rational &lhs, const rational &rhs )
+            inline static rational mul(const rational &lhs, const rational &rhs )
             {
                 const integer u = lhs.num * rhs.num;
                 const natural v = lhs.den * rhs.den;
                 return rational(u,v);
             }
-            
+            YOCTO_MPQ_DECL(*,*=,mul)
+
             //__________________________________________________________________
             //
             //
             // division
             //
             //__________________________________________________________________
-            inline rational div(const rational &lhs, const rational &rhs )
+            inline static rational div(const rational &lhs, const rational &rhs )
             {
                 const integer u = lhs.num * rhs.den;
                 const integer v = rhs.num * lhs.den;
                 (sign_type &)(u.s) = sign_mul(u.s,v.s);
                 return rational(u,v.n);
             }
-            
+            YOCTO_MPQ_DECL(/,/=,div)
+
         };
     }
     
