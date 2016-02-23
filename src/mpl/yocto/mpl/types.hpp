@@ -67,7 +67,7 @@ namespace yocto
                 n = 0;
             }
 
-
+            static bool random_bit();
 
         private:
             friend class singleton<manager>;

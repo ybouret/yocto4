@@ -2,7 +2,7 @@
 #define YOCTO_MPL_MPI_INCLUDED 1
 
 #include "yocto/mpi/mpi.hpp"
-#include "yocto/mpl/integer.hpp"
+#include "yocto/mpl/rational.hpp"
 
 namespace yocto
 {

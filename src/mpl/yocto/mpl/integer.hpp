@@ -50,6 +50,16 @@ namespace yocto
             }
         }
         
+        inline sign_type sign_abs(const sign_type s) throw()
+        {
+            switch(s)
+            {
+                case __negative: return __positive;
+                case __positive: return __positive;
+                case __zero:     return __zero;
+            }
+        }
+        
         
         class integer : public object
         {
@@ -287,7 +297,7 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length()) OP 0;       \
             }
             
             inline integer operator+() const { return integer(*this); }
-#define YOCTO_MPZ_DECL(OP,CALL) \
+#define YOCTO_MPZ_DECL(OP,OP1,CALL) \
 inline friend integer operator OP ( const integer &lhs, const integer &rhs )      \
 { return CALL(lhs.s,lhs.n.ro(),lhs.n.length(),rhs.s,rhs.n.ro(),rhs.n.length()); } \
 inline friend integer operator OP(const integer &lhs, const integer_t rhs)        \
@@ -303,22 +313,13 @@ const sign_type ls = integer2sign(lhs);                                         
 word_t          lb = integer2word(lhs);                                           \
 const size_t    ln = natural::prepare(lb);                                        \
 return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                           \
-}
+}\
+inline integer & operator OP1 ( const integer &rhs ) { \
+integer tmp = (*this) + rhs; xch(tmp); return *this; } \
+inline integer & operator OP1 ( const integer_t rhs) { \
+integer tmp = (*this) + rhs; xch(tmp); return *this; }
             
-            YOCTO_MPZ_DECL(+,add)
-            inline integer & operator+=( const integer &rhs )
-            {
-                integer tmp = *this + rhs;
-                xch(tmp);
-                return *this;
-            }
-            
-            inline integer & operator+=(const integer_t rhs)
-            {
-                integer tmp = *this + rhs;
-                xch(tmp);
-                return *this;
-            }
+            YOCTO_MPZ_DECL(+,+=,add)
             
             inline integer &inc()
             {
@@ -362,20 +363,7 @@ return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                         
             
             inline integer operator-() const { return integer( sign_neg(s), n ); }
             
-            YOCTO_MPZ_DECL(-,sub)
-            inline integer & operator-=( const integer &rhs )
-            {
-                integer tmp = *this - rhs;
-                xch(tmp);
-                return *this;
-            }
-            
-            inline integer & operator-=(const integer_t rhs)
-            {
-                integer tmp = *this - rhs;
-                xch(tmp);
-                return *this;
-            }
+            YOCTO_MPZ_DECL(-,-=,sub)
             
             inline integer &dec()
             {
@@ -423,21 +411,8 @@ return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                         
                     return integer( sign_mul(ls,rs), p );
                 }
             }
-            YOCTO_MPZ_DECL(*,mul)
-            inline integer & operator*=( const integer &rhs )
-            {
-                integer tmp = *this * rhs;
-                xch(tmp);
-                return *this;
-            }
+            YOCTO_MPZ_DECL(*,*=,mul)
             
-            inline integer & operator*=(const integer_t rhs)
-            {
-                integer tmp = *this * rhs;
-                xch(tmp);
-                return *this;
-            }
-
             inline friend integer operator*(const integer &lhs, const natural &rhs)
             {
                 const  natural p = lhs.n * rhs;
@@ -460,20 +435,7 @@ return CALL(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length());                         
                 const natural q = natural::div(lb, ln, rb, rn);
                 return integer( sign_mul(ls,rs), q );
             }
-            YOCTO_MPZ_DECL(/,div)
-            inline integer & operator/=( const integer &rhs )
-            {
-                integer tmp = *this / rhs;
-                xch(tmp);
-                return *this;
-            }
-            
-            inline integer & operator/=(const integer_t rhs)
-            {
-                integer tmp = *this / rhs;
-                xch(tmp);
-                return *this;
-            }
+            YOCTO_MPZ_DECL(/,/=,div)
             
             inline friend integer operator/(const integer &lhs, const natural &rhs)
             {

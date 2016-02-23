@@ -11,7 +11,7 @@ FIND_PACKAGE(MPI)
 
 IF(MPI_FOUND)
 INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
-INCLUDE_DIRECTORIES(../../mpi)
+INCLUDE_DIRECTORIES(../../mpi ../../mk)
 
 ADD_EXECUTABLE(test-mpl-par main-par.cpp)
 TARGET_LINK_YOCTO(test-mpl-par mpl mpi)

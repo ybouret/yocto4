@@ -22,12 +22,16 @@ assert( (X).size <= (X).maxi );\
 assert( ! ( ((X).size>0) && (X).byte[(X).size-1] <= 0 ) )
 
 #define YOCTO_MPN_DECL(RET,OP,CALL) \
-inline friend RET OP (const natural &lhs, const natural &rhs) \
+inline friend RET operator OP (const natural &lhs, const natural &rhs) \
 { return CALL(lhs.byte,lhs.size,rhs.byte,rhs.size); } \
-inline friend RET OP (const natural &lhs, word_t rhs ) \
+inline friend RET operator OP (const natural &lhs, word_t rhs ) \
 { const size_t n = prepare(rhs); return CALL(lhs.byte,lhs.size,&rhs,n); } \
-inline friend RET OP (word_t lhs, const natural &rhs) \
+inline friend RET operator OP (word_t lhs, const natural &rhs) \
 { const size_t n = prepare(lhs); return CALL(&lhs,n,rhs.byte,rhs.size); }
+
+#define YOCTO_MPN_DECL_SELF(OP1,OP) \
+inline natural & operator OP1 ( const natural &rhs ) { natural tmp = (*this) + rhs; xch(tmp); return *this; }\
+inline natural & operator OP1 ( const word_t   rhs ) { natural tmp = (*this) + rhs; xch(tmp); return *this; }
 
         class integer;
 
@@ -158,7 +162,7 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
                     return true;
                 }
             }
-            YOCTO_MPN_DECL(bool,operator==,are_same)
+            YOCTO_MPN_DECL(bool,==,are_same)
 
             static inline bool are_different(const void *lhs, const size_t nl,
                                              const void *rhs, const size_t nr) throw()
@@ -175,7 +179,7 @@ inline friend RET OP (word_t lhs, const natural &rhs) \
                     return false;
                 }
             }
-            YOCTO_MPN_DECL(bool,operator!=,are_different)
+            YOCTO_MPN_DECL(bool,!=,are_different)
 
             static
             int compare(const void *lhs, const size_t nl,
@@ -293,25 +297,11 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                                const void *rhs, size_t nr);
 
             //! unary operator
-            natural  operator+() { return natural(*this); }
-            YOCTO_MPN_DECL(natural,operator+,add)
-
-            //! in place
-            inline natural & operator+=( const natural &rhs )
-            {
-                natural tmp = *this + rhs;
-                xch(tmp);
-                return *this;
-            }
-
-            //! in place
-            inline natural & operator+=(const word_t rhs)
-            {
-                natural tmp = *this + rhs;
-                xch(tmp);
-                return *this;
-            }
-
+            natural  operator+() const { return natural(*this); }
+            YOCTO_MPN_DECL(natural,+,add)
+            YOCTO_MPN_DECL_SELF(+=,+)
+            
+            
             inline natural &inc()
             {
                 word_t       __one = 1;
@@ -346,22 +336,10 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             static natural sub(const void *lhs, const size_t nl,
                                const void *rhs, const size_t nr);
             // no unary operator !
-            YOCTO_MPN_DECL(natural,operator-,sub)
-
-            inline natural & operator-=( const natural &rhs )
-            {
-                natural tmp = *this - rhs;
-                xch(tmp);
-                return *this;
-            }
-
-            inline natural & operator-=(const word_t rhs)
-            {
-                natural tmp = *this - rhs;
-                xch(tmp);
-                return *this;
-            }
-
+            YOCTO_MPN_DECL(natural,-,sub)
+            YOCTO_MPN_DECL_SELF(-=,-)
+            
+          
             inline natural &dec()
             {
                 word_t       __one = 1;
@@ -394,22 +372,10 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //! universal FFT based mul function
             static natural mul(const void *lhs, const size_t nl,
                                const void *rhs, const size_t nr);
-            YOCTO_MPN_DECL(natural,operator*,mul)
+            YOCTO_MPN_DECL(natural,*,mul)
+            YOCTO_MPN_DECL_SELF(*=,*)
 
-            inline natural & operator*=( const natural &rhs )
-            {
-                natural tmp = *this * rhs;
-                xch(tmp);
-                return *this;
-            }
-
-            inline natural & operator*=(const word_t rhs)
-            {
-                natural tmp = *this * rhs;
-                xch(tmp);
-                return *this;
-            }
-
+            
             static natural sqr(const natural &);
             static inline
             natural power(const natural &rhs,  word_t p)
@@ -460,22 +426,10 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //!universal division algorithm
             static natural div(const void *num, const size_t nn,
                                const void *den, const size_t nd);
-            YOCTO_MPN_DECL(natural, operator/, div)
-
-            inline natural &operator/=(const natural &den )
-            {
-                natural tmp = *this/den;
-                xch(tmp);
-                return *this;
-            }
-
-            inline natural & operator/=(const word_t den)
-            {
-                natural tmp = *this/den;
-                xch(tmp);
-                return *this;
-            }
-
+            YOCTO_MPN_DECL(natural,/,div)
+            YOCTO_MPN_DECL_SELF(/=,/)
+            
+            
             static void split( natural &q, natural &r, const natural &num, const natural &den );
 
             //__________________________________________________________________
@@ -491,22 +445,9 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                                   const size_t nn,
                                   const void  *den,
                                   const size_t nd);
-            YOCTO_MPN_DECL(natural,operator%,modulo)
-
-            inline natural &operator%=(const natural &den )
-            {
-                natural tmp = *this%den;
-                xch(tmp);
-                return *this;
-            }
-
-            inline natural & operator%=(const word_t den)
-            {
-                natural tmp = *this%den;
-                xch(tmp);
-                return *this;
-            }
-
+            YOCTO_MPN_DECL(natural,%,modulo)
+            YOCTO_MPN_DECL_SELF(%=,%)
+           
             //__________________________________________________________________
             //
             //

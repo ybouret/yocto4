@@ -1,5 +1,4 @@
 #include "yocto/mpl/natural.hpp"
-#include "yocto/random/bits.hpp"
 #include "yocto/code/round.hpp"
 
 #include <iostream>
@@ -198,11 +197,10 @@ namespace yocto {
         natural natural::rand(size_t nbits)
         {
             if(nbits<=0) return  natural();
-            Random::Bits &ran = Random::CryptoBits();
             natural ans=1;
             while(--nbits>0)
             {
-                ans.shl().byte[0] |= static_cast<uint8_t>( ran() ? 1 : 0 );
+                ans.shl().byte[0] |= static_cast<uint8_t>( manager::random_bit() ? 1 : 0 );
             }
             return ans;
         }

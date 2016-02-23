@@ -61,7 +61,19 @@ namespace yocto
 #define YOCTO_MPQ_DECL(OP,OP1,CALL) \
 inline friend rational operator OP ( const rational &lhs, const rational &rhs ) \
 { return CALL(lhs,rhs); }\
-inline  rational & operator OP1(const rational &rhs) { rational r = *this OP rhs; xch(r); return *this; }
+inline rational & operator OP1(const rational &rhs) { rational r = *this OP rhs; xch(r); return *this; } \
+inline friend rational operator OP ( const rational &lhs, const integer &rhs ) \
+{ const rational r(rhs); return lhs OP r; } \
+inline friend rational operator OP ( const rational &lhs, const integer_t rhs) \
+{ const rational r(rhs); return CALL(lhs,r); } \
+inline friend rational operator OP ( const integer &lhs, const rational &rhs ) \
+{ const rational l(lhs); return CALL(l,rhs); } \
+inline friend rational operator OP ( const integer_t lhs,const rational &rhs ) \
+{ const rational l(lhs); return CALL(l,rhs); } \
+inline rational & operator OP1(const integer  &rhs) { rational r = *this OP rhs; xch(r); return *this; } \
+inline rational & operator OP1(const integer_t rhs) { rational r = *this OP rhs; xch(r); return *this; }
+
+            
             
             //__________________________________________________________________
             //
@@ -126,7 +138,34 @@ inline  rational & operator OP1(const rational &rhs) { rational r = *this OP rhs
                 return rational(u,v.n);
             }
             YOCTO_MPQ_DECL(/,/=,div)
-
+            
+            //__________________________________________________________________
+            //
+            //
+            // comparison
+            //
+            //__________________________________________________________________
+            inline static int compare( const rational &lhs, const rational &rhs )
+            {
+                const integer u = lhs.num * rhs.den;
+                const integer v = rhs.num * lhs.den;
+                return integer::compare(                                                     \
+                                        u.s,u.n.ro(),u.n.length(),                                               \
+                                        v.s,v.n.ro(),v.n.length()                                                \
+                                        );
+            }
+            
+#define YOCTO_MPQ_CMP(OP) \
+inline friend bool operator OP(const rational &lhs, const rational  &rhs) throw()\
+{ return compare(lhs,rhs) OP 0; }
+            
+            YOCTO_MPQ_CMP(==)
+            YOCTO_MPQ_CMP(!=)
+            YOCTO_MPQ_CMP(>=)
+            YOCTO_MPQ_CMP(<=)
+            YOCTO_MPQ_CMP(>)
+            YOCTO_MPQ_CMP(<)
+            
         };
     }
     
@@ -134,9 +173,19 @@ inline  rational & operator OP1(const rational &rhs) { rational r = *this OP rhs
     template <>
     struct xnumeric<mpq>
     {
-        inline static mpq zero() { return mpq();  }
-        inline static mpq one()  { return mpq(1); }
+        inline static mpq zero()    { return mpq();  }
+        inline static mpq one()     { return mpq(1); }
+        inline static mpq minimum() { return mpq(); }
     };
+    
+    namespace math
+    {
+        inline mpq Fabs(const mpq &r)
+        {
+            const mpl::integer nn( sign_abs(r.num.s), r.num.n );
+            return mpq(nn,r.den);
+        }
+    }
 }
 
 #endif
