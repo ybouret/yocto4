@@ -118,6 +118,18 @@ namespace yocto
 
         void natural:: simplify(natural &lhs, natural &rhs)
         {
+            if(lhs.is_zero())
+            {
+                if(!rhs.is_zero()) rhs=1;
+                return;
+            }
+            
+            if(rhs.is_zero())
+            {
+                if(!lhs.is_zero()) lhs=1;
+                return;
+            }
+            
             const mpn fac = natural::gcd(lhs,rhs);
             if(!fac.is_byte(1))
             {
