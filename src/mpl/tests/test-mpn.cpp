@@ -3,6 +3,7 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/sort/quick.hpp"
+#include <cmath>
 
 using namespace yocto;
 using namespace mpl;
@@ -262,12 +263,43 @@ YOCTO_UNIT_TEST_IMPL(mpn)
 
     std::cerr << "-- Testing conversion" << std::endl;
     {
+        for(size_t p=0;p<=10;++p)
+        {
+            const double pp    = (1<<p);
+            const double invpp = 1.0/pp;
+            double ip=0;
+            double nd=0;
+            double q=1;
+            for(;;)
+            {
+                const double tmp = q*invpp;
+                if( modf(tmp,&ip) > 0 )
+                {
+                    ++nd;
+                    q*=10;
+                }
+                else
+                    break;
+            }
+            std::cerr << "2^" << p << "=" << pp << "-> " << invpp << " -> #decimal=" << nd << std::endl;
+        }
         for(size_t i=1;i<=10;++i)
         {
             mpn n = mpn::rand(alea_leq(40));
             double x = n.to_real();
             std::cerr << n << " -> " << x << std::endl;
-
+        }
+        for(size_t i=1;i<=10;++i)
+        {
+            const mpn num = mpn::rand(alea_leq(40));
+            const mpn den = mpn::rand(alea_leq(40));
+            if(den>0)
+            {
+                const double x = num.to_real();
+                const double y = den.to_real();
+                const double z = mpn::ratio_of(num,den);
+                std::cerr << num << "/" << den << "->" << x/y << " | " << z << std::endl;
+            }
         }
     }
 

@@ -3,6 +3,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/code/bswap.hpp"
 #include <iostream>
+//#include <cmath>
 
 namespace yocto
 {
@@ -76,6 +77,21 @@ namespace yocto
             }
             return ans;
         }
+
+        double natural:: ratio_of(const natural &num,const natural &den)
+        {
+            natural q,r;
+            natural::split(q, r, num, den);
+            double ans = q.to_real();
+
+            const size_t nd = den.bits();
+            for(size_t i=1;i<=nd;++i)
+            {
+                
+            }
+            return ans;
+        }
+
 
         void natural::save(ios::ostream &fp) const
         {

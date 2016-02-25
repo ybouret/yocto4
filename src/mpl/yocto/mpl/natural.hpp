@@ -521,7 +521,8 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //
             //__________________________________________________________________
             double to_real() const;
-            
+            static double ratio_of(const natural &num,const natural &den);
+
         private:
             size_t   maxi; //!< maximum #bytes
             size_t   size; //!< current #bytes
