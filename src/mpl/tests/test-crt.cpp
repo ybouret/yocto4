@@ -23,9 +23,15 @@ mpn ByCRT(const mpn &C,
 {
     mpn       M1 = mpn::mod_exp(C,exponent1,prime1);
     const mpn M2 = mpn::mod_exp(C,exponent2,prime2);
+   
+    std::cerr << "\t (1) M1=" << M1 << ", M2=" << M2 << std::endl;
     while(M1<M2) M1 += prime1;
+    std::cerr << "\t (2) M1=" << M1 << ", M2=" << M2 << std::endl;
     M1 -= M2;
+    std::cerr << "\t (3) M1=" << M1 << ", M2=" << M2 << std::endl;
     M1 *= coefficient;
+    std::cerr << "\t (4) M1=" << M1 << ", M2=" << M2 << std::endl;
+
     return M2 + (M1%prime1) * prime2;
 }
 
@@ -49,6 +55,7 @@ static inline void perform_CRT(const natural &M,
     if(Q!=M)
     {
         std::cerr << "CRT Failure!" << std::endl;
+        throw exception("CRT Failure");
     }
 }
 
@@ -90,16 +97,17 @@ YOCTO_UNIT_TEST_IMPL(crt)
     std::cerr << "exponent2       = " << exponent2       << std::endl;
     std::cerr << "coefficient     = " << coefficient     << std::endl;
     
-    std::cerr << std::hex;
+    //std::cerr << std::hex;
     const size_t ibits = modulus.bits()-2;
 #define __XCRT(XX) perform_CRT(XX,modulus, publicExponent, privateExponent, exponent1, exponent2, prime1, prime2, coefficient)
     
-    for(size_t i=0;i<=ibits;++i)
+    for(size_t i=0;i<=ibits/2;++i)
     {
         natural M = mpn::exp2(i);
         __XCRT(M);
         --M;
         __XCRT(M);
+        break;
     }
     
 }
