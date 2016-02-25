@@ -225,6 +225,8 @@ YOCTO_UNIT_TEST_IMPL(mpn)
     }
 
 
+
+
     std::cerr << "-- Testing RSA" << std::endl;
     std::cerr << std::hex;
     for(size_t iter=1;iter<=10;++iter)
@@ -258,6 +260,16 @@ YOCTO_UNIT_TEST_IMPL(mpn)
     }
     std::cerr << std::dec;
 
+    std::cerr << "-- Testing conversion" << std::endl;
+    {
+        for(size_t i=1;i<=10;++i)
+        {
+            mpn n = mpn::rand(alea_leq(40));
+            double x = n.to_real();
+            std::cerr << n << " -> " << x << std::endl;
+
+        }
+    }
 
 
 }

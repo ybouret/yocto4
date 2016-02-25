@@ -520,7 +520,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             // conversion
             //
             //__________________________________________________________________
-            static double to_real(const natural &x);
+            double to_real() const;
             
         private:
             size_t   maxi; //!< maximum #bytes

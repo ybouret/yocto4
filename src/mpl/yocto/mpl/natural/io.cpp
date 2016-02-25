@@ -65,13 +65,14 @@ namespace yocto
             }
         }
 
-        double natural:: to_real(const natural &x)
+        double natural:: to_real() const
         {
             double ans = 0;
-            for(size_t i=0;i<x.size;++i)
+            uint8_t *q=byte+size;
+            for(size_t i=size;i>0;--i)
             {
                 ans *= 256.0;
-                ans += double(x.byte[i]);
+                ans += double(*(--q));
             }
             return ans;
         }
