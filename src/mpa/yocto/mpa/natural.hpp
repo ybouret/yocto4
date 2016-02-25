@@ -255,7 +255,10 @@ inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() 
             //__________________________________________________________________
             bool     is_prime_() const;
             natural  next_prime_() const;
-            
+            static inline natural __next_prime( const natural &x )
+            {
+                return x.next_prime_();
+            }
             bool is_prime() const;
             
             

@@ -32,7 +32,5 @@ YOCTO_UNIT_TEST_IMPL(rsa)
             //throw exception("CRT Failure");
         }
     }
-
-
 }
 YOCTO_UNIT_TEST_DONE()
