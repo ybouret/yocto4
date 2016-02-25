@@ -7,6 +7,8 @@
 #include "yocto/code/bswap.hpp"
 #include "yocto/xnumeric.hpp"
 #include "yocto/ios/bitio.hpp"
+#include "yocto/ios/ostream.hpp"
+#include "yocto/ios/istream.hpp"
 
 #include <iosfwd>
 
@@ -140,6 +142,8 @@ inline natural & operator OP1 ( const word_t   rhs ) { natural tmp = (*this) + r
 
             void           put(ios::bitio &Q) const;
             static natural get(ios::bitio &Q, const size_t n);
+            void   save( ios::ostream &) const;
+            static natural load( ios::istream &);
 
             //__________________________________________________________________
             //
@@ -291,6 +295,13 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             //__________________________________________________________________
             //! helper
             inline void    ldz() throw() { size=0; }
+
+#define Y_MPL_CLR(I) ( (uint8_t &)byte[I] ) = 0
+            inline void    __clr() const throw()
+            {
+                (size_t &)size = 0;
+                YOCTO_LOOP_FUNC_(maxi,Y_MPL_CLR,0);
+            }
 
             //! unversal add function
             static natural add(const void *lhs, size_t nl,

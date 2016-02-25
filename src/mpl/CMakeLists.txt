@@ -9,7 +9,13 @@ SOURCE_GROUP( mpl FILES ${mpl_srcs} )
 FILE( GLOB mpn_srcs yocto/mpl/natural/*.cpp )
 SOURCE_GROUP( mpl/natural FILES ${mpn_srcs} )
 
-SET( srcs ${mpl_srcs} ${mpn_srcs} ${mpz_srcs} ${rsa_srcs} )
+FILE( GLOB rsa_decl yocto/mpl/rsa/*.hpp)
+FILE( GLOB rsa_impl yocto/mpl/rsa/*.cpp)
+SET(       rsa_srcs ${rsa_decl} ${rsa_impl} )
+INSTALL( FILES ${rsa_decl} DESTINATION include/yocto/mpl/rsa )
+SOURCE_GROUP( mpl/rsa FILES ${rsa_srcs} )
+
+SET( srcs ${mpl_srcs} ${mpn_srcs} ${rsa_srcs} )
 INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY( y-mpl STATIC ${srcs} )

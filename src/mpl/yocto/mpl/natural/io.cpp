@@ -75,7 +75,22 @@ namespace yocto
             }
             return ans;
         }
-      
+
+        void natural::save(ios::ostream &fp) const
+        {
+            fp.emit<uint32_t>(size);
+            fp.save(byte,size);
+        }
+
+        natural natural::load(ios::istream &fp)
+        {
+            const size_t sz = fp.read<uint32_t>();
+            natural      ans(sz,as_capacity);
+            fp.load(ans.byte,sz);
+            ans.update();
+            return ans;
+        }
+
     }
 
 }
