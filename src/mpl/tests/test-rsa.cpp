@@ -1,6 +1,7 @@
 #include "yocto/mpl/rsa/keys.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/sys/rt-clock.hpp"
 
 using namespace yocto;
 using namespace mpl;
@@ -19,18 +20,35 @@ YOCTO_UNIT_TEST_IMPL(rsa)
     std::cerr << "prv=[" << prv.modulus << "," << prv.privateExponent << "]" << std::endl;
     std::cerr << "pub=[" << pub.modulus << "," << prv.publicExponent  << "]" << std::endl;
 
-    for(size_t i=1;i<=100;++i)
+    rt_clock chrono;
+    chrono.calibrate();
+    uint64_t _rsa = 0;
+    uint64_t _crt = 0;
+    uint64_t mark = 0;
+    
+    for(size_t i=1;i<=1000;++i)
     {
         const mpn M = mpn::rand( pub.ibits );
         const mpn C = pub.encode(M);
+        
+        mark = chrono.ticks();
         const mpn P = prv.decode_(C);
+        _rsa += chrono.ticks()-mark;
+        
+        mark = chrono.ticks();
         const mpn Q = prv.decode(C);
+        _crt += chrono.ticks()-mark;
         if(P!=M)  throw exception("RSA Failure");
         if(P!=Q)
         {
-            std::cerr << "CRT Failure" << std::endl;
-            //throw exception("CRT Failure");
+            //std::cerr << "CRT Failure" << std::endl;
+            throw exception("CRT Failure");
         }
     }
+    
+    const double tmx_rsa = chrono(_rsa);
+    const double tmx_crt = chrono(_crt);
+    std::cerr << "rsa: " << tmx_rsa << std::endl;
+    std::cerr << "crt: " << tmx_crt << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

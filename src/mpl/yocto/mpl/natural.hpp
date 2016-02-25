@@ -32,8 +32,8 @@ inline friend RET operator OP (word_t lhs, const natural &rhs) \
 { const size_t n = prepare(lhs); return CALL(&lhs,n,rhs.byte,rhs.size); }
 
 #define YOCTO_MPN_DECL_SELF(OP1,OP) \
-inline natural & operator OP1 ( const natural &rhs ) { natural tmp = (*this) + rhs; xch(tmp); return *this; }\
-inline natural & operator OP1 ( const word_t   rhs ) { natural tmp = (*this) + rhs; xch(tmp); return *this; }
+inline natural & operator OP1 ( const natural &rhs ) { natural tmp = (*this) OP rhs; xch(tmp); return *this; }\
+inline natural & operator OP1 ( const word_t   rhs ) { natural tmp = (*this) OP rhs; xch(tmp); return *this; }
 
         class integer;
 

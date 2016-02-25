@@ -24,11 +24,12 @@ mpn ByCRT(const mpn &C,
     mpn       M1 = mpn::mod_exp(C,exponent1,prime1);
     const mpn M2 = mpn::mod_exp(C,exponent2,prime2);
    
-    std::cerr << "\t (1) M1=" << M1 << ", M2=" << M2 << std::endl;
+    std::cerr << "\t prime1=" << prime1 << std::endl;
+    std::cerr << "\t (1) (original) M1=" << M1 << ", M2=" << M2 << std::endl;
     while(M1<M2) M1 += prime1;
-    std::cerr << "\t (2) M1=" << M1 << ", M2=" << M2 << std::endl;
+    std::cerr << "\t (2) (M1>=M2)   M1=" << M1 << ", M2=" << M2 << std::endl;
     M1 -= M2;
-    std::cerr << "\t (3) M1=" << M1 << ", M2=" << M2 << std::endl;
+    std::cerr << "\t (3) (M1-=M2)   M1=" << M1 << ", M2=" << M2 << std::endl;
     M1 *= coefficient;
     std::cerr << "\t (4) M1=" << M1 << ", M2=" << M2 << std::endl;
 
@@ -107,7 +108,6 @@ YOCTO_UNIT_TEST_IMPL(crt)
         __XCRT(M);
         --M;
         __XCRT(M);
-        break;
     }
     
 }
