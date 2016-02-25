@@ -70,6 +70,28 @@ namespace yocto
             return integer(s,n);
         }
         
+        template <>
+        inline
+        void send<rational>(const mpi      &MPI,
+                            const rational &x,
+                            const int       dest,
+                            MPI_Comm        comm )
+        {
+            send<integer>(MPI,x.num,dest,comm);
+            send<natural>(MPI,x.den,dest,comm);
+        }
+        
+
+        template <>
+        inline
+        rational recv<rational>(const mpi &MPI,
+                                const int  from,
+                                MPI_Comm   comm)
+        {
+            const integer num = recv<integer>(MPI,from,comm);
+            const natural den = recv<natural>(MPI,from,comm);
+            return rational(num,den);
+        }
         
         
         

@@ -502,6 +502,14 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
             static bool    __is_prime( const natural &n );
             static natural __next_prime(const natural &n);
 
+            //__________________________________________________________________
+            //
+            //
+            // conversion
+            //
+            //__________________________________________________________________
+            static double to_real(const natural &x);
+            
         private:
             size_t   maxi; //!< maximum #bytes
             size_t   size; //!< current #bytes

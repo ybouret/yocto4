@@ -65,6 +65,16 @@ namespace yocto
             }
         }
 
+        double natural:: to_real(const natural &x)
+        {
+            double ans = 0;
+            for(size_t i=0;i<x.size;++i)
+            {
+                ans *= 256.0;
+                ans += double(x.byte[i]);
+            }
+            return ans;
+        }
       
     }
 
