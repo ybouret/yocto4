@@ -107,7 +107,7 @@ inline natural & operator OP1 ( const word_t   rhs ) { natural tmp = (*this) + r
             inline void update() throw() {  update(byte,size);  }
 
             //! size=maxi and update
-            inline void rescan() throw() {  update(byte,size=maxi); }
+            inline void rescan() throw() {  update(byte,(size=maxi)); }
 
             //! ro_buffer interface
             virtual size_t length() const throw() { return size; }
@@ -119,6 +119,7 @@ inline natural & operator OP1 ( const word_t   rhs ) { natural tmp = (*this) + r
             //
             //__________________________________________________________________
             void display( std::ostream & ) const;
+            
             inline friend std::ostream & operator<<( std::ostream &os, const natural &n )
             {
                 n.display(os);

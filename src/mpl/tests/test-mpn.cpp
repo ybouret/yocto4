@@ -245,7 +245,7 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         std::cerr << "\tg=" << g << std::endl;
         mpn d = mpn::mod_inv(e,phi);
         std::cerr << "\td=" << d << std::endl;
-        const size_t bmax = n.bits()-1;
+        const size_t bmax = n.bits()-2;
         for(size_t i=1;i<=10;++i)
         {
             const mpn M = mpn::rand(alea_leq(bmax));

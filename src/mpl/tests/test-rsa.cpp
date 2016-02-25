@@ -26,7 +26,11 @@ YOCTO_UNIT_TEST_IMPL(rsa)
         const mpn P = prv.decode_(C);
         const mpn Q = prv.decode(C);
         if(P!=M)  throw exception("RSA Failure");
-        //if(P!=Q)  throw exception("CRT Failure");
+        if(P!=Q)
+        {
+            std::cerr << "CRT Failure" << std::endl;
+            //throw exception("CRT Failure");
+        }
     }
 
 
