@@ -333,8 +333,8 @@ YOCTO_UNIT_TEST_IMPL(parse)
     string line;
     while( line.clear(), (std::cerr << "> ").flush(), fp.read_line(line) >= 0 )
     {
-        const mpn n = mpn::hex(line);
-        std::cerr << "\t" << std::hex << n << " | " << std::dec << n << std::endl;
+        const mpn n = mpn::parse(line);
+        std::cerr << "\t 0x" << std::hex << n << " | " << std::dec << n << std::endl;
     }
 
 }

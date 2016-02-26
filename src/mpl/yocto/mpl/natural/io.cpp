@@ -108,7 +108,7 @@ namespace yocto
             return ans;
         }
 
-        natural natural:: hex( const string &s )
+        natural natural:: hex2mpn( const string &s )
         {
             natural ans;
             const size_t sz = s.size();
@@ -119,7 +119,7 @@ namespace yocto
                 const int  h = hex2dec(c);
                 if(h<0)
                 {
-                    throw exception("mpn::hex(invalid char '%c')",c);
+                    throw exception("mpn::hex2mpn(invalid char '%c')",c);
                 }
                 ans <<= 4;
                 ans +=  h;
@@ -127,6 +127,38 @@ namespace yocto
             return ans;
         }
 
+        natural natural:: dec2mpn( const string &s )
+        {
+            const natural ten=10;
+            natural ans;
+            const size_t sz = s.size();
+            const char  *ch = static_cast<const char *>(s.ro());
+            for(size_t i=0;i<sz;++i)
+            {
+                const int C = ch[i]; //*(--ch);
+                if(C<'0' || C >'9')
+                {
+                    throw exception("mpn::dec2mpn(invalid char '%c')",char(C));
+                }
+                ans *= 10;
+                ans += (C-'0');
+            }
+            return ans;
+        }
+
+
+        natural natural:: parse(const string &s)
+        {
+            if(s.size()>2&&s[0]=='0'&&s[1]=='x')
+            {
+                const string h(&s[2]);
+                return hex2mpn(h);
+            }
+            else
+            {
+                return dec2mpn(s);
+            }
+        }
 
     }
 
