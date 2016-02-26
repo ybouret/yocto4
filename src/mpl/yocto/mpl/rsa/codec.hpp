@@ -16,6 +16,7 @@ namespace yocto
             class Codec : public pack::q_codec
             {
             public:
+                static const size_t W = 10;
                 virtual ~Codec() throw();
 
                 virtual void reset() throw();
@@ -64,7 +65,9 @@ namespace yocto
                 explicit decoder(const Key &k);
                 virtual ~decoder() throw();
 
+                //! write and test for obits
                 virtual void write( char C );
+
                 virtual void flush();
 
             private:

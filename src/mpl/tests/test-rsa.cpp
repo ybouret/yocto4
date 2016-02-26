@@ -75,6 +75,10 @@ YOCTO_UNIT_TEST_IMPL(rsaQ)
     ios::icstream fp( ios::cstdin );
     RSA::encoder EncPub(pub);
     RSA::encoder EncPrv(prv);
+
+    RSA::decoder DecPub(pub);
+    RSA::decoder DecPrv(prv);
+
     while( line.clear(), (std::cerr << "> ").flush(), fp.read_line(line) >= 0 )
     {
         const string pub_enc     = EncPub.to_string(line);
@@ -83,6 +87,9 @@ YOCTO_UNIT_TEST_IMPL(rsaQ)
         const string prv_enc     = EncPrv.to_string(line);
         const string prv_enc_out = b64.to_string(prv_enc);
         std::cerr << "prv_enc: " << prv_enc_out << std::endl;
+
+        const string pub_enc_dec = DecPrv.to_string(pub_enc);
+
 
     }
 

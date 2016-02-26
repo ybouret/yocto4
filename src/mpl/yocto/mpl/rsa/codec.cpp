@@ -112,3 +112,68 @@ namespace yocto
     }
 }
 
+
+namespace yocto
+{
+    namespace mpl
+    {
+
+        namespace RSA
+        {
+
+            decoder:: decoder(const Key &k) :
+            Codec(k)
+            {
+            }
+
+            decoder:: ~decoder() throw()
+            {
+            }
+
+
+            void decoder::write(char C)
+            {
+                coded.push_full<uint8_t>(C);
+                const size_t ibits = key->ibits;
+                const size_t obits = key->obits;
+
+                while(coded.size()>=obits)
+                {
+                    const natural C = natural::get(coded,obits);
+                    const natural P = key->decode(C);
+                    P.put(plain,ibits);
+                }
+
+                // extract words
+                while(plain.size()>=W)
+                {
+                    const bool flag = plain.pop();
+                    if(!flag)
+                    {
+                        // cleanup and return;
+                        return;
+                    }
+                    else
+                    {
+                        // discard random
+                        (void) plain.pop();
+
+                        // get value
+                        q_codec::store( plain.pop_full<uint8_t>() );
+                    }
+                }
+
+            }
+
+            void decoder:: flush()
+            {
+
+            }
+
+
+        }
+
+    }
+
+}
+
