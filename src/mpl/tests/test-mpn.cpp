@@ -92,6 +92,24 @@ YOCTO_UNIT_TEST_IMPL(mpn)
                 throw exception("Invalid I/O!");
             }
         }
+
+        values.free();
+        Q.free();
+        for(size_t i=0;i<100;++i)
+        {
+            const size_t n = alea_leq(128);
+            const mpn    v = mpn::rand(n);
+            values.push_back(v);
+            v.put(Q,128);
+        }
+        for(size_t i=1;i<=values.size();++i)
+        {
+            const mpn n = mpn::get(Q,128);
+            if(n!=values[i])
+            {
+                throw exception("Invalid I/O level-2");
+            }
+        }
     }
 
 

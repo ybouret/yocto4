@@ -142,6 +142,7 @@ inline natural & operator OP1 ( const word_t   rhs ) { natural tmp = (*this) OP 
             inline bool is_byte(const uint8_t x) const throw() { assert(x>0); return (1==size) && (x==byte[0]); }
 
             void           put(ios::bitio &Q) const;
+            void           put(ios::bitio &Q, const size_t n) const;
             static natural get(ios::bitio &Q, const size_t n);
             void   save( ios::ostream &) const;
             static natural load( ios::istream &);

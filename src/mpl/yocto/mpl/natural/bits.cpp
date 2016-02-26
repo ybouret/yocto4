@@ -68,6 +68,27 @@ namespace yocto {
             }
         }
 
+        void natural:: put(ios::bitio &Q, const size_t n) const
+        {
+            const size_t num_bits = bits();
+            size_t obits = n;
+            size_t ebits = 0;
+            if(n>num_bits)
+            {
+                obits = num_bits;
+                ebits = n-num_bits;
+            }
+            for(size_t i=0;i<obits;++i)
+            {
+                Q.push( 0!= (byte[i>>3]&_bit[i&7]) );
+            }
+            for(size_t i=0;i<ebits;++i)
+            {
+                Q.push(false);
+            }
+
+        }
+
         natural natural::get(ios::bitio &Q, const size_t n)
         {
             assert(n<=Q.size());
