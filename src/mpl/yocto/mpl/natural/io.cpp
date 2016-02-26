@@ -108,6 +108,26 @@ namespace yocto
             return ans;
         }
 
+        natural natural:: hex( const string &s )
+        {
+            natural ans;
+            const size_t sz = s.size();
+            const char  *ch = static_cast<const char *>(s.ro());// + sz;
+            for(size_t i=0;i<sz;++i)
+            {
+                const char c = ch[i]; //*(--ch);
+                const int  h = hex2dec(c);
+                if(h<0)
+                {
+                    throw exception("mpn::hex(invalid char '%c')",c);
+                }
+                ans <<= 4;
+                ans +=  h;
+            }
+            return ans;
+        }
+
+
     }
 
 }

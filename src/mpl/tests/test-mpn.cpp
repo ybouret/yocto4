@@ -324,3 +324,19 @@ YOCTO_UNIT_TEST_IMPL(mpn)
 
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/ios/icstream.hpp"
+
+YOCTO_UNIT_TEST_IMPL(parse)
+{
+    ios::icstream fp( ios::cstdin );
+    string line;
+    while( line.clear(), (std::cerr << "> ").flush(), fp.read_line(line) >= 0 )
+    {
+        const mpn n = mpn::hex(line);
+        std::cerr << "\t" << std::hex << n << " | " << std::dec << n << std::endl;
+    }
+
+}
+YOCTO_UNIT_TEST_DONE()
+

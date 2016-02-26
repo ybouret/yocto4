@@ -52,3 +52,40 @@ YOCTO_UNIT_TEST_IMPL(rsa)
     std::cerr << "crt: " << tmx_crt << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+#include "yocto/mpl/rsa/codec.hpp"
+#include "yocto/ios/icstream.hpp"
+#include "yocto/string/base64.hpp"
+
+YOCTO_UNIT_TEST_IMPL(rsaQ)
+{
+    mpn p = mpn::rand(6+alea_leq(30));
+    mpn q = mpn::rand(6+alea_leq(30));
+    p = mpn::__next_prime(p);
+    q = mpn::__next_prime(q);
+    mpn e = 3+alea_leq(100);
+    RSA::PrivateKey prv = RSA::PrivateKey::GenerateFrom(p, q, e);
+    RSA::PublicKey  pub(prv);
+    std::cerr << "pub=[" << pub.modulus << "," << pub.publicExponent << "]" << std::endl;
+
+    base64::encoder b64;
+    
+    string line;
+    ios::icstream fp( ios::cstdin );
+    RSA::encoder EncPub(pub);
+    RSA::encoder EncPrv(prv);
+    while( line.clear(), (std::cerr << "> ").flush(), fp.read_line(line) >= 0 )
+    {
+        const string pub_enc     = EncPub.to_string(line);
+        const string pub_enc_out = b64.to_string(pub_enc);
+        std::cerr << "pub_enc: " << pub_enc_out << std::endl;
+        const string prv_enc     = EncPrv.to_string(line);
+        const string prv_enc_out = b64.to_string(prv_enc);
+        std::cerr << "prv_enc: " << prv_enc_out << std::endl;
+
+    }
+
+
+}
+YOCTO_UNIT_TEST_DONE()

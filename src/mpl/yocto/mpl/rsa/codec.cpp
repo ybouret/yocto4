@@ -60,12 +60,31 @@ namespace yocto
 
             void encoder:: flush()
             {
+                // put a stop
                 plain.push(false);
+
+                // round to ibits
                 const size_t m = key->ibits;
                 while( 0 !=( plain.size() % m ) )
                 {
                     plain.push(manager::random_bit());
                 }
+
+                // emit all words
+                emit();
+
+                // pad final
+                while( 0 != (coded.size()&7) )
+                {
+                    coded.push( manager::random_bit() );
+                }
+
+                // write padding
+                while(coded.size()>=8)
+                {
+                    q_codec::store( coded.pop_full<uint8_t>() );
+                }
+                assert(0==coded.size());
             }
 
             void encoder::emit()
@@ -78,10 +97,14 @@ namespace yocto
                     const natural M = natural::get(plain,ibits);
 
                     // encode it
-                    const natural C = key->encode(M);
+                    const natural C = key->encode(M); assert(C.bits()<=obits);
 
                     // put obits message
                     C.put(coded,obits);
+                }
+                while(coded.size()>=8)
+                {
+                    q_codec::store( coded.pop_full<uint8_t>() );
                 }
             }
 
