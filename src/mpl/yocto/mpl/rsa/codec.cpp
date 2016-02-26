@@ -99,7 +99,7 @@ namespace yocto
                     // encode it
                     const natural C = key->encode(M); assert(C.bits()<=obits);
                     assert(C<=key->modulus);
-                    std::cerr << "C=" << C << std::endl;
+                    std::cerr << "emit:C=" << C << std::endl;
                     // put obits message
                     C.put(coded,obits);
                 }
@@ -140,7 +140,7 @@ namespace yocto
 
                 while(coded.size()>=obits)
                 {
-                    const natural C = natural::get(coded,obits); std::cerr << "C=" << C << std::endl;
+                    const natural C = natural::get(coded,obits); std::cerr << "read:C=" << C << std::endl;
                     const natural P = key->decode(C);
                     P.put(plain,ibits);
                 }
