@@ -97,14 +97,14 @@ YOCTO_UNIT_TEST_IMPL(mpn)
         Q.free();
         for(size_t i=0;i<100;++i)
         {
-            const size_t n = alea_leq(128);
+            const size_t n = alea_leq(200);
             const mpn    v = mpn::rand(n);
             values.push_back(v);
-            v.put(Q,128);
+            v.put(Q,200);
         }
         for(size_t i=1;i<=values.size();++i)
         {
-            const mpn n = mpn::get(Q,128);
+            const mpn n = mpn::get(Q,200);
             if(n!=values[i])
             {
                 throw exception("Invalid I/O level-2");
