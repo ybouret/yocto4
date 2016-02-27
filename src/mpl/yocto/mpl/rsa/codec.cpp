@@ -52,6 +52,7 @@ namespace yocto
 
             void encoder::write(char C)
             {
+                std::cerr << "encode [" << C << "]" << std::endl;
                 plain.push(true);
                 plain.push(manager::random_bit());
                 plain.push_full<uint8_t>(C);
@@ -60,6 +61,7 @@ namespace yocto
 
             void encoder:: flush()
             {
+                std::cerr << "encode flush." << std::endl;
                 // put a stop
                 plain.push(false);
 
@@ -99,7 +101,8 @@ namespace yocto
                     // encode it
                     const natural C = key->encode(M); assert(C.bits()<=obits);
                     assert(C<=key->modulus);
-                    std::cerr << "emit:C=" << C << std::endl;
+                    std::cerr << "msg : M=" << M << " (" << M.bits() << "/" << ibits << " bits)" << std::endl;
+                    std::cerr << "emit: C=" << C << " (" << C.bits() << "/" << obits << " bits)" << std::endl;
                     // put obits message
                     C.put(coded,obits);
                 }
@@ -140,7 +143,8 @@ namespace yocto
 
                 while(coded.size()>=obits)
                 {
-                    const natural C = natural::get(coded,obits); std::cerr << "read:C=" << C << std::endl;
+                    const natural C = natural::get(coded,obits);
+                    std::cerr << "read: C=" << C << std::endl;
                     const natural P = key->decode(C);
                     P.put(plain,ibits);
                 }
