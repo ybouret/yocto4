@@ -46,6 +46,7 @@ namespace yocto {
             0x80
         };
 
+#if 0
         void natural:: put(ios::bitio &Q) const
         {
             if(size>0)
@@ -67,7 +68,8 @@ namespace yocto {
                 }
             }
         }
-
+#endif
+        
         void natural:: put(ios::bitio &Q, const size_t n) const
         {
             const size_t num_bits = bits();

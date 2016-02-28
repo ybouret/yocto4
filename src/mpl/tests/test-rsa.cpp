@@ -20,6 +20,8 @@ YOCTO_UNIT_TEST_IMPL(rsa)
     std::cerr << "prv=[" << prv.modulus << "," << prv.privateExponent << "]" << std::endl;
     std::cerr << "pub=[" << pub.modulus << "," << prv.publicExponent  << "]" << std::endl;
 
+    std::cerr << "timing performances..." << std::endl;
+    
     rt_clock chrono;
     chrono.calibrate();
     uint64_t _rsa = 0;

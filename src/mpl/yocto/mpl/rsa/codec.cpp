@@ -101,14 +101,18 @@ namespace yocto
                     // encode it
                     const natural C = key->encode(M); assert(C.bits()<=obits);
                     assert(C<=key->modulus);
-                    std::cerr << "msg : M=" << M << " (" << M.bits() << "/" << ibits << " bits)" << std::endl;
-                    std::cerr << "emit: C=" << C << " (" << C.bits() << "/" << obits << " bits)" << std::endl;
+                    std::cerr << "msg : M=" << M << std::endl;
+                    std::cerr << "emit: C=" << C << std::endl;
+                    
                     // put obits message
                     C.put(coded,obits);
                 }
+                
                 while(coded.size()>=8)
                 {
-                    q_codec::store( coded.pop_full<uint8_t>() );
+                    const uint8_t B = coded.pop_full<uint8_t>();
+                    std::cerr << "\tstore: " << unsigned(B) << std::endl;
+                    q_codec::store( B );
                 }
             }
 
@@ -137,7 +141,9 @@ namespace yocto
 
             void decoder::write(char C)
             {
-                coded.push_full<uint8_t>(C);
+                const uint8_t B = uint8_t(C);
+                std::cerr << "\tquery: " << unsigned(B) << std::endl;
+                coded.push_full<uint8_t>(B);
                 const size_t ibits = key->ibits;
                 const size_t obits = key->obits;
 
