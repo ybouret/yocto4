@@ -84,7 +84,9 @@ namespace yocto
                 // write padding
                 while(coded.size()>=8)
                 {
-                    q_codec::store( coded.pop_full<uint8_t>() );
+                    const uint8_t B = coded.pop_full<uint8_t>();
+                    std::cerr << "\tstore: " << unsigned(B) << std::endl;
+                    q_codec::store( B );
                 }
                 assert(0==coded.size());
             }
