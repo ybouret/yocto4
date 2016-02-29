@@ -40,6 +40,7 @@ namespace yocto
                 case __zero:      return __zero;
                 case __positive:  return __negative;
             }
+	    return __zero;
         }
         
         inline sign_type sign_mul(const sign_type a, const sign_type b) throw()
