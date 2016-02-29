@@ -85,8 +85,8 @@ namespace yocto
                 while(coded.size()>=8)
                 {
                     const uint8_t B = coded.pop_full<uint8_t>();
-                    std::cerr << "\tstore: " << unsigned(B) << std::endl;
-                    q_codec::store( B );
+                    std::cerr << "\tadd: " << unsigned(B) << std::endl;
+                    Q.push_back(B);
                 }
                 assert(0==coded.size());
             }
@@ -113,8 +113,8 @@ namespace yocto
                 while(coded.size()>=8)
                 {
                     const uint8_t B = coded.pop_full<uint8_t>();
-                    std::cerr << "\tstore: " << unsigned(B) << std::endl;
-                    q_codec::store( B );
+                    std::cerr << "\tadd: " << unsigned(B) << std::endl;
+                    Q.push_back(B);
                 }
             }
 
