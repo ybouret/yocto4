@@ -2,6 +2,8 @@
 #define YOCTO_MPL_INTEGER_INCLUDED 1
 
 #include "yocto/mpl/natural.hpp"
+#include "yocto/error.hpp"
+#include <cerrno>
 
 namespace yocto
 {
@@ -182,6 +184,8 @@ namespace yocto
                         }
                     }
                 }
+                libc::critical_error( EINVAL, "unexpected MPZ sign failure!!!");
+                return 0;
             }
             
 #define YOCTO_MPZ_CMP(OP) \
@@ -294,6 +298,7 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length()) OP 0;       \
                         }
                     }
                 }
+                throw libc::exception(EINVAL,"unexpected sign failure in MPZ add!!!");
             }
             
             inline integer operator+() const { return integer(*this); }
