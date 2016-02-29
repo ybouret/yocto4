@@ -4,6 +4,7 @@
 #include "yocto/threading/engine.hpp"
 #include "yocto/graphics/types.hpp"
 #include "yocto/parallel/splitter.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {

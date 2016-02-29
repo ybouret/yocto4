@@ -67,6 +67,17 @@ namespace yocto
                 return rows[j];
             }
 
+            inline void ld( const typename type_traits<T>::parameter_type x ) throw()
+            {
+                for(size_t j=0;j<h;++j)
+                {
+                    row &r_j = rows[j];
+                    for(size_t i=0;i<w;++i)
+                    {
+                        r_j[i] = x;
+                    }
+                }
+            }
 
             inline pixmap( const pixmap &other ) :
             bitmap(other),
