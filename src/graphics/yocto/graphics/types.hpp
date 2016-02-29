@@ -73,40 +73,6 @@ namespace yocto
 
         };
 
-        class vnode
-        {
-        public:
-            vnode *next;
-            vnode *prev;
-            vertex v;
-            inline  vnode() throw() : next(0), prev(0), v() {}
-            inline  vnode(const vertex u) throw() : next(0), prev(0), v(u) {}
-            inline ~vnode() throw() {}
-            inline  vnode(const vnode &other) throw() : next(0), prev(0), v(other.v) {}
-
-            YOCTO_MAKE_OBJECT
-        private:
-            YOCTO_DISABLE_ASSIGN(vnode);
-        };
-
-        typedef core::list_of_cpp<vnode> _vlist;
-
-        class vlist : public _vlist
-        {
-        public:
-            vlist *next;
-            vlist *prev;
-
-            inline explicit vlist() throw() : _vlist(), next(0), prev(0) {}
-            inline virtual ~vlist() throw() {}
-            inline vlist(const vlist &other) : _vlist(other), next(0), prev(0) {}
-
-        private:
-            YOCTO_DISABLE_ASSIGN(vlist);
-        };
-        
-        typedef core::list_of_cpp<vlist> vlists;
-        
         
     }
 }

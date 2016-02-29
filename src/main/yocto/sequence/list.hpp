@@ -68,8 +68,8 @@ namespace yocto
 		
 		inline void swap_with( list &other ) throw()
 		{
-			mswap( list_, other.list_ );
-			mswap( pool_, other.pool_ );
+			bswap( list_, other.list_ );
+			bswap( pool_, other.pool_ );
 		}
 		
 		inline list( const list &other ) : list_(), pool_()
@@ -191,8 +191,11 @@ namespace yocto
         }
         
 	protected:
-		core::list_of<node_type> list_;
-		core::pool_of<node_type> pool_;
+        typedef core::list_of<node_type> list_type;
+        typedef core::pool_of<node_type> pool_type;
+
+		list_type list_;
+		pool_type pool_;
 		
 	private:
 		inline void kill() throw() { list_.delete_with( node_type::destroy ); pool_.delete_with( node_type::release ); }
