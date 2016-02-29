@@ -1,4 +1,4 @@
-#include "yocto/mpa/rational.hpp"
+#include "yocto/mpl/rational.hpp"
 #include "yocto/math/core/tridiag.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/math/core/tao.hpp"

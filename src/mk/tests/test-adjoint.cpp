@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 
-#include "yocto/mpa/rational.hpp"
+#include "yocto/mpl/rational.hpp"
 
 #include "yocto/code/rand.hpp"
 #include "yocto/math/core/tao.hpp"

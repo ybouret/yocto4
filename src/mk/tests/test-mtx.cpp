@@ -3,7 +3,7 @@
 #include "yocto/string.hpp"
 #include "yocto/code/rand.hpp"
 #include "../../main/tests/support.hpp"
-#include "yocto/mpa/rational.hpp"
+#include "yocto/mpl/rational.hpp"
 #include "yocto/string/xnum.hpp"
 
 using namespace yocto;
