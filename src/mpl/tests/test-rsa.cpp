@@ -83,6 +83,8 @@ YOCTO_UNIT_TEST_IMPL(rsaQ)
     std::cerr << std::hex;
     while( line.clear(), (std::cerr << "> ").flush(), fp.read_line(line) >= 0 )
     {
+        const string input       = b64.to_string(line);
+        std::cerr << "input  : " << input       << std::endl;
         const string pub_enc     = EncPub.to_string(line);
         const string pub_enc_out = b64.to_string(pub_enc);
         std::cerr << "pub_enc: " << pub_enc_out << std::endl;
