@@ -75,10 +75,10 @@ YOCTO_UNIT_TEST_IMPL(rsaQ)
     
     string line;
     ios::icstream fp( ios::cstdin );
-    RSA::encoder EncPub(pub);
-    //RSA::encoder EncPrv(prv);
-    //RSA::decoder DecPub(pub);
-    RSA::decoder DecPrv(prv);
+    RSA::encoder  EncPub(pub);
+    RSA::encoder  EncPrv(prv);
+    RSA::decoder  DecPub(pub);
+    RSA::decoder  DecPrv(prv);
 
     std::cerr << std::hex;
     while( line.clear(), (std::cerr << "> ").flush(), fp.read_line(line) >= 0 )
@@ -88,15 +88,18 @@ YOCTO_UNIT_TEST_IMPL(rsaQ)
         const string pub_enc     = EncPub.to_string(line);
         const string pub_enc_out = b64.to_string(pub_enc);
         std::cerr << "pub_enc: " << pub_enc_out << std::endl;
-        const string pub_enc_dec = DecPrv.to_string(pub_enc);
-        
-        /*
+
+        const string pub_dec     = DecPrv.to_string(pub_enc);
+        const string pub_dec_out = b64.to_string(pub_dec);
+        std::cerr << "pub_dec: " << pub_dec_out << std::endl;
+
+
         const string prv_enc     = EncPrv.to_string(line);
         const string prv_enc_out = b64.to_string(prv_enc);
         std::cerr << "prv_enc: " << prv_enc_out << std::endl;
-
-         */
-
+        const string prv_dec     = DecPub.to_string(prv_enc);
+        const string prv_dec_out = b64.to_string(prv_dec);
+        std::cerr << "prv_dec: " << prv_dec_out << std::endl;
     }
 
 

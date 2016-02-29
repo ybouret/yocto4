@@ -52,42 +52,74 @@ namespace yocto
 
             void encoder::write(char C)
             {
-                std::cerr << "encode [" << C << "]" << std::endl;
+                //______________________________________________________________
+                //
+                // put a data flag
+                //______________________________________________________________
                 plain.push(true);
+
+                //______________________________________________________________
+                //
+                // put some noise
+                //______________________________________________________________
                 plain.push(manager::random_bit());
+
+                //______________________________________________________________
+                //
+                // write input bits
+                //______________________________________________________________
                 plain.push_full<uint8_t>(C);
+
+                //______________________________________________________________
+                //
+                // process
+                //______________________________________________________________
                 emit();
             }
 
             void encoder:: flush()
             {
-                std::cerr << "encode flush." << std::endl;
+                //______________________________________________________________
+                //
                 // put a stop
+                //______________________________________________________________
                 plain.push(false);
 
+                //______________________________________________________________
+                //
                 // round to ibits
+                //______________________________________________________________
                 const size_t m = key->ibits;
                 while( 0 !=( plain.size() % m ) )
                 {
                     plain.push(manager::random_bit());
                 }
 
+                //______________________________________________________________
+                //
                 // emit all words
+                //______________________________________________________________
                 emit();
 
+                //______________________________________________________________
+                //
                 // pad final
+                //______________________________________________________________
                 while( 0 != (coded.size()&7) )
                 {
                     coded.push( manager::random_bit() );
                 }
 
+                //______________________________________________________________
+                //
                 // write padding
+                //______________________________________________________________
                 while(coded.size()>=8)
                 {
                     const uint8_t B = coded.pop_full<uint8_t>();
-                    std::cerr << "\tadd: " << unsigned(B) << std::endl;
                     Q.push_back(B);
                 }
+
                 assert(0==coded.size());
             }
 
@@ -95,25 +127,40 @@ namespace yocto
             {
                 const size_t ibits = key->ibits;
                 const size_t obits = key->obits;
+
+                //______________________________________________________________
+                //
+                // extract ibits chunks
+                //______________________________________________________________
                 while( plain.size() >= ibits )
                 {
+                    //__________________________________________________________
+                    //
                     // get ibits message
+                    //__________________________________________________________
                     const natural M = natural::get(plain,ibits);
 
+                    //__________________________________________________________
+                    //
                     // encode it
-                    const natural C = key->encode(M); assert(C.bits()<=obits);
-                    assert(C<=key->modulus);
-                    std::cerr << "msg : M=" << M << std::endl;
-                    std::cerr << "emit: C=" << C << std::endl;
-                    
+                    //
+                    //__________________________________________________________
+                    const natural C = key->encode(M);
+
+                    //__________________________________________________________
+                    //
                     // put obits message
+                    //__________________________________________________________
                     C.put(coded,obits);
                 }
-                
+
+                //______________________________________________________________
+                //
+                // tranfer bytes
+                //______________________________________________________________
                 while(coded.size()>=8)
                 {
                     const uint8_t B = coded.pop_full<uint8_t>();
-                    std::cerr << "\tadd: " << unsigned(B) << std::endl;
                     Q.push_back(B);
                 }
             }
@@ -143,21 +190,31 @@ namespace yocto
 
             void decoder::write(char C)
             {
+                //______________________________________________________________
+                //
+                // write bits to coded stream
+                //______________________________________________________________
                 const uint8_t B = uint8_t(C);
-                std::cerr << "\tquery: " << unsigned(B) << std::endl;
                 coded.push_full<uint8_t>(B);
+
+                //______________________________________________________________
+                //
+                // extract obits chunks
+                //______________________________________________________________
                 const size_t ibits = key->ibits;
                 const size_t obits = key->obits;
 
                 while(coded.size()>=obits)
                 {
                     const natural C = natural::get(coded,obits);
-                    std::cerr << "read: C=" << C << std::endl;
                     const natural P = key->decode(C);
                     P.put(plain,ibits);
                 }
 
-                // extract words
+                //______________________________________________________________
+                //
+                // extract bytes from plain stream
+                //______________________________________________________________
                 while(plain.size()>=W)
                 {
                     const bool flag = plain.pop();
@@ -169,10 +226,10 @@ namespace yocto
                     else
                     {
                         // discard random
-                        (void) plain.pop();
+                        plain.skip();
 
                         // get value
-                        q_codec::store( plain.pop_full<uint8_t>() );
+                        Q.push_back( plain.pop_full<uint8_t>() );
                     }
                 }
 
