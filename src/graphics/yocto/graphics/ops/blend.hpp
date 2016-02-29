@@ -37,7 +37,8 @@ namespace yocto
             public:
                 void       *target;
                 const void *source;
-                
+                const void *args;
+
                 virtual ~patch() throw();
                 explicit patch(const graphics::patch &p) throw();
                 patch(const patch &p) throw();
