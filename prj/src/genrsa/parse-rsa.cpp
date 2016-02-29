@@ -4,7 +4,7 @@
 #include "yocto/associative/map.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/mpa/rsa/keys.hpp"
+#include "yocto/mpl/rsa/keys.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/hashing/sha1.hpp"
 
@@ -14,7 +14,7 @@
 #include <iostream>
 
 using namespace yocto;
-using namespace mpa;
+using namespace mpl;
 
 #if 0
 static inline natural get_value( const string &data )
@@ -75,7 +75,7 @@ static mpn toHex( const string &value )
         if(isxdigit(C))
             data += C;
     }
-    return mpn::hex(data);
+    return mpn::hex2mpn(data);
 }
 
 static inline void parse_for( associative<string,mpn> &db, const string &line )
@@ -93,7 +93,7 @@ static inline void parse_for( associative<string,mpn> &db, const string &line )
     const string value = tkn.to_string();
     if(value.size()>0 && hex2dec(value[0])>=0 )
     {
-        const mpn x = strchr(value.c_str(), ':') ? toHex(value) : mpn::dec(value);
+        const mpn x = strchr(value.c_str(), ':') ? toHex(value) : mpn::dec2mpn(value);
         //std::cerr << key << " = " << x << std::endl;
         if( !db.insert(key,x) )
             throw exception("Multiple '%s' in DB", key.c_str());

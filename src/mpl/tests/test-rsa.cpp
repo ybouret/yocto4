@@ -6,6 +6,8 @@
 using namespace yocto;
 using namespace mpl;
 
+
+
 YOCTO_UNIT_TEST_IMPL(rsa)
 {
     mpn p = mpn::rand(6+alea_leq(25));
@@ -60,8 +62,65 @@ YOCTO_UNIT_TEST_DONE()
 #include "yocto/ios/icstream.hpp"
 #include "yocto/string/base64.hpp"
 
+static const char rsa_keys[] =
+{
+#include "./rsa-keys.inc"
+};
+
+static const size_t rsa_keys_length = sizeof(rsa_keys)/sizeof(rsa_keys[0]);
+
+#include "yocto/ios/imstream.hpp"
+#include "yocto/ptr/shared.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/string/conv.hpp"
+
 YOCTO_UNIT_TEST_IMPL(rsaQ)
 {
+    typedef shared_ptr<RSA::Key>  key_ptr;
+
+    vector<key_ptr> pub_vec;
+    vector<key_ptr> prv_vec;
+    {
+        ios::imstream inp(rsa_keys,rsa_keys_length);
+        char C;
+        while( inp.query(C) )
+        {
+            inp.store(C);
+            const RSA::PublicKey k = RSA::PublicKey::load_pub(inp);
+            const key_ptr        p( k.clone() );
+            pub_vec.push_back(p);
+        }
+        std::cerr << "Loaded " << pub_vec.size() << " public keys..." << std::endl;
+    }
+
+    {
+        ios::imstream inp(rsa_keys,rsa_keys_length);
+        char C;
+        while( inp.query(C) )
+        {
+            inp.store(C);
+            const RSA::PrivateKey k = RSA::PrivateKey::load_prv(inp);
+            const key_ptr         p( k.clone() );
+            prv_vec.push_back(p);
+        }
+        std::cerr << "Loaded " << prv_vec.size() << " private keys..." << std::endl;
+    }
+
+    if( prv_vec.size() != pub_vec.size() )
+    {
+        throw exception("key pairs mismatch!");
+    }
+
+    for(size_t i=1;i<=pub_vec.size();++i)
+    {
+        const RSA::Key &pub_k = *pub_vec[i];
+        const RSA::Key &prv_k = *pub_vec[i];
+        if(pub_k.modulus!=prv_k.modulus) throw exception("Modulus Mismatch!");
+        std::cerr << "key#" << i << " bits=" << pub_k.modulus.bits() << std::endl;
+    }
+
+
+#if 0
     mpn p = mpn::rand(6+alea_leq(30));
     mpn q = mpn::rand(6+alea_leq(30));
     p = mpn::__next_prime(p);
@@ -70,6 +129,21 @@ YOCTO_UNIT_TEST_IMPL(rsaQ)
     RSA::PrivateKey prv = RSA::PrivateKey::GenerateFrom(p, q, e);
     RSA::PublicKey  pub(prv);
     std::cerr << "pub=[" << pub.modulus << "," << pub.publicExponent << "]" << std::endl;
+#endif
+
+    size_t idx=1;
+
+    if(argc>1)
+    {
+        idx = strconv::to<size_t>(argv[1],"idx");
+        idx = clamp<size_t>(1,idx,prv_vec.size());
+    }
+
+    const RSA::Key &pub = *pub_vec[idx];
+    const RSA::Key &prv = *prv_vec[idx];
+
+    std::cerr << "Using pub =[" << pub.modulus << "]" << std::endl;
+    std::cerr << "Using bits=[" << pub.modulus.bits() << "]" << std::endl;
 
     base64::encoder b64;
     
