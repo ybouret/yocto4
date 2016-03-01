@@ -8,34 +8,33 @@ namespace yocto
 {
     namespace graphics
     {
-        typedef list<vertex> _region;
-
-        class region : public _region
+        class displacement
         {
         public:
-            typedef _region::node_type node_type;
+            vertex r;
+            char   data[sizeof(vertex)];
 
-            explicit region() throw() : _region() {}
-            explicit region(const size_t n) : _region(n,as_capacity) {}
-            virtual ~region() throw() {}
-            region(const region &r) : _region(r) {}
+            displacement() throw();
+            displacement(const vertex &p) throw();
+            ~displacement() throw();
 
-            inline region & operator=( const region &r )
+            displacement(const displacement &) throw();
+            displacement & operator=(const displacement &) throw();
+
+            template <typename T>
+            T & get() throw()
             {
-                _region tmp(r);
-                swap_with(tmp);
-                return *this;
+                return *(T *)&data[0];
             }
 
-            void simplify() throw();
-            const node_type *head() const throw() { return list_.head; }
-            inline void shift(const vertex &p) throw();
-
-            void load_block(const vertex &org, unit_t w);
-            void load_disk(const vertex &org, unit_t r);
-
-
+            template <typename T>
+            const T & get() const throw()
+            {
+                return *(T *)&data[0];
+            }
         };
+
+        
 
     }
 }

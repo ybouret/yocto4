@@ -7,5 +7,6 @@ using namespace graphics;
 YOCTO_UNIT_TEST_IMPL(block)
 {
     std::cerr << "sizeof(vertex)=" << sizeof(vertex) << std::endl;
+    std::cerr << "sizeof(displacement)=" << sizeof(displacement) << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

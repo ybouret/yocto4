@@ -1,54 +1,41 @@
 #include "yocto/graphics/region.hpp"
+#include <cstring>
 
 namespace yocto
 {
     namespace graphics
     {
 
-        void region:: simplify() throw()
+        displacement:: ~displacement() throw()
         {
-            list_type stk;
-            while(list_.size)
-            {
-                node_type     *n = list_.pop_front();
-                const vertex  &lhs = n->data;
-                for(node_type *i=stk.head;i!=NULL;i=i->next)
-                {
-                    const vertex &rhs = i->data;
-                    if(lhs.x==rhs.x&&lhs.y==rhs.y)
-                    {
-                        pool_.store(n);
-                    }
-                    else
-                    {
-                        stk.push_back(n);
-                    }
-                }
-            }
-            stk.swap_with(list_);
         }
 
-        void region:: load_block(const vertex &org, unit_t w)
+        displacement:: displacement() throw() :
+        r(),
+        data()
         {
-            w = (w<0) ?-w:w;
-            for(unit_t j=-w;j<=w;++j)
-            {
-                for(unit_t i=-w;i<=w;++i)
-                {
-                    const vertex tmp(org.x+i,org.y+j);
-                    push_back(tmp);
-                }
-            }
+            memset(data,0,sizeof(data));
         }
 
-        void region:: load_disk(const vertex &org, unit_t r)
+        displacement:: displacement(const vertex &p) throw() :
+        r(p),
+        data()
         {
-            for(unit_t y=-r;y<=r;++y)
-            {
-
-            }
+            memset(data,0,sizeof(data));
         }
 
-        
+        displacement:: displacement( const displacement &d ) throw() :
+        r(d.r),
+        data()
+        {
+            memcpy(data,d.data,sizeof(data));
+        }
+
+        displacement & displacement:: operator=(const displacement &d) throw()
+        {
+            r = d.r;
+            memmove(data, d.data, sizeof(data) );
+            return *this;
+        }
     }
 }
