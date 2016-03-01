@@ -8,12 +8,16 @@ namespace yocto
 {
     namespace graphics
     {
+        //! size=6*sizeof(unit_t), with 3*sizeof(unit_t) data
+        /**
+         so that a node of displacement is 8*sizeof(unit_t)
+         */
         class displacement
         {
         public:
             vertex r;
             unit_t flag;
-            char   data[5*sizeof(unit_t)];
+            char   data[3*sizeof(unit_t)];
             
             displacement() throw();
             displacement(const vertex &p) throw();
@@ -50,6 +54,8 @@ namespace yocto
 
             void load_square(const unit_t w);
             void load_disk(const unit_t r);
+            void shift(const vertex &delta) throw();
+            void simplify() throw();
         };
 
     }

@@ -12,6 +12,7 @@ namespace yocto
 
         displacement:: displacement() throw() :
         r(),
+        flag(true),
         data()
         {
             clear();
@@ -19,6 +20,7 @@ namespace yocto
 
         displacement:: displacement(const vertex &p) throw() :
         r(p),
+        flag(true),
         data()
         {
             clear();
@@ -26,6 +28,7 @@ namespace yocto
 
         displacement:: displacement( const displacement &d ) throw() :
         r(d.r),
+        flag(d.flag),
         data()
         {
             memcpy(data,d.data,sizeof(data));
@@ -33,13 +36,15 @@ namespace yocto
 
         displacement & displacement:: operator=(const displacement &d) throw()
         {
-            r = d.r;
+            r    = d.r;
+            flag = d.flag;
             memmove(data, d.data, sizeof(data) );
             return *this;
         }
 
         void displacement:: clear() throw()
         {
+            flag = true;
             memset(data, 0, sizeof(data) );
         }
     }
@@ -100,6 +105,46 @@ namespace yocto
             }
 
         }
+
+
+        void region:: shift(const vertex &delta) throw()
+        {
+            for(node_type *n = list_.head;n;n=n->next)
+            {
+                n->data.r += delta;
+            }
+        }
+
+        void region:: simplify() throw()
+        {
+            list_type stk;
+            while(list_.size)
+            {
+                node_type   *i = list_.pop_front();
+                const vertex u = i->data.r;
+                bool         found = false;
+                for(const node_type *j=stk.head;j;j=j->next)
+                {
+                    const vertex v = j->data.r;
+                    if( (u.x==v.x) && (u.y==v.y) )
+                    {
+                        found=true;
+                        break;
+                    }
+                }
+
+                if(found)
+                {
+                    pool_.store(i);
+                }
+                else
+                {
+                    stk.push_back(i);
+                }
+            }
+            list_.swap_with(stk);
+        }
+
 
     }
 
