@@ -1,7 +1,7 @@
 #ifndef YOCTO_GRAPHICS_REGION_INCLUDED
 #define YOCTO_GRAPHICS_REGION_INCLUDED 1
 
-#include "yocto/graphics/types.hpp"
+#include "yocto/graphics/pixmap.hpp"
 #include "yocto/sequence/list.hpp"
 
 namespace yocto
@@ -56,6 +56,34 @@ namespace yocto
             void load_disk(const unit_t r);
             void shift(const vertex &delta) throw();
             void simplify() throw();
+
+            //__________________________________________________________________
+            //
+            // Unary ops
+            //__________________________________________________________________
+            template <typename T>
+            inline size_t apply_on(const vertex    &org,
+                                   const pixmap<T> &px)
+            {
+                size_t count = 0;
+                for(node_type *n=list_.head;n;n=n->next)
+                {
+                    displacement  &d = n->data;
+                    const vertex   v = org + d.r;
+                    if(px.has(v))
+                    {
+                        d.flag = true;
+                        ++count;
+                    }
+                    else
+                    {
+                        d.flag = false;
+                    }
+                }
+                return count;
+            }
+
+
         };
 
     }
