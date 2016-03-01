@@ -12,14 +12,16 @@ namespace yocto
         {
         public:
             vertex r;
-            char   data[sizeof(vertex)];
-
+            unit_t flag;
+            char   data[5*sizeof(unit_t)];
+            
             displacement() throw();
             displacement(const vertex &p) throw();
             ~displacement() throw();
 
             displacement(const displacement &) throw();
             displacement & operator=(const displacement &) throw();
+            void clear() throw();
 
             template <typename T>
             T & get() throw()
@@ -32,9 +34,23 @@ namespace yocto
             {
                 return *(T *)&data[0];
             }
+
+
         };
 
-        
+        typedef list<displacement> region_base;
+
+        class region : public region_base
+        {
+        public:
+            explicit region() throw();
+            virtual ~region() throw();
+            region(const region &);
+            region&operator=(const region &);
+
+            void load_square(const unit_t w);
+            void load_disk(const unit_t r);
+        };
 
     }
 }
