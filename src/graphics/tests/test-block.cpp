@@ -111,3 +111,57 @@ YOCTO_UNIT_TEST_IMPL(block)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/sequence/list.hpp"
+
+static
+void plotCircle( sequence<vertex> &out, int xm, int ym, int r)
+{
+    int x = -r, y = 0, err = 2-2*r;                /* bottom left to top right */
+    do {
+        const vertex I(xm-x,xm+y);
+        const vertex II(xm-y,ym-x);
+        const vertex III(xm+x,ym-y);
+        const vertex IV(xm+y,ym+x);
+        out.push_back(I);
+        out.push_back(II);
+        out.push_back(III);
+        out.push_back(IV);
+
+        //setPixel(xm-x, ym+y);                            /*   I. Quadrant +x +y */
+        //setPixel(xm-y, ym-x);                            /*  II. Quadrant -x +y */
+        //setPixel(xm+x, ym-y);                            /* III. Quadrant -x -y */
+        //setPixel(xm+y, ym+x);                            /*  IV. Quadrant +x -y */
+        r = err;
+        if (r <= y) err += ++y*2+1;                             /* e_xy+e_y < 0 */
+        if (r > x || err > y)                  /* e_xy+e_x > 0 or no 2nd y-step */
+            err += ++x*2+1;                                     /* -> x-step now */
+    } while (x < 0);
+}
+
+YOCTO_UNIT_TEST_IMPL(circle)
+{
+    list<vertex> paths;
+
+    size_t count = 0;
+    for(unit_t r=0;r<=10;++r)
+    {
+        list<vertex> cr;
+        plotCircle(cr,0,0,r);
+        const size_t oldSize = cr.size();
+        cr.uniq( gist::fast_compare );
+        std::cerr << "cr.size=" << oldSize << " -> " << cr.size() << std::endl;
+        count += cr.size();
+        for( list<vertex>::iterator i=cr.begin();i!=cr.end();++i)
+        {
+            paths.push_back( *i );
+        }
+    }
+    assert(count==paths.size());
+    std::cerr << "paths=" << paths.size() << std::endl;
+    paths.uniq(gist::fast_compare);
+    std::cerr << "paths=" << paths.size() << std::endl;
+
+
+}
+YOCTO_UNIT_TEST_DONE()

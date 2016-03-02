@@ -13,8 +13,16 @@ namespace yocto
         typedef point2d<unit_t>   vertex; //!< base class for operations
         typedef parallel::patch2D patch;  //!< base class for patches
 
+
+
+
         struct gist
         {
+            static inline int fast_compare( const vertex &lhs, const vertex &rhs ) throw()
+            {
+                if(lhs.x==rhs.x&&lhs.y==rhs.y) return 0; else return -1;
+            }
+
             static const  float   unit_float[256];
             static inline uint8_t float2byte(const float x) throw() { return uint8_t(floorf(255.0f*x+0.5f)); }
 

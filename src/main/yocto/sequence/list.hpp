@@ -189,6 +189,37 @@ namespace yocto
             void *args = (void *)&cmp;
             core::merging<node_type>:: template sort<core::list_of>(list_,__compare_nodes<FUNC>,args);
         }
+
+        template <typename FUNC>
+        inline void uniq( FUNC &cmp ) throw()
+        {
+            list_type tmp;
+            while( list_.size )
+            {
+                node_type *n     = list_.pop_front();
+                bool       found = false;
+                for(const node_type *i=tmp.head;i;i=i->next)
+                {
+                    if( 0 == cmp(i->data,n->data) )
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if( found )
+                {
+                    keep(n);
+                }
+                else
+                {
+                    tmp.push_back(n);
+                }
+
+            }
+            list_.swap_with(tmp);
+        }
+
         
 	protected:
         typedef core::list_of<node_type> list_type;
