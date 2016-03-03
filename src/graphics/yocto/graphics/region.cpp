@@ -63,12 +63,14 @@ namespace yocto
 
         void region:: simplify() throw()
         {
-            uniq( regxel::fast_compare );
+
         }
 
         void region:: load_square(const unit_t r)
         {
             assert(r>=0);
+            //const size_t len = 2*r+1;
+            //ensure( size() + len*len );
             vertex p;
             for(p.y=-r;p.y<=r;++p.y)
             {
@@ -82,6 +84,9 @@ namespace yocto
 
         void region:: load_disk(const unit_t r)
         {
+            assert(r>=0);
+            //const size_t len = 2*r+1;
+            //ensure( size() + len*len );
             const unit_t r2 = r*r;
             vertex p;
             for(p.y=-r;p.y<=r;++p.y)
@@ -100,26 +105,26 @@ namespace yocto
         void region:: shift(const unit_t x, const unit_t y) throw()
         {
             const vertex p(x,y);
-            for(node_type *node=list_.head;node;node=node->next)
-            {
-                node->data.r += p;
-            }
+            regxels &self = *this;
+            for(size_t i=size();i>0;--i) self[i].r += p;
         }
 
         void region:: center() throw()
         {
-            const unit_t n = list_.size;
+            const unit_t n = size();
+            
             if(n>0)
             {
+                regxels &self = *this;
                 vertex G(0,0);
-                for(const node_type *node=list_.head;node;node=node->next)
+                for(size_t i=n;i>0;--i)
                 {
-                    G += node->data.r;
+                    G += self[i].r;
                 }
                 G /= n;
-                for(node_type *node=list_.head;node;node=node->next)
+                for(size_t i=n;i>0;--i)
                 {
-                    node->data.r -= G;
+                    self[i].r -= G;
                 }
             }
         }

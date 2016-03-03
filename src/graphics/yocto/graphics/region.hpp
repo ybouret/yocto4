@@ -2,7 +2,6 @@
 #define YOCTO_GRAPHICS_REGION_INCLUDED 1
 
 #include "yocto/graphics/pixmap.hpp"
-#include "yocto/sequence/list.hpp"
 #include "yocto/code/static-check.hpp"
 
 namespace yocto
@@ -48,7 +47,20 @@ namespace yocto
 
         };
 
-        typedef list<regxel> regxels;
+    }
+
+}
+
+YOCTO_SUPPORT_C_STYLE_OPS(graphics::regxel);
+
+#include "yocto/sequence/vector.hpp"
+
+namespace yocto
+{
+    namespace graphics
+    {
+
+        typedef vector<regxel> regxels;
 
         class region : public regxels
         {
@@ -56,7 +68,6 @@ namespace yocto
             explicit region() throw();
             virtual ~region() throw();
             region(const region &);
-            region & operator=(const region &);
 
             void simplify() throw();
             
@@ -72,9 +83,10 @@ namespace yocto
                             typename pixmap<T>::param_type value) const
             {
                 const vertex c(xc,yc);
-                for(const node_type *node = list_.head;node;node=node->next)
+                const regxels &self = *this;
+                for(size_t i=size();i>0;--i)
                 {
-                    const vertex p = node->data.r + c;
+                    const vertex p = self[i].r+c;
                     if(pxm.has(p))
                     {
                         pxm[p] = value;
@@ -82,6 +94,7 @@ namespace yocto
                 }
             }
 
+#if 0
             template <typename T>
             inline size_t load(const pixmap<T> &pxm,
                                const unit_t     xc,
@@ -106,9 +119,11 @@ namespace yocto
 
                 }
             }
+#endif
+            
 
-
-
+        private:
+            YOCTO_DISABLE_ASSIGN(region);
             
 
         };

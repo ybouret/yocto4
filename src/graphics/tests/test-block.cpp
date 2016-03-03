@@ -14,7 +14,6 @@ using namespace graphics;
 YOCTO_UNIT_TEST_IMPL(block)
 {
     std::cerr << "sizeof(regxel)=" << sizeof(regxel) << std::endl;
-    std::cerr << "sizeof(list<regxel>::node_type)=" << sizeof(list<regxel>::node_type) << std::endl;
     image &IMG = image::instance();
 
     auto_ptr<pixmapf> p0;
@@ -60,27 +59,22 @@ YOCTO_UNIT_TEST_IMPL(block)
     std::cerr << std::endl;
      */
 
-    matrix< vector<float> > regA(h,w);
+    matrix<region> regA(h,w);
     for(unit_t j=1;j<=h;++j)
     {
         std::cerr << ".";
         std::cerr.flush();
         for(unit_t i=1;i<=w;++i)
         {
-            regA[j][i].reserve(100);
+            regA[j][i].load_square(30);
         }
     }
     std::cerr << std::endl;
 
 
 
-
-
-    region  Sqr; Sqr.load_square(20);
-    region  Dsk; Dsk.load_disk(20);
-    region  Reg; Reg.load_disk(20); Reg.shift(0, 15); Reg.load_square(10); Reg.simplify(); Reg.center();
-
-    
+    region Sqr; Sqr.load_square(30);
+    region Dsk; Dsk.load_disk(30);
 
     for(size_t id=0;id<nd-1;++id)
     {
@@ -95,18 +89,22 @@ YOCTO_UNIT_TEST_IMPL(block)
             p1.reset( new pixmapf(bmp) );
         }
 
+#if 1
         Sqr.tag(*p0, 0, 0, 0.25);
         Sqr.tag(*p0, 0, h, 0.50);
         Sqr.tag(*p0, w, h, 0.75);
         Sqr.tag(*p0, w, 0, 1.00);
 
+        Sqr.tag(*p0, w/2, h/2, 0.9);
+
         Dsk.tag(*p1, 0, 0, 0.25);
         Dsk.tag(*p1, 0, h, 0.50);
         Dsk.tag(*p1, w, h, 0.75);
         Dsk.tag(*p1, w, 0, 1.00);
+        Dsk.tag(*p1, w/2, h/2, 0.9);
 
-        Reg.tag(*p0, w/2, h/2, 0.9);
-
+#endif
+        
         IMG["PNG"].save("p0.png", *p0, NULL);
         IMG["PNG"].save("p1.png", *p1, NULL);
 
