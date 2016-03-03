@@ -66,6 +66,8 @@ void compute_corr(pixmapf       &U,
 
 YOCTO_UNIT_TEST_IMPL(block)
 {
+    std::cerr << "sizeof(regxel)=" << sizeof(regxel) << std::endl;
+    std::cerr << "sizeof(list<regxel>::node_type)=" << sizeof(list<regxel>::node_type) << std::endl;
     image &IMG = image::instance();
 
     auto_ptr<pixmapf> p0;
@@ -87,11 +89,20 @@ YOCTO_UNIT_TEST_IMPL(block)
 
     const unit_t w = p0->w;
     const unit_t h = p0->h;
+    const unit_t nr = w*h;
+    std::cerr << "need " << nr*2 << " regions!" << std::endl;
     pixmapf U(w,h);
     pixmapf V(w,h);
+
+    vector<region> regA(nr,as_capacity);
+    vector<region> regB(nr,as_capacity);
+
     region  Sqr; Sqr.load_square(20);
     region  Dsk; Dsk.load_disk(20);
-    region  Reg; Reg.load_disk(20); Reg.shift(0, 15); Reg.load_square(10); Reg.simplify();
+    region  Reg; Reg.load_disk(20); Reg.shift(0, 15); Reg.load_square(10); Reg.simplify(); Reg.center();
+
+    
+
     for(size_t id=0;id<nd-1;++id)
     {
         if(id>0)

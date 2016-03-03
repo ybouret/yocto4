@@ -1,13 +1,56 @@
 #include "yocto/graphics/region.hpp"
+#include "yocto/code/bzset.hpp"
+
+#include <cstring>
 
 namespace yocto
 {
+
     namespace graphics
     {
-        region:: region() throw() : region_base() {}
+        regxel:: ~regxel() throw() {}
+
+
+        regxel:: regxel() throw() :
+        r(),
+        flag(true),
+        data()
+        {
+            memset(data, 0, sizeof(data) );
+        }
+
+
+        regxel:: regxel( const vertex &p ) throw() :
+        r(p),
+        flag(true),
+        data()
+        {
+            memset(data, 0, sizeof(data) );
+        }
+
+        regxel:: regxel(const regxel &other ) throw() :
+        r( other.r ),
+        flag( other.flag ),
+        data()
+        {
+            memcpy(data,other.data,sizeof(data));
+        }
+
+    }
+
+
+
+}
+
+namespace yocto
+{
+
+    namespace graphics
+    {
+        region:: region() throw() : regxels() {}
         region:: ~region() throw() {}
 
-        region:: region( const region &other ) : region_base(other)
+        region:: region( const region &other ) : regxels(other)
         {
         }
 
@@ -20,7 +63,7 @@ namespace yocto
 
         void region:: simplify() throw()
         {
-            uniq( gist::fast_compare );
+            uniq( regxel::fast_compare );
         }
 
         void region:: load_square(const unit_t r)
@@ -31,11 +74,12 @@ namespace yocto
             {
                 for(p.x=-r;p.x<=r;++p.x)
                 {
-                    push_back(p);
+                    const regxel rg(p);
+                    push_back(rg);
                 }
             }
         }
-        
+
         void region:: load_disk(const unit_t r)
         {
             const unit_t r2 = r*r;
@@ -47,7 +91,8 @@ namespace yocto
                 {
                     const unit_t x2 = p.x*p.x;
                     if(r2<(x2+y2)) continue;
-                    push_back(p);
+                    const regxel rg(p);
+                    push_back(rg);
                 }
             }
         }
@@ -57,10 +102,29 @@ namespace yocto
             const vertex p(x,y);
             for(node_type *node=list_.head;node;node=node->next)
             {
-                node->data += p;
+                node->data.r += p;
             }
         }
 
-
+        void region:: center() throw()
+        {
+            const unit_t n = list_.size;
+            if(n>0)
+            {
+                vertex G(0,0);
+                for(const node_type *node=list_.head;node;node=node->next)
+                {
+                    G += node->data.r;
+                }
+                G /= n;
+                for(node_type *node=list_.head;node;node=node->next)
+                {
+                    node->data.r -= G;
+                }
+            }
+        }
+        
+        
+        
     }
 }
