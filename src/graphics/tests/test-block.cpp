@@ -3,65 +3,12 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/graphics/region.hpp"
+#include "yocto/container/matrix.hpp"
 
 using namespace yocto;
 using namespace graphics;
 
-static inline void load_block( array<float> &value, const pixmapf &pxm, const unit_t x, const unit_t y, const unit_t r)
-{
-    assert( (2*r+1)*(2*r+1) == value.size() );
-    size_t idx=0;
-    for(unit_t dy=-r;dy<=r;++dy)
-    {
-        const unit_t ytmp = y+dy;
-        for(unit_t dx=-r;dx<=r;++dx)
-        {
-            value[++idx] = pxm[ytmp][x+dx];
-        }
-    }
 
-}
-
-
-static inline
-void compute_corr(pixmapf       &U,
-                  pixmapf       &V,
-                  const pixmapf &p0,
-                  const pixmapf &p1,
-                  const unit_t   r)
-{
-    assert(r>=0);
-    const unit_t w = U.w;
-    const unit_t h = U.h;
-    U.ldz();
-    V.ldz();
-    const size_t  dim = r*2+1;
-    const size_t  np = dim*dim;
-    vector<float> src(np);
-    vector<float> tgt(np);
-
-    unit_t xmin = dim;
-    unit_t xmax = w-(dim);
-    unit_t ymin = dim;
-    unit_t ymax = h-(dim);
-
-    for(unit_t y=ymin;y<ymax;++y)
-    {
-        for(unit_t x=xmin;x<xmax;++x)
-        {
-            load_block(src,p0, x, y, r);
-
-            for(unit_t dy=-r;dy<=r;++dy)
-            {
-                for(unit_t dx=-r;dx<=r;++dx)
-                {
-                    load_block(tgt,p1,x+dx,y+dy,r);
-                }
-            }
-
-        }
-    }
-}
 
 
 YOCTO_UNIT_TEST_IMPL(block)
@@ -94,8 +41,40 @@ YOCTO_UNIT_TEST_IMPL(block)
     pixmapf U(w,h);
     pixmapf V(w,h);
 
-    vector<region> regA(nr,as_capacity);
-    vector<region> regB(nr,as_capacity);
+    std::cerr << "creating matrices..." << std::endl;
+
+    /*
+     matrix<region> regA(h,w);
+     matrix<region> regB(h,w);
+    std::cerr << "Filling Matrices..." << std::endl;
+    for(unit_t j=1;j<=h;++j)
+    {
+        std::cerr << ".";
+        std::cerr.flush();
+        for(unit_t i=1;i<=w;++i)
+        {
+            regA[j][i].load_disk(20);
+            regB[j][i].load_disk(20);
+        }
+    }
+    std::cerr << std::endl;
+     */
+
+    matrix< vector<float> > regA(h,w);
+    for(unit_t j=1;j<=h;++j)
+    {
+        std::cerr << ".";
+        std::cerr.flush();
+        for(unit_t i=1;i<=w;++i)
+        {
+            regA[j][i].reserve(100);
+        }
+    }
+    std::cerr << std::endl;
+
+
+
+
 
     region  Sqr; Sqr.load_square(20);
     region  Dsk; Dsk.load_disk(20);
