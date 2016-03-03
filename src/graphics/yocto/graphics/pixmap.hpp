@@ -18,7 +18,7 @@ namespace yocto
         class pixmap : public bitmap
         {
         public:
-            typedef T type;
+            YOCTO_ARGUMENTS_DECL_T;
             
             class row
             {
@@ -67,7 +67,19 @@ namespace yocto
                 return rows[j];
             }
 
-            inline void ld( const typename type_traits<T>::parameter_type x ) throw()
+            inline T &operator[](const vertex &p) throw()
+            {
+                assert(has(p));
+                return rows[p.y][p.x];
+            }
+
+            inline const T &operator[](const vertex &p) const throw()
+            {
+                assert(has(p));
+                return rows[p.y][p.x];
+            }
+
+            inline void ld( typename type_traits<T>::parameter_type x ) throw()
             {
                 for(size_t j=0;j<h;++j)
                 {

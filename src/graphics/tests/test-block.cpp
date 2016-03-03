@@ -2,6 +2,7 @@
 #include "yocto/graphics/image/tiff.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ptr/auto.hpp"
+#include "yocto/graphics/region.hpp"
 
 using namespace yocto;
 using namespace graphics;
@@ -88,6 +89,9 @@ YOCTO_UNIT_TEST_IMPL(block)
     const unit_t h = p0->h;
     pixmapf U(w,h);
     pixmapf V(w,h);
+    region  Sqr; Sqr.load_square(20);
+    region  Dsk; Dsk.load_disk(20);
+    region  Reg; Reg.load_disk(20); Reg.shift(0, 15); Reg.load_square(10); Reg.simplify();
     for(size_t id=0;id<nd-1;++id)
     {
         if(id>0)
@@ -101,10 +105,24 @@ YOCTO_UNIT_TEST_IMPL(block)
             p1.reset( new pixmapf(bmp) );
         }
 
+        Sqr.tag(*p0, 0, 0, 0.25);
+        Sqr.tag(*p0, 0, h, 0.50);
+        Sqr.tag(*p0, w, h, 0.75);
+        Sqr.tag(*p0, w, 0, 1.00);
+
+        Dsk.tag(*p1, 0, 0, 0.25);
+        Dsk.tag(*p1, 0, h, 0.50);
+        Dsk.tag(*p1, w, h, 0.75);
+        Dsk.tag(*p1, w, 0, 1.00);
+
+        Reg.tag(*p0, w/2, h/2, 0.9);
+
         IMG["PNG"].save("p0.png", *p0, NULL);
         IMG["PNG"].save("p1.png", *p1, NULL);
-        
-        compute_corr(U,V,*p0,*p1,3);
+
+
+
+        //compute_corr(U,V,*p0,*p1,3);
         
         break;
     }
@@ -112,56 +130,3 @@ YOCTO_UNIT_TEST_IMPL(block)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/sequence/list.hpp"
-
-static
-void plotCircle( sequence<vertex> &out, int xm, int ym, int r)
-{
-    int x = -r, y = 0, err = 2-2*r;                /* bottom left to top right */
-    do {
-        const vertex I(xm-x,xm+y);
-        const vertex II(xm-y,ym-x);
-        const vertex III(xm+x,ym-y);
-        const vertex IV(xm+y,ym+x);
-        out.push_back(I);
-        out.push_back(II);
-        out.push_back(III);
-        out.push_back(IV);
-
-        //setPixel(xm-x, ym+y);                            /*   I. Quadrant +x +y */
-        //setPixel(xm-y, ym-x);                            /*  II. Quadrant -x +y */
-        //setPixel(xm+x, ym-y);                            /* III. Quadrant -x -y */
-        //setPixel(xm+y, ym+x);                            /*  IV. Quadrant +x -y */
-        r = err;
-        if (r <= y) err += ++y*2+1;                             /* e_xy+e_y < 0 */
-        if (r > x || err > y)                  /* e_xy+e_x > 0 or no 2nd y-step */
-            err += ++x*2+1;                                     /* -> x-step now */
-    } while (x < 0);
-}
-
-YOCTO_UNIT_TEST_IMPL(circle)
-{
-    list<vertex> paths;
-
-    size_t count = 0;
-    for(unit_t r=0;r<=10;++r)
-    {
-        list<vertex> cr;
-        plotCircle(cr,0,0,r);
-        const size_t oldSize = cr.size();
-        cr.uniq( gist::fast_compare );
-        std::cerr << "cr.size=" << oldSize << " -> " << cr.size() << std::endl;
-        count += cr.size();
-        for( list<vertex>::iterator i=cr.begin();i!=cr.end();++i)
-        {
-            paths.push_back( *i );
-        }
-    }
-    assert(count==paths.size());
-    std::cerr << "paths=" << paths.size() << std::endl;
-    paths.uniq(gist::fast_compare);
-    std::cerr << "paths=" << paths.size() << std::endl;
-
-
-}
-YOCTO_UNIT_TEST_DONE()
