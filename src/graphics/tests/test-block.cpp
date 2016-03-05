@@ -3,7 +3,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/graphics/region.hpp"
-#include "yocto/container/matrix.hpp"
+#include "yocto/container/xtensor.hpp"
 
 using namespace yocto;
 using namespace graphics;
@@ -42,34 +42,10 @@ YOCTO_UNIT_TEST_IMPL(block)
 
     std::cerr << "creating matrices..." << std::endl;
 
-    /*
-     matrix<region> regA(h,w);
-     matrix<region> regB(h,w);
-    std::cerr << "Filling Matrices..." << std::endl;
-    for(unit_t j=1;j<=h;++j)
-    {
-        std::cerr << ".";
-        std::cerr.flush();
-        for(unit_t i=1;i<=w;++i)
-        {
-            regA[j][i].load_disk(20);
-            regB[j][i].load_disk(20);
-        }
-    }
-    std::cerr << std::endl;
-     */
-
-    matrix<region> regA(h,w);
-    for(unit_t j=1;j<=h;++j)
-    {
-        std::cerr << ".";
-        std::cerr.flush();
-        for(unit_t i=1;i<=w;++i)
-        {
-            regA[j][i].load_square(30);
-        }
-    }
-    std::cerr << std::endl;
+    const size_t rmax = 30;
+    const size_t wmax = 2*rmax+1;
+    const size_t vmax = wmax*wmax;
+    std::cerr << "vmax=" << vmax << std::endl;
 
 
 
