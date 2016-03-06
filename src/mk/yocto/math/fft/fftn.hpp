@@ -20,19 +20,22 @@ namespace yocto
              */
             static void Compute(T *data, const size_t nn[], const size_t ndim, int isign) throw();
             
-            static inline void Forward(const T *data, const size_t nn[], const size_t ndim) throw()
+            static inline void Forward( T *data, const size_t nn[], const size_t ndim) throw()
             {
                 Compute(data, nn, ndim, 1);
             }
             
-            static inline void Reverse(const T *data, const size_t nn[], const size_t ndim) throw()
+            static inline void Reverse( T *data, const size_t nn[], const size_t ndim) throw()
             {
                 Compute(data, nn, ndim, -1);
             }
             
         };
         
-        void FFT(matrix< complex<float> > &);
+        void FFT( matrix< complex<float>  > &) throw();
+        void iFFT(matrix< complex<float>  > &) throw();
+        void FFT( matrix< complex<double> > &) throw();
+        void iFFT(matrix< complex<double> > &) throw();
         
     }
 
