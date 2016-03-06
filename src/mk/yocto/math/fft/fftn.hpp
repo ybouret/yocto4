@@ -17,6 +17,7 @@ namespace yocto
             //! generic fourier
             /**
              nn[1]..nn[ndim]
+             data[1..prod(nn)*2], row major array of 'complexes'
              */
             static void Compute(T *data, const size_t nn[], const size_t ndim, int isign) throw();
             

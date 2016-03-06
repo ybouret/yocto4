@@ -14,14 +14,22 @@ namespace yocto
         template <>
         void FourierN<real_t>:: Compute(real_t *data, const size_t nn[], const size_t ndim, int isign) throw()
         {
-            
+            /*
+            std::cerr << "fft" << ndim << "(";
+            for(size_t i=1;i<=ndim;++i)
+            {
+                std::cerr << " " << nn[i];
+            }
+            std::cerr << " , " << isign;
+            std::cerr << " )" << std::endl;
+             */
             assert(data);
             assert(nn);
             assert(ndim>0);
             assert(1==isign||-1==isign);
             
-            unsigned long i1,i2,i3,i2rev,i3rev,ip1,ip2,ip3,ifp1,ifp2;
-            unsigned long ibit,k1,k2,n,nprev,nrem,ntot;
+            size_t i1,i2,i3,i2rev,i3rev,ip1,ip2,ip3,ifp1,ifp2;
+            size_t ibit,k1,k2,n,nprev,nrem,ntot;
             real_t  tempi,tempr;
             real_t  theta,wi,wpi,wpr,wr,wtemp;
             
@@ -32,7 +40,7 @@ namespace yocto
                 ntot *= nn[idim];
             }
             nprev=1;
-            for(size_t idim=ndim;idim>=1;idim--)
+            for(size_t idim=ndim;idim>=1;--idim)
             {
                 n     = nn[idim];
                 nrem  = ntot/(n*nprev);
@@ -97,7 +105,10 @@ namespace yocto
                 }
                 nprev *= n;
             }
-            
+            if(-1==isign)
+            {
+                for(size_t i=ntot<<1;i>0;--i) data[i] /= ntot;
+            }
         }
         
         
