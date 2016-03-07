@@ -1,8 +1,11 @@
 #include "yocto/graphics/pixmap.hpp"
 #include "yocto/utest/run.hpp"
 
+#include "yocto/math/complex.hpp"
+
 using namespace yocto;
 using namespace graphics;
+using namespace math;
 
 namespace {
 struct abc { char a,b,c; };
@@ -18,6 +21,8 @@ YOCTO_UNIT_TEST_IMPL(pixmap)
     pixmap<uint64_t> p8(100,20),p8a(p8),p8b(p8,rect);
     pixmap<abc>      p3(100,20),p3a(p3),p3b(p3,rect);
 
+    pixmap< complex<float> > Z(128,64);
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
