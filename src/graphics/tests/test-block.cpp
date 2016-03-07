@@ -5,6 +5,8 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/graphics/ops/fft.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/graphics/ramp/cold_to_very_hot.hpp"
+#include "yocto/graphics/ramp/grey.hpp"
 
 using namespace yocto;
 using namespace graphics;
@@ -47,7 +49,7 @@ YOCTO_UNIT_TEST_IMPL(block)
     pixmapz zz(aw,ah);
     pixmapf cr(w,h);
 
-    get_rampf to_ramp;
+    cold_to_very_hot to_ramp;
     float &cmin = to_ramp.vmin;
     float &cmax = to_ramp.vmax;
 
@@ -64,6 +66,7 @@ YOCTO_UNIT_TEST_IMPL(block)
             p1.reset( new pixmapf(bmp) );
         }
 
+        // load source image
         za.ldz();
         for(unit_t j=0;j<h;++j)
         {
@@ -75,12 +78,14 @@ YOCTO_UNIT_TEST_IMPL(block)
         }
         fft::forward(za);
 
+        // load zone
         zb.ldz();
         cr.ldz();
         vertex q;
-        for(q.y=h/2-8;q.y<=h/2+8;++q.y)
+        const unit_t SQ = 10;
+        for(q.y=h/2-SQ;q.y<=h/2+SQ;++q.y)
         {
-            for(q.x=w/2-8;q.x<=w/2+8;++q.x)
+            for(q.x=w/2-SQ;q.x<=w/2+SQ;++q.x)
             {
                 if(p1->has(q))
                 {
@@ -98,8 +103,11 @@ YOCTO_UNIT_TEST_IMPL(block)
             for(unit_t i=0;i<aw;++i)
             {
                 zz[j][i] = za[j][i] * zb[j][i].conj();
+                //zz[j][i] = -za[j][i];
             }
         }
+
+        // come back to real space
         fft::reverse(zz);
 
         cmin = cmax = 0;

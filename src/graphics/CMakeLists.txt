@@ -26,6 +26,7 @@ SET(srcs_ramp ${impl_ramp} ${decl_ramp})
 INSTALL( FILES ${decl_ramp} DESTINATION include/yocto/graphics/ramp )
 SOURCE_GROUP( graphics/ramp FILES ${srcs_ramp} )
 
+
 INCLUDE_DIRECTORIES( . ../main ../mk ../third_party/png ../third_party/jpeg ../tiff++)
 
 ADD_LIBRARY(y-graphics STATIC ${srcs} ${srcs_image} ${srcs_ops} ${srcs_ramp} )
