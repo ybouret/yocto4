@@ -48,7 +48,6 @@ YOCTO_UNIT_TEST_IMPL(block)
     pixmapf cr(w,h);
 
     get_rampf to_ramp;
-    //get_gsf   to_gs;
     float &cmin = to_ramp.vmin;
     float &cmax = to_ramp.vmax;
 
@@ -66,16 +65,33 @@ YOCTO_UNIT_TEST_IMPL(block)
         }
 
         za.ldz();
-        zb.ldz();
         for(unit_t j=0;j<h;++j)
         {
             for(unit_t i=0;i<w;++i)
             {
                 za[j][i].re = (*p0)[j][i];
-                zb[j][i].re = (*p1)[j][i];
+                //zb[j][i].re = (*p1)[j][i];
             }
         }
         fft::forward(za);
+
+        zb.ldz();
+        cr.ldz();
+        vertex q;
+        for(q.y=h/2-8;q.y<=h/2+8;++q.y)
+        {
+            for(q.x=w/2-8;q.x<=w/2+8;++q.x)
+            {
+                if(p1->has(q))
+                {
+                    zb[q].re = (*p1)[q];
+                    cr[q]    = (*p1)[q];
+                }
+            }
+        }
+
+        gfx.save("zone.png", cr, NULL);
+
         fft::forward(zb);
         for(unit_t j=0;j<ah;++j)
         {
