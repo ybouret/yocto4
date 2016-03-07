@@ -7,6 +7,7 @@
 #include "yocto/graphics/ops/grad.hpp"
 #include "yocto/graphics/ops/stencil.hpp"
 #include "yocto/graphics/ops/blur.hpp"
+#include "yocto/graphics/ops/bilinear.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/graphics/ops/blend.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
@@ -90,6 +91,20 @@ YOCTO_UNIT_TEST_IMPL(ops)
             channels::merge(ch,gc, chp, &server);
             PNG.save("grad3.png", gc, NULL);
         }
+
+        std::cerr << "Zoom..." << std::endl;
+        {
+            pixmapf zoomed(pgs.w*2.2,pgs.h*2.2);
+            bilinear::zoom(zoomed,pgs);
+            PNG.save("zoomedGS.png", zoomed,NULL);
+
+
+            pixmap4 zoomed4(zoomed.w,zoomed.h);
+            bilinear::zoom(zoomed4,pxm);
+            PNG.save("zoomed4.png", zoomed4,NULL);
+
+        }
+
 
         std::cerr << "Stencils..." << std::endl;
         stencil::weights W;

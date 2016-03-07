@@ -12,8 +12,6 @@ using namespace yocto;
 using namespace graphics;
 
 
-
-
 YOCTO_UNIT_TEST_IMPL(block)
 {
     image &IMG = image::instance();
