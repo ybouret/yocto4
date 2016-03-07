@@ -47,6 +47,23 @@ virtual RGBA get(const void *addr) { CODE; } \
                                 return RGBA(u,u,u)
                                 );
 
+        //! for pixmapf
+        class get_rampf : public data2rgba
+        {
+        public:
+            float vmin;
+            float vmax;
+            inline explicit get_rampf() throw() : data2rgba(), vmin(0), vmax(1) {}
+            inline virtual ~get_rampf() throw() {}
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(get_rampf);
+            virtual RGBA get(const void *addr)
+            {
+                return default_ramp<RGBA>( *(const float *)addr,vmin,vmax);
+            }
+        };
+
         //! for pixmapu
         YOCTO_GRAPHIX_DATA2RGBA(get_gsu,
                                 const uint8_t u=*(const uint8_t *)addr;

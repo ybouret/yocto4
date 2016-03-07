@@ -1,4 +1,5 @@
 #include "yocto/graphics/image/png.hpp"
+#include "yocto/graphics/image/jpeg.hpp"
 #include "yocto/graphics/image/tiff.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ptr/auto.hpp"
@@ -21,6 +22,8 @@ YOCTO_UNIT_TEST_IMPL(block)
     tiff_format *TIF = new tiff_format();
     IMG.declare(TIF);
     IMG.declare(new  png_format() );
+    IMG.declare(new  jpeg_format() );
+    const imageIO &gfx = IMG;
 
     if(argc<2) throw exception("need one TIFF file");
     const string   filename = argv[1];
@@ -42,6 +45,12 @@ YOCTO_UNIT_TEST_IMPL(block)
     pixmapz za(aw,ah);
     pixmapz zb(aw,ah);
     pixmapz zz(aw,ah);
+    pixmapf cr(w,h);
+
+    get_rampf to_ramp;
+    //get_gsf   to_gs;
+    float &cmin = to_ramp.vmin;
+    float &cmax = to_ramp.vmax;
 
     for(size_t id=0;id<nd-1;++id)
     {
@@ -77,10 +86,24 @@ YOCTO_UNIT_TEST_IMPL(block)
         }
         fft::reverse(zz);
 
+        cmin = cmax = 0;
+        for(unit_t j=0;j<h;++j)
+        {
+            for(unit_t i=0;i<w;++i)
+            {
+                const float cc = zz[j][i].re;
+                cr[j][i] = cc;
+                if(cc<cmin) cmin = cc;
+                if(cc>cmax) cmax = cc;
+            }
+        }
 
+        std::cerr << "cmin=" << cmin << std::endl;
+        std::cerr << "cmax=" << cmax << std::endl;
 
-        IMG["PNG"].save("p0.png", *p0, NULL);
-        IMG["PNG"].save("p1.png", *p1, NULL);
+        gfx.save("p0.png", *p0, NULL);
+        gfx.save("p1.png", *p1, NULL);
+        gfx.save("cr.png", cr,to_ramp, NULL);
 
 
 

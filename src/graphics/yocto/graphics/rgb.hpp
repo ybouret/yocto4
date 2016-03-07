@@ -15,8 +15,15 @@ namespace yocto
         template <typename T>
         struct channel_info
         {
-            static const T opaque;
-            static bool    is_zero(const T) throw();
+            static const  T opaque;
+            static bool     is_zero(const T) throw();
+            static inline T scale(const double x) throw()
+            {
+                static const double amplitude( opaque );
+                const T ans(amplitude*x);
+                //std::cerr << x << "->" << double(ans) << std::endl;
+                return ans;
+            }
         };
 
         template <typename T>
@@ -71,6 +78,40 @@ namespace yocto
         template <typename T> float   to_float(const T&) throw();
         template <typename T> T       invert_color(const T&) throw();
 
+        template <typename RGB_TYPE>
+        inline RGB_TYPE default_ramp( double v, const double vmin=0, const double vmax=0)
+        {
+
+            double r=1,g=1,b=1;
+            //std::cerr << v << "[" << vmin << ";" << vmax << "]" << std::endl;
+            if(vmax>vmin)
+            {
+                if (v < vmin)
+                    v = vmin;
+                if (v > vmax)
+                    v = vmax;
+                const double dv = vmax - vmin;
+
+                if (v < (vmin + 0.25 * dv)) {
+                    r = 0;
+                    g = 4 * (v - vmin) / dv;
+                } else if (v < (vmin + 0.5 * dv)) {
+                    r = 0;
+                    b = 1 + 4 * (vmin + 0.25 * dv - v) / dv;
+                } else if (v < (vmin + 0.75 * dv)) {
+                    r = 4 * (v - vmin - 0.5 * dv) / dv;
+                    b = 0;
+                } else {
+                    g = 1 + 4 * (vmin + 0.75 * dv - v) / dv;
+                    b = 0;
+                }
+            }
+
+            return RGB_TYPE(channel_info< typename RGB_TYPE::type>::scale(r),
+                            channel_info< typename RGB_TYPE::type>::scale(g),
+                            channel_info< typename RGB_TYPE::type>::scale(b));
+        }
+        
     }
     
 }
