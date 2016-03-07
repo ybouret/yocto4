@@ -1,3 +1,7 @@
+ADD_EXECUTABLE(make_ramp make_ramp.cpp)
+TARGET_LINK_YOCTO(make_ramp)
+
+
 FILE(GLOB decl yocto/graphics/*.hpp)
 FILE(GLOB impl yocto/graphics/*.cpp)
 SET(srcs ${impl} ${decl})
@@ -16,9 +20,15 @@ SET(srcs_ops ${impl_ops} ${decl_ops})
 INSTALL( FILES ${decl_ops} DESTINATION include/yocto/graphics/ops )
 SOURCE_GROUP( graphics/ops FILES ${srcs_ops} )
 
+FILE(GLOB decl_ramp yocto/graphics/ramp/*.hpp)
+FILE(GLOB impl_ramp yocto/graphics/ramp/*.cpp)
+SET(srcs_ramp ${impl_ramp} ${decl_ramp})
+INSTALL( FILES ${decl_ramp} DESTINATION include/yocto/graphics/ramp )
+SOURCE_GROUP( graphics/ramp FILES ${srcs_ramp} )
+
 INCLUDE_DIRECTORIES( . ../main ../mk ../third_party/png ../third_party/jpeg ../tiff++)
 
-ADD_LIBRARY(y-graphics STATIC ${srcs} ${srcs_image} ${srcs_ops} )
+ADD_LIBRARY(y-graphics STATIC ${srcs} ${srcs_image} ${srcs_ops} ${srcs_ramp} )
 INSTALL( TARGETS y-graphics ARCHIVE DESTINATION lib)
 
 IF(YOCTO_BUILD_TESTS)
