@@ -13,7 +13,7 @@ namespace yocto
         typedef pixmap<double>   pixmapd;
         typedef pixmap<RGB>      pixmap3;
         typedef pixmap<RGBA>     pixmap4;
-        
+        typedef pixmap<cplx_t>   pixmapz;
     }
 }
 

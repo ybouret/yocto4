@@ -14,13 +14,7 @@ namespace yocto
         template <typename T>
         struct FourierN
         {
-            //! generic fourier
-            /**
-             nn[1]..nn[ndim]
-             data[1..prod(nn)*2], row major array of 'complexes'
-             */
-            static void Compute(T *data, const size_t nn[], const size_t ndim, int isign) throw();
-            
+
             static inline void Forward( T *data, const size_t nn[], const size_t ndim) throw()
             {
                 Compute(data, nn, ndim, 1);
@@ -30,6 +24,15 @@ namespace yocto
             {
                 Compute(data, nn, ndim, -1);
             }
+
+        private:
+            //! generic fourier
+            /**
+             nn[1]..nn[ndim]
+             data[1..prod(nn)*2], row major array of 'complexes'
+             */
+            static void Compute(T *data, const size_t nn[], const size_t ndim, int isign) throw();
+
             
         };
         

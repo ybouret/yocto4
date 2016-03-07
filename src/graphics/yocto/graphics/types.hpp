@@ -3,16 +3,16 @@
 
 #include "yocto/parallel/splitter.hpp"
 #include "yocto/core/list.hpp"
-
+#include "yocto/math/complex.hpp"
 #include <cmath>
 
 namespace yocto
 {
     namespace graphics
     {
-        typedef point2d<unit_t>   vertex; //!< base class for operations
-        typedef parallel::patch2D patch;  //!< base class for patches
-
+        typedef point2d<unit_t>      vertex; //!< base class for operations
+        typedef parallel::patch2D    patch;  //!< base class for patches
+        typedef math::complex<float> cplx_t; //!< complex for graphics...
 
 
 

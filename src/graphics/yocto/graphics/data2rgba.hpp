@@ -69,6 +69,7 @@ virtual RGBA get(const void *addr) { CODE; } \
         //! for pixmap 1, blue-scale
         YOCTO_GRAPHIX_DATA2RGBA(get_blue,  return RGBA(0,0,*(const uint8_t*)addr,255) );
 
+        
     }
 
 }

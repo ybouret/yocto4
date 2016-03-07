@@ -16,7 +16,7 @@ SET(srcs_ops ${impl_ops} ${decl_ops})
 INSTALL( FILES ${decl_ops} DESTINATION include/yocto/graphics/ops )
 SOURCE_GROUP( graphics/ops FILES ${srcs_ops} )
 
-INCLUDE_DIRECTORIES( . ../main ../third_party/png ../third_party/jpeg ../tiff++)
+INCLUDE_DIRECTORIES( . ../main ../mk ../third_party/png ../third_party/jpeg ../tiff++)
 
 ADD_LIBRARY(y-graphics STATIC ${srcs} ${srcs_image} ${srcs_ops} )
 INSTALL( TARGETS y-graphics ARCHIVE DESTINATION lib)
