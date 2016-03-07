@@ -28,7 +28,7 @@ namespace yocto
 
             static inline float mix(const float lhs,const float rhs,const float alpha) throw()
             {
-                return lhs*alpha + rhs*(1.0-alpha);
+                return lhs*alpha + rhs*(1.0f-alpha);
             }
 
 

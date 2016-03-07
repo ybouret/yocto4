@@ -62,7 +62,7 @@ YOCTO_UNIT_TEST_DONE()
 #include "yocto/ios/icstream.hpp"
 #include "yocto/string/base64.hpp"
 
-static const char rsa_keys[] =
+static const uint8_t rsa_keys[] =
 {
 #include "./rsa-keys.inc"
 };
