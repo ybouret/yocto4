@@ -2,8 +2,8 @@
 #include "yocto/graphics/image/tiff.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ptr/auto.hpp"
-#include "yocto/graphics/region.hpp"
-#include "yocto/container/xtensor.hpp"
+#include "yocto/graphics/ops/fft.hpp"
+#include "yocto/code/utils.hpp"
 
 using namespace yocto;
 using namespace graphics;
@@ -13,7 +13,6 @@ using namespace graphics;
 
 YOCTO_UNIT_TEST_IMPL(block)
 {
-    std::cerr << "sizeof(regxel)=" << sizeof(regxel) << std::endl;
     image &IMG = image::instance();
 
     auto_ptr<pixmapf> p0;
@@ -35,22 +34,14 @@ YOCTO_UNIT_TEST_IMPL(block)
 
     const unit_t w = p0->w;
     const unit_t h = p0->h;
-    const unit_t nr = w*h;
-    std::cerr << "need " << nr*2 << " regions!" << std::endl;
-    pixmapf U(w,h);
-    pixmapf V(w,h);
+    //const unit_t nr = w*h;
 
-    std::cerr << "creating matrices..." << std::endl;
+    const unit_t aw = next_power_of_two(w);
+    const unit_t ah = next_power_of_two(h);
 
-    const size_t rmax = 30;
-    const size_t wmax = 2*rmax+1;
-    const size_t vmax = wmax*wmax;
-    std::cerr << "vmax=" << vmax << std::endl;
-
-
-
-    region Sqr; Sqr.load_square(30);
-    region Dsk; Dsk.load_disk(30);
+    pixmapz za(aw,ah);
+    pixmapz zb(aw,ah);
+    pixmapz zz(aw,ah);
 
     for(size_t id=0;id<nd-1;++id)
     {
@@ -65,22 +56,29 @@ YOCTO_UNIT_TEST_IMPL(block)
             p1.reset( new pixmapf(bmp) );
         }
 
-#if 1
-        Sqr.tag(*p0, 0, 0, 0.25);
-        Sqr.tag(*p0, 0, h, 0.50);
-        Sqr.tag(*p0, w, h, 0.75);
-        Sqr.tag(*p0, w, 0, 1.00);
+        za.ldz();
+        zb.ldz();
+        for(unit_t j=0;j<h;++j)
+        {
+            for(unit_t i=0;i<w;++i)
+            {
+                za[j][i].re = (*p0)[j][i];
+                zb[j][i].re = (*p1)[j][i];
+            }
+        }
+        fft::forward(za);
+        fft::forward(zb);
+        for(unit_t j=0;j<ah;++j)
+        {
+            for(unit_t i=0;i<aw;++i)
+            {
+                zz[j][i] = za[j][i] * zb[j][i].conj();
+            }
+        }
+        fft::reverse(zz);
 
-        Sqr.tag(*p0, w/2, h/2, 0.9);
 
-        Dsk.tag(*p1, 0, 0, 0.25);
-        Dsk.tag(*p1, 0, h, 0.50);
-        Dsk.tag(*p1, w, h, 0.75);
-        Dsk.tag(*p1, w, 0, 1.00);
-        Dsk.tag(*p1, w/2, h/2, 0.9);
 
-#endif
-        
         IMG["PNG"].save("p0.png", *p0, NULL);
         IMG["PNG"].save("p1.png", *p1, NULL);
 

@@ -31,7 +31,7 @@ namespace yocto
             size_t i1,i2,i3,i2rev,i3rev,ip1,ip2,ip3,ifp1,ifp2;
             size_t ibit,k1,k2,n,nprev,nrem,ntot;
             real_t  tempi,tempr;
-            real_t  theta,wi,wpi,wpr,wr,wtemp;
+            double  theta,wi,wpi,wpr,wr,wtemp;
             
             ntot=1;
             for(size_t idim=1;idim<=ndim;++idim)
@@ -72,16 +72,16 @@ namespace yocto
                 }
                 
                 ifp1=ip1;
-                const real_t sgn_two_pi = numeric<real_t>::two_pi * isign;
+                const double sgn_two_pi = numeric<double>::two_pi * isign;
                 while (ifp1 < ip2)
                 {
                     ifp2  = ifp1 << 1;
                     theta = sgn_two_pi/(ifp2/ip1);
-                    wtemp = Sin(REAL(0.5)*theta);
-                    wpr   = -REAL(2.0)*wtemp*wtemp;
-                    wpi   = Sin(theta);
-                    wr    = REAL(1.0);
-                    wi    = REAL(0.0);
+                    wtemp = sin(0.5*theta);
+                    wpr   = -2.0*wtemp*wtemp;
+                    wpi   = sin(theta);
+                    wr    = 1;
+                    wi    = 0;
                     for (i3=1;i3<=ifp1;i3+=ip1)
                     {
                         for (i1=i3;i1<=i3+ip1-2;i1+=2)
@@ -90,11 +90,11 @@ namespace yocto
                             {
                                 k1=i2;
                                 k2=k1+ifp1;
-                                tempr=wr*data[k2]-wi*data[k2+1];
-                                tempi=wr*data[k2+1]+wi*data[k2];
-                                data[k2]=data[k1]-tempr;
-                                data[k2+1]=data[k1+1]-tempi;
-                                data[k1] += tempr;
+                                tempr=real_t(wr)*data[k2]  -real_t(wi)*data[k2+1];
+                                tempi=real_t(wr)*data[k2+1]+real_t(wi)*data[k2];
+                                data[k2]    = data[k1]-tempr;
+                                data[k2+1]  = data[k1+1]-tempi;
+                                data[k1]   += tempr;
                                 data[k1+1] += tempi;
                             }
                         }
@@ -105,10 +105,13 @@ namespace yocto
                 }
                 nprev *= n;
             }
-            if(-1==isign)
-            {
-                for(size_t i=ntot<<1;i>0;--i) data[i] /= ntot;
-            }
+
+            
+            const real_t coef = real_t(1.0/sqrt( double(ntot) ));
+#define _YOCTO_FFT_SCALE(INDEX) data[INDEX] *= coef
+            YOCTO_LOOP_FUNC_(ntot<<1,_YOCTO_FFT_SCALE,1);
+
+
         }
         
         

@@ -75,12 +75,13 @@ YOCTO_UNIT_TEST_IMPL(fft)
         gfx.save("fft.png", pA, NULL);
 
 
+#if 0
         const float sig = min_of(w,h)/4.0f;
         const float sig2= 2*sig*sig;
-        for(unit_t j=0;j<ah;++j)
+        for(unit_t j=0;j<ah/2;++j)
         {
             const float j2 = (j*j);
-            for(unit_t i=0;i<aw;++i)
+            for(unit_t i=0;i<aw/2;++i)
             {
                 const float i2 = (i*i);
                 const float r2 = i2+j2;
@@ -88,7 +89,8 @@ YOCTO_UNIT_TEST_IMPL(fft)
                 pz[j][i] *= fac;
             }
         }
-
+#endif
+        
         fft::reverse(pz);
 
         pixmapf tgt(w,h);
