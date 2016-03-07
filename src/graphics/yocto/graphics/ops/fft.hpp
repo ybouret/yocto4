@@ -11,6 +11,7 @@ namespace yocto
         {
             //! must be a full pixmap, not shared
             static void forward( pixmapz &img ) throw();
+            static void reverse( pixmapz &img ) throw();
         };
     }
 }

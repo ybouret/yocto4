@@ -12,5 +12,13 @@ namespace yocto
             const size_t nn[4] = { 0, img.w, img.h, 0 };
             math::FourierN<float>::Forward(addr-1, nn, 2);
         }
+
+        void fft:: reverse( pixmapz &img ) throw()
+        {
+            assert(img.model==bitmap::memory_is_global);
+            float       *addr  = & (img[0][0].re);
+            const size_t nn[4] = { 0, img.w, img.h, 0 };
+            math::FourierN<float>::Reverse(addr-1, nn, 2);
+        }
     }
 }

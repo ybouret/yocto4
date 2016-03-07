@@ -75,6 +75,33 @@ YOCTO_UNIT_TEST_IMPL(fft)
         gfx.save("fft.png", pA, NULL);
 
 
+        const float sig = min_of(w,h)/4.0f;
+        const float sig2= 2*sig*sig;
+        for(unit_t j=0;j<ah;++j)
+        {
+            const float j2 = (j*j);
+            for(unit_t i=0;i<aw;++i)
+            {
+                const float i2 = (i*i);
+                const float r2 = i2+j2;
+                const float fac = expf(-r2/sig2);
+                pz[j][i] *= fac;
+            }
+        }
+
+        fft::reverse(pz);
+
+        pixmapf tgt(w,h);
+        for(unit_t j=0;j<h;++j)
+        {
+            for(unit_t i=0;i<w;++i)
+            {
+                tgt[j][i] = pz[j][i].re;
+            }
+        }
+        gfx.save("tgt.png", tgt, NULL);
+
+
     }
 }
 YOCTO_UNIT_TEST_DONE()
