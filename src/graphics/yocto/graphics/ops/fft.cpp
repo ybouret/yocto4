@@ -60,6 +60,28 @@ namespace yocto
             }
         }
 
+        void fft:: dispatch(const rectangle area) throw()
+        {
+            data.ldz();
+            assert(core.contains(area));
+            const unit_t wtop = data.w-1;
+            const unit_t htop = data.h-1;
+            for(unit_t y=area.lower.y;y<=area.upper.y;++y)
+            {
+                const unit_t ym = htop-y;
+                for(unit_t x=area.lower.x;x<=area.upper.x;++x)
+                {
+                    const unit_t xm = wtop-x;
+                    const float u   = core[y][x];
+                    data[y][x] .re  = u;
+                    data[y][xm].re  = u;
+                    data[ym][x].re  = u;
+                    data[ym][xm].re = u;
+                }
+            }
+
+        }
+
         void fft:: forward() throw()
         {
             __forward(data);

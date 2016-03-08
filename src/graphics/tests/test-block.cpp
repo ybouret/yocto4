@@ -61,9 +61,14 @@ YOCTO_UNIT_TEST_IMPL(block)
         gfx.save("p1.png", *p1, NULL);
 
         sourceA.load(*p0);
-        sourceA.dispatch();
+        sourceA.dispatch(); //! dispatch full content...
         gfx.save("p0d.png", sourceA.data, z2gs, NULL);
-        
+
+        sourceB.load(*p1);
+        sourceB.dispatch( rectangle(w/2,h/2,8,8) );
+        gfx.save("p1d.png", sourceB.data, z2gs, NULL);
+
+
         break;
     }
     

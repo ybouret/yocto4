@@ -29,8 +29,11 @@ namespace yocto
             //! put src into core, zooming
             void load( const pixmapf &src ) throw();
 
-            //! dispatch core into data
+            //! dispatch full core into data
             void dispatch() throw();
+
+            //! only a sub part
+            void dispatch(const rectangle area) throw();
 
             //! forward FFT of data
             void forward() throw();

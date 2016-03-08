@@ -56,9 +56,9 @@ namespace yocto
                         tgt[Y][X] = mix_quad(src[y0][x0],src[y1][x0],src[y1][x1],src[y0][x1],px0,px1,py0,py1);
                     }
                 }
-
-
             }
+
+            
 
         };
 
