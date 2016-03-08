@@ -37,19 +37,11 @@ YOCTO_UNIT_TEST_IMPL(block)
 
     const unit_t w = p0->w;
     const unit_t h = p0->h;
-    //const unit_t nr = w*h;
 
-    const unit_t aw = next_power_of_two(w);
-    const unit_t ah = next_power_of_two(h);
+    fft sourceA(w,h);
+    fft sourceB(w,h);
 
-    pixmapz za(aw,ah);
-    pixmapz zb(aw,ah);
-    pixmapz zz(aw,ah);
-    pixmapf cr(w,h);
-
-    cold_to_very_hot to_ramp;
-    float &cmin = to_ramp.vmin;
-    float &cmax = to_ramp.vmax;
+    get_gsz z2gs;
 
     for(size_t id=0;id<nd-1;++id)
     {
@@ -64,72 +56,13 @@ YOCTO_UNIT_TEST_IMPL(block)
             p1.reset( new pixmapf(bmp) );
         }
 
-        // load source image
-        za.ldz();
-        for(unit_t j=0;j<h;++j)
-        {
-            for(unit_t i=0;i<w;++i)
-            {
-                za[j][i].re = (*p0)[j][i];
-                //zb[j][i].re = (*p1)[j][i];
-            }
-        }
-        fft::forward(za);
-
-        // load zone
-        zb.ldz();
-        cr.ldz();
-        vertex q;
-        const unit_t SQ = 10;
-        for(q.y=h/2-SQ;q.y<=h/2+SQ;++q.y)
-        {
-            for(q.x=w/2-SQ;q.x<=w/2+SQ;++q.x)
-            {
-                if(p1->has(q))
-                {
-                    zb[q].re = (*p1)[q];
-                    cr[q]    = (*p1)[q];
-                }
-            }
-        }
-
-        gfx.save("zone.png", cr, NULL);
-
-        fft::forward(zb);
-        for(unit_t j=0;j<ah;++j)
-        {
-            for(unit_t i=0;i<aw;++i)
-            {
-                zz[j][i] = za[j][i] * zb[j][i].conj();
-                //zz[j][i] = -za[j][i];
-            }
-        }
-
-        // come back to real space
-        fft::reverse(zz);
-
-        cmin = cmax = 0;
-        for(unit_t j=0;j<h;++j)
-        {
-            for(unit_t i=0;i<w;++i)
-            {
-                const float cc = zz[j][i].re;
-                cr[j][i] = cc;
-                if(cc<cmin) cmin = cc;
-                if(cc>cmax) cmax = cc;
-            }
-        }
-
-        std::cerr << "cmin=" << cmin << std::endl;
-        std::cerr << "cmax=" << cmax << std::endl;
 
         gfx.save("p0.png", *p0, NULL);
         gfx.save("p1.png", *p1, NULL);
-        gfx.save("cr.png", cr,to_ramp, NULL);
 
-
-
-        //compute_corr(U,V,*p0,*p1,3);
+        sourceA.load(*p0);
+        sourceA.dispatch();
+        gfx.save("p0d.png", sourceA.data, z2gs, NULL);
         
         break;
     }

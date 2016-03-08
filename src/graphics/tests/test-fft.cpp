@@ -19,6 +19,7 @@ YOCTO_UNIT_TEST_IMPL(fft)
 
     //const image::format &PNG = IMG["PNG"];
     const imageIO       &gfx = IMG;
+    get_gsz z2gs;
 
     if(argc>1)
     {
@@ -33,78 +34,19 @@ YOCTO_UNIT_TEST_IMPL(fft)
         const unit_t w = pf.w;
         const unit_t h = pf.h;
 
-        const unit_t aw = next_power_of_two(w);
-        const unit_t ah = next_power_of_two(h);
-        pixmapz      pz(aw,ah);
-        for(unit_t j=0;j<h;++j)
-        {
-            for(unit_t i=0;i<w;++i)
-            {
-                pz[j][i].re = pf[j][i];
-            }
+        fft work(w,h);
 
-        }
-
-        std::cerr << "FFT on " << pz.w << "x" << pz.h << std::endl;
-        fft::forward(pz);
-
-        pixmapf pA(aw,ah);
-        float amax = 0.0f;
-        for(unit_t j=0;j<ah;++j)
-        {
-            for(unit_t i=0;i<aw;++i)
-            {
-                const float a = pz[j][i].mod();
-                pA[j][i] = a;
-                amax     = max_of(a,amax);
-            }
-        }
-
-        std::cerr << "amax=" << amax << std::endl;
-        if(amax>0)
-        {
-            for(unit_t j=0;j<ah;++j)
-            {
-                for(unit_t i=0;i<aw;++i)
-                {
-                    pA[j][i] /= amax;
-                }
-            }
-        }
-
-        gfx.save("fft.png", pA, NULL);
-
-
-#if 0
-        const float sig = min_of(w,h)/4.0f;
-        const float sig2= 2*sig*sig;
-        for(unit_t j=0;j<ah/2;++j)
-        {
-            const float j2 = (j*j);
-            for(unit_t i=0;i<aw/2;++i)
-            {
-                const float i2 = (i*i);
-                const float r2 = i2+j2;
-                const float fac = expf(-r2/sig2);
-                pz[j][i] *= fac;
-            }
-        }
-#endif
-        
-        fft::reverse(pz);
-
-        pixmapf tgt(w,h);
-        for(unit_t j=0;j<h;++j)
-        {
-            for(unit_t i=0;i<w;++i)
-            {
-                tgt[j][i] = pz[j][i].re;
-            }
-        }
-        gfx.save("tgt.png", tgt, NULL);
+        work.load(pf);
+        work.dispatch();
+        gfx.save("work.png",work.data,z2gs,NULL);
+        work.forward();
+        gfx.save("wfwd.png",work.data,z2gs,NULL);
+        work.reverse();
+        gfx.save("wrev.png",work.data,z2gs,NULL);
 
 
     }
+
 }
 YOCTO_UNIT_TEST_DONE()
 

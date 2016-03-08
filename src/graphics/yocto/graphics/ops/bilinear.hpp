@@ -63,14 +63,14 @@ namespace yocto
         };
 
         template <>
-        float bilinear::mix_quad<float>(const float &q00,
-                                        const float &q01,
-                                        const float &q11,
-                                        const float &q10,
-                                        const float px0,
-                                        const float px1,
-                                        const float py0,
-                                        const float py1) throw()
+        inline float bilinear::mix_quad<float>(const float &q00,
+                                               const float &q01,
+                                               const float &q11,
+                                               const float &q10,
+                                               const float px0,
+                                               const float px1,
+                                               const float py0,
+                                               const float py1) throw()
         {
             const float p00=px0*py0;
             const float p01=px0*py1;
@@ -80,14 +80,14 @@ namespace yocto
         }
 
         template <>
-        RGB bilinear::mix_quad<RGB>(const RGB &q00,
-                                    const RGB &q01,
-                                    const RGB &q11,
-                                    const RGB &q10,
-                                    const float px0,
-                                    const float px1,
-                                    const float py0,
-                                    const float py1) throw()
+        inline RGB bilinear::mix_quad<RGB>(const RGB &q00,
+                                           const RGB &q01,
+                                           const RGB &q11,
+                                           const RGB &q10,
+                                           const float px0,
+                                           const float px1,
+                                           const float py0,
+                                           const float py1) throw()
         {
             const float p00=px0*py0;
             const float p01=px0*py1;
@@ -103,14 +103,14 @@ namespace yocto
 
 
         template <>
-        RGBA bilinear::mix_quad<RGBA>(const RGBA &q00,
-                                      const RGBA &q01,
-                                      const RGBA &q11,
-                                      const RGBA &q10,
-                                      const float px0,
-                                      const float px1,
-                                      const float py0,
-                                      const float py1) throw()
+        inline RGBA bilinear::mix_quad<RGBA>(const RGBA &q00,
+                                             const RGBA &q01,
+                                             const RGBA &q11,
+                                             const RGBA &q10,
+                                             const float px0,
+                                             const float px1,
+                                             const float py0,
+                                             const float py1) throw()
         {
             const float p00=px0*py0;
             const float p01=px0*py1;
@@ -121,8 +121,8 @@ namespace yocto
             const float g = p00*gist::unit_float[q00.g] + p01*gist::unit_float[q01.g] + p11*gist::unit_float[q11.g] + p10*gist::unit_float[q10.g];
             const float b = p00*gist::unit_float[q00.b] + p01*gist::unit_float[q01.b] + p11*gist::unit_float[q11.b] + p10*gist::unit_float[q10.b];
             const float a = p00*gist::unit_float[q00.a] + p01*gist::unit_float[q01.a] + p11*gist::unit_float[q11.a] + p10*gist::unit_float[q10.a];
-
-
+            
+            
             return RGBA( gist::float2byte(r), gist::float2byte(g), gist::float2byte(b), gist::float2byte(a) );
         }
         
