@@ -7,6 +7,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/graphics/ramp/cold_to_very_hot.hpp"
 #include "yocto/graphics/ramp/grey.hpp"
+#include "yocto/graphics/ramp/orange.hpp"
 
 using namespace yocto;
 using namespace graphics;
@@ -39,15 +40,18 @@ YOCTO_UNIT_TEST_IMPL(block)
     const unit_t w = p0->w;
     const unit_t h = p0->h;
 
-    fft sourceA(w,h);
-    fft sourceB(w,h);
+    const unit_t aw = next_power_of_two(w);
+    const unit_t ah = next_power_of_two(h);
 
-    pixmapz zprod(sourceA.data.w,sourceA.data.h);
-    pixmapf rprod(sourceA.core.w,sourceA.core.h);
+    pixmapz za(aw,ah);
+    pixmapz zb(aw,ah);
+    pixmapz zp(aw,ah);
+    pixmapf cr(aw,ah);
 
     get_gsz          z2gs;
     cold_to_very_hot rmp;
-
+    float &vmin = rmp.vmin;
+    float &vmax = rmp.vmax;
     for(size_t id=0;id<nd-1;++id)
     {
         if(id>0)
@@ -65,61 +69,62 @@ YOCTO_UNIT_TEST_IMPL(block)
         gfx.save("p0.png", *p0, NULL);
         gfx.save("p1.png", *p1, NULL);
 
-        sourceA.load(*p0);
-        sourceA.dispatch(); //! dispatch full content...
-        gfx.save("p0d.png", sourceA.data, z2gs, NULL);
+        za.ldz();
+        for(unit_t y=0;y<h;++y)
+        {
+            for(unit_t x=0;x<w;++x)
+            {
+                za[y][x].re = (*p0)[y][x];
+            }
+        }
 
-        sourceB.load(*p1);
-        sourceB.dispatch( rectangle(w/2,h/2,32,32) );
-        gfx.save("p1d.png", sourceB.data, z2gs, NULL);
+        gfx.save("za.png", za, z2gs, NULL);
+        fft::__forward(za);
 
-        sourceA.forward();
-        sourceB.forward();
+
+        for(unit_t SQ=1;SQ<=16;SQ *= 2)
+        //for(unit_t SQ=16;SQ<=16;SQ *= 2)
+        {
+            std::cerr << "SQ=" << SQ << std::endl;
+            zb.ldz();
+            const rectangle rect(w/2-SQ,h/2-SQ,2*SQ+1,2*SQ+1);
+            for(unit_t y=rect.lower.y;y<=rect.upper.y;++y)
+            {
+                for(unit_t x=rect.lower.x;x<=rect.upper.x;++x)
+                {
+                    zb[y][x].re = (*p1)[y][x];
+                }
+            }
+
+            gfx.save( vformat("zb%02d.png", int(SQ)), zb, z2gs, NULL);
+            fft::__forward(zb);
+
+            for(unit_t y=0;y<ah;++y)
+            {
+                for(unit_t x=0;x<aw;++x)
+                {
+                    zp[y][x] = za[y][x]* zb[y][x].conj();
+                }
+            }
+            fft::__reverse(zp);
+
+            vmin = vmax = zp[0][0].re;
+            const unit_t sx = aw/2;
+            const unit_t sy = ah/2;
+            for(unit_t y=0;y<ah;++y)
+            {
+                for(unit_t x=0;x<aw;++x)
+                {
+                    const float tmp = zp[y][x].re;
+                    if(tmp<vmin) vmin=tmp;
+                    if(tmp>vmax) vmax=tmp;
+                    cr[(y+sy)%ah][(x+sx)%aw] = tmp;
+                }
+            }
+            std::cerr << "vmin=" << vmin << ", vmax=" << vmax << std::endl;
+            gfx.save( vformat("cr%02d.png",int(SQ)),cr,rmp,NULL);
+        }
         
-        for(unit_t y=0;y<sourceA.data.h;++y)
-        {
-            for(unit_t x=0;x<sourceA.data.w;++x)
-            {
-                zprod[y][x] = sourceA.data[y][x] * sourceB.data[y][x].conj();
-            }
-        }
-
-        fft::__reverse(zprod);
-
-        rmp.vmin=zprod[0][0].re;
-        rmp.vmax=rmp.vmin;
-        for(unit_t y=0;y<rprod.h;++y)
-        {
-            for(unit_t x=0;x<rprod.w;++x)
-            {
-                const float tmp = zprod[y][x].re;
-                if(tmp<rmp.vmin) rmp.vmin=tmp;
-                if(tmp>rmp.vmax) rmp.vmax=tmp;
-                rprod[y][x] = tmp;
-            }
-        }
-        std::cerr << "vmin=" << rmp.vmin << ", vmax=" << rmp.vmax << std::endl;
-
-        gfx.save("corr.png", rprod, rmp, NULL);
-
-        rmp.vmin=zprod[0][0].mod();
-        rmp.vmax=rmp.vmin;
-        for(unit_t y=0;y<rprod.h;++y)
-        {
-            for(unit_t x=0;x<rprod.w;++x)
-            {
-                const float tmp = zprod[y][x].mod();
-                if(tmp<rmp.vmin) rmp.vmin=tmp;
-                if(tmp>rmp.vmax) rmp.vmax=tmp;
-                rprod[y][x] = tmp;
-            }
-        }
-        std::cerr << "vmin=" << rmp.vmin << ", vmax=" << rmp.vmax << std::endl;
-
-        gfx.save("peak.png", rprod, rmp, NULL);
-
-
-
         break;
     }
     

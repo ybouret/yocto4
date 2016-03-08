@@ -25,7 +25,6 @@ namespace yocto
 
         fft::fft(const unit_t user_w, const unit_t user_h) :
         data(2*next_power_of_two( size_t(user_w) ),2*next_power_of_two( size_t(user_h) ) ),
-        //rect(0,0,data.w/2,data.h/2),
         core(data.w/2,data.h/2)
         {
         }
