@@ -14,15 +14,6 @@ namespace yocto
         template <>
         void FourierN<real_t>:: Compute(real_t *data, const size_t nn[], const size_t ndim, int isign) throw()
         {
-            /*
-             std::cerr << "fft" << ndim << "(";
-             for(size_t i=1;i<=ndim;++i)
-             {
-             std::cerr << " " << nn[i];
-             }
-             std::cerr << " , " << isign;
-             std::cerr << " )" << std::endl;
-             */
             assert(data);
             assert(nn);
             assert(ndim>0);
@@ -73,16 +64,16 @@ namespace yocto
                 }
 
                 ifp1=ip1;
-                const double sgn_two_pi = numeric<double>::two_pi * isign;
+                const double sgn_two_pi = 6.28318530717958623199592693708837032318115234375 * isign;
                 while (ifp1 < ip2)
                 {
                     ifp2  = ifp1 << 1;
                     const double theta = sgn_two_pi/(ifp2/ip1);
-                    double wtemp = sin(0.5*theta);
-                    double wpr   = -2.0*wtemp*wtemp;
-                    double wpi   = sin(theta);
-                    double wr    = 1;
-                    double wi    = 0;
+                    double       wtemp = sin(0.5*theta);
+                    const double wpr   = -2.0*wtemp*wtemp;
+                    double       wpi   = sin(theta);
+                    double       wr    = 1;
+                    double       wi    = 0;
                     for(i3=1;i3<=ifp1;i3+=ip1)
                     {
                         const size_t itop=i3+ip1-2;
