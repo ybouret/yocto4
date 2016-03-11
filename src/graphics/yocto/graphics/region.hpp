@@ -39,6 +39,9 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(region);
         };
 
+        typedef vector<region> regions;
+        
+        
 
 
     }

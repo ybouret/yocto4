@@ -42,14 +42,23 @@ YOCTO_UNIT_TEST_IMPL(block)
     const unit_t w = p0->w;
     const unit_t h = p0->h;
 
-
+    
+    const unit_t ws = 16;
+    unit_t       nw = 1;
+    while(nw*ws<w) ++nw;
+    unit_t       nh = 1;
+    while(nh*ws<h) ++nh;
+    std::cerr << "ws=" << ws << std::endl;
+    std::cerr << "nw=" << nw << std::endl;
+    std::cerr << "nh=" << nh << std::endl;
+    
     //pixmapf src(aw,ah);
     //pixmapf tgt(aw,ah);
 
     get_gsz          z2gs;
-    cold_to_very_hot rmp;
-    float &vmin = rmp.vmin;
-    float &vmax = rmp.vmax;
+    //cold_to_very_hot rmp;
+    //float &vmin = rmp.vmin;
+    //float &vmax = rmp.vmax;
 
     for(size_t id=0;id<nd-1;++id)
     {
