@@ -11,7 +11,7 @@
 #include "yocto/graphics/ramp/orange.hpp"
 #include "yocto/graphics/region.hpp"
 #include "yocto/parallel/basic.hpp"
-#include "yocto/container/matrix.hpp"
+#include "yocto/parallel/field.hpp"
 
 using namespace yocto;
 using namespace graphics;
@@ -26,7 +26,7 @@ size_t split_length( const unit_t length, const unit_t ws ) throw()
 }
 
 
-
+using parallel::coord2D;
 
 YOCTO_UNIT_TEST_IMPL(block)
 {
@@ -62,15 +62,34 @@ YOCTO_UNIT_TEST_IMPL(block)
     std::cerr << "nw         =" << nw    << std::endl;
     std::cerr << "nh         =" << nh    << std::endl;
     std::cerr << "#regions   =" << nw*nh << std::endl;
-    matrix<region> Region;
+
+    const parallel::patch2D   z2( coord2D(0,0), coord2D(nw-1,nh-1) );
+    parallel::field2D<region> Regions(z2);
 
     for(size_t j=0;j<nh;++j)
     {
         unit_t y_off = 0;
         unit_t y_len = h;
         parallel::basic_split(j, nh, y_off, y_len);
-        std::cerr << "j=" << j << "/" << nh << " : ";
-        std::cerr << "y_off=" << y_off << ", y_len=" << y_len << std::endl;
+        for(size_t i=0;i<nw;++i)
+        {
+            unit_t x_off = 0;
+            unit_t x_len = w;
+            parallel::basic_split(i, nw, x_off, x_len);
+            region &rr = Regions[j][i];
+            vertex pos;
+            for(unit_t y=y_off,ny=y_len;ny>0;++y,--ny)
+            {
+                pos.y = y;
+                for(unit_t x=x_off,nx=x_len;nx>0;++x,--nx)
+                {
+                    pos.x = x;
+                    regxel *r = new regxel(pos);
+                    rr.push_back(r);
+                }
+            }
+        }
+
     }
 
     get_gsz          z2gs;

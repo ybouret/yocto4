@@ -17,8 +17,10 @@ namespace yocto
             regxel *prev;
             YOCTO_MAKE_OBJECT
 
-            regxel() throw();
-            ~regxel() throw();
+            regxel() throw() : r(), next(0), prev(0) {}
+            regxel(const vertex &pos) throw() : r(pos), next(0), prev(0) {}
+            
+            ~regxel() throw() {}
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(regxel);
