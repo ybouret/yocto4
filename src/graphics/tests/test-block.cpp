@@ -11,6 +11,7 @@
 #include "yocto/graphics/ramp/orange.hpp"
 #include "yocto/graphics/region.hpp"
 #include "yocto/parallel/basic.hpp"
+#include "yocto/container/matrix.hpp"
 
 using namespace yocto;
 using namespace graphics;
@@ -61,6 +62,8 @@ YOCTO_UNIT_TEST_IMPL(block)
     std::cerr << "nw         =" << nw    << std::endl;
     std::cerr << "nh         =" << nh    << std::endl;
     std::cerr << "#regions   =" << nw*nh << std::endl;
+    matrix<region> Region;
+
     for(size_t j=0;j<nh;++j)
     {
         unit_t y_off = 0;
@@ -69,9 +72,6 @@ YOCTO_UNIT_TEST_IMPL(block)
         std::cerr << "j=" << j << "/" << nh << " : ";
         std::cerr << "y_off=" << y_off << ", y_len=" << y_len << std::endl;
     }
-
-    //pixmapf src(aw,ah);
-    //pixmapf tgt(aw,ah);
 
     get_gsz          z2gs;
     //cold_to_very_hot rmp;
@@ -83,7 +83,8 @@ YOCTO_UNIT_TEST_IMPL(block)
         if(id>0)
         {
             assert(p1.is_valid());
-            p0.reset( p1.yield() );
+            //p0.reset( p1.yield() );
+            p0.steal(p1);
         }
 
         {

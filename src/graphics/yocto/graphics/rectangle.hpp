@@ -1,5 +1,5 @@
 #ifndef YOCTO_GRAPHIX_RECTANGLE_INCLUDED
-#define YOCTO_GRAPHIX_RECTANBLE_INCLUDED 1
+#define YOCTO_GRAPHIX_RECTANGLE_INCLUDED 1
 
 #include "yocto/graphics/types.hpp"
 
