@@ -11,6 +11,12 @@ namespace yocto
     namespace parallel
     {
 
+        //______________________________________________________________________
+        //
+        //
+        //! Agnostic field info
+        //
+        //______________________________________________________________________
         class field_info : public object
         {
         public:
@@ -30,6 +36,12 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(field_info);
         };
 
+        //______________________________________________________________________
+        //
+        //
+        //! base class: type+dimension
+        //
+        //______________________________________________________________________
         template <typename T, typename COORD>
         class field_of : public field_info, public patch_of<COORD>
         {
@@ -58,12 +70,19 @@ namespace yocto
         };
 
 
+        //______________________________________________________________________
+        //
+        //
+        //! 1D field
+        //
+        //______________________________________________________________________
         template <typename T>
         class field1D : public field_of<T,coord1D>
         {
         public:
             typedef  field_of<T,coord1D> field_type;
 
+            //! with own memory
             explicit field1D(const patch1D p) :
             field_type(p),
             count(this->items),
@@ -81,6 +100,7 @@ namespace yocto
                 entry -= this->lower;
             }
 
+            //! with user's memory
             explicit field1D(const patch1D p, T *user_entry) :
             field_type(p),
             count(0),
@@ -90,15 +110,14 @@ namespace yocto
                 chunk_ops<T>::setup(user_entry,this->items);
             }
 
+            //! destruct all, with control
             virtual ~field1D() throw()
             {
                 entry += this->lower;
                 chunk_ops<T>::clear(entry,this->items);
-                if(count)
-                {
-                    memory::kind<memory::global>::release_as<T>(entry,count);
-                }
+                if(count) memory::kind<memory::global>::release_as<T>(entry,count);
             }
+
 
             inline T & operator[](const unit_t x) throw()
             {
@@ -123,6 +142,12 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(field1D);
         };
 
+        //______________________________________________________________________
+        //
+        //
+        //! 2D field
+        //
+        //______________________________________________________________________
         template <typename T>
         class field2D : public field_of<T,coord2D>
         {
@@ -166,6 +191,20 @@ namespace yocto
                 }
             }
 
+            inline explicit field2D(const patch2D p, row_type *user_rows, T *user_data ) :
+            field_type(p),
+            rows(user_rows),
+            data(user_data),
+            wlen(0),
+            wksp(0)
+            {
+                assert(0!=user_rows);
+                assert(0!=user_data);
+                const size_t nr         = size_t(this->width.y);
+                const size_t nc         = size_t(this->width.x);
+                map_rows(nr,nc);
+            }
+
 
             inline virtual ~field2D() throw()
             {
@@ -191,15 +230,15 @@ namespace yocto
 
 
         private:
-            row_type *rows;
-            T        *data;
+            row_type *rows; //!< width.y * sizeof(row_type)
+            T        *data; //!< items   * sizeof(T)
             size_t    wlen;
             void     *wksp;
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(field2D);
             inline void clean_up() throw()
             {
-                memory::kind<memory::global>::release(wksp, wlen);
+                if(wlen) memory::kind<memory::global>::release(wksp, wlen);
             }
 
             inline void map_rows(const size_t nr,const size_t nc)
