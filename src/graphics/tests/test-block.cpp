@@ -10,9 +10,20 @@
 #include "yocto/graphics/ramp/grey.hpp"
 #include "yocto/graphics/ramp/orange.hpp"
 #include "yocto/graphics/region.hpp"
+#include "yocto/parallel/basic.hpp"
 
 using namespace yocto;
 using namespace graphics;
+
+
+static inline
+size_t split_length( const unit_t length, const unit_t ws ) throw()
+{
+    unit_t nw = 4;
+    while(nw*ws<length) ++nw;
+    return --nw;
+}
+
 
 
 
@@ -42,16 +53,23 @@ YOCTO_UNIT_TEST_IMPL(block)
     const unit_t w = p0->w;
     const unit_t h = p0->h;
 
-    
+
     const unit_t ws = 16;
-    unit_t       nw = 1;
-    while(nw*ws<w) ++nw;
-    unit_t       nh = 1;
-    while(nh*ws<h) ++nh;
-    std::cerr << "ws=" << ws << std::endl;
-    std::cerr << "nw=" << nw << std::endl;
-    std::cerr << "nh=" << nh << std::endl;
-    
+    const size_t nw = split_length(w, ws);
+    const size_t nh = split_length(h, ws);
+    std::cerr << "window_size=" << ws    << std::endl;
+    std::cerr << "nw         =" << nw    << std::endl;
+    std::cerr << "nh         =" << nh    << std::endl;
+    std::cerr << "#regions   =" << nw*nh << std::endl;
+    for(size_t j=0;j<nh;++j)
+    {
+        unit_t y_off = 0;
+        unit_t y_len = h;
+        parallel::basic_split(j, nh, y_off, y_len);
+        std::cerr << "j=" << j << "/" << nh << " : ";
+        std::cerr << "y_off=" << y_off << ", y_len=" << y_len << std::endl;
+    }
+
     //pixmapf src(aw,ah);
     //pixmapf tgt(aw,ah);
 

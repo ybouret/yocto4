@@ -43,7 +43,19 @@ namespace yocto
 			pointee_ = 0;
 			return p;
 		}
-		
+
+        inline void steal( auto_ptr &other ) throw()
+        {
+            __kill();
+            pointee_       = other.pointee_;
+            other.pointee_ = 0;
+        }
+
+        inline void swap_with( auto_ptr &other ) throw()
+        {
+            cswap(pointee_,other.pointee_);
+        }
+
 		inline type & operator*()  throw()
 		{
 			assert( is_valid() );
