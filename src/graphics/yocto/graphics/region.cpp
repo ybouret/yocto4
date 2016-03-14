@@ -35,6 +35,14 @@ namespace yocto
             }
         }
 
+        void region::load(const pixmapf &pxm) throw()
+        {
+            for(regxel *node=head;node;node=node->next)
+            {
+                node->value = pxm[node->r];
+            }
+        }
+
 
     }
 }

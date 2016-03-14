@@ -115,7 +115,15 @@ YOCTO_UNIT_TEST_IMPL(block)
         gfx.save("p0.png", *p0, NULL);
         gfx.save("p1.png", *p1, NULL);
 
-        
+        for(size_t j=0;j<nh;++j)
+        {
+            for(size_t i=0;i<nw;++i)
+            {
+                region &rr = Regions[j][i];
+                rr.load(*p0);
+            }
+        }
+
 
 
         break;
