@@ -116,7 +116,7 @@ namespace yocto
                 entry += this->lower;
                 chunk_ops<T>::clear(entry,this->items);
                 if(count) memory::kind<memory::global>::release_as<T>(entry,count);
-            }
+                    }
 
 
             inline T & operator[](const unit_t x) throw()
@@ -154,7 +154,7 @@ namespace yocto
         public:
             typedef  field_of<T,coord2D> field_type;
             typedef  field1D<T>          row_type;
-            
+
             inline explicit field2D(const patch2D p) :
             field_type(p),
             rows(0),
@@ -236,10 +236,11 @@ namespace yocto
             void     *wksp;
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(field2D);
+
             inline void clean_up() throw()
             {
                 if(wlen) memory::kind<memory::global>::release(wksp, wlen);
-            }
+                    }
 
             inline void map_rows(const size_t nr,const size_t nc)
             {
@@ -267,6 +268,98 @@ namespace yocto
             }
         };
 
+
+        //______________________________________________________________________
+        //
+        //
+        //! 2D field
+        //
+        //______________________________________________________________________
+        template <typename T>
+        class field3D : public field_of<T,coord3D>
+        {
+        public:
+            typedef  field_of<T,coord3D> field_type;
+            typedef  field2D<T>          slice_type;
+            typedef  field1D<T>          row_type;
+
+            inline explicit field3D( const patch3D p ) :
+            field_type(p),
+            slices(0)
+            {
+                const size_t num_slices     = this->width.z;
+                const size_t rows_per_slice = this->width.y;
+                const size_t num_rows       = rows_per_slice * num_slices;
+
+                const size_t slice_offset = 0;
+                const size_t slice_length = num_slices * sizeof(slice_type);
+
+                const size_t rows_offset  = memory::align(slice_offset+slice_length);
+                const size_t rows_length  = num_rows * sizeof(row_type);
+
+                const size_t data_offset  = memory::align(rows_offset+rows_length);
+                const size_t data_length  = this->items * sizeof(T);
+
+                wlen = data_offset+data_length;
+                wksp = memory::kind<memory::global>::acquire(wlen);
+
+                uint8_t      *q  = (uint8_t *)wksp;
+                slices           = (slice_type *) &q[slice_offset];
+                row_type     *pr = (row_type   *) &q[rows_offset ];
+                T            *pd = (T          *) &q[data_offset ];
+                const coord2D c2lo(this->lower.x,this->lower.y);
+                const coord2D c2hi(this->upper.x,this->upper.y);
+                const patch2D p2(c2lo,c2hi);
+                const size_t  items_per_slice = p2.items;
+                size_t islice = 0;
+                try
+                {
+                    while(islice<num_slices)
+                    {
+                        new ( &slices[islice] ) slice_type(p2,pr,pd);
+                        ++islice;
+                        pr +=  rows_per_slice;
+                        pd += items_per_slice;
+                    }
+                }
+                catch(...)
+                {
+                    while(islice>0)
+                    {
+                        destruct<slice_type>( &slices[--islice] );
+                    }
+                    memory::kind<memory::global>::release(wksp,wlen);
+                    throw;
+                }
+                slices -= this->lower.z;
+            }
+
+            inline virtual ~field3D() throw()
+            {
+                slices += this->lower.z;
+                size_t islice = this->width.z;
+                while(islice>0)
+                {
+                    destruct<slice_type>( &slices[--islice] );
+                }
+                
+                memory::kind<memory::global>::release(wksp,wlen);
+            }
+            
+            inline slice_type & operator[](const unit_t z) throw()
+            {
+                assert(z>=this->lower.z);
+                assert(z<=this->upper.z);
+                return slices[z];
+            }
+            
+        private:
+            slice_type *slices;
+            size_t      wlen;
+            void       *wksp;
+            
+            YOCTO_DISABLE_COPY_AND_ASSIGN(field3D);
+        };
         
     }
     

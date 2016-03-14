@@ -54,7 +54,7 @@ YOCTO_SUPPORT_NO_DESTRUCT(CLASS)
 
     //! wrapper to setup/clear chunks with default constructor/destructor
     template <typename T>
-    class chunk_ops
+    struct chunk_ops
     {
     public:
         static inline void setup(T *base,const size_t size)
@@ -67,7 +67,6 @@ YOCTO_SUPPORT_NO_DESTRUCT(CLASS)
             __clear(base,size,int2type< support_no_destruct<T>::value >() );
         }
 
-    private:
         static inline void __setup(T *,const size_t, int2type<true> )
         {
         }

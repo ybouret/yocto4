@@ -35,5 +35,39 @@ YOCTO_UNIT_TEST_IMPL(field)
     }
 
 
+    const parallel::coord3D   c3min(-5,-8,-1), c3max(15,10,20);
+    const parallel::patch3D   p3(c3min,c3max);
+    parallel::field3D<int>    F3i(p3);
+
+    int sumA = 0;
+    for(unit_t z=p3.lower.z;z<=p3.upper.z;++z)
+    {
+        for(unit_t y=p3.lower.y;y<=p3.upper.y;++y)
+        {
+            for(unit_t x=p3.lower.x;x<=p3.upper.x;++x)
+            {
+                const int tmp = gen<int>::get();
+                F3i[z][y][x] = tmp;
+                sumA += tmp;
+            }
+        }
+
+    }
+
+    int sumB = 0;
+    for(unit_t z=p3.lower.z;z<=p3.upper.z;++z)
+    {
+        for(unit_t y=p3.lower.y;y<=p3.upper.y;++y)
+        {
+            for(unit_t x=p3.lower.x;x<=p3.upper.x;++x)
+            {
+                sumB += F3i[z][y][x];
+            }
+        }
+    }
+    std::cerr << "sum: " << sumA << ", " << sumB << std::endl;
+
+
+
 }
 YOCTO_UNIT_TEST_DONE()
