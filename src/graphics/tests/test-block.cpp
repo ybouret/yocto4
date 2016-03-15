@@ -12,18 +12,13 @@
 #include "yocto/graphics/region.hpp"
 #include "yocto/parallel/basic.hpp"
 #include "yocto/parallel/field.hpp"
+#include "yocto/graphics/piv/zone.hpp"
 
 using namespace yocto;
 using namespace graphics;
 
 
-static inline
-size_t split_length( const unit_t length, const unit_t ws ) throw()
-{
-    unit_t nw = 4;
-    while(nw*ws<length) ++nw;
-    return --nw;
-}
+
 
 
 using parallel::coord2D;
@@ -54,18 +49,11 @@ YOCTO_UNIT_TEST_IMPL(block)
     const unit_t w = p0->w;
     const unit_t h = p0->h;
 
+    const vertex nz = PIV::Zone::Count(*p0,16);
+    std::cerr << "nz=" << nz << std::endl;
 
-    const unit_t ws = 16;
-    const size_t nw = split_length(w, ws);
-    const size_t nh = split_length(h, ws);
-    std::cerr << "window_size=" << ws    << std::endl;
-    std::cerr << "nw         =" << nw    << std::endl;
-    std::cerr << "nh         =" << nh    << std::endl;
-    std::cerr << "#regions   =" << nw*nh << std::endl;
 
-    const parallel::patch2D   z2( coord2D(0,0), coord2D(nw-1,nh-1) );
-    parallel::field2D<region> Regions(z2);
-
+#if 0
     for(size_t j=0;j<nh;++j)
     {
         unit_t y_off = 0;
@@ -91,6 +79,7 @@ YOCTO_UNIT_TEST_IMPL(block)
         }
 
     }
+#endif
 
     get_gsz          z2gs;
     //cold_to_very_hot rmp;
@@ -115,6 +104,7 @@ YOCTO_UNIT_TEST_IMPL(block)
         gfx.save("p0.png", *p0, NULL);
         gfx.save("p1.png", *p1, NULL);
 
+#if 0
         for(size_t j=0;j<nh;++j)
         {
             for(size_t i=0;i<nw;++i)
@@ -123,13 +113,14 @@ YOCTO_UNIT_TEST_IMPL(block)
                 rr.load(*p0);
             }
         }
-
+#endif
 
 
         break;
     }
     std::cerr << "sizeof(regxel)=" << sizeof(regxel) << std::endl;
-    
+    std::cerr << "sizeof(rectangle)=" << sizeof(rectangle) << std::endl;
+
     
 }
 YOCTO_UNIT_TEST_DONE()

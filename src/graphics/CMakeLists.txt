@@ -26,10 +26,16 @@ SET(srcs_ramp ${impl_ramp} ${decl_ramp})
 INSTALL( FILES ${decl_ramp} DESTINATION include/yocto/graphics/ramp )
 SOURCE_GROUP( graphics/ramp FILES ${srcs_ramp} )
 
+FILE(GLOB decl_piv yocto/graphics/piv/*.hpp)
+FILE(GLOB impl_piv yocto/graphics/piv/*.cpp)
+SET(srcs_piv ${impl_piv} ${decl_piv})
+INSTALL( FILES ${decl_piv} DESTINATION include/yocto/graphics/piv )
+SOURCE_GROUP( graphics/piv FILES ${srcs_piv} )
+
 
 INCLUDE_DIRECTORIES( . ../main ../mk ../third_party/png ../third_party/jpeg ../tiff++)
 
-ADD_LIBRARY(y-graphics STATIC ${srcs} ${srcs_image} ${srcs_ops} ${srcs_ramp} )
+ADD_LIBRARY(y-graphics STATIC ${srcs} ${srcs_image} ${srcs_ops} ${srcs_ramp} ${srcs_piv} )
 INSTALL( TARGETS y-graphics ARCHIVE DESTINATION lib)
 
 IF(YOCTO_BUILD_TESTS)
