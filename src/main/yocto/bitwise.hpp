@@ -5,7 +5,7 @@
 #ifndef YOCTO_BITWISE_INCLUDED
 #define YOCTO_BITWISE_INCLUDED 1
 
-#include "yocto/type/traits.hpp"
+#include "yocto/type/args.hpp"
 
 
 namespace yocto {
@@ -57,6 +57,8 @@ YOCTO_SUPPORT_NO_DESTRUCT(CLASS)
     struct chunk_ops
     {
     public:
+        YOCTO_ARGUMENTS_DECL_T;
+
         static inline void setup(T *base,const size_t size)
         {
             __setup(base,size,int2type< type_traits<T>::is_primitive >() );
@@ -65,6 +67,27 @@ YOCTO_SUPPORT_NO_DESTRUCT(CLASS)
         static inline void clear(T *base,const size_t size) throw()
         {
             __clear(base,size,int2type< support_no_destruct<T>::value >() );
+        }
+
+        static inline void setup(T *base,const size_t size, param_type arg)
+        {
+            size_t i=0;
+            try
+            {
+                while(i<size)
+                {
+                    new ( &base[i] ) T(arg);
+                    ++i;
+                }
+            }
+            catch(...)
+            {
+                while(i>0)
+                {
+                    destruct<T>(&base[--i]);
+                }
+                throw;
+            }
         }
 
         static inline void __setup(T *,const size_t, int2type<true> )

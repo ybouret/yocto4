@@ -39,21 +39,23 @@ namespace yocto
                 {
                     assert(indx.x>=0); assert(indx.x<count.x);
                     assert(indx.y>=0); assert(indx.y<count.y);
-                    const unit_t w    = src.w;
-                    const unit_t h    = src.h;
+                    const unit_t W    = src.w;
+                    const unit_t H    = src.h;
                     vertex    & _r    = (vertex &)r;
                     vertex    & _size = (vertex &)size;
-                    _r.x = 0;
-                    _r.y = 0;
-                    _size.x = w;
-                    _size.y = h;
+                    _r.x    = 0;
+                    _r.y    = 0;
+                    _size.x = W;
+                    _size.y = H;
                     parallel::basic_split(indx.x, count.x, _r.x, _size.x);
                     parallel::basic_split(indx.y, count.y, _r.y, _size.y);
                     (unit_t&)(dmin.x) = -r.x;
                     (unit_t&)(dmin.y) = -r.y;
+                    (unit_t&)(dmax.x) = W-size.x;
+                    (unit_t&)(dmax.y) = H-size.y;
                 }
 
-
+                
 
                 ~Zone() throw() {}
 
