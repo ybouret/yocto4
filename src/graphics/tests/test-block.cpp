@@ -49,8 +49,9 @@ YOCTO_UNIT_TEST_IMPL(block)
     const unit_t w = p0->w;
     const unit_t h = p0->h;
 
-    const vertex nz = PIV::Zone::Count(*p0,16);
-    std::cerr << "nz=" << nz << std::endl;
+    PIV::Zones zones(*p0,16);
+
+
 
 
 #if 0

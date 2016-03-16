@@ -16,14 +16,15 @@ namespace yocto
             {
             public:
 
-                static vertex Count( const bitmap &src, const unit_t window_size ) throw()
+
+                static patch PatchFor( const bitmap &src, const unit_t window_size ) throw()
                 {
                     vertex n(3,3);
                     while(n.x*window_size<src.w) ++n.x;
-                    --n.x;
+                    n.x -= 2;
                     while(n.y*window_size<src.h) ++n.y;
-                    --n.y;
-                    return n;
+                    n.y -= 2;
+                    return patch( vertex(0,0), n);
                 }
 
                 const vertex r;
@@ -55,7 +56,15 @@ namespace yocto
                     (unit_t&)(dmax.y) = H-size.y;
                 }
 
+                explicit Zone() throw() :
+                r(),
+                size(),
+                dmin(),
+                dmax()
+                {
+                }
                 
+
 
                 ~Zone() throw() {}
 
@@ -65,9 +74,48 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Zone);
             };
+
+
+            typedef parallel::field2D<Zone> _Zones;
+
+            class Zones : public _Zones
+            {
+            public:
+                typedef parallel::field1D<Zone> Row;
+
+                const unit_t W;
+                const unit_t H;
+
+                Zones(const bitmap &src, const unit_t window_size) :
+                _Zones( Zone::PatchFor(src,window_size) ),
+                W( width.x ),
+                H( width.y )
+                {
+                    _Zones &self = *this;
+                    const vertex count(W,H);
+                    for(unit_t j=0;j<H;++j)
+                    {
+                        for(unit_t i=0;i<W;++i)
+                        {
+                            const vertex indx(i,j);
+                            Zone ztmp(src,indx,count);
+                            bswap(ztmp,self[j][i]);
+                        }
+                    }
+                }
+
+
+                virtual ~Zones() throw() {}
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Zones);
+            };
         }
     }
 }
+
+YOCTO_SUPPORT_C_STYLE_OPS(graphics::PIV::Zone);
+
 
 #endif
 

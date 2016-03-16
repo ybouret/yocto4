@@ -82,7 +82,7 @@ namespace yocto
         public:
             typedef  field_of<T,coord1D> field_type;
 
-            //! with own memory
+            //! create with own memory
             explicit field1D(const patch1D p) :
             field_type(p),
             count(this->items),
@@ -100,7 +100,7 @@ namespace yocto
                 entry -= this->lower;
             }
 
-            //! with user's memory
+            //! create with user's memory
             explicit field1D(const patch1D p, T *user_entry) :
             field_type(p),
             count(0),
@@ -115,8 +115,12 @@ namespace yocto
             {
                 entry += this->lower;
                 chunk_ops<T>::clear(entry,this->items);
-                if(count) memory::kind<memory::global>::release_as<T>(entry,count);
-                    }
+                if(count)
+                {
+                    memory::kind<memory::global>::release_as<T>(entry,count);
+                }
+
+            }
 
 
             inline T & operator[](const unit_t x) throw()
@@ -126,7 +130,7 @@ namespace yocto
                 return entry[x];
             }
 
-            inline const T * operator[](const unit_t x) const throw()
+            inline const T & operator[](const unit_t x) const throw()
             {
                 assert(x>=this->lower);
                 assert(x<=this->upper);
