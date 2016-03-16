@@ -12,12 +12,12 @@ namespace yocto
         namespace PIV
         {
 
-            class Zone
+            class Zone : public patch
             {
             public:
 
 
-                static patch PatchFor( const bitmap &src, const unit_t window_size ) throw()
+                static patch MetaPatchFor( const bitmap &src, const unit_t window_size ) throw()
                 {
                     vertex n(3,3);
                     while(n.x*window_size<src.w) ++n.x;
@@ -27,38 +27,38 @@ namespace yocto
                     return patch( vertex(0,0), n);
                 }
 
-                const vertex r;
-                const vertex size;
+                static patch SubPatch(const bitmap &src, const vertex indx, const vertex count) throw()
+                {
+
+                    assert(indx.x>=0); assert(indx.x<count.x);
+                    assert(indx.y>=0); assert(indx.y<count.y);
+                    unit_t X = 0;
+                    unit_t Y = 0;
+                    unit_t W = src.w;
+                    unit_t H = src.h;
+                    parallel::basic_split(indx.x, count.x,X,W);
+                    parallel::basic_split(indx.y, count.y,Y,H);
+                    const vertex lo(X,Y);
+                    const vertex hi(X+W-1,Y+H-1);
+                    return patch(lo,hi);
+                }
+
                 const vertex dmin;
                 const vertex dmax;
 
                 explicit Zone( const bitmap &src, const vertex indx, const vertex count ) throw() :
-                r(),
-                size(),
+                patch( SubPatch(src,indx,count) ),
                 dmin(),
                 dmax()
                 {
-                    assert(indx.x>=0); assert(indx.x<count.x);
-                    assert(indx.y>=0); assert(indx.y<count.y);
-                    const unit_t W    = src.w;
-                    const unit_t H    = src.h;
-                    vertex    & _r    = (vertex &)r;
-                    vertex    & _size = (vertex &)size;
-                    _r.x    = 0;
-                    _r.y    = 0;
-                    _size.x = W;
-                    _size.y = H;
-                    parallel::basic_split(indx.x, count.x, _r.x, _size.x);
-                    parallel::basic_split(indx.y, count.y, _r.y, _size.y);
-                    (unit_t&)(dmin.x) = -r.x;
-                    (unit_t&)(dmin.y) = -r.y;
-                    (unit_t&)(dmax.x) = W-size.x;
-                    (unit_t&)(dmax.y) = H-size.y;
+                    (unit_t&)(dmin.x) = -lower.x;
+                    (unit_t&)(dmin.y) = -lower.y;
+                    (unit_t&)(dmax.x) = src.w-width.x;
+                    (unit_t&)(dmax.y) = src.h-width.y;
                 }
 
                 explicit Zone() throw() :
-                r(),
-                size(),
+                patch( vertex(), vertex() ),
                 dmin(),
                 dmax()
                 {
@@ -87,7 +87,7 @@ namespace yocto
                 const unit_t H;
 
                 Zones(const bitmap &src, const unit_t window_size) :
-                _Zones( Zone::PatchFor(src,window_size) ),
+                _Zones( Zone::MetaPatchFor(src,window_size) ),
                 W( width.x ),
                 H( width.y )
                 {

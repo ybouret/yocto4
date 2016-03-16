@@ -48,6 +48,7 @@ YOCTO_UNIT_TEST_IMPL(block)
 
     const unit_t w = p0->w;
     const unit_t h = p0->h;
+    pixmap3      pxm(w,h);
 
     PIV::Zones zones(*p0,16);
 
@@ -105,23 +106,33 @@ YOCTO_UNIT_TEST_IMPL(block)
         gfx.save("p0.png", *p0, NULL);
         gfx.save("p1.png", *p1, NULL);
 
-#if 0
-        for(size_t j=0;j<nh;++j)
+        size_t ic=0;
+        for(unit_t j=0;j<zones.H;++j)
         {
-            for(size_t i=0;i<nw;++i)
+            for(unit_t i=0;i<zones.W;++i)
             {
-                region &rr = Regions[j][i];
-                rr.load(*p0);
+                const RGB       &c    = named_color::fetch(++ic);
+                const PIV::Zone &zone = zones[j][i];
+                for(unit_t y=zone.lower.y;y<=zone.upper.y;++y)
+                {
+                    for(unit_t x=zone.lower.x;x<=zone.upper.x;++x)
+                    {
+                        pxm[y][x] = c;
+                    }
+                }
+
             }
+
         }
-#endif
+        gfx.save("pz.png", pxm, NULL);
+
 
 
         break;
     }
     std::cerr << "sizeof(regxel)=" << sizeof(regxel) << std::endl;
     std::cerr << "sizeof(rectangle)=" << sizeof(rectangle) << std::endl;
-
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
