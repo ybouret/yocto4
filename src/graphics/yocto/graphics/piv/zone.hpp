@@ -49,7 +49,9 @@ namespace yocto
                 explicit Zone( const bitmap &src, const vertex indx, const vertex count ) throw() :
                 patch( SubPatch(src,indx,count) ),
                 dmin(),
-                dmax()
+                dmax(),
+                data(0),
+                dmem(0)
                 {
                     (unit_t&)(dmin.x) = -lower.x;
                     (unit_t&)(dmin.y) = -lower.y;
@@ -66,10 +68,38 @@ namespace yocto
                 
 
 
-                ~Zone() throw() {}
+                ~Zone() throw()
+                {
+                    memory::kind<memory::global>::release_as(data,dmem);
+                }
 
 
-                
+                float *data;
+                size_t dmem;
+
+                void allocate()
+                {
+                    assert(dmem<=0);
+                    assert(0==data);
+                    dmem = items;
+                    data = memory::kind<memory::global>::acquire_as<float>(dmem);
+                }
+
+                void load( const pixmapf &src ) throw()
+                {
+                    assert(data);
+                    assert(dmem>=items);
+                    assert(src.contains(*this));
+                    size_t k = 0;
+                    for(unit_t y=upper.y;y>=lower.y;--y)
+                    {
+                        const pixmapf::row &src_y = src[y];
+                        for(unit_t x=upper.x;x>=lower.x;--x)
+                        {
+                            data[k++] = src_y[x];
+                        }
+                    }
+                }
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Zone);
@@ -100,6 +130,7 @@ namespace yocto
                             const vertex indx(i,j);
                             Zone ztmp(src,indx,count);
                             bswap(ztmp,self[j][i]);
+                            self[j][i].allocate();
                         }
                     }
                 }
@@ -114,7 +145,6 @@ namespace yocto
     }
 }
 
-YOCTO_SUPPORT_C_STYLE_OPS(graphics::PIV::Zone);
 
 
 #endif

@@ -111,13 +111,17 @@ YOCTO_UNIT_TEST_IMPL(block)
         {
             for(unit_t i=0;i<zones.W;++i)
             {
-                const RGB       &c    = named_color::fetch(++ic);
-                const PIV::Zone &zone = zones[j][i];
+                const RGB &c    = named_color::fetch(++ic);
+                PIV::Zone &zone = zones[j][i];
+                zone.load(*p0);
                 for(unit_t y=zone.lower.y;y<=zone.upper.y;++y)
                 {
                     for(unit_t x=zone.lower.x;x<=zone.upper.x;++x)
                     {
-                        pxm[y][x] = c;
+                        const float I = (*p0)[y][x];
+                        pxm[y][x] = RGB(gist::float2byte(I*c.r),
+                                        gist::float2byte(I*c.g),
+                                        gist::float2byte(I*c.b) );
                     }
                 }
 
