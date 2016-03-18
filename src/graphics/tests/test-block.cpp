@@ -51,37 +51,9 @@ YOCTO_UNIT_TEST_IMPL(block)
     pixmap3      pxm(w,h);
 
     PIV::Zones zones(*p0,16);
-
-
-
-
-#if 0
-    for(size_t j=0;j<nh;++j)
-    {
-        unit_t y_off = 0;
-        unit_t y_len = h;
-        parallel::basic_split(j, nh, y_off, y_len);
-        for(size_t i=0;i<nw;++i)
-        {
-            unit_t x_off = 0;
-            unit_t x_len = w;
-            parallel::basic_split(i, nw, x_off, x_len);
-            region &rr = Regions[j][i];
-            vertex pos;
-            for(unit_t y=y_off,ny=y_len;ny>0;++y,--ny)
-            {
-                pos.y = y;
-                for(unit_t x=x_off,nx=x_len;nx>0;++x,--nx)
-                {
-                    pos.x = x;
-                    regxel *r = new regxel(pos);
-                    rr.push_back(r);
-                }
-            }
-        }
-
-    }
-#endif
+    std::cerr << "zones=" << zones << std::endl;
+    std::cerr << "owned_memory=" << zones.owned_memory << std::endl;
+    std::cerr << "allocated="    << zones.allocated()  << std::endl;
 
     get_gsz          z2gs;
     //cold_to_very_hot rmp;
@@ -134,9 +106,8 @@ YOCTO_UNIT_TEST_IMPL(block)
 
         break;
     }
-    std::cerr << "sizeof(regxel)=" << sizeof(regxel) << std::endl;
-    std::cerr << "sizeof(rectangle)=" << sizeof(rectangle) << std::endl;
-    
+    std::cerr << "sizeof(Zone)=" << sizeof(PIV::Zone) << std::endl;
+
     
 }
 YOCTO_UNIT_TEST_DONE()

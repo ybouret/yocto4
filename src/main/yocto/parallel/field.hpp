@@ -24,10 +24,12 @@ namespace yocto
             {
             }
 
-            virtual size_t dimensions() const throw() = 0;
+            virtual size_t dimensions()   const throw() = 0;
+            const size_t owned_memory; //!< owned bytes
 
         protected:
-            explicit field_info() throw()
+            explicit field_info() throw() :
+            owned_memory(0)
             {
             }
 
@@ -98,6 +100,7 @@ namespace yocto
                     throw;
                 }
                 entry -= this->lower;
+                (size_t &)(this->owned_memory) = count * sizeof(T);
             }
 
             //! create with user's memory
@@ -136,7 +139,6 @@ namespace yocto
                 assert(x<=this->upper);
                 return entry[x];
             }
-
 
 
         private:
@@ -193,6 +195,9 @@ namespace yocto
                     clean_up();
                     throw;
                 }
+
+                (size_t &)(this->owned_memory) = wlen;
+
             }
 
             inline explicit field2D(const patch2D p, row_type *user_rows, T *user_data ) :
@@ -336,6 +341,7 @@ namespace yocto
                     throw;
                 }
                 slices -= this->lower.z;
+                (size_t &)(this->owned_memory)  = wlen;
             }
 
             inline virtual ~field3D() throw()

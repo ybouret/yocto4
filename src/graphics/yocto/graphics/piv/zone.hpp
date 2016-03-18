@@ -17,6 +17,7 @@ namespace yocto
             public:
 
 
+                //! get meta patch numbers for a given window size
                 static patch MetaPatchFor( const bitmap &src, const unit_t window_size ) throw()
                 {
                     vertex n(3,3);
@@ -27,6 +28,7 @@ namespace yocto
                     return patch( vertex(0,0), n);
                 }
 
+                //! split according to 2D MPI-like pattern
                 static patch SubPatch(const bitmap &src, const vertex indx, const vertex count) throw()
                 {
 
@@ -43,6 +45,7 @@ namespace yocto
                     return patch(lo,hi);
                 }
 
+
                 const vertex dmin;
                 const vertex dmax;
 
@@ -50,8 +53,11 @@ namespace yocto
                 patch( SubPatch(src,indx,count) ),
                 dmin(),
                 dmax(),
-                data(0),
-                dmem(0)
+                original(0),
+                org_diff(0),
+                org_dsqr(0),
+                advected(0),
+                allocated(0)
                 {
                     (unit_t&)(dmin.x) = -lower.x;
                     (unit_t&)(dmin.y) = -lower.y;
@@ -70,36 +76,91 @@ namespace yocto
 
                 ~Zone() throw()
                 {
-                    memory::kind<memory::global>::release_as(data,dmem);
+                    memory::kind<memory::global>::release_as(original,allocated);
+                    org_diff = 0;
+                    org_dsqr = 0;
+                    advected = 0;
                 }
 
 
-                float *data;
-                size_t dmem;
+                float *original;
+                float *org_diff;
+                float *org_dsqr;
+                float *advected;
+                size_t allocated;
 
                 void allocate()
                 {
-                    assert(dmem<=0);
-                    assert(0==data);
-                    dmem = items;
-                    data = memory::kind<memory::global>::acquire_as<float>(dmem);
+                    assert(allocated<=0);
+                    assert(0==original);
+                    allocated = 4*items;
+                    original  = memory::kind<memory::global>::acquire_as<float>(allocated);
+                    org_diff  = original + items;
+                    org_dsqr  = org_diff + items;
+                    advected  = org_dsqr + items;
                 }
 
                 void load( const pixmapf &src ) throw()
                 {
-                    assert(data);
-                    assert(dmem>=items);
+                    assert(original);
+                    assert(org_diff);
+                    assert(org_dsqr);
+                    assert(advected);
                     assert(src.contains(*this));
-                    size_t k = 0;
+                    size_t k       = 0;
+                    float  average = 0;
                     for(unit_t y=upper.y;y>=lower.y;--y)
                     {
                         const pixmapf::row &src_y = src[y];
                         for(unit_t x=upper.x;x>=lower.x;--x)
                         {
-                            data[k++] = src_y[x];
+                            const float tmp = src_y[x];
+                            original[k++] = tmp;
+                            average += tmp;
                         }
                     }
+                    assert(items==k);
+                    average/=items;
+                    while(k>0)
+                    {
+                        --k;
+                        const float del = original[k] - average;
+                        org_diff[k] = del;
+                        org_dsqr[k] = del*del;
+                    }
                 }
+
+                float correlate_with(const pixmapf &tgt, const vertex delta ) const
+                {
+                    assert(delta.x>=dmin.x);
+                    assert(delta.x<=dmax.x);
+                    assert(delta.y>=dmin.y);
+                    assert(delta.y<=dmax.y);
+
+                    //-- first loop
+                    const vertex _ini = lower+delta;
+                    const vertex _end = upper+delta;
+                    size_t k = 0;
+                    float  adv = 0;
+                    for(unit_t y=_ini.y;y<=_end.y;++y)
+                    {
+                        const pixmapf::row &tgt_y = tgt[y];
+                        for(unit_t x=_ini.x;x<=_end.x;++x)
+                        {
+                            const float tmp = tgt_y[x];
+                            advected[k++] = tmp;
+                            adv += tmp;
+                        }
+                    }
+
+                    // -- second loop
+                    
+
+                    return 0;
+                }
+
+
+                
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Zone);
@@ -133,6 +194,20 @@ namespace yocto
                             self[j][i].allocate();
                         }
                     }
+                }
+
+                size_t allocated() const throw()
+                {
+                    const _Zones &self = *this;
+                    size_t sum = 0;
+                    for(unit_t j=0;j<H;++j)
+                    {
+                        for(unit_t i=0;i<W;++i)
+                        {
+                            sum += self[j][i].allocated;
+                        }
+                    }
+                    return sum;
                 }
 
 
