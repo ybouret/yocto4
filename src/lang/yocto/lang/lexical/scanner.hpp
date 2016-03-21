@@ -50,7 +50,10 @@ namespace yocto
 
                 //! action upon pattern, wrapper
                 template <typename HOST_POINTER, typename METHOD_POINTER>
-                inline void make(const char *label, const char *expr, HOST_POINTER h, METHOD_POINTER m)
+                inline void make(const char    *label,
+                                 const char    *expr,
+                                 HOST_POINTER   h,
+                                 METHOD_POINTER m)
                 {
                     const string l(label);
                     const action a(h,m);
