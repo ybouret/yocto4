@@ -34,20 +34,19 @@ YOCTO_UNIT_TEST_IMPL(field)
         }
     }
 
+    {
+        ios::wcstream fp("f2d.vtk");
+        parallel::vtk::save_patch(fp, "f2d", F2d);
+        parallel::vtk::scalars(fp, "double_values", F2d);
+    }
+
+
     parallel::field2D<string> F2s(p2);
     for(unit_t y=F2s.lower.y;y<=F2s.upper.y;++y)
     {
         for(unit_t x=F2s.lower.x;x<=F2s.upper.x;++x)
         {
             F2s[y][x] = gen<string>::get();
-        }
-    }
-
-    {
-        parallel::field2D< double > F2d(p2);
-        {
-            ios::wcstream fp("f2d.vtk");
-            parallel::vtk::save_patch(fp, "f2d", F2d);
         }
     }
 

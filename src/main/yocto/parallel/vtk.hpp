@@ -14,7 +14,8 @@ namespace yocto
             static inline void header(ios::ostream &fp, const string &title)
             {
                 fp << "# vtk DataFile Version 2.0\n";
-                const size_t n = min_of<size_t>(title.size(),255);
+                fp << "# ";
+                const size_t n = min_of<size_t>(title.size(),250);
                 for(size_t i=0;i<n;++i)
                 {
                     char C = title[i];
@@ -36,6 +37,10 @@ namespace yocto
                 {
                     fp(" %u", unsigned(__coord(g.width,i)) );
                 }
+                for(size_t i=patch_of<COORD>::DIM;i<3;++i)
+                {
+                    fp(" 1");
+                }
                 fp << "\n";
 
                 fp << "ORIGIN";
@@ -43,10 +48,15 @@ namespace yocto
                 {
                     fp(" %d", int(__coord(g.lower,i)) );
                 }
+                for(size_t i=patch_of<COORD>::DIM;i<3;++i)
+                {
+                    fp(" 0");
+                }
                 fp << "\n";
 
+
                 fp << "SPACING";
-                for(size_t i=0;i<patch_of<COORD>::DIM;++i)
+                for(size_t i=0;i<3;++i)
                 {
                     fp << " 1";
                 }
@@ -77,10 +87,11 @@ namespace yocto
                                        const string &label,
                                        const FIELD  &F)
             {
+                fp << "POINT_DATA "; fp(" %u\n", unsigned(F.items));
                 fp << "SCALARS " << label << ' ';
                 __output_type<typename FIELD::type>(fp);
                 fp << "\n";
-                fp << "LOOKUP_TABLE default\n";
+                fp << "LOOKUP_TABLE " << label  << "\n";
                 __output_scalars(fp, F);
             }
 

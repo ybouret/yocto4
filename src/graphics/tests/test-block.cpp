@@ -51,14 +51,16 @@ YOCTO_UNIT_TEST_IMPL(block)
     pixmap3      pxm(w,h);
 
     PIV::Zones zones(*p0,16);
-    std::cerr << "zones=" << zones << std::endl;
+    std::cerr << "zones       =" << zones << std::endl;
     std::cerr << "owned_memory=" << zones.owned_memory << std::endl;
-    std::cerr << "allocated="    << zones.allocated()  << std::endl;
+    std::cerr << "allocated   =" << zones.allocated()  << std::endl;
+
+    pixmapf zcr(zones.width.x,zones.width.y);
 
     get_gsz          z2gs;
-    //cold_to_very_hot rmp;
-    //float &vmin = rmp.vmin;
-    //float &vmax = rmp.vmax;
+    cold_to_very_hot rmp;
+    float &vmin = rmp.vmin;
+    float &vmax = rmp.vmax;
 
     for(size_t id=0;id<nd-1;++id)
     {
@@ -79,6 +81,8 @@ YOCTO_UNIT_TEST_IMPL(block)
         gfx.save("p1.png", *p1, NULL);
 
         size_t ic=0;
+        vmin = 0;
+        vmax = 0;
         for(unit_t j=0;j<zones.H;++j)
         {
             for(unit_t i=0;i<zones.W;++i)
@@ -96,13 +100,17 @@ YOCTO_UNIT_TEST_IMPL(block)
                                         gist::float2byte(I*c.b) );
                     }
                 }
-                zone.correlate_with(*p1, vertex(0,0) );
+                const float tmp = zone.correlate_with(*p1, vertex(0,0) );
+                zcr[j][i] = tmp;
+                vmin = min_of(tmp,vmin);
+                vmax = max_of(tmp,vmax);
             }
 
         }
         gfx.save("pz.png", pxm, NULL);
-
-
+        std::cerr << "vmin=" << vmin << ", vmax=" << vmax << std::endl;
+        gfx.save("zcr.png", zcr, rmp, NULL);
+        
 
         break;
     }
