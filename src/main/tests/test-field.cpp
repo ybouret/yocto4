@@ -4,6 +4,8 @@
 #include "yocto/string.hpp"
 #include "support.hpp"
 #include "yocto/math/point2d.hpp"
+#include "yocto/parallel/vtk.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 
@@ -13,6 +15,11 @@ YOCTO_UNIT_TEST_IMPL(field)
     for(unit_t x=F1.lower;x<=F1.upper;++x)
     {
         F1[x] = alea<float>();
+    }
+
+    {
+        ios::wcstream fp("f1f.vtk");
+        parallel::vtk::save_patch(fp, "F1f", F1);
     }
 
     const parallel::coord2D   c2min(-5,-8), c2max(15,10);
@@ -35,8 +42,13 @@ YOCTO_UNIT_TEST_IMPL(field)
         }
     }
 
-    parallel::field2D< point2d<float> > F2v(p2);
-    
+    {
+        parallel::field2D< double > F2d(p2);
+        {
+            ios::wcstream fp("f2d.vtk");
+            parallel::vtk::save_patch(fp, "f2d", F2d);
+        }
+    }
 
 
     const parallel::coord3D   c3min(-5,-8,-1), c3max(15,10,20);
@@ -70,9 +82,9 @@ YOCTO_UNIT_TEST_IMPL(field)
         }
     }
     std::cerr << "sum: " << sumA << ", " << sumB << std::endl;
-
-
-
-
+    
+    
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()
