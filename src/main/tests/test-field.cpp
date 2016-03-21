@@ -20,6 +20,7 @@ YOCTO_UNIT_TEST_IMPL(field)
     {
         ios::wcstream fp("f1f.vtk");
         parallel::vtk::save_patch(fp, "F1f", F1);
+        parallel::vtk::scalars(fp, "float_values", F1);
     }
 
     const parallel::coord2D   c2min(-5,-8), c2max(15,10);

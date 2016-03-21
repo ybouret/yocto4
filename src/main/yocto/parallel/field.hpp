@@ -48,6 +48,7 @@ namespace yocto
         class field_of : public field_info, public patch_of<COORD>
         {
         public:
+            YOCTO_ARGUMENTS_DECL_T;
             typedef patch_of<COORD>   patch_type;
             static const size_t DIM = patch_type::DIM;
 
@@ -58,6 +59,29 @@ namespace yocto
 
             virtual size_t dimensions() const throw() { return DIM; }
 
+            inline T & operator()(const COORD C) throw()
+            {
+                return *(T*)item_at(C);
+            }
+
+            inline const T & operator()(const COORD C) const throw()
+            {
+                return *(const T*)item_at(C);
+            }
+
+            inline T & get(const size_t i) throw()
+            {
+                assert(i<this->items);
+                return * ( ( (T*)base_of() ) + i);
+            }
+
+            inline const T & get(const size_t i) const throw()
+            {
+                assert(i<this->items);
+                return * ( ( (const T*)base_of() ) + i);
+            }
+
+
         protected:
             explicit field_of( const patch_type &p ) :
             field_info(),
@@ -66,6 +90,8 @@ namespace yocto
 
             }
 
+            virtual const void *item_at(const COORD &C) const throw() = 0;
+            virtual const void *base_of()               const throw() = 0;
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(field_of);
@@ -88,7 +114,8 @@ namespace yocto
             explicit field1D(const patch1D p) :
             field_type(p),
             count(this->items),
-            entry( memory::kind<memory::global>::acquire_as<T>(count) )
+            entry( memory::kind<memory::global>::acquire_as<T>(count) ),
+            data(entry)
             {
                 try
                 {
@@ -107,7 +134,8 @@ namespace yocto
             explicit field1D(const patch1D p, T *user_entry) :
             field_type(p),
             count(0),
-            entry(user_entry-this->lower)
+            entry(user_entry-this->lower),
+            data(user_entry)
             {
                 assert(NULL!=user_entry);
                 chunk_ops<T>::setup(user_entry,this->items);
@@ -122,7 +150,7 @@ namespace yocto
                 {
                     memory::kind<memory::global>::release_as<T>(entry,count);
                 }
-
+                data = 0;
             }
 
 
@@ -142,10 +170,18 @@ namespace yocto
 
 
         private:
-            size_t count;
-            T     *entry;
+            size_t      count;
+            T          *entry;
+            const void *data;
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(field1D);
+            virtual const void *item_at(const coord1D &C) const throw()
+            {
+                assert(this->has(C));
+                return &entry[C];
+            }
+
+            virtual const void *base_of() const throw() { return data; }
         };
 
         //______________________________________________________________________
@@ -237,7 +273,6 @@ namespace yocto
                 return rows[y];
             }
 
-
         private:
             row_type *rows; //!< width.y * sizeof(row_type)
             T        *data; //!< items   * sizeof(T)
@@ -275,6 +310,16 @@ namespace yocto
                 }
                 rows -= this->lower.y;
             }
+
+            virtual const void *item_at(const coord2D &C) const throw()
+            {
+
+                assert(this->has(C));
+                return &rows[C.y][C.x];
+            }
+
+            virtual const void *base_of() const throw() { return data; }
+
         };
 
 
@@ -294,7 +339,10 @@ namespace yocto
 
             inline explicit field3D( const patch3D p ) :
             field_type(p),
-            slices(0)
+            slices(0),
+            data(0),
+            wlen(0),
+            wksp(0)
             {
                 const size_t num_slices     = this->width.z;
                 const size_t rows_per_slice = this->width.y;
@@ -316,6 +364,7 @@ namespace yocto
                 slices           = (slice_type *) &q[slice_offset];
                 row_type     *pr = (row_type   *) &q[rows_offset ];
                 T            *pd = (T          *) &q[data_offset ];
+                data = pd;
                 const coord2D c2lo(this->lower.x,this->lower.y);
                 const coord2D c2hi(this->upper.x,this->upper.y);
                 const patch2D p2(c2lo,c2hi);
@@ -354,6 +403,7 @@ namespace yocto
                 }
                 
                 memory::kind<memory::global>::release(wksp,wlen);
+                data = 0;
             }
             
             inline slice_type & operator[](const unit_t z) throw()
@@ -365,10 +415,20 @@ namespace yocto
             
         private:
             slice_type *slices;
+            T          *data;
             size_t      wlen;
             void       *wksp;
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(field3D);
+            virtual const void *item_at(const coord3D &C) const throw()
+            {
+
+                assert(this->has(C));
+                return &slices[C.z][C.y][C.x];
+            }
+
+            virtual const void *base_of() const throw() { return data; }
+
         };
         
     }
