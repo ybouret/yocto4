@@ -45,7 +45,7 @@ namespace yocto
                     return patch(lo,hi);
                 }
 
-
+                float        sumOO;
                 const vertex dmin;
                 const vertex dmax;
 
@@ -54,8 +54,7 @@ namespace yocto
                 dmin(),
                 dmax(),
                 original(0),
-                org_diff(0),
-                org_dsqr(0),
+                rescaled(0),
                 advected(0),
                 allocated(0)
                 {
@@ -77,15 +76,13 @@ namespace yocto
                 ~Zone() throw()
                 {
                     memory::kind<memory::global>::release_as(original,allocated);
-                    org_diff = 0;
-                    org_dsqr = 0;
+                    rescaled = 0;
                     advected = 0;
                 }
 
 
                 float *original;
-                float *org_diff;
-                float *org_dsqr;
+                float *rescaled;
                 float *advected;
                 size_t allocated;
 
@@ -93,18 +90,14 @@ namespace yocto
                 {
                     assert(allocated<=0);
                     assert(0==original);
-                    allocated = 4*items;
-                    original  = memory::kind<memory::global>::acquire_as<float>(allocated);
-                    org_diff  = original + items;
-                    org_dsqr  = org_diff + items;
-                    advected  = org_dsqr + items;
+                    allocated = items;
+                    memory::kind<memory::global>::acquire_chunks<float>(allocated,3,&original,&rescaled,&advected);
                 }
 
                 void load( const pixmapf &src ) throw()
                 {
                     assert(original);
-                    assert(org_diff);
-                    assert(org_dsqr);
+                    assert(rescaled);
                     assert(advected);
                     assert(src.contains(*this));
                     size_t k       = 0;
@@ -121,17 +114,19 @@ namespace yocto
                     }
                     assert(items==k);
                     average/=items;
+                    sumOO = 0;
                     while(k>0)
                     {
                         --k;
                         const float del = original[k] - average;
-                        org_diff[k] = del;
-                        org_dsqr[k] = del*del;
+                        rescaled[k] = del;
+                        sumOO += del*del;
                     }
                 }
 
                 float correlate_with(const pixmapf &tgt, const vertex delta ) const
                 {
+                    static const float TINY = 1.0e-20f;
                     assert(delta.x>=dmin.x);
                     assert(delta.x<=dmax.x);
                     assert(delta.y>=dmin.y);
@@ -152,11 +147,22 @@ namespace yocto
                             adv += tmp;
                         }
                     }
+                    assert(items==k);
+                    adv/=k;
 
                     // -- second loop
-                    
+                    float sumAA = 0;
+                    float sumAO = 0;
+                    while(k>0)
+                    {
+                        --k;
+                        const float dA = advected[k]-adv;
+                        sumAA += dA*dA;
+                        sumAO += rescaled[k]*dA;
+                    }
+                    const float r = sumAO/(sqrtf(sumAA*sumOO)+TINY);
 
-                    return 0;
+                    return r;
                 }
 
 

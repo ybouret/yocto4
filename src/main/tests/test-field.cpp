@@ -3,6 +3,7 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/string.hpp"
 #include "support.hpp"
+#include "yocto/math/point2d.hpp"
 
 using namespace yocto;
 
@@ -33,6 +34,9 @@ YOCTO_UNIT_TEST_IMPL(field)
             F2s[y][x] = gen<string>::get();
         }
     }
+
+    parallel::field2D< point2d<float> > F2v(p2);
+    
 
 
     const parallel::coord3D   c3min(-5,-8,-1), c3max(15,10,20);
@@ -66,6 +70,7 @@ YOCTO_UNIT_TEST_IMPL(field)
         }
     }
     std::cerr << "sum: " << sumA << ", " << sumB << std::endl;
+
 
 
 

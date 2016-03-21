@@ -96,7 +96,7 @@ YOCTO_UNIT_TEST_IMPL(block)
                                         gist::float2byte(I*c.b) );
                     }
                 }
-
+                zone.correlate_with(*p1, vertex(0,0) );
             }
 
         }
