@@ -2,6 +2,7 @@
 #define YOCTO_MEMORY_ALLOCATOR_INCLUDED 1
 
 #include "yocto/threading/singleton.hpp"
+#include <cstdarg>
 
 namespace yocto 
 {
@@ -84,6 +85,60 @@ namespace yocto
 				static ALLOCATOR &h = ALLOCATOR::instance(); 
 				h.template release_as<T>(p,n);
 			}
+
+            //! acquire multiple chunks
+            /**
+             T *p,*q;
+             size_t n=100;
+             acquire_chunks<T>(n,2,&p,&q);
+             release_as<T>(p,n); q=0; ...
+             */
+            template <typename T>
+            static void acquire_chunks(size_t &n,const size_t num,...)
+            {
+                assert(num>0);
+                if(n>0)
+                {
+                    //__________________________________________________________
+                    //
+                    // allocate memory
+                    //__________________________________________________________
+                    const size_t chunk_size = n;
+                    n*=num;
+                    T *addr = acquire_as<T>(n);
+
+                    //__________________________________________________________
+                    //
+                    // shift assign
+                    //__________________________________________________________
+                    va_list ap;
+                    va_start(ap,num);
+                    for(size_t i=1;i<=num;++i)
+                    {
+                        T **ppChunk = va_arg(ap,T**);
+                        assert(ppChunk);
+                        *ppChunk = addr;
+                        addr += chunk_size;
+                    }
+                    va_end(ap);
+                }
+                else
+                {
+                    //__________________________________________________________
+                    //
+                    // no throw set everyone to NULL
+                    //__________________________________________________________
+                    va_list ap;
+                    va_start(ap,num);
+                    for(size_t i=1;i<=num;++i)
+                    {
+                        T **ppChunk = va_arg(ap,T**);
+                        assert(ppChunk);
+                        *ppChunk = 0;
+                    }
+                    va_end(ap);
+                }
+            }
 		};
 	}
 	
