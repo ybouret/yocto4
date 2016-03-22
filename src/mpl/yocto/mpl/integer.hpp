@@ -297,7 +297,8 @@ return integer::compare(ls,&lb,ln,rhs.s,rhs.n.ro(),rhs.n.length()) OP 0;       \
                         }
                     }
                 }
-                throw libc::exception(EINVAL,"unexpected sign failure in MPZ add!!!");
+                libc::critical_error(EINVAL,"unexpected sign failure in MPZ add!!!");
+				return integer();
             }
             
             inline integer operator+() const { return integer(*this); }
