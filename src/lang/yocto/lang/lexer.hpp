@@ -18,15 +18,20 @@ namespace yocto
         class lexer : public object, public l_list
         {
         public:
+            //! initialize and build a default root scanner
             explicit lexer(const string &id, const string &root_scanner);
+
+            //! initialize and build a default root scanner
             explicit lexer(const char   *id, const char   *root_scanner);
             virtual ~lexer() throw();
 
-            const string name;
-            int          line;
+            const string name; //!< lexer's name
+            int          line; //!< shared line for scanner
 
+            //! line=1, scan=root, clear historu
             void restart() throw();
 
+            //! get root scanner
             lexical::scanner & get_root() throw();
 
             //! create a new scanner

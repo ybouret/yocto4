@@ -17,10 +17,12 @@ namespace yocto
                 {
                     throw exception("<%s> already linked to {%s}", name.c_str(), lex->name.c_str());
                 }
+
                 if( &line != &parent.line)
                 {
                     throw exception("<%s>'s line is not {%s}'s line", name.c_str(), parent.name.c_str());
                 }
+
                 lex  = &parent;
                 dict = &parent.dict;
             }
@@ -42,6 +44,7 @@ namespace yocto
         {
 
             namespace {
+
                 class JumpAction
                 {
                 public:
@@ -131,6 +134,7 @@ namespace yocto
             }
 
             namespace  {
+                
                 class BackAction
                 {
                 public:

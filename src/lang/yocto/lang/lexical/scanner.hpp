@@ -29,14 +29,20 @@ namespace yocto
             public:
                 typedef intr_ptr<string,scanner> ptr;
                 virtual ~scanner() throw();
+
+                //! set name and line reference
                 explicit scanner(const string &id, int &ir);
+
+                //! set name and line reference
                 explicit scanner(const char   *id, int &ir);
 
+                //! the name
                 const string &key() const throw();
 
                 const string name;  //!< identifier
                 int         &line;  //!< line index reference
 
+                //! post-init for lexer's control
                 void link_to( lexer &parent );
 
                 //--------------------------------------------------------------
