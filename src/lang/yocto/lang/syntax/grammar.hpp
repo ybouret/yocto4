@@ -49,8 +49,10 @@ namespace yocto
                 //! try to accept first rule
                 xnode *accept( lexer &lxr, source &src, ios::istream &fp);
 
-                //! build GraphViZ..
+                //! build Graphviz
                 void gramviz( const string &filename ) const;
+
+                //! build Graphviz wrapper
                 void gramviz( const char   *filename ) const;
 
                 //! find rule, grammar must be UNLOCKED
@@ -71,13 +73,17 @@ namespace yocto
                 //! slowly fetch rule, NULL if no one found
                 const rule *fetch(const string &ID) const throw();
 
+                //! append a rule
                 void append( rule *r );
 
+                //! return current top level rule
                 rule &top_level();
 
                 size_t count() const throw();
 
                 void cleanup(); //! remove empty aggregate
+
+                //! remove a rule with given label
                 void remove( const string &label );
                 
                 void lock() throw();

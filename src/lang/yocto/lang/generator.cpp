@@ -20,7 +20,7 @@ namespace yocto
         {
         }
 
-        generator:: generator(const char *langID,const bool output_files) :
+        generator:: generator(const char *langID, const bool output_files) :
         parser(langID,"main"),
         output(output_files)
         {
@@ -123,8 +123,8 @@ namespace yocto
             //
             // some comments
             //__________________________________________________________________
-            load<lexical::comment>("C++ Comment","//").hook(scanner);
-            load<lexical::ccomment>("C Comment","/\\*","\\*/").hook(scanner);
+            load<lexical::comment> ("C++ Comment","//").hook(scanner);
+            load<lexical::ccomment>("C Comment",  "/\\*","\\*/").hook(scanner);
 
             //__________________________________________________________________
             //
@@ -302,8 +302,8 @@ namespace yocto
             xg.xprs->lock();
             if(output)
             {
-                xg.xprs->gramviz("lang_gram.dot");
-                ios::graphviz_render("lang_gram.dot");
+                xg.xprs->gramviz("usr_gram.dot");
+                ios::graphviz_render("usr_gram.dot");
             }
             return xg.xprs.yield();
         }
