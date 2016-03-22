@@ -40,6 +40,7 @@ namespace yocto
                 case __zero:      return __zero;
                 case __positive:  return __negative;
             }
+	    libc::critical_error( EINVAL, "unexpected sign_neg failure!!!");
 	    return __zero;
         }
         
@@ -51,16 +52,13 @@ namespace yocto
                 case __zero:     return __zero;
                 case __positive: return b;
             }
+	    libc::critical_error( EINVAL, "unexpected sign_mul failure!!!");
+	    return __zero;
         }
         
         inline sign_type sign_abs(const sign_type s) throw()
         {
-            switch(s)
-            {
-                case __negative: return __positive;
-                case __positive: return __positive;
-                case __zero:     return __zero;
-            }
+	    return (__zero==s) ? __zero : __positive;
         }
         
         
