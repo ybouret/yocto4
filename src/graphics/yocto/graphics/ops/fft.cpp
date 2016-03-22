@@ -11,7 +11,7 @@ namespace yocto
         {
             assert(img.model==bitmap::memory_is_global);
             float       *addr  = & (img[0][0].re);
-            const size_t nn[4] = { 0, img.w, img.h, 0 };
+            const size_t nn[4] = { 0, size_t(img.w), size_t(img.h), 0 };
             math::FourierN<float>::Forward(addr-1, nn, 2);
         }
 
@@ -19,7 +19,7 @@ namespace yocto
         {
             assert(img.model==bitmap::memory_is_global);
             float       *addr  = & (img[0][0].re);
-            const size_t nn[4] = { 0, img.w, img.h, 0 };
+            const size_t nn[4] = { 0, size_t(img.w), size_t(img.h), 0 };
             math::FourierN<float>::Reverse(addr-1, nn, 2);
         }
 

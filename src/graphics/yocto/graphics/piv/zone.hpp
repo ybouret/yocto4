@@ -51,6 +51,7 @@ namespace yocto
 
                 explicit Zone( const bitmap &src, const vertex indx, const vertex count ) throw() :
                 patch( SubPatch(src,indx,count) ),
+		sumOO(0),
                 dmin(),
                 dmax(),
                 original(0),
@@ -66,8 +67,13 @@ namespace yocto
 
                 explicit Zone() throw() :
                 patch( vertex(), vertex() ),
+		sumOO(0),
                 dmin(),
-                dmax()
+                dmax(),
+		original(0),
+		rescaled(0),
+		advected(0),
+		allocated(0)
                 {
                 }
                 
