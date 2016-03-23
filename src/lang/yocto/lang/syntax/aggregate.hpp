@@ -22,6 +22,8 @@ namespace yocto
                 virtual bool accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const;
                 virtual void viz( ios::ostream &fp ) const;
                 virtual void lnk( ios::ostream &fp ) const;
+                virtual void cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const;
+
 
                 //! syntactic sugar
                 aggregate & operator+=( rule &r );

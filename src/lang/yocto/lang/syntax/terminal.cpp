@@ -67,6 +67,12 @@ namespace yocto
                 return (void *)&modifier;
             }
 
+
+            void terminal:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
+            {
+
+            }
+
         }
         
     }

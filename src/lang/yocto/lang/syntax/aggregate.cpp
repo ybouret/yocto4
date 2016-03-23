@@ -90,6 +90,11 @@ namespace yocto
                 return *this;
             }
 
+            void aggregate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
+            {
+
+            }
+
         }
     }
 }

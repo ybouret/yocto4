@@ -70,10 +70,15 @@ namespace yocto
             {
                 fp.viz( (const rule*)this ); fp << " -> "; fp.viz(jk); fp << ";\n";
             }
+
+
+            void at_least:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
+            {
+
+            }
+
         }
 
-        
-        
     }
     
 }
