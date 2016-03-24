@@ -2,6 +2,7 @@
 #include "yocto/fs/local-fs.hpp"
 #include "yocto/lang/parser.hpp"
 #include "yocto/ios/icstream.hpp"
+#include "yocto/ios/ocstream.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/ios/graphviz.hpp"
 
@@ -29,8 +30,15 @@ YOCTO_UNIT_TEST_IMPL(gen)
             P.reset( parser::generate(vfs::get_base_name(argv[1]),fp,true) );
         }
 
+        {
+            ios::wcstream fp("walker.hxx");
+            P->walker_prolog(fp, "the_walker");
+            P->walker_epilog(fp, "the_walker");
+            
+        }
+
         std::cerr << "Ready" << std::endl;
-        
+
         try
         {
             ios::icstream           fp( ios::cstdin );

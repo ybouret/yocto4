@@ -88,7 +88,8 @@ namespace yocto
                 
                 void lock() throw();
 
-                void walker_proto( ios::ostream &fp, const string &class_name) const;
+                void walker_prolog( ios::ostream &fp, const string &class_name) const;
+                void walker_epilog( ios::ostream &fp, const string &class_name) const;
 
 
             private:

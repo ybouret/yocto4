@@ -11,7 +11,7 @@ namespace yocto
         namespace syntax
         {
 
-            static const char walker_name[] = "yocto::lang::syntax::walker";
+            static const char walker_name[] = "WALKER";
             static const char xnode_name[]  = "XNODE";
 
             void optional:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
@@ -23,7 +23,7 @@ namespace yocto
             {
 
             }
-            
+
             void alternate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
 
@@ -35,27 +35,35 @@ namespace yocto
             }
 
 
-            void grammar:: walker_proto(ios::ostream &fp,
-                                        const string &class_name) const
+            void grammar:: walker_prolog(ios::ostream &fp,
+                                         const string &class_name) const
             {
                 //______________________________________________________________
                 //
                 // prolog
                 //______________________________________________________________
-                fp << "class " << class_name << " : public " << walker_name << "{\n";
+                fp << "class " << class_name << " : public yocto::lang::syntax::walker {\n";
                 fp << "public:\n";
-                fp << "typedef yocto::lang::syntax::xnode " << xnode_name << ";\n";
-                fp << "\tinline virtual ~" << class_name << "() throw() {}\n";
+                fp << "\ttypedef yocto::lang::syntax::xnode  " << xnode_name << ";\n";
+                fp << "\ttypedef yocto::lang::syntax::walker " << walker_name << ";\n";
 
+                fp << "\tvirtual ~" << class_name << "() throw();\n";
+                fp << "\texplicit " << class_name << "() throw();\n";
+
+            }
+
+
+            void grammar:: walker_epilog(ios::ostream &fp, const string &class_name) const
+            {
                 //______________________________________________________________
                 //
                 // epilog
                 //______________________________________________________________
                 fp << "private:\n";
-                fp << "\tYOCTO_DISABLE_COPY_AND_ASSIGN(class_name);\n";
+                fp << "\tYOCTO_DISABLE_COPY_AND_ASSIGN(" << class_name << ");\n";
                 fp << "};\n";
             }
-
+            
         }
     }
 }
