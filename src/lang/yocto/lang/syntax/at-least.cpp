@@ -72,10 +72,6 @@ namespace yocto
             }
 
 
-            void at_least:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-
-            }
 
         }
 
