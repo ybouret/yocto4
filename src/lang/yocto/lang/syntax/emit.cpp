@@ -6,6 +6,7 @@
 #include "yocto/lang/syntax/grammar.hpp"
 
 #include "yocto/code/utils.hpp"
+#include "yocto/exception.hpp"
 
 #include <cstring>
 
@@ -151,13 +152,21 @@ namespace yocto
             void grammar:: walker_prolog(ios::ostream &fp,
                                          const string &class_name) const
             {
-                walker_db db(rules.size,as_capacity);
+                walker_db wdb(rules.size,as_capacity);
+                hashing::sha1 H;
 
                 //______________________________________________________________
                 //
                 // collect all seen rules: exclude jettison...
                 //______________________________________________________________
-
+                for(const rule *r = rules.head;r;r=r->next)
+                {
+                    const walker_rule wr(r->label,H);
+                    if( !wdb.insert(wr) )
+                    {
+                        throw exception("unexpected walker failure for '%s'", r->label.c_str());
+                    }
+                }
 
                 //______________________________________________________________
                 //
@@ -165,7 +174,7 @@ namespace yocto
                 //______________________________________________________________
                 fp << "class " << class_name << " : public yocto::lang::syntax::walker {\n";
                 fp << "public:\n";
-                fp << "\ttypedef yocto::lang::syntax::xnode  " << xnode_name << ";\n";
+                fp << "\ttypedef yocto::lang::syntax::xnode  " << xnode_name  << ";\n";
                 fp << "\ttypedef yocto::lang::syntax::walker " << walker_name << ";\n";
 
                 fp << "\tvirtual ~" << class_name << "() throw();\n";
