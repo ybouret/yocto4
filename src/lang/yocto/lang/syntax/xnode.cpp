@@ -8,7 +8,8 @@ namespace yocto
         namespace syntax
         {
 
-            const char * xnode:: property_text(const property ppty) const throw()
+
+            const char * xnode:: get_property_text(const property ppty)  throw()
             {
                 switch (ppty)
                 {
@@ -19,6 +20,11 @@ namespace yocto
                     case mergeOne: return "mergeOne";
                 }
                 return "UNKNOWN";
+            }
+
+            const char * xnode:: property_text() const throw()
+            {
+                return get_property_text(modifier);
             }
 
             xnode:: ~xnode() throw()

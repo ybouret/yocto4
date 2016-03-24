@@ -51,15 +51,8 @@ namespace yocto
 
             void terminal:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// terminal: " << label;
-                if(standard==modifier)
-                {
-                    fp << "\n";
-                }
-                else
-                {
-                    fp << " (-)\n";
-                }
+                fp << "\t// terminal: " << label << "(" << xnode::get_property_text(modifier) << ")\n";
+
             }
 
             void alternate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
@@ -73,7 +66,7 @@ namespace yocto
 
             void aggregate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// aggregate: " << label << "\n";
+                fp << "\t// aggregate: " << label << "(" << xnode::get_property_text(modifier) << ")\n";
                 const string method = label2method(label);
                 fp << "\tvoid " << method << "(" << walker_args << ")\n";
                 fp << "\t{\n";
