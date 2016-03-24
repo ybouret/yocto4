@@ -7,6 +7,8 @@
 
 #include "yocto/code/utils.hpp"
 
+#include <cstring>
+
 namespace yocto
 {
     namespace lang
@@ -17,6 +19,7 @@ namespace yocto
             static const char walker_name[] = "WALKER";
             static const char xnode_name [] = "XNODE";
             static const char walker_args[] = "const XNODE *node";
+
 
             static inline string label2method(const string &label)
             {
@@ -39,47 +42,69 @@ namespace yocto
                 return ans;
             }
 
+
+            static inline void __check_terminal_is(const bool value, ios::ostream &fp)
+            {
+                fp << "\t\tassert(" << (value?"true":"false") << "==node->terminal);\n";
+            }
+
+            static inline bool __is_internal(const string &label) throw()
+            {
+                return 0 != strchr(label.c_str(),'#');
+            }
+
             void optional:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// optional: " << label << "\n";
+                fp << "\t// optional: '" << label << "'\n";
                 const string method = label2method(label);
-                fp << "\tvoid " << method << "(" << walker_args << ")\n";
+                fp << "\tinline void " << method << "(" << walker_args << ")\n";
                 fp << "\t{\n";
-                fp << "\t\tassert(false==node->terminal);\n";
+                __check_terminal_is(false,fp);
                 fp << "\t}\n";
             }
 
             void terminal:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// terminal: " << label << "(" << xnode::get_property_text(modifier) << ")\n";
-
+                fp << "\t// terminal: '" << label << "' (" << xnode::get_property_text(modifier) << ")\n";
+                if(jettison==modifier)
+                {
+                    return;
+                }
+                else
+                {
+                    const string method = label2method(label);
+                    fp << "void " << method << "(" << walker_args << "); // MUST BE IMPLEMENTED!\n";
+                }
             }
 
             void alternate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// alternate: " << label << "\n";
+                fp << "\t// alternate: '" << label << "'\n";
                 const string method = label2method(label);
-                fp << "\tvoid " << method << "(" << walker_args << ")\n";
+                fp << "\tinline void " << method << "(" << walker_args << ")\n";
                 fp << "\t{\n";
+                __check_terminal_is(false,fp);
                 fp << "\t}\n";
             }
 
             void aggregate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// aggregate: " << label << "(" << xnode::get_property_text(modifier) << ")\n";
+                fp << "\t// aggregate: '" << label << "'(" << xnode::get_property_text(modifier) << ")\n";
                 const string method = label2method(label);
                 fp << "\tvoid " << method << "(" << walker_args << ")\n";
                 fp << "\t{\n";
+                __check_terminal_is(false,fp);
                 fp << "\t}\n";
             }
 
 
             void at_least:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// optional: " << label << "\n";
+                fp << "\t// at_least: '" << label << "'\n";
                 const string method = label2method(label);
-                fp << "\tvoid " << method << "(" << walker_args << ")\n";
+                fp << "\tinline void " << method << "(" << walker_args << ")\n";
                 fp << "\t{\n";
+                __check_terminal_is(false,fp);
                 fp << "\t}\n";
             }
 
