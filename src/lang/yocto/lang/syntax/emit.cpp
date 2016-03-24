@@ -45,6 +45,7 @@ namespace yocto
                 const string method = label2method(label);
                 fp << "\tvoid " << method << "(" << walker_args << ")\n";
                 fp << "\t{\n";
+                fp << "\t\tassert(false==node->terminal);\n";
                 fp << "\t}\n";
             }
 
