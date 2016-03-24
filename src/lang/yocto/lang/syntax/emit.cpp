@@ -108,10 +108,57 @@ namespace yocto
                 fp << "\t}\n";
             }
 
+
+            namespace
+            {
+                class walker_rule : public object
+                {
+                public:
+                    const string   label;
+                    const string   method;
+                    const uint32_t hcode;
+
+
+                    inline walker_rule(const string &l, hashing::function &H) :
+                    label(l),
+                    method(label2method(label)),
+                    hcode( H.key<uint32_t>(label) )
+                    {
+                    }
+
+                    inline virtual ~walker_rule() throw()
+                    {}
+
+
+                    const string &key() const throw() { return label; }
+
+                    inline walker_rule(const walker_rule &other) :
+                    label( other.label ),
+                    method(other.method),
+                    hcode( other.hcode )
+                    {
+                    }
+
+
+                private:
+                    YOCTO_DISABLE_ASSIGN(walker_rule);
+                };
+
+                typedef set<string,walker_rule> walker_db;
+
+            }
+
             void grammar:: walker_prolog(ios::ostream &fp,
                                          const string &class_name) const
             {
-                
+                walker_db db(rules.size,as_capacity);
+
+                //______________________________________________________________
+                //
+                // collect all seen rules: exclude jettison...
+                //______________________________________________________________
+
+
                 //______________________________________________________________
                 //
                 // prolog
