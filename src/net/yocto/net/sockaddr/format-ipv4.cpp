@@ -7,6 +7,10 @@
 #include <sys/socket.h>
 #endif
 
+#if defined(__FreeBSD__)
+typedef uint32_t u_int32_t;
+#endif
+
 namespace yocto {
 
     namespace network {
