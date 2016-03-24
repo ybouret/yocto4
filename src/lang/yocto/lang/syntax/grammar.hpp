@@ -87,7 +87,10 @@ namespace yocto
                 void remove( const string &label );
                 
                 void lock() throw();
-                
+
+                void walker_proto( ios::ostream &fp, const string &class_name) const;
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 class  dbase;
