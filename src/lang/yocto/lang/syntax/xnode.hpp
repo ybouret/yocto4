@@ -32,6 +32,9 @@ namespace yocto
                 bool           terminal; //!< true if is terminal
                 const property modifier; //!< assigned by syntax rule
 
+                const char *property_text(const property ppty) const throw();
+
+
                 typedef core::list_of_cpp<xnode> leaves;
 
                 ~xnode() throw();

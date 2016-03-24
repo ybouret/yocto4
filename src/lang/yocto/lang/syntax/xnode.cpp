@@ -7,6 +7,20 @@ namespace yocto
     {
         namespace syntax
         {
+
+            const char * xnode:: property_text(const property ppty) const throw()
+            {
+                switch (ppty)
+                {
+                    case standard: return "standard";
+                    case jettison: return "jettison";
+                    case univocal: return "univocal";
+                    case mergeAll: return "mergeAll";
+                    case mergeOne: return "mergeOne";
+                }
+                return "UNKNOWN";
+            }
+
             xnode:: ~xnode() throw()
             {
                 if(terminal)
