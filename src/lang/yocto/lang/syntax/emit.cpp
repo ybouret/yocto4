@@ -4,9 +4,11 @@
 #include "yocto/lang/syntax/alternate.hpp"
 #include "yocto/lang/syntax/aggregate.hpp"
 #include "yocto/lang/syntax/grammar.hpp"
+#include "yocto/lang/syntax/walker.hpp"
 
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
+#include <iostream>
 
 #include <cstring>
 
@@ -44,10 +46,12 @@ namespace yocto
             }
 
 
+#if 0
             static inline void __check_terminal_is(const bool value, ios::ostream &fp)
             {
                 fp << "\t\tassert(" << (value?"true":"false") << "==node->terminal);\n";
             }
+#endif
 
             static inline bool __is_internal(const string &label) throw()
             {
@@ -56,69 +60,33 @@ namespace yocto
 
             void optional:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// optional: '" << label << "'\n";
-                const string method = label2method(label);
-                fp << "\tinline void " << method << "(" << walker_args << ")\n";
-                fp << "\t{\n";
-                __check_terminal_is(false,fp);
-                fp << "\t}\n";
             }
 
             void terminal:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// terminal: '" << label << "' (" << xnode::get_property_text(modifier) << ")\n";
-                if(jettison==modifier)
-                {
-                    return;
-                }
-                else
-                {
-                    const string method = label2method(label);
-                    fp << "void " << method << "(" << walker_args << "); // MUST BE IMPLEMENTED!\n";
-                }
             }
 
             void alternate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// alternate: '" << label << "'\n";
-                const string method = label2method(label);
-                fp << "\tinline void " << method << "(" << walker_args << ")\n";
-                fp << "\t{\n";
-                __check_terminal_is(false,fp);
-                fp << "\t}\n";
             }
 
             void aggregate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// aggregate: '" << label << "'(" << xnode::get_property_text(modifier) << ")\n";
-                const string method = label2method(label);
-                fp << "\tvoid " << method << "(" << walker_args << ")\n";
-                fp << "\t{\n";
-                __check_terminal_is(false,fp);
-                fp << "\t}\n";
             }
 
 
             void at_least:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
-                fp << "\t// at_least: '" << label << "'\n";
-                const string method = label2method(label);
-                fp << "\tinline void " << method << "(" << walker_args << ")\n";
-                fp << "\t{\n";
-                __check_terminal_is(false,fp);
-                fp << "\t}\n";
             }
 
 
             namespace
             {
-                class walker_rule : public object
-                {
+                class walker_rule                 {
                 public:
                     const string   label;
                     const string   method;
                     const uint32_t hcode;
-
 
                     inline walker_rule(const string &l, hashing::function &H) :
                     label(l),
@@ -127,7 +95,7 @@ namespace yocto
                     {
                     }
 
-                    inline virtual ~walker_rule() throw()
+                    inline  ~walker_rule() throw()
                     {}
 
 
@@ -152,21 +120,35 @@ namespace yocto
             void grammar:: walker_prolog(ios::ostream &fp,
                                          const string &class_name) const
             {
-                walker_db wdb(rules.size,as_capacity);
-                hashing::sha1 H;
+                walker_db       wdb(rules.size,as_capacity);
+                walker::hash_fn H;
 
                 //______________________________________________________________
                 //
-                // collect all seen rules: exclude jettison...
+                // collect all seen rules
                 //______________________________________________________________
                 for(const rule *r = rules.head;r;r=r->next)
                 {
                     const walker_rule wr(r->label,H);
+                    {
+                        const uint32_t hcode = wr.hcode;
+                        for( walker_db::iterator i=wdb.begin(); i!=wdb.end(); ++i)
+                        {
+                            if( hcode == (*i).hcode )
+                            {
+                                throw exception("Unexpected Multiple HashCode!");
+                            }
+                        }
+                    }
                     if( !wdb.insert(wr) )
                     {
                         throw exception("unexpected walker failure for '%s'", r->label.c_str());
                     }
+                    std::cerr << wr.label << " -> " << wr.method << " -> " << std::hex << wr.hcode << std::dec << std::endl;
                 }
+
+
+
 
                 //______________________________________________________________
                 //

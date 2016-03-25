@@ -91,7 +91,8 @@ namespace yocto
                 void walker_prolog( ios::ostream &fp, const string &class_name) const;
                 void walker_epilog( ios::ostream &fp, const string &class_name) const;
 
-
+                static const char internal_char = '#';
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 class  dbase;
