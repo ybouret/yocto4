@@ -90,6 +90,20 @@ namespace yocto
         {
         }
 
+        mperf:: mperf( const char **words, const size_t count) :
+        root( new node_type(0) ),
+        nodes(1)
+        {
+            assert(!(words==NULL&&count>0));
+            for(size_t i=0;i<count;++i)
+            {
+                const char *word = words[i];
+                insert(word,i);
+            }
+            optimize();
+        }
+
+
         void mperf:: insert(const void *data, const size_t size, const int h)
         {
             assert( ! ( (NULL==data) && (size>0) ) );
@@ -152,6 +166,7 @@ namespace yocto
     }
 }
 
+
 namespace yocto
 {
     namespace hashing
@@ -170,11 +185,12 @@ namespace yocto
                 {
                     if(code==node->code)
                     {
-                        curr=node;
-                        found=true;
+                        curr = node;
+                        found= true;
                         break;
                     }
                 }
+
                 if(!found)
                 {
                     return -1;

@@ -37,6 +37,7 @@ namespace yocto
             };
 
             explicit mperf();          //!< default constructor
+            explicit mperf(const char **words,const size_t count);
             virtual ~mperf() throw();  //!< delete root
 
             //! insert a new data in tree, h>=0
@@ -61,11 +62,13 @@ namespace yocto
             //! get the hash code
             int find(const void *data, const size_t size) const throw();
 
+            //! get the hash code for litterals
             inline int operator()(const char *text) const throw()
             {
                 return find(text,length_of(text));
             }
 
+            //! get the hash code for buffers
             inline int operator()(const memory::ro_buffer &buf) const throw()
             {
                 return find(buf.ro(),buf.length());
@@ -80,6 +83,9 @@ namespace yocto
             void graphviz( const string &filename ) const;
         };
     }
+    
+#define YOCTO_MPERF_FOR(WORDS) WORDS,sizeof(WORDS)/sizeof(WORDS[0])
+
 }
 
 #endif

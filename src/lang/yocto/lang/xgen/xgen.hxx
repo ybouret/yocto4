@@ -5,7 +5,7 @@
 #include "yocto/lang/parser.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/ptr/alias.hpp"
-#include "yocto/hashing/perfect.hpp"
+#include "yocto/hashing/mph.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
@@ -35,11 +35,11 @@ namespace yocto
                 term_set          rxp;
                 term_set          raw;
 
-                hashing::perfect  zmph; //!< RULE | LXR | PTY
-                hashing::perfect  cmph; //!< lxr codes: @drop, @endl, @comment
-                hashing::perfect  mmph; //!< lxr meta: RXP|RAW
-                hashing::perfect  kmph; //!< kind of item
-                hashing::perfect  gmph; //!< for growing rules
+                hashing::mperf    zmph; //!< RULE | LXR | PTY
+                hashing::mperf    cmph; //!< lxr codes: @drop, @endl, @comment
+                hashing::mperf    mmph; //!< lxr meta: RXP|RAW
+                hashing::mperf    kmph; //!< kind of item
+                hashing::mperf    gmph; //!< for growing rules
                 
                 unsigned          indx;       //!< for sub rules naming
                 unsigned          jndx;       //!< for lexical rules naming

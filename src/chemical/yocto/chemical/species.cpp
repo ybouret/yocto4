@@ -1,6 +1,6 @@
 #include "yocto/chemical/species.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/hashing/perfect.hpp"
+#include "yocto/hashing/mph.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -50,12 +50,12 @@ namespace yocto
             class builder
             {
             public:
-                const hashing::perfect coreH;
-                const hashing::perfect extraH;
+                const hashing::mperf coreH;
+                const hashing::mperf extraH;
 
                 inline builder() :
-                coreH( YOCTO_PERFECT_HASHER_FOR(core_words) ),
-                extraH(YOCTO_PERFECT_HASHER_FOR(extra_words))
+                coreH( YOCTO_MPERF_FOR(core_words) ),
+                extraH(YOCTO_MPERF_FOR(extra_words))
                 {
                 }
 
