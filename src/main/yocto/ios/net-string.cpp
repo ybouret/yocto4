@@ -45,8 +45,69 @@ namespace yocto
                 }
             }
         }
-        
 
+    }
+
+}
+
+#include "yocto/exception.hpp"
+#include <iostream>
+
+namespace yocto
+{
+    namespace ios
+    {
+        static const char fn[] = "net_string::read: ";
+
+        static inline
+        unsigned char2dec(const char C)
+        {
+            if(C<'0'||C>'9')
+            {
+                throw exception("%sinvalid char in length",fn);
+            }
+            return unsigned(C-'0');
+        }
+
+        bool net_string::read(ios::istream &fp, string &s)
+        {
+            s.clear();
+            //__________________________________________________________________
+            //
+            // parse length
+            //__________________________________________________________________
+            char C = 0;
+            if( !fp.query(C) ) return false;
+
+            unsigned count = char2dec(C);
+            while(true)
+            {
+                if(!fp.query(C))
+                {
+                    throw exception("%sEOF while reading length",fn);
+                }
+                if(':'==C)
+                {
+                    break;
+                }
+                count *= 10;
+                count += char2dec(C);
+            }
+
+            //__________________________________________________________________
+            //
+            // read items
+            //__________________________________________________________________
+            for(unsigned i=1;i<=count;++i)
+            {
+                if(!fp.query(C))
+                {
+                    throw exception("%sEOF while reading char %u/%u",fn,i,count);
+                }
+                s.append(C);
+            }
+            return true;
+        }
 
     }
 }

@@ -2,7 +2,9 @@
 #define YOCTO_IOS_NET_STRING_INCLUDED 1
 
 #include "yocto/string.hpp"
+
 #include "yocto/ios/ostream.hpp"
+#include "yocto/ios/istream.hpp"
 
 namespace yocto
 {
@@ -32,7 +34,8 @@ namespace yocto
             {
                 format(buf.ro(), buf.length(), fp);
             }
-            
+
+            static bool read(ios::istream &fp, string &s);
         };
     }
 
