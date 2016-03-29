@@ -51,10 +51,11 @@ YOCTO_UNIT_TEST_IMPL(phash)
     {
         "for",
         "while",
-        "toto"
+        "if",
+        "then"
     };
     
-    const hashing::perfect kw(other,sizeof(other)/sizeof(other[0]));
+    const hashing::perfect kw(YOCTO_PERFECT_HASHER_FOR(other));
     
 }
 YOCTO_UNIT_TEST_DONE()

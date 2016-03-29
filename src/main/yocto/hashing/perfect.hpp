@@ -21,10 +21,10 @@ namespace yocto
                 typedef core::list_of_cpp<node_type> list_type;
                 node_type     *next;
                 node_type     *prev;
-                const int      hash;
-                list_type      chld;
-                const uint8_t  code;
-                size_t         freq;
+                const int      hash; //!< the hash code, -1  => not in table
+                list_type      chld; //!< the children
+                const uint8_t  code; //!< the byte
+                size_t         freq; //!< the frequency
 
                 node_type(const uint8_t C) throw();
                 ~node_type() throw();
