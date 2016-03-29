@@ -22,76 +22,49 @@ namespace yocto
         namespace syntax
         {
 
-            static const char xnode_name [] = "XNODE";
-            static const char walker_args[] = "const XNODE *node";
+            static const char xnode_name  [] = "XNODE";
+            static const char leaves_name [] = "LEAVES";
+            static const char walker_args [] = "const XNODE *node";
 
-
-            static inline string label2method(const string &label)
-            {
-                string       ans = "";
-                const size_t n = label.size();
-                for(size_t i=0;i<n;++i)
-                {
-                    const char C = label[i];
-                    if( isalnum(C) || '_' == C)
-                    {
-                        ans += C;
-                    }
-                    else
-                    {
-                        const uint8_t B(C);
-                        ans += '_';
-                        ans += hexa_text[B];
-                    }
-                }
-                return ans;
-            }
-
-
-
-
-            void optional:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-                fp << "\t//! optional  : " << label << "\n";
-            }
-
-            void terminal:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-                fp << "\t//! terminal  : " << label << "(" << xnode::get_property_text(modifier) << ")\n";
-            }
-
-            void alternate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-                fp << "\t//! alternate : " << label << "\n";
-            }
-
-            void aggregate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-                fp << "\t//! aggregate : " << label << "\n";
-
-            }
-
-
-            void at_least:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-                fp << "\t//! at_least  : " << label << "\n";
-            }
 
 
             namespace
             {
+                static inline string label2method(const string &label)
+                {
+                    string       ans = "on_";
+                    const size_t n   = label.size();
+                    for(size_t i=0;i<n;++i)
+                    {
+                        const char C = label[i];
+                        if( isalnum(C) || '_' == C)
+                        {
+                            ans += C;
+                        }
+                        else
+                        {
+                            const uint8_t B(C);
+                            ans += '_';
+                            ans += hexa_text[B];
+                        }
+                    }
+                    return ans;
+                }
+
+                static inline bool __is_internal(const string &label) throw()
+                {
+                    return (0 != strchr( label.c_str(), grammar::internal_char ) );
+                }
+
                 class walker_rule
                 {
                 public:
                     const string   label;
                     const string   method;
-                    const bool     internal;
 
                     inline walker_rule(const string &l) :
                     label(l),
-                    method(label2method(label)),
-                    internal( strchr( method.c_str(), grammar::internal_char ) )
-                    {
+                    method(label2method(label))                    {
                     }
 
                     inline  ~walker_rule() throw()
@@ -102,8 +75,7 @@ namespace yocto
 
                     inline walker_rule(const walker_rule &other) :
                     label( other.label ),
-                    method(other.method),
-                    internal(other.internal)
+                    method(other.method)
                     {
                     }
 
@@ -112,29 +84,141 @@ namespace yocto
                     YOCTO_DISABLE_ASSIGN(walker_rule);
                 };
 
-                typedef set<string,walker_rule> walker_db;
+                typedef set<string,walker_rule> _walker_db;
 
-
-                static inline void register_walker_rule_in(walker_db    &wdb,
-                                                           const rule   *r,
-                                                           ios::ostream &nsfp)
+                class walker_db : public _walker_db
                 {
-                    assert(r);
-                    const walker_rule wr(r->label);
-                    if( !wdb.insert(wr) )
+                public:
+                    hashing::mperf mph;
+
+                    explicit walker_db(const size_t n) : _walker_db(n,as_capacity) {}
+                    virtual ~walker_db() throw() {}
+
+                    inline void add( const rule *r, ios::ostream &nsfp)
                     {
-                        throw exception("unexpected walker failure for '%s'", r->label.c_str());
+                        assert(r);
+                        //-- make local perfect hash
+                        mph.insert(r->label,size());
+
+
+                        //-- local database of method
+                        const walker_rule wr(r->label);
+                        if( !insert(wr) )
+                        {
+                            throw exception("unexpected walker failure for '%s'", r->label.c_str());
+                        }
+
+                        //-- store info for binary code
+                        ios::net_string::format(wr.label,nsfp);
+
                     }
-                    ios::net_string::format(r->label,nsfp);
+
+                private:
+                    YOCTO_DISABLE_COPY_AND_ASSIGN(walker_db);
+                };
+
+
+
+
+                static inline void __assert_terminal_is(const bool flag, ios::ostream &fp)
+                {
+                    fp << "\t\tassert(" << (flag?"true":"false") << "==node->terminal);\n";
                 }
             }
+
+
+
+            void optional:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
+            {
+                assert(__is_internal(label));
+                fp << "\t//! optional  : '" << label << "' \n";
+
+                const walker_db &wdb = *static_cast<walker_db*>(handle); assert(wdb.search(label));
+                fp << "\tinline void " << wdb.search(label)->method << "(" << walker_args << ") {\n";
+
+                __assert_terminal_is(false,fp);
+                fp << "\t\tconst LEAVES &ch = node->children();\n";
+                fp << "\t\tassert(0==ch.size||1==ch.size);\n";
+
+                fp << "\t\tif(ch.size){\n"; assert(wdb.search(jk->label));
+                fp << "\t\t\t" << wdb.search(jk->label)->method << "(ch.head);\n";
+                fp << "\t\t}\n";
+
+                fp << "\t}\n";
+            }
+
+
+            void terminal:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
+            {
+                fp << "\t//! terminal  : '" << label << "' (" << xnode::get_property_text(modifier) << ")\n";
+                const walker_db &wdb = *static_cast<walker_db*>(handle);
+                switch(modifier)
+                {
+                    case standard:
+                    case univocal:
+                        assert(NULL!=wdb.search(label));
+                        fp << "\t/** to be coded by user */\n";
+                        fp << "\tvoid " << wdb.search(label)->method << "(" << walker_args << ");\n";
+                        break;
+
+                    case jettison:
+                        assert(NULL==wdb.search(label));
+                        fp << "\t//...\n";
+                        break;
+
+                    default:
+                        throw exception("terminal::cpp(unexpected '%s')",xnode::get_property_text(modifier));
+                }
+            }
+
+            void alternate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
+            {
+                assert(__is_internal(label));
+                fp << "\t//! alternate : '" << label << "'\n";
+                const walker_db &wdb = *static_cast<walker_db*>(handle);
+                fp << "\tinline void " << wdb.search(label)->method << "(" << walker_args << ") {\n";
+
+                __assert_terminal_is(false,fp);
+                fp << "\t\tconst LEAVES &ch = node->children();\n";
+                fp << "\t\tassert(1==ch.size);\n";
+                fp << "\t\tconst XNODE *sub = ch.head;\n";
+
+                fp << "\t\tswitch(hash(sub->label)) {\n";
+                const operands &ops = *static_cast<const operands *>(content());
+                for(const operand *op = ops.head; op; op=op->next)
+                {
+                    fp("\t\t\tcase %3d:", 0); fp << "// '" << op->addr->label << "'\n";
+
+                    fp("\t\t\t\tbreak;\n");
+                }
+                fp << "\t\t\tdefault: break;\n";
+                fp << "\t\t}\n";
+
+
+                fp << "}\n";
+            }
+
+            void aggregate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
+            {
+                fp << "\t//! aggregate : '" << label << "' \n";
+                const walker_db &wdb = *static_cast<walker_db*>(handle); assert(wdb.search(label));
+
+            }
+
+
+            void at_least:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
+            {
+                fp << "\t//! at_least  : '" << label << "' \n";
+            }
+
+
 
 
 
             void grammar:: walker_prolog(ios::ostream &fp,
                                          const string &class_name) const
             {
-                walker_db       wdb(rules.size,as_capacity);
+                walker_db       wdb(rules.size);
 
                 //______________________________________________________________
                 //
@@ -162,9 +246,20 @@ namespace yocto
                         default:
                             break;
                     }
-                    register_walker_rule_in(wdb,r,nsfp);
+                    if(do_register)
+                    {
+                        wdb.add(r,nsfp);
+                    }
                 }
-
+                wdb.mph.optimize();
+                for(const rule *r = rules.head;r;r=r->next)
+                {
+                    const int h = wdb.mph(r->label);
+                    if(h>=0)
+                    {
+                        std::cerr << r->label << " => " <<  h << std::endl;
+                    }
+                }
 
                 //______________________________________________________________
                 //
@@ -186,6 +281,7 @@ namespace yocto
                 fp << "class " << class_name << " : public " << class_name << "_base {\n";
                 fp << "public:\n";
                 fp << "\ttypedef yocto::lang::syntax::xnode  " << xnode_name  << ";\n";
+                fp << "\ttypedef " << xnode_name  <<"::leaves " << leaves_name  << ";\n";
 
                 fp << "\tvirtual ~" << class_name << "() throw();\n";
                 fp << "\texplicit " << class_name << "() throw();\n";
@@ -203,7 +299,7 @@ namespace yocto
                     fp << "\n";
                     fp << "\t//\n";
 
-                    r->cpp(fp,class_name);
+                    r->cpp(fp,class_name,&wdb);
                     fp << "\t//";
                     for(size_t i=0;i<ns;++i) fp << "_";
                     fp << "\n";

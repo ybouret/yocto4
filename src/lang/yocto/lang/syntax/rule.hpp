@@ -13,7 +13,7 @@ namespace yocto
         {
 
 #define Y_LANG_SYNTAX_RULE_ACCEPT_ARGS  xnode * &tree, lexer &lxr, source &src, ios::istream &fp
-#define Y_LANG_SYNTAX_RULE_CPPCODE_ARGS ios::ostream &fp, const string &class_name
+#define Y_LANG_SYNTAX_RULE_CPPCODE_ARGS ios::ostream &fp, const string &class_name, void *handle
 
             //! a syntax rule
             class rule : public object
