@@ -27,7 +27,7 @@ namespace yocto
                 logical & operator<<( rule &r );
 
                 //! return & operands
-                virtual void *content() throw();
+                virtual  void *content() const throw();
 
             protected:
                 explicit logical(const string &id, uint32_t uu);

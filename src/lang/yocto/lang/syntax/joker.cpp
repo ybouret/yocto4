@@ -18,7 +18,7 @@ namespace yocto
                 
             }
 
-            void * joker:: content() throw()
+            void * joker:: content() const throw()
             {
                 return (void*)jk;
             }

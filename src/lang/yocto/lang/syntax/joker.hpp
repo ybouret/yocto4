@@ -16,7 +16,7 @@ namespace yocto
             public:
                 virtual ~joker() throw();
 
-                virtual void *content() throw(); //!< return &jk;
+                virtual void *content() const throw(); //!< return &jk;
 
 
             protected:

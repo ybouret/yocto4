@@ -10,7 +10,14 @@ namespace yocto
             {
             }
 
-            walker:: walker() throw() : hasher() {}
+            walker:: walker(const char *nsdb) throw() : hasher(nsdb)
+            {
+            }
+
+            int walker:: hash(const string &label) const throw()
+            {
+                return hasher(label);
+            }
             
         }
     }

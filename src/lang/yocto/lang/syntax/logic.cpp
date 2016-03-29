@@ -26,10 +26,10 @@ namespace yocto
                 return *this;
             }
 
-            void * logical::content() throw()
+            void * logical::content() const throw()
             {
-                operands &ops = *this;
-                return &ops;
+                const operands &ops = *this;
+                return (void*)&ops;
             }
         }
 

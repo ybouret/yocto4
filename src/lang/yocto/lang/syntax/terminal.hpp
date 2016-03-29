@@ -27,7 +27,7 @@ namespace yocto
                 virtual void lnk( ios::ostream &fp ) const;
                 virtual void cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const;
 
-                virtual void *content() throw(); //!< &modifier
+                virtual void *content() const throw(); //!< &modifier
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);

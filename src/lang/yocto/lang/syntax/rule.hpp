@@ -46,8 +46,8 @@ namespace yocto
                 //! for smart pointer
                 const string & key() const throw();
 
-                //! internal data for specific stuff, default=NULL
-                virtual void *content() throw();
+                //! internal data to read specific stuff
+                virtual void *content() const throw() = 0;
 
                 void encode_label( ios::ostream &fp ) const;
                 

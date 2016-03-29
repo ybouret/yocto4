@@ -8,6 +8,9 @@
 
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/ios/osstream.hpp"
+#include "yocto/ios/net-string.hpp"
+
 #include <iostream>
 
 #include <cstring>
@@ -19,7 +22,6 @@ namespace yocto
         namespace syntax
         {
 
-            static const char walker_name[] = "WALKER";
             static const char xnode_name [] = "XNODE";
             static const char walker_args[] = "const XNODE *node";
 
@@ -46,37 +48,33 @@ namespace yocto
             }
 
 
-#if 0
-            static inline void __check_terminal_is(const bool value, ios::ostream &fp)
-            {
-                fp << "\t\tassert(" << (value?"true":"false") << "==node->terminal);\n";
-            }
-#endif
 
-            static inline bool __is_internal(const string &label) throw()
-            {
-                return 0 != strchr(label.c_str(),'#');
-            }
 
             void optional:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
+                fp << "\t//! optional  : " << label << "\n";
             }
 
             void terminal:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
+                fp << "\t//! terminal  : " << label << "(" << xnode::get_property_text(modifier) << ")\n";
             }
 
             void alternate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
+                fp << "\t//! alternate : " << label << "\n";
             }
 
             void aggregate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
+                fp << "\t//! aggregate : " << label << "\n";
+
             }
 
 
             void at_least:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
             {
+                fp << "\t//! at_least  : " << label << "\n";
             }
 
 
@@ -86,12 +84,10 @@ namespace yocto
                 public:
                     const string   label;
                     const string   method;
-                    const uint32_t hcode;
 
-                    inline walker_rule(const string &l, hashing::function &H) :
+                    inline walker_rule(const string &l) :
                     label(l),
-                    method(label2method(label)),
-                    hcode( H.key<uint32_t>(label) )
+                    method(label2method(label))
                     {
                     }
 
@@ -103,8 +99,7 @@ namespace yocto
 
                     inline walker_rule(const walker_rule &other) :
                     label( other.label ),
-                    method(other.method),
-                    hcode( other.hcode )
+                    method(other.method)
                     {
                     }
 
@@ -115,49 +110,69 @@ namespace yocto
 
                 typedef set<string,walker_rule> walker_db;
 
+
+                static inline void register_walker_rule_in( walker_db &wdb, const rule *r )
+                {
+                    assert(r);
+                    const walker_rule wr(r->label);
+                    if( !wdb.insert(wr) )
+                    {
+                        throw exception("unexpected walker failure for '%s'", r->label.c_str());
+                    }
+
+                }
             }
+
+
 
             void grammar:: walker_prolog(ios::ostream &fp,
                                          const string &class_name) const
             {
                 walker_db       wdb(rules.size,as_capacity);
-                walker::hash_fn H;
 
                 //______________________________________________________________
                 //
                 // collect all seen rules
                 //______________________________________________________________
+                string        nsdb;       // net string databas
+                ios::osstream nsfp(nsdb); // to write
+
                 for(const rule *r = rules.head;r;r=r->next)
                 {
-                    const walker_rule wr(r->label,H);
+                    switch(r->uuid)
                     {
-                        const uint32_t hcode = wr.hcode;
-                        for( walker_db::iterator i=wdb.begin(); i!=wdb.end(); ++i)
-                        {
-                            if( hcode == (*i).hcode )
-                            {
-                                throw exception("Unexpected Multiple HashCode!");
-                            }
-                        }
+                        case terminal::UUID: assert(r->content()!=NULL);
+                            break;
+
+                        default:
+                            break;
+
                     }
-                    if( !wdb.insert(wr) )
-                    {
-                        throw exception("unexpected walker failure for '%s'", r->label.c_str());
-                    }
-                    std::cerr << wr.label << " -> " << wr.method << " -> " << std::hex << wr.hcode << std::dec << std::endl;
+
+                    ios::net_string::format(r->label, nsfp);
                 }
 
 
-
+                //______________________________________________________________
+                //
+                // dedicated walker
+                //______________________________________________________________
+                fp << "class " << class_name << "_base : public yocto::lang::syntax::walker {\n";
+                fp << "public:\n";
+                fp << "\tinline virtual ~" << class_name << "_base() throw() {}\n";
+                fp << "\tinline explicit " << class_name << "_base() : yocto::lang::syntax::walker(\"" << nsdb << "\") {}\n";
+                fp << "private:\n";
+                fp << "\t" << class_name << "_base(const " << class_name << "_base &);\n";
+                fp << "\t" << class_name << "_base &operator=(const " << class_name << "_base &);\n";
+                fp << "};\n\n";
 
                 //______________________________________________________________
                 //
                 // prolog
                 //______________________________________________________________
-                fp << "class " << class_name << " : public yocto::lang::syntax::walker {\n";
+                fp << "class " << class_name << " : public " << class_name << "_base {\n";
                 fp << "public:\n";
                 fp << "\ttypedef yocto::lang::syntax::xnode  " << xnode_name  << ";\n";
-                fp << "\ttypedef yocto::lang::syntax::walker " << walker_name << ";\n";
 
                 fp << "\tvirtual ~" << class_name << "() throw();\n";
                 fp << "\texplicit " << class_name << "() throw();\n";
@@ -181,12 +196,12 @@ namespace yocto
                     fp << "\n";
                     fp << "\n";
                 }
-
+                
                 fp << "public:\n";
-
+                
             }
-
-
+            
+            
             void grammar:: walker_epilog(ios::ostream &fp, const string &class_name) const
             {
                 //______________________________________________________________
