@@ -224,3 +224,28 @@ namespace yocto
     
 }
 
+
+#include "yocto/ios/imstream.hpp"
+#include "yocto/ios/net-string.hpp"
+
+namespace yocto
+{
+    namespace hashing
+    {
+        mperf:: mperf(const char *nsdb) :
+        root( new node_type(0) ),
+        nodes(1)
+        {
+            ios::imstream fp(nsdb,length_of(nsdb));
+            string        word;
+            int           indx=0;
+            while( ios::net_string::read(fp, word))
+            {
+                insert(word, indx);
+                ++indx;
+            }
+            optimize();
+        }
+
+    }
+}

@@ -65,5 +65,10 @@ YOCTO_UNIT_TEST_IMPL(mph)
     kw.graphviz("kw.dot");
     ios::graphviz_render("kw.dot");
 
+
+    hashing::mperf mm("8:zodiacal6:zombie4:zone3:zoo7:zoology4:zoom11:zooplankton6:zounds8:zucchini6:zygote");
+    mm.graphviz("mm.dot");
+    ios::graphviz_render("mm.dot");
+
 }
 YOCTO_UNIT_TEST_DONE()

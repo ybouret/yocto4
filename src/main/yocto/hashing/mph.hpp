@@ -37,7 +37,14 @@ namespace yocto
             };
 
             explicit mperf();          //!< default constructor
+
+            //! construct using a database of C strings
             explicit mperf(const char **words,const size_t count);
+
+            //! construct using a litteral of net_string
+            explicit mperf(const char *nsdb);
+
+            //!
             virtual ~mperf() throw();  //!< delete root
 
             //! insert a new data in tree, h>=0
