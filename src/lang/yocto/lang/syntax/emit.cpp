@@ -118,8 +118,6 @@ namespace yocto
                 };
 
 
-
-
                 static inline void __assert_terminal_is(const bool flag, ios::ostream &fp)
                 {
                     fp << "\t\tassert(" << (flag?"true":"false") << "==node->terminal);\n";
@@ -187,8 +185,10 @@ namespace yocto
                 const operands &ops = *static_cast<const operands *>(content());
                 for(const operand *op = ops.head; op; op=op->next)
                 {
-                    fp("\t\t\tcase %3d:", 0); fp << "// '" << op->addr->label << "'\n";
-
+                    const string &sub = op->addr->label;
+                    const int     h   = wdb.mph(sub); assert(h>=0);
+                    fp("\t\t\tcase %3d:", h); fp << "// '" << op->addr->label << "'\n";
+                    fp << "\t\t\t\t" << wdb.search(sub)->method << "(sub);\n";
                     fp("\t\t\t\tbreak;\n");
                 }
                 fp << "\t\t\tdefault: break;\n";
