@@ -80,14 +80,17 @@ namespace yocto
 
             namespace
             {
-                class walker_rule                 {
+                class walker_rule
+                {
                 public:
                     const string   label;
                     const string   method;
+                    const bool     internal;
 
                     inline walker_rule(const string &l) :
                     label(l),
-                    method(label2method(label))
+                    method(label2method(label)),
+                    internal( strchr( method.c_str(), grammar::internal_char ) )
                     {
                     }
 
@@ -99,7 +102,8 @@ namespace yocto
 
                     inline walker_rule(const walker_rule &other) :
                     label( other.label ),
-                    method(other.method)
+                    method(other.method),
+                    internal(other.internal)
                     {
                     }
 
@@ -111,7 +115,9 @@ namespace yocto
                 typedef set<string,walker_rule> walker_db;
 
 
-                static inline void register_walker_rule_in( walker_db &wdb, const rule *r )
+                static inline void register_walker_rule_in(walker_db    &wdb,
+                                                           const rule   *r,
+                                                           ios::ostream &nsfp)
                 {
                     assert(r);
                     const walker_rule wr(r->label);
@@ -119,7 +125,7 @@ namespace yocto
                     {
                         throw exception("unexpected walker failure for '%s'", r->label.c_str());
                     }
-
+                    ios::net_string::format(r->label,nsfp);
                 }
             }
 
@@ -139,17 +145,24 @@ namespace yocto
 
                 for(const rule *r = rules.head;r;r=r->next)
                 {
+                    bool do_register = true;
                     switch(r->uuid)
                     {
-                        case terminal::UUID: assert(r->content()!=NULL);
-                            break;
+                        case terminal::UUID:
+                        {
+                            assert(r->content()!=NULL);
+                            const property modifier = *static_cast<property *>(r->content());
+                            if(jettison==modifier)
+                            {
+                                do_register = false;
+                                std::cerr << "drop " << r->label << std::endl;
+                            }
+                        } break;
 
                         default:
                             break;
-
                     }
-
-                    ios::net_string::format(r->label, nsfp);
+                    register_walker_rule_in(wdb,r,nsfp);
                 }
 
 

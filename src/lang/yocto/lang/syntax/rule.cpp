@@ -52,13 +52,6 @@ namespace yocto
                 return label;
             }
 
-
-#if 0
-            const void * rule:: content() const throw()
-            {
-                return 0;
-            }
-#endif
             
             void rule:: encode_label( ios::ostream &fp ) const
             {
