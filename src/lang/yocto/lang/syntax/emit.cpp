@@ -215,6 +215,7 @@ namespace yocto
                     inline void add( const rule *r )
                     {
                         bool do_register = true;
+
                         switch(r->uuid)
                         {
                             case terminal::UUID: {
@@ -234,7 +235,8 @@ namespace yocto
                         {
                             // register for class_name hashing
                             ios::net_string::format(r->label, nsfp);
-
+                            nsfp.flush();
+                            
                             // register for local hashing
                             mph.insert(r->label, size());
 
@@ -250,7 +252,14 @@ namespace yocto
 
                     inline void export_base( ios::ostream &fp ) const
                     {
+                        fp << "class " << class_name_base << " : public yocto::lang::syntax::walker {\n";
+                        fp << "public:\n";
 
+                        fp << "\tinline  " << class_name_base << "() : yocto::lang::syntax::walker(\"" << nsdb << "\")\n\t{}\n";
+                        fp << "\tinline ~" << class_name_base << "() throw() {}\n";
+                        fp << "private:\n";
+                        fp << "\tYOCTO_DISABLE_COPY_AND_ASSIGN(" << class_name_base << ");\n";
+                        fp << "};\n\n";
                     }
 
 
@@ -298,6 +307,8 @@ namespace yocto
                 {
                     wmk.add(r);
                 }
+
+                wmk.export_base(fp);
             }
 
             

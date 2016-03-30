@@ -35,7 +35,10 @@ namespace yocto
             {
                 fp("x%02x",unsigned(code));
             }
-            fp("#%u", unsigned(freq) );
+            if(freq>1)
+            {
+                fp("#%u", unsigned(freq) );
+            }
             if(hash>=0)
             {
                 fp("[%d]",int(hash));

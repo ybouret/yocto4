@@ -18,7 +18,11 @@ namespace yocto
                 virtual ~walker() throw();
                 int hash(const string &label) const throw();
 
-
+                inline void graphviz(const string &filename) const
+                {
+                    hasher.graphviz(filename);
+                }
+                
             protected:
                 explicit walker(const char *nsdb) throw();
                 hashing::mperf hasher;
