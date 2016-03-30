@@ -50,7 +50,8 @@ namespace yocto
                     internal(wr.internal)
                     {
                     }
-
+                    
+                   
                     inline ~wrule() throw()
                     {
                     }
@@ -61,7 +62,7 @@ namespace yocto
                     YOCTO_DISABLE_ASSIGN(wrule);
                     static string label2cname(const string &s)
                     {
-                        string ans;
+                        string ans = "on_";
                         const size_t n   = s.size();
                         for(size_t i=0;i<n;++i)
                         {
@@ -85,6 +86,8 @@ namespace yocto
 
                 typedef set<string,wrule> _wmaker;
 
+                static const char walker_args[] = "const XNODE *node";
+                
                 class wmaker : public _wmaker
                 {
                 public:
@@ -175,59 +178,72 @@ namespace yocto
                         fp << "};\n\n";
                     }
 
+                    //__________________________________________________________
+                    //
+                    // start a comment
+                    //__________________________________________________________
                     inline ios::ostream & com() const
                     {
                         fp << "\t\t//";
                         return fp;
                     }
 
+                    //__________________________________________________________
+                    //
+                    // make a horizontal line
+                    //__________________________________________________________
                     inline void hline() const
                     {
                         com(); for(size_t i=0;i<64;++i) fp << '_'; fp << '\n';
                     }
 
+                    //__________________________________________________________
+                    //
+                    // start class prolog
+                    //__________________________________________________________
                     inline void export_prolog( ) const
                     {
                         fp << "class " << class_name << " : public " << class_name_base << " {\n";
                         fp << "public:\n";
+                        fp << "\ttypedef yocto::lang::syntax::xnode XNODE;\n";
                         fp << "\texplicit " << class_name << "();          //!< implemented by user\n";
                         fp << "\tvirtual ~" << class_name << "() throw() ; //!< implemented by user\n";
                     }
 
-
-#define YWK_LABEL(NAME) case NAME ::UUID: fp << #NAME " : '" << r->label << "'"; break
+                    //__________________________________________________________
+                    //
+                    // export all rules
+                    //__________________________________________________________
+#define YWK_LABEL(NAME) case NAME ::UUID: fp << " " #NAME " : '" << r->label << "'\n"; export_##NAME(w); break
 
                     inline void export_rules() const
                     {
                         fp << "private:\n";
                         for(const_iterator i=begin();i!=end();++i)
                         {
-                            const wrule &wr = *i;
-                            const rule  *r  = wr.pRule;
+                            const wrule &w  = *i;
+                            const rule  *r  = w.pRule;
                             hline();
-                            com();
+                            com() << '\n';
                             com();
                             switch(r->uuid)
                             {
                                     YWK_LABEL(terminal);
                                     YWK_LABEL(optional);
                                     YWK_LABEL(at_least);
-                                //case alternate::UUID: break;
-                                    YMK_LABEL(alternate);
-                                    //YMK_LABEL(aggregate);
-
-
+                                    YWK_LABEL(alternate);
+                                    YWK_LABEL(aggregate);
 
                                 default:
                                     throw exception("unrecognized rule uuid!");
                             }
                             hline();
-
+                            
+                            fp << '\n';
                         }
                     }
 
-
-
+                    
                     inline void prepare_public_api() const
                     {
                         fp << "public:\n";
@@ -236,39 +252,68 @@ namespace yocto
                         com() << "user's data\n";
                         hline();
                     }
+                    
+                    inline ios::ostream & proto(const wrule &w) const
+                    {
+                        fp << "\t\tvoid " <<  w.cname << '(' << walker_args << ')';
+                        return fp;
+                    }
+                    
+                    //__________________________________________________________
+                    //
+                    // export terminal
+                    //__________________________________________________________
+                    inline void export_terminal(const wrule &w) const
+                    {
+                        proto(w) << "; // to be implemented\n";
+                    }
 
+                    //__________________________________________________________
+                    //
+                    // export optional
+                    //__________________________________________________________
+                    inline void export_optional(const wrule &w) const
+                    {
+                        proto(w) << ";\n";
+                    }
+                    
+                    //__________________________________________________________
+                    //
+                    // export at_least
+                    //__________________________________________________________
+                    inline void export_at_least(const wrule &w) const
+                    {
+                        proto(w) << ";\n";
+
+                    }
+                    
+                    //__________________________________________________________
+                    //
+                    // export alternate
+                    //__________________________________________________________
+                    inline void export_alternate(const wrule &w) const
+                    {
+                        proto(w) << ";\n";
+
+                    }
+                    
+                    //__________________________________________________________
+                    //
+                    // export aggregate
+                    //__________________________________________________________
+                    inline void export_aggregate(const wrule &w) const
+                    {
+                        proto(w) << ";\n";
+
+                    }
+                    
+                    
                 private:
                     YOCTO_DISABLE_COPY_AND_ASSIGN(wmaker);
                 };
 
 
             }
-
-
-
-
-            void optional:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-            }
-
-
-            void terminal:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-            }
-
-            void alternate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-            }
-
-            void aggregate:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-            }
-
-
-            void at_least:: cpp(Y_LANG_SYNTAX_RULE_CPPCODE_ARGS) const
-            {
-            }
-
 
 
 
