@@ -16,7 +16,8 @@ namespace yocto
 
             aggregate:: aggregate(const string &id, const property ppty) :
             logical(id, UUID),
-            modifier(ppty)
+            modifier(ppty),
+	    followers()
             {
                 Y_LANG_SYNTAX_DERIVED(aggregate);
                 
