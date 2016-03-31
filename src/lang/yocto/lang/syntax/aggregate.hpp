@@ -37,7 +37,9 @@ namespace yocto
             public:
                 explicit following_rules() throw();
                 virtual ~following_rules() throw();
-                
+
+                void collect(const rule *);
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(following_rules);
             };
@@ -47,7 +49,9 @@ namespace yocto
             public:
 
                 static const uint32_t UUID = YOCTO_FOURCC('[', '&', '&', ']');
-                const property modifier; //!< passed to xnode
+                const property  modifier; //!< passed to xnode
+                //following_rules follow;   //!< possible next char
+
                 virtual ~aggregate() throw();
                 explicit aggregate(const string &id, const property ppty = standard);
 
