@@ -25,8 +25,8 @@ namespace yocto
                 rule             *prev;
                 const string      label;
                 const uint32_t    uuid;
-                auto_ptr<alist_t> following;
                 
+
                 virtual ~rule() throw();
                 
                 //! main accept routine
@@ -50,7 +50,6 @@ namespace yocto
 
                 void encode_label( ios::ostream &fp ) const;
                 
-                alist_t &check_following();
                 
             protected:
                 explicit rule(const string &id, uint32_t uu);

@@ -305,9 +305,7 @@ namespace yocto
                 {
                     case 0:
                     {
-                        if(root.following.is_valid())
-                        {
-                        }
+                        
                         throw exception("[[%s]]: no lexeme, expecting %s",gname,root.label.c_str());
                     }
 

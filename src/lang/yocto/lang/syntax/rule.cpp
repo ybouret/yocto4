@@ -6,7 +6,8 @@ namespace yocto
     {
         namespace syntax
         {
-            
+
+#if 0
             rule::alist_t & rule::check_following()
             {
                 if(!following.is_valid())
@@ -15,6 +16,7 @@ namespace yocto
                 }
                 return *following;
             }
+#endif
 
             rule:: ~rule() throw()
             {
@@ -25,8 +27,7 @@ namespace yocto
             next(0),
             prev(0),
             label(id),
-            uuid(uu),
-            following(0)
+            uuid(uu)
             {
             }
 
