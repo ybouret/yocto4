@@ -10,6 +10,7 @@ namespace yocto
             following_rule:: following_rule(const rule *r) throw() :
             next(0),
             prev(0),
+            self(r),
             addr(r->derived),
             uuid(r->uuid)
             {
@@ -76,3 +77,39 @@ namespace yocto
     }
 
 }
+
+
+#include "yocto/lang/syntax/grammar.hpp"
+#include <iostream>
+
+namespace yocto
+{
+    namespace lang
+    {
+        namespace syntax
+        {
+            void grammar:: show_followers() const
+            {
+                std::cerr << "-- grammar '" << name << "' followers:" << std::endl;
+                for(const rule *r=rules.head;r;r=r->next)
+                {
+                    if(aggregate::UUID==r->uuid)
+                    {
+                        std::cerr << r->label << " ->";
+                        const aggregate        *a = static_cast<const aggregate *>(r->derived);
+                        const _following_rules &fr = a->followers;
+
+                        for(const following_rule *f = fr.head;f;f=f->next)
+                        {
+                            std::cerr << ' ' << f->self->label;
+                        }
+
+                        std::cerr << std::endl;
+                    }
+                }
+            }
+        }
+    }
+}
+
+

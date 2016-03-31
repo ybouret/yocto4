@@ -93,7 +93,14 @@ namespace yocto
             }
 
            
-
+            void aggregate::compile()
+            {
+                followers.clear();
+                if(size>0)
+                {
+                    followers.collect(head->addr);
+                }
+            }
         }
     }
 }

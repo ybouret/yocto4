@@ -17,6 +17,7 @@ namespace yocto
             public:
                 following_rule *next;
                 following_rule *prev;
+                const rule     *self;
                 const void     *addr;
                 const uint32_t  uuid; //!< terminal or aggregate
                 following_rule(const rule *r) throw();
@@ -50,7 +51,7 @@ namespace yocto
 
                 static const uint32_t UUID = YOCTO_FOURCC('[', '&', '&', ']');
                 const property  modifier; //!< passed to xnode
-                //following_rules follow;   //!< possible next char
+                following_rules followers;   //!< possible next char
 
                 virtual ~aggregate() throw();
                 explicit aggregate(const string &id, const property ppty = standard);
@@ -62,7 +63,10 @@ namespace yocto
 
                 //! syntactic sugar
                 aggregate & operator+=( rule &r );
-                
+
+                //! build followers
+                void compile();
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(aggregate);
             };

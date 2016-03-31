@@ -105,7 +105,7 @@ namespace
 
             gramviz("gram.dot");
             (void) system("dot -Tpng -o gram.png gram.dot");
-
+            lock();
         }
 
         virtual ~JSON_Parser() throw()
@@ -122,6 +122,7 @@ namespace
 YOCTO_UNIT_TEST_IMPL(json)
 {
     JSON_Parser P;
+    P.show_followers();
 
     vfs &fs = local_fs::instance();
     fs.try_remove_file("xnode.dot");

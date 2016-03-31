@@ -30,6 +30,8 @@ YOCTO_UNIT_TEST_IMPL(gen)
             P.reset( parser::generate(vfs::get_base_name(argv[1]),fp,true) );
         }
 
+        P->show_followers();
+
         {
             ios::wcstream fp("walker.hxx");
             P->walker_prolog(fp, "the_walker");

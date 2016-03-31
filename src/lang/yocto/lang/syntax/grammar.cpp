@@ -62,12 +62,19 @@ namespace yocto
                 }
             }
             
-            void grammar:: lock() throw()
+            void grammar:: lock()
             {
                 if(db)
                 {
                     delete db;
                     db = 0;
+                }
+                for(rule *r=rules.head;r;r=r->next)
+                {
+                    if( aggregate::UUID == r->uuid )
+                    {
+                        static_cast<aggregate *>(r->derived)->compile();
+                    }
                 }
             }
             

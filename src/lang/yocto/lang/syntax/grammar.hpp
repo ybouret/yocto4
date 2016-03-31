@@ -85,8 +85,11 @@ namespace yocto
 
                 //! remove a rule with given label
                 void remove( const string &label );
-                
-                void lock() throw();
+
+                //! delete internal database and compile aggregates followers
+                void lock();
+
+                void show_followers() const;
 
                 void walker_prolog( ios::ostream &fp, const string &class_name) const;
                 void walker_epilog( ios::ostream &fp, const string &class_name) const;
