@@ -73,10 +73,22 @@ namespace yocto
                 }
             }
 
+
+            void aggregate::compile()
+            {
+                followers.clear();
+                if(size>0)
+                {
+                    followers.collect(head->addr);
+                }
+            }
+
         }
     }
 
 }
+
+
 
 
 #include "yocto/lang/syntax/grammar.hpp"

@@ -7,18 +7,7 @@ namespace yocto
     {
         namespace syntax
         {
-
-#if 0
-            rule::alist_t & rule::check_following()
-            {
-                if(!following.is_valid())
-                {
-                    following.reset( new alist_t() );
-                }
-                return *following;
-            }
-#endif
-
+            
             rule:: ~rule() throw()
             {
             }
