@@ -1,4 +1,5 @@
 #include "yocto/lang/syntax/rule.hpp"
+#include <cstring>
 
 namespace yocto
 {
@@ -32,6 +33,10 @@ namespace yocto
             {
             }
 
+            bool rule:: is_internal() const throw()
+            {
+                return 0 != strchr( label.c_str(), internal_char );
+            }
 
             void rule:: grow( xnode * &tree, xnode *leaf ) const throw()
             {

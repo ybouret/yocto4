@@ -50,7 +50,8 @@ namespace yocto
                 virtual void *content() const throw() = 0;
 
                 void encode_label( ios::ostream &fp ) const;
-                
+
+                bool is_internal() const throw(); //!< is internal char is in the name
                 
             protected:
                 explicit rule(const string &id, uint32_t uu);
