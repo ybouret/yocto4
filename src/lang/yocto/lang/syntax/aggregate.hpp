@@ -11,9 +11,41 @@ namespace yocto
         namespace syntax
         {
 
+            //! a following rules...
+            class following_rule
+            {
+            public:
+                following_rule *next;
+                following_rule *prev;
+                const void     *addr;
+                const uint32_t  uuid; //!< terminal or aggregate
+                following_rule(const rule *r) throw();
+                ~following_rule() throw();
+
+                YOCTO_MAKE_OBJECT
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(following_rule);
+            };
+
+
+            //! base class for following rules
+            typedef core::list_of_cpp<following_rule> _following_rules;
+
+            //! possible following rules of an aggregate
+            class following_rules : public _following_rules
+            {
+            public:
+                explicit following_rules() throw();
+                virtual ~following_rules() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(following_rules);
+            };
+
             class aggregate : public logical
             {
             public:
+
                 static const uint32_t UUID = YOCTO_FOURCC('[', '&', '&', ']');
                 const property modifier; //!< passed to xnode
                 virtual ~aggregate() throw();

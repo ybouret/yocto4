@@ -20,8 +20,7 @@ namespace yocto
             {
             public:
                 static const char internal_char = '#';
-                typedef addr_node<rule> anode_t;
-                typedef addr_list<rule> alist_t;
+                
                 
                 rule             *next;
                 rule             *prev;
