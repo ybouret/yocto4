@@ -16,6 +16,7 @@ namespace yocto
             rule(id,UUID),
             modifier(ppty)
             {
+                Y_LANG_SYNTAX_DERIVED(terminal);
             }
 
             bool terminal:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const

@@ -146,7 +146,7 @@ namespace yocto
             {
                 assert(curr!=NULL);
                 const string label = curr->label;
-                const string id    = label + vformat("%c%u", grammar::internal_char, ++indx);
+                const string id    = label + vformat("%c%u", rule::internal_char, ++indx);
                 return & xprs->agg(id, one_level.search(label) ? mergeAll : mergeOne);
             }
             

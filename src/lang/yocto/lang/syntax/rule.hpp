@@ -13,11 +13,13 @@ namespace yocto
         {
 
 #define Y_LANG_SYNTAX_RULE_ACCEPT_ARGS  xnode * &tree, lexer &lxr, source &src, ios::istream &fp
+#define Y_LANG_SYNTAX_DERIVED(CLASS)    do { assert(0==derived); CLASS *__self = this; derived = __self; } while(false)
 
             //! a syntax rule
             class rule : public object
             {
             public:
+                static const char internal_char = '#';
                 typedef addr_node<rule> anode_t;
                 typedef addr_list<rule> alist_t;
                 
@@ -25,7 +27,7 @@ namespace yocto
                 rule             *prev;
                 const string      label;
                 const uint32_t    uuid;
-                
+                void             *derived;
 
                 virtual ~rule() throw();
                 

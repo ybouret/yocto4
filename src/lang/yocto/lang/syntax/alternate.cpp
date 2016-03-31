@@ -15,7 +15,7 @@ namespace yocto
             {
                 YOCTO_GIANT_LOCK();
                 ++counter;
-                const string ans = vformat("ALT#%u",counter);
+                const string ans = vformat("ALT%c%u",rule::internal_char,counter);
                 return ans;
             }
 
@@ -28,7 +28,7 @@ namespace yocto
             alternate:: alternate() :
             logical( make_label(), UUID)
             {
-
+                Y_LANG_SYNTAX_DERIVED(alternate);
             }
 
 

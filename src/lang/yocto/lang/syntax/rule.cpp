@@ -27,7 +27,8 @@ namespace yocto
             next(0),
             prev(0),
             label(id),
-            uuid(uu)
+            uuid(uu),
+            derived(0)
             {
             }
 

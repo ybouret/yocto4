@@ -40,7 +40,7 @@ namespace yocto
                     inline wrule(const rule *r) :
                     pRule(r),
                     cname( label2cname(pRule->label) ),
-                    internal( strchr( pRule->label.c_str(), grammar::internal_char) != NULL )
+                    internal( strchr( pRule->label.c_str(), rule::internal_char) != NULL )
                     {
                     }
 

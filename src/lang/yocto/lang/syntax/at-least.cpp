@@ -18,6 +18,7 @@ namespace yocto
             joker( make_label(n), r, UUID),
             nmin(n)
             {
+                Y_LANG_SYNTAX_DERIVED(at_least);
             }
 
             unsigned at_least:: counter = 0;

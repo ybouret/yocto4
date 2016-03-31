@@ -18,6 +18,8 @@ namespace yocto
             logical(id, UUID),
             modifier(ppty)
             {
+                Y_LANG_SYNTAX_DERIVED(aggregate);
+                
                 switch(modifier)
                 {
                     case jettison:

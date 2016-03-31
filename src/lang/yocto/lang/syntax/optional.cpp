@@ -23,6 +23,7 @@ namespace yocto
             optional:: optional(rule &r) :
             joker(make_label(),r,UUID)
             {
+                Y_LANG_SYNTAX_DERIVED(optional);
             }
 
             bool optional:: accept(Y_LANG_SYNTAX_RULE_ACCEPT_ARGS) const
