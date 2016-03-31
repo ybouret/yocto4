@@ -299,7 +299,7 @@ namespace yocto
             // generate the new parser/grammar
             //__________________________________________________________________
             syntax::xgen   xg(tree);
-            xg.xprs->lock();
+            xg.xprs->finalize();
             if(output)
             {
                 xg.xprs->gramviz("usr_gram.dot");

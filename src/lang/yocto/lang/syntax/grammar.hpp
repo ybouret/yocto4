@@ -87,7 +87,7 @@ namespace yocto
                 void remove( const string &label );
 
                 //! delete internal database and compile aggregates followers
-                void lock();
+                void finalize();
 
                 void show_followers() const;
 

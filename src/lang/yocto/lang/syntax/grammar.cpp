@@ -62,13 +62,18 @@ namespace yocto
                 }
             }
             
-            void grammar:: lock()
+            void grammar:: finalize()
             {
                 if(db)
                 {
                     delete db;
                     db = 0;
                 }
+
+                //______________________________________________________________
+                //
+                // first pass: compile all
+                //______________________________________________________________
                 for(rule *r=rules.head;r;r=r->next)
                 {
                     if( aggregate::UUID == r->uuid )
@@ -76,11 +81,18 @@ namespace yocto
                         static_cast<aggregate *>(r->derived)->compile();
                     }
                 }
+
+                //______________________________________________________________
+                //
+                // second pass: merge internals
+                //______________________________________________________________
+
+
             }
             
             grammar:: ~grammar() throw()
             {
-                lock();
+                if(db) delete db;
             }
             
             

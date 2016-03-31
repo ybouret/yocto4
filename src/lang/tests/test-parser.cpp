@@ -105,7 +105,7 @@ namespace
 
             gramviz("gram.dot");
             (void) system("dot -Tpng -o gram.png gram.dot");
-            lock();
+            finalize();
         }
 
         virtual ~JSON_Parser() throw()
