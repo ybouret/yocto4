@@ -36,6 +36,7 @@ namespace yocto
             void grammar:: enroll( rule *r )
             {
                 assert(r);
+                assert(r->derived);
                 check_locked();
                 const rule_alias ra(r);
                 if(!db->insert(ra))
