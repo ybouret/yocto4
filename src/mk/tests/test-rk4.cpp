@@ -1,6 +1,6 @@
 #include "yocto/math/ode/rk4.hpp"
 #include "yocto/utest/run.hpp"
-
+//#include "yocto/math/ode/explicit/driver-ck.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -48,7 +48,8 @@ namespace
 
 YOCTO_UNIT_TEST_IMPL(rk4)
 {
-    ode::RK4<double> rk4;
+    ode::RK4<double>            rk4;
+    //ode::driverCK<double>::type rkck(1e-7);
 
     dummy dum;
 
