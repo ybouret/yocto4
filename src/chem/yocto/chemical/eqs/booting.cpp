@@ -252,7 +252,8 @@ namespace yocto
         
         void equilibria:: optimize()
         {
-            cgrad<double>::optimize(optH,optG, xi, 0, NULL);
+            vector<bool> used(xi.size(),true);
+            cgrad<double>::optimize(optH,optG, xi, used, 0, NULL);
             compute_C(xi);
         }
         

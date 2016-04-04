@@ -80,9 +80,10 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
     X[2] = 0;
     P.count = 0;
     { ios::ocstream fp("cgrad.dat",false); }
-    
+
+    vector<bool> used(X.size(),true);
     cgrad<double>::callback cb( &P, &pot2::cb);
-    cgrad<double>::optimize(Func, Grad, X, ftol, &cb);
+    cgrad<double>::optimize(Func, Grad, X, used, ftol, &cb);
     std::cerr << "X=" << X << std::endl;
     std::cerr << "#calls=" << P.count << std::endl;
     
@@ -91,7 +92,7 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
     X[2] = 0;
     vector<double> dX( X.size(), 1e-4 );
     cgrad<double>  cg;
-    cg.run(Func, X, dX, ftol, &cb);
+    cg.run(Func, X, used, dX, ftol, &cb);
     std::cerr << "X=" << X << std::endl;
     std::cerr << "#calls=" << P.count << std::endl;
     
@@ -180,7 +181,8 @@ YOCTO_UNIT_TEST_IMPL(cgrad2)
     { ios::ocstream fp("cgrad2.dat",false); }
     
     cgrad<double>::callback cb( &param, &Param::cb );
-    cgrad<double>::optimize(Func,Grad,var,ftol,&cb);
+    vector<bool> used(var.size(),true);
+    cgrad<double>::optimize(Func,Grad,var,used,ftol,&cb);
     std::cerr << "var=" << var << std::endl;
     std::cerr << "count=" << param.count << std::endl;
 }

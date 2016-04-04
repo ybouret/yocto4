@@ -58,10 +58,12 @@ namespace yocto
         bool cgrad<real_t>::optimize(numeric<real_t>::scalar_field          &func,
                                      numeric<real_t>::vector_field          &grad,
                                      array<real_t>                          &p,
+                                     const array<bool>                      &used,
                                      const real_t                            ftol,
                                      callback                               *cb
                                      )
         {
+            assert(p.size()==used.size());
             const size_t nvar = p.size(); assert(nvar>0);
             some_arrays<4,real_t,memory::global> arrays;
             arrays.allocate(nvar);
@@ -85,6 +87,7 @@ namespace yocto
             grad(xi,p);
             for( size_t j=nvar;j>0;--j)
             {
+                if(!used[j]) xi[j] = 0; // initial clean up of gradient
                 g[j]  = -xi[j];
                 xi[j] = h[j]=g[j];
             }
@@ -148,6 +151,7 @@ namespace yocto
                 real_t dgg = 0, gg= 0;
                 for( size_t i=nvar;i>0;--i)
                 {
+                    if(!used[i]) xi[i] = 0; // in loop cleaning of gradient
                     gg  += g[i] * g[i];
                     dgg += (xi[i]+g[i])*xi[i];
                 }
@@ -196,6 +200,7 @@ namespace yocto
         template <>
         bool cgrad<real_t>:: run(numeric<real_t>::scalar_field  &F,
                                  array<real_t>                  &p,
+                                 const array<bool>              &used,
                                  const array<real_t>            &dp,
                                  const real_t                    ftol,
                                  callback                       *cb)
@@ -203,7 +208,7 @@ namespace yocto
             //-- prepare data
             pF  = &F;
             pdp = &dp;
-            return optimize(F, G, p, ftol,cb);
+            return optimize(F, G, p, used, ftol,cb);
         }
         
         

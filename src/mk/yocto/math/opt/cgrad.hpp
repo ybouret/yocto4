@@ -27,6 +27,7 @@ namespace yocto
             static bool optimize(typename numeric<T>::scalar_field &func,
                                  typename numeric<T>::vector_field &grad,
                                  array<T>                          &p,
+                                 const array<bool>                 &used,
                                  const T                            ftol,
                                  callback                          *cb = 0
                                  );
@@ -45,6 +46,7 @@ namespace yocto
              */
             bool run(typename numeric<T>::scalar_field &func,
                      array<T>                          &p,
+                     const array<bool>                 &used,
                      const array<T>                    &dp,
                      const T                            ftol,
                      callback                          *cb = 0
