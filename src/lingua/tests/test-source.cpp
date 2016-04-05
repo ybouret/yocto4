@@ -38,7 +38,7 @@ YOCTO_UNIT_TEST_IMPL(source)
     }
 
 
-    src.store(tkn); assert(0==tkn.size);
+    src.unread(tkn); assert(0==tkn.size);
     while( 0 != (ch=src.query()) )
     {
         tkn.push_back(ch);
@@ -50,7 +50,7 @@ YOCTO_UNIT_TEST_IMPL(source)
         throw exception("bad source.store/token!");
     }
 
-    src.unread(tkn); tkn.clear(); assert(0==tkn.size);
+    src.unread_a_copy_of(tkn); tkn.clear(); assert(0==tkn.size);
     while( 0 != (ch=src.query()) )
     {
         tkn.push_back(ch);

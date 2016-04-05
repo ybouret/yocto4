@@ -22,10 +22,10 @@ namespace yocto
             void    store(t_char *ch) throw();
 
             //! store a previously read token
-            void    store(token  &tkn) throw();
+            void    unread(token  &tkn) throw();
 
             //! unread a copy
-            void    unread(const token &tkn);
+            void    unread_a_copy_of(const token &tkn);
             
             //! attached a new input, save status
             void attach( ios::istream & );

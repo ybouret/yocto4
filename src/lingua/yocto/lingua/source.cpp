@@ -36,7 +36,7 @@ namespace yocto
         }
 
 
-        void source::store(token  &tkn) throw()
+        void source::unread(token  &tkn) throw()
         {
             while(tkn.size)
             {
@@ -44,7 +44,7 @@ namespace yocto
             }
         }
 
-        void source:: unread(const token &tkn)
+        void source:: unread_a_copy_of(const token &tkn)
         {
             for(const t_char *ch=tkn.tail;ch;ch=ch->prev)
             {
