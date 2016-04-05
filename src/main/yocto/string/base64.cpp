@@ -301,6 +301,7 @@ namespace yocto
 
     string base64:: Encode(const memory::ro_buffer &buff)
     {
+        YOCTO_LOCK(access);
         string ans;
         Encoder.clear();
         const size_t n = buff.length();
@@ -318,6 +319,7 @@ namespace yocto
 
     string base64::Decode(const memory::ro_buffer &buff)
     {
+        YOCTO_LOCK(access);
         string ans;
         Decoder.clear();
         const size_t n = buff.length();

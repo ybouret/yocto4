@@ -1,6 +1,7 @@
 #include "yocto/lingua/pattern.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/ios/osstream.hpp"
+#include "yocto/string/base64.hpp"
 
 namespace yocto
 {
@@ -38,7 +39,7 @@ namespace yocto
             fp << "}\n";
         }
 
-        string pattern:: binary() const
+        string pattern:: bin() const
         {
             string        ans;
             {
@@ -46,6 +47,13 @@ namespace yocto
                 save(fp);
             }
             return ans;
+        }
+
+        string pattern:: b64() const
+        {
+            static base64 &Base64 = base64::instance();
+            string s = bin();
+            return Base64.Encode(s);
         }
         
     }

@@ -45,7 +45,7 @@ YOCTO_UNIT_TEST_IMPL(pattern)
             ios::wcstream  fp( i->key + ".bin" );
             p.save(fp);
         }
-
+        std::cerr << "\t" << p.b64() << std::endl;
     }
 
 }

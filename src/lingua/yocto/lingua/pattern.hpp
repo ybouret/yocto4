@@ -35,7 +35,8 @@ namespace yocto
             // non virtual interface
             //__________________________________________________________________
             void   save(ios::ostream &) const; //!< write uuid and call __out
-            string binary() const;
+            string bin() const;
+            string b64() const;
             void graphviz(const string &filename) const;
 
         protected:
