@@ -24,14 +24,15 @@ namespace yocto
         public:
             inline ~RXCompiler() throw() {}
 
-            const char   *expr;
-            const char   *curr;
-            const char   *last;
-            int           depth;
-            const p_dict  dloc;
-            const p_dict *dict;
+            const char   *expr;  //!< for message is necessary
+            const char   *curr;  //!< current char
+            const char   *last;  //!< first invalid char
+            int           depth; //!< nesting level
+            const p_dict  dloc;  //!< local dictionary, empty
+            const p_dict *dict;  //!< user's or local dict
 
-            inline RXCompiler(const string &Expr, const p_dict *user_dict) throw() :
+            inline RXCompiler(const string &Expr,
+                              const p_dict *user_dict) throw() :
             expr( Expr.c_str() ),
             curr( expr ),
             last( expr + Expr.size() ),
