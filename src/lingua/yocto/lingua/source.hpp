@@ -1,0 +1,46 @@
+#ifndef YOCTO_LINGUA_SOURCE_INCLUDED
+#define YOCTO_LINGUA_SOURCE_INCLUDED 1
+
+#include "yocto/lingua/token.hpp"
+#include "yocto/ios/istream.hpp"
+#include "yocto/sequence/addr-list.hpp"
+namespace yocto
+{
+    namespace lingua
+    {
+        class source
+        {
+        public:
+            explicit source() throw();
+            explicit source(ios::istream&) throw();
+            virtual ~source() throw();
+
+            //! read a t_char from input(s)
+            t_char *query();
+
+            //! store a previously read t_char
+            void    store(t_char *ch) throw();
+
+            //! store a previously read token
+            void    store(token  &tkn) throw();
+
+            //! unread a copy
+            void    unread(const token &tkn);
+            
+            //! attached a new input, save status
+            void attach( ios::istream & );
+
+        private:
+            typedef addr_node<ios::istream> input_node;
+            typedef addr_list<ios::istream> input_list;
+
+            ios::istream *input;
+            token         cache;
+            input_list    attached;
+            t_char       *query_from_input();
+            YOCTO_DISABLE_COPY_AND_ASSIGN(source);
+        };
+    }
+}
+
+#endif
