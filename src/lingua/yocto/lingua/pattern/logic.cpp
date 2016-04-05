@@ -48,10 +48,18 @@ namespace yocto
 {
     namespace lingua
     {
-        AND::  AND() throw() : logical(UUID) {}
+        AND::  AND() throw() : logical(UUID)
+        {
+            YOCTO_LINGUA_PATTERN_IS(AND);
+        }
+
         AND:: ~AND() throw() {}
 
-        AND:: AND(const AND &other) : logical(other) {}
+        AND:: AND(const AND &other) :
+        logical(other)
+        {
+            YOCTO_LINGUA_PATTERN_IS(AND);
+        }
 
         pattern *AND:: clone() const
         {
@@ -99,10 +107,17 @@ namespace yocto
 {
     namespace lingua
     {
-        OR::  OR() throw() : logical(UUID) {}
+        OR::  OR() throw() : logical(UUID)
+        {
+            YOCTO_LINGUA_PATTERN_IS(OR);
+        }
+
         OR:: ~OR() throw() {}
 
-        OR:: OR(const OR &other) : logical(other) {}
+        OR:: OR(const OR &other) : logical(other)
+        {
+            YOCTO_LINGUA_PATTERN_IS(OR);
+        }
 
         pattern *OR:: clone() const
         {
@@ -145,10 +160,17 @@ namespace yocto
 {
     namespace lingua
     {
-        NONE::  NONE() throw() : logical(UUID) {}
+        NONE::  NONE() throw() : logical(UUID)
+        {
+            YOCTO_LINGUA_PATTERN_IS(NONE);
+        }
+
         NONE:: ~NONE() throw() {}
 
-        NONE:: NONE(const NONE &other) : logical(other) {}
+        NONE:: NONE(const NONE &other) : logical(other)
+        {
+            YOCTO_LINGUA_PATTERN_IS(NONE);
+        }
 
         pattern *NONE:: clone() const
         {

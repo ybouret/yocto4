@@ -43,10 +43,12 @@ namespace yocto
 
         optional:: optional(pattern *p) throw() : joker( UUID, p)
         {
+            YOCTO_LINGUA_PATTERN_IS(optional);
         }
 
         optional:: optional(const optional &other) : joker(other)
         {
+            YOCTO_LINGUA_PATTERN_IS(optional);
         }
 
         pattern *optional:: clone() const
@@ -105,10 +107,12 @@ namespace yocto
 
         zero_or_more:: zero_or_more(pattern *p) throw() : joker(UUID, p)
         {
+            YOCTO_LINGUA_PATTERN_IS(zero_or_more);
         }
 
         zero_or_more:: zero_or_more(const zero_or_more &other) : joker(other)
         {
+            YOCTO_LINGUA_PATTERN_IS(zero_or_more);
         }
 
         pattern *zero_or_more:: clone() const
@@ -169,10 +173,12 @@ namespace yocto
 
         one_or_more:: one_or_more(pattern *p) throw() : joker(UUID, p)
         {
+            YOCTO_LINGUA_PATTERN_IS(one_or_more);
         }
 
         one_or_more:: one_or_more(const one_or_more &other) : joker(other)
         {
+            YOCTO_LINGUA_PATTERN_IS(one_or_more);
         }
 
         pattern *one_or_more:: clone() const

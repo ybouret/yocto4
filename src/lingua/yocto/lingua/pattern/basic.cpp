@@ -11,6 +11,7 @@ namespace yocto
 
         any1:: any1() throw() : pattern( UUID )
         {
+            YOCTO_LINGUA_PATTERN_IS(any1);
         }
 
         pattern * any1:: clone() const
@@ -59,9 +60,16 @@ namespace yocto
         {
         }
 
-        single:: single(const char C) throw() : pattern(UUID), code(C) {}
+        single:: single(const char C) throw() : pattern(UUID), code(C)
+        {
+            YOCTO_LINGUA_PATTERN_IS(single);
+        }
 
-        single:: single(const single &other) throw() : pattern(other), code(other.code) {}
+        single:: single(const single &other) throw() :
+        pattern(other), code(other.code)
+        {
+            YOCTO_LINGUA_PATTERN_IS(single);
+        }
 
         single * single::create(const char C) { return new single(C); }
 
@@ -124,6 +132,7 @@ namespace yocto
         lower( min_of(lo,up) ),
         upper( max_of(lo,up) )
         {
+            YOCTO_LINGUA_PATTERN_IS(range);
         }
 
         range:: range(const range &other) throw() :
@@ -131,6 +140,7 @@ namespace yocto
         lower(other.lower),
         upper(other.upper)
         {
+            YOCTO_LINGUA_PATTERN_IS(range);
         }
 
         range * range::create(const uint8_t lo, const uint8_t up)

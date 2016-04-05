@@ -11,6 +11,7 @@ namespace yocto
     {
 
 #define YOCTO_LINGUA_PATTERN_MATCH_ARGS token &tkn, source &src
+#define YOCTO_LINGUA_PATTERN_IS(CLASS) assert(0==self); self = static_cast<CLASS *>(this)
 
         class pattern : public object
         {
@@ -18,6 +19,7 @@ namespace yocto
             pattern        *next;
             pattern        *prev;
             const uint32_t  uuid;
+            void           *self;
 
             virtual ~pattern() throw();
 
@@ -38,6 +40,9 @@ namespace yocto
             string bin() const;
             string b64() const;
             void graphviz(const string &filename) const;
+
+            static pattern *simplify(pattern *p) throw();
+
 
         protected:
             explicit pattern(const uint32_t) throw();

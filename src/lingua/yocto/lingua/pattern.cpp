@@ -14,7 +14,8 @@ namespace yocto
         pattern:: pattern(const uint32_t t) throw() :
         next(0),
         prev(0),
-        uuid(t)
+        uuid(t),
+        self(0)
         {
         }
 
