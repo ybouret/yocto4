@@ -1,5 +1,6 @@
 #include "yocto/lingua/pattern.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/ios/osstream.hpp"
 
 namespace yocto
 {
@@ -37,6 +38,15 @@ namespace yocto
             fp << "}\n";
         }
 
-
+        string pattern:: binary() const
+        {
+            string        ans;
+            {
+                ios::osstream fp(ans);
+                save(fp);
+            }
+            return ans;
+        }
+        
     }
 }

@@ -53,7 +53,7 @@ namespace yocto
             return (*pp)->clone();
         }
 
-
+        
 
 
     }
