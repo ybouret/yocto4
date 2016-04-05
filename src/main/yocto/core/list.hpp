@@ -128,7 +128,8 @@ namespace yocto
 			}
 			
 			inline void reset() throw() { head = tail = NULL; size=0; }
-					
+
+            //! assuming C++ node
             inline void auto_delete() throw()
             {
                 NODE *node = tail;
@@ -376,7 +377,46 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(list_of_cpp);
             
         };
-		
+
+        template <typename NODE>
+        class list_of_cloneable : public list_of<NODE>
+        {
+        public:
+            explicit list_of_cloneable() throw() : list_of<NODE>() {}
+
+            inline void clear() throw()
+            {
+                this->auto_delete();
+            }
+
+            virtual ~list_of_cloneable() throw()
+            {
+                clear();
+            }
+
+            //! valid only if a copy ctor is defined for NODE
+            list_of_cloneable( const list_of_cloneable &other ) : list_of<NODE> ()
+            {
+                try
+                {
+                    for(const NODE *node=other.head;node;node=node->next)
+                    {
+                        this->push_back( node->clone() );
+                    }
+                }
+                catch(...)
+                {
+                    clear();
+                    throw;
+                }
+            }
+
+        private:
+            YOCTO_DISABLE_ASSIGN(list_of_cloneable);
+
+        };
+
+
 	}
 	
 }

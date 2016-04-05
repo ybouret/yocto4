@@ -8,7 +8,7 @@ namespace yocto
 {
     namespace lingua
     {
-
+        
         //! a dynamic char
         class t_char
         {
