@@ -1,4 +1,5 @@
 #include "yocto/lingua/pattern.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 namespace yocto
 {
@@ -28,6 +29,14 @@ namespace yocto
             __out(fp);
         }
 
-        
+        void pattern:: graphviz(const string &filename) const
+        {
+            ios::wcstream fp(filename);
+            fp << "digraph G {\n";
+            __viz(fp);
+            fp << "}\n";
+        }
+
+
     }
 }

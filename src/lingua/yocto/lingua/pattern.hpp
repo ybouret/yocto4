@@ -35,7 +35,8 @@ namespace yocto
             // non virtual interface
             //__________________________________________________________________
             void save(ios::ostream &) const;
-            
+            void graphviz(const string &filename) const;
+
         protected:
             explicit pattern(const uint32_t) throw();
             pattern(const pattern &other) throw();
