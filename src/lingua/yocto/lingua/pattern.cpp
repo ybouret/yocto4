@@ -28,6 +28,6 @@ namespace yocto
             __out(fp);
         }
 
-
+        
     }
 }

@@ -30,25 +30,38 @@ namespace yocto
             graphviz_render(fn,delete_upon_success);
         }
 
-
-        string graphviz_encode(const string &label)
+        void graphviz_encode(const char c, ios::ostream &fp )
         {
             static const char bad[] = { 0x22, 0x5C, 0x00};
-            string ans;
-            for(size_t i=0;i<label.size();++i)
+            const uint8_t C(c);
+            if(C<32||C>126|| 0 != strchr(bad,c) )
             {
-                const uint8_t C(label[i]);
-                if(C<32||C>126|| 0 != strchr(bad,char(C)) )
-                {
-                    ans.append('x');
-                    ans.append( hexa_text[C] );
-                }
-                else
-                {
-                    ans.append(char(C));
-                }
+                fp << 'x';
+                fp << hexa_text[C];
             }
-            return ans;
+            else
+            {
+                fp << c;
+            }
+
+        }
+
+        void graphviz_encode(const char *label, ios::ostream &fp)
+        {
+            const size_t n = length_of(label);
+            for(size_t i=0;i<n;++i)
+            {
+                graphviz_encode(label[i],fp);
+            }
+        }
+
+        void graphviz_encode(const string &label, ios::ostream &fp)
+        {
+            const size_t n=label.size();
+            for(size_t i=0;i<n;++i)
+            {
+                graphviz_encode(label[i],fp);
+            }
         }
 
     }

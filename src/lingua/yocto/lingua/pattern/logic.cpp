@@ -1,4 +1,5 @@
 #include "yocto/lingua/pattern/logic.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {
@@ -16,7 +17,7 @@ namespace yocto
         pattern(other)
         {
         }
-        
+
         void logical:: __out(ios::ostream &fp) const
         {
             fp.emit<uint32_t>(operands.size);
@@ -25,6 +26,21 @@ namespace yocto
                 p->save(fp);
             }
         }
+
+        void logical:: add( pattern *p ) throw()
+        {
+            operands.push_back(p);
+        }
+
+        void logical:: __subviz(ios::ostream &fp) const
+        {
+            for(const pattern *p=operands.head;p;p=p->next)
+            {
+                p->__viz(fp);
+                fp.viz( (const pattern *)this ); fp << "->"; fp.viz(p); fp << ";\n";
+            }
+        }
+
     }
 }
 
@@ -69,6 +85,12 @@ namespace yocto
         }
 
 
+        void AND:: __viz(ios::ostream &fp) const
+        {
+            fp.viz((const pattern *)this);
+            fp << "[label=\"&&\",shape=house];\n";
+            __subviz(fp);
+        }
     }
 
 }
@@ -107,8 +129,15 @@ namespace yocto
             return false;
         }
 
+        void OR:: __viz(ios::ostream &fp) const
+        {
+            fp.viz((const pattern *)this);
+            fp << "[label=\"||\",shape=diamond];\n";
+            __subviz(fp);
+        }
+
     }
-    
+
 }
 
 
@@ -151,7 +180,60 @@ namespace yocto
             }
             return true;
         }
+
+        void NONE:: __viz(ios::ostream &fp) const
+        {
+            fp.viz((const pattern *)this);
+            fp << "[label=\"!!\",shape=triangle];\n";
+            __subviz(fp);
+        }
+
+    }
+
+}
+
+#include "yocto/lingua/pattern/basic.hpp"
+
+namespace yocto
+{
+    namespace lingua
+    {
+        logical * logical::among(const string &str)
+        {
+            auto_ptr<logical> p( OR::create() );
+            for( size_t i=0;i<str.size();++i)
+            {
+                p->add( single::create(str[i]) );
+            }
+            return p.yield();
+        }
+
+        logical *logical:: among(const char *str)
+        {
+            const string tmp(str);
+            return among(tmp);
+        }
+
+        logical * logical::equal(const string &str)
+        {
+            auto_ptr<logical> p( AND::create() );
+            for( size_t i=0;i<str.size();++i)
+            {
+                p->add( single::create(str[i]) );
+            }
+            return p.yield();
+        }
+
+        logical *logical:: equal(const char *str)
+        {
+            const string tmp(str);
+            return equal(tmp);
+        }
+        
+
     }
     
 }
+
+
 

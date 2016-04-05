@@ -1,4 +1,5 @@
 #include "yocto/lingua/pattern/basic.hpp"
+#include "yocto/ios/graphviz.hpp"
 
 namespace yocto
 {
@@ -39,9 +40,14 @@ namespace yocto
 
         void any1:: __out(ios::ostream &) const
         {
+            // do nothing
         }
 
-
+        void  any1:: __viz(ios::ostream &fp) const
+        {
+            fp.viz((const pattern *)this);
+            fp << "[label=\"ANY1\",shape=circle];\n";
+        }
     }
 }
 
@@ -89,7 +95,14 @@ namespace yocto
             fp.emit<uint8_t>(code);
         }
 
+        void  single:: __viz(ios::ostream &fp) const
+        {
+            fp.viz((const pattern *)this);
 
+            fp << "[label=\"";
+            ios::graphviz_encode(char(code),fp);
+            fp << "\",shape=square];\n";
+        }
     }
 
 
@@ -160,6 +173,16 @@ namespace yocto
             fp.emit<uint8_t>(upper);
         }
 
+
+        void range:: __viz(ios::ostream &fp) const
+        {
+            fp.viz( (const pattern *)this );
+            fp << "[label=\"";
+            ios::graphviz_encode(char(lower),fp);
+            fp << '-';
+            ios::graphviz_encode(char(upper),fp);
+            fp << "\",shape=note];\n";
+        }
     }
 
 }

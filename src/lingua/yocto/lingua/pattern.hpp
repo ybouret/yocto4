@@ -28,13 +28,14 @@ namespace yocto
             virtual pattern *clone() const = 0;                                 //!< cloning
             virtual bool     match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const = 0;  //!< matching
             virtual void     __out(ios::ostream &) const = 0;                   //!< output data without uuid
+            virtual void     __viz(ios::ostream &) const = 0;                   //!< output graphviz
 
             //__________________________________________________________________
             //
             // non virtual interface
             //__________________________________________________________________
             void save(ios::ostream &) const;
-
+            
         protected:
             explicit pattern(const uint32_t) throw();
             pattern(const pattern &other) throw();

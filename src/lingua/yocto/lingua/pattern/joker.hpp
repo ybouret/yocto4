@@ -3,7 +3,13 @@
 
 #include "yocto/lingua/pattern.hpp"
 
+namespace yocto
+{
+    namespace lingua
+    {
 
+    }
+}
 
 #endif
 
