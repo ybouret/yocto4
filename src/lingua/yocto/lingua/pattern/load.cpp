@@ -38,8 +38,8 @@ namespace yocto
                     return single::create( fp.read<uint8_t>() );
 
                 case range:: UUID: {
-                    const size_t lo = fp.read<uint32_t>();
-                    const size_t up = fp.read<uint32_t>();
+                    const uint8_t lo = fp.read<uint8_t>();
+                    const uint8_t up = fp.read<uint8_t>();
                     return range::create(lo,up);
                 }
                     
@@ -89,7 +89,7 @@ namespace yocto
                 default:
                     break;
             }
-            throw exception("pattern::load(unknown ID)");
+            throw exception("pattern::load(unknown ID=%08x)",uuid);
         }
     }
 }
