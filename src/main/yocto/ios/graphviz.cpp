@@ -32,17 +32,37 @@ namespace yocto
 
         void graphviz_encode(const char c, ios::ostream &fp )
         {
-            static const char bad[] = { 0x22, 0x5C, 0x00};
             const uint8_t C(c);
-            if(C<32||C>126|| 0 != strchr(bad,c) )
+            if(C>=127)
             {
-                fp << 'x';
-                fp << hexa_text[C];
+                fp << 'x' << hexa_text[C];
             }
             else
             {
-                fp << c;
+                if(C<32)
+                {
+                    switch(C)
+                    {
+                        case '\n': fp << "\\\\n"; break;
+                        case '\r': fp << "\\\\r"; break;
+                        case '\t': fp << "\\\\t"; break;
+                        default:
+                            fp << 'x' << hexa_text[C];
+                    }
+                }
+                else
+                {
+                    // C>=32&&C<127
+                    switch(c)
+                    {
+                        case '\\': fp << "\\\\";   break;
+                        case '\"': fp << "\\\""; break;
+                        default:
+                            fp << c;
+                    }
+                }
             }
+
 
         }
 

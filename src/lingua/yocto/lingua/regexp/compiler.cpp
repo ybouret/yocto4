@@ -55,6 +55,7 @@ namespace yocto
 #define LPAREN '('
 #define RPAREN ')'
 #define ALTERN '|'
+#define ESCAPE '\\'
 
             //__________________________________________________________________
             //
@@ -150,6 +151,15 @@ namespace yocto
 
                             //__________________________________________________
                             //
+                            // Escape sequence
+                            //__________________________________________________
+                        case ESCAPE:
+                            YRX_OUTPUT(Indent(); std::cerr << "ESC" << std::endl);
+                            p->add( SubEsc() );
+                            break;
+
+                            //__________________________________________________
+                            //
                             // default: single char...
                             //__________________________________________________
                         default:
@@ -198,6 +208,40 @@ namespace yocto
                 throw exception("%s: unexpected joker '%c'",fn,C);
             }
 
+            //__________________________________________________________________
+            //
+            //
+            // Sub Escape Sequence
+            //
+            //__________________________________________________________________
+            pattern *SubEsc()
+            {
+                assert(ESCAPE==curr[0]);
+                if(++curr>=last) throw exception("%s: unfinished escaped sequence",fn);
+                const char C = curr[0];
+                switch(C)
+                {
+                    case 'n': return single::create('\n');
+                    case 'r': return single::create('\r');
+                    case 't': return single::create('\t');
+
+                    case '+':
+                    case '*':
+                    case '?':
+                    case '(':
+                    case ')':
+                    case '[':
+                    case ']':
+                    case '\\':
+                    case '\'':
+                    case '\"':
+                        return single::create(C);
+
+                    default:
+                        break;
+                }
+                throw exception("%s: unknown escaped sequence",fn);
+            }
 
 
         private:
@@ -215,7 +259,7 @@ namespace yocto
     namespace lingua
     {
 
-
+        
         pattern * regexp::compile(const string &expr,const p_dict *dict)
         {
             RXCompiler        rxcmp(expr,dict);
