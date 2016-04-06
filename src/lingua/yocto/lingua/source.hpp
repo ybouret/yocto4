@@ -27,6 +27,8 @@ namespace yocto
             //! unread a copy
             void    unread_a_copy_of(const token &tkn);
             
+            bool    is_active();
+
             //! attached a new input, save status
             void attach( ios::istream & );
 

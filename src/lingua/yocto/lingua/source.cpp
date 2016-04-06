@@ -35,6 +35,19 @@ namespace yocto
             cache.push_front(ch);
         }
 
+        bool source:: is_active()
+        {
+            t_char *ch = query();
+            if(ch)
+            {
+                store(ch);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         void source::unread(token  &tkn) throw()
         {
