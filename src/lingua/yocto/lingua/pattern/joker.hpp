@@ -35,7 +35,7 @@ namespace yocto
         class optional : public joker
         {
         public:
-            static const uint32_t UUID = YOCTO_FOURCC(' ',' ',' ','?');
+            static const uint32_t UUID = YOCTO_FOURCC(' ',' ','?',' ');
             virtual ~optional() throw();
 
             //__________________________________________________________________

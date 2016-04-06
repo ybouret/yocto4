@@ -42,6 +42,7 @@ namespace yocto
             void graphviz(const string &filename) const;
 
             static pattern *simplify(pattern *p) throw();
+            static pattern *load(ios::istream &);
 
 
         protected:

@@ -25,8 +25,19 @@ YOCTO_UNIT_TEST_IMPL(regexp)
         ios::graphviz_render("rx.dot");
 
         {
+            std::cerr << "\tsaving..." << std::endl;
             ios::wcstream fp("rx.bin");
             p->save(fp);
+        }
+
+        {
+            ios::icstream fp("rx.bin");
+            auto_ptr<pattern> q( pattern::load(fp) );
+            std::cerr << "\tloading..." << std::endl;
+            const string p64 = p->b64();
+            const string q64 = q->b64();
+            std::cerr << "\t" << p64 << std::endl;
+            std::cerr << "\t" << q64 << std::endl;
         }
 
         ios::icstream fp( ios::cstdin );
