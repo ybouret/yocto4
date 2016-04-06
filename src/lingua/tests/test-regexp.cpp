@@ -14,6 +14,7 @@ YOCTO_UNIT_TEST_IMPL(regexp)
         auto_ptr<pattern> p( regexp::compile(expr) );
         p->graphviz("rx.dot");
         ios::graphviz_render("rx.dot");
+        
     }
 }
 YOCTO_UNIT_TEST_DONE()

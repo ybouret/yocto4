@@ -3,6 +3,7 @@
 #include "yocto/lingua/pattern/basic.hpp"
 #include "yocto/lingua/pattern/logic.hpp"
 #include "yocto/lingua/pattern/joker.hpp"
+#include "yocto/lingua/pattern/posix.hpp"
 
 #include "yocto/ptr/auto.hpp"
 #include "yocto/exception.hpp"
@@ -57,6 +58,10 @@ namespace yocto
 #define RPAREN ')'
 #define ALTERN '|'
 #define ESCAPE '\\'
+#define LBRACK '['
+#define RBRACK ']'
+#define LBRACE '{'
+#define RBRACE '}'
 
             //__________________________________________________________________
             //
@@ -139,16 +144,31 @@ namespace yocto
                             return q.yield();
                         } break;
 
+
+
                             //__________________________________________________
                             //
                             // simple jokers
                             //__________________________________________________
+                        case '.': p->add( posix::dot() ); break;
+
                         case '?':
                         case '+':
                         case '*':
                             YRX_OUTPUT(Indent(); std::cerr << "$'" << C << "'" << std::endl);
                             Jokerize(p->operands,C);
                             break;
+
+                            //__________________________________________________
+                            //
+                            // grouping
+                            //__________________________________________________
+                        case LBRACK:
+                            YRX_OUTPUT(Indent(); std::cerr << "<+grp>" << std::endl);
+                            p->add( SubGrp() );
+                            YRX_OUTPUT(Indent(); std::cerr << "<-grp>" << std::endl);
+                            break;
+
 
                             //__________________________________________________
                             //
@@ -240,6 +260,7 @@ namespace yocto
                     case '\"':
                     case '{':
                     case '}':
+                    case '.':
                         return single::create(C);
 
                         // hexadecimal
@@ -253,6 +274,12 @@ namespace yocto
                 throw exception("%s: unknown escaped sequence",fn);
             }
 
+            //__________________________________________________________________
+            //
+            //
+            // Sub Hexadecimal escape sequence
+            //
+            //__________________________________________________________________
             pattern *SubHex()
             {
                 assert('x'==curr[0]);
@@ -261,7 +288,7 @@ namespace yocto
                     throw exception("%s: missing first char for hexadecimal",fn);
                 }
 
-
+                // get hi byte
                 const char hiC = curr[0];
                 const int  hi = hex2dec(hiC);
                 if(hi<0)
@@ -269,6 +296,7 @@ namespace yocto
                     throw exception("%s: invalid first hex char '%c'", fn, hiC);
                 }
 
+                // get lo byte
                 if(++curr>=last)
                 {
                     throw exception("%s: missing second char for hexadecimal",fn);
@@ -279,11 +307,128 @@ namespace yocto
                 {
                     throw exception("%s: invalid second hex char '%c'", fn, loC);
                 }
+
+                // create single char...
                 const int C = hi*16+lo;
                 return single::create( uint8_t(C) );
             }
-            
 
+            //__________________________________________________________________
+            //
+            //
+            // group sequence
+            //
+            //__________________________________________________________________
+            pattern *SubGrp()
+            {
+                assert(LBRACK==curr[0]);
+
+                //______________________________________________________________
+                //
+                // let's find choice char
+                //______________________________________________________________
+                if(++curr>=last)
+                {
+                    throw exception("%s: unfinished group",fn);
+                }
+                const char choice = curr[0];
+
+                auto_ptr<logical> p;
+                switch(choice)
+                {
+                    case ':':
+                        return Posix();
+
+                    default:
+                        p.reset( OR::create() );
+                        break;
+                }
+
+                assert(p.is_valid());
+
+                //______________________________________________________________
+                //
+                // accumulation
+                //______________________________________________________________
+                while(curr<last)
+                {
+                    const char C = curr[0];
+                    switch(C)
+                    {
+                        case RBRACK:
+                            return Check(p.yield());
+
+                        case LBRACK:
+                            p->add( SubGrp() );
+                            break;
+
+                        default:
+                            p->add( single::create(C) );
+                    }
+
+
+                    ++curr;
+                }
+
+                throw exception("%s: unfinished group", fn);
+            }
+
+            //__________________________________________________________________
+            //
+            //
+            // find posix
+            //
+            //__________________________________________________________________
+            pattern *Posix()
+            {
+                assert(':'   ==curr[0]);
+                assert(LBRACK==curr[-1]);
+                const char *org   = ++curr;
+                bool        found = false;
+                while(curr<last)
+                {
+                    if(':'==curr[0]&&RBRACK==curr[1])
+                    {
+                        found = true;
+                        break;
+                    }
+                    ++curr;
+                }
+                if(!found)
+                {
+                    throw exception("%s: unifinished POSIX group",fn);
+                }
+                const string id(org,curr-org);
+                YRX_OUTPUT(Indent(); std::cerr << "=<:" << id << ":>" << std::endl);
+
+                ++curr;
+
+                if(id.size()<=0)
+                {
+                    throw exception("%s: empty POSIX name",fn);
+                }
+
+#define YRX_POSIX(NAME) if( #NAME == id ) return posix:: NAME()
+
+                YRX_POSIX(upper);
+                YRX_POSIX(lower);
+                YRX_POSIX(alpha);
+                YRX_POSIX(digit);
+                YRX_POSIX(alnum);
+                YRX_POSIX(xdigit);
+                YRX_POSIX(blank);
+                YRX_POSIX(space);
+                YRX_POSIX(punct);
+
+                YRX_POSIX(word);
+                YRX_POSIX(endl);
+                YRX_POSIX(dot);
+                YRX_POSIX(cstring);
+
+                throw exception("%s: unknowm POSIX name '%s'", fn, id.c_str());
+
+
+            }
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(RXCompiler);
@@ -309,7 +454,7 @@ namespace yocto
             {
                 throw exception("%s: unfininished sub-expression",fn);
             }
-            return p.yield();
+            return pattern::simplify(p.yield());
         }
         
         pattern * regexp::compile(const char *expr,const p_dict *dict)
