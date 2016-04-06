@@ -2,6 +2,8 @@
 #include "yocto/exception.hpp"
 #include "yocto/ptr/auto.hpp"
 
+#include <cctype>
+
 namespace yocto
 {
     namespace lingua
@@ -13,9 +15,23 @@ namespace yocto
         void p_dict :: define(const string &id, pattern *p)
         {
             const pattern_ptr q(p);
+            check_id(id);
             if( ! insert(id,q) )
             {
                 throw exception("lingua::p_dict.multiple('%s')", id.c_str());
+            }
+        }
+
+
+        void p_dict:: check_id(const string &id) const
+        {
+            if(id.size()<=0)
+            {
+                throw exception("p_dict: empty ID");
+            }
+            if(isdigit(id[0]))
+            {
+                throw exception("p_dict: ID starts with a digit!");
             }
         }
 

@@ -168,6 +168,14 @@ namespace yocto
 
                             //__________________________________________________
                             //
+                            // advanced jokers
+                            //__________________________________________________
+                        case LBRACE:
+                            Jokerize2(p->operands);
+                            break;
+
+                            //__________________________________________________
+                            //
                             // grouping
                             //__________________________________________________
                         case LBRACK:
@@ -234,6 +242,61 @@ namespace yocto
                         break;
                 }
                 throw exception("%s: unexpected joker '%c'",fn,C);
+            }
+
+            //__________________________________________________________________
+            //
+            //
+            // Advanced joker
+            //
+            //__________________________________________________________________
+            inline void Jokerize2( p_list &ops )
+            {
+                assert(LBRACE==curr[0]);
+                const char *org = ++curr;
+                bool found = false;
+                while(curr<last)
+                {
+                    if(RBRACE==curr[0])
+                    {
+                        found = true;
+                        break;
+                    }
+                    ++curr;
+                }
+                if(!found)
+                {
+                    throw exception("%s: unfinished brace",fn);
+                }
+                assert(RBRACE==curr[0]);
+                const string jk(org,curr-org);
+                YRX_OUTPUT(Indent(); std::cerr << "braces {" << jk << "}" << std::endl);
+
+                if(jk.size()<=0)
+                {
+                    throw exception("%s: empty braces",fn);
+                }
+
+                if(isdigit(jk[0]))
+                {
+                    //__________________________________________________________
+                    //
+                    // assume counting joker
+                    //__________________________________________________________
+                    throw exception("not implemented!");
+                }
+                else
+                {
+                    //__________________________________________________________
+                    //
+                    // assume substitution
+                    //__________________________________________________________
+                    assert(dict);
+                    const pattern_ptr *pp = dict->search(jk);
+                    if(!pp) throw exception("%s: undefined pattern '%s'", fn, jk.c_str());
+                    ops.push_back( (*pp)->clone() );
+                }
+
             }
 
             //__________________________________________________________________
@@ -586,3 +649,24 @@ namespace yocto
     }
     
 }
+
+
+namespace yocto
+{
+    namespace lingua
+    {
+        void p_dict:: define(const string &id, const string &expr)
+        {
+            define(id, regexp::compile(expr,this) );
+        }
+
+        void p_dict:: define(const char   *id, const char   *expr)
+        {
+            const string ID(id);
+            const string EXPR(expr);
+            define(ID,EXPR);
+        }
+    }
+
+}
+
