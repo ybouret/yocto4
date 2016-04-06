@@ -227,11 +227,11 @@ namespace yocto
                 switch(C)
                 {
                     case '+':
-                        ops.push_back( one_or_more ::create(ops.pop_back()) );
+                        ops.push_back( one_or_more(ops.pop_back()) );
                         return;
 
                     case '*':
-                        ops.push_back( zero_or_more::create(ops.pop_back()) );
+                        ops.push_back( zero_or_more(ops.pop_back()) );
                         return;
 
                     case '?':
@@ -269,7 +269,7 @@ namespace yocto
                     throw exception("%s: unfinished brace",fn);
                 }
                 assert(RBRACE==curr[0]);
-                const string jk(org,curr-org);
+                string jk(org,curr-org);
                 YRX_OUTPUT(Indent(); std::cerr << "braces {" << jk << "}" << std::endl);
 
                 if(jk.size()<=0)
@@ -283,7 +283,25 @@ namespace yocto
                     //
                     // assume counting joker
                     //__________________________________________________________
+                    if(ops.size<=0)
+                    {
+                        throw exception("%s: not pattern before braces!",fn);
+                    }
+
+                    char *ns = &jk[0];
+                    char *ms = (char *)strchr(ns,',');
+                    if(ms)
+                    {
+                        *(ms++) = 0;
+                    }
+                    std::cerr << "ns='" << ns << "'" << std::endl;
+                    if(ms)
+                    {
+                        std::cerr << "ms='" << ms << "'" << std::endl;
+                    }
+
                     throw exception("not implemented!");
+
                 }
                 else
                 {
@@ -389,7 +407,7 @@ namespace yocto
             // group sequence
             //
             //__________________________________________________________________
-            pattern *Grp()
+            inline pattern *Grp()
             {
                 assert(LBRACK==curr[0]);
 
@@ -522,7 +540,7 @@ namespace yocto
             // find posix
             //
             //__________________________________________________________________
-            pattern *Posix()
+            inline pattern *Posix()
             {
                 assert(':'   ==curr[0]);
                 assert(LBRACK==curr[-1]);
@@ -579,7 +597,7 @@ namespace yocto
             // Group Escape Sequence
             //
             //__________________________________________________________________
-            single *GrpEsc()
+            inline single *GrpEsc()
             {
                 assert(ESCAPE==curr[0]);
                 if(++curr>=last) throw exception("%s: unfinished escaped sequence",fn);
@@ -612,7 +630,16 @@ namespace yocto
                 throw exception("%s: unknown escaped sequence",fn);
             }
             
-            
+            //__________________________________________________________________
+            //
+            //
+            // Create Range
+            //
+            //__________________________________________________________________
+            inline void Range( p_list &ops )
+            {
+
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(RXCompiler);

@@ -12,7 +12,6 @@ namespace yocto
         {
         public:
             virtual ~joker() throw();
-            virtual void     __out(ios::ostream &) const;
 
         protected:
             joker(const uint32_t t, pattern *p) throw();
@@ -46,6 +45,7 @@ namespace yocto
             virtual bool     match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const;
             virtual pattern *clone() const;
             virtual void     __viz(ios::ostream &) const;
+            virtual void     __out(ios::ostream &) const;
 
             //__________________________________________________________________
             //
@@ -68,11 +68,13 @@ namespace yocto
 {
     namespace lingua
     {
-        class zero_or_more : public joker
+        class at_least : public joker
         {
         public:
-            static const uint32_t UUID = YOCTO_FOURCC(' ',' ',' ','*');
-            virtual ~zero_or_more() throw();
+            static const uint32_t UUID = YOCTO_FOURCC(' ','>','=',' ');
+            virtual ~at_least() throw();
+
+            const size_t nmin;
 
             //__________________________________________________________________
             //
@@ -81,59 +83,28 @@ namespace yocto
             virtual bool     match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const;
             virtual pattern *clone() const;
             virtual void     __viz(ios::ostream &) const;
+            virtual void     __out(ios::ostream &) const;
 
             //__________________________________________________________________
             //
             // non virtual interface
             //__________________________________________________________________
-            static zero_or_more *create(pattern *p);
+            static at_least *create(pattern *p,const size_t n);
 
         protected:
-            explicit zero_or_more(pattern *p) throw();
-            zero_or_more(const zero_or_more &other);
+            explicit at_least(pattern *p,const size_t n) throw();
+            at_least(const at_least &other);
 
 
         private:
-            YOCTO_DISABLE_ASSIGN(zero_or_more);
+            YOCTO_DISABLE_ASSIGN(at_least);
         };
+
+        pattern *zero_or_more(pattern *);
+        pattern *one_or_more(pattern *);
     }
 }
 
-
-namespace yocto
-{
-    namespace lingua
-    {
-        class one_or_more : public joker
-        {
-        public:
-            static const uint32_t UUID = YOCTO_FOURCC(' ',' ',' ','+');
-            virtual ~one_or_more() throw();
-
-            //__________________________________________________________________
-            //
-            // virtual interface
-            //__________________________________________________________________
-            virtual bool     match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const;
-            virtual pattern *clone() const;
-            virtual void     __viz(ios::ostream &) const;
-
-            //__________________________________________________________________
-            //
-            // non virtual interface
-            //__________________________________________________________________
-            static one_or_more *create(pattern *p);
-
-        protected:
-            explicit one_or_more(pattern *p) throw();
-            one_or_more(const one_or_more &other);
-
-
-        private:
-            YOCTO_DISABLE_ASSIGN(one_or_more);
-        };
-    }
-}
 
 
 namespace yocto

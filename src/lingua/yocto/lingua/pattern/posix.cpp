@@ -123,7 +123,7 @@ namespace yocto
                     q->add(hex.yield());
                 }
 
-                p->add( zero_or_more::create(q.yield()) );
+                p->add( zero_or_more(q.yield()) );
             }
 
             p->add( single::create('"'));

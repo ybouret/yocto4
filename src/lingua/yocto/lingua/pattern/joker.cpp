@@ -24,11 +24,7 @@ namespace yocto
         {
         }
 
-        void joker:: __out(ios::ostream &fp) const
-        {
-            motif->save(fp);
-        }
-
+        
     }
 }
 
@@ -91,6 +87,12 @@ namespace yocto
             }
         }
 
+        void optional:: __out(ios::ostream &fp) const
+        {
+            motif->save(fp);
+        }
+
+
     }
 
 }
@@ -101,31 +103,35 @@ namespace yocto
     namespace lingua
     {
 
-        zero_or_more:: ~zero_or_more() throw()
+        at_least:: ~at_least() throw()
         {
         }
 
-        zero_or_more:: zero_or_more(pattern *p) throw() : joker(UUID, p)
+        at_least:: at_least(pattern *p,const size_t n) throw() :
+        joker(UUID, p),
+        nmin(n)
         {
-            YOCTO_LINGUA_PATTERN_IS(zero_or_more);
+            YOCTO_LINGUA_PATTERN_IS(at_least);
         }
 
-        zero_or_more:: zero_or_more(const zero_or_more &other) : joker(other)
+        at_least:: at_least(const at_least &other) :
+        joker(other),
+        nmin(other.nmin)
         {
-            YOCTO_LINGUA_PATTERN_IS(zero_or_more);
+            YOCTO_LINGUA_PATTERN_IS(at_least);
         }
 
-        pattern *zero_or_more:: clone() const
+        pattern *at_least:: clone() const
         {
-            return new zero_or_more(*this);
+            return new at_least(*this);
         }
 
-        zero_or_more * zero_or_more:: create( pattern *p )
+        at_least * at_least:: create( pattern *p, const size_t n)
         {
             assert(p);
             try
             {
-                return new zero_or_more(p);
+                return new at_least(p,n);
             }
             catch(...)
             {
@@ -134,81 +140,21 @@ namespace yocto
             }
         }
 
-        void zero_or_more:: __viz(ios::ostream &fp) const
+        void at_least:: __viz(ios::ostream &fp) const
         {
             fp.viz( (const pattern *)this );
-            fp << "[label=\">=0\",shape=egg];\n";
+            fp("[label=\">=%u\",shape=egg];\n",unsigned(nmin));
             motif->__viz(fp);
             fp.viz( (const pattern *)this ); fp << "->"; fp.viz(motif); fp << ";\n";
         }
 
-        bool zero_or_more:: match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const
+        void at_least:: __out(ios::ostream &fp) const
         {
-            assert(0==tkn.size);
-            while(true)
-            {
-                token sub;
-                if(!motif->match(sub,src))
-                {
-                    assert(0==sub.size);
-                    break;
-                }
-                tkn.merge_back(sub);
-            }
-            return true;
+            fp.emit<uint32_t>(nmin);
+            motif->save(fp);
         }
-
-    }
-
-}
-
-namespace yocto
-{
-    namespace lingua
-    {
-
-        one_or_more:: ~one_or_more() throw()
-        {
-        }
-
-        one_or_more:: one_or_more(pattern *p) throw() : joker(UUID, p)
-        {
-            YOCTO_LINGUA_PATTERN_IS(one_or_more);
-        }
-
-        one_or_more:: one_or_more(const one_or_more &other) : joker(other)
-        {
-            YOCTO_LINGUA_PATTERN_IS(one_or_more);
-        }
-
-        pattern *one_or_more:: clone() const
-        {
-            return new one_or_more(*this);
-        }
-
-        one_or_more * one_or_more:: create( pattern *p )
-        {
-            assert(p);
-            try
-            {
-                return new one_or_more(p);
-            }
-            catch(...)
-            {
-                delete p;
-                throw;
-            }
-        }
-
-        void one_or_more:: __viz(ios::ostream &fp) const
-        {
-            fp.viz( (const pattern *)this );
-            fp << "[label=\">=1\",shape=egg];\n";
-            motif->__viz(fp);
-            fp.viz( (const pattern *)this ); fp << "->"; fp.viz(motif); fp << ";\n";
-        }
-
-        bool one_or_more:: match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const
+        
+        bool at_least:: match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const
         {
             assert(0==tkn.size);
             size_t count = 0;
@@ -223,7 +169,7 @@ namespace yocto
                 ++count;
                 tkn.merge_back(sub);
             }
-            if(count>0)
+            if(count>=nmin)
             {
                 return true;
             }
@@ -233,10 +179,21 @@ namespace yocto
                 return false;
             }
         }
-        
+
+        pattern *zero_or_more(pattern *p)
+        {
+            return at_least::create(p,0);
+        }
+
+        pattern *one_or_more(pattern *p)
+        {
+            return at_least::create(p,1);
+        }
+
     }
-    
+
 }
+
 
 #include "yocto/code/utils.hpp"
 
@@ -296,7 +253,7 @@ namespace yocto
         {
             fp.emit<uint32_t>(nmin);
             fp.emit<uint32_t>(nmax);
-            joker::__out(fp);
+            motif->save(fp);
         }
 
         bool counting:: match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const
