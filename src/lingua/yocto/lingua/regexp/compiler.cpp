@@ -8,6 +8,7 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/string/conv.hpp"
 
 #define YRX_VERBOSE 1
 
@@ -277,7 +278,9 @@ namespace yocto
                     throw exception("%s: empty braces",fn);
                 }
 
-                if(isdigit(jk[0]))
+                char *ns = &jk[0];
+                char *ms = (char *)strchr(ns,',');
+                if(isdigit(jk[0])||0!=ms)
                 {
                     //__________________________________________________________
                     //
@@ -288,19 +291,33 @@ namespace yocto
                         throw exception("%s: not pattern before braces!",fn);
                     }
 
-                    char *ns = &jk[0];
-                    char *ms = (char *)strchr(ns,',');
-                    if(ms)
+                    if(!ms)
                     {
-                        *(ms++) = 0;
+                        ms=ns+jk.size();
                     }
-                    std::cerr << "ns='" << ns << "'" << std::endl;
-                    if(ms)
+                    else
                     {
-                        std::cerr << "ms='" << ms << "'" << std::endl;
+                        *(ms++)=0;
                     }
 
-                    throw exception("not implemented!");
+                    std::cerr << "ns='" << ns << "'" << std::endl;
+                    std::cerr << "ms='" << ms << "'" << std::endl;
+
+                    const size_t nmin = (length_of(ns) > 0) ? strconv::to_size(ns,"nmin") : 0;
+                    YRX_OUTPUT(Indent(); std::cerr << "nmin=" << nmin << std::endl);
+
+                    if(length_of(ms)>0)
+                    {
+                        // make a counting/at_most
+                        const size_t nmax = strconv::to_size(ms,"nmax");
+                        YRX_OUTPUT(Indent(); std::cerr << "nmax=" << nmax << std::endl);
+                        ops.push_back( counting::create( ops.pop_back(), nmin, nmax) );
+                    }
+                    else
+                    {
+                        // make a at_least
+                        ops.push_back( at_least::create( ops.pop_back(), nmin) );
+                    }
 
                 }
                 else

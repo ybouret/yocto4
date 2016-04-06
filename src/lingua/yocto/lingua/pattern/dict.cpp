@@ -3,6 +3,7 @@
 #include "yocto/ptr/auto.hpp"
 
 #include <cctype>
+#include <cstring>
 
 namespace yocto
 {
@@ -32,6 +33,10 @@ namespace yocto
             if(isdigit(id[0]))
             {
                 throw exception("p_dict: ID starts with a digit!");
+            }
+            if(0!=strchr(&id[0],','))
+            {
+                throw exception("p_dict: found a ',' in ID");
             }
         }
 

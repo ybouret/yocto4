@@ -19,6 +19,7 @@ namespace yocto
             explicit p_dict() throw();
             virtual ~p_dict() throw();
 
+            //! id shouldn't start with a digit and posess a ','
             void define(const string &id, pattern *p);
             void define(const char   *id, pattern *p);
 
