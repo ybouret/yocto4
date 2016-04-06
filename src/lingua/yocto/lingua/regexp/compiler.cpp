@@ -7,6 +7,15 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/exception.hpp"
 
+#define YRX_VERBOSE 1
+
+#if YRX_VERBOSE ==1
+#include <iostream>
+#define YRX_OUTPUT(EXPR) do { EXPR; } while(false)
+#else
+#define YRX_OUTPUT(EXPR)
+#endif
+
 namespace yocto
 {
 
@@ -43,12 +52,42 @@ namespace yocto
 
             }
 
+#define LPAREN '('
+#define RPAREN ')'
 
             //__________________________________________________________________
             //
-            // start SubExpr
+            //
+            // check sub-expression
+            //
             //__________________________________________________________________
-            logical *SubExpr()
+            inline logical *Check( logical *p )
+            {
+                auto_ptr<logical> guard(p);
+                if(p->operands.size<=0)
+                {
+                    throw exception("%s: empty sub-expression!",fn);
+                }
+                return guard.yield();
+            }
+
+            //__________________________________________________________________
+            //
+            //
+            // start SubExpr
+            //
+            //__________________________________________________________________
+#if YRX_VERBOSE == 1
+            inline void Indent() const
+            {
+                for(int i=0;i<depth;++i)
+                {
+                    std::cerr << "  ";
+                }
+            }
+#endif
+
+            inline logical *SubExpr()
             {
 
                 auto_ptr<logical> p( AND::create() );
@@ -63,6 +102,22 @@ namespace yocto
 
                     switch(C)
                     {
+                            //__________________________________________________
+                            //
+                            // grouping
+                            //__________________________________________________
+                        case LPAREN: {
+                            YRX_OUTPUT(Indent(); std::cerr << "<+sub>@" << curr[0] << std::endl);
+                            ++depth;             // keep track
+                            ++curr;              // skip lparen
+                            p->add( SubExpr() ); // recursive call
+                        } break;
+
+                        case RPAREN : {
+                            if(--depth<0) throw exception("%s: extraneous '%c'", fn, RPAREN);
+                            YRX_OUTPUT(Indent(); std::cerr << "<sub/>@" << curr[0] << std::endl);
+                            return Check(p.yield());
+                        } break;
 
                             //__________________________________________________
                             //
@@ -71,6 +126,7 @@ namespace yocto
                         case '?':
                         case '+':
                         case '*':
+                            YRX_OUTPUT(Indent(); std::cerr << "$'" << C << "'" << std::endl);
                             Jokerize(p->operands,C);
                             break;
 
@@ -79,6 +135,7 @@ namespace yocto
                             // default: single char...
                             //__________________________________________________
                         default:
+                            YRX_OUTPUT(Indent(); std::cerr << '\'' << C << '\'' << std::endl);
                             p->add( single::create(C) );
                             break;
                     }
@@ -90,14 +147,16 @@ namespace yocto
                     //__________________________________________________________
                     ++curr;
                 }
-                return p.yield();
+                return Check(p.yield());
             }
 
             //__________________________________________________________________
             //
+            //
             // make simple Joker
+            //
             //__________________________________________________________________
-            void Jokerize( p_list &ops, const char C )
+            inline void Jokerize( p_list &ops, const char C )
             {
 
                 if(ops.size<1) throw exception("%s: no pattern before joker '%c'",fn,C);
@@ -137,12 +196,17 @@ namespace yocto
 {
     namespace lingua
     {
-        
-        
+
+
         pattern * regexp::compile(const string &expr,const p_dict *dict)
         {
-            RXCompiler rxcmp(expr,dict);
-            return rxcmp.SubExpr();
+            RXCompiler        rxcmp(expr,dict);
+            auto_ptr<pattern> p( rxcmp.SubExpr() );
+            if( rxcmp.depth != 0 )
+            {
+                throw exception("%s: unfininished sub-expression",fn);
+            }
+            return p.yield();
         }
         
         pattern * regexp::compile(const char *expr,const p_dict *dict)
