@@ -6,6 +6,7 @@
 
 #include "yocto/ptr/auto.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/code/utils.hpp"
 
 #define YRX_VERBOSE 1
 
@@ -221,10 +222,12 @@ namespace yocto
                 const char C = curr[0];
                 switch(C)
                 {
+                        // specific encoding
                     case 'n': return single::create('\n');
                     case 'r': return single::create('\r');
                     case 't': return single::create('\t');
 
+                        // special chars
                     case '+':
                     case '*':
                     case '?':
@@ -237,11 +240,47 @@ namespace yocto
                     case '\"':
                         return single::create(C);
 
+                        // hexadecimal
+                    case 'x':
+                        return SubHex();
+
+                        // unknown
                     default:
                         break;
                 }
                 throw exception("%s: unknown escaped sequence",fn);
             }
+
+            pattern *SubHex()
+            {
+                assert('x'==curr[0]);
+                if(++curr>=last)
+                {
+                    throw exception("%s: missing first char for hexadecimal",fn);
+                }
+
+
+                const char hiC = curr[0];
+                const int  hi = hex2dec(hiC);
+                if(hi<0)
+                {
+                    throw exception("%s: invalid first hex char '%c'", fn, hiC);
+                }
+
+                if(++curr>=last)
+                {
+                    throw exception("%s: missing second char for hexadecimal",fn);
+                }
+                const char loC = curr[0];
+                const int  lo  = hex2dec(loC);
+                if(lo<0)
+                {
+                    throw exception("%s: invalid second hex char '%c'", fn, loC);
+                }
+                const int C = hi*16+lo;
+                return single::create( uint8_t(C) );
+            }
+            
 
 
         private:

@@ -13,7 +13,7 @@ YOCTO_UNIT_TEST_IMPL(regexp)
         const string      expr = argv[1];
         auto_ptr<pattern> p( regexp::compile(expr) );
         p->graphviz("rx.dot");
-        ios::graphviz_render("rx.dot",false);
+        ios::graphviz_render("rx.dot");
     }
 }
 YOCTO_UNIT_TEST_DONE()
