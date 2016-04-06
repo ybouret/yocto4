@@ -238,6 +238,8 @@ namespace yocto
                     case '\\':
                     case '\'':
                     case '\"':
+                    case '{':
+                    case '}':
                         return single::create(C);
 
                         // hexadecimal
