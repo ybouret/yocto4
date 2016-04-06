@@ -35,13 +35,12 @@ YOCTO_UNIT_TEST_IMPL(regexp)
         {
             ios::imstream input(line);
             source        src(input);
-            token         tkn;
             while(src.is_active())
             {
+                token         tkn;
                 if(p->match(tkn,src))
                 {
                     std::cerr << "<" << tkn << ">";
-                    tkn.clear();
                 }
                 else
                 {
