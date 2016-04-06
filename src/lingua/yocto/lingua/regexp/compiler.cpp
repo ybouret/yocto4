@@ -31,14 +31,14 @@ namespace yocto
             const p_dict  dloc;  //!< local dictionary, empty
             const p_dict *dict;  //!< user's or local dict
 
-            inline RXCompiler(const string &Expr,
-                              const p_dict *user_dict) throw() :
-            expr( Expr.c_str() ),
+            inline RXCompiler(const string & _expr,
+                              const p_dict * _dict) throw() :
+            expr( _expr.c_str() ),
             curr( expr ),
-            last( expr + Expr.size() ),
+            last( expr + _expr.size() ),
             depth(0),
             dloc(),
-            dict( user_dict ? user_dict : &dloc )
+            dict( _dict ? _dict : &dloc )
             {
 
             }
@@ -66,7 +66,7 @@ namespace yocto
 
                             //__________________________________________________
                             //
-                            // jokers
+                            // simple jokers
                             //__________________________________________________
                         case '?':
                         case '+':
@@ -90,8 +90,6 @@ namespace yocto
                     //__________________________________________________________
                     ++curr;
                 }
-
-
                 return p.yield();
             }
 
@@ -106,13 +104,16 @@ namespace yocto
                 switch(C)
                 {
                     case '+':
-                        break;
+                        ops.push_back( one_or_more ::create(ops.pop_back()) );
+                        return;
 
                     case '*':
-                        break;
+                        ops.push_back( zero_or_more::create(ops.pop_back()) );
+                        return;
 
                     case '?':
-                        break;
+                        ops.push_back( optional    ::create(ops.pop_back()) );
+                        return;
 
                     default:
                         break;
