@@ -165,7 +165,7 @@ namespace yocto
                             //__________________________________________________
                         case LBRACK:
                             YRX_OUTPUT(Indent(); std::cerr << "<+grp>" << std::endl);
-                            p->add( SubGrp() );
+                            p->add( Grp() );
                             YRX_OUTPUT(Indent(); std::cerr << "<-grp>" << std::endl);
                             break;
 
@@ -235,7 +235,7 @@ namespace yocto
             // Sub Escape Sequence
             //
             //__________________________________________________________________
-            pattern *SubEsc()
+            single *SubEsc()
             {
                 assert(ESCAPE==curr[0]);
                 if(++curr>=last) throw exception("%s: unfinished escaped sequence",fn);
@@ -280,7 +280,7 @@ namespace yocto
             // Sub Hexadecimal escape sequence
             //
             //__________________________________________________________________
-            pattern *SubHex()
+            single *SubHex()
             {
                 assert('x'==curr[0]);
                 if(++curr>=last)
@@ -319,7 +319,7 @@ namespace yocto
             // group sequence
             //
             //__________________________________________________________________
-            pattern *SubGrp()
+            pattern *Grp()
             {
                 assert(LBRACK==curr[0]);
 
@@ -338,6 +338,11 @@ namespace yocto
                 {
                     case ':':
                         return Posix();
+
+                    case '^':
+                        p.reset( NONE::create() );
+                        ++curr;
+                        break;
 
                     default:
                         p.reset( OR::create() );
@@ -359,7 +364,11 @@ namespace yocto
                             return Check(p.yield());
 
                         case LBRACK:
-                            p->add( SubGrp() );
+                            p->add( Grp() );
+                            break;
+
+                        case ESCAPE:
+                            p->add( GrpEsc() );
                             break;
 
                         default:
@@ -429,6 +438,46 @@ namespace yocto
 
 
             }
+
+            //__________________________________________________________________
+            //
+            //
+            // Group Escape Sequence
+            //
+            //__________________________________________________________________
+            single *GrpEsc()
+            {
+                assert(ESCAPE==curr[0]);
+                if(++curr>=last) throw exception("%s: unfinished escaped sequence",fn);
+                const char C = curr[0];
+                switch(C)
+                {
+                        // specific encoding
+                    case 'n': return single::create('\n');
+                    case 'r': return single::create('\r');
+                    case 't': return single::create('\t');
+
+                        // special chars
+                    case '^':
+                    case '[':
+                    case ']':
+                    case '\\':
+                    case '\'':
+                    case '\"':
+                        return single::create(C);
+
+                        // hexadecimal
+                    case 'x':
+                        return SubHex();
+
+                        // unknown
+                    default:
+                        break;
+                }
+                throw exception("%s: unknown escaped sequence",fn);
+            }
+
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(RXCompiler);

@@ -4,21 +4,7 @@ namespace yocto
 {
     namespace lingua
     {
-#if 0
-        static inline
-        void simplify_logical(logical *p) throw()
-        {
-            assert(p);
-            p_list &ops = p->operands;
-            p_list stk;
-            while(ops.size)
-            {
-                stk.push_back( pattern::simplify(ops.pop_front()) );
-            }
-            ops.swap_with(stk);
-        }
-#endif
-
+        
         static inline
         pattern * __simplify( AND *p ) throw()
         {
