@@ -24,7 +24,7 @@ namespace yocto
     namespace lingua
     {
 
-        static const char fn[] = "regexp";
+        static const char fn[] = "regexp.compiler";
 
         //______________________________________________________________________
         //
@@ -51,7 +51,14 @@ namespace yocto
             dloc(),
             dict( _dict ? _dict : &dloc )
             {
-
+                for(const char *p=expr;p<last;++p)
+                {
+                    const uint8_t C(*p);
+                    if(C<32||C>126)
+                    {
+                        throw exception("%s: invalid char detected",fn);
+                    }
+                }
             }
 
 #define LPAREN '('
@@ -360,18 +367,82 @@ namespace yocto
                     const char C = curr[0];
                     switch(C)
                     {
+                            //__________________________________________________
+                            //
+                            // end of group
+                            //__________________________________________________
                         case RBRACK:
                             return Check(p.yield());
 
+                            //__________________________________________________
+                            //
+                            // recursive group...
+                            //__________________________________________________
                         case LBRACK:
                             p->add( Grp() );
                             break;
 
+                            //__________________________________________________
+                            //
+                            // escape sequence
+                            //__________________________________________________
                         case ESCAPE:
                             p->add( GrpEsc() );
                             break;
 
+                            //__________________________________________________
+                            //
+                            // range
+                            //__________________________________________________
+                        case '-': {
+
+                            //--------------------------------------------------
+                            // extract range start
+                            //--------------------------------------------------
+                            if(p->operands.size<=0)
+                            {
+                                throw exception("%s: no range start",fn);
+                            }
+                            auto_ptr<pattern> lhs(p->operands.pop_back());
+                            if(lhs->uuid!=single::UUID)
+                            {
+                                throw exception("%s: range start is not a single char",fn);
+                            }
+
+                            const uint8_t lo = static_cast<single *>(lhs->self)->code;
+                            YRX_OUTPUT(Indent();std::cerr << "range start: " << char(lo) << std::endl);
+
+                            //--------------------------------------------------
+                            // extract range end, skip '-'
+                            //--------------------------------------------------
+                            if(++curr>last)
+                            {
+                                throw exception("%s: unfinished range",fn);
+                            }
+
+                            uint8_t hi( curr[0] );
+                            if(LBRACK==hi)
+                            {
+                                throw exception("%s: range end cannot be '%c'",fn,LBRACK);
+                            }
+
+                            if(ESCAPE==hi)
+                            {
+                                auto_ptr<single> sg( GrpEsc() );
+                                hi=sg->code;
+                            }
+
+                            YRX_OUTPUT(Indent();std::cerr << "range end  : " << char(hi) << std::endl);
+                            p->add( range::create(lo, hi) );
+
+                        } break;
+
+                            //__________________________________________________
+                            //
+                            // single char
+                            //__________________________________________________
                         default:
+                            YRX_OUTPUT(Indent(); std::cerr << "'" << char(C) << "'" << std::endl);
                             p->add( single::create(C) );
                     }
 
@@ -459,33 +530,34 @@ namespace yocto
 
                         // special chars
                     case '^':
+                    case '-':
                     case '[':
                     case ']':
                     case '\\':
                     case '\'':
                     case '\"':
                         return single::create(C);
-
+                        
                         // hexadecimal
                     case 'x':
                         return SubHex();
-
+                        
                         // unknown
                     default:
                         break;
                 }
                 throw exception("%s: unknown escaped sequence",fn);
             }
-
-
-
+            
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(RXCompiler);
         };
-
-
+        
+        
     }
-
+    
 }
 
 
@@ -493,7 +565,7 @@ namespace yocto
 {
     namespace lingua
     {
-
+        
         
         pattern * regexp::compile(const string &expr,const p_dict *dict)
         {
