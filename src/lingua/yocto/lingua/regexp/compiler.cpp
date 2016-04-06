@@ -54,6 +54,7 @@ namespace yocto
 
 #define LPAREN '('
 #define RPAREN ')'
+#define ALTERN '|'
 
             //__________________________________________________________________
             //
@@ -117,6 +118,23 @@ namespace yocto
                             if(--depth<0) throw exception("%s: extraneous '%c'", fn, RPAREN);
                             YRX_OUTPUT(Indent(); std::cerr << "<sub/>@" << curr[0] << std::endl);
                             return Check(p.yield());
+                        } break;
+
+
+                            //__________________________________________________
+                            //
+                            // alternation
+                            //__________________________________________________
+                        case ALTERN: {
+                            YRX_OUTPUT(Indent(); std::cerr << ALTERN << std::endl);
+                            if(p->operands.size<=0) throw exception("%s: no left sub-expression before '%c'", fn, ALTERN);
+                            auto_ptr<logical> q( OR::create() );
+                            ++curr; // skip ALTERN
+                            logical *rhs = SubExpr();
+                            logical *lhs = p.yield();
+                            q->add(lhs);
+                            q->add(rhs);
+                            return q.yield();
                         } break;
 
                             //__________________________________________________
