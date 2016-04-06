@@ -136,7 +136,44 @@ namespace yocto
 }
 
 
+namespace yocto
+{
+    namespace lingua
+    {
+        class counting : public joker
+        {
+        public:
+            static const uint32_t UUID = YOCTO_FOURCC('{',' ',' ','}');
+            virtual ~counting() throw();
 
+            const size_t nmin;
+            const size_t nmax;
+            
+            //__________________________________________________________________
+            //
+            // virtual interface
+            //__________________________________________________________________
+            virtual bool     match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const;
+            virtual pattern *clone() const;
+            virtual void     __viz(ios::ostream &) const;
+            virtual void     __out(ios::ostream &) const;
+
+            //__________________________________________________________________
+            //
+            // non virtual interface
+            //__________________________________________________________________
+            static counting *create(pattern *p,const size_t,const size_t);
+
+        protected:
+            explicit counting(pattern *p,const size_t,const size_t) throw();
+            counting(const counting &other);
+
+
+        private:
+            YOCTO_DISABLE_ASSIGN(counting);
+        };
+    }
+}
 
 
 

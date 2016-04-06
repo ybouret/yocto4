@@ -30,7 +30,7 @@ YOCTO_UNIT_TEST_IMPL(regexp)
         }
 
         ios::icstream fp( ios::cstdin );
-        string line;
+        string        line;
         while( (std::cerr << "> ").flush(), line.clear(), fp.gets(line) )
         {
             ios::imstream input(line);
