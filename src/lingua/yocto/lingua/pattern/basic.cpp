@@ -5,11 +5,35 @@ namespace yocto
 {
     namespace lingua
     {
+        one_char:: ~one_char() throw()
+        {
+        }
+
+        one_char:: one_char(const uint32_t t) throw() : pattern(t)
+        {
+        }
+
+        one_char:: one_char(const one_char &other) throw() : pattern(other)
+        {
+        }
+
+
+        bool one_char:: match_empty() const
+        {
+            return false;
+        }
+    }
+}
+
+namespace yocto
+{
+    namespace lingua
+    {
         any1:: ~any1() throw()
         {
         }
 
-        any1:: any1() throw() : pattern( UUID )
+        any1:: any1() throw() : one_char( UUID )
         {
             YOCTO_LINGUA_PATTERN_IS(any1);
         }
@@ -60,13 +84,13 @@ namespace yocto
         {
         }
 
-        single:: single(const char C) throw() : pattern(UUID), code(C)
+        single:: single(const char C) throw() : one_char(UUID), code(C)
         {
             YOCTO_LINGUA_PATTERN_IS(single);
         }
 
         single:: single(const single &other) throw() :
-        pattern(other), code(other.code)
+        one_char(other), code(other.code)
         {
             YOCTO_LINGUA_PATTERN_IS(single);
         }
@@ -128,7 +152,7 @@ namespace yocto
         }
 
         range:: range(const uint8_t lo, const uint8_t up) throw() :
-        pattern(UUID),
+        one_char(UUID),
         lower( min_of(lo,up) ),
         upper( max_of(lo,up) )
         {
@@ -136,7 +160,7 @@ namespace yocto
         }
 
         range:: range(const range &other) throw() :
-        pattern(other),
+        one_char(other),
         lower(other.lower),
         upper(other.upper)
         {

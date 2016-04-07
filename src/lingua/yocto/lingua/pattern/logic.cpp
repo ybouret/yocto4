@@ -99,6 +99,24 @@ namespace yocto
             fp << "[label=\"&&\",shape=house];\n";
             __subviz(fp);
         }
+
+        bool AND:: match_empty() const
+        {
+            for(const pattern *p=operands.head;p;p=p->next)
+            {
+                if(p->match_empty())
+                {
+                    continue;
+                }
+                else
+                {
+                    // one of the requested operand doesn't match empty
+                    return false;
+                }
+            }
+            return true;
+        }
+
     }
 
 }
@@ -150,6 +168,20 @@ namespace yocto
             fp << "[label=\"||\",shape=diamond];\n";
             __subviz(fp);
         }
+
+        bool OR:: match_empty() const
+        {
+            // if one of the operands accept empty => true
+            for(const pattern *p=operands.head;p;p=p->next)
+            {
+                if(p->match_empty())
+                {
+                    return true;;
+                }
+            }
+            return false;
+        }
+
 
     }
 
@@ -208,6 +240,11 @@ namespace yocto
             fp.viz((const pattern *)this);
             fp << "[label=\"!!\",shape=triangle];\n";
             __subviz(fp);
+        }
+
+        bool NONE:: match_empty() const
+        {
+            return false;
         }
 
     }

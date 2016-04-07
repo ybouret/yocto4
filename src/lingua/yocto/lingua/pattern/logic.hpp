@@ -62,6 +62,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual bool     match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const;
             virtual void     __viz(ios::ostream &) const;
+            virtual bool     match_empty() const;
 
             static AND *create();
 
@@ -96,6 +97,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual bool     match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const;
             virtual void     __viz(ios::ostream &) const;
+            virtual bool     match_empty() const;
 
             static OR *create();
 
@@ -130,6 +132,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual bool     match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const;
             virtual void     __viz(ios::ostream &) const;
+            virtual bool     match_empty() const;
 
             static NONE *create();
 

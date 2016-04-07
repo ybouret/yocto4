@@ -8,7 +8,34 @@ namespace yocto
     namespace lingua
     {
 
-        class any1 : public pattern
+        //! base class for accepting one char...
+        class one_char : public pattern
+        {
+        public:
+            virtual ~one_char() throw();
+
+            virtual  bool match_empty() const;
+
+        protected:
+            one_char( const uint32_t t ) throw();
+            one_char(const one_char &other) throw();
+
+
+        private:
+            YOCTO_DISABLE_ASSIGN(one_char);
+        };
+
+    }
+
+}
+
+
+namespace yocto
+{
+    namespace lingua
+    {
+
+        class any1 : public one_char
         {
         public:
             static const uint32_t UUID = YOCTO_FOURCC('A','N','Y','1');
@@ -44,7 +71,7 @@ namespace yocto
 {
     namespace lingua
     {
-        class single : public pattern
+        class single : public one_char
         {
         public:
             static const uint32_t UUID = YOCTO_FOURCC('S', 'N', 'G', 'L');
@@ -81,7 +108,7 @@ namespace yocto
 {
     namespace lingua
     {
-        class range : public pattern
+        class range : public one_char
         {
         public:
             static const uint32_t UUID = YOCTO_FOURCC('R', 'N', 'G', 'E');

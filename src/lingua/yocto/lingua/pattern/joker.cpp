@@ -93,6 +93,11 @@ namespace yocto
         }
 
 
+        bool optional:: match_empty() const
+        {
+            return true;
+        }
+
     }
 
 }
@@ -177,6 +182,19 @@ namespace yocto
             {
                 assert(0==tkn.size);
                 return false;
+            }
+        }
+
+
+        bool at_least:: match_empty() const
+        {
+            if(nmin<=0)
+            {
+                return true;
+            }
+            else
+            {
+                return motif->match_empty();
             }
         }
 
@@ -281,7 +299,20 @@ namespace yocto
                 return false;
             }
         }
-        
+
+
+        bool counting:: match_empty() const
+        {
+            if(nmin<=0)
+            {
+                return true;
+            }
+            else
+            {
+                return motif->match_empty();
+            }
+        }
+
     }
     
 }

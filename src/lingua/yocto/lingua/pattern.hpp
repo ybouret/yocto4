@@ -31,7 +31,7 @@ namespace yocto
             virtual bool     match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const = 0;  //!< matching
             virtual void     __sav(ios::ostream &) const = 0;                   //!< output data without uuid
             virtual void     __viz(ios::ostream &) const = 0;                   //!< output graphviz
-
+            virtual bool     match_empty()         const = 0;                   //!< check is may return empty token
             //__________________________________________________________________
             //
             // non virtual interface

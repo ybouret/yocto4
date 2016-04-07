@@ -46,6 +46,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     __viz(ios::ostream &) const;
             virtual void     __sav(ios::ostream &) const;
+            virtual bool     match_empty() const;
 
             //__________________________________________________________________
             //
@@ -84,6 +85,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     __viz(ios::ostream &) const;
             virtual void     __sav(ios::ostream &) const;
+            virtual bool     match_empty() const;
 
             //__________________________________________________________________
             //
@@ -128,6 +130,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     __viz(ios::ostream &) const;
             virtual void     __sav(ios::ostream &) const;
+            virtual bool     match_empty() const;
 
             //__________________________________________________________________
             //
