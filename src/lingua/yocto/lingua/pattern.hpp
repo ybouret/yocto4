@@ -29,7 +29,7 @@ namespace yocto
             //__________________________________________________________________
             virtual pattern *clone() const = 0;                                 //!< cloning
             virtual bool     match(YOCTO_LINGUA_PATTERN_MATCH_ARGS) const = 0;  //!< matching
-            virtual void     __out(ios::ostream &) const = 0;                   //!< output data without uuid
+            virtual void     __sav(ios::ostream &) const = 0;                   //!< output data without uuid
             virtual void     __viz(ios::ostream &) const = 0;                   //!< output graphviz
 
             //__________________________________________________________________

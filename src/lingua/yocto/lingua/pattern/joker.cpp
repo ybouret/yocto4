@@ -87,7 +87,7 @@ namespace yocto
             }
         }
 
-        void optional:: __out(ios::ostream &fp) const
+        void optional:: __sav(ios::ostream &fp) const
         {
             motif->save(fp);
         }
@@ -148,7 +148,7 @@ namespace yocto
             fp.viz( (const pattern *)this ); fp << "->"; fp.viz(motif); fp << ";\n";
         }
 
-        void at_least:: __out(ios::ostream &fp) const
+        void at_least:: __sav(ios::ostream &fp) const
         {
             fp.emit<uint32_t>(nmin);
             motif->save(fp);
@@ -249,7 +249,7 @@ namespace yocto
             fp.viz( (const pattern *)this ); fp << "->"; fp.viz(motif); fp << ";\n";
         }
 
-        void counting:: __out(ios::ostream &fp) const
+        void counting:: __sav(ios::ostream &fp) const
         {
             fp.emit<uint32_t>(nmin);
             fp.emit<uint32_t>(nmax);

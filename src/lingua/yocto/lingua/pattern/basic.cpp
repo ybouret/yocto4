@@ -39,7 +39,7 @@ namespace yocto
             }
         }
 
-        void any1:: __out(ios::ostream &) const
+        void any1:: __sav(ios::ostream &) const
         {
             // do nothing
         }
@@ -98,7 +98,7 @@ namespace yocto
             }
         }
 
-        void single:: __out(ios::ostream &fp) const
+        void single:: __sav(ios::ostream &fp) const
         {
             fp.emit<uint8_t>(code);
         }
@@ -177,7 +177,7 @@ namespace yocto
             }
         }
 
-        void range:: __out(ios::ostream &fp) const
+        void range:: __sav(ios::ostream &fp) const
         {
             fp.emit<uint8_t>(lower);
             fp.emit<uint8_t>(upper);

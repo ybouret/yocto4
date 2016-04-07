@@ -18,7 +18,7 @@ namespace yocto
         {
         }
 
-        void logical:: __out(ios::ostream &fp) const
+        void logical:: __sav(ios::ostream &fp) const
         {
             fp.emit<uint32_t>(operands.size);
             for(const pattern *p=operands.head;p;p=p->next)

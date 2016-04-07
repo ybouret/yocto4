@@ -29,7 +29,7 @@ namespace yocto
         void pattern:: save(ios::ostream &fp) const
         {
             fp.emit<uint32_t>(uuid);
-            __out(fp);
+            __sav(fp);
         }
 
         void pattern:: graphviz(const string &filename) const

@@ -18,7 +18,7 @@ namespace yocto
             // virtual interface
             //__________________________________________________________________
             virtual ~logical() throw();
-            virtual void __out(ios::ostream &fp) const;
+            virtual void __sav(ios::ostream &fp) const;
 
             //__________________________________________________________________
             //
