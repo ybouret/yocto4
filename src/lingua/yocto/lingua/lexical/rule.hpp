@@ -24,24 +24,22 @@ namespace yocto
                 rule              *next;   //!< for list
                 rule              *prev;   //!< for list
                 const string       label;  //!< identifier
-                const pattern     *motif;  //!< the matcher
+                const pattern::ptr motif;  //!< the matcher
                 const action       apply;  //!< what to do if win
                 const bool         ctrl;   //!< is it a control rule ?
 
                 virtual ~rule() throw();
-
-                static rule *create(const string &id,
-                                    pattern      *p,
-                                    const action &a,
-                                    const bool    is_control);
-
-
-            private:
-                explicit rule(const string &id,
-                              pattern      *p,
-                              const action &a,
-                              const bool    is_control
+                
+                explicit rule(const string       &rule_id,
+                              const pattern::ptr &user_pattern,
+                              const action       &user_action,
+                              const bool          is_control
                               );
+
+
+                
+            private:
+
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
             };
             

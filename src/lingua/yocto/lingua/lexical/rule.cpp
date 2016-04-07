@@ -9,43 +9,23 @@ namespace yocto
 
             rule:: ~rule() throw()
             {
-                assert(0!=motif);
-                delete motif;
-                motif = 0;
             }
 
 
-            rule:: rule(const string &id,
-                        pattern      *p,
-                        const action &a,
-                        const bool    flag) :
+            rule:: rule(const string       &rule_id,
+                        const pattern::ptr &user_pattern,
+                        const action       &user_action,
+                        const bool          is_control) :
             next(0),
             prev(0),
-            label(id),
-            motif(p),
-            apply(a),
-            ctrl(flag)
+            label(rule_id),
+            motif(user_pattern),
+            apply(user_action),
+            ctrl(is_control)
             {
-                assert(0!=motif);
             }
 
 
-            rule * rule::create(const string &id,
-                                pattern      *p,
-                                const action &a,
-                                const bool    is_control)
-            {
-                assert(0!=p);
-                try
-                {
-                    return new rule(id,p,a,is_control);
-                }
-                catch(...)
-                {
-                    delete p;
-                    throw;
-                }
-            }
             
         }
     }
