@@ -15,6 +15,7 @@ namespace yocto
             /**
              - if it returns true,  the lexeme is emitted
              - if it returns false, the token is dicarded
+             a control rule MUST return false
              */
             typedef functor<bool,TL1(const token&)> action;
 
@@ -37,7 +38,7 @@ namespace yocto
                               );
 
 
-                
+
             private:
 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
