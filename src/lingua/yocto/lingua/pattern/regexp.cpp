@@ -44,7 +44,7 @@ namespace yocto
             const p_dict *dict;  //!< user's or local dict
 
             inline RXCompiler(const string & _expr,
-                              const p_dict * _dict) throw() :
+                              const p_dict * _dict)  :
             expr( _expr.c_str() ),
             curr( expr ),
             last( expr + _expr.size() ),
