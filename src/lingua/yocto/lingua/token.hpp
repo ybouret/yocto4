@@ -1,5 +1,5 @@
 #ifndef YOCTO_LINGUA_TOKEN_INCLUDED
-#define YOCTP_LINGUA_TOKEN_INCLUDED 1
+#define YOCTO_LINGUA_TOKEN_INCLUDED 1
 
 #include "yocto/string.hpp"
 #include "yocto/core/list.hpp"

@@ -3,6 +3,8 @@
 
 #include "yocto/lingua/lexical/rule.hpp"
 #include "yocto/lingua/pattern/regexp.hpp"
+#include "yocto/lingua/lexeme.hpp"
+
 #include "yocto/ptr/intr.hpp"
 
 namespace yocto
