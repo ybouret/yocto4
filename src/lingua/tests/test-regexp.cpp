@@ -1,4 +1,4 @@
-#include "yocto/lingua/regexp/compiler.hpp"
+#include "yocto/lingua/pattern/regexp.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ios/graphviz.hpp"
@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(regexp)
     if(argc>1)
     {
         const string      expr = argv[1];
-        auto_ptr<pattern> p( regexp::compile(expr,&dict) );
+        auto_ptr<pattern> p( regexp(expr,&dict) );
         p->graphviz("rx.dot");
         ios::graphviz_render("rx.dot");
 

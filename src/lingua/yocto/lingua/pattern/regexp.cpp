@@ -1,4 +1,4 @@
-#include "yocto/lingua/regexp/compiler.hpp"
+#include "yocto/lingua/pattern/regexp.hpp"
 
 #include "yocto/lingua/pattern/basic.hpp"
 #include "yocto/lingua/pattern/logic.hpp"
@@ -25,7 +25,7 @@ namespace yocto
     namespace lingua
     {
 
-        static const char fn[] = "regexp.compiler";
+        static const char fn[] = "regexp";
 
         //______________________________________________________________________
         //
@@ -674,7 +674,7 @@ namespace yocto
     {
         
         
-        pattern * regexp::compile(const string &expr,const p_dict *dict)
+        pattern * regexp(const string &expr,const p_dict *dict)
         {
             RXCompiler        rxcmp(expr,dict);
             auto_ptr<pattern> p( rxcmp.SubExpr() );
@@ -685,10 +685,10 @@ namespace yocto
             return pattern::simplify(p.yield());
         }
         
-        pattern * regexp::compile(const char *expr,const p_dict *dict)
+        pattern * regexp(const char *expr,const p_dict *dict)
         {
-            const string Expr(expr);
-            return compile(Expr,dict);
+            const  string Expr(expr);
+            return regexp(Expr,dict);
         }
     }
     
@@ -701,7 +701,7 @@ namespace yocto
     {
         void p_dict:: define(const string &id, const string &expr)
         {
-            define(id, regexp::compile(expr,this) );
+            define(id, regexp(expr,this) );
         }
 
         void p_dict:: define(const char   *id, const char   *expr)
