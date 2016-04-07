@@ -328,7 +328,7 @@ namespace yocto
                     // assume substitution
                     //__________________________________________________________
                     assert(dict);
-                    const pattern_ptr *pp = dict->search(jk);
+                    const pattern::ptr *pp = dict->search(jk);
                     if(!pp) throw exception("%s: undefined pattern '%s'", fn, jk.c_str());
                     ops.push_back( (*pp)->clone() );
                 }

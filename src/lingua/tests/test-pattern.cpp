@@ -48,5 +48,7 @@ YOCTO_UNIT_TEST_IMPL(pattern)
         std::cerr << "\t" << p.b64() << std::endl;
     }
 
+    std::cerr << "sizeof(pattern)=" << sizeof(pattern) << std::endl;
+
 }
 YOCTO_UNIT_TEST_DONE()

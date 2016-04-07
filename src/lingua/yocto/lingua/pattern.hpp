@@ -4,6 +4,8 @@
 #include "yocto/lingua/source.hpp"
 #include "yocto/code/fourcc.hpp"
 #include "yocto/ios/ostream.hpp"
+#include "yocto/counted-object.hpp"
+#include "yocto/ptr/arc.hpp"
 
 namespace yocto
 {
@@ -13,9 +15,10 @@ namespace yocto
 #define YOCTO_LINGUA_PATTERN_MATCH_ARGS token &tkn, source &src
 #define YOCTO_LINGUA_PATTERN_IS(CLASS) assert(0==self); self = static_cast<CLASS *>(this)
 
-        class pattern : public object
+        class pattern : public counted_object
         {
         public:
+            typedef arc_ptr<pattern> ptr; //!< smart pointer for dict/rules...
             pattern        *next;
             pattern        *prev;
             const uint32_t  uuid;

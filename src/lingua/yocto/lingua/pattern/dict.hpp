@@ -3,14 +3,12 @@
 
 #include "yocto/lingua/pattern.hpp"
 #include "yocto/associative/map.hpp"
-#include "yocto/ptr/shared.hpp"
 
 namespace yocto
 {
     namespace lingua
     {
-        typedef shared_ptr<pattern>         pattern_ptr;
-        typedef map<string,pattern_ptr>     pattern_db;
+        typedef map<string,pattern::ptr>  pattern_db;
 
         //! simple dictionary
         class p_dict : public pattern_db

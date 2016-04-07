@@ -15,7 +15,7 @@ namespace yocto
 
         void p_dict :: define(const string &id, pattern *p)
         {
-            const pattern_ptr q(p);
+            const pattern::ptr q(p);
             check_id(id);
             if( ! insert(id,q) )
             {
@@ -49,7 +49,7 @@ namespace yocto
 
         pattern * p_dict:: operator[](const string &id) const
         {
-            const pattern_ptr *pp = search(id);
+            const pattern::ptr *pp = search(id);
             if(!pp)
             {
                 throw exception("undeclared pattern '%s'", id.c_str());
