@@ -9,6 +9,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/string/conv.hpp"
+#include <cstring>
 
 #define YRX_VERBOSE 1
 

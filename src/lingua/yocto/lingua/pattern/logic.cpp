@@ -10,11 +10,13 @@ namespace yocto
         }
 
         logical:: logical(const uint32_t t) throw() :
-        pattern(t)
+        pattern(t),
+	operands()
         {}
 
         logical:: logical(const logical &other) :
-        pattern(other)
+        pattern(other),
+	operands()
         {
         }
 

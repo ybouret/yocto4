@@ -22,7 +22,8 @@ namespace yocto
         pattern:: pattern(const pattern &other) throw() :
         next(0),
         prev(0),
-        uuid(other.uuid)
+        uuid(other.uuid),
+	self(0)
         {
         }
 
