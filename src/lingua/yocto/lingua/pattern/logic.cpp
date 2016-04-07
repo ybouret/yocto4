@@ -262,7 +262,8 @@ namespace yocto
         logical * logical::among(const string &str)
         {
             auto_ptr<logical> p( OR::create() );
-            for( size_t i=0;i<str.size();++i)
+            const size_t n = str.size();
+            for( size_t i=0;i<n;++i)
             {
                 p->add( single::create(str[i]) );
             }
@@ -278,7 +279,8 @@ namespace yocto
         logical * logical::equal(const string &str)
         {
             auto_ptr<logical> p( AND::create() );
-            for( size_t i=0;i<str.size();++i)
+            const size_t n = str.size();
+            for( size_t i=0;i<n;++i)
             {
                 p->add( single::create(str[i]) );
             }

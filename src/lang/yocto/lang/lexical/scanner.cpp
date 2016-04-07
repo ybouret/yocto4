@@ -124,8 +124,8 @@ namespace yocto
             {
                 make(label,"[:endl:]", this, &scanner::newline);
             }
-            
+
         }
-        
+
     }
 }
