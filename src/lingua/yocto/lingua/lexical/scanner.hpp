@@ -66,14 +66,18 @@ namespace yocto
                 bool discard(const token&) throw(); //!< return false
                 bool newline(const token&) throw(); //!< increase line, return false
 
-#define YOCTO_LINGUA_SCANNER_DEF(METH,FUNC) \
-inline void METH(const string &label, const string &expr) { make(label,expr,this, &scanner:: FUNC); } \
-inline void METH(const char   *label, const char   *expr) { make(label,expr,this, &scanner:: FUNC); }
+                void emit(const string &label, const string &expr); //!< will produce token
+                void emit(const char   *label, const char   *expr); //!< will produce token
 
-                YOCTO_LINGUA_SCANNER_DEF(emit,forward)
-                YOCTO_LINGUA_SCANNER_DEF(drop,discard)
-                void endl(const string &label);
-                void endl(const char   *label);
+                void drop(const string &label, const string &expr); //!< will discard token
+                void drop(const char   *label, const char   *expr); //!< will discard token
+
+                void endl(const string &label); //!< silent endl
+                void endl(const char   *label); //!< silent endl
+
+
+                
+
 
             protected:
                 lexer  *lex;  //!< the line ref must match !

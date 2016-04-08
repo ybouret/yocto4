@@ -67,6 +67,26 @@ namespace yocto
                 rules.push_back( new rule(l,q,a,false) );
             }
 
+            void scanner:: emit(const string &label, const string &expr)
+            {
+                make(label,expr,this, &scanner::forward);
+            }
+
+            void scanner:: emit(const char *label, const char *expr)
+            {
+                make(label,expr,this, &scanner::forward);
+            }
+
+            void scanner:: drop(const string &label, const string &expr)
+            {
+                make(label,expr,this, &scanner::discard);
+            }
+
+            void scanner:: drop(const char *label, const char *expr)
+            {
+                make(label,expr,this, &scanner::discard);
+            }
+            
 
             void scanner:: endl(const string &label)
             {
