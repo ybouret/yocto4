@@ -75,8 +75,9 @@ namespace yocto
                 void endl(const string &label); //!< silent endl
                 void endl(const char   *label); //!< silent endl
 
+                //! get next lexeme or control flag
+                lexeme *get(bool &ctrl);
 
-                
 
 
             protected:
