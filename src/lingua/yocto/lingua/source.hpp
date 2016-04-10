@@ -31,7 +31,7 @@ namespace yocto
 
             //! attached a new input, save status
             void attach( ios::istream & );
-
+            
         private:
             typedef addr_node<ios::istream> input_node;
             typedef addr_list<ios::istream> input_list;

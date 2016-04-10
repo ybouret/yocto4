@@ -105,3 +105,23 @@ namespace yocto
 
     }
 }
+
+namespace yocto
+{
+    namespace lingua
+    {
+        namespace lexical
+        {
+            
+            lexeme * scanner::get(bool &ctrl)
+            {
+                return 0;
+            }
+
+            
+        }
+        
+    }
+    
+}
+
