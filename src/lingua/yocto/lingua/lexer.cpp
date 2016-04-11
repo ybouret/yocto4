@@ -58,14 +58,27 @@ dict()
 
         lexical::scanner & lexer:: declare(const string &id)
         {
-            lexical::scanner::ptr p( new lexical::scanner(id,line) );
+            lexical::scanner *scan =new lexical::scanner(id,line);
+            lexical::scanner::ptr p(scan);
             if( !scdb.insert(p) )
             {
-                throw exception("{%s}: multipler scanner <%s>", name.c_str(), id.c_str());
+                throw exception("{%s}: multipler scanner <%s>", name.c_str(), scan->name.c_str());
             }
             p->link_to(*this);
-            return *p;
+            return *scan;
         }
+
+        lexical::plugin & lexer:: declare_plugin( lexical::plugin *plg )
+        {
+            assert(plg);
+            lexical::scanner::ptr p(plg);
+            if( !scdb.insert(p) )
+            {
+                throw exception("{%s}: multipler plugin <%s>", name.c_str(), plg->name.c_str());
+            }
+            return *plg;
+        }
+
 
         void lexer:: stop() throw()
         {

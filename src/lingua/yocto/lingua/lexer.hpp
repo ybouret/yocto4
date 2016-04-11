@@ -1,7 +1,7 @@
 #ifndef YOCTO_LINGUA_LEXER_INCLUDED
 #define YOCTO_LINGUA_LEXER_INCLUDED 1
 
-#include "yocto/lingua/lexical/scanner.hpp"
+#include "yocto/lingua/lexical/plugin.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/sequence/addr-list.hpp"
 
@@ -24,12 +24,47 @@ namespace yocto
             void stop()    throw();
             void call(const string &id); //!< change current scanner
             void back();                 //!< replace current scanner by last history
+
             lexical::scanner & declare(const string &);
 
             lexeme *get(source &src);
             void    unget(const lexical::scanner &subscan,
                           const int               created,
                           const string           &content);
+
+            //__________________________________________________________________
+            //
+            // registering plugins
+            //__________________________________________________________________
+            template <typename PLUGIN>
+            inline lexical::plugin & load(const string &id)
+            {
+                return declare_plugin(new PLUGIN(id,*this));
+            }
+
+            template <typename PLUGIN>
+            inline lexical::plugin & load(const char *id)
+            {
+                const string ID(id);
+                return load<PLUGIN>(ID);
+            }
+
+            template <typename PLUGIN>
+            inline lexical::plugin & load(const string &id,
+                                          const string &expr)
+            {
+                return declare_plugin(new PLUGIN(id,*this,expr));
+            }
+
+            template <typename PLUGIN>
+            inline lexical::plugin & load(const char *id,
+                                          const char *expr)
+            {
+                const string Id(id);
+                const string Expr(expr);
+                return load<PLUGIN>(Id,Expr);
+            }
+
 
         private:
             typedef set<string,lexical::scanner::ptr> scanner_db;
@@ -43,6 +78,7 @@ namespace yocto
             scanner_db            scdb;     //!< database
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             void setup();
+            lexical::plugin & declare_plugin( lexical::plugin *plg );
 
         public:
             lexical::scanner &root;

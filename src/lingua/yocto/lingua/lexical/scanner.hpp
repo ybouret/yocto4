@@ -67,6 +67,7 @@ namespace yocto
                 bool forward(const token&) throw(); //!< return true
                 bool discard(const token&) throw(); //!< return false
                 bool newline(const token&) throw(); //!< increase line, return false
+                void endl_cb(const token&) throw(); //!< increase line
 
                 void emit(const string &label, const string &expr); //!< will produce token
                 void emit(const char   *label, const char   *expr); //!< will produce token

@@ -1,6 +1,7 @@
 #include "yocto/lingua/lexer.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ios/icstream.hpp"
+#include "yocto/lingua/lexical/plugin/end_of_line_comment.hpp"
 
 using namespace yocto;
 using namespace lingua;
@@ -29,6 +30,8 @@ namespace
             com2.back("\\*/", this, & my_lexer::end_com2);
             com2.drop("any1","[\\x00-\\xff]");
 
+            lexical::plugin &sh_com = load<lexical::end_of_line_comment>("shell comment","#");
+            
             
         }
 
