@@ -16,6 +16,8 @@ namespace yocto
         namespace lexical
         {
 
+            typedef functor<void,TL1(const token &)> callback;
+
             class scanner : public counted_object
             {
             public:
@@ -87,7 +89,73 @@ namespace yocto
                 void link_to( lexer &parent) throw();
 
                 
-                void stop(const string &expr); //!< will stop lexer
+                void stop(const string &expr); //!< will stop lexer upon expression
+
+
+                //! will call lexer 'call(id)' and execute callback upon expr
+                void call(const string   &id,
+                          const string   &expr,
+                          const callback &cb);
+
+                //! wrapper
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER >
+                inline void call(const string  &id,
+                                 const string  &expr,
+                                 OBJECT_POINTER host,
+                                 METHOD_POINTER method)
+                {
+                    const callback cb(host,method);
+                    call(id,expr,cb);
+                }
+
+                //! wrapper
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER >
+                inline void call(const char    *id,
+                                 const char    *expr,
+                                 OBJECT_POINTER host,
+                                 METHOD_POINTER method)
+                {
+                    const string ID(id);
+                    const string EXPR(expr);
+                    const callback cb(host,method);
+                    call(ID,EXPR,cb);
+                }
+
+
+
+                void back(const string   &expr,
+                          const callback &cb);
+
+
+                //! wrapper
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER >
+                inline void back(const string  &expr,
+                                 OBJECT_POINTER host,
+                                 METHOD_POINTER method)
+                {
+                    const callback cb(host,method);
+                    back(expr,cb);
+                }
+
+                //! wrapper
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER >
+                inline void back(const char    *expr,
+                                 OBJECT_POINTER host,
+                                 METHOD_POINTER method)
+                {
+                    const string EXPR(expr);
+                    const callback cb(host,method);
+                    back(EXPR,cb);
+                }
+
 
 
 
