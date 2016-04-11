@@ -110,6 +110,13 @@ dict()
             history.remove();
         }
 
+        void lexer:: unget(lexeme *lx) throw()
+        {
+            assert(lx);
+            cache.push_front(lx);
+        }
+
+
         lexeme * lexer::get(source &src)
         {
             assert(current!=NULL);

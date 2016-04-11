@@ -23,9 +23,20 @@ SET(lexical_plugin_srcs ${lexical_plugin_decl} ${lexical_plugin_impl} )
 SOURCE_GROUP(lingua/lexical/plugin FILES ${lexical_plugin_srcs} )
 INSTALL(FILES ${lexical_plugin_decl} DESTINATION include/yocto/lang/lexical/plugin )
 
+FILE(GLOB syntax_decl yocto/lingua/syntax/*.hpp)
+FILE(GLOB syntax_impl yocto/lingua/syntax/*.cpp)
+SET(syntax_srcs ${syntax_decl} ${syntax_impl} )
+SOURCE_GROUP(lingua/syntax FILES ${syntax_srcs} )
+INSTALL(FILES ${syntax_decl} DESTINATION include/yocto/lang/syntax )
+
+
 INCLUDE_DIRECTORIES(. ../main)
 
-ADD_LIBRARY(y-lingua STATIC ${srcs} ${pattern_srcs} ${lexical_srcs} ${lexical_plugin_srcs})
+ADD_LIBRARY(y-lingua STATIC ${srcs} ${pattern_srcs} ${lexical_srcs} ${lexical_plugin_srcs} ${syntax_srcs})
 
-ADD_SUBDIRECTORY(tests)
+INSTALL( TARGETS y-lingua ARCHIVE DESTINATION lib )
 
+
+IF(YOCTO_BUILD_TESTS)
+	ADD_SUBDIRECTORY(tests)
+ENDIF()

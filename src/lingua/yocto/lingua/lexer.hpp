@@ -28,6 +28,7 @@ namespace yocto
             lexical::scanner & declare(const string &);
 
             lexeme *get(source &src);
+            void    unget(lexeme *lx) throw();
             void    unget(const lexical::scanner &subscan,
                           const int               created,
                           const string           &content);
