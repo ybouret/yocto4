@@ -83,6 +83,8 @@ namespace yocto
                  */
                 lexeme *get( source &src, bool &ctrl);
 
+                //! link to a parent lexer, from where 'line' comes..
+                void link_to( lexer &parent) throw();
 
 
             protected:

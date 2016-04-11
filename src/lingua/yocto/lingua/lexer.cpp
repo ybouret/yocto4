@@ -15,8 +15,9 @@ name(id),                                   \
 line(0),                                    \
 curr(0), \
 hist(),\
-root( new lexical::scanner(root_id,line) ), \
+base( new lexical::scanner(root_id,line) ), \
 scdb(2,as_capacity),                        \
+root( *base ), \
 dict()
 
         lexer:: lexer(const string &id, const string &root_id) :
@@ -33,10 +34,11 @@ dict()
 
         void lexer:: setup()
         {
-            if(!scdb.insert(root))
+            if(!scdb.insert(base))
             {
-                throw exception("{%s}: failure to store root scanner <%s>", name.c_str(), root->name.c_str());
+                throw exception("{%s}: failure to store root scanner <%s>", name.c_str(), base->name.c_str());
             }
+            base->link_to(*this);
             restart();
         }
 
@@ -45,7 +47,7 @@ dict()
         {
             line = 1;
             hist.clear();
-            curr = root.__get(); assert(curr);
+            curr = &root; assert(curr);
         }
 
 
@@ -56,6 +58,7 @@ dict()
             {
                 throw exception("{%s}: multipler scanner <%s>", name.c_str(), id.c_str());
             }
+            p->link_to(*this);
             return *p;
         }
 

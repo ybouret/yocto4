@@ -13,6 +13,7 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     scan.emit("word","[:alpha:][:word:]*");
     scan.emit("int","[:digit:]+");
     scan.emit("double","[:digit:]+\\.[:digit:]*");
+    scan.emit("float","[:digit:]+\\.[:digit:]*f");
     scan.drop("punct","[:punct:]+");
     scan.drop("blank","[:blank:]+");
     scan.endl("endl");

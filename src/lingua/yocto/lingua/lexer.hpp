@@ -30,14 +30,15 @@ namespace yocto
 
             lexical::scanner     *curr; //!< current scanner
             history_type          hist; //!< history for sub-scanners
-            lexical::scanner::ptr root; //!< root scanner
+            lexical::scanner::ptr base; //!< root scanner
             scanner_db            scdb; //!< database
 
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             void setup();
 
         public:
-            p_dict       dict;
+            lexical::scanner &root;
+            p_dict            dict;
 
         };
     }
