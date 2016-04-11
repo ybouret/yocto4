@@ -20,19 +20,19 @@ namespace yocto
             int          line;
 
             void restart() throw();
-
+            void stop()    throw();
             lexical::scanner & declare(const string &);
-
 
         private:
             typedef set<string,lexical::scanner::ptr> scanner_db;
             typedef addr_list<lexical::scanner>       history_type;
 
-            lexical::scanner     *curr; //!< current scanner
-            history_type          hist; //!< history for sub-scanners
-            lexical::scanner::ptr base; //!< root scanner
-            scanner_db            scdb; //!< database
-
+            lexical::scanner     *curr;     //!< current scanner
+            bool                  stopped;  //!< flag
+            l_list                cache;    //!< lexemes
+            history_type          history;  //!< history for sub-scanners
+            lexical::scanner::ptr base;     //!< root scanner
+            scanner_db            scdb;     //!< database
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             void setup();
 

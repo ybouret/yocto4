@@ -13,11 +13,13 @@ namespace yocto
 #define Y_LEXER_CTOR()                      \
 name(id),                                   \
 line(0),                                    \
-curr(0), \
-hist(),\
+curr(0),                                    \
+stopped(false),                             \
+cache(),                                    \
+history(),                                  \
 base( new lexical::scanner(root_id,line) ), \
 scdb(2,as_capacity),                        \
-root( *base ), \
+root( *base ),                              \
 dict()
 
         lexer:: lexer(const string &id, const string &root_id) :
@@ -46,8 +48,9 @@ dict()
         void lexer:: restart() throw()
         {
             line = 1;
-            hist.clear();
+            history.clear();
             curr = &root; assert(curr);
+            stopped = false;
         }
 
 
@@ -60,6 +63,11 @@ dict()
             }
             p->link_to(*this);
             return *p;
+        }
+
+        void lexer:: stop() throw()
+        {
+            stopped = true;
         }
 
     }

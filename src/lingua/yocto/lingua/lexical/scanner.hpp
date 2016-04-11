@@ -31,7 +31,7 @@ namespace yocto
                 explicit scanner(const string &id, int &line_ref);
 
 
-                //! action upon pattern
+                //! lexical action upon pattern
                 void make(const string &l,pattern *p,const action &a);
 
                 //! wrapper
@@ -85,6 +85,10 @@ namespace yocto
 
                 //! link to a parent lexer, from where 'line' comes..
                 void link_to( lexer &parent) throw();
+
+                
+                void stop(const string &expr); //!< will stop lexer
+
 
 
             protected:
