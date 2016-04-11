@@ -175,7 +175,7 @@ namespace yocto
                     {
                     }
 
-                    inline bool operator()(const token &tkn )
+                    inline bool operator()(const token &tkn)
                     {
                         lxr->back();
                         cb(tkn);

@@ -36,7 +36,7 @@ namespace
 
         void end_com1(const token &) throw()
         {
-            std::cerr << "<C++ comment>" << std::endl;
+            std::cerr << "<C++ comment/>" << std::endl;
             ++line;
         }
 

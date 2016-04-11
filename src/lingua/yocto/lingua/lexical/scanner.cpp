@@ -117,7 +117,6 @@ namespace yocto
             {
 
 
-                ctrl = false;
                 while(true)
                 {
                     //__________________________________________________________
@@ -222,6 +221,7 @@ namespace yocto
                         //
                         // this is a control rule
                         //______________________________________________________
+                        ctrl = true;
                         if(best_rule->apply(best_tokn))
                         {
                             throw exception("<%s>: control rule '%s' must not produce a lexeme!", name.c_str(), best_rule->label.c_str());
@@ -234,6 +234,7 @@ namespace yocto
                         //
                         // this is a regular rule
                         //______________________________________________________
+                        ctrl = false;
                         if(best_rule->apply(best_tokn))
                         {
                             // produce a lexeme

@@ -1,6 +1,8 @@
 #include "yocto/lingua/lexer.hpp"
 #include "yocto/exception.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
     namespace lingua
@@ -73,6 +75,7 @@ dict()
         void lexer:: call(const string &id)
         {
             assert(current);
+            std::cerr << "<" << name << "." << current->name << ">.call(" << id << ")" << std::endl;
             lexical::scanner::ptr *pp = scdb.search(id);
             if(!pp)
             {
@@ -85,6 +88,7 @@ dict()
         void lexer:: back()
         {
             assert(current);
+            std::cerr << "<" << name << "." << current->name << ">.back" << std::endl;
             if(history.size<=0)
             {
                 throw exception("<%s.%s>:back(empty stack)",name.c_str(),current->name.c_str());
@@ -96,7 +100,8 @@ dict()
         lexeme * lexer::get(source &src)
         {
             assert(current!=NULL);
-            if(cache.size)
+        GET_LEXEME:
+            if(cache.size>0)
             {
                 return cache.pop_front();
             }
@@ -104,28 +109,27 @@ dict()
             {
                 if(stopped)
                 {
-                    return NULL;
+                    return 0;
                 }
                 else
                 {
-                    while(true)
+                    bool    ctrl = false;
+                    lexeme *lx  = current->get(src,ctrl);
+                    if(lx)
                     {
-                        bool    ctrl = false;
-                        lexeme *lxm  = current->get(src, ctrl);
-                        if(lxm)
-                        {
-                            assert(false==ctrl);
-                            return lxm;
-                        }
-                        else
-                        {
-                            if(ctrl) continue; // something happened to the lexer
-                            return 0;          // end of source...
-                        }
+                        // got someting
+                        assert(false==ctrl);
+                        return lx;
+                    }
+                    else
+                    {
+                        if(ctrl) goto GET_LEXEME; //! something happened to the lexer
+                        return 0;                 //! end of source
                     }
                 }
             }
 
+            return NULL;
         }
 
 
