@@ -24,6 +24,10 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(cstring);
                 void on_back(const token &);
                 bool append(const token &);
+                void on_esc(const token&);
+                void on_esc_hex(const token&);
+
+
             };
 
         }

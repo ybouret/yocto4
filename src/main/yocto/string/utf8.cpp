@@ -7,7 +7,7 @@ namespace yocto
 {
 #define Y_UTF8_SUB "[\\x80-\\xBF]"
 	
-	const char UTF8::ValidCharRX[]    = "[ !\\x23-\\x5B\\x5D-\\x7F]";
+	const char UTF8::ValidCharRX[]    = "[ !\\x23-\\x5B\\x5D-\\x7E]";
 	const char UTF8::Valid8to11RX[]   = "[\\xC2-\\xDF]" Y_UTF8_SUB ;
 	const char UTF8::Valid12to16RX[]  = "[\\xE0-\\xEF]" Y_UTF8_SUB Y_UTF8_SUB ;
 	const char UTF8::Valid17to21RX[]  = "[\\xF0-\\xF7]" Y_UTF8_SUB Y_UTF8_SUB Y_UTF8_SUB;
