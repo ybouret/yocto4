@@ -60,7 +60,8 @@ namespace yocto
             bool scanner:: discard(const token&) throw() { return false; }
             bool scanner:: newline(const token&) throw() { ++line; return false; }
             void scanner:: endl_cb(const token&) throw() { ++line; }
-            
+            void scanner:: drop_cb(const token&) throw() {  }
+
             void scanner::make(const string &l,pattern *p,const action &a)
             {
                 const pattern::ptr q(p);

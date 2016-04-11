@@ -15,14 +15,18 @@ namespace yocto
                 virtual ~plugin() throw();
 
                 virtual void on_call(const token &) = 0;
-                
+
+                void hook( scanner &target );
+
+
+
             protected:
                 explicit plugin(const string &id,
                                 lexer        &lxr,
                                 const string &expr);
                 
                 
-                const pattern::ptr motif;
+                const string trigger;
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(plugin);

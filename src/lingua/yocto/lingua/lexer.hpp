@@ -37,19 +37,6 @@ namespace yocto
             // registering plugins
             //__________________________________________________________________
             template <typename PLUGIN>
-            inline lexical::plugin & load(const string &id)
-            {
-                return declare_plugin(new PLUGIN(id,*this));
-            }
-
-            template <typename PLUGIN>
-            inline lexical::plugin & load(const char *id)
-            {
-                const string ID(id);
-                return load<PLUGIN>(ID);
-            }
-
-            template <typename PLUGIN>
             inline lexical::plugin & load(const string &id,
                                           const string &expr)
             {
@@ -64,6 +51,26 @@ namespace yocto
                 const string Expr(expr);
                 return load<PLUGIN>(Id,Expr);
             }
+
+            template <typename PLUGIN>
+            inline lexical::plugin & load(const string &id,
+                                          const string &callExpr,
+                                          const string &backExpr)
+            {
+                return declare_plugin(new PLUGIN(id,*this,callExpr,backExpr));
+            }
+
+            template <typename PLUGIN>
+            inline lexical::plugin & load(const string &id,
+                                          const char  *callExpr,
+                                          const char  *backExpr)
+            {
+                const string CallExpr(callExpr);
+                const string BackExpr(backExpr);
+                return declare_plugin(new PLUGIN(id,*this,CallExpr,BackExpr));
+            }
+
+
 
 
         private:

@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/lingua/lexical/plugin/end_of_line_comment.hpp"
+#include "yocto/lingua/lexical/plugin/block-comment.hpp"
 
 using namespace yocto;
 using namespace lingua;
@@ -31,8 +32,10 @@ namespace
             com2.drop("any1","[\\x00-\\xff]");
 
             lexical::plugin &sh_com = load<lexical::end_of_line_comment>("shell comment","#");
-            
-            
+            sh_com.hook(root);
+
+            lexical::plugin &xml_com = load<lexical::block_comment>("xml comment","<!--","-->");
+            xml_com.hook(root);
         }
 
         virtual ~my_lexer() throw()

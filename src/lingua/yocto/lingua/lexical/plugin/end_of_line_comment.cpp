@@ -18,7 +18,7 @@ namespace yocto
             plugin(id,lxr,expr)
             {
                 back("[:endl:]", this, &scanner::endl_cb);
-                const string label = "any1";
+                const string label = id + "_any1";
                 const action forget(this, &scanner::discard);
                 make(label, any1::create(), forget);
             }

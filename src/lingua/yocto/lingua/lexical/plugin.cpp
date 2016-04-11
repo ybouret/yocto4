@@ -16,12 +16,17 @@ namespace yocto
                             lexer        &lxr,
                             const string &expr) :
             scanner(id,lxr.line),
-            motif( regexp(expr,&lxr.dict) )
+            trigger(expr)
             {
                 link_to(lxr);
             }
 
-            
+            void plugin:: hook( scanner &target )
+            {
+                target.call(name,trigger,this,&plugin::on_call);
+            }
+
+
         }
     }
 }
