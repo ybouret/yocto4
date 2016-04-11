@@ -106,7 +106,6 @@ namespace yocto
     }
 }
 
-#include <iostream>
 namespace yocto
 {
     namespace lingua
@@ -168,7 +167,6 @@ namespace yocto
                         }
                     }
 
-                    std::cerr << "<" << name << ">: init '" << best_rule->label << "' => '" << best_tokn << "'" << std::endl;
 
                     //__________________________________________________________
                     //
@@ -189,7 +187,6 @@ namespace yocto
                         //
                         // we have a possible better expression
                         //______________________________________________________
-                        std::cerr << "<" << name << ">: test '" << r->label << "' => '" << t  << "'" << std::endl;
                         if(t.size<=best_tokn.size)
                         {
                             // too late !

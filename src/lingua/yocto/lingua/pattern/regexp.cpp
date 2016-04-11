@@ -11,7 +11,7 @@
 #include "yocto/string/conv.hpp"
 #include <cstring>
 
-#define YRX_VERBOSE 1
+#define YRX_VERBOSE 0
 
 #if YRX_VERBOSE ==1
 #include <iostream>
@@ -301,8 +301,8 @@ namespace yocto
                         *(ms++)=0;
                     }
 
-                    std::cerr << "ns='" << ns << "'" << std::endl;
-                    std::cerr << "ms='" << ms << "'" << std::endl;
+                    YRX_OUTPUT(Indent();std::cerr << "ns='" << ns << "'" << std::endl);
+                    YRX_OUTPUT(Indent();std::cerr << "ms='" << ms << "'" << std::endl);
 
                     const size_t nmin = (length_of(ns) > 0) ? strconv::to_size(ns,"nmin") : 0;
                     YRX_OUTPUT(Indent(); std::cerr << "nmin=" << nmin << std::endl);

@@ -12,9 +12,9 @@ YOCTO_UNIT_TEST_IMPL(scanner)
 
     scan.emit("word","[:alpha:][:word:]*");
     scan.emit("int","[:digit:]+");
-    scan.emit("double","[digit]+\\.[:digit:]*");
-    scan.drop("punct","[:punct:]");
-    scan.drop("blank","[:blank:]");
+    scan.emit("double","[:digit:]+\\.[:digit:]*");
+    scan.drop("punct","[:punct:]+");
+    scan.drop("blank","[:blank:]+");
     scan.endl("endl");
 
     ios::icstream fp( ios::cstdin );
