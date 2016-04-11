@@ -22,6 +22,8 @@ namespace yocto
 
             void restart() throw();
             void stop()    throw();
+            void call(const string &id); //!< change current scanner
+            void back();                 //!< replace current scanner by last history
             lexical::scanner & declare(const string &);
 
             lexeme *get(source &src);
@@ -31,7 +33,7 @@ namespace yocto
             typedef set<string,lexical::scanner::ptr> scanner_db;
             typedef addr_list<lexical::scanner>       history_type;
 
-            lexical::scanner     *curr;     //!< current scanner
+            lexical::scanner     *current;  //!< current scanner
             bool                  stopped;  //!< flag
             l_list                cache;    //!< lexemes
             history_type          history;  //!< history for sub-scanners

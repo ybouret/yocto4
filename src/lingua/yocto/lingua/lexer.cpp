@@ -13,7 +13,7 @@ namespace yocto
 #define Y_LEXER_CTOR()                      \
 name(id),                                   \
 line(0),                                    \
-curr(0),                                    \
+current(0),                                \
 stopped(false),                             \
 cache(),                                    \
 history(),                                  \
@@ -49,7 +49,7 @@ dict()
         {
             line = 1;
             history.clear();
-            curr = &root; assert(curr);
+            current = &root; assert(current);
             stopped = false;
         }
 
@@ -70,10 +70,32 @@ dict()
             stopped = true;
         }
 
+        void lexer:: call(const string &id)
+        {
+            assert(current);
+            lexical::scanner::ptr *pp = scdb.search(id);
+            if(!pp)
+            {
+                throw exception("<%s.%s>.call(no scanner <%s>)",name.c_str(),current->name.c_str(),id.c_str());
+            }
+            history.append(current);
+            current = pp->__get();
+        }
+
+        void lexer:: back()
+        {
+            assert(current);
+            if(history.size<=0)
+            {
+                throw exception("<%s.%s>:back(empty stack)",name.c_str(),current->name.c_str());
+            }
+            current = history.tail->addr;
+            history.remove();
+        }
 
         lexeme * lexer::get(source &src)
         {
-
+            assert(current!=NULL);
             if(cache.size)
             {
                 return cache.pop_front();
@@ -86,7 +108,21 @@ dict()
                 }
                 else
                 {
-                    return NULL;
+                    while(true)
+                    {
+                        bool    ctrl = false;
+                        lexeme *lxm  = current->get(src, ctrl);
+                        if(lxm)
+                        {
+                            assert(false==ctrl);
+                            return lxm;
+                        }
+                        else
+                        {
+                            if(ctrl) continue; // something happened to the lexer
+                            return false;
+                        }
+                    }
                 }
             }
 
