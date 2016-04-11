@@ -10,6 +10,7 @@ namespace yocto
     namespace lingua
     {
 
+        //! transform a source of t_char in a source of lexemes
         class lexer : public object
         {
         public:
@@ -22,6 +23,9 @@ namespace yocto
             void restart() throw();
             void stop()    throw();
             lexical::scanner & declare(const string &);
+
+            lexeme *get(source &src);
+
 
         private:
             typedef set<string,lexical::scanner::ptr> scanner_db;

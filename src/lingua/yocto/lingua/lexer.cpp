@@ -70,6 +70,29 @@ dict()
             stopped = true;
         }
 
+
+        lexeme * lexer::get(source &src)
+        {
+
+            if(cache.size)
+            {
+                return cache.pop_front();
+            }
+            else
+            {
+                if(stopped)
+                {
+                    return NULL;
+                }
+                else
+                {
+                    return NULL;
+                }
+            }
+
+        }
+
+
     }
 
 }

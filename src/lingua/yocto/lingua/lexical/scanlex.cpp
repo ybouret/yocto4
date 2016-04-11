@@ -18,6 +18,20 @@ namespace yocto
             }
 
 
+
+        }
+
+    }
+
+}
+
+
+namespace yocto
+{
+    namespace lingua
+    {
+        namespace lexical
+        {
             namespace {
 
                 class stop_action
@@ -52,17 +66,19 @@ namespace yocto
             void scanner :: stop(const string &expr)
             {
                 if(!lex) throw exception("<%s>.stop: is not linked to a lexer!", name.c_str() );
-                const stop_action will_stop(lex);
                 const string      label = "stop";
                 check(label);
-                rules.push_back( new rule(label,regexp(expr,dict),will_stop,true) );
+                const stop_action  will_stop(lex);
+                const pattern::ptr motif( regexp(expr,dict) );
+
+                rules.push_back( new rule(label,motif,will_stop,true) );
             }
 
+
         }
-
     }
-
 }
+
 
 
 
