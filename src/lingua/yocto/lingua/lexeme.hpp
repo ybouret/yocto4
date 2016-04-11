@@ -24,7 +24,7 @@ namespace yocto
             virtual ~lexeme() throw();
 
         private:
-            YOCTO_DISABLE_ASSIGN(lexeme);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(lexeme);
         };
 
         typedef core::list_of_cpp<lexeme> l_list;

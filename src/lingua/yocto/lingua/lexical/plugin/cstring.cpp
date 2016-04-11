@@ -15,7 +15,8 @@ namespace yocto
 
 
             cstring:: cstring(const string &id, lexer &lxr) :
-            plugin(id,lxr,"\"")
+            plugin(id,lxr,"\""),
+	    content()
             {
                 back(trigger, this, &cstring::on_back);
 
