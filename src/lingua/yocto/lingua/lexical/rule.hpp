@@ -26,7 +26,7 @@ namespace yocto
                 rule              *prev;   //!< for list
                 const string       label;  //!< identifier
                 const pattern::ptr motif;  //!< the matcher
-                const action       apply;  //!< what to do if win
+                action             apply;  //!< what to do if win
                 const bool         ctrl;   //!< is it a control rule ?
 
                 virtual ~rule() throw();

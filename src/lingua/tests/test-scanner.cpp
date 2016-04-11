@@ -11,6 +11,7 @@ YOCTO_UNIT_TEST_IMPL(scanner)
 
     scan.emit("word","[:alpha:][:word:]*");
     scan.drop("blank","[:blank:]");
+    scan.endl("endl");
     
 }
 YOCTO_UNIT_TEST_DONE()

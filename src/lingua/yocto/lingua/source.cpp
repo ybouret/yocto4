@@ -99,6 +99,31 @@ namespace yocto
             input = &fp;
         }
 
+        const t_char * source::peek()
+        {
+            t_char *ans = query();
+            if(ans)
+            {
+                store(ans);
+            }
+            return ans;
+        }
+
+        const size_t source:: read() const throw()
+        {
+            return cache.size;
+        }
+
+
+        void source::skip(size_t n) throw()
+        {
+            assert(n<=cache.size);
+            while(n-->0)
+            {
+                delete cache.pop_front();
+            }
+        }
+
     }
 }
 

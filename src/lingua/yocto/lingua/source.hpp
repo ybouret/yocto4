@@ -31,7 +31,16 @@ namespace yocto
 
             //! attached a new input, save status
             void attach( ios::istream & );
-            
+
+            //! return next t_char if possible
+            const t_char *peek();
+
+            //! number of read chars in cache
+            const size_t read() const throw();
+
+            //! skip n <= read() chars
+            void         skip(size_t n) throw();
+
         private:
             typedef addr_node<ios::istream> input_node;
             typedef addr_list<ios::istream> input_list;
