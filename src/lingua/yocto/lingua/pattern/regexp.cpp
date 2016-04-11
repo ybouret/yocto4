@@ -367,6 +367,7 @@ namespace yocto
                     case '{':
                     case '}':
                     case '.':
+                        YRX_OUTPUT(Indent();std::cerr << "escaped '" << C << "'" << std::endl);
                         return single::create(C);
 
                         // hexadecimal

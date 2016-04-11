@@ -27,7 +27,7 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(lexeme);
         };
 
-        typedef core::list_of<lexeme> l_list;
+        typedef core::list_of_cpp<lexeme> l_list;
 
     }
 }

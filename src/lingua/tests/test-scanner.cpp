@@ -11,6 +11,9 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     lexical::scanner scan("scanner",line);
 
     scan.emit("word","[:alpha:][:word:]*");
+    scan.emit("int","[:digit:]+");
+    scan.emit("double","[digit]+\\.[:digit:]*");
+    scan.drop("punct","[:punct:]");
     scan.drop("blank","[:blank:]");
     scan.endl("endl");
 
@@ -22,7 +25,8 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     bool    ctrl=false;
     while( 0 != (lx=scan.get(src,ctrl)))
     {
-        std::cerr << lx->label << " : " << *lx << std::endl;
+        std::cerr << lx->line << ":" <<  lx->label << " '" << *lx << "'" << std::endl;
+        lexemes.push_back(lx);
     }
 
 }

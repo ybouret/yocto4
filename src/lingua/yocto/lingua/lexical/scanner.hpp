@@ -76,6 +76,11 @@ namespace yocto
                 void endl(const char   *label); //!< silent endl
 
                 //! get next lexeme or control flag
+                /**
+                 first longest matching...
+                 - return a regular lexeme (ctrl==false)
+                 - or return NULL: if(ctrl==true) => for lexer, if(ctrl==false)=> End of Source...
+                 */
                 lexeme *get( source &src, bool &ctrl);
 
 
