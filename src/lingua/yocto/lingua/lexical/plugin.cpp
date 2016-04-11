@@ -21,6 +21,15 @@ namespace yocto
                 link_to(lxr);
             }
 
+            plugin:: plugin(const string &id,
+                            lexer        &lxr,
+                            const char   *expr) :
+            scanner(id,lxr.line),
+            trigger(expr)
+            {
+                link_to(lxr);
+            }
+
             void plugin:: hook( scanner &target )
             {
                 target.call(name,trigger,this,&plugin::on_call);

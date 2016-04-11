@@ -3,6 +3,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/lingua/lexical/plugin/end_of_line_comment.hpp"
 #include "yocto/lingua/lexical/plugin/block-comment.hpp"
+#include "yocto/lingua/lexical/plugin/cstring.hpp"
 
 using namespace yocto;
 using namespace lingua;
@@ -36,6 +37,10 @@ namespace
 
             lexical::plugin &xml_com = load<lexical::block_comment>("xml comment","<!--","-->");
             xml_com.hook(root);
+
+            lexical::plugin &cstr = load<lexical::cstring>("cstring");
+            cstr.hook(root);
+
         }
 
         virtual ~my_lexer() throw()

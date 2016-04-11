@@ -32,9 +32,27 @@ namespace yocto
                           const int               created,
                           const string           &content);
 
+
             //__________________________________________________________________
             //
-            // registering plugins
+            //! registering plugins, all defined
+            //__________________________________________________________________
+            template <typename PLUGIN>
+            inline lexical::plugin & load(const string &id)
+            {
+                return declare_plugin( new PLUGIN(id,*this) );
+            }
+
+            template <typename PLUGIN>
+            inline lexical::plugin & load(const char *id)
+            {
+                const string Id(id);
+                return load<PLUGIN>(Id);
+            }
+
+            //__________________________________________________________________
+            //
+            //! registering plugins with call expressions
             //__________________________________________________________________
             template <typename PLUGIN>
             inline lexical::plugin & load(const string &id,
@@ -43,6 +61,7 @@ namespace yocto
                 return declare_plugin(new PLUGIN(id,*this,expr));
             }
 
+            //! wrapper
             template <typename PLUGIN>
             inline lexical::plugin & load(const char *id,
                                           const char *expr)
@@ -52,6 +71,10 @@ namespace yocto
                 return load<PLUGIN>(Id,Expr);
             }
 
+            //__________________________________________________________________
+            //
+            //! registering plugins with call/back expressions
+            //__________________________________________________________________
             template <typename PLUGIN>
             inline lexical::plugin & load(const string &id,
                                           const string &callExpr,
@@ -60,6 +83,7 @@ namespace yocto
                 return declare_plugin(new PLUGIN(id,*this,callExpr,backExpr));
             }
 
+            //! wrapper
             template <typename PLUGIN>
             inline lexical::plugin & load(const string &id,
                                           const char  *callExpr,

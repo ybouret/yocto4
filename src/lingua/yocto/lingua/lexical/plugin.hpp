@@ -24,7 +24,10 @@ namespace yocto
                 explicit plugin(const string &id,
                                 lexer        &lxr,
                                 const string &expr);
-                
+
+                explicit plugin(const string &id,
+                                lexer        &lxr,
+                                const char   *expr);
                 
                 const string trigger;
                 
