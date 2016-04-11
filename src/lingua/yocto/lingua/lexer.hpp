@@ -27,7 +27,9 @@ namespace yocto
             lexical::scanner & declare(const string &);
 
             lexeme *get(source &src);
-
+            void    unget(const lexical::scanner &subscan,
+                          const int               created,
+                          const string           &content);
 
         private:
             typedef set<string,lexical::scanner::ptr> scanner_db;

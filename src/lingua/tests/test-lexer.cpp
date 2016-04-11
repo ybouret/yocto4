@@ -15,14 +15,21 @@ namespace
             root.emit("word","[:word:]+");
             root.emit("int","[:digit:]+");
             root.drop("blank","[:blank:]+");
-            root.emit("punct","[:punct:]");
+            //root.emit("punct","[:punct:]");
             root.call("com1", "//", this, &my_lexer::ini_com1);
+            root.call("com2", "/\\*", this, &my_lexer::ini_com2);
             root.endl("endl");
 
             lexical::scanner &com1 = declare("com1");
-            com1.drop("dot",".");
             com1.back("[:endl:]", this, & my_lexer::end_com1);
+            com1.drop("any1","[\\x00-\\xff]");
 
+            lexical::scanner &com2 = declare("com2");
+            com2.endl("endl");
+            com2.back("\\*/", this, & my_lexer::end_com2);
+            com2.drop("any1","[\\x00-\\xff]");
+
+            
         }
 
         virtual ~my_lexer() throw()
@@ -31,13 +38,20 @@ namespace
 
         void ini_com1(const token &) throw()
         {
-            std::cerr << "<C++ comment>" << std::endl;
         }
 
         void end_com1(const token &) throw()
         {
-            std::cerr << "<C++ comment/>" << std::endl;
             ++line;
+        }
+
+        void ini_com2(const token &)
+        {
+        }
+
+        void end_com2(const token&)
+        {
+
         }
 
     private:
@@ -48,7 +62,7 @@ namespace
 YOCTO_UNIT_TEST_IMPL(lexer)
 {
 
-    
+
     my_lexer      lxr;
     ios::icstream fp( ios::cstdin );
     source        src(fp);

@@ -1,7 +1,7 @@
 #include "yocto/lingua/lexer.hpp"
 #include "yocto/exception.hpp"
 
-#include <iostream>
+//#include <iostream>
 
 namespace yocto
 {
@@ -49,7 +49,7 @@ dict()
 
         void lexer:: restart() throw()
         {
-            line = 1;
+            line    = 1;
             history.clear();
             current = &root; assert(current);
             stopped = false;
@@ -75,11 +75,11 @@ dict()
         void lexer:: call(const string &id)
         {
             assert(current);
-            std::cerr << "<" << name << "." << current->name << ">.call(" << id << ")" << std::endl;
+            //std::cerr << "<" << name << "." << current->name << ">.call(" << id << ")" << std::endl;
             lexical::scanner::ptr *pp = scdb.search(id);
             if(!pp)
             {
-                throw exception("<%s.%s>.call(no scanner <%s>)",name.c_str(),current->name.c_str(),id.c_str());
+                throw exception("{%s}<%s>.call(no scanner <%s>)",name.c_str(),current->name.c_str(),id.c_str());
             }
             history.append(current);
             current = pp->__get();
@@ -88,10 +88,10 @@ dict()
         void lexer:: back()
         {
             assert(current);
-            std::cerr << "<" << name << "." << current->name << ">.back" << std::endl;
+            //std::cerr << "<" << name << "." << current->name << ">.back" << std::endl;
             if(history.size<=0)
             {
-                throw exception("<%s.%s>:back(empty stack)",name.c_str(),current->name.c_str());
+                throw exception("{%s}<%s>:back(empty stack)",name.c_str(),current->name.c_str());
             }
             current = history.tail->addr;
             history.remove();
@@ -114,7 +114,7 @@ dict()
                 else
                 {
                     bool    ctrl = false;
-                    lexeme *lx  = current->get(src,ctrl);
+                    lexeme *lx   = current->get(src,ctrl);
                     if(lx)
                     {
                         // got someting
@@ -131,6 +131,16 @@ dict()
 
             return NULL;
         }
+
+
+        void lexer:: unget(const lexical::scanner &subscan,
+                           const int               created,
+                           const string           &content)
+        {
+            token tmp(content);
+            cache.push_front( new lexeme(subscan.name,created,tmp) );
+        }
+
 
 
     }

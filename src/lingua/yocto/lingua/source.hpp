@@ -26,7 +26,8 @@ namespace yocto
 
             //! unread a copy
             void    unread_a_copy_of(const token &tkn);
-            
+
+            //! check if got next char
             bool    is_active();
 
             //! attached a new input, save status
@@ -40,6 +41,7 @@ namespace yocto
 
             //! skip n <= read() chars
             void         skip(size_t n) throw();
+            
 
         private:
             typedef addr_node<ios::istream> input_node;
