@@ -10,6 +10,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/string/conv.hpp"
 #include <cstring>
+#include <cctype>
 
 #define YRX_VERBOSE 0
 

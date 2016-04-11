@@ -226,7 +226,7 @@ namespace yocto
                         {
                             throw exception("<%s>: control rule '%s' must not produce a lexeme!", name.c_str(), best_rule->label.c_str());
                         }
-                        return false;
+                        return 0;
                     }
                     else
                     {
