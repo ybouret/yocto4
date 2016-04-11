@@ -120,7 +120,7 @@ dict()
                         else
                         {
                             if(ctrl) continue; // something happened to the lexer
-                            return false;
+                            return 0;          // end of source...
                         }
                     }
                 }
