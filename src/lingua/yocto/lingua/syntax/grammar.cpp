@@ -71,7 +71,23 @@ namespace yocto
                 return *tt;
             }
 
-            
+            aggregate & grammar:: agg(const string &id, const uint32_t flags)
+            {
+                check(id);
+                aggregate *tt = new aggregate(id);
+                rules.push_back(tt);
+                tt->flags     = flags;
+                return *tt;
+            }
+
+            alternate & grammar:: alt()
+            {
+                const string label = vformat("alt%c%u",rule::internal_char,++nalt);
+                alternate   *tt    = new alternate(label);
+                rules.push_back(tt);
+                return *tt;
+            }
+
             void grammar:: top_level(rule &r) throw()
             {
                 assert(rules.owns(&r));

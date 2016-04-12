@@ -28,6 +28,10 @@ namespace yocto
 
                 virtual ~rule() throw();
 
+                //______________________________________________________________
+                //
+                // virtual interface
+                //______________________________________________________________
                 virtual void viz(ios::ostream &fp) const = 0;
 
             protected:

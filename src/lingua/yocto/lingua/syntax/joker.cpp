@@ -74,7 +74,7 @@ namespace yocto
             joker(id,UUID,r),
             nmin(n)
             {
-
+                YOCTO_LINGUA_SYNTAX_RULE_IS(at_least);
             }
 
             void at_least:: viz(ios::ostream &fp) const

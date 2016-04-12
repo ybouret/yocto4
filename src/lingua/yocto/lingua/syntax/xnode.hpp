@@ -21,10 +21,10 @@ namespace yocto
             class xnode 
             {
             public:
-                xnode        *next;
-                xnode        *prev;
-                xnode        *parent;
-                const rule   *origin;
+                xnode        *next;   //!< for xlist
+                xnode        *prev;   //!< for xlist
+                xnode        *parent; //!< for tree ops
+                const rule   *origin; //!< hold label, flags...
 
                 union {
                     lexeme *lx;
@@ -33,6 +33,7 @@ namespace yocto
                 const bool terminal;
 
                 ~xnode() throw();
+                
                 void         push_back(  xnode *node ) throw(); //!< push_back wrapper
                 void         push_front( xnode *node ) throw(); //!< push_front wrapper
                 xnode       *pop_back()  throw(); //!< pop_back wrapper
@@ -49,6 +50,8 @@ namespace yocto
 
                 //! origin->label...
                 const string   &label() const throw();
+
+
 
                 YOCTO_MAKE_OBJECT
             private:
