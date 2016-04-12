@@ -33,7 +33,8 @@ namespace yocto
                           const int               created,
                           const string           &content);
             
-            //const lexeme *peek();
+            const lexeme *peek(source&);
+            const lexeme *last(source&);
 
             //__________________________________________________________________
             //

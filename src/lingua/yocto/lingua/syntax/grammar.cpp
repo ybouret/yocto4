@@ -98,6 +98,7 @@ namespace yocto
     }
 }
 
+#include "yocto/ptr/auto.hpp"
 namespace yocto
 {
     namespace lingua
@@ -109,6 +110,11 @@ namespace yocto
                 xnode *tree = 0;
                 if(rules.size<=0) throw exception("[%s]: no top-level rule!", name.c_str());
                 const rule &top = *(rules.head);
+
+                //______________________________________________________________
+                //
+                // try to admit top-level rule
+                //______________________________________________________________
                 if(!top.admit(tree,lxr,src))
                 {
                     assert(0==tree);
@@ -118,6 +124,20 @@ namespace yocto
                     //__________________________________________________________
                     throw exception("%d:[%s] syntax error",lxr.line,name.c_str());
                 }
+
+                //______________________________________________________________
+                //
+                // is there and error
+                //______________________________________________________________
+                auto_ptr<xnode> guard(tree);
+                const lexeme   *lx = lxr.last(src);
+                if(lx)
+                {
+                    const string content = lx->to_string();
+                    throw exception("%d:[%s] syntax error after %s='%s'", lx->line, name.c_str(), lx->label.c_str(), content.c_str());
+                }
+
+                guard.forget();
                 return tree;
             }
 

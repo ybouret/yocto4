@@ -161,6 +161,20 @@ dict()
             cache.push_front( new lexeme(subscan.name,created,tmp) );
         }
 
+        const lexeme * lexer:: peek(source &src)
+        {
+            lexeme *lx = get(src);
+            if(lx) unget(lx);
+            return cache.head;
+        }
+
+        const lexeme * lexer:: last(source &src)
+        {
+            lexeme *lx = get(src);
+            if(lx) unget(lx);
+            return cache.tail;
+        }
+
 
 
     }
