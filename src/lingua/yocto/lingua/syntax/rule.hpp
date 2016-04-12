@@ -13,6 +13,7 @@ namespace yocto
 
 
 #define YOCTO_LINGUA_SYNTAX_RULE_IS(DERIVED) do { assert(0==self); DERIVED *addr = this; self = addr; } while(false)
+#define YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS xnode * &tree, lexer &lxr, source &src
 
             //! a rule to accept the output of a lexer
             class rule : public object
@@ -33,9 +34,12 @@ namespace yocto
                 // virtual interface
                 //______________________________________________________________
                 virtual void viz(ios::ostream &fp) const = 0;
+                virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const = 0;
+
 
             protected:
                 explicit rule(const string &id,const uint32_t t);
+                void     grow( xnode * &tree, xnode *leaf ) const throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);

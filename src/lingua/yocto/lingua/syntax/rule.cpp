@@ -20,7 +20,24 @@ namespace yocto
             self(0)
             {
             }
-            
+
+
+            void rule:: grow( xnode * &tree, xnode *leaf ) const throw()
+            {
+                assert(leaf);
+                assert(0==leaf->parent);
+                
+                if(NULL==tree)
+                {
+                    tree = leaf;
+                }
+                else
+                {
+                    assert(false==tree->terminal);
+                    tree->push_back(leaf);
+                }
+            }
+
         }
     }
 }

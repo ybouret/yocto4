@@ -33,11 +33,10 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 void check(const string &label) const;
                 r_list   rules;
-                unsigned nopt;
-                unsigned nalt;
-                unsigned nzom;
-                unsigned noom;
-
+                unsigned nopt; //!< generate optional rule labels
+                unsigned nalt; //!< generate alternate rule labels
+                unsigned nzom; //!< generate altermnate zero_or_more rule labels
+                unsigned noom; //!< generate altermnate one_or_more rule labels
             };
 
         }

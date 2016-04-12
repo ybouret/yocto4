@@ -50,6 +50,7 @@ namespace yocto
                 // virtual interface
                 //______________________________________________________________
                 virtual void viz(ios::ostream &fp) const;
+                virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const;
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(optional);
@@ -80,7 +81,8 @@ namespace yocto
                 // virtual interface
                 //______________________________________________________________
                 virtual void viz(ios::ostream &fp) const;
-
+                virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const;
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(at_least);
             };

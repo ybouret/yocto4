@@ -30,6 +30,30 @@ namespace yocto
                 fp << "];\n";
             }
 
+
+            bool terminal:: admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const
+            {
+                lexeme *lx = lxr.get(src);
+                if(!lx)
+                {
+                    return false; // End Of Input
+                }
+                else
+                {
+                    if(label==lx->label)
+                    {
+                        xnode *node = xnode::create(*this,lx);
+                        grow(tree,node);
+                        return true;
+                    }
+                    else
+                    {
+                        lxr.unget(lx);
+                        return false;
+                    }
+                }
+            }
+
         }
     }
 }

@@ -32,7 +32,7 @@ namespace yocto
             void    unget(const lexical::scanner &subscan,
                           const int               created,
                           const string           &content);
-
+            
 
             //__________________________________________________________________
             //
