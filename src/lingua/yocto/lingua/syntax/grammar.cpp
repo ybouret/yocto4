@@ -98,6 +98,35 @@ namespace yocto
     }
 }
 
+namespace yocto
+{
+    namespace lingua
+    {
+        namespace syntax
+        {
+            xnode *grammar::run(lexer &lxr, source &src) const
+            {
+                xnode *tree = 0;
+                if(rules.size<=0) throw exception("[%s]: no top-level rule!", name.c_str());
+                const rule &top = *(rules.head);
+                if(!top.admit(tree,lxr,src))
+                {
+                    assert(0==tree);
+                    //__________________________________________________________
+                    //
+                    // an error happened
+                    //__________________________________________________________
+                    throw exception("%d:[%s] syntax error",lxr.line,name.c_str());
+                }
+                return tree;
+            }
+
+}
+    }
+}
+
+
+
 #include "yocto/ios/ocstream.hpp"
 
 namespace yocto

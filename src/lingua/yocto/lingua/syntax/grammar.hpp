@@ -29,6 +29,8 @@ namespace yocto
                 void graphviz(const string &filename) const;
                 void top_level(rule &r) throw();
 
+                xnode *run(lexer &lxr, source &src) const;
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 void check(const string &label) const;

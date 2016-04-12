@@ -26,9 +26,12 @@ namespace yocto
             void compound:: subviz(ios::ostream &fp) const
             {
                 const rule *addr = this;
+                unsigned    indx = 0;
                 for(const node_type *node = members.head; node; node=node->next)
                 {
-                    fp.viz(addr); fp << "->" ; fp.viz(node->addr); fp << ";\n";
+                    fp.viz(addr); fp << "->" ; fp.viz(node->addr);
+                    fp("[label=\"%u\"]", ++indx);
+                    fp << ";\n";
                 }
             }
         }
