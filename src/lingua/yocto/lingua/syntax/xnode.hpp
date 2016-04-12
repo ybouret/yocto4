@@ -33,7 +33,7 @@ namespace yocto
                 const bool terminal;
 
                 ~xnode() throw();
-                
+
                 void         push_back(  xnode *node ) throw(); //!< push_back wrapper
                 void         push_front( xnode *node ) throw(); //!< push_front wrapper
                 xnode       *pop_back()  throw(); //!< pop_back wrapper
@@ -51,7 +51,7 @@ namespace yocto
                 //! origin->label...
                 const string   &label() const throw();
 
-
+                static void back_to(lexer &lxr, xnode *node) throw();
 
                 YOCTO_MAKE_OBJECT
             private:

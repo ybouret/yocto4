@@ -11,9 +11,11 @@ namespace yocto
             {
                 if(terminal)
                 {
-                    assert(lx);
-                    delete lx;
-                    lx = 0;
+                    if(lx)
+                    {
+                        delete lx;
+                        lx = 0;
+                    }
                 }
                 else
                 {
@@ -128,6 +130,27 @@ namespace yocto
                     throw;
                 }
                 return node;
+            }
+
+            void xnode:: back_to(lexer &lxr, xnode *node) throw()
+            {
+                if(node)
+                {
+                    if(node->terminal)
+                    {
+                        assert(node->lx);
+                        lxr.unget(node->lx);
+                        node->lx = 0;
+                    }
+                    else
+                    {
+                        for(xnode *sub = node->ch->tail;sub;sub=sub->prev)
+                        {
+                            back_to(lxr,sub);
+                        }
+                    }
+                    delete node;
+                }
             }
 
         }
