@@ -18,15 +18,18 @@ namespace yocto
             class rule : public object
             {
             public:
+                static const char internal_char='#';
                 rule          *next;
                 rule          *prev;
                 const string   label;
+                uint32_t       flags;
                 const uint32_t uuid;
-                uint32_t       flag;
                 void          *self;
 
                 virtual ~rule() throw();
-                
+
+                virtual void viz(ios::ostream &fp) const = 0;
+
             protected:
                 explicit rule(const string &id,const uint32_t t);
 

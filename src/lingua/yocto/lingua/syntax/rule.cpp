@@ -15,8 +15,8 @@ namespace yocto
             next(0),
             prev(0),
             label(id),
+            flags(0),
             uuid(t),
-            flag(0),
             self(0)
             {
             }

@@ -19,6 +19,12 @@ namespace yocto
                 explicit terminal(const string &id);
                 virtual ~terminal() throw();
 
+                //______________________________________________________________
+                //
+                // virtual interface
+                //______________________________________________________________
+                virtual void viz(ios::ostream &fp) const;
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
             };
