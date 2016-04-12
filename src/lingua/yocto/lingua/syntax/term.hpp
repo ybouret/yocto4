@@ -24,6 +24,8 @@ namespace yocto
                 // virtual interface
                 //______________________________________________________________
                 virtual void viz(ios::ostream &fp) const;
+
+                //! admit a lexeme with same label
                 virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const;
                 
             private:

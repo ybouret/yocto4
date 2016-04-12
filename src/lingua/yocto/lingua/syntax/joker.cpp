@@ -53,10 +53,25 @@ namespace yocto
                 fp << "];\n";
                 fp.viz(addr); fp << "->"; fp.viz(jk); fp << ";\n";
             }
+
+
+            bool optional:: admit( YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS ) const
+            {
+                xnode *leaf = 0;
+                if(jk->admit(leaf, lxr, src))
+                {
+                    if(leaf)
+                    {
+                        grow(tree,leaf);
+                    }
+                }
+                return true;
+            }
         }
     }
 }
 
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {
@@ -85,6 +100,45 @@ namespace yocto
                 fp << "\",shape=trapezium";
                 fp << "];\n";
                 fp.viz(addr); fp << "->"; fp.viz(jk); fp << ";\n";
+            }
+
+            bool at_least :: admit( YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS ) const
+            {
+                //______________________________________________________________
+                //
+                // make a subtree
+                //______________________________________________________________
+                xnode          *leaves = xnode::create(*this);
+                auto_ptr<xnode> guard(leaves);
+                size_t          count = 0;
+
+                //______________________________________________________________
+                //
+                // collect subtree
+                //______________________________________________________________
+                while(jk->admit(leaves, lxr, src))
+                {
+                    ++count;
+                }
+
+                //______________________________________________________________
+                //
+                // process
+                //______________________________________________________________
+                guard.forget();
+
+                if(count>=nmin)
+                {
+                    grow(tree,leaves);
+                    return true;
+                }
+                else
+                {
+                    xnode::back_to(lxr,leaves);
+                    return false;
+                }
+
+
             }
         }
     }

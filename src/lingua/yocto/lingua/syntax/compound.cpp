@@ -58,11 +58,27 @@ namespace yocto
                 fp.viz(addr); fp << "[label=\""; ios::graphviz_encode(label,fp); fp << "\",shape=egg];\n";
                 subviz(fp);
             }
+
+            bool alternate:: admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const
+            {
+                xnode *leaf = 0;
+                for(const node_type *member = members.head; member; member=member->next)
+                {
+                    if(member->addr->admit(leaf, lxr, src) )
+                    {
+                        grow(tree,leaf);
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
 
     }
 
 }
+
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {
@@ -84,6 +100,25 @@ namespace yocto
                 const rule *addr = this;
                 fp.viz(addr); fp << "[label=\""; ios::graphviz_encode(label,fp); fp << "\",shape=house];\n";
                 subviz(fp);
+            }
+
+            bool aggregate::admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const
+            {
+                xnode *leaves = xnode::create(*this);
+                auto_ptr<xnode> guard(leaves);
+                for(const node_type *member = members.head; member; member=member->next)
+                {
+                    if(!member->addr->admit(leaves,lxr,src))
+                    {
+                        guard.forget();
+                        xnode::back_to(lxr,leaves);
+                        return false;
+                    }
+                }
+
+                guard.forget();
+                grow(tree,leaves);
+                return true;
             }
 
         }
