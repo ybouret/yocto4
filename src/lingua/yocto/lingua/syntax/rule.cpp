@@ -10,8 +10,14 @@ namespace yocto
             {}
 
 
-            rule:: rule( const uint32_t t) throw() :
-            next(0), prev(0), uuid(t), self(0)
+            rule:: rule(const string   &id,
+                        const uint32_t  t)  :
+            next(0),
+            prev(0),
+            label(id),
+            uuid(t),
+            flag(0),
+            self(0)
             {
             }
             
