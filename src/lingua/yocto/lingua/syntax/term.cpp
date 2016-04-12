@@ -26,6 +26,12 @@ namespace yocto
                 fp << "[label=\"";
                 ios::graphviz_encode(label,fp);
                 fp << "\",shape=box";
+                switch(flags)
+                {
+                    case property::standard: fp << ",style=solid";    break;
+                    case property::univocal: fp << ",style=rounded"; break;
+                    case property::jettison: fp << ",style=dotted";  break;
+                }
 
                 fp << "];\n";
             }

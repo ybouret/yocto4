@@ -16,6 +16,7 @@ namespace yocto
             {
             public:
                 static const uint32_t UUID = YOCTO_FOURCC('T','E','R','M');
+
                 explicit terminal(const string &id);
                 virtual ~terminal() throw();
 

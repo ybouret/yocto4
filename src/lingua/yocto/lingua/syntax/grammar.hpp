@@ -18,11 +18,11 @@ namespace yocto
                 
                 const string name;
 
-                rule      & decl_term(const string &label,const uint32_t flags=0);
+                rule      & decl_term(const string &label,const uint32_t flags=property::standard);
                 rule      & opt( const rule &r );
                 rule      & zero_or_more(const rule &r);
                 rule      & one_or_more(const rule &r);
-                aggregate & agg(const string &id,const uint32_t flags=0);
+                aggregate & agg(const string &id,const uint32_t flags=property::standard);
                 alternate & alt();
 
 

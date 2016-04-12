@@ -20,6 +20,7 @@ namespace
             root.emit("ID",    "[:word:]+");
             root.emit("EQ",    "=");
             root.emit(";",     ";");
+            root.emit("null" , "null");
             root.drop("BLANK", "[:blank:]");
             root.endl("endl");
         }
@@ -41,10 +42,11 @@ namespace
         my_grammar() : syntax::grammar("my_grammar")
         {
 
-            Rule & INT = decl_term("INT");
-            Rule & ID  = decl_term("ID");
-            Rule & EQ  = decl_term("EQ");
-            Rule & END = decl_term(";");
+            Rule & INT  = decl_term("INT");
+            Rule & ID   = decl_term("ID");
+            Rule & EQ   = decl_term("EQ",syntax::property::jettison);
+            Rule & END  = decl_term(";",syntax::property::jettison);
+            Rule & null = decl_term("null",syntax::property::univocal);
 
             syntax::aggregate &PUSH_INT  = agg("PUSH_INT");
             PUSH_INT << INT << END;
@@ -54,7 +56,7 @@ namespace
 
             syntax::aggregate &ASSIGN    = agg("ASSIGN");
             syntax::alternate &RHS       = alt();
-            RHS << ID << INT;
+            RHS << ID << INT << null;
             ASSIGN << ID << EQ << RHS << END;
 
             syntax::alternate &LINE = alt();

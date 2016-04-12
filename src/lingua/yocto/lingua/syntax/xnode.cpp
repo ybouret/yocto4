@@ -92,8 +92,8 @@ namespace yocto
                 assert(origin);
                 return origin->label;
             }
-            
-            
+
+
             xnode * xnode:: create( const rule &r, lexeme *l )
             {
                 assert(terminal::UUID==r.uuid);
@@ -171,7 +171,9 @@ namespace yocto
 
             void xnode:: viz( ios::ostream &fp ) const
             {
-                const char *shape = "box";
+                const char    *shape = "box";
+                const uint32_t flags= origin->flags;
+
                 switch(origin->uuid)
                 {
                     case at_least::UUID:  shape = "trapezium"; break;
@@ -186,8 +188,14 @@ namespace yocto
                 {
                     fp.viz(this);
                     fp << "[label=\"";
-                    const string content =  lx->to_string();
-                    ios::graphviz_encode(content,fp);
+                    ios::graphviz_encode(label(), fp);
+                    if(flags==property::standard)
+                    {
+                        fp << "='";
+                        const string content =  lx->to_string();
+                        ios::graphviz_encode(content,fp);
+                        fp << "'";
+                    }
                     fp << "\",shape=" << shape;
                     fp << "];\n";
                 }
@@ -213,9 +221,9 @@ namespace yocto
                 viz(fp);
                 fp << "}\n";
             }
-
+            
         }
-
+        
     }
-
+    
 }
