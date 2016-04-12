@@ -144,9 +144,9 @@ namespace yocto
                     }
                     else
                     {
-                        for(xnode *sub = node->ch->tail;sub;sub=sub->prev)
+                        while(node->ch->size)
                         {
-                            back_to(lxr,sub);
+                            back_to(lxr,node->ch->pop_back());
                         }
                     }
                     delete node;
@@ -157,3 +157,65 @@ namespace yocto
     }
 }
 
+#include "yocto/ios/graphviz.hpp"
+#include "yocto/ios/ocstream.hpp"
+#include "yocto/lingua/syntax/joker.hpp"
+#include "yocto/lingua/syntax/compound.hpp"
+
+namespace yocto
+{
+    namespace lingua
+    {
+        namespace syntax
+        {
+
+            void xnode:: viz( ios::ostream &fp ) const
+            {
+                const char *shape = "box";
+                switch(origin->uuid)
+                {
+                    case at_least::UUID:  shape = "trapezium"; break;
+                    case optional::UUID:  shape = "circle";    break;
+                    case aggregate::UUID: shape = "house";    break;
+                    default:
+                        break;
+                }
+                assert(shape);
+
+                if(terminal)
+                {
+                    fp.viz(this);
+                    fp << "[label=\"";
+                    const string content =  lx->to_string();
+                    ios::graphviz_encode(content,fp);
+                    fp << "\",shape=" << shape;
+                    fp << "];\n";
+                }
+                else
+                {
+                    fp.viz(this);
+                    fp << "[label=\"";
+                    ios::graphviz_encode(label(), fp);
+                    fp << "\",shape=" << shape;
+                    fp << "];\n";
+                    for(const xnode *sub = ch->head; sub; sub=sub->next)
+                    {
+                        sub->viz(fp);
+                        fp.viz(this); fp << "->"; fp.viz(sub); fp << ";\n";
+                    }
+                }
+            }
+
+            void xnode:: graphviz(const string &filename) const
+            {
+                ios::wcstream fp(filename);
+                fp << "digraph G {\n";
+                viz(fp);
+                fp << "}\n";
+            }
+
+        }
+
+    }
+
+}

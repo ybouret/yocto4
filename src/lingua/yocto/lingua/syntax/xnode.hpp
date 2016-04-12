@@ -51,7 +51,11 @@ namespace yocto
                 //! origin->label...
                 const string   &label() const throw();
 
+                //!
                 static void back_to(lexer &lxr, xnode *node) throw();
+
+                void viz( ios::ostream &fp ) const;
+                void graphviz(const string &filename) const;
 
                 YOCTO_MAKE_OBJECT
             private:

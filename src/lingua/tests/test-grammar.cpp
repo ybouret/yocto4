@@ -94,7 +94,8 @@ YOCTO_UNIT_TEST_IMPL(grammar)
     auto_ptr<syntax::xnode> tree( G.run(L,src) );
     if(tree.is_valid())
     {
-
+        tree->graphviz("tree.dot");
+        ios::graphviz_render("tree.dot");
     }
 
 
