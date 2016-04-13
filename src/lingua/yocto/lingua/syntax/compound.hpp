@@ -49,6 +49,12 @@ namespace yocto
                 virtual ~alternate() throw();
                 explicit alternate(const string &id);
 
+                inline alternate & operator|=(const rule &r)
+                {
+                    (*this) << r;
+                    return *this;
+                }
+
                 //______________________________________________________________
                 //
                 // virtual interface
@@ -77,6 +83,12 @@ namespace yocto
                 static const uint32_t UUID = YOCTO_FOURCC('[', '&', '&', ']');
                 virtual ~aggregate() throw();
                 explicit aggregate(const string &id);
+
+                inline aggregate & operator+=(const rule &r)
+                {
+                    (*this) << r;
+                    return *this;
+                }
 
                 //______________________________________________________________
                 //

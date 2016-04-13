@@ -67,6 +67,8 @@ namespace yocto
             //! helper
             Alt &choice(const Rule &, const Rule &, const Rule &);
 
+            
+
             syntax::xnode *parse( ios::istream &fp, const int start_line=1);
 
 
