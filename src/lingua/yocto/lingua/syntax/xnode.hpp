@@ -51,11 +51,13 @@ namespace yocto
                 //! origin->label...
                 const string   &label() const throw();
 
-                //!
+                //! return content to lexer
                 static void back_to(lexer &lxr, xnode *node) throw();
 
-                void viz( ios::ostream &fp ) const;
-                void graphviz(const string &filename) const;
+                void viz( ios::ostream &fp ) const;          //!< for one node
+                void graphviz(const string &filename) const; //!< from this node
+
+                static xnode *ast(xnode *node) throw();
 
                 YOCTO_MAKE_OBJECT
             private:

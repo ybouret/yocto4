@@ -138,7 +138,7 @@ namespace yocto
                 }
 
                 guard.forget();
-                return tree;
+                return xnode::ast(tree);
             }
 
 }
