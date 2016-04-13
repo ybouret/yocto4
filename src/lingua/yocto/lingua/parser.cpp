@@ -1,5 +1,5 @@
 #include "yocto/lingua/parser.hpp"
-
+#include "yocto/lingua/pattern/logic.hpp"
 
 namespace yocto
 {
@@ -25,7 +25,7 @@ namespace yocto
         {
         }
 
-        syntax::rule & parser::terminal(const string &label, const string &expr,const uint32_t flags)
+        syntax::rule & parser::maketerm(const string &label, const string &expr,const uint32_t flags)
         {
             //-- lexical
             root.emit(label, expr);
@@ -34,23 +34,88 @@ namespace yocto
             return decl_term(label,flags);
         }
 
-        syntax::rule & parser::terminal(const char *label, const char *expr,const uint32_t flags)
+
+        syntax::rule & parser::terminal(const string &label, const string &expr)
+        {
+            return maketerm(label,expr,syntax::property::standard);
+        }
+
+        syntax::rule & parser::terminal(const char *label, const char *expr)
         {
             const string Label(label);
             const string Expr(expr);
-            return terminal(Label,Expr,flags);
+            return maketerm(Label,Expr,syntax::property::standard);
         }
 
-        syntax::rule & parser::terminal(const string &expr,const uint32_t flags)
+        syntax::rule & parser::univocal(const string &label, const string &expr)
         {
-            return terminal(expr,expr,flags);
+            return maketerm(label,expr,syntax::property::univocal);
         }
 
-        syntax::rule & parser:: terminal(const char   *expr,const uint32_t flags)
+        syntax::rule & parser::univocal(const char *label, const char *expr)
+        {
+            const string Label(label);
+            const string Expr(expr);
+            return maketerm(Label,Expr,syntax::property::univocal);
+        }
+
+
+        syntax::rule & parser::univocal(const string &expr)
+        {
+            const lexical::action a( &root, & lexical::scanner::forward );
+            pattern *p = logical::equal(expr);
+            root.make(expr, p, a);
+
+            return decl_term(expr,syntax::property::univocal);
+        }
+
+        syntax::rule & parser::univocal(const char *expr)
         {
             const string Expr(expr);
-            return terminal(Expr,flags);
+            return univocal(Expr);
         }
+
+        syntax::rule & parser:: univocal(const char    C)
+        {
+            const string expr(&C,1);
+            return univocal(expr);
+        }
+
+        syntax::rule & parser::jettison(const string &label, const string &expr)
+        {
+            return maketerm(label,expr,syntax::property::jettison);
+        }
+
+        syntax::rule & parser::jettison(const char *label, const char *expr)
+        {
+            const string Label(label);
+            const string Expr(expr);
+            return maketerm(Label,Expr,syntax::property::jettison);
+        }
+
+
+        syntax::rule & parser::jettison(const string &expr)
+        {
+            const lexical::action a( &root, & lexical::scanner::forward );
+            pattern *p = logical::equal(expr);
+            root.make(expr, p, a);
+
+            return decl_term(expr,syntax::property::jettison);
+        }
+
+        syntax::rule & parser::jettison(const char *expr)
+        {
+            const string Expr(expr);
+            return jettison(Expr);
+        }
+
+        syntax::rule & parser:: jettison(const char    C)
+        {
+            const string expr(&C,1);
+            return jettison(expr);
+        }
+
+
 
         syntax::alternate & parser::choice(const Rule &r1, const Rule &r2)
         {

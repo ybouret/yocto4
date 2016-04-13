@@ -16,8 +16,8 @@ namespace
 
             Rule &ID  = terminal("ID","[:word:]+");
             Rule &INT = terminal("INT","[:digit:]+");
-            Rule &EQ  = terminal("EQ",syntax::property::jettison);
-            Rule &END = terminal("END",",",syntax::property::jettison);
+            Rule &EQ  = jettison("=");
+            Rule &END = jettison(';');
 
             Alt  &VALUE = alt();
             VALUE << INT << ID;
@@ -25,7 +25,10 @@ namespace
             Agg  &ASSIGN = agg("ASSIGN");
             ASSIGN << ID << EQ << VALUE << END;
 
-            Alt &STATEMENT = choice( ASSIGN, VALUE );
+            Agg  &PUSH   = agg("PUSH");
+            PUSH << VALUE << END;
+
+            Alt &STATEMENT = choice( ASSIGN, PUSH );
 
             top_level( zero_or_more(STATEMENT) );
 
@@ -53,11 +56,18 @@ namespace
 }
 
 #include "yocto/ios/icstream.hpp"
+#include "yocto/ptr/auto.hpp"
 
 YOCTO_UNIT_TEST_IMPL(parser)
 {
     my_parser     P;
     ios::icstream fp( ios::cstdin );
-    
+    auto_ptr<syntax::xnode> tree( P.parse(fp) );
+    if(tree.is_valid())
+    {
+        tree->graphviz("tree.dot");
+        ios::graphviz_render("tree.dot");
+    }
+
 }
 YOCTO_UNIT_TEST_DONE()
