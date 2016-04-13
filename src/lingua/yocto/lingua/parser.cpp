@@ -52,7 +52,37 @@ namespace yocto
             return terminal(Expr,flags);
         }
 
-        
+        syntax::alternate & parser::choice(const Rule &r1, const Rule &r2)
+        {
+            Alt &ans = alt();
+            ans << r1 << r2;
+            return ans;
+        }
+
+        syntax::alternate & parser::choice(const Rule &r1, const Rule &r2, const Rule &r3)
+        {
+            Alt &ans = alt();
+            ans << r1 << r2 << r3;
+            return ans;
+        }
+
+
     }
 }
 
+namespace yocto
+{
+    namespace lingua
+    {
+
+        syntax::xnode *parser::parse( ios::istream &fp, const int start_line)
+        {
+            restart();
+            line = start_line;
+            source src(fp);
+            return run(*this, src);
+        }
+
+    }
+
+}

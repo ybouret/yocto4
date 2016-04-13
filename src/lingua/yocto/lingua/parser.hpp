@@ -27,6 +27,11 @@ namespace yocto
             Rule &terminal(const string &expr,  const uint32_t flags=syntax::property::standard);
             Rule &terminal(const char   *expr,  const uint32_t flags=syntax::property::standard);
 
+            Alt &choice(const Rule &, const Rule &);
+            Alt &choice(const Rule &, const Rule &, const Rule &);
+
+            syntax::xnode *parse( ios::istream &fp, const int start_line=1);
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(parser);
