@@ -45,12 +45,33 @@ namespace yocto
                 while(ch.size)
                 {
                     xnode *sub = ast(ch.pop_front()); //!< recursive call
-                    if(!sub) continue;
+                    if(!sub) continue;                //!< was deleted
+
+                    //__________________________________________________________
+                    //
+                    // fusions...
+                    //__________________________________________________________
+                    const uint32_t uuid  = sub->origin->uuid;
+                    const uint32_t flags = sub->origin->flags;
+                    if(   (uuid==optional::UUID)
+                       || (uuid==at_least::UUID)
+                       || (property::temporary==flags)
+                       )
+                    {
+                        assert(false==sub->terminal);
+                        stk.merge_back(*(sub->ch));
+                        delete sub;
+                        continue;
+                    }
 
                     stk.push_back(sub);
 
                 }
                 ch.swap_with(stk);
+                for(xnode *sub=ch.head;sub;sub=sub->next)
+                {
+                    sub->parent = node;
+                }
                 return node;
             }
 

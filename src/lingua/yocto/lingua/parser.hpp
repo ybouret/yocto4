@@ -20,7 +20,7 @@ namespace yocto
             explicit parser(const string &lang_id, const string &root_id);
             explicit parser(const char   *lang_id, const char   *root_id);
 
-            Rule &maketerm(const string &label, const string &expr,const uint32_t flags=syntax::property::standard);
+            Rule &maketerm(const string &label, const string &expr,const uint32_t flags=property::standard);
             
             Rule &terminal(const string &label, const string &expr);
             Rule &terminal(const char   *label, const char   *expr);
@@ -30,7 +30,7 @@ namespace yocto
             Rule &term(const string &label)
             {
                 load<PLUGIN>(label).hook(root);               //!< lexical definition
-                return decl_term(label,syntax::property::standard);  //!< syntaxtic defintion
+                return decl_term(label,property::standard);  //!< syntaxtic defintion
             }
 
             template <typename PLUGIN>

@@ -8,15 +8,17 @@ namespace yocto
 {
     namespace lingua
     {
+        struct property
+        {
+            static const uint32_t standard  = 0x00; //!< full terminal
+            static const uint32_t univocal  = 0x01; //!< single content terminal
+            static const uint32_t jettison  = 0x02; //!< syntax only
+            static const uint32_t temporary = 0x04;
+        };
+
         namespace syntax
         {
 
-            struct property
-            {
-                static const uint32_t standard = 0x00; //!< full terminal
-                static const uint32_t univocal = 0x01; //!< single content terminal
-                static const uint32_t jettison = 0x02; //!< syntax only
-            };
 
 #define YOCTO_LINGUA_SYNTAX_RULE_IS(DERIVED) do { assert(0==self); DERIVED *addr = this; self = addr; } while(false)
 #define YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS xnode * &tree, lexer &lxr, source &src

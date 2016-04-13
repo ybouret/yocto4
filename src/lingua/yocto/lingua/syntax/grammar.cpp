@@ -80,6 +80,13 @@ namespace yocto
                 return *tt;
             }
 
+            aggregate & grammar:: agg(const char   *id,const uint32_t flags)
+            {
+                const string ID(id);
+                return agg(ID,flags);
+            }
+
+
             alternate & grammar:: alt()
             {
                 const string label = vformat("alt%c%u",rule::internal_char,++nalt);

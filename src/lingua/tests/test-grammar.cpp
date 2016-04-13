@@ -44,9 +44,9 @@ namespace
 
             Rule & INT  = decl_term("INT");
             Rule & ID   = decl_term("ID");
-            Rule & EQ   = decl_term("EQ",syntax::property::jettison);
-            Rule & END  = decl_term(";",syntax::property::jettison);
-            Rule & null = decl_term("null",syntax::property::univocal);
+            Rule & EQ   = decl_term("EQ",   property::jettison);
+            Rule & END  = decl_term(";",    property::jettison);
+            Rule & null = decl_term("null", property::univocal);
 
             syntax::aggregate &PUSH_INT  = agg("PUSH_INT");
             PUSH_INT << INT << END;

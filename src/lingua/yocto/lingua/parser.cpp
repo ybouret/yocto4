@@ -37,26 +37,26 @@ namespace yocto
 
         syntax::rule & parser::terminal(const string &label, const string &expr)
         {
-            return maketerm(label,expr,syntax::property::standard);
+            return maketerm(label,expr,property::standard);
         }
 
         syntax::rule & parser::terminal(const char *label, const char *expr)
         {
             const string Label(label);
             const string Expr(expr);
-            return maketerm(Label,Expr,syntax::property::standard);
+            return maketerm(Label,Expr,property::standard);
         }
 
         syntax::rule & parser::univocal(const string &label, const string &expr)
         {
-            return maketerm(label,expr,syntax::property::univocal);
+            return maketerm(label,expr,property::univocal);
         }
 
         syntax::rule & parser::univocal(const char *label, const char *expr)
         {
             const string Label(label);
             const string Expr(expr);
-            return maketerm(Label,Expr,syntax::property::univocal);
+            return maketerm(Label,Expr,property::univocal);
         }
 
 
@@ -66,7 +66,7 @@ namespace yocto
             pattern *p = logical::equal(expr);
             root.make(expr, p, a);
 
-            return decl_term(expr,syntax::property::univocal);
+            return decl_term(expr,property::univocal);
         }
 
         syntax::rule & parser::univocal(const char *expr)
@@ -83,14 +83,14 @@ namespace yocto
 
         syntax::rule & parser::jettison(const string &label, const string &expr)
         {
-            return maketerm(label,expr,syntax::property::jettison);
+            return maketerm(label,expr,property::jettison);
         }
 
         syntax::rule & parser::jettison(const char *label, const char *expr)
         {
             const string Label(label);
             const string Expr(expr);
-            return maketerm(Label,Expr,syntax::property::jettison);
+            return maketerm(Label,Expr,property::jettison);
         }
 
 
@@ -100,7 +100,7 @@ namespace yocto
             pattern *p = logical::equal(expr);
             root.make(expr, p, a);
 
-            return decl_term(expr,syntax::property::jettison);
+            return decl_term(expr,property::jettison);
         }
 
         syntax::rule & parser::jettison(const char *expr)

@@ -23,6 +23,7 @@ namespace yocto
                 rule      & zero_or_more(const rule &r);
                 rule      & one_or_more(const rule &r);
                 aggregate & agg(const string &id,const uint32_t flags=property::standard);
+                aggregate & agg(const char   *id,const uint32_t flags=property::standard);
                 alternate & alt();
 
 

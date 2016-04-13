@@ -17,7 +17,7 @@ namespace
             Alt  &VALUE  = alt();
             Rule &STRING = term<lexical::cstring>("string");
             Rule &COMA   = jettison(',');
-            
+
             VALUE
             << univocal("null")
             << univocal("true")
@@ -25,23 +25,49 @@ namespace
             << STRING
             << terminal("number","-?[:digit:]+");
 
-            Rule &LBRACK = jettison('[');
-            Rule &RBRACK = jettison(']');
 
-            Alt &ARRAY = alt();
             {
-                Agg &empty_array = agg("empty_array");
-                empty_array << LBRACK << RBRACK;
-                ARRAY |= empty_array;
+                Rule &LBRACK = jettison('[');
+                Rule &RBRACK = jettison(']');
+
+                Alt &ARRAY = alt();
+                {
+                    Agg &empty_array = agg("empty_array");
+                    empty_array << LBRACK << RBRACK;
+                    ARRAY |= empty_array;
+                }
+
+                {
+                    Agg &heavy_array = agg("heavy_array");
+                    heavy_array << LBRACK << VALUE << zero_or_more( agg("extra_value",property::temporary) << COMA << VALUE) << RBRACK;
+                    ARRAY |= heavy_array;
+                }
+
+                VALUE << ARRAY;
             }
 
             {
-                Agg &heavy_array = agg("heavy_array");
-                heavy_array << LBRACK << VALUE << zero_or_more( agg("extra_value") << COMA << VALUE) << RBRACK;
-                ARRAY |= heavy_array;
-            }
+                Rule &LBRACE = jettison('{');
+                Rule &RBRACE = jettison('}');
 
-            VALUE << ARRAY;
+                Alt &OBJECT = alt();
+                {
+                    Agg &empty_object = agg("empty_object");
+                    empty_object << LBRACE << RBRACE;
+                    OBJECT |= empty_object;
+                }
+
+                {
+                    Agg &heavy_object = agg("heavy_object");
+                    {
+                        Agg &PAIR = agg("pair");
+                        PAIR << STRING << jettison(':') << VALUE;
+                        heavy_object << LBRACE << PAIR << zero_or_more( agg("extra_pair",property::temporary) << COMA << PAIR ) << RBRACE;
+                    }
+                    OBJECT |= heavy_object;
+                }
+                VALUE << OBJECT;
+            }
 
             top_level( zero_or_more(VALUE) );
 
@@ -78,6 +104,6 @@ YOCTO_UNIT_TEST_IMPL(json)
         tree->graphviz("tree.dot");
         ios::graphviz_render("tree.dot");
     }
-
+    
 }
 YOCTO_UNIT_TEST_DONE()
