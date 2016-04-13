@@ -25,27 +25,46 @@ namespace yocto
             Rule &terminal(const string &label, const string &expr);
             Rule &terminal(const char   *label, const char   *expr);
 
+            //! load a plugin as terminal
+            template <typename PLUGIN>
+            Rule &term(const string &label)
+            {
+                load<PLUGIN>(label).hook(root);               //!< lexical definition
+                return decl_term(label,syntax::property::standard);  //!< syntaxtic defintion
+            }
+
+            template <typename PLUGIN>
+            Rule &term(const char *label)
+            {
+                const string Label(label);
+                return term<PLUGIN>(Label);
+            }
+            
+
             //! expression  is compiled
             Rule &univocal(const string &label, const string &expr);
-            Rule &univocal(const char   *label, const char   *expr);
+            Rule &univocal(const char   *label, const char   *expr); //!< wrapper
 
             //! expression is not compiled
             Rule &univocal(const string &expr);
-            Rule &univocal(const char   *expr);
-            Rule &univocal(const char    C);
+            Rule &univocal(const char   *expr); //!< wrapper
+            Rule &univocal(const char    C);    //!< wrapper
 
 
             //! expression is compiled
             Rule &jettison(const string &label, const string &expr);
-            Rule &jettison(const char   *label, const char   *expr);
+            Rule &jettison(const char   *label, const char   *expr); //!< wrapper
 
             //! expression is not compiled
             Rule &jettison(const string &expr);
-            Rule &jettison(const char   *expr);
-            Rule &jettison(const char    C);
+            Rule &jettison(const char   *expr); //!< wrapper
+            Rule &jettison(const char    C);    //!< wrapper
 
-            
+
+            //! helper
             Alt &choice(const Rule &, const Rule &);
+
+            //! helper
             Alt &choice(const Rule &, const Rule &, const Rule &);
 
             syntax::xnode *parse( ios::istream &fp, const int start_line=1);

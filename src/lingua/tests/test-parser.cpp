@@ -1,6 +1,8 @@
 #include "yocto/lingua/parser.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ios/graphviz.hpp"
+#include "yocto/lingua/lexical/plugin/end_of_line_comment.hpp"
+#include "yocto/lingua/lexical/plugin/cstring.hpp"
 
 using namespace yocto;
 using namespace lingua;
@@ -16,11 +18,13 @@ namespace
 
             Rule &ID  = terminal("ID","[:word:]+");
             Rule &INT = terminal("INT","[:digit:]+");
+            Rule &STR = term<lexical::cstring>("string");
+
             Rule &EQ  = jettison("=");
             Rule &END = jettison(';');
 
             Alt  &VALUE = alt();
-            VALUE << INT << ID;
+            VALUE << INT << ID << STR;
             
             Agg  &ASSIGN = agg("ASSIGN");
             ASSIGN << ID << EQ << VALUE << END;
@@ -37,6 +41,7 @@ namespace
             //
             // lexical rules
             //__________________________________________________________________
+            load<lexical::end_of_line_comment>("comment","//").hook(root);
             root.endl("endl");
             root.drop("blank", "[:blank:]");
 
