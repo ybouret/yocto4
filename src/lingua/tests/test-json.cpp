@@ -25,12 +25,11 @@ namespace
             << STRING
             << terminal("number","-?[:digit:]+");
 
-
+            Alt &ARRAY = alt();
             {
                 Rule &LBRACK = jettison('[');
                 Rule &RBRACK = jettison(']');
 
-                Alt &ARRAY = alt();
                 {
                     Agg &empty_array = agg("empty_array");
                     empty_array << LBRACK << RBRACK;
@@ -46,11 +45,12 @@ namespace
                 VALUE << ARRAY;
             }
 
+            Alt &OBJECT = alt();
+
             {
                 Rule &LBRACE = jettison('{');
                 Rule &RBRACE = jettison('}');
 
-                Alt &OBJECT = alt();
                 {
                     Agg &empty_object = agg("empty_object");
                     empty_object << LBRACE << RBRACE;
@@ -69,7 +69,7 @@ namespace
                 VALUE << OBJECT;
             }
 
-            top_level( zero_or_more(VALUE) );
+            top_level( choice(OBJECT,ARRAY) );
 
             graphviz("json.dot");
             ios::graphviz_render("json.dot");
