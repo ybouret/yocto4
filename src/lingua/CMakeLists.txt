@@ -29,10 +29,14 @@ SET(syntax_srcs ${syntax_decl} ${syntax_impl} )
 SOURCE_GROUP(lingua/syntax FILES ${syntax_srcs} )
 INSTALL(FILES ${syntax_decl} DESTINATION include/yocto/lang/syntax )
 
+FILE(GLOB prv_decl yocto/lingua/prv/*.hpp)
+FILE(GLOB prv_impl yocto/lingua/prv/*.cpp)
+SET(prv_srcs ${prv_decl} ${prv_impl} )
+SOURCE_GROUP(lingua/prv FILES ${prv_srcs} )
 
 INCLUDE_DIRECTORIES(. ../main)
 
-ADD_LIBRARY(y-lingua STATIC ${srcs} ${pattern_srcs} ${lexical_srcs} ${lexical_plugin_srcs} ${syntax_srcs})
+ADD_LIBRARY(y-lingua STATIC ${srcs} ${pattern_srcs} ${lexical_srcs} ${lexical_plugin_srcs} ${syntax_srcs} ${prv_srcs})
 
 INSTALL( TARGETS y-lingua ARCHIVE DESTINATION lib )
 

@@ -15,6 +15,7 @@ YOCTO_UNIT_TEST_IMPL(regexp)
     p_dict dict;
     dict.define("DIGIT","[0-9]");
     dict.define("INT","{DIGIT}+");
+    dict.define("ID", "[[:alpha:]_][:word:]*");
 
 
     if(argc>1)

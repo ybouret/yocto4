@@ -11,12 +11,12 @@ namespace yocto
 
         logical:: logical(const uint32_t t) throw() :
         pattern(t),
-	operands()
+        operands()
         {}
 
         logical:: logical(const logical &other) :
         pattern(other),
-	operands()
+        operands(other.operands)
         {
         }
 
@@ -286,14 +286,14 @@ namespace yocto
             }
             return p.yield();
         }
-
+        
         logical *logical:: equal(const char *str)
         {
             const string tmp(str);
             return equal(tmp);
         }
         
-
+        
     }
     
 }

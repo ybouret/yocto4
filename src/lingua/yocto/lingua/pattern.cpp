@@ -23,7 +23,7 @@ namespace yocto
         next(0),
         prev(0),
         uuid(other.uuid),
-	self(0)
+        self(0)
         {
         }
 

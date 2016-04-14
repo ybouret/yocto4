@@ -14,7 +14,7 @@
 
 #define YRX_VERBOSE 0
 
-#if YRX_VERBOSE ==1
+#if YRX_VERBOSE == 1
 #include <iostream>
 #define YRX_OUTPUT(EXPR) do { EXPR; } while(false)
 #else
@@ -306,13 +306,13 @@ namespace yocto
                     YRX_OUTPUT(Indent();std::cerr << "ms='" << ms << "'" << std::endl);
 
                     const size_t nmin = (length_of(ns) > 0) ? strconv::to_size(ns,"nmin") : 0;
-                    YRX_OUTPUT(Indent(); std::cerr << "nmin=" << nmin << std::endl);
+                    YRX_OUTPUT(Indent(); std::cerr << "  nmin=" << nmin << std::endl);
 
                     if(length_of(ms)>0)
                     {
                         // make a counting/at_most
                         const size_t nmax = strconv::to_size(ms,"nmax");
-                        YRX_OUTPUT(Indent(); std::cerr << "nmax=" << nmax << std::endl);
+                        YRX_OUTPUT(Indent(); std::cerr << "  nmax=" << nmax << std::endl);
                         ops.push_back( counting::create( ops.pop_back(), nmin, nmax) );
                     }
                     else
@@ -331,6 +331,7 @@ namespace yocto
                     assert(dict);
                     const pattern::ptr *pp = dict->search(jk);
                     if(!pp) throw exception("%s: undefined pattern '%s'", fn, jk.c_str());
+                    YRX_OUTPUT(Indent(); std::cerr << "  cloning " << jk << std::endl);
                     ops.push_back( (*pp)->clone() );
                 }
 
