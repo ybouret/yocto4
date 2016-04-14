@@ -17,7 +17,8 @@ namespace yocto
             label(id),
             flags(0),
             uuid(t),
-            self(0)
+            self(0),
+            following()
             {
             }
 

@@ -38,6 +38,7 @@ namespace yocto
                 uint32_t       flags;
                 const uint32_t uuid;
                 void          *self;
+                meta_list      following;
 
                 virtual ~rule() throw();
 
@@ -52,8 +53,8 @@ namespace yocto
                 //
                 // non virtual interface
                 //______________________________________________________________
+                void build_following() const;
                 
-
             protected:
                 explicit rule(const string &id,const uint32_t t);
                 void     grow( xnode * &tree, xnode *leaf ) const throw();
