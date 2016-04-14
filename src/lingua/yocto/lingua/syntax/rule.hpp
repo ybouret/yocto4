@@ -3,6 +3,7 @@
 
 #include "yocto/lingua/lexer.hpp"
 #include "yocto/lingua/syntax/xnode.hpp"
+#include "yocto/sequence/addr-list.hpp"
 
 namespace yocto
 {
@@ -28,6 +29,9 @@ namespace yocto
             {
             public:
                 static const char internal_char='#';
+                typedef addr_node<const rule> meta_node;
+                typedef addr_list<const rule> meta_list;
+
                 rule          *next;
                 rule          *prev;
                 const string   label;
@@ -44,6 +48,11 @@ namespace yocto
                 virtual void viz(ios::ostream &fp) const = 0;
                 virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const = 0;
 
+                //______________________________________________________________
+                //
+                // non virtual interface
+                //______________________________________________________________
+                
 
             protected:
                 explicit rule(const string &id,const uint32_t t);

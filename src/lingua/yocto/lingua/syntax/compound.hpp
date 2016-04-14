@@ -2,7 +2,6 @@
 #define YOCTO_LINGUA_SYNTAX_COMPOUND_INCLUDED 1
 
 #include "yocto/lingua/syntax/rule.hpp"
-#include "yocto/sequence/addr-list.hpp"
 
 namespace yocto
 {
@@ -14,10 +13,7 @@ namespace yocto
             class compound : public rule
             {
             public:
-                typedef addr_node<const rule> node_type;
-                typedef addr_list<const rule> components;
-
-                components members;
+                meta_list members;
 
                 virtual ~compound() throw();
 

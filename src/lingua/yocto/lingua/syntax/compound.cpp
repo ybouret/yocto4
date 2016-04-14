@@ -27,7 +27,7 @@ namespace yocto
             {
                 const rule *addr = this;
                 unsigned    indx = 0;
-                for(const node_type *node = members.head; node; node=node->next)
+                for(const meta_node *node = members.head; node; node=node->next)
                 {
                     fp.viz(addr); fp << "->" ; fp.viz(node->addr);
                     fp("[label=\"%u\"]", ++indx);
@@ -70,7 +70,7 @@ namespace yocto
                     throw exception("{%s}: empty alternate rule '%s'", lxr.name.c_str(), label.c_str());
                 }
                 xnode *leaf = 0;
-                for(const node_type *member = members.head; member; member=member->next)
+                for(const meta_node *member = members.head; member; member=member->next)
                 {
                     if(member->addr->admit(leaf, lxr, src) )
                     {
@@ -118,7 +118,7 @@ namespace yocto
                 }
                 xnode *leaves = xnode::create(*this);
                 auto_ptr<xnode> guard(leaves);
-                for(const node_type *member = members.head; member; member=member->next)
+                for(const meta_node *member = members.head; member; member=member->next)
                 {
                     if(!member->addr->admit(leaves,lxr,src))
                     {

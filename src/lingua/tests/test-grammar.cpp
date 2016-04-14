@@ -86,7 +86,7 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 {
     std::cerr << "sizeof(xnode)=" << sizeof(syntax::xnode) << std::endl;
     std::cerr << "sizeof(xlist)=" << sizeof(syntax::xlist) << std::endl;
-
+    std::cerr << "sizeof(rule) =" << sizeof(syntax::rule)  << std::endl;
 
     my_grammar    G;
     my_lexer      L;
