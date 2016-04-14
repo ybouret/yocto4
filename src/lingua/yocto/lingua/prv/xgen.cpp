@@ -41,16 +41,19 @@ namespace yocto
                     GRAMMAR << LANG_ID;
                 }
 
-                Agg &RULE    = agg("RULE");
-                {
-                    Rule &RULE_ID = terminal("RULE_ID","{ID}");
-                    RULE << RULE_ID << jettison(':');
 
-                }
+                //______________________________________________________________
+                //
+                // some rules
+                //______________________________________________________________
+                Agg &RULE     = agg("RULE");
+                Rule &RULE_ID = terminal("RULE_ID","{ID}");
+                RULE << RULE_ID << jettison(':');
+
                 RULE << END;
 
                 GRAMMAR << zero_or_more(RULE);
-                
+
                 //______________________________________________________________
                 //
                 // lexical rules
