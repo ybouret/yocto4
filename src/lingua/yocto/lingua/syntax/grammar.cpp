@@ -131,6 +131,10 @@ namespace yocto
                     //__________________________________________________________
                     throw exception("%d:[%s] syntax error",lxr.line,name.c_str());
                 }
+                if(!tree)
+                {
+                    throw exception("%d:[%s] is invalid: no AST!",lxr.line,name.c_str());
+                }
 
                 //______________________________________________________________
                 //

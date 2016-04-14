@@ -40,6 +40,7 @@ namespace yocto
 }
 
 #include "yocto/ios/graphviz.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -64,6 +65,10 @@ namespace yocto
 
             bool alternate:: admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const
             {
+                if(members.size<=0)
+                {
+                    throw exception("{%s}: empty alternate rule '%s'", lxr.name.c_str(), label.c_str());
+                }
                 xnode *leaf = 0;
                 for(const node_type *member = members.head; member; member=member->next)
                 {
@@ -107,6 +112,10 @@ namespace yocto
 
             bool aggregate::admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const
             {
+                if(members.size<=0)
+                {
+                    throw exception("{%s}: empty aggregate rule '%s'", lxr.name.c_str(), label.c_str());
+                }
                 xnode *leaves = xnode::create(*this);
                 auto_ptr<xnode> guard(leaves);
                 for(const node_type *member = members.head; member; member=member->next)

@@ -99,11 +99,9 @@ YOCTO_UNIT_TEST_IMPL(json)
     json_parser J;
     ios::icstream fp( ios::cstdin );
     auto_ptr<syntax::xnode> tree(J.parse(fp));
-    if(tree.is_valid())
-    {
-        tree->graphviz("tree.dot");
-        ios::graphviz_render("tree.dot");
-    }
+    assert(tree.is_valid());
+    tree->graphviz("tree.dot");
+    ios::graphviz_render("tree.dot");
     
 }
 YOCTO_UNIT_TEST_DONE()
