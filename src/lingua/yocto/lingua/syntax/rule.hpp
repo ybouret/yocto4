@@ -53,7 +53,7 @@ namespace yocto
                 //
                 // non virtual interface
                 //______________________________________________________________
-                void build_following() const;
+                void build_following();
                 
             protected:
                 explicit rule(const string &id,const uint32_t t);
