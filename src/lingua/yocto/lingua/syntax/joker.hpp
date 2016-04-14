@@ -52,6 +52,7 @@ namespace yocto
                 //______________________________________________________________
                 virtual void viz(ios::ostream &fp) const;
                 virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const;
+                virtual bool admit_empty() const throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(optional);
@@ -74,7 +75,7 @@ namespace yocto
                 static const uint32_t UUID = YOCTO_FOURCC('[', '>', '=', ']');
                 explicit at_least(const string &id, const rule *r, const size_t n);
                 virtual ~at_least() throw();
-                
+
                 const size_t nmin;
 
                 //______________________________________________________________
@@ -83,7 +84,8 @@ namespace yocto
                 //______________________________________________________________
                 virtual void viz(ios::ostream &fp) const;
                 virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const;
-                
+                virtual bool admit_empty() const throw();
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(at_least);
             };

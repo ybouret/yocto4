@@ -67,6 +67,12 @@ namespace yocto
                 }
                 return true;
             }
+
+            bool optional:: admit_empty() const throw()
+            {
+                return true;
+            }
+
         }
     }
 }
@@ -138,8 +144,21 @@ namespace yocto
                     return false;
                 }
 
-
             }
+
+            bool at_least:: admit_empty() const throw()
+            {
+                if(nmin<=0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return jk->admit_empty();
+                }
+            }
+
+
         }
     }
 }

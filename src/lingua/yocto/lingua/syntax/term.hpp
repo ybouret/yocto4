@@ -28,7 +28,8 @@ namespace yocto
 
                 //! admit a lexeme with same label
                 virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const;
-                
+                virtual bool admit_empty() const throw(); //!< false
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
             };

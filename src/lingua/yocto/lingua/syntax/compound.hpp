@@ -57,6 +57,7 @@ namespace yocto
                 //______________________________________________________________
                 virtual void viz(ios::ostream &fp) const;
                 virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const;
+                virtual bool admit_empty() const throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(alternate);
@@ -92,7 +93,8 @@ namespace yocto
                 //______________________________________________________________
                 virtual void viz(ios::ostream &fp) const;
                 virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const;
-                
+                virtual bool admit_empty() const throw();
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(aggregate);
             };

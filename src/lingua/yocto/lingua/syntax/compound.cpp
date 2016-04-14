@@ -80,6 +80,24 @@ namespace yocto
                 }
                 return false;
             }
+
+            bool alternate:: admit_empty() const throw()
+            {
+                if(members.size<=0)
+                {
+                    return true;
+                }
+
+                for(const meta_node *member = members.head; member; member=member->next)
+                {
+                    if(member->addr->admit_empty())
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
         }
 
     }
@@ -130,6 +148,18 @@ namespace yocto
 
                 guard.forget();
                 grow(tree,leaves);
+                return true;
+            }
+
+            bool aggregate:: admit_empty() const throw()
+            {
+                for(const meta_node *member = members.head; member; member=member->next)
+                {
+                    if( ! member->addr->admit_empty() )
+                    {
+                        return false;
+                    }
+                }
                 return true;
             }
 

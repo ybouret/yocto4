@@ -36,7 +36,7 @@ namespace yocto
                               const action       &user_action,
                               const bool          is_control
                               );
-
+                
 
 
             private:

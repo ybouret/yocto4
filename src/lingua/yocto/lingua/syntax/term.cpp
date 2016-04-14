@@ -60,6 +60,11 @@ namespace yocto
                 }
             }
 
+            bool terminal:: admit_empty() const throw()
+            {
+                return false;
+            }
+
         }
     }
 }
