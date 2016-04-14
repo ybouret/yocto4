@@ -1,4 +1,5 @@
 #include "yocto/lingua/lexical/rule.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -23,6 +24,10 @@ namespace yocto
             apply(user_action),
             ctrl(is_control)
             {
+                if(motif->match_empty())
+                {
+                    throw exception("syntax rule '%s' MUST NOT match empty token!",label.c_str());
+                }
             }
 
 
