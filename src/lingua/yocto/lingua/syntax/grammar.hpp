@@ -32,6 +32,9 @@ namespace yocto
 
                 xnode *run(lexer &lxr, source &src) const;
 
+                void   build_following();
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 void check(const string &label) const;

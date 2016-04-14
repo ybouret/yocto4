@@ -89,6 +89,7 @@ YOCTO_UNIT_TEST_IMPL(grammar)
     std::cerr << "sizeof(rule) =" << sizeof(syntax::rule)  << std::endl;
 
     my_grammar    G;
+    G.build_following();
     my_lexer      L;
     ios::icstream fp( ios::cstdin );
     source        src(fp);

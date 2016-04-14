@@ -43,7 +43,7 @@ namespace yocto
                 return *tt;
             }
 
-            
+
             rule & grammar:: opt(const rule &r)
             {
                 assert(rules.owns(&r));
@@ -131,7 +131,7 @@ namespace yocto
                     //__________________________________________________________
                     throw exception("%d:[%s] syntax error",lxr.line,name.c_str());
                 }
-                
+
                 if(!tree)
                 {
                     throw exception("%d:[%s] is invalid: no AST!",lxr.line,name.c_str());
@@ -153,7 +153,7 @@ namespace yocto
                 return xnode::ast(tree);
             }
 
-}
+        }
     }
 }
 
@@ -181,3 +181,31 @@ namespace yocto
         }
     }
 }
+
+#include <iostream>
+namespace yocto
+{
+    namespace lingua
+    {
+        namespace syntax
+        {
+
+            void grammar::build_following()
+            {
+                for(rule *r = rules.head; r; r=r->next )
+                {
+                    r->build_following();
+                    std::cerr << r->label << " -> {";
+                    for(const rule::meta_node *node=r->following.head;node;node=node->next)
+                    {
+                        std::cerr << " " << node->addr->label << std::endl;
+                    }
+                    std::cerr << "}" << std::endl;
+                }
+            }
+        }
+        
+    }
+}
+
+

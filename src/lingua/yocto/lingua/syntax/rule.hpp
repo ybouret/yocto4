@@ -54,6 +54,7 @@ namespace yocto
                 //
                 // non virtual interface
                 //______________________________________________________________
+                void setup_following( meta_list &f ) const;
                 void build_following();
                 
             protected:
