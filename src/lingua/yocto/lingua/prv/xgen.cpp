@@ -21,22 +21,36 @@ namespace yocto
 
                 //______________________________________________________________
                 //
+                //
                 // grammar description grammar !
+                //
                 //______________________________________________________________
+                Agg &GRAMMAR = agg("GRAMMAR");
+
                 dict.define("ID", "[[:alpha:]_][:word:]*");
-                (**dict.search("ID")).graphviz("id.dot");
-                ios::graphviz_render("id.dot");
-                
+
                 Rule &END     = jettison(';');
 
-                Agg  &LANG_ID = agg("_LANG_ID",property::temporary);
-                LANG_ID << terminal("LANG_ID", "\\x2E{ID}") << END;
+                //______________________________________________________________
+                //
+                // fist item: the lang name...
+                //______________________________________________________________
+                {
+                    Agg  &LANG_ID = agg("_LANG_ID",property::temporary);
+                    LANG_ID << terminal("LANG_ID", "\\x2E{ID}") << END;
+                    GRAMMAR << LANG_ID;
+                }
 
+                Agg &RULE    = agg("RULE");
+                {
+                    Rule &RULE_ID = terminal("RULE_ID","{ID}");
+                    RULE << RULE_ID << jettison(':');
 
-                Agg &GRAMMAR = agg("GRAMMAR");
-                GRAMMAR << LANG_ID;
+                }
+                RULE << END;
 
-                top_level(GRAMMAR);
+                GRAMMAR << zero_or_more(RULE);
+                
                 //______________________________________________________________
                 //
                 // lexical rules
@@ -53,7 +67,7 @@ namespace yocto
                     graphviz("xgen.dot");
                     ios::graphviz_render("xgen.dot");
                 }
-                
+
             }
 
         }
@@ -71,6 +85,6 @@ namespace yocto
             }
             return 0;
         }
-
+        
     }
 }
