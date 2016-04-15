@@ -85,6 +85,7 @@ namespace yocto
                         Agg  &ALT   = agg("ALT",property::standard);
                         ALT << ALTERN << ITEMS;
 
+                        // if SUB exist => ALT !
                         Agg  &SUB  = agg("SUB",property::noSingle);
                         SUB << ITEMS << zero_or_more(ALT);
 
@@ -153,12 +154,19 @@ namespace yocto
         parser * parser:: generate(ios::istream &fp, const bool output_files)
         {
             syntax::xgen   generator(output_files);
-            syntax::xnode *tree = generator.parse(fp);
-            assert(tree);
-            auto_ptr<syntax::xnode> guard(tree);
+            syntax::xnode *raw_tree = generator.parse(fp);
+            assert(raw_tree);
+            auto_ptr<syntax::xnode> Tree(raw_tree);
             if(output_files)
             {
-                tree->graphviz("usr_tree.dot");
+                raw_tree->graphviz("raw_tree.dot");
+                ios::graphviz_render("raw_tree.dot");
+            }
+            Tree.forget();
+            Tree.reset( syntax::xgen::rewrite(raw_tree) );
+            if(output_files)
+            {
+                Tree->graphviz("usr_tree.dot");
                 ios::graphviz_render("usr_tree.dot");
             }
             return 0;

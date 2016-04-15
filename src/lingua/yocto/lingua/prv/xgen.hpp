@@ -18,6 +18,9 @@ namespace yocto
                 explicit xgen(const bool output_files);
                 virtual ~xgen() throw();
 
+                //! collect ALT
+                static xnode *rewrite(xnode *tree) throw();
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xgen);
             };
