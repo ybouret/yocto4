@@ -71,6 +71,8 @@ namespace
 
             top_level( choice(OBJECT,ARRAY) );
 
+            check_consistency();
+
             graphviz("json.dot");
             ios::graphviz_render("json.dot");
 

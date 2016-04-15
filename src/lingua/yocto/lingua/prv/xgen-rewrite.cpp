@@ -86,6 +86,7 @@ namespace yocto
             xnode * xgen:: rewrite(xnode *tree)
             {
                 assert(tree);
+
                 if(tree->terminal)
                 {
                     return tree;
@@ -110,7 +111,6 @@ namespace yocto
                     }
 
                     tch.swap_with(stk);
-
 
                     return tree;
                 }

@@ -10,17 +10,26 @@ namespace yocto
         namespace syntax
         {
 
-            class xgen : public lingua::parser
+            class xgen
             {
             public:
-                const bool output;
+                class Parser : public lingua::parser
+                {
+                public:
+                    explicit Parser(const bool output_files);
+                    virtual ~Parser() throw();
+                    
+                private:
+                    YOCTO_DISABLE_COPY_AND_ASSIGN(Parser);
+                };
 
-                explicit xgen(const bool output_files);
-                virtual ~xgen() throw();
+
+                xgen();
+                ~xgen() throw();
 
                 static xnode *rewrite(xnode *tree);
 
-                
+                lingua::parser *generate(const xnode *tree,const bool output_files);
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xgen);
