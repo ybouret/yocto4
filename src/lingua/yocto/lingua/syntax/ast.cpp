@@ -1,5 +1,6 @@
 #include "yocto/lingua/syntax/rule.hpp"
 #include "yocto/lingua/syntax/joker.hpp"
+#include "yocto/lingua/syntax/compound.hpp"
 
 namespace yocto
 {
@@ -8,6 +9,29 @@ namespace yocto
         namespace syntax
         {
 
+            static inline
+            bool __collapse(const xnode *sub) throw()
+            {
+                assert(sub);
+                switch(sub->origin->uuid)
+                {
+                    case optional::UUID:
+                    case at_least::UUID:
+                        return true;
+
+                    case aggregate::UUID:
+                        switch(sub->origin->flags)
+                    {
+                        case property::jettison: return true;
+                        case property::noSingle: return sub->ch->size <= 1;
+                        default:                 return false;
+                    }
+
+                    default:
+                        break;
+                }
+                return false;
+            }
 
             xnode * xnode:: ast(xnode *node) throw()
             {
@@ -49,14 +73,9 @@ namespace yocto
 
                     //__________________________________________________________
                     //
-                    // fusions...
+                    // collapsing ?
                     //__________________________________________________________
-                    const uint32_t uuid  = sub->origin->uuid;
-                    const uint32_t flags = sub->origin->flags;
-                    if(   (uuid==optional::UUID)
-                       || (uuid==at_least::UUID)
-                       || (property::jettison==flags)
-                       )
+                    if( __collapse(sub) )
                     {
                         assert(false==sub->terminal);
                         stk.merge_back(*(sub->ch));

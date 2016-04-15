@@ -124,7 +124,11 @@ namespace yocto
             void aggregate:: viz(ios::ostream &fp) const
             {
                 const rule *addr = this;
-                fp.viz(addr); fp << "[label=\""; ios::graphviz_encode(label,fp); fp << "\",shape=house];\n";
+                fp.viz(addr); fp << "[label=\""; ios::graphviz_encode(label,fp);
+                fp << "\",shape=house";
+                if(flags==property::noSingle) fp  << ",style=rounded";
+                if(flags==property::jettison) fp  << ",style=dotted";
+                fp << "];\n";
                 subviz(fp);
             }
 
