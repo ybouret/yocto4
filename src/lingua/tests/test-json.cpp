@@ -38,7 +38,7 @@ namespace
 
                 {
                     Agg &heavy_array = agg("heavy_array");
-                    heavy_array << LBRACK << VALUE << zero_or_more( agg("extra_value",property::temporary) << COMA << VALUE) << RBRACK;
+                    heavy_array << LBRACK << VALUE << zero_or_more( agg("extra_value",property::jettison) << COMA << VALUE) << RBRACK;
                     ARRAY |= heavy_array;
                 }
 
@@ -62,7 +62,7 @@ namespace
                     {
                         Agg &PAIR = agg("pair");
                         PAIR << STRING << jettison(':') << VALUE;
-                        heavy_object << LBRACE << PAIR << zero_or_more( agg("extra_pair",property::temporary) << COMA << PAIR ) << RBRACE;
+                        heavy_object << LBRACE << PAIR << zero_or_more( agg("extra_pair",property::jettison) << COMA << PAIR ) << RBRACE;
                     }
                     OBJECT |= heavy_object;
                 }

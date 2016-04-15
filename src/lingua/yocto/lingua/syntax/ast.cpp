@@ -55,7 +55,7 @@ namespace yocto
                     const uint32_t flags = sub->origin->flags;
                     if(   (uuid==optional::UUID)
                        || (uuid==at_least::UUID)
-                       || (property::temporary==flags)
+                       || (property::jettison==flags)
                        )
                     {
                         assert(false==sub->terminal);

@@ -2,6 +2,8 @@
 #include "yocto/ptr/auto.hpp"
 
 #include "yocto/ios/graphviz.hpp"
+#include "yocto/lingua/lexical/plugin/cstring.hpp"
+#include "yocto/lingua/lexical/plugin/rstring.hpp"
 
 namespace yocto
 {
@@ -36,23 +38,67 @@ namespace yocto
                 // fist item: the lang name...
                 //______________________________________________________________
                 {
-                    Agg  &LANG_ID = agg("_LANG_ID",property::temporary);
-                    LANG_ID << terminal("LANG_ID", "\\x2E{ID}") << END;
-                    GRAMMAR << LANG_ID;
+                    Agg &USR_NAME = agg("USR",property::jettison);
+                    USR_NAME << terminal("NAME","\\.{ID}");
+                    USR_NAME << END;
+                    GRAMMAR  << USR_NAME;
                 }
 
 
-                //______________________________________________________________
+                //__________________________________________________________________
                 //
-                // some rules
-                //______________________________________________________________
-                Agg &RULE     = agg("RULE");
-                Rule &RULE_ID = terminal("RULE_ID","{ID}");
-                RULE << RULE_ID << jettison(':');
+                // Rule Definitions
+                //__________________________________________________________________
+                Rule &ID        = terminal("ID","{ID}");
+                Rule &COLON     = jettison(':');
+                Rule &RXP       = term<lexical::cstring>("RXP");
+                Rule &RAW       = term<lexical::rstring>("RAW");
+                Rule &ALTERN    = jettison('|');
+                Rule &LPAREN    = jettison('(');
+                Rule &RPAREN    = jettison(')');
 
-                RULE << END;
+                {
+                    Agg  &RULE      = agg("RULE");
 
-                GRAMMAR << zero_or_more(RULE);
+                    RULE << ID << COLON;
+
+                    {
+                        Alt &ATOM = alt();
+                        ATOM << ID;
+                        ATOM << RXP;
+                        ATOM << RAW;
+                        Agg  &ITEM  = agg("ITEM");
+                        ITEM << ATOM;
+                        {
+                            Alt  &MOD  = alt();
+                            MOD << univocal('+') << univocal('*') << univocal('?');
+                            ITEM << opt(MOD);
+                        }
+
+                        Rule &ITEMS = one_or_more(ITEM);
+                        Agg  &ALT   = agg("ALT");
+                        ALT << ALTERN << ITEMS;
+
+                        Agg  &SUB  = agg("SUB");
+                        SUB << ITEMS << zero_or_more(ALT);
+
+                        Agg &XPRN  = agg("XPRN");
+                        XPRN << LPAREN << SUB << RPAREN;
+
+                        ATOM << XPRN;
+
+                        RULE << SUB;
+
+
+
+                    }
+
+                    RULE << END;
+                    GRAMMAR << zero_or_more(RULE);
+                }
+
+
+
 
                 //______________________________________________________________
                 //
@@ -70,11 +116,11 @@ namespace yocto
                     graphviz("xgen.dot");
                     ios::graphviz_render("xgen.dot");
                 }
-
+                
             }
-
+            
         }
-
+        
         parser * parser:: generate(ios::istream &fp, const bool output_files)
         {
             syntax::xgen   generator(output_files);

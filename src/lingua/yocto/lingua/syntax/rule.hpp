@@ -13,8 +13,8 @@ namespace yocto
         {
             static const uint32_t standard  = 0x00; //!< full terminal
             static const uint32_t univocal  = 0x01; //!< single content terminal
-            static const uint32_t jettison  = 0x02; //!< syntax only
-            static const uint32_t temporary = 0x04;
+            static const uint32_t jettison  = 0x02; //!< syntax only or temporary aggregate
+            //static const uint32_t;
         };
 
         namespace syntax
