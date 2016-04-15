@@ -29,7 +29,7 @@ namespace yocto
 
                 static xnode *rewrite(xnode *tree);
 
-                lingua::parser *generate(const xnode *tree,const bool output_files);
+                lingua::parser *generate(xnode *tree,const bool output_files);
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xgen);
