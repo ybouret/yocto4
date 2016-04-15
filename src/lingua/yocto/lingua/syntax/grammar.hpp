@@ -34,7 +34,7 @@ namespace yocto
 
                 void   build_following();
 
-                void   check() const;
+                void   check_consistency() const;
 
 
             private:
@@ -45,6 +45,8 @@ namespace yocto
                 unsigned nalt; //!< generate alternate rule labels
                 unsigned nzom; //!< generate altermnate zero_or_more rule labels
                 unsigned noom; //!< generate altermnate one_or_more rule labels
+                static void check_rule( const rule *r, void *args, const char *id);
+
             };
 
         }

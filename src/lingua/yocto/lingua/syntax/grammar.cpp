@@ -158,6 +158,128 @@ namespace yocto
 }
 
 
+#include "yocto/associative/map.hpp"
+
+namespace yocto
+{
+    namespace lingua
+    {
+        namespace syntax
+        {
+
+            namespace
+            {
+                typedef map<string,int> visited_db;
+
+            }
+
+            void   grammar:: check_consistency() const
+            {
+                if(rules.size<=0)
+                {
+                    throw exception("[%s]: no rules !", name.c_str());
+
+                }
+                visited_db visited(rules.size, as_capacity);
+                for(const rule *r = rules.head; r; r=r->next)
+                {
+                    if(!visited.insert(r->label,0))
+                    {
+                        throw exception("[%s].check(UNEXCPECTED MULTIPLE '%s')", name.c_str(), r->label.c_str());
+                    }
+                }
+
+                check_rule(rules.head,&visited,name.c_str());
+                for(visited_db::iterator i=visited.begin();i!=visited.end();++i)
+                {
+                    const string &label = i->key;
+                    const int     count = *i;
+                    //std::cerr << "#'" << label << "'=" << count << std::endl;
+                    if(count<=0) throw exception("[%s]: standalone rule '%s'", name.c_str(), label.c_str());
+                }
+            }
+
+
+            static inline
+            int & __count_of(const string &label, visited_db &visited, const char *id)
+            {
+                int *pCount = visited.search(label);
+                if(!pCount)
+                {
+                    throw exception("[%s] UNEXPECTED UNREGISTERED rule '%s'", id, label.c_str());
+                }
+                return *pCount;
+            }
+
+
+            void grammar:: check_rule(const rule *r, void *args, const char *id)
+            {
+                assert(r!=NULL);
+                visited_db &visited = *(visited_db *)args;
+                assert(r->self);
+                switch(r->uuid)
+                {
+                    case terminal::UUID: __count_of(r->label,visited,id)++; break;
+
+                    case optional::UUID: {
+                        optional *self = static_cast<optional *>(r->self);
+                        if( __count_of(self->label,visited,id)++ <= 0 )
+                        {
+                            check_rule(self->jk,args,id);
+                        }
+                    } break;
+
+                    case at_least::UUID: {
+                        at_least *self = static_cast<at_least *>(r->self);
+                        if( __count_of(self->label,visited,id)++ <= 0 )
+                        {
+                            check_rule(self->jk,args,id);
+                        }
+                    } break;
+
+                    case alternate::UUID: {
+                        alternate *self = static_cast<alternate *>(r->self);
+                        if(self->members.size<=0)
+                        {
+                            throw exception("[%s]: EMPTY ALTERNATE '%s'", id, r->label.c_str());
+                        }
+
+                        if( __count_of(self->label,visited,id)++ <= 0 )
+                        {
+                            for(rule::meta_node *m=self->members.head;m;m=m->next)
+                            {
+                                check_rule(m->addr,args,id);
+                            }
+                        }
+                    } break;
+
+                    case aggregate::UUID: {
+                        aggregate *self = static_cast<aggregate *>(r->self);
+                        if(self->members.size<=0)
+                        {
+                            throw exception("[%s]: EMPTY AGGREGATE '%s'", id, r->label.c_str());
+                        }
+                        if( __count_of(self->label,visited,id)++ <= 0 )
+                        {
+                            for(rule::meta_node *m=self->members.head;m;m=m->next)
+                            {
+                                check_rule(m->addr,args,id);
+                            }
+                        }
+                    } break;
+
+                    default:
+                        throw exception("grammar::check(UNKNOWN UUID)");
+                }
+
+            }
+
+        }
+
+    }
+
+}
+
 
 #include "yocto/ios/ocstream.hpp"
 

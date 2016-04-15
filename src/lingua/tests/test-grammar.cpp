@@ -64,6 +64,8 @@ namespace
 
             top_level( zero_or_more(LINE) );
 
+            check_consistency();
+
             graphviz("g.dot");
             ios::graphviz_render("g.dot");
 
@@ -89,7 +91,7 @@ YOCTO_UNIT_TEST_IMPL(grammar)
     std::cerr << "sizeof(rule) =" << sizeof(syntax::rule)  << std::endl;
 
     my_grammar    G;
-    G.build_following();
+    //G.build_following();
     my_lexer      L;
     ios::icstream fp( ios::cstdin );
     source        src(fp);
