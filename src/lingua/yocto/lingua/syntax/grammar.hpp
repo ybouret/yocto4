@@ -34,6 +34,8 @@ namespace yocto
 
                 void   build_following();
 
+                void   check() const;
+
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);

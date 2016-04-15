@@ -20,6 +20,8 @@ namespace yocto
 
                 static xnode *rewrite(xnode *tree);
 
+                
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xgen);
             };
