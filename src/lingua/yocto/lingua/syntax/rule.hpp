@@ -56,6 +56,7 @@ namespace yocto
                 //______________________________________________________________
                 void setup_following( meta_list &f ) const;
                 void build_following();
+                inline const string & key() const throw() { return label; }
                 
             protected:
                 explicit rule(const string &id,const uint32_t t);
