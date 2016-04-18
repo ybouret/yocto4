@@ -1,4 +1,6 @@
 #include "yocto/lingua/prv/xgen.hpp"
+#include "yocto/exception.hpp"
+
 #include <iostream>
 
 namespace yocto
@@ -7,50 +9,72 @@ namespace yocto
     {
         namespace syntax
         {
-            void xgen:: build_syntax_databases(const xnode *node)
+            
+            aggregate & xgen:: fetch(const string &label)
             {
-                if(node->terminal)
+                
+                agg_ptr *ppAgg = adb.search(label);
+                if(ppAgg)
                 {
-                    const string  content = node->lx->to_string();
-                    const string &label   = node->origin->label;
-                    switch(h_db(label))
-                    {
-                        case 0: {
-                            assert("ID"==label);
-                            std::cerr << "Found ID='" << content << "'" << std::endl;
-                            //syntax::aggregate  &a = xprs->agg(content);
-                            //const agg_ptr       p(&a);
-
-                        } break;
-
-                        case 1: {
-                            assert("RXP"==label);
-                            std::cerr << "Found RXP='" << content << "'" << std::endl;
-                        } break;
-
-                        case 2: {
-                            assert("RAW"==label);
-                            std::cerr << "Found RAW='" << content << "'" << std::endl;
-                        } break;
-
-
-                        default:
-                            break;
-                    }
-
+                    std::cerr << "returning '" << label << "'" << std::endl;
+                    return **ppAgg;
                 }
                 else
                 {
-                    for(const xnode *sub = node->ch->head; sub; sub=sub->next)
+                    aggregate &r = xprs->agg(label);
+                    
+                    const agg_ptr tmp(&r);
+                    if(! adb.insert(tmp) )
                     {
-                        build_syntax_databases(sub);
+                        throw exception("unexpected multiple '%s'", label.c_str());
                     }
+                    std::cerr << "creating  '" << label << "'" << std::endl;
+                    return r;
                 }
-
+                
             }
+            
 
+            void xgen::create_rule( const xnode *top )
+            {
+                assert("RULE"==top->label());
+                assert(false==top->terminal);
+                const xnode *node = top->ch->head;
+                
+                //-- get the rule label from "ID"
+                assert("ID"==node->label());
+                assert(true==node->terminal);
+                const string r_label = node->lx->to_string();
+                aggregate   &r       = fetch(r_label);
+                
+                
+            }
+            
         }
 
     }
 
+}
+
+namespace yocto
+{
+    namespace lingua
+    {
+        namespace syntax
+        {
+            
+            void xgen::create_lxr_( const xnode *top )
+            {
+                assert("LXR"==top->label());
+                assert(false==top->terminal);
+                const xnode *node = top->ch->head;
+                
+                assert("LX"==node->label());
+                assert(true==node->terminal);
+            }
+            
+        }
+        
+    }
+    
 }

@@ -49,7 +49,7 @@ namespace yocto
                 const rule *addr = this;
                 fp.viz(addr);
                 fp << "[label=\""; ios::graphviz_encode(label,fp);
-                fp << "\",shape=circle";
+                fp << "\",shape=circle,style=dotted";
                 fp << "];\n";
                 fp.viz(addr); fp << "->"; fp.viz(jk); fp << ";\n";
             }
@@ -103,7 +103,7 @@ namespace yocto
                 const rule *addr = this;
                 fp.viz(addr);
                 fp << "[label=\""; ios::graphviz_encode(label,fp);
-                fp << "\",shape=trapezium";
+                fp << "\",shape=invhouse,style=dotted";
                 fp << "];\n";
                 fp.viz(addr); fp << "->"; fp.viz(jk); fp << ";\n";
             }

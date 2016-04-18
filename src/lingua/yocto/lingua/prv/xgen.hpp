@@ -2,6 +2,7 @@
 #define YOCTO_LINGUA_XGEN_INCLUDED 1
 
 #include "yocto/lingua/parser.hpp"
+#include "yocto/lingua/syntax/term.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/ptr/alias.hpp"
 #include "yocto/ptr/auto.hpp"
@@ -41,13 +42,21 @@ namespace yocto
 
                 typedef alias_ptr<string,aggregate> agg_ptr;
                 typedef set<string,agg_ptr>         agg_db;
-
-                void build_syntax_databases(const xnode *node);
-
+                typedef alias_ptr<string,rule>      term_ptr;
+                typedef set<string,term_ptr>        term_db;
+                
                 auto_ptr<lingua::parser> xprs;
                 agg_db                   adb;
-                hashing::mperf           h_db; //!< ID,RAW,RXP
+                term_db                  tdb;
+                hashing::mperf           htop; //!< RULE,LXR
 
+                
+                void create_rule(const xnode *top);
+                void create_lxr_(const xnode *top);
+                
+                
+                aggregate & fetch(const string &label);
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xgen);
             };

@@ -59,7 +59,7 @@ namespace yocto
             void alternate:: viz(ios::ostream &fp) const
             {
                 const rule *addr = this;
-                fp.viz(addr); fp << "[label=\""; ios::graphviz_encode(label,fp); fp << "\",shape=egg];\n";
+                fp.viz(addr); fp << "[label=\""; ios::graphviz_encode(label,fp); fp << "\",shape=egg,style=dotted];\n";
                 subviz(fp);
             }
 

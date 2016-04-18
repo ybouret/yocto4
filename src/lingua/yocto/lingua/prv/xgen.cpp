@@ -1,5 +1,7 @@
 #include "yocto/lingua/prv/xgen.hpp"
 #include "yocto/ptr/auto.hpp"
+#include "yocto/ios/graphviz.hpp"
+#include "yocto/exception.hpp"
 
 #define Y_XGEN_VERBOSE 1
 
@@ -23,17 +25,16 @@ namespace yocto
             }
 
 
-            static const char *kw_db[] =
+            static const char *kw_top[] =
             {
-                "ID",
-                "RXP",
-                "RAW"
+                "RULE",
+                "LXR"
             };
 
             xgen:: xgen() :
             xprs(NULL),
             adb(),
-            h_db(YOCTO_MPERF_FOR(kw_db))
+            htop(YOCTO_MPERF_FOR(kw_top))
             {
             }
 
@@ -68,17 +69,32 @@ namespace yocto
 
                 //______________________________________________________________
                 //
-                // pass1: build databases for syntax
+                // run over top level rule
                 //______________________________________________________________
                 for(const xnode *node = top_level.head; node; node=node->next)
                 {
-                    if("RULE"==node->label())
+                    switch(htop(node->label()))
                     {
-                        build_syntax_databases(node);
+                        case 0: assert("RULE"==node->label());
+                            create_rule(node);
+                            break;
+                            
+                        case 1: assert("LXR"==node->label());
+                            create_lxr_(node);
+                            break;
+                            
+                        default:
+                            throw exception("xgen: unhandled top level '%s'", node->label().c_str());
                     }
+                
                 }
 
-
+                if(output_files)
+                {
+                    xprs->graphviz("usr_gram.dot");
+                    ios::graphviz_render("usr_gram.dot");
+                }
+                
                 return xprs.yield();
             }
 
