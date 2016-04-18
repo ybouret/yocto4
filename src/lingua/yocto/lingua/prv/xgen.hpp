@@ -34,9 +34,7 @@ namespace yocto
 
                 xgen();
                 ~xgen() throw();
-
-                static xnode *rewrite(xnode *tree);
-
+                
                 //! top level generation
                 lingua::parser *generate(xnode *tree,const bool output_files);
 

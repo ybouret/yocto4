@@ -7,6 +7,7 @@ namespace yocto
         namespace syntax
         {
 
+#if 0
             static inline xnode * __reformat( xnode *node )
             {
                 assert("SUB"==node->origin->label);
@@ -115,6 +116,9 @@ namespace yocto
                     return tree;
                 }
             }
+            
+#endif
+            
         }
         
     }

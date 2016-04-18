@@ -64,44 +64,31 @@ namespace yocto
                 //______________________________________________________________
 
                 Agg  &RULE      = agg("RULE");
+                RULE << ID << COLON;
                 {
 
-                    RULE << ID << COLON;
 
+                    
+                    Alt &ATOM = alt();
+                    ATOM << ID << RXP << RAW;
+                    
+                    Agg &ITEM = agg("ITEM",property::noSingle);
+                    ITEM << ATOM;
                     {
-                        Alt &ATOM = alt();
-                        ATOM << ID;
-                        ATOM << RXP;
-                        ATOM << RAW;
-                        Agg  &ITEM  = agg("ITEM");//,property::noSingle);
-                        ITEM << ATOM;
-                        {
-                            Alt  &MOD  = alt();
-                            MOD  << univocal('+') << univocal('*') << univocal('?');
-                            ITEM << opt(MOD);
-                        }
-
-                        Rule &ITEMS = one_or_more(ITEM);
-                        Agg  &ALT   = agg("ALT",property::standard);
-                        ALT << ALTERN << ITEMS;
-
-                        // if SUB exist => ALT !
-                        Agg  &SUB  = agg("SUB");//,property::noSingle);
-                        SUB << ITEMS << zero_or_more(ALT);
-
-                        Agg &XPRN  = agg("XPRN");//,property::jettison);
-                        XPRN << LPAREN << SUB << RPAREN;
-
-                        ATOM << XPRN;
-
-                        RULE << SUB;
-
-
-
+                        Alt &MODIFIER = alt();
+                        MODIFIER <<univocal('+') << univocal('*') << univocal('?');
+                        ITEM << opt(MODIFIER);
                     }
-
-                    RULE << END;
+                    
+                    Agg &SUB = agg("SUB",property::noSingle);
+                    Agg &ALT = agg("ALT",property::noSingle);
+                    ALT  << SUB  << zero_or_more( agg("EXTRA_ALT",property::jettison) << ALTERN << SUB );
+                    SUB  << ITEM << zero_or_more( agg("EXTRA_SUB",property::jettison) << ITEM);
+                    ATOM << ( agg("GRP",property::jettison) << LPAREN << ALT << RPAREN );
+                    
+                    RULE << ALT;
                 }
+                RULE << END;
 
 
                 //______________________________________________________________
@@ -159,30 +146,18 @@ namespace yocto
 
                 //______________________________________________________________
                 //
-                // parse input to produce a raw tree
+                // parse input to produce a tree
                 //______________________________________________________________
-                syntax::xnode *raw_tree = xparser.parse(fp);
-                assert(raw_tree);
-                tree.reset(raw_tree);
+                syntax::xnode *usr_tree = xparser.parse(fp);
+                assert(usr_tree);
+                tree.reset(usr_tree);
                 if(output_files)
                 {
-                    raw_tree->graphviz("raw_tree.dot");
+                    usr_tree->graphviz("raw_tree.dot");
                     ios::graphviz_render("raw_tree.dot");
                 }
 
                 
-                //______________________________________________________________
-                //
-                // rewrite the tree
-                //______________________________________________________________
-                //tree.forget();
-                //tree.reset( syntax::xgen::rewrite(raw_tree) );
-
-                if(output_files)
-                {
-                    tree->graphviz("usr_tree.dot");
-                    ios::graphviz_render("usr_tree.dot");
-                }
             }
 
             syntax::xgen xg;

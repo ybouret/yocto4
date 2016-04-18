@@ -76,11 +76,11 @@ namespace yocto
                     switch(htop(node->label()))
                     {
                         case 0: assert("RULE"==node->label());
-                            create_rule(node);
+                            //create_rule(node);
                             break;
                             
                         case 1: assert("LXR"==node->label());
-                            create_lxr_(node);
+                            //create_lxr_(node);
                             break;
                             
                         default:
