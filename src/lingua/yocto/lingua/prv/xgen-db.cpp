@@ -132,7 +132,7 @@ namespace yocto
                             
                         case 3: assert("SUB"==node->label());
                         {
-                            const string sub_label = parent.label + '/' + vformat("%c%d", rule::internal_char, ++(parent.prv));
+                            const string sub_label = parent.label + "_sub" + vformat("%c%d", rule::internal_char, ++(parent.prv));
                             aggregate   &sub = fetch_agg(sub_label);
                             grow(sub,node->ch->head);
                             parent << sub;
@@ -141,13 +141,34 @@ namespace yocto
                             
                         case 4: assert("ITEM"==node->label());
                         {
-                            
+                            assert(2==node->ch->size);
+                            const string  sub_label = parent.label + "_itm" + vformat("%c%d", rule::internal_char, ++(parent.prv));
+                            aggregate    &sub = fetch_agg(sub_label);
+                            const string  modifier = node->ch->tail->label();
+                            delete node->ch->pop_back();
+                            std::cerr << "\t\tmodifier=" << modifier << std::endl;
+                            grow(sub,node->ch->head);
+                            switch(hmod(modifier))
+                            {
+                                case 0: assert("?"==modifier); parent << xprs->opt(sub);          break;
+                                case 1: assert("*"==modifier); parent << xprs->zero_or_more(sub); break;
+                                case 2: assert("+"==modifier); parent << xprs->one_or_more(sub);  break;
+                                default: throw exception("unknown modifier '%s' in rule '%s'", modifier.c_str(), parent.label.c_str());
+                            }
                         }
                             break;
                             
-                        default:
-                            std::cerr << "NO GROW for " << node->label() << std::endl;
+                        case 5: assert( "ALT"==node->label() );
+                        {
+                            alternate  &alt = xprs->alt();
+                            grow(alt,node->ch->head);
+                            parent << alt;
+                        }
                             break;
+                            
+                            
+                        default:
+                            throw exception("unhandled grammar component '%s'", node->label().c_str());
                     }
                     node = node->next;
                 }

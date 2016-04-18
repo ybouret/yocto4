@@ -49,7 +49,7 @@ namespace yocto
                 termDB                   raw_db;
                 hashing::mperf           htop; //!< RULE,LXR
                 hashing::mperf           hsub; //!< ID,RXP,RAW
-
+                hashing::mperf           hmod; //!< +,*,?
                 
                 void create_rule(const xnode *top);
                 void create_lxr_(const xnode *top);

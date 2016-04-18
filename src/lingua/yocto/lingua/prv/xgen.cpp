@@ -37,17 +37,25 @@ namespace yocto
                 "RXP",
                 "RAW",
                 "SUB",
-                "ITEM"
+                "ITEM",
+                "ALT"
             };
 
-
+            static const char *kw_mod[] =
+            {
+                "?",
+                "*",
+                "+"
+            };
+            
             xgen:: xgen() :
             xprs(NULL),
             agg_db(),
             rxp_db(),
             raw_db(),
             htop(YOCTO_MPERF_FOR(kw_top)),
-            hsub(YOCTO_MPERF_FOR(kw_sub))
+            hsub(YOCTO_MPERF_FOR(kw_sub)),
+            hmod(YOCTO_MPERF_FOR(kw_mod))
             {
             }
 
