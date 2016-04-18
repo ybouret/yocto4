@@ -101,6 +101,22 @@ namespace yocto
                 rules.move_to_front(&r);
             }
 
+            
+            rule & grammar:: append(rule *r)
+            {
+                assert(r);
+                try
+                {
+                    check(r->label);
+                    rules.push_back(r);
+                    return *r;
+                }
+                catch(...)
+                {
+                    delete r;
+                    throw;
+                }
+            }
         }
     }
 }

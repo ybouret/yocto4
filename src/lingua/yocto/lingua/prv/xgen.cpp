@@ -116,6 +116,8 @@ namespace yocto
                     ios::graphviz_render("usr_gram.dot");
                 }
                 
+                xprs->check_consistency();
+                
                 return xprs.yield();
             }
 

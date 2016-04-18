@@ -452,6 +452,12 @@ namespace yocto
                         p.reset( NONE::create() );
                         ++curr;
                         break;
+                        
+                    case '-':
+                        p.reset( OR::create() );
+                        p->add( single::create('-') );
+                        ++curr;
+                        break;
 
                     default:
                         p.reset( OR::create() );

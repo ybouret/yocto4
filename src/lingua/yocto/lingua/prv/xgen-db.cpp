@@ -91,11 +91,26 @@ namespace yocto
                         throw exception("unexpected multiple RAW '%s'", label.c_str());
                         
                     }
-                    std::cerr << "creating  rxp '" << label << "'" << std::endl;
+                    std::cerr << "creating  raw '" << label << "'" << std::endl;
                     return r;
                 }
             }
             
+            
+            rule & __modified(const rule           &r,
+                              parser               &prs,
+                              const string         &modifier,
+                              const hashing::mperf &hmod)
+            {
+                switch(hmod(modifier))
+                {
+                    case 0: assert("?"==modifier); return prs.opt(r);
+                    case 1: assert("*"==modifier); return prs.zero_or_more(r);
+                    case 2: assert("+"==modifier); return prs.one_or_more(r);
+                    default: break;
+                }
+                throw exception("unknown modifier '%s'", modifier.c_str());
+            }
             
             void xgen::grow(compound &parent, const xnode *node)
             {
@@ -132,7 +147,7 @@ namespace yocto
                             
                         case 3: assert("SUB"==node->label());
                         {
-                            const string sub_label = parent.label + "_sub" + vformat("%c%d", rule::internal_char, ++(parent.prv));
+                            const string sub_label = parent.label + vformat("(%c%d)", rule::internal_char, ++(parent.prv));
                             aggregate   &sub = fetch_agg(sub_label);
                             grow(sub,node->ch->head);
                             parent << sub;
@@ -142,19 +157,14 @@ namespace yocto
                         case 4: assert("ITEM"==node->label());
                         {
                             assert(2==node->ch->size);
-                            const string  sub_label = parent.label + "_itm" + vformat("%c%d", rule::internal_char, ++(parent.prv));
+                            const string  sub_label = parent.label + vformat("[%c%d]", rule::internal_char, ++(parent.prv));
                             aggregate    &sub = fetch_agg(sub_label);
+                            sub.flags         = property::jettison;
                             const string  modifier = node->ch->tail->label();
                             delete node->ch->pop_back();
                             std::cerr << "\t\tmodifier=" << modifier << std::endl;
                             grow(sub,node->ch->head);
-                            switch(hmod(modifier))
-                            {
-                                case 0: assert("?"==modifier); parent << xprs->opt(sub);          break;
-                                case 1: assert("*"==modifier); parent << xprs->zero_or_more(sub); break;
-                                case 2: assert("+"==modifier); parent << xprs->one_or_more(sub);  break;
-                                default: throw exception("unknown modifier '%s' in rule '%s'", modifier.c_str(), parent.label.c_str());
-                            }
+                            parent << __modified(sub, *xprs, modifier, hmod);
                         }
                             break;
                             
