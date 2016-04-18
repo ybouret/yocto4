@@ -39,22 +39,26 @@ namespace yocto
                 lingua::parser *generate(xnode *tree,const bool output_files);
 
                 typedef alias_ptr<string,aggregate> agg_ptr;
-                typedef set<string,agg_ptr>         agg_db;
+                typedef set<string,agg_ptr>         aggDB;
                 typedef alias_ptr<string,rule>      term_ptr;
-                typedef set<string,term_ptr>        term_db;
+                typedef set<string,term_ptr>        termDB;
                 
                 auto_ptr<lingua::parser> xprs;
-                agg_db                   adb;
-                term_db                  tdb;
+                aggDB                    agg_db;
+                termDB                   rxp_db;
+                termDB                   raw_db;
                 hashing::mperf           htop; //!< RULE,LXR
+                hashing::mperf           hsub; //!< ID,RXP,RAW
 
                 
                 void create_rule(const xnode *top);
                 void create_lxr_(const xnode *top);
                 
                 
-                aggregate & fetch(const string &label);
-                
+                aggregate & fetch_agg(const string &label);
+                rule      & fetch_rxp(const string &label);
+                rule      & fetch_raw(const string &label);
+
                 //! grow parent from child node
                 void grow(compound &parent, const xnode *node);
                 

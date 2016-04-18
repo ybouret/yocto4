@@ -30,11 +30,24 @@ namespace yocto
                 "RULE",
                 "LXR"
             };
+            
+            static const char *kw_sub[] =
+            {
+                "ID",
+                "RXP",
+                "RAW",
+                "SUB",
+                "ITEM"
+            };
+
 
             xgen:: xgen() :
             xprs(NULL),
-            adb(),
-            htop(YOCTO_MPERF_FOR(kw_top))
+            agg_db(),
+            rxp_db(),
+            raw_db(),
+            htop(YOCTO_MPERF_FOR(kw_top)),
+            hsub(YOCTO_MPERF_FOR(kw_sub))
             {
             }
 
@@ -76,11 +89,11 @@ namespace yocto
                     switch(htop(node->label()))
                     {
                         case 0: assert("RULE"==node->label());
-                            //create_rule(node);
+                            create_rule(node);
                             break;
                             
                         case 1: assert("LXR"==node->label());
-                            //create_lxr_(node);
+                            create_lxr_(node);
                             break;
                             
                         default:
