@@ -57,6 +57,9 @@ namespace yocto
                 
                 aggregate & fetch(const string &label);
                 
+                //! grow parent from child node
+                void grow(compound &parent, const xnode *node);
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xgen);
             };

@@ -46,7 +46,13 @@ namespace yocto
                 assert(true==node->terminal);
                 const string r_label = node->lx->to_string();
                 aggregate   &r       = fetch(r_label);
+                grow(r,top->next);
                 
+            }
+            
+            
+            void xgen::grow(compound &parent, const xnode *node)
+            {
                 
             }
             

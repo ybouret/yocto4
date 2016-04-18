@@ -73,7 +73,7 @@ namespace yocto
                         ATOM << ID;
                         ATOM << RXP;
                         ATOM << RAW;
-                        Agg  &ITEM  = agg("ITEM",property::noSingle);
+                        Agg  &ITEM  = agg("ITEM");//,property::noSingle);
                         ITEM << ATOM;
                         {
                             Alt  &MOD  = alt();
@@ -86,10 +86,10 @@ namespace yocto
                         ALT << ALTERN << ITEMS;
 
                         // if SUB exist => ALT !
-                        Agg  &SUB  = agg("SUB",property::noSingle);
+                        Agg  &SUB  = agg("SUB");//,property::noSingle);
                         SUB << ITEMS << zero_or_more(ALT);
 
-                        Agg &XPRN  = agg("XPRN",property::jettison);
+                        Agg &XPRN  = agg("XPRN");//,property::jettison);
                         XPRN << LPAREN << SUB << RPAREN;
 
                         ATOM << XPRN;
@@ -175,8 +175,8 @@ namespace yocto
                 //
                 // rewrite the tree
                 //______________________________________________________________
-                tree.forget();
-                tree.reset( syntax::xgen::rewrite(raw_tree) );
+                //tree.forget();
+                //tree.reset( syntax::xgen::rewrite(raw_tree) );
 
                 if(output_files)
                 {
