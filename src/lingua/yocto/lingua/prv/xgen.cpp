@@ -90,6 +90,12 @@ namespace yocto
 
                 //______________________________________________________________
                 //
+                // Top level rule and plugin detection
+                //______________________________________________________________
+                initialize(top_level);
+                
+                //______________________________________________________________
+                //
                 // run over top level rule
                 //______________________________________________________________
                 for(const xnode *node = top_level.head; node; node=node->next)
@@ -105,7 +111,7 @@ namespace yocto
                             break;
                             
                         default:
-                            throw exception("xgen: unhandled top level '%s'", node->label().c_str());
+                            throw exception("xgen.generate: unhandled top level '%s'", node->label().c_str());
                     }
                 
                 }
@@ -116,13 +122,34 @@ namespace yocto
                     ios::graphviz_render("usr_gram.dot");
                 }
                 
+                if(agg_db.size()>0)
+                {
+                    aggDB::iterator first = agg_db.begin();
+                    xprs->top_level(**first);
+                }
                 xprs->check_consistency();
                 
                 return xprs.yield();
             }
 
+            
+            void xgen:: initialize( xlist &top_level )
+            {
+                xlist tmp;
+                while(top_level.size)
+                {
+                    xnode *node = top_level.pop_front();
+                    tmp.push_back(node);
+                    if(1==htop(node->label()))
+                    {
+                        assert("LXR"==node->label());
+                        const string lx_id = node->ch->head->lx->to_string(1,0);
+                        std::cerr << "lexical rule id=" << lx_id << std::endl;
+                    }
+                }
+                top_level.swap_with(tmp);
+            }
+            
         }
-
-        
     }
 }

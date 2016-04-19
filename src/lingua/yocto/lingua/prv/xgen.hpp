@@ -54,7 +54,7 @@ namespace yocto
                 void create_rule(const xnode *top);
                 void create_lxr_(const xnode *top);
                 
-                
+                void        initialize( xlist &top_level );
                 aggregate & fetch_agg(const string &label);
                 rule      & fetch_rxp(const string &label);
                 rule      & fetch_raw(const string &label);
