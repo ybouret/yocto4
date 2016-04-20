@@ -208,17 +208,47 @@ namespace yocto
 
 
             static inline
-            pattern *create_from(const xnode *args)
+            pattern *create_from(const xnode *args, p_dict &dict)
             {
                 assert(args);
                 auto_ptr<logical> motif( OR::create() );
                 while(args)
                 {
-                    const string &kind = args->label();
+                    const string &kind = args->origin->label;
                     assert("RXP"==kind || "RAW" == kind );
+                    assert(args->terminal);
+                    const string  content = args->lx->to_string();
+                    if("RAW"==kind)
+                    {
+                        std::cerr << "RAW: '" << content << "'" << std::endl;
+                        auto_ptr<pattern> p( logical::equal(content) );
+                        if(p->match_empty())
+                        {
+                            throw exception("line %d: raw string '%s' match empty", args->lx->line, content.c_str());
+                        }
+                        motif->add(p.yield());
+                    }
+                    else
+                    {
+                        std::cerr << "RXP: \"" << content << "\"" << std::endl;
+                        auto_ptr<pattern> p( regexp(content, &dict) );
+                        if(p->match_empty())
+                        {
+                            throw exception("line %d: regexp '%s' match empty", args->lx->line, content.c_str());
+                        }
+                        motif->add(p.yield());
+                    }
                     args = args->next;
                 }
-                return motif.yield();
+                p_list &ops = motif->operands;
+                if(ops.size==1)
+                {
+                    return ops.pop_back();
+                }
+                else
+                {
+                    return motif.yield();
+                }
             }
 
             void xgen::create_lexical_rule( const xnode *top )
@@ -237,20 +267,16 @@ namespace yocto
                 switch(hres(id))
                 {
                     case 0:
-                        std::cerr << "Will drop..." << std::endl;
                     {
                         const lexical::action __drop( & (xprs->root), & lexical::scanner::discard );
-                        xprs->root.make(id, create_from(args), __drop);
-                    }
-                        break;
+                        xprs->root.make(id, create_from(args,xprs->dict), __drop);
+                    } break;
 
                     case 1:
-                        std::cerr << "Will endl..." << std::endl;
                     {
                         const lexical::action __endl( & (xprs->root), &lexical::scanner::newline );
-                        xprs->root.make(id, create_from(args), __endl);
-                    }
-                        break;
+                        xprs->root.make(id, create_from(args,xprs->dict), __endl);
+                    }  break;
 
                     case 2:
                         std::cerr << "Will comment..." << std::endl;

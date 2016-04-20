@@ -83,7 +83,8 @@ namespace yocto
                     Agg &SUB = agg("SUB",property::noSingle);
                     Agg &ALT = agg("ALT",property::noSingle);
                     ALT  << SUB  << zero_or_more( agg("EXTRA_ALT",property::jettison) << ALTERN << SUB );
-                    SUB  << ITEM << zero_or_more( agg("EXTRA_SUB",property::jettison) << ITEM);
+                    //SUB  << ITEM << zero_or_more( agg("EXTRA_SUB",property::jettison) << ITEM);
+                    SUB << one_or_more(ITEM);
                     ATOM << ( agg("GRP",property::jettison) << LPAREN << ALT << RPAREN );
                     
                     RULE << ALT;
@@ -98,7 +99,7 @@ namespace yocto
                 Agg &LXR = agg("LXR");
                 LXR << terminal("LX","@{ID}");
                 LXR << COLON;
-                LXR << one_or_more(choice(RXP,RAW));
+                LXR << one_or_more(RAW);
                 LXR << END;
 
 
