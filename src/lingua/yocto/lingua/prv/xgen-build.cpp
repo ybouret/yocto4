@@ -9,53 +9,33 @@ namespace yocto
     {
         namespace syntax
         {
-            
-            aggregate & xgen:: fetch_agg(const string &label)
+
+            rule       &xgen::fetch_agg(const string &label)
             {
-                agg_ptr *ppAgg = agg_db.search(label);
-                if(ppAgg)
+                rule_ptr *ppRule = rules.search(label);
+                if(ppRule)
                 {
+                    // may be a terminal plugged in
                     std::cerr << "returning '" << label << "'" << std::endl;
-                    rule &r = **ppAgg;
-                    assert(r.self);
-                    assert(aggregate::UUID==r.uuid);
-                    return *static_cast<aggregate *>(r.self);
+                    return **ppRule;
                 }
                 else
                 {
-                    aggregate &r = xprs->agg(label);
-                    
-                    const agg_ptr tmp(&r);
-                    if(! agg_db.insert(tmp) )
+                    aggregate      &r = xprs->agg(label);
+                    const rule_ptr p(&r);
+                    if(!rules.insert(p))
                     {
                         throw exception("unexpected multiple ID '%s'", label.c_str());
                     }
                     std::cerr << "creating  '" << label << "'" << std::endl;
                     return r;
+
                 }
-                
             }
-            
-            
-            void xgen::create_rule( const xnode *top )
-            {
-                assert("RULE"==top->label());
-                assert(false==top->terminal);
-                const xnode *node = top->ch->head;
-                
-                //-- get the rule label from "ID"
-                assert("ID"==node->label());
-                assert(true==node->terminal);
-                const string r_label = node->lx->to_string();
-                aggregate   &r       = fetch_agg(r_label);
-                grow(r,node->next);
-                
-            }
-            
-            
+
             rule & xgen::fetch_rxp(const string &label)
             {
-                term_ptr *ppRxp = rxp_db.search(label);
+                rule_ptr *ppRxp = rules.search(label);
                 if(ppRxp)
                 {
                     std::cerr << "returning rxp '" << label << "'" << std::endl;
@@ -64,21 +44,21 @@ namespace yocto
                 else
                 {
                     rule &r = xprs->terminal(label, label);
-                    
-                    const term_ptr tmp(&r);
-                    if(! rxp_db.insert(tmp) )
+
+                    const rule_ptr tmp(&r);
+                    if(!rules.insert(tmp))
                     {
                         throw exception("unexpected multiple RXP '%s'", label.c_str());
-                        
+
                     }
                     std::cerr << "creating  rxp '" << label << "'" << std::endl;
                     return r;
                 }
             }
-            
+
             rule & xgen::fetch_raw(const string &label)
             {
-                term_ptr *ppRxp = raw_db.search(label);
+                rule_ptr *ppRxp = rules.search(label);
                 if(ppRxp)
                 {
                     std::cerr << "returning raw '" << label << "'" << std::endl;
@@ -87,19 +67,40 @@ namespace yocto
                 else
                 {
                     rule &r = xprs->univocal(label);
-                    
-                    const term_ptr tmp(&r);
-                    if(! raw_db.insert(tmp) )
+
+                    const rule_ptr tmp(&r);
+                    if(!rules.insert(tmp))
                     {
                         throw exception("unexpected multiple RAW '%s'", label.c_str());
-                        
                     }
                     std::cerr << "creating  raw '" << label << "'" << std::endl;
                     return r;
                 }
             }
+
+
+
+            void xgen::create_leading_rule( const xnode *top )
+            {
+                assert("RULE"==top->label());
+                assert(false==top->terminal);
+                const xnode *node = top->ch->head;
+
+                //-- get the rule label from "ID"
+                assert("ID"==node->label());
+                assert(true==node->terminal);
+                const string id = node->lx->to_string();
+                rule        &r  = fetch_agg(id);
+                if(r.uuid != aggregate::UUID)
+                {
+                    throw exception("xgen: top-level '%s' is not an aggregate!", id.c_str());
+                }
+                grow(r.as<aggregate>(),node->next);
+
+            }
             
-            
+
+
             rule & __modified(const rule           &r,
                               parser               &prs,
                               const string         &modifier,
@@ -114,7 +115,7 @@ namespace yocto
                 }
                 throw exception("unknown modifier '%s'", modifier.c_str());
             }
-            
+
             void xgen::grow(compound &parent, const xnode *node)
             {
                 while(node)
@@ -129,7 +130,7 @@ namespace yocto
                             parent << fetch_agg(content);
                         }
                             break;
-                            
+
                         case 1: assert("RXP"==node->label());
                         {
                             assert(node->terminal);
@@ -138,7 +139,7 @@ namespace yocto
                             parent << fetch_rxp(content);
                         }
                             break;
-                            
+
                         case 2: assert("RAW"==node->label());
                         {
                             assert(node->terminal);
@@ -147,30 +148,31 @@ namespace yocto
                             parent << fetch_raw(content);
                         }
                             break;
-                            
+
                         case 3: assert("SUB"==node->label());
                         {
                             const string sub_label = parent.label + vformat("(%c%d)", rule::internal_char, ++(parent.prv));
-                            aggregate   &sub = fetch_agg(sub_label);
+                            aggregate   &sub = fetch_agg(sub_label).as<aggregate>();
                             grow(sub,node->ch->head);
                             parent << sub;
                         }
                             break;
-                            
+
                         case 4: assert("ITEM"==node->label());
                         {
                             assert(2==node->ch->size);
                             const string  sub_label = parent.label + vformat("[%c%d]", rule::internal_char, ++(parent.prv));
-                            aggregate    &sub = fetch_agg(sub_label);
-                            sub.flags         = property::jettison;
-                            const string  modifier = node->ch->tail->label();
+                            aggregate    &sub       = fetch_agg(sub_label).as<aggregate>();
+                            const string  modifier  = node->ch->tail->label();
+                            sub.flags               = property::jettison;
+
                             delete node->ch->pop_back();
                             std::cerr << "\t\tmodifier=" << modifier << std::endl;
                             grow(sub,node->ch->head);
                             parent << __modified(sub, *xprs, modifier, hmod);
                         }
                             break;
-                            
+
                         case 5: assert( "ALT"==node->label() );
                         {
                             alternate  &alt = xprs->alt();
@@ -178,19 +180,19 @@ namespace yocto
                             parent << alt;
                         }
                             break;
-                            
-                            
+
+
                         default:
                             throw exception("unhandled grammar component '%s'", node->label().c_str());
                     }
                     node = node->next;
                 }
             }
-            
+
         }
-        
+
     }
-    
+
 }
 
 namespace yocto
@@ -199,8 +201,8 @@ namespace yocto
     {
         namespace syntax
         {
-            
-            void xgen::create_lxr_( const xnode *top )
+
+            void xgen::create_lexical_rule( const xnode *top )
             {
                 assert("LXR"==top->label());
                 assert(false==top->terminal);
@@ -208,6 +210,10 @@ namespace yocto
                 
                 assert("LX"==node->label());
                 assert(true==node->terminal);
+
+                const string id = node->lx->to_string();
+                std::cerr << "Lexical: '" << id << "'" << std::endl;
+
             }
             
         }

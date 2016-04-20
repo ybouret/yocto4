@@ -58,7 +58,24 @@ namespace yocto
                 void setup_following( meta_list &f ) const;
                 void build_following();
                 inline const string & key() const throw() { return label; }
-                
+
+                template <typename T>
+                T &as() throw()
+                {
+                    assert(uuid==T::UUID);
+                    assert(self);
+                    return *static_cast<T*>(self);
+                }
+
+                template <typename T>
+                const T &as() const throw()
+                {
+                    assert(uuid==T::UUID);
+                    assert(self);
+                    return *static_cast<T*>(self);
+                }
+
+
             protected:
                 explicit rule(const string &id,const uint32_t t);
                 void     grow( xnode * &tree, xnode *leaf ) const throw();

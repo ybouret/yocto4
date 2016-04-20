@@ -56,9 +56,7 @@ namespace yocto
             
             xgen:: xgen() :
             xprs(NULL),
-            agg_db(),
-            rxp_db(),
-            raw_db(),
+            rules(),
             htop(YOCTO_MPERF_FOR(kw_top)),
             hsub(YOCTO_MPERF_FOR(kw_sub)),
             hmod(YOCTO_MPERF_FOR(kw_mod)),
@@ -105,23 +103,44 @@ namespace yocto
                 //______________________________________________________________
                 //
                 // run over top level rule
-                //______________________________________________________________
-                for(const xnode *node = top_level.head; node; node=node->next)
+                //______________________________________________________________`
+                xlist tmp;
+                while(top_level.size>0)
                 {
+                    xnode *node = top_level.pop_front();
+                    tmp.push_back(node);
                     switch(htop(node->label()))
                     {
                         case 0: assert("RULE"==node->label());
-                            create_rule(node);
+                            create_leading_rule(node);
                             break;
                             
                         case 1: assert("LXR"==node->label());
-                            create_lxr_(node);
+                            create_lexical_rule(node);
+                            delete tmp.pop_back();
                             break;
                             
                         default:
-                            throw exception("xgen.generate: unhandled top level '%s'", node->label().c_str());
+                            throw exception("xgen.generate(unhandled top level '%s')", node->label().c_str());
                     }
-                
+                }
+                top_level.swap_with(tmp);
+
+                if(top_level.size<=0)
+                {
+                    throw exception("xgen.generate(NO SYNTAX RULE)");
+                }
+
+                //______________________________________________________________
+                //
+                // setting top_level code
+                //______________________________________________________________`
+                {
+                    const xnode    *top_xnode = top_level.head;
+                    const string    top_label = top_xnode->ch->head->lx->to_string();
+                    rule_ptr       *ppTop     = rules.search(top_label);
+                    if(!ppTop) throw exception("xgen.generate(unexpected no top-level '%s')", top_label.c_str());
+                    xprs->top_level(**ppTop);
                 }
 
                 if(output_files)
@@ -130,15 +149,7 @@ namespace yocto
                     ios::graphviz_render("usr_gram.dot");
                 }
 
-                //______________________________________________________________
-                //
-                // Enforce top level rule
-                //______________________________________________________________
-                if(agg_db.size()>0)
-                {
-                    aggDB::iterator first = agg_db.begin();
-                    xprs->top_level(**first);
-                }
+
                 xprs->check_consistency();
                 
                 return xprs.yield();
