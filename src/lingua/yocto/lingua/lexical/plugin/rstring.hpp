@@ -10,6 +10,7 @@ namespace yocto
         namespace lexical
         {
 
+            //! a single quoted string
             class rstring : public _string
             {
             public:

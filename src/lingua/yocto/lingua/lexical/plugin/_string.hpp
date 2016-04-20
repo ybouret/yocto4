@@ -10,6 +10,7 @@ namespace yocto
         namespace lexical
         {
 
+            //! compile a C string
             class _string : public plugin
             {
             public:
