@@ -50,11 +50,14 @@ namespace yocto
                 hashing::mperf           htop; //!< RULE,LXR
                 hashing::mperf           hsub; //!< ID,RXP,RAW
                 hashing::mperf           hmod; //!< +,*,?
+                hashing::mperf           hres; //!< reserved words: drop, endl, comment
                 
                 void create_rule(const xnode *top);
                 void create_lxr_(const xnode *top);
                 
                 void        initialize( xlist &top_level );
+                void        load_plugin(const string &id);
+
                 aggregate & fetch_agg(const string &label);
                 rule      & fetch_rxp(const string &label);
                 rule      & fetch_raw(const string &label);
