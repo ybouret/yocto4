@@ -51,7 +51,8 @@ namespace yocto
             static const char *kw_res[] =
             {
                 "drop",
-                "endl"
+                "endl",
+                "comment"
             };
             
             xgen:: xgen() :

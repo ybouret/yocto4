@@ -32,8 +32,8 @@ namespace yocto
                             if(hres(id)<0)
                             {
                                 // this is not a reserved keyword
-                                load_plugin(id, node);
-                                delete tmp.pop_back();
+                                load_plugin(id, node); // make a plugin
+                                delete tmp.pop_back(); // remove from top level
                             }
                         }
                             break;
@@ -48,51 +48,50 @@ namespace yocto
 
             void xgen::load_plugin(const string &id, xnode *node)
             {
-                std::cerr << "\tloading plugin<" << id << ">" << std::endl;
                 assert("LXR"==node->label());
+                std::cerr << "loading plugin for '" << id << "'" << std::endl;
                 xlist &args = *(node->ch);
-                assert(args.size>0);
+                assert(args.size>=2);
                 delete args.pop_front();
+                assert(args.size>=1);
+                assert(args.head->terminal);
+                const string plg = args.head->lx->to_string();
+                std::cerr << "plugin '" << plg << "'" << std::endl;
 
-                if("cstring" == id)
+                if("cstring" == plg)
                 {
-                    ld_cstring(args);
+                    ld_cstring(id,args);
                     return;
                 }
 
+                if("rstring" == plg)
+                {
+                    ld_rstring(id,args);
+                }
+
             }
 
-            void xgen:: ld_cstring(const xlist &args)
+            void xgen:: ld_cstring(const string &id, const xlist &args)
             {
                 if(1!=args.size)       throw exception("plugin<cstring> must have only 1 argument");
-                const xnode *arg = args.head;
-                if("ID"!=arg->label()) throw exception("plugin<cstring> must have a rule ID as argument");
-                const string rule_id = arg->lx->to_string();
-                std::cerr << "used as '" << rule_id << "'" << std::endl;
-                rule &r = xprs->term<lexical::cstring>(rule_id);
+                rule &r = xprs->term<lexical::cstring>(id);
                 rule_ptr p(&r);
                 if(!rules.insert(p))
                 {
-                    throw exception("plugin<cstring>: unexpected multiple '%s'", rule_id.c_str());
+                    throw exception("plugin<cstring>: unexpected multiple '%s'", id.c_str());
                 }
-
             }
 
 
-            void xgen:: ld_rstring(const xlist &args)
+            void xgen:: ld_rstring(const string &id, const xlist &args)
             {
                 if(1!=args.size)       throw exception("plugin<rstring> must have only 1 argument");
-                const xnode *arg = args.head;
-                if("ID"!=arg->label()) throw exception("plugin<rstring> must have a rule ID as argument");
-                const string rule_id = arg->lx->to_string();
-                std::cerr << "used as '" << rule_id << "'" << std::endl;
-                rule &r = xprs->term<lexical::rstring>(rule_id);
+                rule &r = xprs->term<lexical::cstring>(id);
                 rule_ptr p(&r);
                 if(!rules.insert(p))
                 {
-                    throw exception("plugin<rstring>: unexpected multiple '%s'", rule_id.c_str());
+                    throw exception("plugin<rstring>: unexpected multiple '%s'", id.c_str());
                 }
-
             }
             
 

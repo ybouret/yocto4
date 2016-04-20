@@ -47,15 +47,15 @@ namespace yocto
                 hashing::mperf           htop; //!< RULE,LXR
                 hashing::mperf           hsub; //!< ID,RXP,RAW
                 hashing::mperf           hmod; //!< +,*,?
-                hashing::mperf           hres; //!< reserved words: drop, endl
+                hashing::mperf           hres; //!< reserved words: drop, endl, comment
                 
                 void create_leading_rule(const xnode *top);
                 void create_lexical_rule(const xnode *top);
                 
                 void        initialize( xlist &top_level ); //!< initialize plugin and remove their lexical rules
                 void        load_plugin(const string &id, xnode *node);
-                void        ld_cstring(const xlist &args);
-                void        ld_rstring(const xlist &args);
+                void        ld_cstring(const string &id, const xlist &args);
+                void        ld_rstring(const string &id, const xlist &args);
 
                 rule       &fetch_agg(const string &label); //!< return existing rule or new rule as aggregate
                 rule       &fetch_rxp(const string &label);
