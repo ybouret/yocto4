@@ -16,7 +16,10 @@ namespace yocto
                 if(ppAgg)
                 {
                     std::cerr << "returning '" << label << "'" << std::endl;
-                    return **ppAgg;
+                    rule &r = **ppAgg;
+                    assert(r.self);
+                    assert(aggregate::UUID==r.uuid);
+                    return *static_cast<aggregate *>(r.self);
                 }
                 else
                 {

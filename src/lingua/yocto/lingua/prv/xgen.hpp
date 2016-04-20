@@ -38,7 +38,7 @@ namespace yocto
                 //! top level generation
                 lingua::parser *generate(xnode *tree,const bool output_files);
 
-                typedef alias_ptr<string,aggregate> agg_ptr;
+                typedef alias_ptr<string,rule>      agg_ptr;
                 typedef set<string,agg_ptr>         aggDB;
                 typedef alias_ptr<string,rule>      term_ptr;
                 typedef set<string,term_ptr>        termDB;
@@ -50,13 +50,13 @@ namespace yocto
                 hashing::mperf           htop; //!< RULE,LXR
                 hashing::mperf           hsub; //!< ID,RXP,RAW
                 hashing::mperf           hmod; //!< +,*,?
-                hashing::mperf           hres; //!< reserved words: drop, endl, comment
+                hashing::mperf           hres; //!< reserved words: drop, endl
                 
                 void create_rule(const xnode *top);
                 void create_lxr_(const xnode *top);
                 
                 void        initialize( xlist &top_level );
-                void        load_plugin(const string &id);
+                void        load_plugin(const string &id,const xnode *node);
 
                 aggregate & fetch_agg(const string &label);
                 rule      & fetch_rxp(const string &label);
