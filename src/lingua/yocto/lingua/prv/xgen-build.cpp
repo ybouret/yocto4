@@ -53,7 +53,7 @@ namespace yocto
                         throw exception("unexpected multiple RXP '%s'", label.c_str());
 
                     }
-                    std::cerr << "creating  rxp '" << label << "'" << std::endl;
+                    std::cerr << "creating  rxp '" << expr << "'" << std::endl;
                     return r;
                 }
             }
@@ -68,8 +68,7 @@ namespace yocto
                 }
                 else
                 {
-                    const string expr = lexical::_string::encode(label);
-                    rule &r = xprs->univocal(label,expr);
+                    rule &r = xprs->univocal(label);
 
                     const rule_ptr tmp(&r);
                     if(!rules.insert(tmp))

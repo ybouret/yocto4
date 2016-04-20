@@ -7,7 +7,7 @@ id      : "[:alpha:][:word:]*\t?";
 
 @string : 'cstring';
 
-@drop   : "[ \t]" ;
+@drop   : ' ' '\t' ;
 @endl   : "[:endl:]";
 
 @comment: '#';
