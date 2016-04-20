@@ -44,7 +44,7 @@ namespace yocto
                 }
                 else
                 {
-                    const string expr = lexical::_string::encode(label);
+                    const string expr = strconv::to_cstring(label);
                     rule &r = xprs->terminal(label, expr);
 
                     const rule_ptr tmp(&r);
@@ -237,7 +237,7 @@ namespace yocto
 
                 const string &kind    = args->origin->label; assert("RAW"==kind||"RXP"==kind);
                 const string content  = args->lx->to_string();
-                const string expr     = lexical::_string::encode(content);
+                const string expr     = strconv::to_cstring(content);
                 //std::cerr << "content='" << content << "'=>'" << expr << "'" << std::endl;
 
                 auto_ptr<pattern> ans( string2pattern(kind,expr,dict) );
@@ -278,7 +278,7 @@ namespace yocto
 
                 const string label = vformat("comment%d",++icom);
                 const string content = args->lx->to_string();
-                const string expr    = lexical::_string::encode(content);
+                const string expr    = strconv::to_cstring(content);
                 prs.load<lexical::end_of_line_comment>(label,expr).hook(prs.root);
                 
 
@@ -294,9 +294,9 @@ namespace yocto
 
                 const string label = vformat("comment%d",++icom);
                 const string callContent = args->lx->to_string();
-                const string callExpr    = lexical::_string::encode(callContent);
+                const string callExpr    = strconv::to_cstring(callContent);
                 const string backContent = args->next->lx->to_string();
-                const string backExpr    = lexical::_string::encode(backContent);
+                const string backExpr    = strconv::to_cstring(backContent);
                 prs.load<lexical::block_comment>(label,callExpr,backExpr).hook(prs.root);
             }
 

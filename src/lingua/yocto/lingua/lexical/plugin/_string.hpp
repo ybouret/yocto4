@@ -2,6 +2,7 @@
 #define YOCTO_LINGUA_LEXICAL_PLUGIN__STRING_INCLUDED 1
 
 #include "yocto/lingua/lexical/plugin.hpp"
+#include "yocto/string/conv.hpp"
 
 namespace yocto
 {
@@ -20,10 +21,10 @@ namespace yocto
                                  const char   *delim);
 
                 string content;
+                
                 virtual void on_call(const token&);
 
-                //! retrieve C-style compiled string
-                static string encode(const string &src);
+                
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(_string);

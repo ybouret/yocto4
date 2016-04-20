@@ -103,6 +103,7 @@ namespace yocto
             }
 
 
+#if 0
             string _string::encode(const string &src)
             {
                 string ans;
@@ -129,6 +130,7 @@ namespace yocto
                 }
                 return ans;
             }
+#endif
         }
     }
 }

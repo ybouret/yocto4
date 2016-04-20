@@ -53,7 +53,9 @@ namespace yocto
             const string _txt(txt);
             return to<T>( _txt, ctx );
         }
-        
+
+        //! convert bytes to C representation
+        static string to_cstring(const string &src);
 	};
 	
 }
