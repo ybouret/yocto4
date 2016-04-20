@@ -99,7 +99,7 @@ namespace yocto
                 Agg &LXR = agg("LXR");
                 LXR << terminal("LX","@{ID}");
                 LXR << COLON;
-                LXR << one_or_more(RAW);
+                LXR << one_or_more(choice(RAW,RXP));
                 LXR << END;
 
 

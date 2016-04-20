@@ -9,8 +9,16 @@ using namespace lingua;
 
 YOCTO_UNIT_TEST_IMPL(gen)
 {
-    ios::icstream    fp( ios::cstdin );
-    auto_ptr<parser> P( parser::generate(fp,true) );
+    auto_ptr<parser> P;
+    if(argc>1)
+    {
+        {
+            const string  filename = argv[1];
+            ios::icstream fp(filename);
+            P.reset( parser::generate(fp,true) );
+        }
+    }
+
 
 
 }

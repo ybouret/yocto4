@@ -48,6 +48,7 @@ namespace yocto
                 hashing::mperf           hsub; //!< ID,RXP,RAW
                 hashing::mperf           hmod; //!< +,*,?
                 hashing::mperf           hres; //!< reserved words: drop, endl, comment
+                int                      icom; //!< index for comment
                 
                 void create_leading_rule(const xnode *top);
                 void create_lexical_rule(const xnode *top);

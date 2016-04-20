@@ -83,7 +83,8 @@ namespace yocto
 
                     case '\\':
                     case '\"':
-                    case '/':
+                    case '\'':
+                    case '/' :
                         content.append(C);
                         break;
 
@@ -100,7 +101,34 @@ namespace yocto
                 const uint8_t h = 16 * hex2dec(char(ch->prev->code)) + hex2dec( char(ch->code) );
                 content.append( char(h) );
             }
-            
+
+
+            string _string::encode(const string &src)
+            {
+                string ans;
+                const size_t n = src.size();
+                for(size_t i=0;i<n;++i)
+                {
+                    const uint8_t C( src[i] );
+                    if(C>=32&&C<127)
+                    {
+                        switch(C)
+                        {
+                            case '\\': ans += "\\\\"; break;
+                            case '"' : ans += "\\\""; break;
+                            case '\'': ans += "\\'";  break;
+                            default:
+                                ans += char(C);
+                        }
+                    }
+                    else
+                    {
+                        ans += "\\x";
+                        ans += hexa_text[C];
+                    }
+                }
+                return ans;
+            }
         }
     }
 }

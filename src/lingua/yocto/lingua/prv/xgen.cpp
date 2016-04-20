@@ -61,7 +61,8 @@ namespace yocto
             htop(YOCTO_MPERF_FOR(kw_top)),
             hsub(YOCTO_MPERF_FOR(kw_sub)),
             hmod(YOCTO_MPERF_FOR(kw_mod)),
-            hres(YOCTO_MPERF_FOR(kw_res))
+            hres(YOCTO_MPERF_FOR(kw_res)),
+            icom(0)
             {
             }
 

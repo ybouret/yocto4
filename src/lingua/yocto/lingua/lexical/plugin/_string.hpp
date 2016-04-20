@@ -21,6 +21,9 @@ namespace yocto
                 string content;
                 virtual void on_call(const token&);
 
+                //! retrieve C-style compiled string
+                static string encode(const string &src);
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(_string);
                 void on_back(const token &);

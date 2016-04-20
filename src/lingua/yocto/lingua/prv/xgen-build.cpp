@@ -1,5 +1,6 @@
 #include "yocto/lingua/prv/xgen.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/lingua/lexical/plugin/_string.hpp"
 
 #include <iostream>
 
@@ -43,7 +44,8 @@ namespace yocto
                 }
                 else
                 {
-                    rule &r = xprs->terminal(label, label);
+                    const string expr = lexical::_string::encode(label);
+                    rule &r = xprs->terminal(label, expr);
 
                     const rule_ptr tmp(&r);
                     if(!rules.insert(tmp))
@@ -66,7 +68,8 @@ namespace yocto
                 }
                 else
                 {
-                    rule &r = xprs->univocal(label);
+                    const string expr = lexical::_string::encode(label);
+                    rule &r = xprs->univocal(label,expr);
 
                     const rule_ptr tmp(&r);
                     if(!rules.insert(tmp))
@@ -98,7 +101,7 @@ namespace yocto
                 grow(r.as<aggregate>(),node->next);
 
             }
-            
+
 
 
             rule & __modified(const rule           &r,
@@ -195,6 +198,7 @@ namespace yocto
 
 }
 
+#include "yocto/lingua/lexical/plugin/_string.hpp"
 #include "yocto/lingua/lexical/plugin/end_of_line_comment.hpp"
 #include "yocto/lingua/lexical/plugin/block-comment.hpp"
 #include "yocto/lingua/pattern/logic.hpp"
@@ -208,62 +212,110 @@ namespace yocto
 
 
             static inline
+            pattern *string2pattern(const string &label,
+                                    const string &expr,
+                                    p_dict       &dict)
+            {
+                if("RAW"==label)
+                {
+                    return logical::equal(expr);
+                }
+
+                if("RXP"==label)
+                {
+                    return regexp(expr,&dict);
+                }
+
+                throw exception("unexpected '%s' in lexical rule", label.c_str());
+            }
+
+
+            static inline
+            pattern *xnode2pattern(const xnode *args, p_dict &dict)
+            {
+                assert(args);
+                assert(args->terminal);
+
+                const string &kind    = args->origin->label; assert("RAW"==kind||"RXP"==kind);
+                const string content  = args->lx->to_string();
+                const string expr     = lexical::_string::encode(content);
+                //std::cerr << "content='" << content << "'=>'" << expr << "'" << std::endl;
+
+                auto_ptr<pattern> ans( string2pattern(kind,expr,dict) );
+                if(ans->match_empty())
+                {
+                    throw exception("%d: %s '%s' matches empty", args->lx->line, kind.c_str(), content.c_str());
+                }
+
+                return ans.yield();
+            }
+
+            static inline
             pattern *create_from(const xnode *args, p_dict &dict)
             {
                 assert(args);
-                auto_ptr<logical> motif( OR::create() );
-                while(args)
+                if(args->next)
                 {
-                    const string &kind = args->origin->label;
-                    assert("RXP"==kind || "RAW" == kind );
-                    assert(args->terminal);
-                    const string  content = args->lx->to_string();
-                    if("RAW"==kind)
+                    auto_ptr<logical> q( OR::create() );
+                    while( args )
                     {
-                        std::cerr << "RAW: '" << content << "'" << std::endl;
-                        auto_ptr<pattern> p( logical::equal(content) );
-                        if(p->match_empty())
-                        {
-                            throw exception("line %d: raw string '%s' match empty", args->lx->line, content.c_str());
-                        }
-                        motif->add(p.yield());
+                        q->add(xnode2pattern(args,dict));
+                        args = args->next;
                     }
-                    else
-                    {
-                        std::cerr << "RXP: \"" << content << "\"" << std::endl;
-                        auto_ptr<pattern> p( regexp(content, &dict) );
-                        if(p->match_empty())
-                        {
-                            throw exception("line %d: regexp '%s' match empty", args->lx->line, content.c_str());
-                        }
-                        motif->add(p.yield());
-                    }
-                    args = args->next;
-                }
-                p_list &ops = motif->operands;
-                if(ops.size==1)
-                {
-                    return ops.pop_back();
+                    return q.yield();
                 }
                 else
                 {
-                    return motif.yield();
+                    return xnode2pattern(args,dict);
                 }
             }
+
+
+            static inline
+            void make_eol_comment(int &icom, parser &prs,const xnode *args)
+            {
+                assert(args);
+                assert(args->terminal);
+
+                const string label = vformat("comment%d",++icom);
+                const string content = args->lx->to_string();
+                const string expr    = lexical::_string::encode(content);
+                prs.load<lexical::end_of_line_comment>(label,expr).hook(prs.root);
+                
+
+            }
+
+            static inline
+            void make_blk_comment(int &icom, parser &prs, const xnode *args)
+            {
+                assert(args);
+                assert(args->terminal);
+                assert(args->next);
+                assert(args->next->terminal);
+
+                const string label = vformat("comment%d",++icom);
+                const string callContent = args->lx->to_string();
+                const string callExpr    = lexical::_string::encode(callContent);
+                const string backContent = args->next->lx->to_string();
+                const string backExpr    = lexical::_string::encode(backContent);
+                prs.load<lexical::block_comment>(label,callExpr,backExpr).hook(prs.root);
+            }
+
+
 
             void xgen::create_lexical_rule( const xnode *top )
             {
                 assert("LXR"==top->label());
                 assert(false==top->terminal);
-                const xnode *node = top->ch->head;
-                
+                const xlist &info = *(top->ch);
+                const xnode *node = info.head;
+
                 assert("LX"==node->label());
                 assert(true==node->terminal);
 
                 const string id   = node->lx->to_string(1,0);
                 const xnode *args = node->next;
 
-                std::cerr << "Lexical: '" << id << "'" << std::endl;
                 switch(hres(id))
                 {
                     case 0:
@@ -277,10 +329,23 @@ namespace yocto
                         const lexical::action __endl( & (xprs->root), &lexical::scanner::newline );
                         xprs->root.make(id, create_from(args,xprs->dict), __endl);
                     }  break;
-
+                        
                     case 2:
-                        std::cerr << "Will comment..." << std::endl;
-                        break;
+                    {
+                        switch(info.size)
+                        {
+                            case 2:
+                                make_eol_comment(icom,*xprs,args);
+                                break;
+
+                            case 3:
+                                make_blk_comment(icom,*xprs,args);
+                                break;
+
+                            default:
+                                throw exception("comment must be followed by 1 (=>eol) or 2(=>blk) strings");
+                        }
+                    } break;
                         
                     default:
                         throw exception("xgen: unhandled lexical rule '%s'", id.c_str());
