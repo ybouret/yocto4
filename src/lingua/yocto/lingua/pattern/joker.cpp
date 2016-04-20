@@ -181,6 +181,7 @@ namespace yocto
             else
             {
                 assert(0==tkn.size);
+                src.unread(tkn);
                 return false;
             }
         }

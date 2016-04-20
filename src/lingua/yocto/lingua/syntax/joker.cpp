@@ -78,6 +78,7 @@ namespace yocto
 }
 
 #include "yocto/ptr/auto.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -91,7 +92,9 @@ namespace yocto
             }
 
 
-            at_least:: at_least(const string &id, const rule *r, const size_t n) :
+            at_least:: at_least(const string &id,
+                                const rule   *r,
+                                const size_t  n) :
             joker(id,UUID,r),
             nmin(n)
             {
@@ -135,6 +138,7 @@ namespace yocto
 
                 if(count>=nmin)
                 {
+                    std::cerr << "syntax::at_least(" << count << ">=" << nmin << ")" << std::endl;
                     grow(tree,leaves);
                     return true;
                 }

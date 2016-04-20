@@ -2,8 +2,6 @@
 #include "yocto/exception.hpp"
 #include "yocto/lingua/lexical/plugin/cstring.hpp"
 #include "yocto/lingua/lexical/plugin/rstring.hpp"
-#include "yocto/lingua/lexical/plugin/end_of_line_comment.hpp"
-#include "yocto/lingua/lexical/plugin/block-comment.hpp"
 
 
 #include <iostream>

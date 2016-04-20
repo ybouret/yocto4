@@ -66,7 +66,7 @@ namespace yocto
             {
                 assert(rules.owns(&r));
                 const string label = vformat(">=1%c%u",rule::internal_char,++noom);
-                at_least    *tt    = new at_least(label,&r,0);
+                at_least    *tt    = new at_least(label,&r,1);
                 rules.push_back(tt);
                 return *tt;
             }

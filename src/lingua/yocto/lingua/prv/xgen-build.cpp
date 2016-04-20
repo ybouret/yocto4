@@ -195,12 +195,31 @@ namespace yocto
 
 }
 
+#include "yocto/lingua/lexical/plugin/end_of_line_comment.hpp"
+#include "yocto/lingua/lexical/plugin/block-comment.hpp"
+#include "yocto/lingua/pattern/logic.hpp"
+
 namespace yocto
 {
     namespace lingua
     {
         namespace syntax
         {
+
+
+            static inline
+            pattern *create_from(const xnode *args)
+            {
+                assert(args);
+                auto_ptr<logical> motif( OR::create() );
+                while(args)
+                {
+                    const string &kind = args->label();
+                    assert("RXP"==kind || "RAW" == kind );
+                    args = args->next;
+                }
+                return motif.yield();
+            }
 
             void xgen::create_lexical_rule( const xnode *top )
             {
@@ -211,9 +230,35 @@ namespace yocto
                 assert("LX"==node->label());
                 assert(true==node->terminal);
 
-                const string id = node->lx->to_string();
-                std::cerr << "Lexical: '" << id << "'" << std::endl;
+                const string id   = node->lx->to_string(1,0);
+                const xnode *args = node->next;
 
+                std::cerr << "Lexical: '" << id << "'" << std::endl;
+                switch(hres(id))
+                {
+                    case 0:
+                        std::cerr << "Will drop..." << std::endl;
+                    {
+                        const lexical::action __drop( & (xprs->root), & lexical::scanner::discard );
+                        xprs->root.make(id, create_from(args), __drop);
+                    }
+                        break;
+
+                    case 1:
+                        std::cerr << "Will endl..." << std::endl;
+                    {
+                        const lexical::action __endl( & (xprs->root), &lexical::scanner::newline );
+                        xprs->root.make(id, create_from(args), __endl);
+                    }
+                        break;
+
+                    case 2:
+                        std::cerr << "Will comment..." << std::endl;
+                        break;
+                        
+                    default:
+                        throw exception("xgen: unhandled lexical rule '%s'", id.c_str());
+                }
             }
             
         }
