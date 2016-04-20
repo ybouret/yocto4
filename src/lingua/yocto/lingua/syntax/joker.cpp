@@ -78,7 +78,6 @@ namespace yocto
 }
 
 #include "yocto/ptr/auto.hpp"
-#include <iostream>
 
 namespace yocto
 {
@@ -138,7 +137,6 @@ namespace yocto
 
                 if(count>=nmin)
                 {
-                    std::cerr << "syntax::at_least(" << count << ">=" << nmin << ")" << std::endl;
                     grow(tree,leaves);
                     return true;
                 }
