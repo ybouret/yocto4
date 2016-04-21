@@ -146,11 +146,18 @@ namespace yocto
 
                         case 3: assert("SUB"==node->label());
                         {
-                            const string sub_label = parent.label + vformat("(%c%d)", rule::internal_char, ++(parent.prv));
-                            YXGEN_OUT("+SUB '" << sub_label << "'");
-                            aggregate   &sub = fetch_agg(sub_label).as<aggregate>();
-                            grow(sub,node->ch->head);
-                            parent << sub;
+                            if(parent.uuid==aggregate::UUID)
+                            {
+                                grow(parent,node->ch->head);
+                            }
+                            else
+                            {
+                                const string sub_label = parent.label + vformat("(%c%d)", rule::internal_char, ++(parent.prv));
+                                YXGEN_OUT("+SUB '" << sub_label << "'");
+                                aggregate   &sub = fetch_agg(sub_label).as<aggregate>();
+                                grow(sub,node->ch->head);
+                                parent << sub;
+                            }
                         }
                             break;
 
@@ -251,7 +258,7 @@ namespace yocto
                 const string content = args->lx->to_string();
                 const string expr    = strconv::to_cstring(content);
                 prs.load<lexical::end_of_line_comment>(label,expr).hook(prs.root);
-                
+
 
             }
 
@@ -300,7 +307,7 @@ namespace yocto
                         const lexical::action __endl( & (xprs->root), &lexical::scanner::newline );
                         xprs->root.make(id, create_from(args,xprs->dict), __endl);
                     }  break;
-                        
+
                     case 2: assert("comment"==id);
                     {
                         switch(info.size)
@@ -309,12 +316,12 @@ namespace yocto
                                 YXGEN_OUT("|_EndOfLineComment");
                                 make_eol_comment(icom,*xprs,args);
                                 break;
-
+                                
                             case 3:
                                 YXGEN_OUT("|_BlockComment");
                                 make_blk_comment(icom,*xprs,args);
                                 break;
-
+                                
                             default:
                                 throw exception("comment must be followed by 1 (=>eol) or 2(=>blk) strings");
                         }
