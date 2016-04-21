@@ -142,8 +142,8 @@ namespace yocto
                 if(verbose)
                 {
                     YXGEN_OUT("saving grammar...");
-                    xprs->graphviz("usr_gram.dot");
-                    ios::graphviz_render("usr_gram.dot");
+                    xprs->graphviz(xprs->grammar::name + ".dot");
+                    ios::graphviz_render(xprs->grammar::name + ".dot");
                 }
 
                 YXGEN_OUT("checking consistency");

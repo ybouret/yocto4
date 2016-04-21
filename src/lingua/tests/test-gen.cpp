@@ -21,8 +21,8 @@ YOCTO_UNIT_TEST_IMPL(gen)
         {
             ios::icstream fp( ios::cstdin );
             auto_ptr<syntax::xnode> tree( P->parse(fp) );
-            tree->graphviz( P->grammar::name + ".dot" );
-            ios::graphviz_render( P->grammar::name + ".dot" );
+            tree->graphviz( P->grammar::name + "_output.dot" );
+            ios::graphviz_render( P->grammar::name + "_output.dot" );
         }
     }
 
