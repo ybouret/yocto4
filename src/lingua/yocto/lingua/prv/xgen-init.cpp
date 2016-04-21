@@ -22,7 +22,13 @@ namespace yocto
                     tmp.push_back(node);
                     switch(htop(node->label()))
                     {
-                        case 0: assert("RULE"==node->label()); break;
+                        case 0: assert("RULE"==node->label());
+                        {
+                            if(is_alias(node))
+                            {
+                                delete tmp.pop_back();
+                            }
+                        }   break;
 
                         case 1: assert("LXR" ==node->label());
                         {
@@ -96,7 +102,45 @@ namespace yocto
             }
             
 
+            bool xgen:: is_alias(const xnode *node)
+            {
+                assert("RULE"==node->label());
+                const xlist &info = *(node->ch);
+                if(2==info.size)
+                {
+                    const string &kind = info.tail->label();
+                    if(kind=="RXP")
+                    {
+                        const string label = info.head->lx->to_string();
+                        YXGEN_OUT("--> '" << label << "' is a regexp alias!");
+                        const string expr  = info.tail->lx->to_cstring();
+                        rule &alias = xprs->terminal(label, expr);
+                        rule_ptr q(&alias);
+                        if(!rules.insert(q))
+                        {
+                            throw exception("unexpected multiple regexp alias '%s'", label.c_str());
+                        }
+                        return true;
+                    }
 
+                    if(kind=="RAW")
+                    {
+                        const string label = info.head->lx->to_string();
+                        YXGEN_OUT("--> '" << label << "' is a simple alias!");
+                        const string content = info.tail->lx->to_string();
+                        rule &alias = xprs->univocal(label,content);
+                        rule_ptr q(&alias);
+                        if(!rules.insert(q))
+                        {
+                            throw exception("unexpected multiple simple alias '%s'", label.c_str());
+                        }
+                        return true;
+                    }
+
+
+                }
+                return false;
+            }
         }
 
     }

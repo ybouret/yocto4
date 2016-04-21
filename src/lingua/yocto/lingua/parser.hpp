@@ -41,22 +41,19 @@ namespace yocto
             }
             
 
-            //! expression  is compiled
-            Rule &univocal(const string &label, const string &expr);
-            Rule &univocal(const char   *label, const char   *expr); //!< wrapper
 
             //! expression is not compiled
-            Rule &univocal(const string &expr);
+            Rule &univocal(const string &label, const string &expr);
+            Rule &univocal(const char   *label, const char   *expr); //!< wrapper
+            Rule &univocal(const string &expr); //!< wrapper
             Rule &univocal(const char   *expr); //!< wrapper
             Rule &univocal(const char    C);    //!< wrapper
 
 
-            //! expression is compiled
+            //! expression is not compiled
             Rule &jettison(const string &label, const string &expr);
             Rule &jettison(const char   *label, const char   *expr); //!< wrapper
-
-            //! expression is not compiled
-            Rule &jettison(const string &expr);
+            Rule &jettison(const string &expr); //!< wrapper
             Rule &jettison(const char   *expr); //!< wrapper
             Rule &jettison(const char    C);    //!< wrapper
 

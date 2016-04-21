@@ -60,6 +60,7 @@ namespace yocto
                 void        load_plugin(const string &id, xnode *node);
                 void        ld_cstring(const string &id, const xlist &args);
                 void        ld_rstring(const string &id, const xlist &args);
+                bool        is_alias(const xnode *node);
 
                 rule       &fetch_agg(const string &label); //!< return existing rule or new rule as aggregate
                 rule       &fetch_rxp(const string &label);
@@ -69,7 +70,8 @@ namespace yocto
 
                 //! grow parent from child node
                 void grow(compound &parent, const xnode *node);
-                
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xgen);
             };

@@ -155,6 +155,7 @@ namespace yocto
                                 const string sub_label = parent.label + vformat("(%c%d)", rule::internal_char, ++(parent.prv));
                                 YXGEN_OUT("+SUB '" << sub_label << "'");
                                 aggregate   &sub = fetch_agg(sub_label).as<aggregate>();
+                                sub.flags = property::jettison; // temporary...
                                 grow(sub,node->ch->head);
                                 parent << sub;
                             }

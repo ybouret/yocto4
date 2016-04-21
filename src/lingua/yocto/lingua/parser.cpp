@@ -49,24 +49,23 @@ namespace yocto
 
         syntax::rule & parser::univocal(const string &label, const string &expr)
         {
-            return maketerm(label,expr,property::univocal);
+            const lexical::action a( &root, & lexical::scanner::forward );
+            pattern *p = logical::equal(expr);
+            root.make(label, p, a);
+            return decl_term(label,property::univocal);
         }
 
         syntax::rule & parser::univocal(const char *label, const char *expr)
         {
             const string Label(label);
             const string Expr(expr);
-            return maketerm(Label,Expr,property::univocal);
+            return univocal(Label,Expr);
         }
 
 
         syntax::rule & parser::univocal(const string &expr)
         {
-            const lexical::action a( &root, & lexical::scanner::forward );
-            pattern *p = logical::equal(expr);
-            root.make(expr, p, a);
-
-            return decl_term(expr,property::univocal);
+            return univocal(expr,expr);
         }
 
         syntax::rule & parser::univocal(const char *expr)
@@ -83,24 +82,23 @@ namespace yocto
 
         syntax::rule & parser::jettison(const string &label, const string &expr)
         {
-            return maketerm(label,expr,property::jettison);
+            const lexical::action a( &root, & lexical::scanner::forward );
+            pattern *p = logical::equal(expr);
+            root.make(label, p, a);
+            return decl_term(label,property::jettison);
         }
 
         syntax::rule & parser::jettison(const char *label, const char *expr)
         {
             const string Label(label);
             const string Expr(expr);
-            return maketerm(Label,Expr,property::jettison);
+            return jettison(Label,Expr);
         }
 
 
         syntax::rule & parser::jettison(const string &expr)
         {
-            const lexical::action a( &root, & lexical::scanner::forward );
-            pattern *p = logical::equal(expr);
-            root.make(expr, p, a);
-
-            return decl_term(expr,property::jettison);
+            return jettison(expr,expr);
         }
 
         syntax::rule & parser::jettison(const char *expr)
