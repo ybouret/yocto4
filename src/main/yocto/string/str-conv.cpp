@@ -8,6 +8,34 @@
 namespace yocto
 {
 
+    void   strconv:: append_cchar(const char c, string &ans)
+    {
+        const uint8_t C(c);
+        if(C>=32&&C<127)
+        {
+            switch(C)
+            {
+                case '\\': ans += "\\\\"; break;
+                case '"' : ans += "\\\""; break;
+                case '\'': ans += "\\'";  break;
+                default:
+                    ans += C;
+            }
+        }
+        else
+        {
+            switch(C)
+            {
+                case '\n': ans += "\\r"; break;
+                case '\r': ans += "\\n"; break;
+                case '\t': ans += "\\t"; break;
+                default:
+                    ans += "\\";
+                    ans += hexa_text[C];
+            }
+        }
+    }
+
     string strconv:: to_cstring(const string &src)
     {
         string ans;
@@ -15,30 +43,7 @@ namespace yocto
 
         for(size_t i=0;i<n;++i)
         {
-            const uint8_t C(src[i]);
-            if(C>=32&&C<127)
-            {
-                switch(C)
-                {
-                    case '\\': ans += "\\\\"; break;
-                    case '"' : ans += "\\\""; break;
-                    case '\'': ans += "\\'";  break;
-                    default:
-                        ans += C;
-                }
-            }
-            else
-            {
-                switch(C)
-                {
-                    case '\n': ans += "\\r"; break;
-                    case '\r': ans += "\\n"; break;
-                    case '\t': ans += "\\t"; break;
-                    default:
-                        ans += "\\";
-                        ans += hexa_text[C];
-                }
-            }
+            append_cchar(src[i],ans);
         }
 
         return ans;

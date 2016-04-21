@@ -210,40 +210,44 @@ namespace yocto
         {
 
 
+#if 0
             static inline
             pattern *string2pattern(const string &label,
-                                    const string &expr,
+                                    const string &content,
                                     p_dict       &dict)
             {
                 if("RAW"==label)
                 {
-                    return logical::equal(expr);
+                    return logical::equal(content);
                 }
 
                 if("RXP"==label)
                 {
+                    const string expr = strconv::to_cstring(content);
                     return regexp(expr,&dict);
                 }
 
                 throw exception("unexpected '%s' in lexical rule", label.c_str());
-            }
 
+                assert("RXP"==label);
+                const string expr = strconv::to_cstring(content);
+                return regexp(expr,&dict);
+            }
+#endif
 
             static inline
             pattern *xnode2pattern(const xnode *args, p_dict &dict)
             {
                 assert(args);
                 assert(args->terminal);
-
-                const string &kind    = args->origin->label; assert("RAW"==kind||"RXP"==kind);
+                assert("RXP"==args->origin->label);
                 const string content  = args->lx->to_string();
                 const string expr     = strconv::to_cstring(content);
-                //std::cerr << "content='" << content << "'=>'" << expr << "'" << std::endl;
+                auto_ptr<pattern> ans( regexp(expr,&dict) );
 
-                auto_ptr<pattern> ans( string2pattern(kind,expr,dict) );
                 if(ans->match_empty())
                 {
-                    throw exception("%d: %s '%s' matches empty", args->lx->line, kind.c_str(), content.c_str());
+                    throw exception("%d: \"%s\" matches empty", args->lx->line,content.c_str());
                 }
 
                 return ans.yield();
@@ -276,7 +280,7 @@ namespace yocto
                 assert(args);
                 assert(args->terminal);
 
-                const string label = vformat("comment%d",++icom);
+                const string label   = vformat("comment%d",++icom);
                 const string content = args->lx->to_string();
                 const string expr    = strconv::to_cstring(content);
                 prs.load<lexical::end_of_line_comment>(label,expr).hook(prs.root);
@@ -292,7 +296,7 @@ namespace yocto
                 assert(args->next);
                 assert(args->next->terminal);
 
-                const string label = vformat("comment%d",++icom);
+                const string label       = vformat("comment%d",++icom);
                 const string callContent = args->lx->to_string();
                 const string callExpr    = strconv::to_cstring(callContent);
                 const string backContent = args->next->lx->to_string();
@@ -317,19 +321,19 @@ namespace yocto
 
                 switch(hres(id))
                 {
-                    case 0:
+                    case 0: assert("drop"==id);
                     {
                         const lexical::action __drop( & (xprs->root), & lexical::scanner::discard );
                         xprs->root.make(id, create_from(args,xprs->dict), __drop);
                     } break;
 
-                    case 1:
+                    case 1: assert("endl"==id);
                     {
                         const lexical::action __endl( & (xprs->root), &lexical::scanner::newline );
                         xprs->root.make(id, create_from(args,xprs->dict), __endl);
                     }  break;
                         
-                    case 2:
+                    case 2: assert("comment"==id);
                     {
                         switch(info.size)
                         {

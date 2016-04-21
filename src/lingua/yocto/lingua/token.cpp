@@ -21,6 +21,7 @@ namespace yocto
     }
 }
 
+#include "yocto/string/conv.hpp"
 
 namespace yocto
 {
@@ -84,6 +85,27 @@ namespace yocto
             }
             return ans;
         }
+
+        string token:: to_cstring(const size_t nskip,const size_t ntrim) const
+        {
+
+            string ans;
+            const size_t ndrop = nskip+ntrim;
+            if(ndrop<size)
+            {
+                const t_char *ch = head;
+                for(register size_t i=nskip;i>0;--i)
+                {
+                    ch=ch->next;
+                }
+                for(register size_t i=size-ndrop;i>0;--i,ch=ch->next)
+                {
+                    strconv::append_cchar(char(ch->code), ans);
+                }
+            }
+            return ans;
+        }
+
 
     }
 

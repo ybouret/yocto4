@@ -54,8 +54,12 @@ namespace yocto
             return to<T>( _txt, ctx );
         }
 
+        //! convert a char to C string representation
+        static void   append_cchar(const char c, string &s);
+
         //! convert bytes to C representation
         static string to_cstring(const string &src);
+
 	};
 	
 }

@@ -46,7 +46,8 @@ namespace yocto
             friend std::ostream & operator<<( std::ostream &os, const token &);
 
             string to_string(const size_t nskip=0,const size_t ntrim=0) const;
-
+            string to_cstring(const size_t nskip=0,const size_t ntrim=0) const;
+            
         };
 
     }
