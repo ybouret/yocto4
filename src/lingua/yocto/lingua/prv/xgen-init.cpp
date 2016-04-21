@@ -65,8 +65,11 @@ namespace yocto
                 if("rstring" == plg)
                 {
                     ld_rstring(id,args);
+                    return;
                 }
 
+
+                throw exception("unknown plugin<%s>", plg.c_str());
             }
 
             void xgen:: ld_cstring(const string &id, const xlist &args)

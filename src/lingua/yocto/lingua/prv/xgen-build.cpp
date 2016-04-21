@@ -27,6 +27,7 @@ namespace yocto
                     {
                         throw exception("unexpected multiple ID '%s'", label.c_str());
                     }
+                    //YXGEN_OUT("RULE '" << label << "'");
                     return r;
                 }
             }
@@ -47,6 +48,7 @@ namespace yocto
                     {
                         throw exception("unexpected multiple RXP '%s'", label.c_str());
                     }
+                    //YXGEN_OUT("RXP  '" << label << "'");
                     return r;
                 }
             }
@@ -67,6 +69,7 @@ namespace yocto
                     {
                         throw exception("unexpected multiple RAW '%s'", label.c_str());
                     }
+                    //YXGEN_OUT("RAW  '" << label << "'");
                     return r;
                 }
             }
@@ -119,6 +122,7 @@ namespace yocto
                         {
                             assert(node->terminal);
                             const string content = node->lx->to_string();
+                            YXGEN_OUT("+ID  '" << content << "'");
                             parent << fetch_agg(content);
                         }  break;
 
@@ -126,6 +130,7 @@ namespace yocto
                         {
                             assert(node->terminal);
                             const string content = node->lx->to_cstring();
+                            YXGEN_OUT("+RXP '" << content << "'");
                             parent << fetch_rxp(content);
                         }
                             break;
@@ -134,6 +139,7 @@ namespace yocto
                         {
                             assert(node->terminal);
                             const string content = node->lx->to_string();
+                            YXGEN_OUT("+RAW '" << content << "'");
                             parent << fetch_raw(content);
                         }
                             break;
@@ -141,6 +147,7 @@ namespace yocto
                         case 3: assert("SUB"==node->label());
                         {
                             const string sub_label = parent.label + vformat("(%c%d)", rule::internal_char, ++(parent.prv));
+                            YXGEN_OUT("+SUB '" << sub_label << "'");
                             aggregate   &sub = fetch_agg(sub_label).as<aggregate>();
                             grow(sub,node->ch->head);
                             parent << sub;
@@ -156,6 +163,7 @@ namespace yocto
                             sub.flags               = property::jettison;
 
                             delete node->ch->pop_back();
+                            YXGEN_OUT("ITEM '" << sub_label << "', modifier='" << modifier << "'");
                             grow(sub,node->ch->head);
                             parent << __modified(sub, *xprs, modifier, hmod);
                         } break;
@@ -163,6 +171,7 @@ namespace yocto
                         case 5: assert( "ALT"==node->label() );
                         {
                             alternate  &alt = xprs->alt();
+                            YXGEN_OUT("+ALT '" << alt.label << "'");
                             grow(alt,node->ch->head);
                             parent << alt;
                         } break;
@@ -277,6 +286,7 @@ namespace yocto
                 const string id   = node->lx->to_string(1,0);
                 const xnode *args = node->next;
 
+                YXGEN_OUT("LEXICAL." << id);
                 switch(hres(id))
                 {
                     case 0: assert("drop"==id);
@@ -296,10 +306,12 @@ namespace yocto
                         switch(info.size)
                         {
                             case 2:
+                                YXGEN_OUT("|_EndOfLineComment");
                                 make_eol_comment(icom,*xprs,args);
                                 break;
 
                             case 3:
+                                YXGEN_OUT("|_BlockComment");
                                 make_blk_comment(icom,*xprs,args);
                                 break;
 
