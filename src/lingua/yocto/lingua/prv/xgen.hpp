@@ -16,6 +16,8 @@ namespace yocto
         namespace syntax
         {
 
+#define YXGEN_OUT(OUTPUT) do { if(verbose) { std::cerr << "[XGEN] " << OUTPUT << std::endl; } } while(false)
+            
             class xgen
             {
             public:
@@ -32,11 +34,11 @@ namespace yocto
                 };
 
 
-                xgen();
+                xgen(const bool verb);
                 ~xgen() throw();
                 
                 //! top level generation
-                lingua::parser *generate(xnode *tree,const bool output_files);
+                lingua::parser *generate(xnode *tree);
 
                 typedef alias_ptr<string,rule>       rule_ptr;
                 typedef set<string,rule_ptr>         rules_db;
@@ -49,6 +51,7 @@ namespace yocto
                 hashing::mperf           hmod; //!< +,*,?
                 hashing::mperf           hres; //!< reserved words: drop, endl, comment
                 int                      icom; //!< index for comment
+                const bool               verbose;
                 
                 void create_leading_rule(const xnode *top);
                 void create_lexical_rule(const xnode *top);

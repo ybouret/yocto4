@@ -161,8 +161,8 @@ namespace yocto
                 
             }
 
-            syntax::xgen xg;
-            return xg.generate( &(*tree),output_files);
+            syntax::xgen xg(output_files);
+            return xg.generate( &(*tree) );
         }
         
     }

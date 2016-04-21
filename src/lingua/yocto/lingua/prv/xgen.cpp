@@ -3,6 +3,7 @@
 #include "yocto/ios/graphviz.hpp"
 #include "yocto/exception.hpp"
 
+#include <iostream>
 
 namespace yocto
 {
@@ -46,19 +47,20 @@ namespace yocto
                 "comment"
             };
             
-            xgen:: xgen() :
+            xgen:: xgen(const bool verb) :
             xprs(NULL),
             rules(),
             htop(YOCTO_MPERF_FOR(kw_top)),
             hsub(YOCTO_MPERF_FOR(kw_sub)),
             hmod(YOCTO_MPERF_FOR(kw_mod)),
             hres(YOCTO_MPERF_FOR(kw_res)),
-            icom(0)
+            icom(0),
+            verbose(verb)
             {
             }
 
 
-            lingua::parser *xgen:: generate(xnode *tree, const bool output_files)
+            lingua::parser *xgen:: generate(xnode *tree)
             {
 
                 assert(tree);
@@ -82,7 +84,7 @@ namespace yocto
                     const string rootID    = "main";
 
                     xprs.reset( new lingua::parser(langID,rootID) );
-
+                    YXGEN_OUT( "creating parser for " << xprs->grammar::name);
                     delete top_level.pop_front();
                 }
                 
@@ -127,23 +129,27 @@ namespace yocto
                 //
                 // setting top_level code
                 //______________________________________________________________`
+                YXGEN_OUT( "setting top-level rule" );
                 {
                     const xnode    *top_xnode = top_level.head;
                     const string    top_label = top_xnode->ch->head->lx->to_string();
                     rule_ptr       *ppTop     = rules.search(top_label);
                     if(!ppTop) throw exception("xgen.generate(unexpected no top-level '%s')", top_label.c_str());
+                    YXGEN_OUT("top-level rule is '" << top_label << "'");
                     xprs->top_level(**ppTop);
                 }
 
-                if(output_files)
+                if(verbose)
                 {
+                    YXGEN_OUT("saving grammar...");
                     xprs->graphviz("usr_gram.dot");
                     ios::graphviz_render("usr_gram.dot");
                 }
 
-
+                YXGEN_OUT("checking consistency");
                 xprs->check_consistency();
-                
+
+                YXGEN_OUT("parser is ready");
                 return xprs.yield();
             }
 

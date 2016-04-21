@@ -14,7 +14,7 @@ namespace yocto
         {
             void xgen:: initialize( xlist &top_level )
             {
-                std::cerr << "-- initializing" << std::endl;
+                YXGEN_OUT("initializing top level rules");
                 xlist tmp;
                 while(top_level.size)
                 {
@@ -54,7 +54,8 @@ namespace yocto
                 assert(args.size>=1);
                 assert(args.head->terminal);
                 const string plg = args.head->lx->to_string();
-
+                YXGEN_OUT("loading plugin <" << plg << "> as " << id);
+                
                 if("cstring" == plg)
                 {
                     ld_cstring(id,args);
