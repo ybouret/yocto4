@@ -17,7 +17,6 @@ namespace yocto
                 if(ppRule)
                 {
                     // may be a terminal plugged in
-                    std::cerr << "returning '" << label << "'" << std::endl;
                     return **ppRule;
                 }
                 else
@@ -28,9 +27,7 @@ namespace yocto
                     {
                         throw exception("unexpected multiple ID '%s'", label.c_str());
                     }
-                    std::cerr << "creating  '" << label << "'" << std::endl;
                     return r;
-
                 }
             }
 
@@ -39,21 +36,17 @@ namespace yocto
                 rule_ptr *ppRxp = rules.search(label);
                 if(ppRxp)
                 {
-                    std::cerr << "returning rxp '" << label << "'" << std::endl;
                     return **ppRxp;
                 }
                 else
                 {
-                    const string expr = strconv::to_cstring(label);
-                    rule &r = xprs->terminal(label, expr);
+                    rule &r = xprs->terminal(label,label);
 
                     const rule_ptr tmp(&r);
                     if(!rules.insert(tmp))
                     {
                         throw exception("unexpected multiple RXP '%s'", label.c_str());
-
                     }
-                    std::cerr << "creating  rxp '" << expr << "'" << std::endl;
                     return r;
                 }
             }
@@ -63,7 +56,6 @@ namespace yocto
                 rule_ptr *ppRxp = rules.search(label);
                 if(ppRxp)
                 {
-                    std::cerr << "returning raw '" << label << "'" << std::endl;
                     return **ppRxp;
                 }
                 else
@@ -75,7 +67,6 @@ namespace yocto
                     {
                         throw exception("unexpected multiple RAW '%s'", label.c_str());
                     }
-                    std::cerr << "creating  raw '" << label << "'" << std::endl;
                     return r;
                 }
             }
@@ -88,7 +79,6 @@ namespace yocto
                 assert(false==top->terminal);
                 const xnode *node = top->ch->head;
 
-                //-- get the rule label from "ID"
                 assert("ID"==node->label());
                 assert(true==node->terminal);
                 const string id = node->lx->to_string();
@@ -102,7 +92,7 @@ namespace yocto
             }
 
 
-
+            static inline
             rule & __modified(const rule           &r,
                               parser               &prs,
                               const string         &modifier,
@@ -124,20 +114,18 @@ namespace yocto
                 {
                     switch(hsub(node->label()))
                     {
+
                         case 0: assert("ID"==node->label());
                         {
                             assert(node->terminal);
                             const string content = node->lx->to_string();
-                            std::cerr << "\t" << parent.label << "->" << content << std::endl;
                             parent << fetch_agg(content);
-                        }
-                            break;
+                        }  break;
 
                         case 1: assert("RXP"==node->label());
                         {
                             assert(node->terminal);
-                            const string content = node->lx->to_string();
-                            std::cerr << "\t" << parent.label << "->" << content << std::endl;
+                            const string content = node->lx->to_cstring();
                             parent << fetch_rxp(content);
                         }
                             break;
@@ -146,7 +134,6 @@ namespace yocto
                         {
                             assert(node->terminal);
                             const string content = node->lx->to_string();
-                            std::cerr << "\t" << parent.label << "->" << content << std::endl;
                             parent << fetch_raw(content);
                         }
                             break;
@@ -169,19 +156,16 @@ namespace yocto
                             sub.flags               = property::jettison;
 
                             delete node->ch->pop_back();
-                            std::cerr << "\t\tmodifier=" << modifier << std::endl;
                             grow(sub,node->ch->head);
                             parent << __modified(sub, *xprs, modifier, hmod);
-                        }
-                            break;
+                        } break;
 
                         case 5: assert( "ALT"==node->label() );
                         {
                             alternate  &alt = xprs->alt();
                             grow(alt,node->ch->head);
                             parent << alt;
-                        }
-                            break;
+                        } break;
 
 
                         default:
@@ -209,45 +193,19 @@ namespace yocto
         namespace syntax
         {
 
-
-#if 0
-            static inline
-            pattern *string2pattern(const string &label,
-                                    const string &content,
-                                    p_dict       &dict)
-            {
-                if("RAW"==label)
-                {
-                    return logical::equal(content);
-                }
-
-                if("RXP"==label)
-                {
-                    const string expr = strconv::to_cstring(content);
-                    return regexp(expr,&dict);
-                }
-
-                throw exception("unexpected '%s' in lexical rule", label.c_str());
-
-                assert("RXP"==label);
-                const string expr = strconv::to_cstring(content);
-                return regexp(expr,&dict);
-            }
-#endif
-
             static inline
             pattern *xnode2pattern(const xnode *args, p_dict &dict)
             {
                 assert(args);
                 assert(args->terminal);
                 assert("RXP"==args->origin->label);
-                const string content  = args->lx->to_string();
-                const string expr     = strconv::to_cstring(content);
+
+                const string      expr = args->lx->to_cstring();
                 auto_ptr<pattern> ans( regexp(expr,&dict) );
 
                 if(ans->match_empty())
                 {
-                    throw exception("%d: \"%s\" matches empty", args->lx->line,content.c_str());
+                    throw exception("%d: \"%s\" matches empty", args->lx->line, expr.c_str());
                 }
 
                 return ans.yield();

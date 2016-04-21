@@ -3,15 +3,6 @@
 #include "yocto/ios/graphviz.hpp"
 #include "yocto/exception.hpp"
 
-#define Y_XGEN_VERBOSE 1
-
-#if Y_XGEN_VERBOSE == 1
-#include <iostream>
-#define Y_XGEN_OUT(CODE) do { std::cerr << "[XGEN] "; CODE; } while(false)
-#else
-#define Y_XGEN_OUT(CODE)
-#endif
-
 
 namespace yocto
 {
@@ -94,8 +85,7 @@ namespace yocto
 
                     delete top_level.pop_front();
                 }
-                Y_XGEN_OUT(std::cerr << "parser created with " << xprs->grammar::name << "," << xprs->lexer::name << std::endl);
-
+                
                 //______________________________________________________________
                 //
                 // plugin detection

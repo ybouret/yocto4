@@ -47,14 +47,13 @@ namespace yocto
             void xgen::load_plugin(const string &id, xnode *node)
             {
                 assert("LXR"==node->label());
-                std::cerr << "loading plugin for '" << id << "'" << std::endl;
+
                 xlist &args = *(node->ch);
                 assert(args.size>=2);
                 delete args.pop_front();
                 assert(args.size>=1);
                 assert(args.head->terminal);
                 const string plg = args.head->lx->to_string();
-                std::cerr << "plugin '" << plg << "'" << std::endl;
 
                 if("cstring" == plg)
                 {
