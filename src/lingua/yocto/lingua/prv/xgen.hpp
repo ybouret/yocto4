@@ -75,7 +75,6 @@ namespace yocto
                 //! optimize
                 /**
                  - univocal to jettison syntax only terminals...
-                 - 
                  */
                 void optimize();
 

@@ -11,7 +11,8 @@ namespace yocto
         namespace syntax
         {
 
-            rule       &xgen::fetch_agg(const string &label)
+
+            rule &xgen::fetch_agg(const string &label)
             {
                 rule_ptr *ppRule = rules.search(label);
                 if(ppRule)
@@ -27,7 +28,6 @@ namespace yocto
                     {
                         throw exception("unexpected multiple ID '%s'", label.c_str());
                     }
-                    //YXGEN_OUT("RULE '" << label << "'");
                     return r;
                 }
             }
@@ -48,7 +48,6 @@ namespace yocto
                     {
                         throw exception("unexpected multiple RXP '%s'", label.c_str());
                     }
-                    //YXGEN_OUT("RXP  '" << label << "'");
                     return r;
                 }
             }
@@ -69,7 +68,6 @@ namespace yocto
                     {
                         throw exception("unexpected multiple RAW '%s'", label.c_str());
                     }
-                    //YXGEN_OUT("RAW  '" << label << "'");
                     return r;
                 }
             }
@@ -118,8 +116,14 @@ namespace yocto
                     switch(hsub(node->label()))
                     {
 
+
                         case 0: assert("ID"==node->label());
+                            //__________________________________________________
+                            //
+                            // will call a named rule
+                            //__________________________________________________
                         {
+
                             assert(node->terminal);
                             const string content = node->lx->to_string();
                             YXGEN_OUT("+ID  '" << content << "'");
@@ -127,6 +131,10 @@ namespace yocto
                         }  break;
 
                         case 1: assert("RXP"==node->label());
+                            //__________________________________________________
+                            //
+                            // will call a Regular eXPression
+                            //__________________________________________________
                         {
                             assert(node->terminal);
                             const string content = node->lx->to_cstring();
@@ -135,6 +143,10 @@ namespace yocto
                         } break;
 
                         case 2: assert("RAW"==node->label());
+                            //__________________________________________________
+                            //
+                            // will call a raw string
+                            //__________________________________________________
                         {
                             assert(node->terminal);
                             const string content = node->lx->to_string();

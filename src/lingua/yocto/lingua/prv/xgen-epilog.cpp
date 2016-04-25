@@ -59,7 +59,6 @@ namespace yocto
                         const rule::meta_list &m = a.members;
                         if(m.size==1)
                         {
-                            //YXGEN_OUT("will fusion '" << a.label << "'");
                             to_remove.push_back((rule*)jk);
                             return m.head->addr;
                         }
@@ -75,7 +74,7 @@ namespace yocto
                 for( rules_db::iterator i = rules.begin(); i!=__end; ++i)
                 {
                     rule &r = **i;
-                    
+
                     switch(r.uuid)
                     {
                         case aggregate::UUID: optimize_aggregate( r.as<aggregate>(), verbose); break;
