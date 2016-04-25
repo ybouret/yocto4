@@ -211,6 +211,40 @@ namespace yocto
             return curr->hash;
         }
 
+
+        int mperf:: find(const void *data) const throw()
+        {
+            if(data)
+            {
+                const uint8_t   *addr = static_cast<const uint8_t *>(data);
+                const node_type *curr = root;
+                while(true)
+                {
+                    const uint8_t        code    = *(addr++); if(code<=0) break;
+                    bool                 found   = false;;
+                    for(const node_type *node = curr->chld.head;node;node=node->next)
+                    {
+                        if(code==node->code)
+                        {
+                            curr = node;
+                            found= true;
+                            break;
+                        }
+                    }
+
+                    if(!found)
+                    {
+                        return -1;
+                    }
+                }
+                return curr->hash;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
     }
 }
 
@@ -229,11 +263,11 @@ namespace yocto
                 root->viz(fp);
                 fp << "}\n";
             }
-            
+
         }
-        
+
     }
-    
+
 }
 
 
@@ -258,6 +292,6 @@ namespace yocto
             }
             optimize();
         }
-
+        
     }
 }

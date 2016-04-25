@@ -66,13 +66,11 @@ namespace yocto
             inline void optimize() throw() { root->optimize(); }
 
 
-            //! get the hash code
-            int find(const void *data, const size_t size) const throw();
 
             //! get the hash code for litterals
             inline int operator()(const char *text) const throw()
             {
-                return find(text,length_of(text));
+                return find(text);
             }
 
             //! get the hash code for buffers
@@ -86,6 +84,12 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(mperf);
             node_type *root;
+
+            //! get the hash code
+            int find(const void *data, const size_t size) const throw();
+
+            //! get the hash assuming a '\0' terminated data
+            int find(const void *data) const throw();
 
         public:
             const size_t nodes;

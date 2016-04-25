@@ -112,8 +112,16 @@ namespace yocto
         //______________________________________________________________________
         inline type *search(const char *id) throw()
         {
-            const string ID(id);
-            return search(ID);
+            const int h = hash_(id);
+            if(h<0)
+            {
+                return 0;
+            }
+            else
+            {
+                assert(size_t(h)<size_);
+                return data_+h;
+            }
         }
 
         //______________________________________________________________________
@@ -140,8 +148,16 @@ namespace yocto
         //______________________________________________________________________
         inline const_type *search(const char *id) const throw()
         {
-            const string ID(id);
-            return search(ID);
+            const int h = hash_(id);
+            if(h<0)
+            {
+                return 0;
+            }
+            else
+            {
+                assert(size_t(h)<size_);
+                return data_+h;
+            }
         }
 
 
