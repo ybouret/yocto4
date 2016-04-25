@@ -56,7 +56,7 @@ namespace yocto
             rule & grammar:: zero_or_more(const rule &r)
             {
                 assert(rules.owns(&r));
-                const string label = vformat(">=0%c%u",rule::internal_char,++nzom);
+                const string label = vformat(">=0(%c%u)",rule::internal_char,++nzom);
                 at_least    *tt    = new at_least(label,&r,0);
                 rules.push_back(tt);
                 return *tt;
@@ -65,7 +65,7 @@ namespace yocto
             rule & grammar:: one_or_more(const rule &r)
             {
                 assert(rules.owns(&r));
-                const string label = vformat(">=1%c%u",rule::internal_char,++noom);
+                const string label = vformat(">=1(%c%u)",rule::internal_char,++noom);
                 at_least    *tt    = new at_least(label,&r,1);
                 rules.push_back(tt);
                 return *tt;

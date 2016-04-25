@@ -39,7 +39,7 @@ namespace yocto
                 const uint32_t uuid;
                 void          *self;
                 meta_list      following;
-                int            prv;
+                int            prv;         //!< for building sub_name
                 
                 virtual ~rule() throw();
 
