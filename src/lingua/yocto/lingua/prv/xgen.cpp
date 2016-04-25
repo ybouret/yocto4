@@ -146,6 +146,8 @@ namespace yocto
                     ios::graphviz_render(xprs->grammar::name + ".dot");
                 }
 
+                YXGEN_OUT("------> checking syntax only terminals...");
+
                 YXGEN_OUT("checking consistency");
                 xprs->check_consistency();
 

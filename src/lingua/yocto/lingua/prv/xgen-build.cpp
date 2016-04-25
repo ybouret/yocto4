@@ -132,8 +132,7 @@ namespace yocto
                             const string content = node->lx->to_cstring();
                             YXGEN_OUT("+RXP '" << content << "'");
                             parent << fetch_rxp(content);
-                        }
-                            break;
+                        } break;
 
                         case 2: assert("RAW"==node->label());
                         {
@@ -141,8 +140,7 @@ namespace yocto
                             const string content = node->lx->to_string();
                             YXGEN_OUT("+RAW '" << content << "'");
                             parent << fetch_raw(content);
-                        }
-                            break;
+                        } break;
 
                         case 3: assert("SUB"==node->label());
                         {
@@ -159,8 +157,7 @@ namespace yocto
                                 grow(sub,node->ch->head);
                                 parent << sub;
                             }
-                        }
-                            break;
+                        } break;
 
                         case 4: assert("ITEM"==node->label());
                         {
@@ -199,7 +196,7 @@ namespace yocto
 }
 
 #include "yocto/lingua/lexical/plugin/_string.hpp"
-#include "yocto/lingua/lexical/plugin/end_of_line_comment.hpp"
+#include "yocto/lingua/lexical/plugin/end-of-line-comment.hpp"
 #include "yocto/lingua/lexical/plugin/block-comment.hpp"
 #include "yocto/lingua/pattern/logic.hpp"
 

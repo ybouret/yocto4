@@ -71,6 +71,8 @@ namespace yocto
                 //! grow parent from child node
                 void grow(compound &parent, const xnode *node);
 
+                //! checking syntax only terminals: univocal in aggregates!
+                void univocal2jettison() throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xgen);

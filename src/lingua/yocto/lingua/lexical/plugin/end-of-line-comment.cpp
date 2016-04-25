@@ -1,4 +1,4 @@
-#include "yocto/lingua/lexical/plugin/end_of_line_comment.hpp"
+#include "yocto/lingua/lexical/plugin/end-of-line-comment.hpp"
 #include "yocto/lingua/pattern/basic.hpp"
 
 namespace yocto

@@ -1,7 +1,7 @@
 #include "yocto/lingua/parser.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ios/graphviz.hpp"
-#include "yocto/lingua/lexical/plugin/end_of_line_comment.hpp"
+#include "yocto/lingua/lexical/plugin/end-of-line-comment.hpp"
 #include "yocto/lingua/lexical/plugin/cstring.hpp"
 
 using namespace yocto;
