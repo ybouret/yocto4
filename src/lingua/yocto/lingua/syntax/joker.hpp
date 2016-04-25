@@ -9,22 +9,25 @@ namespace yocto
     {
         namespace syntax
         {
+            class xgen;
             class joker : public rule
             {
             public:
                 virtual ~joker() throw();
+                
 
             protected:
                 explicit joker(const string  &id,
                                const uint32_t t,
                                const rule    *r);
-
                 const rule *jk;
+
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(joker);
                 friend class rule;
                 friend class grammar;
+                friend class xgen;
             };
 
         }

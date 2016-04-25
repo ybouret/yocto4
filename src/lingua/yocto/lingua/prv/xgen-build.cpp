@@ -170,13 +170,29 @@ namespace yocto
                             delete node->ch->pop_back();
                             YXGEN_OUT("ITEM '" << sub_label << "', modifier='" << modifier << "'");
                             grow(sub,node->ch->head);
-                            parent << __modified(sub, *xprs, modifier, hmod);
+                            rule &ans = __modified(sub, *xprs, modifier, hmod);
+                            {
+                                const rule_ptr p(&ans);
+                                if(!rules.insert(p))
+                                {
+                                    throw exception("unexpected multiple modified '%s'", ans.label.c_str());
+                                }
+                            }
+                            parent << ans;
                         } break;
 
                         case 5: assert( "ALT"==node->label() );
                         {
                             alternate  &alt = xprs->alt();
                             YXGEN_OUT("+ALT '" << alt.label << "'");
+                            {
+                                const rule_ptr p(&alt);
+                                if(!rules.insert(p))
+                                {
+                                    throw exception("unexpected multiple ALT '%s'", alt.label.c_str());
+                                }
+
+                            }
                             grow(alt,node->ch->head);
                             parent << alt;
                         } break;

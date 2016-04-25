@@ -10,6 +10,8 @@ namespace yocto
         namespace syntax
         {
 
+            class xgen;
+
             class grammar : public object
             {
             public:
@@ -33,12 +35,8 @@ namespace yocto
                 xnode *run(lexer &lxr, source &src) const;
 
                 void   build_following();
-
                 void   check_consistency() const;
-                
                 rule & append( rule *r );
-
-                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 void check(const string &label) const;
@@ -48,7 +46,7 @@ namespace yocto
                 unsigned nzom; //!< generate altermnate zero_or_more rule labels
                 unsigned noom; //!< generate altermnate one_or_more rule labels
                 static void check_rule( const rule *r, void *args, const char *id);
-
+                friend class xgen;
             };
 
         }

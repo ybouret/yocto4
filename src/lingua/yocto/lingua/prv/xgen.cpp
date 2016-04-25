@@ -139,8 +139,8 @@ namespace yocto
                     xprs->top_level(**ppTop);
                 }
 
-                YXGEN_OUT("-- checking syntax only terminals");
-                univocal2jettison();
+                YXGEN_OUT("-- optimizing");
+                optimize();
 
                 if(verbose)
                 {
@@ -163,3 +163,7 @@ namespace yocto
         }
     }
 }
+
+
+
+
