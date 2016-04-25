@@ -84,7 +84,8 @@ namespace yocto
         mperf:: ~mperf() throw()
         {
             assert(root);
-            delete root; root=0;
+            delete root;
+            root=0;
         }
 
         mperf:: mperf() :
@@ -111,7 +112,7 @@ namespace yocto
         {
             assert( ! ( (NULL==data) && (size>0) ) );
             assert(h>=0);
-            if(h<0)   throw exception("mp_hasher: invalid user's hash code=%d",h);
+            if(h<0)   throw exception("mperf: invalid user's hash code=%d",h);
             if(!size) return;
 
             //__________________________________________________________________
@@ -159,12 +160,20 @@ namespace yocto
             assert(curr);
             assert(curr!=root);
             if(curr->hash>=0)
-                throw exception("mp_hasher: multiple insertions!");
+                throw exception("mperf: multiple keys!");
             (int &)(curr->hash) = h;
 
 
         }
 
+
+        void mperf:: release() throw()
+        {
+            assert(root);
+            root->chld.clear();
+            root->freq=1;
+            (size_t&)nodes=1;
+        }
 
     }
 }

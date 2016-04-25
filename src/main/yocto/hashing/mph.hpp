@@ -81,6 +81,8 @@ namespace yocto
                 return find(buf.ro(),buf.length());
             }
 
+            void release() throw();
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(mperf);
             node_type *root;
