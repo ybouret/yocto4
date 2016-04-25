@@ -25,6 +25,7 @@ namespace yocto
         using typename glossary<T>::const_type;
 
         inline explicit type_glossary() : glossary<T> () {}
+        inline explicit type_glossary(const size_t n) : glossary<T>(n) {}
         virtual        ~type_glossary() throw() {}
 
         virtual const char *name() const throw() { return hidden::type_glossary_info::name; }
@@ -57,6 +58,7 @@ namespace yocto
             enroll( typeid(U), arg );
         }
 
+    
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(type_glossary);
     };

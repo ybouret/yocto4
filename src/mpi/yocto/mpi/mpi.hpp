@@ -296,10 +296,10 @@ namespace yocto
             return get_type( typeid(T) );
         }
         
-        typedef vector<data_type> db_type;
-        const db_type             db;
-        mutable hashing_function  hasher;
-        
+        typedef vector<data_type>   db_type;
+        const db_type               db;
+        mutable hashing_function    hasher;
+
         //======================================================================
         //
         // Allreduce wrappers

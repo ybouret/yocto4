@@ -250,6 +250,15 @@ namespace yocto
             insert(arg->key(),arg);
         }
 
+        inline void optimize() throw()
+        {
+            hash_.optimize();
+        }
+
+        inline void graphviz(const char *filename) const
+        {
+            hash_.graphviz(filename);
+        }
 
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(glossary);

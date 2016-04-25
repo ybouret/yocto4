@@ -1,5 +1,6 @@
 #include "yocto/mpi/mpi.hpp"
 #include "yocto/sort/heap.hpp"
+#include "yocto/ios/graphviz.hpp"
 
 namespace yocto
 {
@@ -80,16 +81,10 @@ namespace yocto
     void mpi:: gendb()
     {
         
-#if 0
-#define Y_MPI_DB_INFO(T) std::cerr << "MPI Register " << #T << std::endl
-#else
-#define Y_MPI_DB_INFO(T)
-#endif
-        
+
 #define Y_MPI_DB ((db_type&)db)
 #define Y_MPI_REGISTER(T,ID) do {     \
 const data_type item( typeid(T), ID); \
-Y_MPI_DB_INFO(T);                     \
 __append_data_type(Y_MPI_DB,item);    \
 } while(false)
         
@@ -98,8 +93,9 @@ __append_data_type(Y_MPI_DB,item);    \
         //----------------------------------------------------------------------
         Y_MPI_REGISTER(float,         MPI_FLOAT);
         Y_MPI_REGISTER(double,        MPI_DOUBLE);
-        
-        
+        Y_MPI_REGISTER(long double,   MPI_LONG_DOUBLE);
+
+
         //----------------------------------------------------------------------
         // standard integers, likely to be aliases
         //----------------------------------------------------------------------
@@ -120,7 +116,33 @@ __append_data_type(Y_MPI_DB,item);    \
         
         
         hsort(Y_MPI_DB, data_type::compare);
-        
+
+#if 0
+        types_db.enroll<float>(MPI_FLOAT);
+        types_db.enroll<double>(MPI_DOUBLE);
+        types_db.enroll<long double>(MPI_LONG_DOUBLE);
+
+        types_db.enroll<char>(MPI_CHAR);
+        types_db.enroll<unsigned char>(MPI_BYTE);
+        types_db.enroll<short>(MPI_SHORT);
+        types_db.enroll<unsigned short>(MPI_UNSIGNED_SHORT);
+        types_db.enroll<int>(MPI_INT);
+        types_db.enroll<unsigned>(MPI_UNSIGNED);
+        types_db.enroll<long>(MPI_LONG);
+        types_db.enroll<unsigned long>(MPI_LONG);
+        types_db.enroll<long long>(MPI_LONG_LONG);
+        types_db.enroll<unsigned long long>(MPI_UNSIGNED_LONG_LONG);
+
+
+        types_db.optimize();
+
+        if(0==CommWorldRank)
+        {
+            types_db.graphviz("types_db.dot");
+            ios::graphviz_render("types_db.dot");
+        }
+#endif
+
     }
     
     
