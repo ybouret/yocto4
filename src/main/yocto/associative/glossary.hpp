@@ -3,6 +3,7 @@
 
 #include "yocto/hashing/mph.hpp"
 #include "yocto/container/container.hpp"
+#include "yocto/container/iter-linear.hpp"
 
 namespace yocto
 {
@@ -45,9 +46,51 @@ namespace yocto
         virtual size_t      size()     const throw() { return size_; }
         virtual size_t      capacity() const throw() { return maxi_; }
         virtual void        reserve(size_t n) { if(n>0) reserve_(n); }
+
+
         //______________________________________________________________________
         //
-        // search by id
+        // iterators
+        //______________________________________________________________________
+        typedef iterating::linear<type,iterating::forward> iterator;
+        inline iterator begin() throw() { return iterator(data_);       }
+        inline iterator end()   throw() { return iterator(data_+size_); }
+
+        typedef iterating::linear<const_type,iterating::forward> const_iterator;
+        inline const_iterator begin() const throw() { return const_iterator(data_);       }
+        inline const_iterator end()   const throw() { return const_iterator(data_+size_); }
+
+        //______________________________________________________________________
+        //
+        //! random access
+        //______________________________________________________________________
+        inline type & operator()(const size_t indx) throw()
+        {
+            assert(indx<size_); return data_[indx];
+        }
+
+        //______________________________________________________________________
+        //
+        //! random access,const
+        //______________________________________________________________________
+        inline const_type & operator()(const size_t indx) const throw()
+        {
+            assert(indx<size_); return data_[indx];
+        }
+
+        inline int index_of(const string &id) const throw()
+        {
+            return hash_(id);
+        }
+
+        inline int index_of(const char *id) const throw()
+        {
+            return hash_(id);
+        }
+
+        //______________________________________________________________________
+        //
+        //! search by id
         //______________________________________________________________________
         inline type *search(const string &id) throw()
         {
@@ -63,12 +106,20 @@ namespace yocto
             }
         }
 
+        //______________________________________________________________________
+        //
+        //! search by id, wrapper
+        //______________________________________________________________________
         inline type *search(const char *id) throw()
         {
             const string ID(id);
             return search(ID);
         }
 
+        //______________________________________________________________________
+        //
+        //! search by id, const
+        //______________________________________________________________________
         inline const_type *search(const string &id) const throw()
         {
             const int h = hash_(id);
@@ -83,12 +134,18 @@ namespace yocto
             }
         }
 
+        //______________________________________________________________________
+        //
+        //! search by id, const wrapper
+        //______________________________________________________________________
         inline const_type *search(const char *id) const throw()
         {
             const string ID(id);
             return search(ID);
         }
 
+
+        
         inline void insert(const string &id, param_type arg)
         {
             if(size_<maxi_)
