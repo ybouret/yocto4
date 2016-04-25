@@ -316,6 +316,12 @@ namespace yocto
                 }
                 fp << "}\n";
             }
+
+            void grammar:: graphviz(const char *filename) const
+            {
+                const string F(filename);
+                graphviz(F);
+            }
         }
     }
 }
