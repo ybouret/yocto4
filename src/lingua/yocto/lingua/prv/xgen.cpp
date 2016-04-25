@@ -84,7 +84,7 @@ namespace yocto
                     const string rootID    = "main";
 
                     xprs.reset( new lingua::parser(langID,rootID) );
-                    YXGEN_OUT( "creating parser for " << xprs->grammar::name);
+                    YXGEN_OUT( "-- creating parser for " << xprs->grammar::name);
                     delete top_level.pop_front();
                 }
                 
@@ -128,8 +128,8 @@ namespace yocto
                 //______________________________________________________________
                 //
                 // setting top_level code
-                //______________________________________________________________`
-                YXGEN_OUT( "setting top-level rule" );
+                //______________________________________________________________
+                YXGEN_OUT( "-- setting top-level rule" );
                 {
                     const xnode    *top_xnode = top_level.head;
                     const string    top_label = top_xnode->ch->head->lx->to_string();
@@ -139,19 +139,21 @@ namespace yocto
                     xprs->top_level(**ppTop);
                 }
 
+                YXGEN_OUT("-- checking syntax only terminals");
+                univocal2jettison();
+
                 if(verbose)
                 {
-                    YXGEN_OUT("saving grammar...");
+                    YXGEN_OUT("-- saving grammar...");
                     xprs->graphviz(xprs->grammar::name + ".dot");
                     ios::graphviz_render(xprs->grammar::name + ".dot");
                 }
 
-                YXGEN_OUT("------> checking syntax only terminals...");
 
-                YXGEN_OUT("checking consistency");
+                YXGEN_OUT("-- checking consistency");
                 xprs->check_consistency();
 
-                YXGEN_OUT("parser is ready");
+                YXGEN_OUT("-- parser is ready");
                 return xprs.yield();
             }
 

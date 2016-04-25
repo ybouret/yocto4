@@ -28,7 +28,7 @@ namespace yocto
                 fp << "\",shape=box";
                 switch(flags)
                 {
-                    case property::standard: fp << ",style=solid";    break;
+                    case property::standard: fp << ",style=solid";   break;
                     case property::univocal: fp << ",style=rounded"; break;
                     case property::jettison: fp << ",style=dotted";  break;
                 }
