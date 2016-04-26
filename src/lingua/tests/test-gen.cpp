@@ -3,6 +3,7 @@
 #include "yocto/ios/graphviz.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/ios/icstream.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 using namespace lingua;
@@ -17,7 +18,12 @@ YOCTO_UNIT_TEST_IMPL(gen)
             ios::icstream fp(filename);
             P.reset( parser::generate(fp,false) );
             std::cerr << "-- ready" << std::endl;
-            P->emit(".");
+        }
+
+        {
+            ios::wcstream fp("walker.hxx");
+            P->emit_prolog(fp);
+            
         }
 
         {

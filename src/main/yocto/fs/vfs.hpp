@@ -134,7 +134,9 @@ namespace yocto {
         static string  to_directory( const string &path );
         static void    change_extension( string &path, const string &ext );
         static void    remove_extension( string &path ) throw();
-        static string  base_name_from(const string &name);
+        static string  base_name_from(const string &name);  //!< make an acceptable file name
+        static string  cpp_label_from(const string &name);  //!< C Pre Processor label
+        static string  class_name_for(const string &name);  //!< acceptable class name
 
     protected:
         explicit vfs() throw();
