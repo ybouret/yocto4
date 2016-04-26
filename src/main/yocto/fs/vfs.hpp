@@ -134,7 +134,8 @@ namespace yocto {
         static string  to_directory( const string &path );
         static void    change_extension( string &path, const string &ext );
         static void    remove_extension( string &path ) throw();
-        
+        static string  base_name_from(const string &name);
+
     protected:
         explicit vfs() throw();
         

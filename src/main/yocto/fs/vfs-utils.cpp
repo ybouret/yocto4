@@ -1,4 +1,5 @@
 #include "yocto/fs/vfs.hpp"
+#include <cstring>
 
 namespace yocto
 {
@@ -205,7 +206,31 @@ namespace yocto
         string temp(path);
         return as_directory( temp );
     }
-    
+
+    string  vfs:: base_name_from(const string &name)
+    {
+        static const char valid[] =
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "0123456789"
+        "._-";
+
+        const size_t n = name.size();
+        string       ans(n,as_capacity);
+
+        for(size_t i=0;i<n;++i)
+        {
+            char C = name[i];
+            if( 0 == strchr(valid, C) )
+            {
+                C = '_';
+            }
+            ans.append(C);
+        }
+
+        return ans;
+    }
+
 }
 
 

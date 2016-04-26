@@ -39,6 +39,9 @@ namespace yocto
                 void   build_following();
                 void   check_consistency() const;
                 rule & append( rule *r );
+
+                void   emit(const string &dirname) const;
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 void check(const string &label) const;
