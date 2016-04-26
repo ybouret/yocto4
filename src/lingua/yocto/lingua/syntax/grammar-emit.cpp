@@ -15,33 +15,50 @@ namespace yocto
             {
                 const string  baseName   = vfs::base_name_from(name) + "_walker";
                 const string  className  = vfs::class_name_for(baseName);
+                const string  coreName   = className + "_base";
+
+                fp << "#include \"yocto/hashing/mph.hpp\"\n";
+
+                fp << "class " << coreName << "  : public yocto::lingua::syntax::walker {\n";
+                fp << "public:\n";
+                fp << "\tyocto::hashing::mperf H;\n";
+
+                fp << "\tinline virtual ~" << coreName << "() throw() {}\n";
+
+                fp << "\tinline explicit " << coreName << "() :\n";
+                fp << "\t\tH(\"";
+                for(const rule *r = rules.head; r; r=r->next)
+                {
+
+                }
+
+                fp << "\")\n";
+                fp << "{}\n";
                 
-#if 0
-                string        dirName    = vfs::to_directory(dirname);
-                const string  baseName   = vfs::base_name_from(name) + "_walker";
-                const string  headerName = dirName + baseName + ".hpp";
-                const string  guardLabel = vfs::cpp_label_from(baseName) + "_included";
-                const string  className  = vfs::class_name_for(baseName);
+                fp << "private:\n";
+                fp << "\tYOCTO_DISABLE_COPY_AND_ASSIGN(" << coreName << ");\n";
+                fp << "};\n\n";
 
-                ios::wcstream hdr(headerName);
-                //ios::wcstream src(sourceName);
+                fp  << "#undef  YOCTO_DEFAULT_WALKER\n";
+                fp  << "#define YOCTO_DEFAULT_WALKER " << coreName << "\n";
+                fp << "class " << className << " : public " << coreName << "{\n";
+                fp << "public:\n";
 
-                hdr << "#ifndef " << guardLabel << "\n";
-                hdr << "#define " << guardLabel << "\n";
-                hdr << "#include \"yocto/lingua/syntax/walker.hpp\"\n";
-
-                hdr << "class " << className << " : public yocto::lingua::syntax::walker {\n";
-                hdr << "public:\n";
-
-                hdr << "private:\n";
-                hdr << "\tYOCTO_DISABLE_COPY_AND_ASSIGN(" << className << ")l;\n";
-                hdr << "};\n";
-                hdr << "#endif\n";
-#endif
+                
             }
-            
+
+
+            void grammar:: emit_epilog(ios::ostream &fp) const
+            {
+                const string  baseName   = vfs::base_name_from(name) + "_walker";
+                const string  className  = vfs::class_name_for(baseName);
+                fp << "private:\n";
+                fp << "\tYOCTO_DISABLE_COPY_AND_ASSIGN(" << className << ");\n";
+                fp << "};\n";
+                //fp << "#endif\n";
+            }
+
         }
-        
     }
     
 }
