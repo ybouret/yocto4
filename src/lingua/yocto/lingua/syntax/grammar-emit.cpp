@@ -1,5 +1,7 @@
 #include "yocto/lingua/syntax/walker.hpp"
 #include "yocto/lingua/syntax/grammar.hpp"
+#include "yocto/lingua/syntax/term.hpp"
+#include "yocto/ios/net-string.hpp"
 #include "yocto/fs/vfs.hpp"
 
 namespace yocto
@@ -29,6 +31,19 @@ namespace yocto
                 fp << "\t\tH(\"";
                 for(const rule *r = rules.head; r; r=r->next)
                 {
+                    switch(r->uuid)
+                    {
+                        case aggregate::UUID:
+                        case terminal ::UUID:
+                            if(r->flags==property::standard)
+                            {
+                                ios::net_string::write(r->label,fp);
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
 
                 }
 

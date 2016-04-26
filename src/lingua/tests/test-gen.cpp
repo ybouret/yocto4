@@ -16,7 +16,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
         {
             const string  filename = argv[1];
             ios::icstream fp(filename);
-            P.reset( parser::generate(fp,false) );
+            P.reset( parser::generate(fp,true) );
             std::cerr << "-- ready" << std::endl;
         }
 
