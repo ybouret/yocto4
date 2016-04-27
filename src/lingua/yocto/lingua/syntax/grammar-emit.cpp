@@ -9,7 +9,6 @@
 
 #include <iostream>
 #include "yocto/ios/graphviz.hpp"
-#include "yocto/associative/map.hpp"
 #include "yocto/exception.hpp"
 
 namespace yocto
@@ -26,7 +25,6 @@ namespace yocto
                     const r_list      &rules;
                     hashing::mperf     H;
                     ios::ostream      &fp;
-                    map<string,string> methods;
 
                     inline Emitter(const r_list &grammar_rules, ios::ostream &output) :
                     rules(grammar_rules),
@@ -50,12 +48,6 @@ namespace yocto
                                 default:
                                     break;
                             }
-                            const string method = "on_" + vfs::class_name_for(r->label);
-                            std::cerr << "label='" << r->label << "' => method='" << method << "'" << std::endl;
-                            if(!methods.insert(r->label,method))
-                            {
-                                throw exception("unexpected multiple rule label '%s", r->label.c_str());
-                            }
                         }
                         H.optimize();
                     }
@@ -64,11 +56,9 @@ namespace yocto
                     {
                     }
 
-                    inline const string & _method(const string &label) const throw()
+                    inline  string method_for(const string &label) const throw()
                     {
-                        const string *pM = methods.search(label);
-                        assert(pM);
-                        return *pM;
+                        return "on_" + vfs::class_name_for(label);
                     }
 
                     inline void run()
