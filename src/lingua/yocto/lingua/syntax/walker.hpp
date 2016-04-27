@@ -9,16 +9,17 @@ namespace yocto
     {
         namespace syntax
         {
-            class walker : public object
+            class tree_walker : public object
             {
             public:
-                virtual ~walker() throw();
+                typedef xnode XNODE;
+                virtual ~tree_walker() throw();
 
             protected:
-                explicit walker() throw();
+                explicit tree_walker() throw();
 
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(walker);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(tree_walker);
             };
         }
     }

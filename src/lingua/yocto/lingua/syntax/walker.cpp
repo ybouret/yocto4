@@ -7,11 +7,11 @@ namespace yocto
         namespace syntax
         {
 
-            walker:: ~walker() throw()
+            tree_walker:: ~tree_walker() throw()
             {
             }
 
-            walker:: walker() throw()
+            tree_walker:: tree_walker() throw()
             {
             }
 

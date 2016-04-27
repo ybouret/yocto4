@@ -40,9 +40,8 @@ namespace yocto
                 void   check_consistency() const;
                 rule & append( rule *r );
 
-                void   emit_prolog(ios::ostream &fp) const;
-                void   emit_epilog(ios::ostream &fp) const;
-                
+                void   emit(ios::ostream &fp) const;
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 void check(const string &label) const;

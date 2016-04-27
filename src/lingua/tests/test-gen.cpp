@@ -22,8 +22,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
 
         {
             ios::wcstream fp("walker.hxx");
-            P->emit_prolog(fp);
-            P->emit_epilog(fp);
+            P->emit(fp);
         }
 
         {
