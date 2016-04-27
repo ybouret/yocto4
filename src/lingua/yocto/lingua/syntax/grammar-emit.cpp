@@ -58,8 +58,6 @@ namespace yocto
                             }
                         }
                         H.optimize();
-                        //H.graphviz("emit_h.dot");
-                        //ios::graphviz_render("emit_h.dot");
                     }
 
                     inline ~Emitter() throw()
