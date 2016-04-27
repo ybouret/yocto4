@@ -6,10 +6,6 @@ using namespace yocto;
 using namespace lingua;
 int main()
 {
-	#if 0
-	the_walker_base a_walker;
-	a_walker.graphviz("walker.dot");
-	ios::graphviz_render("walker.dot");
-	#endif
+	YOCTO_DEFAULT_WALKER w;
 	return 0;
 }
