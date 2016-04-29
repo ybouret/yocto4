@@ -113,7 +113,7 @@ namespace yocto
                             switch(s->uuid)
                             {
                                 case aggregate::UUID:
-                                    
+
                                     break;
 
                                 default:
