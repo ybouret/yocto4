@@ -31,6 +31,10 @@ namespace yocto
                     H(),
                     fp(output)
                     {
+                        //______________________________________________________
+                        //
+                        // Building the same minimal perfect hasher
+                        //______________________________________________________
                         int count = 0;
                         for(const rule *r = rules.head; r; r=r->next)
                         {
