@@ -38,7 +38,6 @@ namespace yocto
                 uint32_t       flags;
                 const uint32_t uuid;
                 void          *self;
-                meta_list      following;
                 int            prv;         //!< for building sub_name
                 
                 virtual ~rule() throw();
@@ -55,8 +54,6 @@ namespace yocto
                 //
                 // non virtual interface
                 //______________________________________________________________
-                void setup_following( meta_list &f ) const;
-                void build_following();
                 inline const string & key() const throw() { return label; }
 
                 template <typename T>

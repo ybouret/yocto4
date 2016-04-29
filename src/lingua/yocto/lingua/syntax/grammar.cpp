@@ -334,19 +334,6 @@ namespace yocto
         namespace syntax
         {
 
-            void grammar::build_following()
-            {
-                for(rule *r = rules.head; r; r=r->next )
-                {
-                    r->build_following();
-                    std::cerr << r->label << " -> {";
-                    for(const rule::meta_node *node=r->following.head;node;node=node->next)
-                    {
-                        std::cerr << " " << node->addr->label << std::endl;
-                    }
-                    std::cerr << "}" << std::endl;
-                }
-            }
         }
         
     }

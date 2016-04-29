@@ -18,7 +18,6 @@ namespace yocto
             flags(0),
             uuid(t),
             self(0),
-            following(),
             prv(0)
             {
             }
