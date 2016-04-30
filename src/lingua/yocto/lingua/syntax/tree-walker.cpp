@@ -33,7 +33,7 @@ namespace yocto
         namespace syntax
         {
 
-#define YTREE_INDENT() do { std::cerr << "|_"; for(int nt=0;nt<depth;++nt) { std::cerr << "__"; } } while(false)
+#define YTREE_INDENT() do { for(int nt=0;nt<depth;++nt) { std::cerr << "  "; } } while(false)
 
             void tree_walker:: on( const XNODE *node )
             {
