@@ -38,13 +38,20 @@ namespace yocto
             void tree_walker:: on( const XNODE *node )
             {
                 assert(node);
+                const string &label  = node->label();
+                callback    *hook    = callbacks.search(label);
+                if(hook)
+                {
+                    
+                }
+
                 if(node->terminal)
                 {
-                    YTREE_INDENT(); std::cerr << "TERM: " << node->label() << " : '" << *(node->lx) << "'" << std::endl;
+                    YTREE_INDENT(); std::cerr << "TERM: " << label << " : '" << *(node->lx) << "'" << std::endl;
                 }
                 else
                 {
-                    YTREE_INDENT(); std::cerr << "CALL: " << node->label() << std::endl;
+                    YTREE_INDENT(); std::cerr << "CALL: " << label << std::endl;
                     ++depth;
                     for(const xnode *sub = node->ch->head;sub;sub=sub->next)
                     {
