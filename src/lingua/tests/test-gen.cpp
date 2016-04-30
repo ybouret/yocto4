@@ -4,6 +4,7 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/lingua/syntax/tree-walker.hpp"
 
 using namespace yocto;
 using namespace lingua;
@@ -30,6 +31,10 @@ YOCTO_UNIT_TEST_IMPL(gen)
             auto_ptr<syntax::xnode> tree( P->parse(fp) );
             tree->graphviz( P->grammar::name + "_output.dot" );
             ios::graphviz_render( P->grammar::name + "_output.dot" );
+
+            syntax::tree_walker walker;
+            std::cerr << "-- WALKING..." << std::endl;
+            walker.walk(tree.__get());
         }
     }
 

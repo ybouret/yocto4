@@ -14,9 +14,13 @@ namespace yocto
             public:
                 typedef xnode XNODE;
                 virtual ~tree_walker() throw();
+                explicit tree_walker() throw();
+
+                void walk(const XNODE *node);
 
             protected:
-                explicit tree_walker() throw();
+                int  depth;
+                void on( const XNODE *node );
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(tree_walker);

@@ -1,4 +1,4 @@
-#include "yocto/lingua/syntax/walker.hpp"
+#include "yocto/lingua/syntax/tree-walker.hpp"
 #include "yocto/lingua/syntax/grammar.hpp"
 #include "yocto/lingua/syntax/joker.hpp"
 
@@ -72,55 +72,8 @@ namespace yocto
                         {
                             throw exception("unexpected empty grammar");
                         }
-                        emit_rule(top);
                     }
 
-                    //__________________________________________________________
-                    //
-                    //! emit any rule
-                    //__________________________________________________________
-                    inline void emit_rule(const rule *r)
-                    {
-                        assert(r);
-                        const string &label  = r->label;
-                        const string  method = method_for(label);
-                        fp << "\tvoid " << method << "(const XNODE *node) {\n";
-                        fp << "\t\tassert(node);\n";
-                        switch(r->uuid)
-                        {
-                            case aggregate::UUID: code_aggregate(r); break;
-                            case alternate::UUID: break;
-                            case at_least::UUID:  break;
-                            case optional::UUID:  break;
-                            case terminal::UUID:  break;
-                            default: throw exception("emit unhandled rule '%s'", label.c_str());
-                        }
-                        fp << "\t}\n";
-                    }
-
-                    inline void code_aggregate(const rule *r)
-                    {
-                        const aggregate       &a = *static_cast<const aggregate *>(r->self);
-                        const rule::meta_list &m = a.members;
-                        if(property::standard==r->flags)
-                        {
-                            fp << "\t\t// should call '" << r->label << "'\n";
-                        }
-
-                        for(const rule::meta_node *node = m.head;node;node=node->next)
-                        {
-                            const rule *s = node->addr;
-                            switch(s->uuid)
-                            {
-                                case aggregate::UUID:
-
-                                    break;
-
-                                default:
-                                    break;
-                            }
-                        }
-                    }
 
 
 

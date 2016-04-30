@@ -1,4 +1,4 @@
-#include "yocto/lingua/syntax/walker.hpp"
+#include "yocto/lingua/syntax/tree-walker.hpp"
 #include "walker.hxx"
 #include "yocto/ios/graphviz.hpp"
 

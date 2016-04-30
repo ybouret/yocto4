@@ -84,6 +84,8 @@ namespace
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ptr/auto.hpp"
 
+#include "yocto/lingua/syntax/tree-walker.hpp"
+
 YOCTO_UNIT_TEST_IMPL(grammar)
 {
     std::cerr << "sizeof(xnode)=" << sizeof(syntax::xnode) << std::endl;
@@ -100,6 +102,10 @@ YOCTO_UNIT_TEST_IMPL(grammar)
     assert(tree.is_valid());
     tree->graphviz("tree.dot");
     ios::graphviz_render("tree.dot");
+
+    syntax::tree_walker walker;
+    std::cerr << "WALKING..." << std::endl;
+    walker.walk(tree.__get());
 
 
 }
