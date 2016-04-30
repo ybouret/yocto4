@@ -10,24 +10,29 @@ namespace yocto
     {
         namespace syntax
         {
-            
-            typedef functor<void,TL1(const string&)> callback;
+
+            typedef functor<void,null_type>            call_type;
+            typedef functor<void,TL1(const string &)>  proc_type;
             
             class tree_walker : public object
             {
             public:
-                typedef xnode    XNODE;
-                typedef callback CALLBACK;
-                typedef glossary<CALLBACK> procedures;
+                typedef xnode     XNODE;
+                typedef call_type CALL_TYPE;
+                typedef proc_type PROC_TYPE;
+                typedef glossary<call_type> callDB;
+                typedef glossary<proc_type> procDB;
 
                 virtual ~tree_walker() throw();
-                explicit tree_walker() throw();
+                explicit tree_walker();
 
                 void walk(const XNODE *node);
 
             protected:
                 int        depth;
-                procedures callbacks;
+                callDB     calls;
+                procDB     procs;
+                
                 void on( const XNODE *node );
 
 

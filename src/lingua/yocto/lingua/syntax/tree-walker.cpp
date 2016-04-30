@@ -11,7 +11,10 @@ namespace yocto
             {
             }
 
-            tree_walker:: tree_walker() throw() : depth(0)
+            tree_walker:: tree_walker() :
+            depth(0),
+            calls(),
+            procs()
             {
             }
 
@@ -39,19 +42,26 @@ namespace yocto
             {
                 assert(node);
                 const string &label  = node->label();
-                callback    *hook    = callbacks.search(label);
-                if(hook)
-                {
-                    
-                }
-
+                
                 if(node->terminal)
                 {
                     YTREE_INDENT(); std::cerr << "TERM: " << label << " : '" << *(node->lx) << "'" << std::endl;
+                    proc_type *pProc = procs.search(label);
+                    if(pProc)
+                    {
+                        const string content = node->lx->to_string();
+                        (*pProc)(content);
+                    }
                 }
                 else
                 {
                     YTREE_INDENT(); std::cerr << "CALL: " << label << std::endl;
+                    call_type *pCall = calls.search(label);
+                    if(pCall)
+                    {
+                        (*pCall)();
+                    }
+
                     ++depth;
                     for(const xnode *sub = node->ch->head;sub;sub=sub->next)
                     {
