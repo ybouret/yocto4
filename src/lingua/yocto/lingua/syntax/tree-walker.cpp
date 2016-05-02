@@ -115,7 +115,6 @@ namespace yocto
                         const string content = node->lx->to_string();
                         (*pProc)(content);
                     }
-                    ++ns;
                 }
                 else
                 {
@@ -133,8 +132,8 @@ namespace yocto
                     {
                         (*pCall)(local_ns);
                     }
-                    ++ns;
                 }
+                ++ns;
             }
 
 
