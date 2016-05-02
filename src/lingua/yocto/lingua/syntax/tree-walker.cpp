@@ -36,6 +36,7 @@ namespace yocto
                                 {
                                     throw exception("tree_walker: unexpected multiple rule '%s'", r->label.c_str());
                                 }
+                                std::cerr << "[WALKER] --> " << ( is_agg ? "RULE" : "TERM" ) << ": '" << r->label << "'" << std::endl;
                                 if(is_agg) ++nr; else ++nt;
                             }
                             break;
