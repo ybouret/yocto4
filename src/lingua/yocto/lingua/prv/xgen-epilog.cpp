@@ -35,7 +35,9 @@ namespace yocto
 
 
             static inline
-            void optimize_aggregate( aggregate &p, const bool verbose)
+            void optimize_aggregate(aggregate &p,
+                                    const bool verbose,
+                                    const bool is_top_level)
             {
                 rule::meta_list &m = p.members;
                 switch(m.size)
@@ -43,10 +45,14 @@ namespace yocto
                     case 0: break;
                     case 1:
                     {
-                        const rule *the_sub = m.head->addr;
-                        if( alternate::UUID == the_sub->uuid )
+                        if(!is_top_level)
                         {
-                            YXGEN_OUT("|_SHOULD JETTISON '" << p.label << "'");
+                            const rule *the_sub = m.head->addr;
+                            if( alternate::UUID == the_sub->uuid )
+                            {
+                                YXGEN_OUT("|_SHOULD JETTISON '" << p.label << "'");
+                                p.flags = property::jettison;
+                            }
                         }
                     } break;
                     default: __univocal2jettison(m,verbose);  break;
@@ -84,7 +90,7 @@ namespace yocto
 
                     switch(r.uuid)
                     {
-                        case aggregate::UUID: optimize_aggregate( r.as<aggregate>(), verbose); break;
+                        case aggregate::UUID: optimize_aggregate( r.as<aggregate>(), verbose, &r == xprs->top_level() ); break;
 
                         case at_least::UUID: {
                             at_least   &J  = r.as<at_least>();
@@ -109,11 +115,11 @@ namespace yocto
                     delete xprs->rules.unlink(p);
                 }
             }
-
-
-
+            
+            
+            
         }
-
+        
     }
-
+    
 }
