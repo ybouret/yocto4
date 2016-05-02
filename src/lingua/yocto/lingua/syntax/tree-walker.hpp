@@ -11,7 +11,7 @@ namespace yocto
         namespace syntax
         {
 
-            typedef functor<void,null_type>            rule_proc; //!< to process rule
+            typedef functor<void,TL1(size_t)>          rule_proc; //!< to process rule
             typedef functor<void,TL1(const string &)>  term_proc; //!< to process terminal
             
             class tree_walker : public object

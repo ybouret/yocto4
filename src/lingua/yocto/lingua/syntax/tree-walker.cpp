@@ -104,7 +104,9 @@ namespace yocto
                 
                 if(node->terminal)
                 {
-                    YTREE_INDENT(); std::cerr << "TERM: " << label << " : '" << *(node->lx) << "'" << std::endl;
+                    YTREE_INDENT(); std::cerr << "TERM: " << label;
+                    if(property::standard==node->origin->flags) std::cerr << " : '" << *(node->lx) << "'";
+                    std::cerr << std::endl;
                     term_proc *pProc = term_procs.search(label);
                     if(pProc)
                     {
@@ -123,12 +125,13 @@ namespace yocto
                         __walk(sub,local_ns);
                     }
                     --depth;
-                    YTREE_INDENT(); std::cerr << "CALL [" << local_ns << "]: " << label << std::endl;
+                    YTREE_INDENT(); std::cerr << "CALL: " << label << "(" << local_ns << ")" << std::endl;
                     rule_proc *pCall = rule_procs.search(label);
                     if(pCall)
                     {
-                        (*pCall)();
+                        (*pCall)(local_ns);
                     }
+                    ++ns;
                 }
             }
 
