@@ -88,6 +88,8 @@ namespace yocto
 }
 
 
+#include <iomanip>
+
 namespace yocto
 {
     namespace lingua
@@ -95,7 +97,7 @@ namespace yocto
         namespace syntax
         {
 
-#define YTREE_INDENT() do { for(int nt=0;nt<depth;++nt) { std::cerr << "  "; } } while(false)
+#define YTREE_INDENT() do { std::cerr << std::setw(5) << depth << ": "; for(int nt=0;nt<depth;++nt) { std::cerr << "  "; } } while(false)
 
             void tree_walker:: __walk( const XNODE *node, size_t &ns )
             {
@@ -138,7 +140,7 @@ namespace yocto
 
             void tree_walker::walk(const XNODE *node)
             {
-                depth = 0;
+                depth     = 0;
                 size_t ns = 0;
                 __walk(node,ns);
             }
