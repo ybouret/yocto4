@@ -21,10 +21,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
             std::cerr << "-- ready" << std::endl;
         }
 
-        {
-            ios::wcstream fp("walker.hxx");
-            P->emit(fp);
-        }
+        
 
         {
             ios::icstream fp( ios::cstdin );
