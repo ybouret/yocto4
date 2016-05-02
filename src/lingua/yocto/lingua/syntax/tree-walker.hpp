@@ -43,7 +43,7 @@ namespace yocto
                 typename METHOD_POINTER >
                 inline void on_rule(const char *label, OBJECT_POINTER host, METHOD_POINTER method)
                 {
-                    const string Label(label); on_rule(label,host,method);
+                    const string Label(label); on_rule(Label,host,method);
                 }
 
 
@@ -64,7 +64,7 @@ namespace yocto
                 typename METHOD_POINTER >
                 inline void on_term(const char *label, OBJECT_POINTER host, METHOD_POINTER method)
                 {
-                    const string Label(label); on_term(label,host,method);
+                    const string Label(label); on_term(Label,host,method);
                 }
 
 

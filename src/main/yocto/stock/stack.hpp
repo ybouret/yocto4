@@ -21,22 +21,22 @@ namespace yocto {
 public:
 	YOCTO_ARGUMENTS_DECL_T;
 	
-	typedef pipe<T,SEQUENCE,lifo_type> self;
+	typedef pipe<T,SEQUENCE,lifo_type> pipe_type;
 	
 	explicit stack() throw() {}
 	virtual ~stack() throw() {}
-	explicit stack( size_t n, const as_capacity_t &x) : self(n,x)  {}
+	explicit stack( size_t n, const as_capacity_t &x) : pipe_type(n,x)  {}
 	
 	virtual const char *name() const throw() { return hidden::stack_name; }
 	
 	type & operator[]( ptrdiff_t n ) throw()
 	{
-		return self::sequence_[ get_stack_offset(n) ];
+		return pipe_type::sequence_[ get_stack_offset(n) ];
 	}
 	
 	const_type & operator[]( ptrdiff_t n ) const throw()
 	{
-		return self::sequence_[ get_stack_offset(n) ];
+		return pipe_type::sequence_[ get_stack_offset(n) ];
 	}
 	
 private:
@@ -50,7 +50,7 @@ private:
 		}
 		else
 		{
-			size_t   m = self::sequence_.size();
+			size_t   m = pipe_type::sequence_.size();
 			return ++m - static_cast<size_t>(-n);
 		}
 	}

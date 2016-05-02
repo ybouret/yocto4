@@ -4,6 +4,9 @@
 #include "yocto/lingua/parser.hpp"
 #include "yocto/lingua/syntax/tree-walker.hpp"
 #include "yocto/ptr/auto.hpp"
+#include "yocto/ios/graphviz.hpp"
+#include "yocto/stock/stack.hpp"
+#include <cstdlib>
 
 namespace yocto
 {
@@ -22,20 +25,78 @@ namespace yocto
         public:
             auto_ptr<parser>    prs;
             syntax::tree_walker walker;
+            stack<Value>        stk;
+
 
             inline virtual ~Impl() throw() {}
 
+#define SET_TERM_CB(NAME) walker.on_term(#NAME,this,&Impl::on_##NAME)
+#define SET_RULE_CB(NAME) walker.on_rule(#NAME,this,&Impl::on_##NAME)
+
             inline Impl() :
-            prs( parser::generate(json_grammar,sizeof(json_grammar)) ),
-            walker( *prs )
+            prs( parser::generate(json_grammar,sizeof(json_grammar),true) ),
+            walker( *prs ),
+            stk(16,as_capacity)
             {
+                SET_TERM_CB(string);
+                SET_TERM_CB(number);
+                SET_TERM_CB(null);
+                SET_TERM_CB(true);
+                SET_TERM_CB(false);
+
+                SET_RULE_CB(pair);
             }
 
 
             inline void call( Value &value, ios::istream &fp )
             {
+                value.nullify();
+                stk.free();
+                auto_ptr<syntax::xnode> tree( prs->parse(fp) );
+                tree->graphviz("json.dot"); ios::graphviz_render("json.dot");
+                walker.walk(tree.__get());
             }
 
+            inline void on_string(const string &jstr)
+            {
+                std::cerr << "[JSON] +string '" << jstr << "'" << std::endl;
+                const Value v = jstr;
+                stk.push(jstr);
+            }
+
+            inline void on_number(const string &jnum)
+            {
+                std::cerr << "[JSON] +number '" << jnum << "'" << std::endl;
+                const Value v = atof(jnum.c_str());
+                stk.push(v);
+            }
+
+            inline void on_null(const string&)
+            {
+                std::cerr << "[JSON] +null" << std::endl;
+                const Value v(IsNull);
+                stk.push(v);
+            }
+
+            inline void on_true(const string&)
+            {
+                std::cerr << "[JSON] +true" << std::endl;
+                const Value v(IsTrue);
+                stk.push(v);
+            }
+
+            inline void on_false(const string&)
+            {
+                std::cerr << "[JSON] +false" << std::endl;
+                const Value v(IsFalse);
+                stk.push(v);
+            }
+
+            inline void on_pair(const size_t n)
+            {
+                std::cerr << "[JSON] +pair(" << n << ")" << std::endl;
+                //std::cerr << "stack=" << stk << std::endl;
+            }
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Impl);
@@ -57,8 +118,7 @@ namespace yocto
 
         Value & Parser:: operator()( ios::istream &in )
         {
-            //impl->call(value,in);
-            value.nullify();
+            impl->call(value,in);
             return value;
         }
 
