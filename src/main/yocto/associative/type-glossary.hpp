@@ -21,8 +21,8 @@ namespace yocto
     class type_glossary : public glossary<T>
     {
     public:
-        using typename glossary<T>::param_type;
-        using typename glossary<T>::const_type;
+        typedef typename glossary<T>::param_type param_type;
+        typedef typename glossary<T>::const_type const_type;
 
         inline explicit type_glossary() : glossary<T> () {}
         inline explicit type_glossary(const size_t n) : glossary<T>(n) {}
