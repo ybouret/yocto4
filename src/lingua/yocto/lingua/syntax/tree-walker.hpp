@@ -26,6 +26,7 @@ namespace yocto
 
                 void walk(const XNODE *node);
 
+                //! declare something to do with internal rule
                 template <
                 typename OBJECT_POINTER,
                 typename METHOD_POINTER >
@@ -35,7 +36,18 @@ namespace yocto
                     const rule_proc cb(host,method);
                     rule_procs.insert(label,cb);
                 }
-                
+
+                //! wrapper
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER >
+                inline void on_rule(const char *label, OBJECT_POINTER host, METHOD_POINTER method)
+                {
+                    const string Label(label); on_rule(label,host,method);
+                }
+
+
+                //! declare something to do with terminal
                 template <
                 typename OBJECT_POINTER,
                 typename METHOD_POINTER >
@@ -46,8 +58,19 @@ namespace yocto
                     term_procs.insert(label,cb);
                 }
 
+                //! wrapper
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER >
+                inline void on_term(const char *label, OBJECT_POINTER host, METHOD_POINTER method)
+                {
+                    const string Label(label); on_term(label,host,method);
+                }
 
-            protected:
+
+
+
+            private:
                 int                  depth;
                 rule_proc_db         rule_procs;
                 term_proc_db         term_procs;
@@ -57,7 +80,6 @@ namespace yocto
                 void     check_is_rule(const string &label) const;
                 void     check_is_term(const string &label) const;
 
-            private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(tree_walker);
             };
         }

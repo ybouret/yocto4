@@ -2,6 +2,8 @@
 #include "yocto/lingua/syntax/term.hpp"
 #include "yocto/exception.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
     namespace lingua
@@ -28,7 +30,7 @@ namespace yocto
                     {
                         case aggregate::UUID: is_agg = true;
                         case terminal:: UUID:
-                            if( property::standard == r->flags )
+                            if( property::jettison != r->flags )
                             {
                                 if(!uuids.insert(r->label,r->uuid))
                                 {
@@ -44,6 +46,10 @@ namespace yocto
                     }
 
                 }
+                std::cerr << "#rule =" << nr << std::endl;
+                std::cerr << "#term =" << nt << std::endl;
+                rule_procs.reserve(nr);
+                term_procs.reserve(nt);
             }
 
 
@@ -80,7 +86,6 @@ namespace yocto
 
 }
 
-#include <iostream>
 
 namespace yocto
 {
