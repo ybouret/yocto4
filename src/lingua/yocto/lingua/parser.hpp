@@ -39,8 +39,6 @@ namespace yocto
                 const string Label(label);
                 return term<PLUGIN>(Label);
             }
-            
-
 
             //! expression is not compiled
             Rule &univocal(const string &label, const string &expr);
@@ -69,7 +67,8 @@ namespace yocto
             syntax::xnode *parse( ios::istream &fp, const int start_line=1);
 
             static parser *generate( ios::istream &fp, const bool output_files=false );
-
+            static parser *generate( const char *data, const size_t size, const bool output_files=false);
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(parser);
         };

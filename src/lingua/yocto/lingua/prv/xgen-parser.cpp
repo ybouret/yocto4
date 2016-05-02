@@ -7,6 +7,7 @@
 #include "yocto/lingua/lexical/plugin/end-of-line-comment.hpp"
 #include "yocto/lingua/lexical/plugin/block-comment.hpp"
 
+#include "yocto/ios/imstream.hpp"
 
 namespace yocto
 {
@@ -164,6 +165,16 @@ namespace yocto
             syntax::xgen xg(output_files);
             return xg.generate( &(*tree) );
         }
-        
+
+        parser * parser:: generate(const char *data, const size_t size, const bool output_files)
+        {
+            ios::imstream fp(data,size);
+            return generate(fp,output_files);
+        }
+
+
     }
 }
+
+
+
