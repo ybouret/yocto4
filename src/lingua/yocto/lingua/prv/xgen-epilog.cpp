@@ -41,7 +41,14 @@ namespace yocto
                 switch(m.size)
                 {
                     case 0: break;
-                    case 1: break;
+                    case 1:
+                    {
+                        const rule *the_sub = m.head->addr;
+                        if( alternate::UUID == the_sub->uuid )
+                        {
+                            YXGEN_OUT("|_SHOULD JETTISON '" << p.label << "'");
+                        }
+                    } break;
                     default: __univocal2jettison(m,verbose);  break;
                 }
             }
