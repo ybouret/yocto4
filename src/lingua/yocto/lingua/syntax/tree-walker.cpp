@@ -97,7 +97,7 @@ namespace yocto
 
 #define YTREE_INDENT() do { for(int nt=0;nt<depth;++nt) { std::cerr << "  "; } } while(false)
 
-            void tree_walker:: __walk( const XNODE *node )
+            void tree_walker:: __walk( const XNODE *node, size_t &ns )
             {
                 assert(node);
                 const string &label  = node->label();
@@ -111,17 +111,19 @@ namespace yocto
                         const string content = node->lx->to_string();
                         (*pProc)(content);
                     }
+                    ++ns;
                 }
                 else
                 {
                     
                     ++depth;
+                    size_t local_ns=0;
                     for(const xnode *sub = node->ch->head;sub;sub=sub->next)
                     {
-                        __walk(sub);
+                        __walk(sub,local_ns);
                     }
                     --depth;
-                    YTREE_INDENT(); std::cerr << "CALL: " << label << std::endl;
+                    YTREE_INDENT(); std::cerr << "CALL [" << local_ns << "]: " << label << std::endl;
                     rule_proc *pCall = rule_procs.search(label);
                     if(pCall)
                     {
@@ -134,7 +136,8 @@ namespace yocto
             void tree_walker::walk(const XNODE *node)
             {
                 depth = 0;
-                __walk(node);
+                size_t ns = 0;
+                __walk(node,ns);
             }
 
         }

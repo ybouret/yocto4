@@ -75,7 +75,7 @@ namespace yocto
                 rule_proc_db         rule_procs;
                 term_proc_db         term_procs;
                 map<string,uint32_t> uuids;
-                void __walk( const XNODE *node );
+                void __walk( const XNODE *node, size_t &ns);
                 uint32_t uuid_for(const string &label) const;
                 void     check_is_rule(const string &label) const;
                 void     check_is_term(const string &label) const;
