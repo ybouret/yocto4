@@ -1,16 +1,84 @@
+
+#include "yocto/json/parser.hpp"
+#include "yocto/exception.hpp"
+#include "yocto/lingua/parser.hpp"
+#include "yocto/lingua/syntax/tree-walker.hpp"
+#include "yocto/ptr/auto.hpp"
+
+namespace yocto
+{
+    using namespace lingua;
+
+    namespace JSON
+    {
+
+        static const char json_grammar[] =
+        {
+#include "./json.inc"
+        };
+
+        class Parser :: Impl : public object
+        {
+        public:
+            auto_ptr<parser>    prs;
+            syntax::tree_walker walker;
+
+            inline virtual ~Impl() throw() {}
+
+            inline Impl() :
+            prs( parser::generate(json_grammar,sizeof(json_grammar)) ),
+            walker( *prs )
+            {
+            }
+
+
+            inline void call( Value &value, ios::istream &fp )
+            {
+            }
+
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Impl);
+        };
+
+
+
+        Parser:: ~Parser() throw()
+        {
+            delete impl;
+        }
+
+
+        Parser:: Parser() :
+        value(),
+        impl( new Impl() )
+        {
+        }
+
+        Value & Parser:: operator()( ios::istream &in )
+        {
+            //impl->call(value,in);
+            value.nullify();
+            return value;
+        }
+
+
+    }
+
+}
+
+
+#if 0
+
 #include "yocto/json/parser.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/lang/parser.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/string/conv.hpp"
 
-//#define Y_JSON_OUTPUT 1
-#if defined(Y_JSON_OUTPUT)
-#include <cstdlib>
-#endif
-
 namespace yocto
 {
+
     using namespace lang;
     
     namespace JSON
@@ -158,8 +226,6 @@ namespace yocto
                 {
                     throw exception("JSON: unexpected empty tree!");
                 }
-                //tree->graphviz("json.dot");
-                //system( "dot -Tpng json.dot -o json.png" );
                 assert(tree->label=="json");
                 assert(tree->size()==1);
                 walk(value,root->head());
@@ -192,3 +258,5 @@ namespace yocto
     }
     
 }
+#endif
+

@@ -1,9 +1,7 @@
 .JSON;
-// structure
 json   : object | array;
 
 value :  number | 'null' | 'true' | 'false' | string | array | object;
-
 
 number : "-?[0-9]+([.][0-9]*)?([eE][-+]?[0-9]+)?";
 
