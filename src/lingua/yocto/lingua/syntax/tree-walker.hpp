@@ -1,7 +1,7 @@
 #ifndef YOCTO_LINGUA_SYNTAX_WALKER_INCLUDED
 #define YOCTO_LINGUA_SYNTAX_WALKER_INCLUDED 1
 
-#include "yocto/lingua/syntax/xnode.hpp"
+#include "yocto/lingua/syntax/grammar.hpp"
 #include "yocto/associative/glossary.hpp"
 
 namespace yocto
@@ -11,51 +11,51 @@ namespace yocto
         namespace syntax
         {
 
-            typedef functor<void,null_type>            call_type; //!< to process rule
-            typedef functor<void,TL1(const string &)>  proc_type; //!< to process terminal
+            typedef functor<void,null_type>            rule_proc; //!< to process rule
+            typedef functor<void,TL1(const string &)>  term_proc; //!< to process terminal
             
             class tree_walker : public object
             {
             public:
                 typedef xnode               XNODE;
-                typedef call_type           CALL_TYPE;
-                typedef proc_type           PROC_TYPE;
-                typedef glossary<call_type> callDB;
-                typedef glossary<proc_type> procDB;
+                typedef glossary<rule_proc> rule_proc_db;
+                typedef glossary<term_proc> term_proc_db;
 
                 virtual ~tree_walker() throw();
-                explicit tree_walker();
+                explicit tree_walker(const grammar &G);
 
                 void walk(const XNODE *node);
 
-#if 0
                 template <
                 typename OBJECT_POINTER,
                 typename METHOD_POINTER >
-                inline void on_call(const string &rule_label, OBJECT_POINTER host, METHOD_POINTER method)
+                inline void on_rule(const string &label, OBJECT_POINTER host, METHOD_POINTER method)
                 {
-                    const call_type cb(host,method);
-                    calls.insert(rule_label,cb);
+                    check_is_rule(label);
+                    const rule_proc cb(host,method);
+                    rule_procs.insert(label,cb);
                 }
                 
                 template <
                 typename OBJECT_POINTER,
                 typename METHOD_POINTER >
-                inline void on_term(const string &term_label, OBJECT_POINTER host, METHOD_POINTER method)
+                inline void on_term(const string &label, OBJECT_POINTER host, METHOD_POINTER method)
                 {
-                    const proc_type cb(host,method);
-                    procs.insert(term_label,cb);
+                    check_is_term(label);
+                    const term_proc cb(host,method);
+                    term_procs.insert(label,cb);
                 }
-#endif
-                
-                
-            protected:
-                int        depth;
-                callDB     calls;
-                procDB     procs;
-                
-                void __walk( const XNODE *node );
 
+
+            protected:
+                int                  depth;
+                rule_proc_db         rule_procs;
+                term_proc_db         term_procs;
+                map<string,uint32_t> uuids;
+                void __walk( const XNODE *node );
+                uint32_t uuid_for(const string &label) const;
+                void     check_is_rule(const string &label) const;
+                void     check_is_term(const string &label) const;
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(tree_walker);

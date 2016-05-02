@@ -11,7 +11,7 @@ namespace yocto
         {
 
             class xgen;
-
+            
             class grammar : public object
             {
             public:
@@ -33,6 +33,7 @@ namespace yocto
                 void graphviz(const char   *filename) const;
 
                 void top_level(rule &r) throw();
+                const rule *top_level(void) const throw();
 
                 xnode *run(lexer &lxr, source &src) const;
 

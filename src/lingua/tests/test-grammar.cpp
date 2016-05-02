@@ -103,7 +103,7 @@ YOCTO_UNIT_TEST_IMPL(grammar)
     tree->graphviz("tree.dot");
     ios::graphviz_render("tree.dot");
 
-    syntax::tree_walker walker;
+    syntax::tree_walker walker(G);
     std::cerr << "WALKING..." << std::endl;
     walker.walk(tree.__get());
 

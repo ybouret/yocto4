@@ -101,6 +101,10 @@ namespace yocto
                 rules.move_to_front(&r);
             }
 
+            const rule * grammar:: top_level() const throw()
+            {
+                return rules.head;
+            }
             
             rule & grammar:: append(rule *r)
             {
