@@ -39,6 +39,56 @@ namespace yocto
         }
         
         
+        std::ostream & operator<<( std::ostream &os, const Value &v)
+        {
+            switch(v.type)
+            {
+                case IsNull:   os << "null";  break;
+                case IsTrue:   os << "true";  break;
+                case IsFalse:  os << "false"; break;
+                case IsString: os << '"' <<  v.as<String>() << '"'; break;
+                case IsNumber: os <<  v.as<Number>(); break;
+                case IsArray:  os << v.as<Array>(); break;
+                case IsObject: os << v.as<Object>(); break;
+            }
+            return os;
+        }
+        
+        std::ostream & operator<<( std::ostream &os, const Array &arr)
+        {
+            os << '[';
+            const size_t num = arr.length();
+            switch(num)
+            {
+                case 0: break;
+                case 1:  os << arr[0]; break;
+                default: os << arr[0]; for(size_t i=1;i<num;++i) os << ',' << arr[i]; break;
+            }
+            os << ']';
+            return os;
+        }
+        
+        std::ostream & operator<<( std::ostream &os, const Pair &p)
+        {
+            os << '"' <<  p.name << '"' <<  " : " << p.value;
+            return os;
+        }
+        
+        std::ostream & operator<<( std::ostream &os, const Object &obj)
+        {
+            const size_t           num = obj.length();
+            Object::const_iterator i   = obj.begin();
+            os << '{';
+            switch(num)
+            {
+                case 0: break;
+                case 1:  os << *i ; break;
+                case 2:  os << *i; for(++i;i!=obj.end();++i) os << ',' << *i; break;
+            }
+            os << '}';
+            return os;
+        }
+        
         void Value::swap_with( Value &other ) throw()
         {
             cswap<ValueType>( (ValueType&)type, (ValueType&)other.type );

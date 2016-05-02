@@ -2,6 +2,7 @@
 #define YOCTO_PIPE_INCLUDED 1
 
 #include "yocto/container/stock.hpp"
+#include <iostream>
 
 namespace yocto {
 	
@@ -44,6 +45,14 @@ namespace yocto {
 		virtual void        pop() throw()           {         pop( int2type<TYPE>() ); }
 		virtual const_type &peek() const throw()    { return peek( int2type<TYPE>() ); }
 		virtual type       &peek() throw()          { return peek( int2type<TYPE>() ); }
+        
+        inline friend
+        std::ostream & operator<<( std::ostream &os, const pipe &p)
+        {
+            os << p.sequence_;
+            return os;
+        }
+        
 	private:
 		YOCTO_DISABLE_COPY_AND_ASSIGN(pipe);
 		

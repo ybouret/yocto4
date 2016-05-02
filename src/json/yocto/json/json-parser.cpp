@@ -1,6 +1,6 @@
 
 #include "yocto/json/parser.hpp"
-#include "yocto/exception.hpp"
+#include "yocto/exceptions.hpp"
 #include "yocto/lingua/parser.hpp"
 #include "yocto/lingua/syntax/tree-walker.hpp"
 #include "yocto/ptr/auto.hpp"
@@ -25,8 +25,8 @@ namespace yocto
         public:
             auto_ptr<parser>    prs;
             syntax::tree_walker walker;
-            stack<Value>        stk;
-
+            stack<Value>        vstk;
+            stack<Pair>         pstk;
 
             inline virtual ~Impl() throw() {}
 
@@ -36,7 +36,8 @@ namespace yocto
             inline Impl() :
             prs( parser::generate(json_grammar,sizeof(json_grammar),true) ),
             walker( *prs ),
-            stk(16,as_capacity)
+            vstk(16,as_capacity),
+            pstk(16,as_capacity)
             {
                 SET_TERM_CB(string);
                 SET_TERM_CB(number);
@@ -45,13 +46,16 @@ namespace yocto
                 SET_TERM_CB(false);
 
                 SET_RULE_CB(pair);
+                SET_RULE_CB(empty_array);
+                SET_RULE_CB(heavy_array);
+
             }
 
 
             inline void call( Value &value, ios::istream &fp )
             {
                 value.nullify();
-                stk.free();
+                vstk.free();
                 auto_ptr<syntax::xnode> tree( prs->parse(fp) );
                 tree->graphviz("json.dot"); ios::graphviz_render("json.dot");
                 walker.walk(tree.__get());
@@ -61,43 +65,86 @@ namespace yocto
             {
                 std::cerr << "[JSON] +string '" << jstr << "'" << std::endl;
                 const Value v = jstr;
-                stk.push(jstr);
+                vstk.push(jstr);
             }
 
             inline void on_number(const string &jnum)
             {
                 std::cerr << "[JSON] +number '" << jnum << "'" << std::endl;
                 const Value v = atof(jnum.c_str());
-                stk.push(v);
+                vstk.push(v);
             }
 
             inline void on_null(const string&)
             {
                 std::cerr << "[JSON] +null" << std::endl;
                 const Value v(IsNull);
-                stk.push(v);
+                vstk.push(v);
             }
 
             inline void on_true(const string&)
             {
                 std::cerr << "[JSON] +true" << std::endl;
                 const Value v(IsTrue);
-                stk.push(v);
+                vstk.push(v);
             }
 
             inline void on_false(const string&)
             {
                 std::cerr << "[JSON] +false" << std::endl;
                 const Value v(IsFalse);
-                stk.push(v);
+                vstk.push(v);
             }
-
+            
             inline void on_pair(const size_t n)
             {
                 std::cerr << "[JSON] +pair(" << n << ")" << std::endl;
-                //std::cerr << "stack=" << stk << std::endl;
+                std::cerr << "stack=" << vstk << std::endl;
+                assert(n==2);
+                assert(vstk.size()>=2);
+                Value       v = vstk.peek(); vstk.pop();
+                const Value s = vstk.peek(); vstk.pop();
+                assert(s.type==IsString);
+                std::cerr << "s=" << s << std::endl;
+                std::cerr << "v=" << v << std::endl;
+                Pair p( s.as<String>() );
+                
+                pstk.push(p);
+                pstk.peek().value.swap_with(v);
             }
 
+            inline void on_empty_array(const size_t n)
+            {
+                std::cerr << "[JSON] +empty_array" << std::endl;
+                
+                assert(n<=0);
+                const Value v(IsArray);
+                vstk.push(v);
+            }
+            
+            inline void on_heavy_array(const size_t n)
+            {
+                std::cerr << "[JSON] +heavy_array(" << n << ")" << std::endl;
+                assert(n>0);
+                assert(vstk.size()>=n);
+                Value  v(IsArray);
+                Array &a = v.as<Array>();
+                for(size_t i=0;i<n;++i)
+                {
+                    const Value tmp(IsNull);
+                    a.push(tmp);
+                    a[a.length()-1].swap_with(vstk.peek());
+                    vstk.pop();
+                }
+                {
+                    const Value tmp(IsNull);
+                    vstk.push(tmp);
+                }
+                a.reverse();
+                vstk.peek().swap_with(v);
+                std::cerr << "[JSON] : pushed " << vstk.peek() << std::endl;
+            }
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Impl);
         };

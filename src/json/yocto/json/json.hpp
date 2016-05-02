@@ -76,8 +76,9 @@ namespace yocto
             void make( const ValueType of );
 
             void output( ios::ostream &fp ) const;
-
-
+            
+            friend std::ostream & operator<<( std::ostream &os, const Value &v);
+            
             bool             is_same_type_than( const std::type_info &tid ) const throw();
             static ValueType TypeFor( const std::type_info &tid );
 
@@ -149,7 +150,8 @@ namespace yocto
                 return v.as<T>();
             }
 
-
+            friend std::ostream & operator<<( std::ostream &os, const Array &arr);
+            
         private:
             YOCTO_DISABLE_ASSIGN(Array);
             vector<Value> values;
@@ -170,6 +172,8 @@ namespace yocto
             Pair( const string & ); //!< with a Null value
             Pair( const char   * ); //!< with a Null value
             ~Pair() throw();
+        
+            friend std::ostream & operator<<( std::ostream &os, const Pair &p);
 
         private:
             YOCTO_DISABLE_ASSIGN(Pair);
@@ -229,6 +233,8 @@ namespace yocto
                 Value &v = p.value;
                 return v.as<T>();
             }
+
+            friend std::ostream & operator<<( std::ostream &os, const Object &obj);
 
         private:
             pairs_type pairs;
