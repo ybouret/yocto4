@@ -449,6 +449,13 @@ return * data._##TYPE; }
                 throw;
             }
         }
+
+        void Array:: push_( Value &content )
+        {
+            const Value nil;
+            values.push_back(nil);
+            values.back().swap_with(content);
+        }
         
         
         Value & Array:: append(const ValueType of)

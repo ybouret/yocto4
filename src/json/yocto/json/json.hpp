@@ -140,6 +140,7 @@ namespace yocto
             void reverse() throw();
 
             void push( const ValueType of );
+            void push_( Value &content ); //!< push null and swap with content
 
             //! valid for Array/Object/String/Number
             template <typename T>
