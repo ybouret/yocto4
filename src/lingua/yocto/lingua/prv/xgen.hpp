@@ -46,11 +46,11 @@ namespace yocto
                 auto_ptr<lingua::parser> xprs;
                 rules_db                 rules;
 
-                hashing::mperf           htop; //!< RULE,LXR
-                hashing::mperf           hsub; //!< ID,RXP,RAW
-                hashing::mperf           hmod; //!< +,*,?
-                hashing::mperf           hres; //!< reserved words: drop, endl, comment
-                int                      icom; //!< index for comment
+                hashing::mperf           htop;    //!< RULE,LXR
+                hashing::mperf           hsub;    //!< ID,RXP,RAW
+                hashing::mperf           hmod;    //!< +,*,?
+                hashing::mperf           hres;    //!< reserved words: drop, endl, comment
+                int                      icom;    //!< index for comment
                 const bool               verbose;
                 
                 void create_leading_rule(const xnode *top);
@@ -60,11 +60,11 @@ namespace yocto
                 void        load_plugin(const string &id, xnode *node);
                 void        ld_cstring(const string &id, const xlist &args);
                 void        ld_rstring(const string &id, const xlist &args);
-                bool        is_alias(const xnode *node);
+                bool        is_alias(const xnode *node); //!< detect is a rule is an alias
 
                 rule       &fetch_agg(const string &label); //!< return existing rule or new rule as aggregate
-                rule       &fetch_rxp(const string &label);
-                rule       &fetch_raw(const string &label);
+                rule       &fetch_rxp(const string &label); //!< return existing or new regexp terminal
+                rule       &fetch_raw(const string &label); //!< return existing or new raw    terminal
 
 
 
@@ -74,7 +74,8 @@ namespace yocto
 
                 //! optimize
                 /**
-                 - univocal to jettison syntax only terminals...
+                 - univocal to jettison syntax only terminals
+                 - jettison rule when it is single alternation
                  */
                 void optimize();
 

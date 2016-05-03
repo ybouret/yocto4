@@ -47,8 +47,6 @@ namespace yocto
                     }
 
                 }
-                //std::cerr << "#rule =" << nr << std::endl;
-                //std::cerr << "#term =" << nt << std::endl;
                 rule_procs.reserve(nr);
                 term_procs.reserve(nt);
             }

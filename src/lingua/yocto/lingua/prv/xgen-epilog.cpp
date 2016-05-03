@@ -17,6 +17,7 @@ namespace yocto
                 return 0 != strchr(r.label.c_str(),rule::internal_char);
             }
 
+
             static inline
             void __univocal2jettison(rule::meta_list &m, const bool verbose)
             {
@@ -27,7 +28,7 @@ namespace yocto
                     rule       &sub      = *(rule *)sub_addr;
                     if(terminal::UUID==sub.uuid && property::univocal==sub.flags)
                     {
-                        YXGEN_OUT("|_jettison '" << sub.label << "'" );
+                        YXGEN_OUT("|_univocal-->jettison '" << sub.label << "'" );
                         sub.flags = property::jettison;
                     }
                 }
@@ -50,7 +51,7 @@ namespace yocto
                             const rule *the_sub = m.head->addr;
                             if( alternate::UUID == the_sub->uuid )
                             {
-                                YXGEN_OUT("|_SHOULD JETTISON '" << p.label << "'");
+                                YXGEN_OUT("|_jettison single ALT '" << p.label << "'");
                                 p.flags = property::jettison;
                             }
                         }
@@ -60,7 +61,9 @@ namespace yocto
             }
 
             static inline
-            const rule *optimize_joker(const rule *jk,sequence<rule*> &to_remove,const bool verbose)
+            const rule *optimize_joker(const rule      *jk,
+                                       sequence<rule*> &to_remove,
+                                       const bool verbose)
             {
                 assert(jk);
                 YXGEN_OUT("|_checking joker '" << jk->label << "'");
