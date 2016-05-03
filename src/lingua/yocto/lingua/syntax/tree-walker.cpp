@@ -1,7 +1,7 @@
 #include "yocto/lingua/syntax/tree-walker.hpp"
 #include "yocto/lingua/syntax/term.hpp"
 #include "yocto/exception.hpp"
-
+#include "yocto/code/utils.hpp"
 #include <iostream>
 
 namespace yocto
@@ -19,7 +19,9 @@ namespace yocto
             depth(0),
             rule_procs(),
             term_procs(),
-            uuids()
+            uuids(),
+            max_label_length(0),
+            output(0)
             {
                 size_t nr = 0;
                 size_t nt = 0;
@@ -36,8 +38,8 @@ namespace yocto
                                 {
                                     throw exception("tree_walker: unexpected multiple rule '%s'", r->label.c_str());
                                 }
-                                //std::cerr << "[WALKER] --> " << ( is_agg ? "RULE" : "TERM" ) << ": '" << r->label << "'" << std::endl;
                                 if(is_agg) ++nr; else ++nt;
+                                max_label_length = max_of(max_label_length,r->label.size());
                             }
                             break;
 
@@ -95,28 +97,50 @@ namespace yocto
         namespace syntax
         {
 
-#define YTREE_INDENT() do { std::cerr << std::setw(5) << depth << ": "; for(int nt=0;nt<depth;++nt) { std::cerr << "  "; } } while(false)
+            void tree_walker:: emit(const string &label)
+            {
+                assert(output);
+                const size_t lsize = label.size();
+                output->append( label.c_str(), lsize );
+                for(size_t i=lsize;i<max_label_length;++i) output->write(' ');
+            }
+
+
 
             void tree_walker:: __walk( const XNODE *node, size_t &ns )
             {
                 assert(node);
                 const string &label  = node->label();
-                
+
                 if(node->terminal)
                 {
-                    //YTREE_INDENT(); std::cerr << "TERM: " << label;
-                    //if(property::standard==node->origin->flags) std::cerr << " : '" << *(node->lx) << "'";
-                    //std::cerr << std::endl;
-                    term_proc *pProc = term_procs.search(label);
-                    if(pProc)
+                    if(output)
                     {
-                        const string content = node->lx->to_string();
-                        (*pProc)(content);
+                        output->write('+');
+                        emit(label);
+                        if(property::standard==node->origin->flags)
+                        {
+                            const string content = node->lx->to_cstring();
+                            output->write('=');
+                            output->write('\'');
+                            output->append(content.c_str(),content.size());
+                            output->write('\'');
+                            output->write('\n');
+                        }
+                    }
+                    else
+                    {
+                        term_proc *pProc = term_procs.search(label);
+                        if(pProc)
+                        {
+                            const string content = node->lx->to_string();
+                            (*pProc)(content);
+                        }
                     }
                 }
                 else
                 {
-                    
+
                     ++depth;
                     size_t local_ns=0;
                     for(const xnode *sub = node->ch->head;sub;sub=sub->next)
@@ -125,23 +149,35 @@ namespace yocto
                     }
                     --depth;
                     //YTREE_INDENT(); std::cerr << "CALL: " << label << "(" << local_ns << ")" << std::endl;
-                    rule_proc *pCall = rule_procs.search(label);
-                    if(pCall)
+                    if(output)
                     {
-                        (*pCall)(local_ns);
+                        output->write('@');
+                        emit(label);
+                        output->write('/');
+                        (*output)("%u",unsigned(local_ns));
+                        output->write('\n');
+                    }
+                    else
+                    {
+                        rule_proc *pCall = rule_procs.search(label);
+                        if(pCall)
+                        {
+                            (*pCall)(local_ns);
+                        }
                     }
                 }
                 ++ns;
             }
-
-
-            void tree_walker::walk(const XNODE *node)
+            
+            
+            void tree_walker::walk(const XNODE *node, ios::ostream *fp)
             {
                 depth     = 0;
+                output    = fp;
                 size_t ns = 0;
                 __walk(node,ns);
             }
-
+            
         }
     }
 }

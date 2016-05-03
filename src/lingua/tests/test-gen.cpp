@@ -31,7 +31,8 @@ YOCTO_UNIT_TEST_IMPL(gen)
 
             syntax::tree_walker walker(*P);
             std::cerr << "-- WALKING..." << std::endl;
-            walker.walk(tree.__get());
+            ios::ocstream output( ios::cstderr );
+            walker.walk(tree.__get(), &output);
         }
     }
 

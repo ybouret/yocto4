@@ -24,7 +24,12 @@ namespace yocto
                 virtual ~tree_walker() throw();
                 explicit tree_walker(const grammar &G);
 
-                void walk(const XNODE *node);
+                //! walk the tree
+                /**
+                 - if fp is NULL, use existing callback
+                 - if fp is not NULL, emit intermediate code
+                 */
+                void walk(const XNODE *node, ios::ostream *fp = 0);
                 
                 //! declare something to do with internal rule
                 template <
@@ -75,10 +80,14 @@ namespace yocto
                 rule_proc_db         rule_procs;
                 term_proc_db         term_procs;
                 map<string,uint32_t> uuids;
+                size_t               max_label_length;
+                ios::ostream        *output;
+                
                 void __walk( const XNODE *node, size_t &ns);
                 uint32_t uuid_for(const string &label) const;
                 void     check_is_rule(const string &label) const;
                 void     check_is_term(const string &label) const;
+                void     emit(const string &label);
 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(tree_walker);
             };
