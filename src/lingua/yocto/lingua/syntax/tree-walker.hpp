@@ -25,7 +25,7 @@ namespace yocto
                 explicit tree_walker(const grammar &G);
 
                 void walk(const XNODE *node);
-
+                
                 //! declare something to do with internal rule
                 template <
                 typename OBJECT_POINTER,

@@ -36,7 +36,7 @@ namespace yocto
                                 {
                                     throw exception("tree_walker: unexpected multiple rule '%s'", r->label.c_str());
                                 }
-                                std::cerr << "[WALKER] --> " << ( is_agg ? "RULE" : "TERM" ) << ": '" << r->label << "'" << std::endl;
+                                //std::cerr << "[WALKER] --> " << ( is_agg ? "RULE" : "TERM" ) << ": '" << r->label << "'" << std::endl;
                                 if(is_agg) ++nr; else ++nt;
                             }
                             break;
@@ -47,8 +47,8 @@ namespace yocto
                     }
 
                 }
-                std::cerr << "#rule =" << nr << std::endl;
-                std::cerr << "#term =" << nt << std::endl;
+                //std::cerr << "#rule =" << nr << std::endl;
+                //std::cerr << "#term =" << nt << std::endl;
                 rule_procs.reserve(nr);
                 term_procs.reserve(nt);
             }
@@ -106,9 +106,9 @@ namespace yocto
                 
                 if(node->terminal)
                 {
-                    YTREE_INDENT(); std::cerr << "TERM: " << label;
-                    if(property::standard==node->origin->flags) std::cerr << " : '" << *(node->lx) << "'";
-                    std::cerr << std::endl;
+                    //YTREE_INDENT(); std::cerr << "TERM: " << label;
+                    //if(property::standard==node->origin->flags) std::cerr << " : '" << *(node->lx) << "'";
+                    //std::cerr << std::endl;
                     term_proc *pProc = term_procs.search(label);
                     if(pProc)
                     {
@@ -126,7 +126,7 @@ namespace yocto
                         __walk(sub,local_ns);
                     }
                     --depth;
-                    YTREE_INDENT(); std::cerr << "CALL: " << label << "(" << local_ns << ")" << std::endl;
+                    //YTREE_INDENT(); std::cerr << "CALL: " << label << "(" << local_ns << ")" << std::endl;
                     rule_proc *pCall = rule_procs.search(label);
                     if(pCall)
                     {
