@@ -70,7 +70,7 @@ namespace yocto
         }
         
         template <>
-        void fit_circle<real_t>:: solve( real_t &R, v2d<real_t> &C ) const
+        void fit_circle<real_t>:: solve( real_t &R, point2d<real_t> &C ) const
         {
             static const char fn[] = "fit_circle";
             
@@ -327,12 +327,14 @@ namespace yocto
         
         
         template <>
-        void fit_conic<real_t>:: reduce(v2d<real_t>   &center,
-                                        v2d<real_t>   &radius,
-                                        m2d<real_t>   &rotation,
-                                        array<real_t> &param )
+        void fit_conic<real_t>:: reduce(point2d<real_t>   &center,
+                                        point2d<real_t>   &radius,
+                                        matrix<real_t>    &rotation,
+                                        array<real_t>     &param )
         {
             assert(param.size()>=6);
+            assert(rotation.rows==2);
+            assert(rotation.cols==2);
             matrix<real_t> S(2);
             const real_t &a = param[1];
             const real_t &b = param[2];
@@ -346,7 +348,7 @@ namespace yocto
             S[2][2] = c;
             S[1][2] = S[2][1] = b/2;
             //std::cerr << "S=" << S << std::endl;
-            matrix<real_t> Q(2,2);
+            matrix<real_t> &Q = rotation;
             vector<real_t> lam(2,numeric<real_t>::zero);
             if( !symdiag<real_t>::build(S,lam,Q) )
                 throw exception("fit_conic::reduce(invalid parameters)");
@@ -377,11 +379,11 @@ namespace yocto
                 //std::cerr << "Q="   << Q   << std::endl;
                 const real_t lamX = lam[1];
                 const real_t lamY = lam[2];
-                rotation.ex.x = Q[1][1];
-                rotation.ex.y = Q[2][1];
+                //rotation.ex.x = Q[1][1];
+                //rotation.ex.y = Q[2][1];
                 
-                rotation.ey.x = Q[1][2];
-                rotation.ey.y = Q[2][2];
+                //rotation.ey.x = Q[1][2];
+                //rotation.ey.y = Q[2][2];
                 
                 //--------------------------------------------------------------
                 // ( D )                  ( d )

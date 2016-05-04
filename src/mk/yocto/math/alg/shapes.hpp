@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_ALG_SHAPES_INCLUDED
 #define YOCTO_MATH_ALG_SHAPES_INCLUDED 1
 
-#include "yocto/math/m2d.hpp"
+#include "yocto/math/point2d.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/container/matrix.hpp"
 
@@ -38,7 +38,7 @@ namespace yocto
             virtual void append(T x, T y) throw();
                         
             //! throw upon failure
-            void solve( T &R, v2d<T> &C ) const;
+            void solve( T &R, point2d<T> &C ) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(fit_circle);
@@ -65,10 +65,10 @@ namespace yocto
             
             void solve(conic_type t,array<T> &param) const;
             
-            static void reduce(v2d<T>   &center,
-                               v2d<T>   &radius,
-                               m2d<T>   &rotation,
-                               array<T> &param );
+            static void reduce(point2d<T>   &center,
+                               point2d<T>   &radius,
+                               matrix<T>    &rotation,
+                               array<T>     &param );
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(fit_conic);

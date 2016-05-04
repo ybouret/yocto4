@@ -5,6 +5,7 @@
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/string/conv.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/math/core/tao.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -40,7 +41,7 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
     }
     
     
-    v2d<double> C;
+    point2d<double> C;
     double      radius=0;
     circ.solve(radius,C);
     std::cerr << "C=" << C << std::endl;
@@ -88,9 +89,9 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             ell.append(x,y);
         }
     }
-    vector<double> param(6,0);
-    v2d<double>    radius,center;
-    m2d<double>    rot;
+    vector<double>     param(6,0);
+    point2d<double>    radius,center;
+    matrix<double>     rot(2,2);
     
     std::cerr << "Ra=" << Ra << std::endl;
     std::cerr << "Rb=" << Rb << std::endl;
@@ -110,13 +111,17 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         ios::ocstream fp("ell_fit.dat",false);
         for(double theta=0; theta <= 6.3; theta += 0.1)
         {
-            const double c = Cos(theta);
-            const double s = Sin(theta);
-            const double Rx = radius.x * c;
-            const double Ry = radius.y * s;
-            const double x  = center.x + Rx * rot.ex.x + Ry * rot.ey.x;
-            const double y  = center.y + Rx * rot.ex.y + Ry * rot.ey.y;
-            fp("%g %g\n", x, y);
+            const double c  = Cos(theta);
+            const double s  = Sin(theta);
+            const point2d<double> R(radius.x*c,radius.y*s);
+            //const double Rx = radius.x * c;
+            //const double Ry = radius.y * s;
+            point2d<double> v;
+            tao::mul(v, rot, R);
+            v += center;
+            //const double x  = 0; //center.x + Rx * rot.ex.x + Ry * rot.ey.x;
+            //const double y  = 0; //center.y + Rx * rot.ex.y + Ry * rot.ey.y;
+            fp("%g %g\n", v.x, v.y);
         }
     }
     
@@ -133,13 +138,15 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         ios::ocstream fp("gen_fit.dat",false);
         for(double theta=0; theta <= 6.3; theta += 0.1)
         {
-            const double c = Cos(theta);
-            const double s = Sin(theta);
-            const double Rx = radius.x * c;
-            const double Ry = radius.y * s;
-            const double x  = center.x + Rx * rot.ex.x + Ry * rot.ey.x;
-            const double y  = center.y + Rx * rot.ex.y + Ry * rot.ey.y;
-            fp("%g %g\n", x, y);
+            const double c  = Cos(theta);
+            const double s  = Sin(theta);
+            const point2d<double> R(radius.x*c,radius.y*s);
+            point2d<double> v;
+            tao::mul(v, rot, R);
+            v += center;
+            //const double x  = 0; //center.x + Rx * rot.ex.x + Ry * rot.ey.x;
+            //const double y  = 0; //center.y + Rx * rot.ex.y + Ry * rot.ey.y;
+            fp("%g %g\n", v.x, v.y);
         }
 
     }

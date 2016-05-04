@@ -81,6 +81,16 @@ namespace yocto
         {
             return (lhs.x*rhs.x) + (lhs.y*rhs.y);
         }
+
+        //______________________________________________________________________
+        //
+        // other
+        //______________________________________________________________________
+        inline type norm2() const throw() { return x*x + y*y; }
+        inline size_t      size() const throw() { return 2; }
+        inline type       &operator[](const size_t indx) throw()       { assert(1==indx||2==indx); return *((&x-1)+indx); }
+        inline const_type &operator[](const size_t indx) const throw() { assert(1==indx||2==indx); return *((&x-1)+indx); }
+
     };
 
 
