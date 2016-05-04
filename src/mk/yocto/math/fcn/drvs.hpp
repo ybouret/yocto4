@@ -15,9 +15,11 @@ namespace yocto
         public:
             explicit derivative();
             virtual ~derivative() throw();
-            
+
+            //! Ridder's method, return error approximate
             T diff( typename numeric<T>::function &F, T x, T h, T &err);
-            
+
+            //! Best effort
             T operator()( typename numeric<T>::function &F, T x, T h );
             
             
