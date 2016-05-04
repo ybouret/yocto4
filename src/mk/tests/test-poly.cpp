@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/polynomial.hpp"
+#include "yocto/math/core/polynomial.hpp"
 
 using namespace yocto;
 using namespace math;

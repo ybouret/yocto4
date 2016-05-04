@@ -1,5 +1,5 @@
 #include "yocto/math/ztype.hpp"
-#include "yocto/math/polynomial.hpp"
+#include "yocto/math/core/polynomial.hpp"
 #include "yocto/math/types.hpp"
 #include <iostream>
 #include "yocto/code/ipower.hpp"

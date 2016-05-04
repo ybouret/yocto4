@@ -45,5 +45,6 @@ ADD_TEST(glsf_poly  test-mk glsf_poly)
 ADD_TEST(glsf_gauss test-mk glsf_gauss)
 ADD_TEST(newt       test-mk newt)
 ADD_TEST(expand     test-mk expand)
+ADD_TEST(Poly       test-mk poly)
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )

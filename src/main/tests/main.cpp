@@ -105,7 +105,6 @@ YOCTO_UNIT_TEST_INIT(150)
     YOCTO_UNIT_TEST_DECL(Primes);
     YOCTO_UNIT_TEST_DECL(file_size);
     YOCTO_UNIT_TEST_DECL(wallpaper);
-    YOCTO_UNIT_TEST_DECL(poly);
     
 	YOCTO_UNIT_TEST_DECL(condition);
     YOCTO_UNIT_TEST_DECL(barrier);
