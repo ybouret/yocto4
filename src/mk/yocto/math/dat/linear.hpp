@@ -2,7 +2,7 @@
 #define YOCTO_MATH_LINEAR_INCLUDED 1
 
 #include "yocto/sequence/array.hpp"
-#include "yocto/math/v2d.hpp"
+#include "yocto/math/point2d.hpp"
 
 namespace yocto 
 {
@@ -46,7 +46,7 @@ namespace yocto
          Find a linear interpolation
          */
         template<typename T>
-        inline T linear(  T x, const array< v2d<T> > &V )
+        inline T linear(  T x, const array< point2d<T> > &V )
         {
             assert( V.size() > 0 );
             const size_t n = V.size();

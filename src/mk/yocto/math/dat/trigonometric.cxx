@@ -95,12 +95,12 @@ namespace yocto
 		}
         
 		template <>
-		v2d<real_t> trigonometric<real_t>::operator()( real_t theta, const array<real_t> &ax, const array<real_t> &ay ) const throw()
+		point2d<real_t> trigonometric<real_t>::operator()( real_t theta, const array<real_t> &ax, const array<real_t> &ay ) const throw()
 		{
 			assert( ax.size() == n );
 			assert( ay.size() == n );
 			size_t            j=1;
-			v2d<real_t> v(ax[j],ay[j]);
+			point2d<real_t> v(ax[j],ay[j]);
 			++j;
 			for( size_t k=1; k <= nn; ++k )
 			{

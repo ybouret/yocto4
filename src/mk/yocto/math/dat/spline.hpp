@@ -2,7 +2,7 @@
 #define YOCTO_MATH_DAT_SPLINE_INCLUDED 1
 
 #include "yocto/sequence/vector.hpp"
-#include "yocto/math/v2d.hpp"
+#include "yocto/math/point2d.hpp"
 #include "yocto/container/matrix.hpp"
 #include "yocto/math/types.hpp"
 
@@ -129,8 +129,8 @@ namespace yocto {
                          const array<T>  &t,
                          const matrix<T> &P,
                          matrix<T>       &Q,
-                         const v2d<T>     LT = v2d<T>::zero,
-                         const v2d<T>     RT = v2d<T>::zero
+                         const point2d<T>     LT = point2d<T>::zero,
+                         const point2d<T>     RT = point2d<T>::zero
                          )
             {
                 assert(P.rows==2);
@@ -150,7 +150,7 @@ namespace yocto {
             
             //! 2D helper
             static inline
-            v2d<T> eval(T u,
+            point2d<T> eval(T u,
                         const array<T>  &t,
                         const matrix<T> &P,
                         const matrix<T> &Q,
@@ -162,7 +162,7 @@ namespace yocto {
                 assert(P.cols==t.size());
                 const array<T>  *y[2] = { &P[1], &P[2] };
                 const array<T> *y2[2] = { &Q[1], &Q[2] };
-                v2d<T> v;
+                point2d<T> v;
                 spline<T>::eval(&v.x, 2, u, t, y, y2, width);
                 return v;
             }
@@ -240,14 +240,14 @@ namespace yocto {
              */
             template <typename ITERATOR>
             inline
-            void load(spline_type      type,
-                      ITERATOR         p,
-                      const v2d<T>     LT = v2d<T>::zero,
-                      const v2d<T>     RT = v2d<T>::zero )
+            void load(spline_type          type,
+                      ITERATOR             p,
+                      const point2d<T>     LT,
+                      const point2d<T>     RT )
             {
                 for( size_t i=1;i<=n;++i,++p)
                 {
-                    const v2d<T> &v = *p;
+                    const point2d<T> &v = *p;
                     P[1][i] = v.x;
                     P[2][i] = v.y;
                 }
@@ -255,7 +255,7 @@ namespace yocto {
                 spline<T>::compute(type,t,P,Q,LT,RT);
             }
             
-            v2d<T> operator()(T X) const throw();
+            point2d<T> operator()(T X) const throw();
             
             
         private:

@@ -47,12 +47,12 @@ namespace yocto
             const double dy = by/cr.y; const double dy2 = dy*0.5;
             const double dz = bz/cr.z; const double dz2 = dz*0.5;
 
-            const v3d<double> r[4] =
+            const point3d<double> r[4] =
             {
-                v3d<double>(0.0,0.0,0.0), //!< sublattice A
-                v3d<double>(dx2,dy2,0.0), //!< sublattice B
-                v3d<double>(0.0,dy2,dz2), //!< sublattice C
-                v3d<double>(dx2,0.0,dz2)  //!< sublattice D
+                point3d<double>(0.0,0.0,0.0), //!< sublattice A
+                point3d<double>(dx2,dy2,0.0), //!< sublattice B
+                point3d<double>(0.0,dy2,dz2), //!< sublattice C
+                point3d<double>(dx2,0.0,dz2)  //!< sublattice D
             };
             size_t m = 0;
 
@@ -68,7 +68,7 @@ namespace yocto
                         const double x = i * dx;
                         for(size_t iref=0; iref < 4; ++ iref )
                         {
-                            v3d<double> pos(r[iref]);
+                            point3d<double> pos(r[iref]);
                             pos.x += x;
                             pos.y += y;
                             pos.z += z;

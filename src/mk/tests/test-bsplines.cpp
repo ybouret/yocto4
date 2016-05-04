@@ -5,7 +5,7 @@
 
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/math/types.hpp"
-#include "yocto/math/v2d.hpp"
+#include "yocto/math/point2d.hpp"
 #include "yocto/code/rand.hpp"
 
 #include "yocto/math/fcn/intg.hpp"
@@ -17,8 +17,8 @@ using namespace math;
 YOCTO_UNIT_TEST_IMPL(bsplines)
 {
 
-    typedef v2d<double>                    vtx_t;
-    typedef CubicApproximation<double,v2d> Approx;
+    typedef point2d<double>                   vtx_t;
+    typedef CubicApproximation<double,point2d> Approx;
     size_t m=4+alea_lt(5);
     Approx P;
     P.reserve(m);

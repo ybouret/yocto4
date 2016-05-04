@@ -9,7 +9,7 @@
 using namespace yocto;
 using namespace math;
 
-typedef v2d<double> V2;
+typedef point2d<double> V2;
 
 YOCTO_UNIT_TEST_IMPL(tr2d)
 {

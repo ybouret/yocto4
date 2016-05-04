@@ -6,7 +6,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/sort/quick.hpp"
-#include "yocto/math/v2d.hpp"
+#include "yocto/math/point2d.hpp"
 #include "yocto/container/matrix.hpp"
 #include "yocto/code/utils.hpp"
 
@@ -23,7 +23,7 @@ namespace yocto
         public:
             typedef arc_ptr<spike2d> pointer;
 
-            typedef v2d<unit_t> vtx;
+            typedef point2d<unit_t> vtx;
 
             class coord
             {

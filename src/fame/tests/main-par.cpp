@@ -162,11 +162,11 @@ int main(int argc, char *argv[])
             
             
             adb.store( new array2D<double>("C", mesh.outline) );
-            adb.store( new array2D< math::v2d<float> >("D",mesh.outline)   );
+            adb.store( new array2D<point2d<float> >("D",mesh.outline)   );
             adb.store( new array2D<double>("G", mesh.outline) );
 
-            array2D<double>              &C = adb["C"].as< array2D<double> >();
-            array2D< math::v2d<float> >  &D = adb["D"].as<   array2D< math::v2d<float> > >();
+            array2D<double>            &C = adb["C"].as< array2D<double> >();
+            array2D< point2d<float> >  &D = adb["D"].as<   array2D< point2d<float> > >();
             //array2D<double>              &G = adb["G"].as< array2D<double> >();
 
             for(unit_t j=mesh.lower.y;j<=mesh.upper.y;++j)
@@ -228,11 +228,11 @@ int main(int argc, char *argv[])
             
             
             adb.store( new array3D<double>("C", mesh.outline) );
-            adb.store( new array3D< math::v3d<float> >("D",mesh.outline)   );
+            adb.store( new array3D<point3d<float> >("D",mesh.outline)   );
             adb.store( new array3D<double>("G", mesh.outline) );
 
             array3D<double>              &C = adb["C"].as< array3D<double> >();
-            array3D< math::v3d<float> >  &D = adb["D"].as<   array3D< math::v3d<float> > >();
+            array3D< point3d<float> >  &D = adb["D"].as<   array3D< point3d<float> > >();
             //array3D<double>              &G = adb["G"].as< array3D<double> >();
 
             for(unit_t k=mesh.lower.z;k<=mesh.upper.z;++k)

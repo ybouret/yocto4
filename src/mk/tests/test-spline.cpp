@@ -137,7 +137,7 @@ YOCTO_UNIT_TEST_DONE()
 
 #include "yocto/string/conv.hpp"
 
-typedef v2d<double> vtx;
+typedef point2d<double> vtx;
 #include "yocto/sequence/list.hpp"
 
 YOCTO_UNIT_TEST_IMPL(spline2d)
@@ -192,7 +192,8 @@ YOCTO_UNIT_TEST_IMPL(spline2d)
     }
     
     spline2D<double> S1(t);
-    S1.load(spline_natural, points.begin() );
+    vtx LT,RT;
+    S1.load(spline_natural, points.begin(), LT, RT);
     const size_t np = 200;
     {
         ios::ocstream fp("spath.dat",false);
@@ -220,7 +221,7 @@ YOCTO_UNIT_TEST_IMPL(spline2d)
     
     
     spline2D<double> S2(t);
-    S2.load(spline_periodic,points.begin());
+    S2.load(spline_periodic,points.begin(),LT,RT);
     {
         ios::ocstream fp("spoly.dat",false);
         const double L = t.back();

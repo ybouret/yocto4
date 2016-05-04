@@ -2,7 +2,7 @@
 #define YOCTO_FAME_TYPES_INCLUDED 1
 
 #include "yocto/ordered/sorted-vector.hpp"
-#include "yocto/math/v3d.hpp"
+#include "yocto/math/point3d.hpp"
 
 namespace yocto
 {
@@ -26,18 +26,18 @@ namespace yocto
         template <size_t,typename>
         struct vertex_for; //! root template
         
-        template <typename T> struct vertex_for<1,T> { typedef T            type; typedef T           args; };
-        template <typename T> struct vertex_for<2,T> { typedef math::v2d<T> type; typedef const type &args; };
-        template <typename T> struct vertex_for<3,T> { typedef math::v3d<T> type; typedef const type &args; };
+        template <typename T> struct vertex_for<1,T> { typedef T          type; typedef T           args; };
+        template <typename T> struct vertex_for<2,T> { typedef point2d<T> type; typedef const type &args; };
+        template <typename T> struct vertex_for<3,T> { typedef point3d<T> type; typedef const type &args; };
         
         
         //______________________________________________________________________
         //
         // logical coordinates
         //______________________________________________________________________
-        typedef unit_t            coord1D;
-        typedef math::v2d<unit_t> coord2D;
-        typedef math::v3d<unit_t> coord3D;
+        typedef unit_t          coord1D;
+        typedef point2d<unit_t> coord2D;
+        typedef point3d<unit_t> coord3D;
         
         template <size_t>
         struct coord_for;

@@ -431,7 +431,7 @@ namespace yocto {
         }
         
         template<>
-        v2d<real_t> spline2D<real_t>:: operator()(real_t u) const throw()
+        point2d<real_t> spline2D<real_t>:: operator()(real_t u) const throw()
         {
             return spline<real_t>::eval(u, t, P, Q, width);
         }

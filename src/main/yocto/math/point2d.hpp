@@ -3,6 +3,7 @@
 
 #include "yocto/bitwise.hpp"
 #include "yocto/type/args.hpp"
+#include "yocto/math/types.hpp"
 #include <iostream>
 
 namespace yocto
@@ -90,7 +91,7 @@ namespace yocto
         inline size_t      size() const throw() { return 2; }
         inline type       &operator[](const size_t indx) throw()       { assert(1==indx||2==indx); return *((&x-1)+indx); }
         inline const_type &operator[](const size_t indx) const throw() { assert(1==indx||2==indx); return *((&x-1)+indx); }
-
+        inline type norm() const throw() { return math::Sqrt(x*x+y*y); }
     };
 
 

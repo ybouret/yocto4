@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_TRIGONOMETRIC_INCLUDED
 #define YOCTO_MATH_TRIGONOMETRIC_INCLUDED 1
 
-#include "yocto/math/v2d.hpp"
+#include "yocto/math/point2d.hpp"
 #include "yocto/math/core/lu.hpp"
 
 namespace yocto
@@ -30,8 +30,8 @@ namespace yocto
              */
             void compute( array<T> &a ) const throw();
             
-            T      operator()( T theta, const array<T> &a ) const throw();
-            v2d<T> operator()( T theta, const array<T> &ax, const array<T> &ay ) const throw();
+            T          operator()( T theta, const array<T> &a ) const throw();
+            point2d<T> operator()( T theta, const array<T> &ax, const array<T> &ay ) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(trigonometric);

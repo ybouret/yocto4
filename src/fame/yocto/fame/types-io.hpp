@@ -2,8 +2,7 @@
 #define YOCTO_FAME_TYPES_IO_INCLUDED 1
 
 #include "yocto/code/endian.hpp"
-#include "yocto/math/v2d.hpp"
-#include "yocto/math/v3d.hpp"
+#include "yocto/math/point3d.hpp"
 
 #include <cstring>
 
@@ -35,7 +34,7 @@ namespace yocto
         };
         
         template <>
-        struct type_io< math::v2d<float> >
+        struct type_io< point2d<float> >
         {
             static inline void put(void * &dst, const void *src) throw()
             {
@@ -52,7 +51,7 @@ namespace yocto
         };
         
         template <>
-        struct type_io< math::v2d<double> >
+        struct type_io< point2d<double> >
         {
             static inline void put(void * &dst, const void *src )
             {
@@ -68,7 +67,7 @@ namespace yocto
         };
         
         template <>
-        struct type_io< math::v3d<float> >
+        struct type_io< point3d<float> >
         {
             static inline void put(void * &dst, const void *src ) throw()
             {
@@ -86,7 +85,7 @@ namespace yocto
         };
         
         template <>
-        struct type_io< math::v3d<double> >
+        struct type_io< point3d<double> >
         {
             static inline void put(void * &dst, const void *src )
             {

@@ -28,7 +28,7 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     adb.store( new array1D<double>("Y",layout1D(-6,6)) );
     adb.store( new array1D<double>("Z",layout1D(-10,10)) );
     
-    box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
+    box<3,float> B(point3d<float>(1.0f,-2.0f,1.2f), point3d<float>(-1.0f,3.0f,-0.7f) );
     B.map_rect<double>(adb);
 
     //RectilinearMesh<layout1D,double> rm1(adb,"mesh1d"); display_mesh(rm1);

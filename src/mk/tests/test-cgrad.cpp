@@ -99,8 +99,8 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/math/v2d.hpp"
-typedef v2d<double> vtx;
+#include "yocto/math/point2d.hpp"
+typedef point2d<double> vtx;
 
 struct Param
 {
@@ -115,7 +115,7 @@ struct Param
         assert( var.size() == 2);
         ++count;
         const vtx a( var[1], var[2]);
-        const double an = a.norm();
+        const double an = Sqrt(a.norm2());
         const double as = a*tau;
         const double F1 = 1 - as/an;
         
@@ -131,7 +131,7 @@ struct Param
         assert( var.size() == 2);
         assert( var.size() == 2);
         const vtx a( var[1], var[2]);
-        const double an = a.norm();
+        const double an = Sqrt(a.norm2());
         const double as = a*tau;
         const double dl = (an - len)/len;
         
@@ -166,7 +166,7 @@ YOCTO_UNIT_TEST_IMPL(cgrad2)
     Param param;
     param.tau.x = 1;
     param.tau.y = 1;
-    param.tau.normalize();
+    param.tau /= Sqrt(param.tau.norm2());
     param.len   = 1.2;
     
     vector<double> var(2,0);

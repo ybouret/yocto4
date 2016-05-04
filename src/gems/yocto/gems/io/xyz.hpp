@@ -5,7 +5,7 @@
 #include "yocto/functor.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ptr/shared.hpp"
-#include "yocto/math/v3d.hpp"
+#include "yocto/math/point3d.hpp"
 
 namespace yocto
 {

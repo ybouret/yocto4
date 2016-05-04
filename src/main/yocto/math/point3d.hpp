@@ -90,7 +90,16 @@ namespace yocto
         {
             return point3d(a.y*b.z-a.z*b.y,b.x*a.z-a.x*b.z,a.x*b.y-a.y*b.x);
         }
-        
+
+        //______________________________________________________________________
+        //
+        // other
+        //______________________________________________________________________
+        inline type        norm2() const throw() { return x*x + y*y + z*z; }
+        inline type        norm()  const throw() { return math::Sqrt(x*x+y*y+z*z); }
+        inline size_t      size()  const throw() { return 3; }
+        inline type       &operator[](const size_t indx) throw()       { assert(1==indx||2==indx||3==indx); return *((&x-1)+indx); }
+        inline const_type &operator[](const size_t indx) const throw() { assert(1==indx||2==indx||3==indx); return *((&x-1)+indx); }
 
 
     };

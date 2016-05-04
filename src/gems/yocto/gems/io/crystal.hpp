@@ -8,7 +8,6 @@ namespace yocto
 {
     namespace gems
     {
-        using math::v3d;
 
         class crystal
         {
@@ -35,7 +34,7 @@ namespace yocto
              \return 4 * cr.x * cr.y * cr.z
              */
             template <typename T>
-            static inline size_t close_packed_count( coord_t &cr, size_t n, const v3d<T> &box ) throw()
+            static inline size_t close_packed_count( coord_t &cr, size_t n, const point3d<T> &box ) throw()
             {
                 return close_packed_count(cr,n,box.x,box.y,box.z);
             }

@@ -78,7 +78,7 @@ YOCTO_UNIT_TEST_IMPL(split)
                 const layout2D s_out = build_quad_ghosts<layout2D>::outline_for(rank, s, 1, links, lg,ag);
                 std::cerr << "\t\toutline=" << s_out << std::endl;
                 handles.append( new array2D<float>("A",s_out) );
-                handles.append( new array2D< math::v2d<double> >("B",s_out) );
+                handles.append( new array2D< point2d<double> >("B",s_out) );
 
                 for(quad_ghosts<layout2D> *g = lg.head;g;g=g->next)
                 {
@@ -122,7 +122,7 @@ YOCTO_UNIT_TEST_IMPL(split)
                 std::cerr << "\t\toutline=" << s_out << std::endl;
                 
                 handles.append( new array3D<long>("A",s_out) );
-                handles.append( new array3D< math::v3d<float> >("B",s_out) );
+                handles.append( new array3D< point3d<float> >("B",s_out) );
                 
                 for(quad_ghosts<layout3D> *g = lg.head;g;g=g->next)
                 {
