@@ -91,6 +91,8 @@ namespace {
                 {
                     data1[i] = c1[i].re = T(0.5)-alea<T>();
                     data2[i] = c2[i].re = T(0.5)-alea<T>();
+                    c1[i].im = 0;
+                    c2[i].im = 0;
                 }
 
                 mark = rt_clock::ticks();
