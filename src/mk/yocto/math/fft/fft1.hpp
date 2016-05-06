@@ -38,11 +38,14 @@ namespace yocto
 		};
 		
 		
-		void FFT(  complex<float>  *data, size_t size ) throw(); //!< Fourier Transform of data[0..size-1]
-		void iFFT( complex<float>  *data, size_t size ) throw(); //!< Inverse Fourier Transform of data[0..size-1]
-		void FFT(  complex<double> *data, size_t size ) throw(); //!< Fourier Transform of data[0..size-1]
-        void iFFT( complex<double> *data, size_t size ) throw(); //!< Inverse Fourier Transform of data[0..size-1]
-        
+		void FFT(  complex<float>  *data, const size_t size ) throw(); //!< Fourier Transform of data[0..size-1]
+		void iFFT( complex<float>  *data, const size_t size ) throw(); //!< Inverse Fourier Transform of data[0..size-1]
+		void FFT(  complex<double> *data, const size_t size ) throw(); //!< Fourier Transform of data[0..size-1]
+        void iFFT( complex<double> *data, const size_t size ) throw(); //!< Inverse Fourier Transform of data[0..size-1]
+
+        void FFT(const float  *data1, const float  *data2, complex<float>  *fft1, complex<float>  *fft2, size_t n) throw();
+        void FFT(const double *data1, const double *data2, complex<double> *fft1, complex<double> *fft2, size_t n) throw();
+
 	}
 	
 }
