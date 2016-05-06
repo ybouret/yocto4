@@ -3,8 +3,14 @@
 
 #define _FILE_OFFSET_BITS 64
 
+#if defined(__cplusplus)
 #include <cassert>
 #include <cstddef>
+#else
+#include <assert.h>
+#include <stddef.h>
+#endif
+
 
 #define YOCTO_SO_EXT "so"
 
@@ -90,6 +96,8 @@ typedef __int64 int64_t;
 #error "YOCTO_HAS_STDINT failure"
 #endif
 
+#if defined(__cplusplus)
+
 namespace yocto
 {
 	
@@ -147,5 +155,6 @@ YOCTO_DISABLE_ASSIGN(CLASS)
 	
     typedef ptrdiff_t unit_t;
 }
+#endif
 
 #endif
