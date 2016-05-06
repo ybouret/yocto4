@@ -10,7 +10,7 @@ test -f $ARCHIVE || (  wget http://tukaani.org/xz/$ARCHIVE -O $ARCHIVE )
 echo "-- Extracting $ARCHIVE"
 test -d $WORKDIR || ( tar xfvz $ARCHIVE)
 echo "-- Configure and Build"
-test -f $LIBXZA || (cd $WORKDIR && ./configure --prefix=`pwd`/../$OUTDIR --disable-threads --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-lzma-links --disable-scripts --disable-doc --disable-shared --disable-nls --disable-rpath && make -s install)
+test -f $LIBXZA || (cd $WORKDIR && ./configure --prefix=`pwd`/../$OUTDIR --enable-threads=no --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-lzma-links --disable-scripts --disable-doc --disable-shared --disable-nls --disable-rpath && make -s install)
 SOURCE_FILES=`ar -t $LIBXZA | grep liblzma | sed -e 's/liblzma_la-//' | sed -e 's/\.o/\.c/'`
 mkdir -p $OUTSRC
 for s in $SOURCE_FILES;
