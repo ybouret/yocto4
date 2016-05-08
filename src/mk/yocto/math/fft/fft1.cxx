@@ -84,8 +84,6 @@ namespace yocto
             assert( fft2  != NULL );
             
             assert( is_a_power_of_two(n) );
-            //unsigned long nn3,nn2;
-            //nn3=1+(nn2=2+n+n);
 
             //__________________________________________________________________
             //
