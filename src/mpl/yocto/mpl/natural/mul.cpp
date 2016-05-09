@@ -156,6 +156,7 @@ namespace yocto
         }
 
         //! assuming ff1 is zeroed, same sime than fft2
+        static inline
         void _fft_v2(const uint8_t *data1,
                      const size_t   size1,
                      const uint8_t *data2,
@@ -195,6 +196,10 @@ namespace yocto
             const size_t np1 = n+1;
             const size_t nn2 = np1<<1;
             const size_t nn3 = nn2+1;
+
+            cplx_t *L = (cplx_t *)fft1;
+            cplx_t *R = (cplx_t *)fft2;
+
             --fft1;
             --fft2;
             fft2[1]=fft1[2];
@@ -215,6 +220,10 @@ namespace yocto
                 fft2[nn2-j] =  aip;
                 fft2[nn3-j] =  rem;
             }
+
+#define Y_MPN_MUL_IN_PLACE(J) L[J] *= R[J]
+            YOCTO_LOOP_FUNC_(n, Y_MPN_MUL_IN_PLACE, 0);
+
         }
 
 
@@ -371,14 +380,9 @@ carry          = q;
                 const uint8_t   *r = (const uint8_t *)rhs;
 
                 //--------------------------------------------------------------
-                //-- get coupled fft
+                //-- get coupled fft, in place multiplied into L
                 //--------------------------------------------------------------
                 _fft_v2(l,nl,r,nr,&L[0].re,&R[0].re,nn);
-
-                //--------------------------------------------------------------
-                //-- multiply in place, in L
-                //--------------------------------------------------------------
-                YOCTO_LOOP_FUNC_(nn, Y_MPN_MUL_L_BY_R, 0);
 
                 //--------------------------------------------------------------
                 //-- reverse
