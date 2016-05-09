@@ -69,8 +69,8 @@ YOCTO_UNIT_TEST_IMPL(mul)
                   }
                   );
     tmx.speed *= count;
-    tmx.speed *= 1e-6;
-    std::cerr << "speed=" << tmx.speed << " Mops" << std::endl;
+    tmx.speed *= 1e-3;
+    std::cerr << "speed=" << tmx.speed << " kops" << std::endl;
 
     std::cerr << "-- Starting MUL_V2 for " << time_length << " seconds" << std::endl;
 
@@ -83,8 +83,8 @@ YOCTO_UNIT_TEST_IMPL(mul)
                   }
                   );
     tmx.speed *= count;
-    tmx.speed *= 1e-6;
-    std::cerr << "speed=" << tmx.speed << " Mops" << std::endl;
+    tmx.speed *= 1e-3;
+    std::cerr << "speed=" << tmx.speed << " kops" << std::endl;
 
 }
 YOCTO_UNIT_TEST_DONE()

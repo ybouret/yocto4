@@ -177,22 +177,10 @@ namespace yocto
             //
             // packing real data in fft1
             //__________________________________________________________________
-#if 0
-            for(size_t j=0,jj=1;j<n;j++,jj+=2)
-            {
-                fft1[jj-1]=data1[j];
-                fft1[jj]  =data2[j];
-            }
-#endif
-            for(size_t j=0;j<size1;++j)
-            {
-                fft1[j<<1] = data1[j];
-            }
-
-            for(size_t j=0;j<size2;++j)
-            {
-                fft1[1+(j<<1)] = data2[j];
-            }
+#define Y_MPN_SET_FFT_RE(J) fft1[     (J)<<1   ] = data1[J]
+#define Y_MPN_SET_FFT_IM(J) fft1[ 1+( (J)<<1 ) ] = data2[J]
+            YOCTO_LOOP_FUNC_(size1,Y_MPN_SET_FFT_RE,0);
+            YOCTO_LOOP_FUNC_(size2,Y_MPN_SET_FFT_IM,0);
 
             //__________________________________________________________________
             //
