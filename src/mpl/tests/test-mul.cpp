@@ -43,6 +43,17 @@ YOCTO_UNIT_TEST_IMPL(mul)
     }
     c_shuffle(v(),v.size());
     assert(v.size()==count);
+    std::cerr << "-- Checking products" << std::endl;
+    for(size_t i=1,j=count;i<=count;++i,--j)
+    {
+        const mpn p1 = mpn::mul(v[i].ro(),v[i].length(),v[j].ro(),v[j].length());
+        const mpn p2 = mpn::mul_v2(v[i].ro(),v[i].length(),v[j].ro(),v[j].length());
+        if(p1!=p2)
+        {
+            throw exception("invalid multiplication");
+        }
+    }
+
     mpn s = 0;
 
     double time_length = 5;
@@ -53,7 +64,22 @@ YOCTO_UNIT_TEST_IMPL(mul)
                   s.ldz();
                   for(size_t i=1,j=count;i<=count;++i,--j)
                   {
-                      s = v[i] * v[j];
+                      //s = v[i]*v[j];
+                      s = mpn::mul(v[i].ro(),v[i].length(),v[j].ro(),v[j].length());
+                  }
+                  );
+    tmx.speed *= count;
+    tmx.speed *= 1e-6;
+    std::cerr << "speed=" << tmx.speed << " Mops" << std::endl;
+
+    std::cerr << "-- Starting MUL_V2 for " << time_length << " seconds" << std::endl;
+
+    YOCTO_TIMINGS(tmx, time_length,
+                  s.ldz();
+                  for(size_t i=1,j=count;i<=count;++i,--j)
+                  {
+                      //s = v[i]*v[j];
+                      s = mpn::mul_v2(v[i].ro(),v[i].length(),v[j].ro(),v[j].length());
                   }
                   );
     tmx.speed *= count;

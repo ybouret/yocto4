@@ -155,11 +155,14 @@ namespace yocto
 
         }
 
-        void _fft_v2(const real_t *data1,
-                     const real_t *data2,
-                     real_t       *fft1,
-                     real_t       *fft2,
-                     const size_t  n) throw()
+        //! assuming ff1 is zeroed, same sime than fft2
+        void _fft_v2(const uint8_t *data1,
+                     const size_t   size1,
+                     const uint8_t *data2,
+                     const real_t   size2,
+                     real_t        *fft1,
+                     real_t        *fft2,
+                     const size_t   n) throw()
         {
             assert( data1 != NULL );
             assert( data2 != NULL );
@@ -167,15 +170,28 @@ namespace yocto
             assert( fft2  != NULL );
 
             assert( is_a_power_of_two(n) );
+            assert(size1<=n);
+            assert(size2<=n);
 
             //__________________________________________________________________
             //
             // packing real data in fft1
             //__________________________________________________________________
+#if 0
             for(size_t j=0,jj=1;j<n;j++,jj+=2)
             {
                 fft1[jj-1]=data1[j];
                 fft1[jj]  =data2[j];
+            }
+#endif
+            for(size_t j=0;j<size1;++j)
+            {
+                fft1[j<<1] = data1[j];
+            }
+
+            for(size_t j=0;j<size2;++j)
+            {
+                fft1[1+(j<<1)] = data2[j];
             }
 
             //__________________________________________________________________
@@ -344,6 +360,61 @@ carry          = q;
             }
         }
 
+        natural natural::mul_v2(const void *lhs, const size_t nl,
+                                const void *rhs, const size_t nr)
+        {
+
+            if(nl>0&&nr>0)
+            {
+                const size_t np = nl+nr;             //-- product size
+                natural      P(np, as_capacity );    //-- product value
+
+                //--------------------------------------------------------------
+                //-- compute common power of two
+                //--------------------------------------------------------------
+                const size_t nn = next_power_of_two(np);
+
+                //--------------------------------------------------------------
+                //- compute wokspaces
+                //--------------------------------------------------------------
+                array_of<cplx_t> L(nn);
+                array_of<cplx_t> R(nn);
+                const uint8_t   *l = (const uint8_t *)lhs;
+                const uint8_t   *r = (const uint8_t *)rhs;
+
+                //--------------------------------------------------------------
+                //-- get coupled fft
+                //--------------------------------------------------------------
+                _fft_v2(l,nl,r,nr,&L[0].re,&R[0].re,nn);
+
+                //--------------------------------------------------------------
+                //-- multiply in place, in L
+                //--------------------------------------------------------------
+                YOCTO_LOOP_FUNC_(nn, Y_MPN_MUL_L_BY_R, 0);
+
+                //--------------------------------------------------------------
+                //-- reverse
+                //--------------------------------------------------------------
+                _ifft( &L[0].re, nn );
+
+                //--------------------------------------------------------------
+                //-- compute
+                //--------------------------------------------------------------
+                real_t       carry = 0.0;
+                uint8_t     *prod  = P.byte;
+                const size_t top   = np - 1;
+                YOCTO_LOOP_FUNC_(top,Y_MPN_MUL_PUT,0);
+                prod[top] = uint8_t(carry);
+                
+                P.update();
+                return P;
+            }
+            else
+            {
+                return natural();
+            }
+        }
+
 
         natural natural:: sqr( const natural &lhs )
         {
@@ -374,12 +445,12 @@ carry          = q;
                 //--------------------------------------------------------------
 #define Y_MPN_SQR_L(I) L[I].in_place_squared()
                 YOCTO_LOOP_FUNC_(nn,Y_MPN_SQR_L,0);
-
+                
                 //--------------------------------------------------------------
                 //-- reverse
                 //--------------------------------------------------------------
                 _ifft( & L[0].re, nn );
-
+                
                 real_t       carry = 0.0;
                 uint8_t     *prod  = P.byte;
                 const size_t top   = np - 1;
