@@ -14,12 +14,14 @@ test -d $WORKDIR || ( tar xfvz $ARCHIVE)
 #cp -f $WORKDIR/src/common/sysdefs.h ..
 
 echo "-- Configure and Build"
-test -f $LIBXZA || (cd $WORKDIR && ./configure --prefix=`pwd`/../$OUTDIR --enable-threads=no --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-lzma-links --disable-scripts --disable-doc --disable-shared --disable-nls --disable-rpath && make -s install)
-SOURCE_FILES=`ar -t $LIBXZA | grep liblzma | sed -e 's/liblzma_la-//' | sed -e 's/\.o/\.c/'`
+test -f $LIBXZA || (cd $WORKDIR && ./configure --prefix=`pwd`/../$OUTDIR --enable-threads=no --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-lzma-links --disable-scripts --disable-doc --disable-shared --disable-nls --disable-rpath --disable-assembler && make -s install)
+SOURCE_FILES=`ar -t $LIBXZA | grep liblzma_la | sed -e 's/liblzma_la-//' | sed -e 's/\.o/\.c/'`
 mkdir -p $OUTSRC
 for s in $SOURCE_FILES;
 do
+	echo "file = $s";
 	src=`find $WORKDIR -name $s`
+	echo "src  = $src"
 	cp -f $src $OUTSRC	
 	srcdir=`dirname $src`
 	cp -f $srcdir/*.h $OUTSRC
