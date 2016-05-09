@@ -155,6 +155,65 @@ namespace yocto
 
         }
 
+        void _fft_v2(const real_t *data1,
+                     const real_t *data2,
+                     real_t       *fft1,
+                     real_t       *fft2,
+                     const size_t  n) throw()
+        {
+            assert( data1 != NULL );
+            assert( data2 != NULL );
+            assert( fft1  != NULL );
+            assert( fft2  != NULL );
+
+            assert( is_a_power_of_two(n) );
+
+            //__________________________________________________________________
+            //
+            // packing real data in fft1
+            //__________________________________________________________________
+            for(size_t j=0,jj=1;j<n;j++,jj+=2)
+            {
+                fft1[jj-1]=data1[j];
+                fft1[jj]  =data2[j];
+            }
+
+            //__________________________________________________________________
+            //
+            // forward transform complex fft1
+            //__________________________________________________________________
+            _fft(fft1,n);
+
+            //__________________________________________________________________
+            //
+            // decompose fourier transforms
+            //__________________________________________________________________
+            const size_t np1 = n+1;
+            const size_t nn2 = np1<<1;
+            const size_t nn3 = nn2+1;
+            --fft1;
+            --fft2;
+            fft2[1]=fft1[2];
+            fft1[2]=fft2[2]=0;
+            for(size_t j=3;j<=np1;j+=2)
+            {
+                const size_t jp1= j+1;
+                const real_t rep=(0.5)*(fft1[j]   + fft1[nn2-j]);
+                const real_t rem=(0.5)*(fft1[j]   - fft1[nn2-j]);
+                const real_t aip=(0.5)*(fft1[jp1] + fft1[nn3-j]);
+                const real_t aim=(0.5)*(fft1[jp1] - fft1[nn3-j]);
+                fft1[j]     =  rep;
+                fft1[jp1]   =  aim;
+                fft1[nn2-j] =  rep;
+                fft1[nn3-j] = -aim;
+                fft2[j]     =  aip;
+                fft2[jp1]   = -rem;
+                fft2[nn2-j] =  aip;
+                fft2[nn3-j] =  rem;
+            }
+        }
+
+
 
         //______________________________________________________________________
         //
