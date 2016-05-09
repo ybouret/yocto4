@@ -109,7 +109,7 @@ namespace yocto
             return ans;
         }
 
-        const size_t source:: read() const throw()
+        size_t source:: read() const throw()
         {
             return cache.size;
         }

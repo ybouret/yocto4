@@ -37,7 +37,7 @@ namespace yocto
             const t_char *peek();
 
             //! number of read chars in cache
-            const size_t read() const throw();
+            size_t read() const throw();
 
             //! skip n <= read() chars
             void         skip(size_t n) throw();
