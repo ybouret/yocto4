@@ -1,0 +1,57 @@
+\documentclass[aps,onecolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+\usepackage{xcolor}
+
+\begin{document}
+
+\title{Curvature of a surface in $\mathbb{R}^3$}
+\maketitle
+
+Let $\mathcal{S}$ be a surface in $\mathbb{R}^3$ define by
+\begin{equation}
+	\mathcal{S} = \lbrace \vec{Q}(u,v) \vert  (u,v) \in \mathbb{R}^2 \rbrace.
+\end{equation}
+We define 
+\begin{itemize}
+\item the two tangent vectors
+\begin{equation}
+	\vec{Q}_u = \partial_u \vec{Q},\;\;\vec{Q}_v = \partial_v \vec{Q}
+\end{equation}
+
+\item the normal direction
+	\begin{equation}
+		\vec{n} = \vec{Q}_u \wedge \vec{Q}_v
+	\end{equation}	
+
+\item the three second tangent vectors
+\begin{equation}
+	\vec{Q}_{uu} = \partial_{uu} \vec{Q},\;\;\vec{Q}_{vv}=\partial_{vv} \vec{Q},\;\;
+	\vec{Q}_{uv} = \vec{Q}_{vu} = \partial_{uv} \vec{Q} = \partial_{vu} \vec{Q}.
+\end{equation}
+
+\end{itemize}
+
+We then compute the quantities
+\begin{equation}
+	E = \vec{Q}_u^2, \;\; F = \vec{Q}_u \cdot \vec{Q}_v,\;\; G = \vec{Q}_v^2
+\end{equation}
+and
+\begin{equation}
+	L = \vec{n} \cdot \vec{Q}_{uu},\;\; M =\vec{n} \cdot \vec{Q}_{uv}, \;\; N = \vec{n}\cdot\vec{Q}_{vv}.
+\end{equation}
+The average curvature is then
+\begin{equation}
+	H = \dfrac{1}{2\left\vert\vec{n}\right\vert} \dfrac{EN+GL-2FM}{EG-F^2}
+\end{equation}
+and the gaussian curvature is
+\begin{equation}
+	K = \dfrac{1}{\vec{n}^2}\dfrac{LN-M^2}{EG-F^2}
+\end{equation}
+
+\end{document}
