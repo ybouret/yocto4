@@ -43,8 +43,10 @@ namespace yocto
                 core::bmove<sizeof(T)>(&piv,&arr[L]);
                 while (L<R)
                 {
-                    while (compare(piv,arr[R])<=0 && L<R) R--; if (L<R) core::bmove<sizeof(T)>(&arr[L++],&arr[R]);
-                    while (compare(arr[L],piv)<=0 && L<R) L++; if (L<R) core::bmove<sizeof(T)>(&arr[R--],&arr[L]);
+                    while (compare(piv,arr[R])<=0 && L<R) R--;
+                    if (L<R) core::bmove<sizeof(T)>(&arr[L++],&arr[R]);
+                    while (compare(arr[L],piv)<=0 && L<R) L++;
+                    if (L<R) core::bmove<sizeof(T)>(&arr[R--],&arr[L]);
                 }
                 core::bmove<sizeof(T)>(&arr[L],&piv);
                 
