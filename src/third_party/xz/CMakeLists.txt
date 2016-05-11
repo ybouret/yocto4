@@ -5,6 +5,8 @@ SET(XZ_CONFIG  "${CMAKE_CURRENT_SOURCE_DIR}/config-${XZ_SYSTEM_NAME}-${YOCTO_FAM
 SET(XZ_OUTDIR  "${CMAKE_CURRENT_SOURCE_DIR}")
 SET(XZ_INCDIR  "${XZ_OUTDIR}/include")
 SET(XZ_SRCDIR  "${XZ_OUTDIR}/src")
+SET(XZ_TSTDIR  "${XZ_OUTDIR}/tests")
+
 
 SET(XZ_VERSION "5.2.2")
 SET(XZ_WORKDIR "${CMAKE_CURRENT_BINARY_DIR}/xz-${XZ_VERSION}")
@@ -121,6 +123,12 @@ FUNCTION(XZ_BUILD)
 		EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${hdr} ${XZ_INCDIR}/lzma)
 	ENDFOREACH()
 	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_WORKDIR}/config.h ${XZ_CONFIG})
+	
+	#copy tests
+	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E make_directory ${XZ_TSTDIR})
+	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_WORKDIR}/doc/examples/01_compress_easy.c ${XZ_TSTDIR})
+	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_WORKDIR}/doc/examples/02_decompress.c    ${XZ_TSTDIR})
+
 ENDFUNCTION()
 
 
@@ -144,6 +152,12 @@ ADD_CUSTOM_COMMAND( OUTPUT  ${XZ_SRCDIR}/config.h
 ADD_DEFINITIONS( -DHAVE_CONFIG_H )
 INCLUDE_DIRECTORIES(./src ./include)
 ADD_LIBRARY(y-lzma STATIC ${XZ_IMPL} ${XZ_SRCDIR}/config.h)
+
+ADD_EXECUTABLE(y_lzma_compress   tests/01_compress_easy.c)
+TARGET_LINK_LIBRARIES(y_lzma_compress y-lzma)
+ADD_EXECUTABLE(y_lzma_decompress tests/02_decompress.c)
+TARGET_LINK_LIBRARIES(y_lzma_decompress y-lzma)
+
 ENDIF()
 
 
