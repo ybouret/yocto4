@@ -290,8 +290,8 @@ namespace yocto
         }
 
 
-        natural natural::mul(const void *lhs, const size_t nl,
-                             const void *rhs, const size_t nr)
+        natural natural::mul_v2(const void *lhs, const size_t nl,
+                                const void *rhs, const size_t nr)
         {
 
             if(nl>0&&nr>0)
@@ -339,15 +339,25 @@ namespace yocto
                 //--------------------------------------------------------------
                 //-- compute
                 //--------------------------------------------------------------
+                const real_t fac   = 1.0/nn;
                 real_t       carry = 0.0;
                 uint8_t     *prod  = P.byte;
                 const size_t top   = np - 1;
-#define Y_MPN_MUL_PUT(i)                      \
-carry         += L[i].re/nn + 0.5;            \
-const real_t q = floor( carry * 0.00390625 ); \
-const real_t r = carry - (256.0 * q);         \
-prod[i]        = uint8_t(r);                  \
+
+#if 0
+#define Y_MPN_MUL_PUT(i)                        \
+carry         += L[i].re*fac + 0.5;             \
+const real_t q = floor( carry * 0.00390625 );   \
+const real_t r = carry - (256.0 * q);           \
+prod[i]        = uint8_t(r);                    \
 carry          = q;
+#else
+#define Y_MPN_MUL_PUT(i)                        \
+const real_t q = floor( (carry += (L[i].re*fac + 0.5) ) * 0.00390625 );   \
+const real_t r = carry - (256.0 * q);           \
+prod[i]        = uint8_t(r);                    \
+carry          = q;
+#endif
                 YOCTO_LOOP_FUNC_(top,Y_MPN_MUL_PUT,0);
                 prod[top] = uint8_t(carry);
                 P.update();
@@ -359,8 +369,8 @@ carry          = q;
             }
         }
 
-        natural natural::mul_v2(const void *lhs, const size_t nl,
-                                const void *rhs, const size_t nr)
+        natural natural::mul(const void *lhs, const size_t nl,
+                             const void *rhs, const size_t nr)
         {
 
             if(nl>0&&nr>0)
@@ -394,12 +404,13 @@ carry          = q;
                 //--------------------------------------------------------------
                 //-- compute
                 //--------------------------------------------------------------
+                const real_t fac   = 1.0/nn;
                 real_t       carry = 0.0;
                 uint8_t     *prod  = P.byte;
                 const size_t top   = np - 1;
                 YOCTO_LOOP_FUNC_(top,Y_MPN_MUL_PUT,0);
                 prod[top] = uint8_t(carry);
-                
+
                 P.update();
                 return P;
             }
@@ -444,7 +455,7 @@ carry          = q;
                 //-- reverse
                 //--------------------------------------------------------------
                 _ifft( & L[0].re, nn );
-                
+                const real_t fac   = 1.0/nn;
                 real_t       carry = 0.0;
                 uint8_t     *prod  = P.byte;
                 const size_t top   = np - 1;
