@@ -5,11 +5,12 @@ SET(XZ_CONFIG  "${CMAKE_CURRENT_SOURCE_DIR}/config-${XZ_SYSTEM_NAME}-${YOCTO_FAM
 SET(XZ_SRCDIR  "${CMAKE_CURRENT_SOURCE_DIR}/xz")
 
 SET(XZ_VERSION "5.2.2")
-SET(XZ_WORKDIR "${CMAKE_CURRENT_SOURCE_DIR}/xz-${XZ_VERSION}")
+SET(XZ_WORKDIR "${CMAKE_CURRENT_BINARY_DIR}/xz-${XZ_VERSION}")
 SET(XZ_ARCHIVE "xz-${XZ_VERSION}.tar.gz")
 SET(XZ_TARBALL "${CMAKE_CURRENT_SOURCE_DIR}/${XZ_ARCHIVE}")
 SET(XZ_URL     "http://tukaani.org/xz/${XZ_ARCHIVE}")
-SET(XZ_TARGET  "${CMAKE_CURRENT_SOURCE_DIR}/sandbox")
+SET(XZ_TARGET  "${CMAKE_CURRENT_BINARY_DIR}/sandbox")
+SET(XZ_LIBRARY "${XZ_TARGET}/lib/liblzma.a")
 
 MESSAGE( STATUS "XZ: setup  is '${XZ_SETUP}'")
 MESSAGE( STATUS "XZ: config is '${XZ_CONFIG}'")
@@ -34,7 +35,7 @@ FUNCTION(XZ_BUILD)
 		MESSAGE( STATUS "XZ: found directory"    )
 	ELSE()
 		MESSAGE( STATUS "XZ: extracting tarball" )
-		EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E tar xfz ${XZ_TARBALL} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+		EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E tar xfz ${XZ_TARBALL} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	ENDIF()
 	
 	#check sandbox was built
@@ -58,7 +59,31 @@ FUNCTION(XZ_BUILD)
 		   --disable-rpath 
 		   --disable-assembler
 		   WORKING_DIRECTORY ${XZ_WORKDIR})
+		MESSAGE( STATUS "XZ: build and install" )
+		EXECUTE_PROCESS(COMMAND make install WORKING_DIRECTORY ${XZ_WORKDIR})
 	ENDIF()
+	
+	#extracting file name from archive
+	IF(NOT EXISTS ${XZ_LIBRARY})
+		MESSAGE( FATAL_ERROR "XZ: connot find ${XZ_LIBRARY}")
+	ENDIF()
+	MESSAGE( STATUS "XZ: analyzing library content" )
+	EXECUTE_PROCESS( COMMAND
+		ar -t ${XZ_LIBRARY}
+		OUTPUT_FILE       raw_content.log
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+	
+	MESSAGE( STATUS "XZ: extracting object files")
+	EXECUTE_PROCESS( COMMAND
+	grep liblzma_la raw_content.log
+	OUTPUT_FILE     content.log
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+	
+	MESSAGE( STATUS "XZ: converting into source files" )
+	EXECUTE_PROCESS( COMMAND
+	sed -e s/liblzma_la-// -e s/\\.o/\\.c/ content.log
+	OUTPUT_FILE sources.log
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	
 ENDFUNCTION()
 
