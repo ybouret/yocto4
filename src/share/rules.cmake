@@ -68,6 +68,7 @@ GET_FILENAME_COMPONENT(CC_NAME ${CMAKE_C_COMPILER} NAME )
 ########################################################################
 IF( "${CC_NAME}" MATCHES "^gcc.*" )
   SET(YOCTO_GNU ON)
+  SET(YOCTO_FAMILY "gnu")
   MESSAGE( STATUS "Using GNU compilers" )
   
   SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS} ${PIC_FLAGS}" )
@@ -92,6 +93,7 @@ ENDIF()
 ########################################################################
 IF( "${CC_NAME}" MATCHES "^clang.*" )
   SET(YOCTO_CLANG ON)
+  SET(YOCTO_FAMILY "clang")
   MESSAGE( STATUS "Using CLANG compilers" )
   
   SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS} ${PIC_FLAGS}" )
@@ -110,6 +112,7 @@ ENDIF()
 ########################################################################
 IF( "${CC_NAME}" MATCHES "^icc.*" )
   SET(YOCTO_INTEL ON)
+  SET(YOCTO_FAMILY "intel")
   MESSAGE( STATUS "Using Intel compilers" )
   
   SET(COMMON_C_FLAGS        "-Wall -pipe -wd981 ${MY_CFLAGS}" )
@@ -126,6 +129,7 @@ ENDIF()
 ########################################################################
 IF( "${CC_NAME}" MATCHES "^path.*" )
   SET(YOCTO_PATHSCALE ON)
+  SET(YOCTO_FAMILY "path")
   MESSAGE( STATUS "Using PathScale compilers" )
   
   SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS}" )
@@ -143,6 +147,7 @@ ENDIF()
 ########################################################################
 IF( "${CC_NAME}" STREQUAL "cl.exe" )
   SET(YOCTO_MSC ON)
+  SET(YOCTO_FAMILY "msc")
   MESSAGE( STATUS "Using Microsoft cl.exe" )
   
   SET(COMMON_C_FLAGS        "${MY_CFLAGS}" )
