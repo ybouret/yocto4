@@ -151,6 +151,10 @@ ADD_CUSTOM_COMMAND( OUTPUT  ${XZ_SRCDIR}/config.h
 				    
 ADD_DEFINITIONS( -DHAVE_CONFIG_H )
 INCLUDE_DIRECTORIES(./src ./include)
+IF(YOCTO_GNU)
+	ADD_COMPILE_OPTIONS("-std=c99")
+ENDIF()
+
 ADD_LIBRARY(y-lzma STATIC ${XZ_IMPL} ${XZ_SRCDIR}/config.h)
 
 ADD_EXECUTABLE(y_lzma_compress   tests/01_compress_easy.c)
