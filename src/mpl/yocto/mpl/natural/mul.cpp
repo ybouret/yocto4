@@ -206,19 +206,21 @@ namespace yocto
             fft1[2]=fft2[2]=0;
             for(size_t j=3;j<=np1;j+=2)
             {
-                const size_t jp1= j+1;
-                const real_t rep=(0.5)*(fft1[j]   + fft1[nn2-j]);
-                const real_t rem=(0.5)*(fft1[j]   - fft1[nn2-j]);
-                const real_t aip=(0.5)*(fft1[jp1] + fft1[nn3-j]);
-                const real_t aim=(0.5)*(fft1[jp1] - fft1[nn3-j]);
+                const size_t jp1   = j+1;
+                const size_t nn2mj = nn2 - j;
+                const size_t nn3mj = nn3 - j;
+                const real_t rep=(0.5)*(fft1[j]   + fft1[nn2mj]);
+                const real_t rem=(0.5)*(fft1[j]   - fft1[nn2mj]);
+                const real_t aip=(0.5)*(fft1[jp1] + fft1[nn3mj]);
+                const real_t aim=(0.5)*(fft1[jp1] - fft1[nn3mj]);
                 fft1[j]     =  rep;
                 fft1[jp1]   =  aim;
-                fft1[nn2-j] =  rep;
-                fft1[nn3-j] = -aim;
+                fft1[nn2mj] =  rep;
+                fft1[nn3mj] = -aim;
                 fft2[j]     =  aip;
                 fft2[jp1]   = -rem;
-                fft2[nn2-j] =  aip;
-                fft2[nn3-j] =  rem;
+                fft2[nn2mj] =  aip;
+                fft2[nn3mj] =  rem;
             }
 
 #define Y_MPN_MUL_IN_PLACE(J) L[J] *= R[J]
