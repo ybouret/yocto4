@@ -150,20 +150,25 @@ namespace yocto
                 size_t k = i;
                 real_t p = d[k];
                 for (size_t j=i+1;j<=n;j++)
+                {
                     if (d[j] >= p)
+                    {
                         p=d[k=j];
-                        if (k != i) {
-                            d[k]=d[i];
-                            d[i]=p;
-                            v.swap_cols(i,k);
-                            /*
-                             for(size_t j=1;j<=n;j++) {
-                             const real_t tmp=v[j][i];
-                             v[j][i]=v[j][k];
-                             v[j][k]=tmp;
-                             }
-                             */
-                        }
+                    }
+                }
+                if (k != i)
+                {
+                    d[k]=d[i];
+                    d[i]=p;
+                    v.swap_cols(i,k);
+                    /*
+                     for(size_t j=1;j<=n;j++) {
+                     const real_t tmp=v[j][i];
+                     v[j][i]=v[j][k];
+                     v[j][k]=tmp;
+                     }
+                     */
+                }
             }
         }
 
@@ -177,25 +182,30 @@ namespace yocto
                 size_t k = i;
                 real_t p = d[k];
                 for (size_t j=i+1;j<=n;j++)
+                {
                     if( Fabs(d[j]) >= Fabs(p) )
+                    {
                         p=(d[k=j]);
-                        if (k != i) {
-                            d[k]=d[i];
-                            d[i]=p;
-                            v.swap_cols(i,k);
-                            /*
-                             for(size_t j=1;j<=n;j++)
-                             {
-                             const real_t tmp=v[j][i];
-                             v[j][i]=v[j][k];
-                             v[j][k]=tmp;
-                             }
-                             */
-                        }
+                    }
+                }
+                if (k != i)
+                {
+                    d[k]=d[i];
+                    d[i]=p;
+                    v.swap_cols(i,k);
+                    /*
+                     for(size_t j=1;j<=n;j++)
+                     {
+                     const real_t tmp=v[j][i];
+                     v[j][i]=v[j][k];
+                     v[j][k]=tmp;
+                     }
+                     */
+                }
             }
         }
-        
-        
+
+
         template <>
         size_t symdiag<real_t>:: eiginv( array_t &d ) throw()
         {
@@ -250,6 +260,6 @@ namespace yocto
                 }
             }
         }
-
+        
     }
 }
