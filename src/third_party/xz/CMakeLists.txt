@@ -2,12 +2,13 @@
 STRING(TOLOWER "${CMAKE_SYSTEM_NAME}" XZ_SYSTEM_NAME)
 SET(XZ_SETUP   "${CMAKE_CURRENT_SOURCE_DIR}/${XZ_SYSTEM_NAME}-${YOCTO_FAMILY}.cmake")
 SET(XZ_CONFIG  "${CMAKE_CURRENT_SOURCE_DIR}/config-${XZ_SYSTEM_NAME}-${YOCTO_FAMILY}.h")
-SET(XZ_SRCDIR  "${CMAKE_CURRENT_SOURCE_DIR}/xz")
+SET(XZ_OUTDIR  "${CMAKE_CURRENT_SOURCE_DIR}")
+SET(XZ_INCDIR  "${XZ_OUTDIR}/include")
 
 SET(XZ_VERSION "5.2.2")
 SET(XZ_WORKDIR "${CMAKE_CURRENT_BINARY_DIR}/xz-${XZ_VERSION}")
 SET(XZ_ARCHIVE "xz-${XZ_VERSION}.tar.gz")
-SET(XZ_TARBALL "${CMAKE_CURRENT_SOURCE_DIR}/${XZ_ARCHIVE}")
+SET(XZ_TARBALL "${CMAKE_CURRENT_BINARY_DIR}/${XZ_ARCHIVE}")
 SET(XZ_URL     "http://tukaani.org/xz/${XZ_ARCHIVE}")
 SET(XZ_TARGET  "${CMAKE_CURRENT_BINARY_DIR}/sandbox")
 SET(XZ_LIBRARY "${XZ_TARGET}/lib/liblzma.a")
@@ -63,7 +64,7 @@ FUNCTION(XZ_BUILD)
 		EXECUTE_PROCESS(COMMAND make install WORKING_DIRECTORY ${XZ_WORKDIR})
 	ENDIF()
 	
-	#extracting file name from archive
+	#extracting object name from archive
 	IF(NOT EXISTS ${XZ_LIBRARY})
 		MESSAGE( FATAL_ERROR "XZ: connot find ${XZ_LIBRARY}")
 	ENDIF()
@@ -73,18 +74,26 @@ FUNCTION(XZ_BUILD)
 		OUTPUT_FILE       raw_content.log
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	
+	#cleanup
 	MESSAGE( STATUS "XZ: extracting object files")
 	EXECUTE_PROCESS( COMMAND
 	grep liblzma_la raw_content.log
 	OUTPUT_FILE     content.log
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	
+	#make a source file to copy
 	MESSAGE( STATUS "XZ: converting into source files" )
 	EXECUTE_PROCESS( COMMAND
 	sed -e s/liblzma_la-// -e s/\\.o/\\.c/ content.log
 	OUTPUT_FILE sources.log
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	
+	#copy public API
+	MESSAGE( STATUS "XZ: copy LZMA public API" )
+	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E make_directory ${XZ_INCDIR}/lzma)
+	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy ${XZ_TARGET}/include/lzma.h ${XZ_INCDIR})
+	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy ${XZ_TARGET}/include/lzma/*.h ${XZ_INCDIR}/lzma)
+
 ENDFUNCTION()
 
 
