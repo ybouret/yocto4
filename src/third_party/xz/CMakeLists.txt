@@ -124,12 +124,26 @@ FUNCTION(XZ_BUILD)
 ENDFUNCTION()
 
 
-IF(EXISTS ${XZ_SETUP})
-	MESSAGE( STATUS "XZ: found..." )
-ELSE()
+IF(NOT EXISTS ${XZ_SETUP})
 	MESSAGE( STATUS "XZ: not found...")
 	IF(NOT YOCTO_MSC)
 		XZ_BUILD()
 	ENDIF()
 ENDIF()
+
+IF(EXISTS ${XZ_SETUP})
+INCLUDE(${XZ_SETUP})
+#MESSAGE(STATUS "XZ_IMPL=${XZ_IMPL}" )
+# select config.h
+MESSAGE( STATUS "using ${XZ_CONFIG} as ${XZ_SRCDIR}/config.h" )
+ADD_CUSTOM_COMMAND( OUTPUT  ${XZ_SRCDIR}/config.h
+				    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_CONFIG} ${XZ_SRCDIR}/config.h
+				    DEPENDS ${XZ_CONFIG}
+				    COMMENT "adjusting config.h")
+				    
+ADD_DEFINITIONS( -DHAVE_CONFIG_H )
+INCLUDE_DIRECTORIES(./src ./include)
+ADD_LIBRARY(y-lzma STATIC ${XZ_IMPL} ${XZ_SRCDIR}/config.h)
+ENDIF()
+
 
