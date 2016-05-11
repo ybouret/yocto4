@@ -171,12 +171,19 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	####################################################################
 	## Reverse order extra libraries
 	####################################################################
-	SET(YOCTO_HAS_NET OFF)
+	SET(YOCTO_HAS_NET  OFF)
+	SET(YOCTO_HAS_LZMA OFF)
 	FOREACH( extra ${ARGN} )
 		TARGET_LINK_LIBRARIES( ${tgt} y-${extra} )
+		
 		IF("net" STREQUAL ${extra})
 			SET(YOCTO_HAS_NET ON)
 		ENDIF()
+		
+		IF("lzma" STREQUAL ${extra})
+			SET(YOCTO_HAS_LZMA ON)
+		ENDIF()
+		
 	ENDFOREACH()
 	
 	
@@ -234,7 +241,15 @@ MACRO(TARGET_LINK_YOCTO tgt)
 			TARGET_LINK_LIBRARIES(${tgt} socket nsl)
 		ENDIF()
 	ENDIF()	
-  
+	
+	####################################################################
+	## LZMA/XZ Specific Flags
+	####################################################################
+	IF(YOCTO_HAS_LZMA)
+		IF(YOCTO_SUNOS)
+			TARGET_LINK_LIBRARIES(${tgt} md)
+		ENDIF()
+	ENDIF()
 ENDMACRO()
 
 FUNCTION(YOCTO_FILE2DATA source target)
