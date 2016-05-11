@@ -4,7 +4,7 @@ SET(XZ_SETUP   "${CMAKE_CURRENT_SOURCE_DIR}/${XZ_SYSTEM_NAME}-${YOCTO_FAMILY}.cm
 SET(XZ_CONFIG  "${CMAKE_CURRENT_SOURCE_DIR}/config-${XZ_SYSTEM_NAME}-${YOCTO_FAMILY}.h")
 SET(XZ_OUTDIR  "${CMAKE_CURRENT_SOURCE_DIR}")
 SET(XZ_INCDIR  "${XZ_OUTDIR}/include")
-SET(XZ_SRCDIR  "${XZ_OUTIDR}/src")
+SET(XZ_SRCDIR  "${XZ_OUTDIR}/src")
 
 SET(XZ_VERSION "5.2.2")
 SET(XZ_WORKDIR "${CMAKE_CURRENT_BINARY_DIR}/xz-${XZ_VERSION}")
@@ -89,10 +89,28 @@ FUNCTION(XZ_BUILD)
 	OUTPUT_FILE sources.log
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	
+	#process implementation files
 	FILE(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/sources.log XZ_SOURCES)
+	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E make_directory ${XZ_SRCDIR})
+
+	FILE(WRITE ${XZ_SETUP} "SET(XZ_IMPL\n")
+	FOREACH(src IN ITEMS ${XZ_SOURCES})
+		MESSAGE( STATUS "XZ: ...processing ${src}" )
+		FILE(APPEND ${XZ_SETUP} "src/${src}\n")
+		EXECUTE_PROCESS( COMMAND find ${XZ_WORKDIR} -name ${src} OUTPUT_VARIABLE real_src OUTPUT_STRIP_TRAILING_WHITESPACE)
+		#copy the real source
+		EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${real_src} ${XZ_SRCDIR}/${src})
+		
+		#copy the real headers
+		GET_FILENAME_COMPONENT(real_dir ${real_src} DIRECTORY)
+		FILE(GLOB real_headers ${real_dir}/*.h)
+		FOREACH(hdr IN ITEMS ${real_headers})
+			EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${hdr} ${XZ_SRCDIR} )
+		ENDFOREACH()
+	ENDFOREACH()
+	FILE(APPEND ${XZ_SETUP} ")\n")
 	
-	
-	#copy public API
+	#copy public API and config.h
 	MESSAGE( STATUS "XZ: copy LZMA public API" )
 	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E make_directory ${XZ_INCDIR}/lzma)
 	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_TARGET}/include/lzma.h ${XZ_INCDIR})
@@ -102,7 +120,7 @@ FUNCTION(XZ_BUILD)
 		MESSAGE( STATUS "XZ: copy lzma/${hid}")
 		EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${hdr} ${XZ_INCDIR}/lzma)
 	ENDFOREACH()
-	
+	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_WORKDIR}/config.h ${XZ_CONFIG})
 ENDFUNCTION()
 
 
