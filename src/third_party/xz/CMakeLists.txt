@@ -162,6 +162,11 @@ TARGET_LINK_LIBRARIES(y_lzma_compress y-lzma)
 ADD_EXECUTABLE(y_lzma_decompress tests/02_decompress.c)
 TARGET_LINK_LIBRARIES(y_lzma_decompress y-lzma)
 
+IF(YOCTO_SUNOS)
+	TARGET_LINK_LIBRARIES(y_lzma_compress md)
+	TARGET_LINK_LIBRARIES(y_lzma_decompress md)
+ENDIF()
+
 ENDIF()
 
 
