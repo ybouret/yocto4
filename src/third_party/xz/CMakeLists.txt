@@ -201,7 +201,17 @@ IF(EXISTS ${XZ_SETUP})
 		ADD_COMPILE_OPTIONS("-std=c99")
 	ENDIF()
 
-	
+	ADD_DEFINITIONS( -DHAVE_CONFIG_H )
+	INCLUDE_DIRECTORIES(./src ./include)
+	IF(YOCTO_GNU OR YOCTO_INTEL)
+		ADD_COMPILE_OPTIONS("-std=c99")
+	ENDIF()
+
+	IF(MSVC)
+		#ADD_COMPILE_OPTIONS("/Tp")
+	ENDIF()
+
+
 	ADD_LIBRARY(y-lzma STATIC ${XZ_IMPL} ${XZ_SRCDIR}/config.h)
 
 	#___________________________________________________________________
