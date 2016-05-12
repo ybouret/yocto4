@@ -48,7 +48,7 @@ FUNCTION(XZ_BUILD)
 	ELSE()
 		MESSAGE( STATUS "XZ: configuring" )
 		EXECUTE_PROCESS( COMMAND 
-		./configure
+		sh ./configure
 		--prefix=${XZ_TARGET}
 		 --enable-threads=no 
 		 --disable-xz
@@ -99,16 +99,29 @@ FUNCTION(XZ_BUILD)
 	FOREACH(src IN ITEMS ${XZ_SOURCES})
 		MESSAGE( STATUS "XZ: ...processing ${src}" )
 		FILE(APPEND ${XZ_SETUP} "src/${src}\n")
-		EXECUTE_PROCESS( COMMAND find ${XZ_WORKDIR} -name ${src} OUTPUT_VARIABLE real_src OUTPUT_STRIP_TRAILING_WHITESPACE)
+		IF(FALSE)
+		MESSAGE( STATUS "find ${XZ_WORKDIR} -name ${src}")
+		EXECUTE_PROCESS( COMMAND "find.exe . -name ${src}"
+		WORKING_DIRECTORY "${XZ_WORKDIR}"
+		RESULT_VARIABLE ans
+		OUTPUT_VARIABLE real_src 
+		ERROR_VARIABLE  real_err
+		OUTPUT_STRIP_TRAILING_WHITESPACE)
+		MESSAGE(STATUS "ans=${ans}, real_src='${real_src}', real_err='${real_err}'")
+		ENDIF()
+		FILE(GLOB_RECURSE real_src "${XZ_WORKDIR}/*/${src}")
+		#MESSAGE(STATUS "real_src=${real_src}")
+		
 		#copy the real source
-		EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${real_src} ${XZ_SRCDIR}/${src})
+		EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different "${real_src}" "${XZ_SRCDIR}/${src}")
 		
 		#copy the real headers
-		GET_FILENAME_COMPONENT(real_dir ${real_src} DIRECTORY)
-		FILE(GLOB real_headers ${real_dir}/*.h)
+		GET_FILENAME_COMPONENT(real_dir "${real_src}" DIRECTORY)
+		FILE(GLOB real_headers "${real_dir}/*.h")
 		FOREACH(hdr IN ITEMS ${real_headers})
-			EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${hdr} ${XZ_SRCDIR} )
+			EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different "${hdr}" "${XZ_SRCDIR}" )
 		ENDFOREACH()
+		
 	ENDFOREACH()
 	FILE(APPEND ${XZ_SETUP} ")\n")
 	
