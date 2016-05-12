@@ -26,15 +26,21 @@ MESSAGE( STATUS "XZ: config is '${XZ_CONFIG}'")
 ########################################################################
 FUNCTION(XZ_BUILD)
 	
-	#check tarball
+	#___________________________________________________________________
+	#
+	# check tarball
+	#___________________________________________________________________
 	IF(EXISTS ${XZ_TARBALL})
 		MESSAGE( STATUS "XZ: found tarball")
 	ELSE()
-		MESSAGE( STATUS "XZ: downloading")
+		MESSAGE( STATUS "XZ: downloading...")
 		FILE( DOWNLOAD ${XZ_URL} ${XZ_TARBALL} TIMEOUT 10 SHOW_PROGRESS )
 	ENDIF()
 	
-	#check directory
+	#___________________________________________________________________
+	#
+	# check extracted directory
+	#___________________________________________________________________
 	IF(IS_DIRECTORY ${XZ_WORKDIR})
 		MESSAGE( STATUS "XZ: found directory"    )
 	ELSE()
@@ -42,7 +48,10 @@ FUNCTION(XZ_BUILD)
 		EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E tar xfz ${XZ_TARBALL} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	ENDIF()
 	
-	#check sandbox was built
+	#___________________________________________________________________
+	#
+	# check sandbox was built
+	#___________________________________________________________________
 	IF(IS_DIRECTORY ${XZ_TARGET})
 		MESSAGE( STATUS "XZ: xz was built")
 	ELSE()
@@ -67,7 +76,10 @@ FUNCTION(XZ_BUILD)
 		EXECUTE_PROCESS(COMMAND make install WORKING_DIRECTORY ${XZ_WORKDIR})
 	ENDIF()
 	
-	#extracting object name from archive
+	#___________________________________________________________________
+	#
+	# extracting object name from archive
+	#___________________________________________________________________
 	IF(NOT EXISTS ${XZ_LIBRARY})
 		MESSAGE( FATAL_ERROR "XZ: connot find ${XZ_LIBRARY}")
 	ENDIF()
@@ -77,40 +89,42 @@ FUNCTION(XZ_BUILD)
 		OUTPUT_FILE       raw_content.log
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	
-	#cleanup
+	#___________________________________________________________________
+	#
+	# cleanup content
+	#___________________________________________________________________
+
 	MESSAGE( STATUS "XZ: extracting object files")
 	EXECUTE_PROCESS( COMMAND
 	grep liblzma_la raw_content.log
 	OUTPUT_FILE     content.log
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	
-	#make a source file to copy
+	#___________________________________________________________________
+	#
+	# make a source file to copy
+	#___________________________________________________________________
 	MESSAGE( STATUS "XZ: converting into source files" )
 	EXECUTE_PROCESS( COMMAND
 	sed -e s/liblzma_la-// -e s/\\.o/\\.c/ content.log
 	OUTPUT_FILE sources.log
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	
-	#process implementation files
+	#___________________________________________________________________
+	#
+	# process implementation files
+	#___________________________________________________________________
 	FILE(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/sources.log XZ_SOURCES)
 	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E make_directory ${XZ_SRCDIR})
 
+	## prolog
 	FILE(WRITE ${XZ_SETUP} "SET(XZ_IMPL\n")
+	
+	## loop over source file
 	FOREACH(src IN ITEMS ${XZ_SOURCES})
 		MESSAGE( STATUS "XZ: ...processing ${src}" )
 		FILE(APPEND ${XZ_SETUP} "src/${src}\n")
-		IF(FALSE)
-		MESSAGE( STATUS "find ${XZ_WORKDIR} -name ${src}")
-		EXECUTE_PROCESS( COMMAND "find.exe . -name ${src}"
-		WORKING_DIRECTORY "${XZ_WORKDIR}"
-		RESULT_VARIABLE ans
-		OUTPUT_VARIABLE real_src 
-		ERROR_VARIABLE  real_err
-		OUTPUT_STRIP_TRAILING_WHITESPACE)
-		MESSAGE(STATUS "ans=${ans}, real_src='${real_src}', real_err='${real_err}'")
-		ENDIF()
 		FILE(GLOB_RECURSE real_src "${XZ_WORKDIR}/*/${src}")
-		#MESSAGE(STATUS "real_src=${real_src}")
 		
 		#copy the real source
 		EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different "${real_src}" "${XZ_SRCDIR}/${src}")
@@ -123,9 +137,14 @@ FUNCTION(XZ_BUILD)
 		ENDFOREACH()
 		
 	ENDFOREACH()
+	
+	## epilog
 	FILE(APPEND ${XZ_SETUP} ")\n")
 	
-	#copy public API and config.h
+	#___________________________________________________________________
+	#
+	# copy public API and config.h
+	#___________________________________________________________________
 	MESSAGE( STATUS "XZ: copy LZMA public API" )
 	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E make_directory ${XZ_INCDIR}/lzma)
 	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_TARGET}/include/lzma.h ${XZ_INCDIR})
@@ -137,14 +156,21 @@ FUNCTION(XZ_BUILD)
 	ENDFOREACH()
 	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_WORKDIR}/config.h ${XZ_CONFIG})
 	
+	#___________________________________________________________________
+	#
 	#copy tests
+	#___________________________________________________________________
 	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E make_directory ${XZ_TSTDIR})
 	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_WORKDIR}/doc/examples/01_compress_easy.c ${XZ_TSTDIR})
 	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_WORKDIR}/doc/examples/02_decompress.c    ${XZ_TSTDIR})
 
 ENDFUNCTION()
 
-
+########################################################################
+##
+## try automatic generation
+##
+########################################################################
 IF(NOT EXISTS ${XZ_SETUP})
 	MESSAGE( STATUS "XZ: not found...")
 	IF(NOT YOCTO_MSC)
@@ -153,32 +179,55 @@ IF(NOT EXISTS ${XZ_SETUP})
 ENDIF()
 
 IF(EXISTS ${XZ_SETUP})
-INCLUDE(${XZ_SETUP})
-#MESSAGE(STATUS "XZ_IMPL=${XZ_IMPL}" )
-# select config.h
-MESSAGE( STATUS "using ${XZ_CONFIG} as ${XZ_SRCDIR}/config.h" )
-ADD_CUSTOM_COMMAND( OUTPUT  ${XZ_SRCDIR}/config.h
-				    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_CONFIG} ${XZ_SRCDIR}/config.h
-				    DEPENDS ${XZ_CONFIG}
-				    COMMENT "adjusting config.h")
+	INCLUDE(${XZ_SETUP})
+
+	#___________________________________________________________________
+	#
+	# select config.h
+	#___________________________________________________________________
+	MESSAGE( STATUS "using ${XZ_CONFIG} as ${XZ_SRCDIR}/config.h" )
+	ADD_CUSTOM_COMMAND( OUTPUT  ${XZ_SRCDIR}/config.h
+						COMMAND ${CMAKE_COMMAND} -E copy_if_different ${XZ_CONFIG} ${XZ_SRCDIR}/config.h
+						DEPENDS ${XZ_CONFIG}
+						COMMENT "XZ: select config.h")
 				    
-ADD_DEFINITIONS( -DHAVE_CONFIG_H )
-INCLUDE_DIRECTORIES(./src ./include)
-IF(YOCTO_GNU OR YOCTO_INTEL)
-	ADD_COMPILE_OPTIONS("-std=c99")
-ENDIF()
+	#___________________________________________________________________
+	#
+	# declare the library
+	#___________________________________________________________________
+	ADD_DEFINITIONS( -DHAVE_CONFIG_H )
+	INCLUDE_DIRECTORIES(./src ./include)
+	IF(YOCTO_GNU OR YOCTO_INTEL)
+		ADD_COMPILE_OPTIONS("-std=c99")
+	ENDIF()
 
-ADD_LIBRARY(y-lzma STATIC ${XZ_IMPL} ${XZ_SRCDIR}/config.h)
+	
+	ADD_LIBRARY(y-lzma STATIC ${XZ_IMPL} ${XZ_SRCDIR}/config.h)
 
-ADD_EXECUTABLE(y_lzma_compress   tests/01_compress_easy.c)
-TARGET_LINK_LIBRARIES(y_lzma_compress y-lzma)
-ADD_EXECUTABLE(y_lzma_decompress tests/02_decompress.c)
-TARGET_LINK_LIBRARIES(y_lzma_decompress y-lzma)
+	#___________________________________________________________________
+	#
+	# built-in tests
+	#___________________________________________________________________
+	ADD_EXECUTABLE(y_lzma_compress   tests/01_compress_easy.c)
+	TARGET_LINK_LIBRARIES(y_lzma_compress y-lzma)
+	
+	ADD_EXECUTABLE(y_lzma_decompress tests/02_decompress.c)
+	TARGET_LINK_LIBRARIES(y_lzma_decompress y-lzma)
 
 IF(YOCTO_SUNOS OR YOCTO_FREEBSD)
 	TARGET_LINK_LIBRARIES(y_lzma_compress md)
 	TARGET_LINK_LIBRARIES(y_lzma_decompress md)
 ENDIF()
+
+########################################################################
+##
+## files for SDK
+##
+########################################################################
+INSTALL( TARGETS y-lzma ARCHIVE DESTINATION lib )
+INSTALL( FILES   include/lzma.h DESTINATION include/yocto)
+FILE(GLOB lzma_decl include/lzma/*.h)
+INSTALL( FILES   ${lzma_decl}   DESTINATION include/yocto/lzma)
 
 ENDIF()
 
