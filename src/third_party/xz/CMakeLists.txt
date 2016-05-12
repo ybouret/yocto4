@@ -168,6 +168,10 @@ IF(YOCTO_GNU OR YOCTO_INTEL)
 	ADD_COMPILE_OPTIONS("-std=c99")
 ENDIF()
 
+IF(MSVC)
+	ADD_COMPILE_OPTIONS("/Tp")
+ENDIF()
+
 ADD_LIBRARY(y-lzma STATIC ${XZ_IMPL} ${XZ_SRCDIR}/config.h)
 
 ADD_EXECUTABLE(y_lzma_compress   tests/01_compress_easy.c)
