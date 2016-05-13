@@ -65,7 +65,7 @@ set(SO_REVISION "${LIBTIFF_REVISION}")
 message(STATUS "Building tiff version ${LIBTIFF_MAJOR_VERSION}.${LIBTIFF_MINOR_VERSION}.${LIBTIFF_MICRO_VERSION}${LIBTIFF_ALPHA_VERSION}")
 message(STATUS "libtiff library version ${SO_MAJOR}.${SO_MINOR}.${SO_REVISION}")
 
-set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries")
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
 
 # Project version
 project(tiff C)
@@ -504,8 +504,12 @@ set(MDI_SUPPORT ${mdi})
 # ZLIB
 option(zlib "use zlib (required for Deflate compression)" ON)
 if (zlib)
-  find_package(ZLIB)
+  #find_package(ZLIB)
+  SET(ZLIB_INCLUDE_DIRS ../z/yocto/zlib)
+  SET(ZLIB_LIBRARIES    y-z)
+  SET(ZLIB_FOUND ON)
 endif()
+
 set(ZLIB_SUPPORT 0)
 if(ZLIB_FOUND)
   set(ZLIB_SUPPORT 1)
@@ -579,8 +583,7 @@ if(LIBLZMA_FOUND)
 endif()
 
 # 8/12-bit jpeg mode
-option(jpeg12 "enable libjpeg 8/12-bit dual mode (requires separate
-12-bit libjpeg build)" ON)
+option(jpeg12 "enable libjpeg 8/12-bit dual mode (requires separate 12-bit libjpeg build)" OFF)
 set(JPEG12_INCLUDE_DIR JPEG12_INCLUDE_DIR-NOTFOUND CACHE PATH "Include directory for 12-bit libjpeg")
 set(JPEG12_LIBRARY JPEG12_LIBRARY-NOTFOUND CACHE FILEPATH "12-bit libjpeg library")
 set(JPEG12_FOUND FALSE)
@@ -594,7 +597,7 @@ if (JPEG12_FOUND)
 endif()
 
 # C++ support
-option(cxx "Enable C++ stream API building (requires C++ compiler)" ON)
+option(cxx "Enable C++ stream API building (requires C++ compiler)" OFF)
 set(CXX_SUPPORT FALSE)
 if (cxx)
   enable_language(CXX)
@@ -602,19 +605,19 @@ if (cxx)
 endif()
 
 # OpenGL and GLUT
-find_package(OpenGL)
-find_package(GLUT)
+#find_package(OpenGL)
+#find_package(GLUT)
 set(HAVE_OPENGL FALSE)
 if(OPENGL_FOUND AND OPENGL_GLU_FOUND AND GLUT_FOUND)
   set(HAVE_OPENGL TRUE)
 endif()
 # Purely to satisfy the generated headers:
-check_include_file(GL/gl.h HAVE_GL_GL_H)
-check_include_file(GL/glu.h HAVE_GL_GLU_H)
-check_include_file(GL/glut.h HAVE_GL_GLUT_H)
-check_include_file(GLUT/glut.h HAVE_GLUT_GLUT_H)
-check_include_file(OpenGL/gl.h HAVE_OPENGL_GL_H)
-check_include_file(OpenGL/glu.h HAVE_OPENGL_GLU_H)
+#check_include_file(GL/gl.h HAVE_GL_GL_H)
+#check_include_file(GL/glu.h HAVE_GL_GLU_H)
+#check_include_file(GL/glut.h HAVE_GL_GLUT_H)
+#check_include_file(GLUT/glut.h HAVE_GLUT_GLUT_H)
+#check_include_file(OpenGL/gl.h HAVE_OPENGL_GL_H)
+#check_include_file(OpenGL/glu.h HAVE_OPENGL_GLU_H)
 
 # Win32 IO
 set(win32_io FALSE)
