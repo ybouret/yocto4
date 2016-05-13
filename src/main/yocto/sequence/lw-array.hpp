@@ -24,9 +24,10 @@ namespace yocto
 		YOCTO_ARGUMENTS_DECL_T;
 		
 		explicit lw_array( T *addr, size_t num_items ) throw() :
-		item_( ((mutable_type *)addr) - 1),
+		item_( ((mutable_type *)addr)-1 ),
 		size_( num_items )
-		{ assert( !(addr==NULL&&num_items>0) );
+		{ 
+			assert( !(addr==NULL&&num_items>0) );
 		}
 		
 		virtual const char *name()     const throw() { return hidden::lw_array_name; }
