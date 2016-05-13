@@ -160,7 +160,7 @@ namespace yocto
         void _fft_v2(const uint8_t *data1,
                      const size_t   size1,
                      const uint8_t *data2,
-                     const real_t   size2,
+                     const size_t   size2,
                      real_t        *fft1,
                      real_t        *fft2,
                      const size_t   n) throw()
