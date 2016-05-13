@@ -102,7 +102,7 @@ set(tiffxx_HEADERS
 set(tiffxx_SOURCES
   tif_stream.cxx)
 
-if(WIN32_IO)
+if(win32_io)
   extra_dist(tif_unix.c)
   list(APPEND tiff_SOURCES tif_win32.c)
 else()
@@ -110,12 +110,13 @@ else()
   list(APPEND tiff_SOURCES tif_unix.c)
 endif()
 
+MESSAGE(STATUS "TIFF_INCLUDES=${TIFF_INCLUDES}" )
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}
                     ${TIFF_INCLUDES})
 
-add_library(tiff ${tiff_SOURCES} ${tiff_HEADERS} ${nodist_tiff_HEADERS}
-            ${tiff_port_SOURCES} libtiff.def)
+add_library(tiff STATIC ${tiff_SOURCES} ${tiff_HEADERS} ${nodist_tiff_HEADERS}
+            ${tiff_port_SOURCES})
 target_link_libraries(tiff ${TIFF_LIBRARY_DEPS})
 set_target_properties(tiff PROPERTIES SOVERSION ${SO_COMPATVERSION})
 if(NOT CYGWIN)
@@ -130,6 +131,7 @@ if(HAVE_LD_VERSION_SCRIPT)
                         "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libtiff.map")
 endif()
 
+IF(OFF)
 install(TARGETS tiff
         RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
@@ -137,6 +139,7 @@ install(TARGETS tiff
 
 install(FILES ${tiff_HEADERS} ${nodist_tiff_HEADERS}
         DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+ENDIF()
 
 if(cxx)
   add_library(tiffxx ${tiffxx_SOURCES} ${tiffxx_HEADERS})
