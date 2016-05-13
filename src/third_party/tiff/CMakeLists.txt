@@ -25,6 +25,7 @@
 
 cmake_minimum_required(VERSION 2.8.9)
 
+IF(OFF)
 # Default policy is from 2.8.9
 cmake_policy(VERSION 2.8.9)
 # Set MacOSX @rpath usage globally.
@@ -41,6 +42,7 @@ endif(POLICY CMP0053)
 if (POLICY CMP0054)
   cmake_policy(SET CMP0054 NEW)
 endif(POLICY CMP0054)
+ENDIF()
 
 # Read version information from configure.ac.
 FILE(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure.ac" configure)
@@ -502,7 +504,6 @@ option(zlib "use zlib (required for Deflate compression)" ON)
 if (zlib)
   #find_package(ZLIB)
   SET(ZLIB_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../z/yocto/zlib)
-  #SET(ZLIB_LIBRARIES    y-z)
   SET(ZLIB_FOUND ON)
 endif()
 
@@ -568,7 +569,9 @@ set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
 # liblzma2
 option(lzma "use liblzma (required for LZMA2 compression)" ON)
 if (lzma)
-  find_package(LibLZMA)
+  #find_package(LibLZMA)
+  set(LIBLZMA_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../xz/include)
+  set(LIBLZMA_FOUND ON)
 endif()
 set(LZMA_SUPPORT 0)
 if(LIBLZMA_FOUND)

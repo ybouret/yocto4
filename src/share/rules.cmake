@@ -176,13 +176,9 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	FOREACH( extra ${ARGN} )
 		TARGET_LINK_LIBRARIES( ${tgt} y-${extra} )
 		
-		IF("net" STREQUAL ${extra})
-			SET(YOCTO_HAS_NET ON)
-		ENDIF()
-		
-		IF("lzma" STREQUAL ${extra})
-			SET(YOCTO_HAS_LZMA ON)
-		ENDIF()
+		STRING(COMPARE EQUAL "net"  "${extra}" YOCTO_HAS_NET)
+		STRING(COMPARE EQUAL "lzma" "${extea}" YOCTO_HAS_LZMA)
+	
 		
 	ENDFOREACH()
 	

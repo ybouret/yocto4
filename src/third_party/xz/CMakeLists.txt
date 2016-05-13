@@ -193,14 +193,8 @@ IF(EXISTS ${XZ_SETUP})
 				    
 	#___________________________________________________________________
 	#
-	# declare the library
+	# declare the library with tubed options
 	#___________________________________________________________________
-	ADD_DEFINITIONS( -DHAVE_CONFIG_H )
-	INCLUDE_DIRECTORIES(./src ./include)
-	IF(YOCTO_GNU OR YOCTO_INTEL)
-		ADD_COMPILE_OPTIONS("-std=c99")
-	ENDIF()
-
 	ADD_DEFINITIONS( -DHAVE_CONFIG_H )
 	INCLUDE_DIRECTORIES(./src ./include)
 	IF(YOCTO_GNU OR YOCTO_INTEL)
