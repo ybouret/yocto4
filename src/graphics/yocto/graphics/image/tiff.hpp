@@ -2,6 +2,7 @@
 #define YOCTO_GFX_IMAGE_TIFF_INCLUDED 1
 
 #include "yocto/graphics/image.hpp"
+#include "yocto/graphics/image/tiff++.hpp"
 
 namespace yocto
 {
@@ -15,8 +16,9 @@ namespace yocto
             virtual ~tiff_format() throw();
             
             virtual bool     lossless() const throw();
-
-            //! option is &indx, uint32_t
+            
+            
+            //! option input_options...
             virtual bitmap  *load(const string          &filename,
                                   unit_t                 depth,
                                   rgba2data             &proc,
@@ -28,17 +30,18 @@ namespace yocto
                                   const void          *options) const;
 
 
-            uint32_t count_directories(const string &filename) const;
+            size_t count_directories(const string &filename) const;
 
             //! load a bitmap with 0<=indx<count_directories
             bitmap *load_bitmap(const string          &filename,
                                 unit_t                 depth,
                                 rgba2data             &proc,
-                                const uint32_t         indx) const;
+                                const size_t           indx) const;
             
 
 
         private:
+            mutable I_TIFF::Raster raster;
             YOCTO_DISABLE_COPY_AND_ASSIGN(tiff_format);
             virtual const char **extensions() const throw();
         };

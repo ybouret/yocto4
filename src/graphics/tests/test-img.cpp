@@ -88,9 +88,9 @@ YOCTO_UNIT_TEST_IMPL(tiff2png)
     if(argc>1)
     {
         const string   filename = argv[1];
-        const uint32_t nd = tif->count_directories(filename);
+        const size_t   nd       = tif->count_directories(filename);
         std::cerr << "Extracting " << nd << " images" << std::endl;
-        for(uint32_t i=0;i<nd;++i)
+        for(size_t i=0;i<nd;++i)
         {
             pixmapf pxm(tif->loadf(filename,&i));
             png.save(vformat("toto%08x.png",unsigned(i)), pxm, NULL);

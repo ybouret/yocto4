@@ -1,7 +1,6 @@
 #ifndef YOCTO_TIFFPP_INCLUDED
 #define YOCTO_TIFFPP_INCLUDED 1
 
-#include "yocto/graphics/types.hpp"
 #include "yocto/string.hpp"
 
 namespace yocto
@@ -11,6 +10,8 @@ namespace yocto
         class I_TIFF
         {
         public:
+          
+                
             explicit I_TIFF(const string &filename);
             virtual ~I_TIFF() throw();
 
@@ -20,16 +21,25 @@ namespace yocto
             int    GetWidth();
             int    GetHeight();
 
-            //! load rgba for current TIFF directory...
-            uint32_t *load_rgba();
-
-            void cleanup() throw();
+            class Raster
+            {
+            public:
+                uint32_t    *data;
+                const size_t size;
+                Raster() throw();
+                ~Raster() throw();
+                void cleanup() throw();
+                void startup(const size_t n);
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Raster);
+            };
+            
+            void ReadRBGAImage(Raster &raster);
             
         private:
             void     *handle;
-            uint32_t *raster;
-            size_t    dwords;
-
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(I_TIFF);
         };
     }

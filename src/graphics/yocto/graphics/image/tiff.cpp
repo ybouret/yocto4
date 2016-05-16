@@ -11,19 +11,9 @@ namespace yocto
         }
         
         tiff_format:: tiff_format() :
-        image::format("TIFF")
+        image::format("TIFF"),
+        raster()
         {
-#if 0
-            if(api.is_loaded())
-            {
-                YOCTO_INTERFACE_CHECK(api,Open);
-                YOCTO_INTERFACE_CHECK(api,Close);
-                YOCTO_INTERFACE_CHECK(api,GetWidth);
-                YOCTO_INTERFACE_CHECK(api,GetHeight);
-                YOCTO_INTERFACE_CHECK(api,ReadRGBAImage);
-                YOCTO_INTERFACE_CHECK(api,SetDirectory);
-            }
-#endif
         }
         
         bool tiff_format:: lossless() const throw()
@@ -46,109 +36,53 @@ namespace yocto
                                     rgba2data             &proc,
                                     const void            *options) const
         {
-#if 0
-            const char *fn = filename.c_str();
-            if(!api.is_loaded())
-            {
-                throw exception("tiff_format.load: TIFF plugin is not loaded");
-            }
-            void *tiff = api->Open(fn,"r");
+            // open file
+            I_TIFF      tiff(filename);
             
-            if(!tiff)
+            // option: set directory
+            if(options)
             {
-                throw exception("can't open '%s'",fn);
+                const size_t d = *(size_t *)options;
+                tiff.SetDirectory(d);
             }
             
-            try
+            // read raster
+            tiff.ReadRBGAImage(raster);
+            
+            // allocate resources
+            const int w = tiff.GetWidth();
+            const int h = tiff.GetHeight();
+            auto_ptr<bitmap> B(new bitmap(depth,w,h) );
+            
+            // map raster to bitmap
+            const uint32_t *p = raster.data;
+            for(int j=0;j<h;++j)
             {
-                if(options)
+                for(int i=0;i<w;++i)
                 {
-                    const uint32_t d = *(const uint32_t *)options;
-                    if(!api->SetDirectory(tiff,d))
-                    {
-                        throw exception("can't SetDirectory %u", unsigned(d) );
-                    }
+                    const uint32_t P = *(p++);
+                    const RGBA   C( TIFFGetR(P), TIFFGetG(P), TIFFGetB(P), TIFFGetA(P));
+                    proc(B->get(i,j),C);
                 }
-                
-                uint32_t w = 0;
-                if(!api->GetWidth(tiff,&w))
-                {
-                    throw exception("no width for '%s'",fn);
-                }
-                uint32_t h = 0;
-                if(!api->GetHeight(tiff,&h))
-                {
-                    throw exception("no height for '%s'",fn);
-                }
-                auto_ptr<bitmap> B(new bitmap(depth,w,h));
-                
-                //direct get
-                uint32_t *raster = new uint32_t[w*h];
-                if(!api->ReadRGBAImage(tiff,w,h,raster))
-                {
-                    delete []raster;
-                    throw exception("can't read raster for '%s'", fn);
-                }
-                
-                const uint32_t *p = raster;
-                for(size_t j=0;j<h;++j)
-                {
-                    for(size_t i=0;i<w;++i)
-                    {
-                        const uint32_t P = *(p++);
-                        const RGBA   C( TIFFGetR(P), TIFFGetG(P), TIFFGetB(P), TIFFGetA(P));
-                        proc(B->get(i,j),C);
-                    }
-                }
-                
-                delete []raster;
-                std::cerr << "TIFF: " << w << "x" << h << std::endl;
-                api->Close(tiff);
-                return B.yield();
             }
-            catch(...)
-            {
-                assert(tiff);
-                api->Close(tiff);
-                throw;
-            }
-#endif
-            return 0;
+            
+            return B.yield();
+            
+            
+            
         }
         
-        uint32_t tiff_format:: count_directories(const string &filename) const
+        size_t tiff_format:: count_directories(const string &filename) const
         {
-#if 0
-            const char *fn = filename.c_str();
-            if(!api.is_loaded())
-            {
-                throw exception("tiff_format.load: TIFF plugin is not loaded");
-            }
-            void *tiff = api->Open(fn,"r");
-            if(!tiff)
-            {
-                throw exception("TIFF: cannot open '%s'", fn);
-            }
-            try
-            {
-                const uint32_t nd = api->CountDirectories(tiff);
-                api->Close(tiff);
-                return nd;
-            }
-            catch(...)
-            {
-                api->Close(tiff);
-                throw;
-            }
-#endif
-            return 0;
+            I_TIFF tiff(filename);
+            return tiff.CountDirectories();
         }
         
         
         bitmap *tiff_format:: load_bitmap(const string          &filename,
                                           unit_t                 depth,
                                           rgba2data             &proc,
-                                          const uint32_t         indx) const
+                                          const size_t           indx) const
         
         {
             return load(filename,depth,proc,&indx);
