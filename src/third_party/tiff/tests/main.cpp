@@ -29,7 +29,7 @@ YOCTO_PROGRAM_START()
             uint32_t h=0;
             if( !TIFFGetField(tif,TIFFTAG_IMAGELENGTH, &h) )
             {
-                throw exception("couldn't read width");
+                throw exception("couldn't read height");
             }
             std::cerr << "h=" << w << std::endl;
             const size_t npx = w*h;

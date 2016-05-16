@@ -119,6 +119,10 @@ add_library(y-tiff STATIC ${tiff_SOURCES} ${tiff_HEADERS} ${nodist_tiff_HEADERS}
             ${tiff_port_SOURCES})
 
 
+install(TARGETS y-tiff ARCHIVE DESTINATION lib)
+install(FILES ${tiff_HEADERS} ${nodist_tiff_HEADERS}
+        DESTINATION include/yocto/tiff)
+        
 IF(OFF)
 install(TARGETS tiff
         RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
