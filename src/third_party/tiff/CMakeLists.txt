@@ -569,9 +569,11 @@ set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
 # liblzma2
 option(lzma "use liblzma (required for LZMA2 compression)" ON)
 if (lzma)
-  #find_package(LibLZMA)
+  # TODO: change according to MSVC version !!!
+  IF(NOT MSVC)
   set(LIBLZMA_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../xz/include)
   set(LIBLZMA_FOUND ON)
+  ENDIF()
 endif()
 set(LZMA_SUPPORT 0)
 if(LIBLZMA_FOUND)
@@ -729,16 +731,9 @@ ENDIF()
 #report_values(TIFF_INCLUDES TIFF_LIBRARY_DEPS)
 
 # Process subdirectories
-#add_subdirectory(port)
 add_subdirectory(libtiff)
-#add_subdirectory(tools)
-#add_subdirectory(test)
-#add_subdirectory(contrib)
-#add_subdirectory(build)
-#add_subdirectory(man)
-#add_subdirectory(html)
 
-#message(STATUS "EXTRA_DIST: ${EXTRA_DIST}")
+
 
 message(STATUS "")
 message(STATUS "Libtiff is now configured for ${host}")
@@ -774,3 +769,5 @@ message(STATUS "")
 # message(STATUS "  X Athena Widgets support:           ${HAVE_XAW}")
 message(STATUS "  OpenGL support:                     ${HAVE_OPENGL}")
 message(STATUS "")
+ADD_SUBDIRECTORY(tests)
+

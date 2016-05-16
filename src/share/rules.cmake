@@ -177,7 +177,7 @@ MACRO(TARGET_LINK_YOCTO tgt)
 		TARGET_LINK_LIBRARIES( ${tgt} y-${extra} )
 		
 		STRING(COMPARE EQUAL "net"  "${extra}" YOCTO_HAS_NET)
-		STRING(COMPARE EQUAL "lzma" "${extea}" YOCTO_HAS_LZMA)
+		STRING(COMPARE EQUAL "lzma" "${extra}" YOCTO_HAS_LZMA)
 	
 		
 	ENDFOREACH()

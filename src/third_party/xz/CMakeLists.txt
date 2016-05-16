@@ -178,6 +178,7 @@ IF(NOT EXISTS ${XZ_SETUP})
 	ENDIF()
 ENDIF()
 
+SET(YOCTO_LZMA OFF)
 IF(EXISTS ${XZ_SETUP})
 	INCLUDE(${XZ_SETUP})
 
@@ -233,6 +234,7 @@ INSTALL( FILES   include/lzma.h DESTINATION include/yocto)
 FILE(GLOB lzma_decl include/lzma/*.h)
 INSTALL( FILES   ${lzma_decl}   DESTINATION include/yocto/lzma)
 
+SET(YOCTO_LZMA ON)
 ENDIF()
 
 
