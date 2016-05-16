@@ -33,9 +33,17 @@ YOCTO_PROGRAM_START()
             }
             std::cerr << "h=" << w << std::endl;
             const size_t npx = w*h;
-            uint32_t *raster = new uint32_t[npx];
-            TIFFReadRGBAImage(tif,w,h,raster);
-            delete []raster;
+            try
+            {
+                uint32_t *raster = new uint32_t[npx];
+                TIFFReadRGBAImage(tif,w,h,raster);
+                delete []raster;
+            }
+            catch(...)
+            {
+                TIFFClose(tif);
+                throw;
+            }
 
         } while( TIFFReadDirectory(tif) );
         std::cerr << "Found " << count << " entry(ies)" << std::endl;
