@@ -2,8 +2,6 @@
 #define YOCTO_GFX_IMAGE_TIFF_INCLUDED 1
 
 #include "yocto/graphics/image.hpp"
-#include "yocto/tiff++/interface.hpp"
-#include "yocto/rtld/plugin.hpp"
 
 namespace yocto
 {
@@ -41,7 +39,6 @@ namespace yocto
 
 
         private:
-            plugin<I_TIFF> api;
             YOCTO_DISABLE_COPY_AND_ASSIGN(tiff_format);
             virtual const char **extensions() const throw();
         };

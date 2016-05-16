@@ -33,9 +33,16 @@ INSTALL( FILES ${decl_piv} DESTINATION include/yocto/graphics/piv )
 SOURCE_GROUP( graphics/piv FILES ${srcs_piv} )
 
 
-INCLUDE_DIRECTORIES( . ../main ../mk ../third_party/png ../third_party/jpeg ../tiff++)
+INCLUDE_DIRECTORIES( . ../main ../mk
+../third_party/png
+../third_party/jpeg
+../third_party/tiff/libtiff
+${CMAKE_CURRENT_BINARY_DIR}/../third_party/tiff/libtiff)
+
 
 ADD_LIBRARY(y-graphics STATIC ${srcs} ${srcs_image} ${srcs_ops} ${srcs_ramp} ${srcs_piv} )
+TARGET_LINK_LIBRARIES(y-graphics y-tiff)
+
 INSTALL( TARGETS y-graphics ARCHIVE DESTINATION lib)
 
 IF(YOCTO_BUILD_TESTS)

@@ -11,9 +11,9 @@ namespace yocto
         }
         
         tiff_format:: tiff_format() :
-        image::format("TIFF"),
-        api("y-tiff")
+        image::format("TIFF")
         {
+#if 0
             if(api.is_loaded())
             {
                 YOCTO_INTERFACE_CHECK(api,Open);
@@ -23,6 +23,7 @@ namespace yocto
                 YOCTO_INTERFACE_CHECK(api,ReadRGBAImage);
                 YOCTO_INTERFACE_CHECK(api,SetDirectory);
             }
+#endif
         }
         
         bool tiff_format:: lossless() const throw()
@@ -45,6 +46,7 @@ namespace yocto
                                     rgba2data             &proc,
                                     const void            *options) const
         {
+#if 0
             const char *fn = filename.c_str();
             if(!api.is_loaded())
             {
@@ -110,10 +112,13 @@ namespace yocto
                 api->Close(tiff);
                 throw;
             }
+#endif
+            return 0;
         }
         
         uint32_t tiff_format:: count_directories(const string &filename) const
         {
+#if 0
             const char *fn = filename.c_str();
             if(!api.is_loaded())
             {
@@ -135,7 +140,8 @@ namespace yocto
                 api->Close(tiff);
                 throw;
             }
-            
+#endif
+            return 0;
         }
         
         
