@@ -25,9 +25,10 @@ YOCTO_UNIT_TEST_IMPL(tiff)
             const string outname = vformat("output%d.tif",count-1);
             O_TIFF out(outname);
             out.SetCompression(NULL);
-            out.SetCompression("");
-            out.SetCompression("LZW");
-            
+            //out.SetCompression("");
+            //out.SetCompression("LZW");
+            //out.SetCompression("JPEG");
+
             out.WriteRGBAImage(raster, w, h);
             
             

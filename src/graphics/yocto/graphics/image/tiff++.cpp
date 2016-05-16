@@ -188,13 +188,24 @@ namespace yocto
                 {
                     if(0==strcmp(ct->name,cmp))
                     {
-                        //std::cerr << "found " << ct->name << std::endl;
                         flag = ct->ttag;
+                        break;
                     }
                     ++ct;
                 }
             }
-            TIFFSetField((TIFF *)handle, TIFFTAG_COMPRESSION, flag);
+            TIFF *out = (TIFF *)handle;
+            TIFFSetField(out, TIFFTAG_COMPRESSION, flag);
+            switch(flag)
+            {
+                case COMPRESSION_LZW:
+                    //TIFFSetField(out, TIFFTAG_PREDICTOR, PREDICTOR_HORIZONTAL);
+                    break;
+                    
+            default:
+                TIFFSetField(out, TIFFTAG_PREDICTOR, PREDICTOR_NONE);
+            }
+            
         }
         
         void O_TIFF:: WriteRGBAImage(const Raster &raster, const int w, const int h)
