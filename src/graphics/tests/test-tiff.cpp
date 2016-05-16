@@ -21,6 +21,16 @@ YOCTO_UNIT_TEST_IMPL(tiff)
             const int h = tif.GetHeight();
             std::cerr << "size=" << w << "x" << h << std::endl;
             tif.ReadRBGAImage(raster);
+            
+            const string outname = vformat("output%d.tif",count-1);
+            O_TIFF out(outname);
+            out.SetCompression(NULL);
+            out.SetCompression("");
+            out.SetCompression("LZW");
+            
+            out.WriteRGBAImage(raster, w, h);
+            
+            
         }
         while( tif.ReadDirectory() );
         std::cerr << "found " << count << " entry(ies)" << std::endl;
