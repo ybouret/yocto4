@@ -115,21 +115,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}
                     ${TIFF_INCLUDES})
 
-add_library(tiff STATIC ${tiff_SOURCES} ${tiff_HEADERS} ${nodist_tiff_HEADERS}
+add_library(y-tiff STATIC ${tiff_SOURCES} ${tiff_HEADERS} ${nodist_tiff_HEADERS}
             ${tiff_port_SOURCES})
-target_link_libraries(tiff ${TIFF_LIBRARY_DEPS})
-set_target_properties(tiff PROPERTIES SOVERSION ${SO_COMPATVERSION})
-if(NOT CYGWIN)
-    # This property causes shared libraries on Linux to have the full version
-    # encoded into their final filename.  We disable this on Cygwin because
-    # it causes cygz-${TIFF_FULL_VERSION}.dll to be created when cygz.dll
-    # seems to be the default.
-    set_target_properties(tiff PROPERTIES VERSION ${SO_VERSION})
-endif()
-if(HAVE_LD_VERSION_SCRIPT)
-  set_target_properties(tiff PROPERTIES LINK_FLAGS
-                        "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libtiff.map")
-endif()
+
 
 IF(OFF)
 install(TARGETS tiff
@@ -140,29 +128,3 @@ install(TARGETS tiff
 install(FILES ${tiff_HEADERS} ${nodist_tiff_HEADERS}
         DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
 ENDIF()
-
-if(cxx)
-  add_library(tiffxx ${tiffxx_SOURCES} ${tiffxx_HEADERS})
-  target_link_libraries(tiffxx tiff)
-  set_target_properties(tiffxx PROPERTIES SOVERSION ${SO_COMPATVERSION})
-  if(NOT CYGWIN)
-    # This property causes shared libraries on Linux to have the full version
-    # encoded into their final filename.  We disable this on Cygwin because
-    # it causes cygz-${TIFF_FULL_VERSION}.dll to be created when cygz.dll
-    # seems to be the default.
-    set_target_properties(tiffxx PROPERTIES VERSION ${SO_VERSION})
-  endif()
-  if(HAVE_LD_VERSION_SCRIPT)
-    set_target_properties(tiffxx PROPERTIES LINK_FLAGS
-                          "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libtiffxx.map")
-  endif()
-
-  install(TARGETS tiffxx
-          RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
-          LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
-          ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
-
-  install(FILES ${tiffxx_HEADERS}
-          DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
-
-endif()
