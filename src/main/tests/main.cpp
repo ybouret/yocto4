@@ -141,6 +141,8 @@ YOCTO_UNIT_TEST_INIT(150)
 
     YOCTO_UNIT_TEST_DECL(points);
     YOCTO_UNIT_TEST_DECL(splitting);
+    YOCTO_UNIT_TEST_DECL(engine_split);
+    
     YOCTO_UNIT_TEST_DECL(xtensor);
 
     YOCTO_UNIT_TEST_DECL(field);

@@ -99,7 +99,22 @@ YOCTO_UNIT_TEST_IMPL(splitting)
         }
         build_patches(sub2, cpus, p2);
     }
-
-
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/parallel/server-split.hpp"
+
+YOCTO_UNIT_TEST_IMPL(engine_split)
+{
+    threading::engine server(true);
+    patch2D p2( coord2D(1,1), coord2D(10,5) );
+    vector<patch2D> sub2;
+    create_patches(sub2,p2,&server);
+    std::cerr << "patch2=" << p2 << std::endl;
+    for(size_t i=1;i<=sub2.size();++i)
+    {
+        std::cerr << "sub#" << i << " : " << sub2[i] << std::endl;
+    }
+}
+YOCTO_UNIT_TEST_DONE()
+
