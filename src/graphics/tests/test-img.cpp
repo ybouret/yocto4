@@ -40,6 +40,8 @@ YOCTO_UNIT_TEST_IMPL(img)
     show_format( IMG["TIFF"] );
     
     const image::format &PNG = IMG["PNG"];
+    //const image::format &JPG = IMG["JPEG"];
+    //const image::format &TIF = IMG["TIFF"];
     const imageIO       &gfx = IMG;
     
     if(argc>1)
@@ -63,7 +65,10 @@ YOCTO_UNIT_TEST_IMPL(img)
         PNG.save("image1.png",p1,NULL);
         PNG.save("imagef.png",pf,NULL);
 
-        gfx.save("toto.png",pf,NULL);
+        gfx.save("toto.png",p4,NULL);
+        gfx.save("toto.jpg",p4,NULL);
+        gfx.save("toto.tiff",p4,NULL);
+
 
         vector<patch> subs;
         prepare_patches(subs, 4, p4, true);
