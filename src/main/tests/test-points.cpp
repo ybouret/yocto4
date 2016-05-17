@@ -102,7 +102,7 @@ YOCTO_UNIT_TEST_IMPL(splitting)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/parallel/server-split.hpp"
+#include "yocto/parallel/engine-split.hpp"
 
 YOCTO_UNIT_TEST_IMPL(engine_split)
 {

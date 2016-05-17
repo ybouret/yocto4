@@ -22,7 +22,7 @@ namespace yocto
         
         //! zero argument contructor, automatic memory management
         template <typename T>
-        inline void make()
+        inline T & make()
         {
             prepare_for(sizeof(T)); // free and get memory
 #if defined(_MSC_VER)
@@ -34,24 +34,27 @@ namespace yocto
 #if defined(_MSC_VER)
 #pragma warning (pop)
 #endif
+            return *(T*)(slot_.data);
         }
         
         //! one argument copy constructor, automatic memory management
         template <typename T>
-        inline void make( typename type_traits<T>::parameter_type args )
+        inline T & make( typename type_traits<T>::parameter_type args )
         {
             prepare_for(sizeof(T));    // free and get memory
             new (slot_.data) T(args);  // try to construct, may throw
             activate<T>();             // activate the object
+            return *(T*)(slot_.data);
         }
-        
+
         //! one argument constructor
         template <typename T,typename U>
-        inline void build(typename type_traits<U>::parameter_type args)
+        inline T &build(typename type_traits<U>::parameter_type args)
         {
             prepare_for(sizeof(T));    // free and get memory
             new (slot_.data) T(args);  // try to construct, may throw
             activate<T>();             // activate the object
+            return *(T*)(slot_.data);
         }
         
         //! two arguments constructor
