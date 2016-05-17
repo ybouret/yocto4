@@ -106,6 +106,48 @@ namespace yocto
             job_id  failed; //!< last failed job
 
 
+            //! wrapper for single instruction, multiple data
+            /**
+             METHOD_POINTER(T &,lockable &)
+             */
+            template <
+            typename OBJECT_POINTER,
+            typename METHOD_POINTER,
+            typename T
+            >
+            class jwrapper
+            {
+            public:
+
+                inline jwrapper(OBJECT_POINTER h, METHOD_POINTER c, T &d ) throw() :
+                host(h), call(c), data(d) {}
+
+                inline jwrapper(const jwrapper &other) throw() :
+                host(other.host), call(other.call), data(other.data) {}
+
+                inline ~jwrapper() throw() {}
+
+                inline void operator()( lockable &shared_lock )
+                {
+                    ((*host).*call)(data,shared_lock);
+                }
+
+            private:
+                OBJECT_POINTER host;
+                METHOD_POINTER call;
+                T             &data;
+                YOCTO_DISABLE_ASSIGN(jwrapper);
+            };
+
+            template <typename OBJECT_POINTER,typename METHOD_POINTER,typename T> inline
+            job_id enqueue(OBJECT_POINTER host, METHOD_POINTER method, T &data)
+            {
+                const jwrapper<OBJECT_POINTER,METHOD_POINTER,T> jw(host,method,data);
+                const job   J(jw);
+                return enqueue(J);
+            }
+
+
         };
 
     }
