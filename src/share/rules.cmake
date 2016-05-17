@@ -178,7 +178,6 @@ MACRO(TARGET_LINK_YOCTO tgt)
 		
 		STRING(COMPARE EQUAL "net"  "${extra}" YOCTO_HAS_NET)
 		STRING(COMPARE EQUAL "lzma" "${extra}" YOCTO_HAS_LZMA)
-	
 		
 	ENDFOREACH()
 	
@@ -242,7 +241,7 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	## LZMA/XZ Specific Flags
 	####################################################################
 	IF(YOCTO_HAS_LZMA)
-		IF(YOCTO_SUNOS)
+		IF(YOCTO_SUNOS OR YOCTO_FREEBSD)
 			TARGET_LINK_LIBRARIES(${tgt} md)
 		ENDIF()
 	ENDIF()
