@@ -31,24 +31,22 @@ namespace yocto
             template <typename OBJECT_POINTER, typename METHOD_POINTER>
             inline void enqueue(OBJECT_POINTER    host,
                                 METHOD_POINTER    method,
-                                threading::engine &server)
+                                threading::engine *server)
             {
                 assert(host);
                 assert(method);
-                jid = server.enqueue<OBJECT_POINTER,METHOD_POINTER,xpatch>(host,method,*this);
+                if(server)
+                {
+                    jid = server->enqueue<OBJECT_POINTER,METHOD_POINTER,xpatch>(host,method,*this);
+                }
+                else
+                {
+                    jid = 0;
+                    ( (*host).*method )(*this,jlk);
+                }
             }
 
-
-            template <typename OBJECT_POINTER, typename METHOD_POINTER>
-            inline void execute(OBJECT_POINTER    host,
-                                METHOD_POINTER    method)
-            {
-                assert(host);
-                assert(method);
-                jid = 0;
-                ( (*host).*method )(*this,jlk);
-            }
-
+            
 
 
         private:

@@ -20,8 +20,8 @@ namespace yocto
                 const void *src;
             };
 
-            explicit gradient() throw() {}
-            virtual ~gradient() throw() {}
+            inline explicit gradient() throw() {}
+            inline virtual ~gradient() throw() {}
 
             template <typename T>
             inline void start(pixmap<float>      &grd,
@@ -36,14 +36,7 @@ namespace yocto
                     data.gmax     = 0;
                     data.tgt      = &grd;
                     data.src      = &img;
-                    if(server)
-                    {
-                        xp.enqueue(this, & gradient::apply<T>, *server);
-                    }
-                    else
-                    {
-                        xp.execute(this, &gradient::apply<T>);
-                    }
+                    xp.enqueue(this, & gradient::apply<T>,server);
                 }
             }
 
@@ -53,9 +46,9 @@ namespace yocto
             template <typename T>
             void apply( xpatch &xp, lockable & ) throw()
             {
-                io_data         &data = xp.as<io_data>();
-                pixmap<float>   &g    = *static_cast<pixmap<float>   *>(data.tgt);
-                const pixmap<T> &s    = *static_cast<const pixmap<T> *>(data.src);
+                io_data         &data  = xp.as<io_data>();
+                pixmap<float>   &g     = *static_cast<pixmap<float>   *>(data.tgt);
+                const pixmap<T> &s     = *static_cast<const pixmap<T> *>(data.src);
                 const vertex     lower = xp.lower;
                 const vertex     upper = xp.upper;
                 for(unit_t j=upper.y;j>=lower.y;--j)
@@ -64,7 +57,7 @@ namespace yocto
                     const typename pixmap<T>::row &s_j = s[j];
                     for(unit_t i=upper.x;i>=lower.x;--i)
                     {
-                        g_j[i] = 0.0f;
+                        g_j[i] = s_j[i];
                     }
                 }
             }
