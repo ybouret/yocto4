@@ -212,7 +212,7 @@ namespace yocto
 
         void O_TIFF:: WriteRGBAImage(const Raster &raster, const int w, const int h)
         {
-            assert(w*h<=raster.size);
+            assert(w*h<=unit_t(raster.size));
             assert(w>0);
             assert(h>0);
             TIFF *out = (TIFF *)handle;
