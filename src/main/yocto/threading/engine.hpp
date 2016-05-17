@@ -17,11 +17,15 @@ namespace yocto
         class engine : public layout
         {
         public:
+            //! using YOCTO_THREADING or default settinfs
             explicit engine(bool setVerbose);
             explicit engine(const size_t num_threads, const size_t threads_offset,bool setVerbose);
             virtual ~engine() throw();
+
+            //! a job to execute
             typedef functor<void,TL1(lockable&)> job;
 
+            //! execute a job
             job_id enqueue( const job &J );
 
             //! wait until all jobs are done
@@ -64,7 +68,7 @@ namespace yocto
             core::list_of<task> tasks;   //!< tasks to process
             const size_t       &pending; //!< task.size
             core::list_of<task> activ;   //!< running tasks
-            const size_t       &running;   //!< activ.size
+            const size_t       &running; //!< activ.size
             core::pool_of<task> tpool;   //!< pool of dangling tasks
             job_id              juuid;   //!< for tasks labelling...
             const size_t        ready;   //!< internal set-up flag
@@ -84,6 +88,7 @@ namespace yocto
             void  activate(task *t) throw();
 
         public:
+
 #define YOCTO_THREAD_ENGINE_ENQUEUE_PROLOG() YOCTO_LOCK(access); task *t = query_task()
 #define YOCTO_THREAD_ENGINE_ENQUEUE_EPILOG() activate(t); return t->uuid
 
@@ -99,6 +104,7 @@ namespace yocto
             bool is_done(const job_id j) const throw();
 
             job_id  failed; //!< last failed job
+
 
         };
 
