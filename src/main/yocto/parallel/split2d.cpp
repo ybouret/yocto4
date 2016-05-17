@@ -88,9 +88,9 @@ namespace yocto
         patch2D split2D:: operator()(size_t rank) const throw()
         {
             assert(rank<cores);
-            ldiv_t d = ldiv(rank,x_cores);
-            const size_t y_rank = d.quot;
-            const size_t x_rank = d.rem;
+            const ldiv_t d         = ldiv(rank,x_cores);
+            const size_t y_rank    = d.quot;
+            const size_t x_rank    = d.rem;
             coord2D      start     = lower;
             coord2D      final     = width;
 

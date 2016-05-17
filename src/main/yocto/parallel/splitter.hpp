@@ -10,12 +10,19 @@ namespace yocto
     namespace parallel
     {
 
+        //! template splitter for dimensions
         template <size_t N>
         struct splitter_for;
 
         template <> struct splitter_for<1> { typedef split1D type; };
         template <> struct splitter_for<2> { typedef split2D type; };
 
+        //! generic 1D/2D splitting
+        /**
+         \param patches  a vector or USER_PATCH, which must accept a copy constructor from a generic patch with the same dimension.
+         \param cpus     the maximum number of available CPUS
+         \param zone     the original zone to split
+         */
         template <
         typename USER_PATCH,
         typename PATCH_TYPE>
