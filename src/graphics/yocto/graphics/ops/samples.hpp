@@ -15,10 +15,6 @@ namespace yocto
             inline explicit samples() throw() : _nch(0), _tgt(0), _src(0) {}
             inline virtual ~samples() throw() {}
 
-            struct io_data
-            {
-            };
-
             template <typename T,typename RGB_TYPE>
             inline void split(pixmaps<T>             &tgt,
                               const pixmap<RGB_TYPE> &src,
@@ -59,15 +55,16 @@ namespace yocto
             size_t       _nch;
             void  *      _tgt;
             const void * _src;
-
+            
             template <typename T,typename RGB_TYPE>
             inline void split_cb( xpatch &xp, lockable & )
             {
                 pixmaps<T>             &tgt   = *static_cast<pixmaps<T> *>(_tgt);
                 const pixmap<RGB_TYPE> &src   = *static_cast<const pixmap<RGB_TYPE> *>(_src);
-                const size_t nch   = _nch;
-                const vertex lower = xp.lower;
-                const vertex upper = xp.upper;
+                const size_t            nch   = _nch;
+                const vertex            lower = xp.lower;
+                const vertex            upper = xp.upper;
+
                 for(unit_t j=upper.y;j>=lower.y;--j)
                 {
                     const typename pixmap<RGB_TYPE>::row &s_j = src[j];
@@ -87,11 +84,12 @@ namespace yocto
             template <typename T,typename RGB_TYPE>
             inline void merge_cb( xpatch &xp, lockable & )
             {
-                const pixmaps<T>       &src   = *static_cast<const pixmaps<T> *>(_src);
-                pixmap<RGB_TYPE>       &tgt   = *static_cast<pixmap<RGB_TYPE> *>(_tgt);
-                const size_t nch   = _nch;
-                const vertex lower = xp.lower;
-                const vertex upper = xp.upper;
+                const pixmaps<T> &src   = *static_cast<const pixmaps<T> *>(_src);
+                pixmap<RGB_TYPE> &tgt   = *static_cast<pixmap<RGB_TYPE> *>(_tgt);
+                const size_t      nch   = _nch;
+                const vertex      lower = xp.lower;
+                const vertex      upper = xp.upper;
+
                 for(unit_t j=upper.y;j>=lower.y;--j)
                 {
                     typename pixmap<RGB_TYPE>::row &t_j = tgt[j];
