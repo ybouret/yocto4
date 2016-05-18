@@ -9,21 +9,22 @@ namespace yocto
 {
     namespace graphics
     {
-
+        
         class gradient
         {
         public:
-
+            
             struct io_data
             {
                 float       gmax;
                 void       *tgt;
                 const void *src;
             };
-
+            
             inline explicit gradient() throw() {}
             inline virtual ~gradient() throw() {}
-
+            
+            
             template <typename T>
             inline void start(pixmap<float>      &grd,
                               const pixmap<T>    &img,
@@ -42,11 +43,12 @@ namespace yocto
             }
             
             template <typename T>
-            inline void finish(pixmap<T>           &img,
+            inline void update(pixmap<T>           &img,
                                const pixmap<float> &grd,
                                xpatches            &xps,
                                threading::engine   *server)
             {
+                if(server) server->flush();
                 float gmax = 0;
                 for(size_t i=xps.size();i>0;--i)
                 {
@@ -59,11 +61,13 @@ namespace yocto
                     data.gmax     = gmax;
                     data.src      = &grd;
                     data.tgt      = &img;
+                    xp.enqueue(this, & gradient::normalize<T>,server);
                 }
+                if(server) server->flush();
             }
             
             
-
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(gradient);
             template <typename T>
@@ -89,7 +93,7 @@ namespace yocto
             }
             
             template <typename T>
-            void update( xpatch &xp, lockable &) throw()
+            void normalize( xpatch &xp, lockable &) throw()
             {
                 io_data               &data  = xp.as<io_data>();
                 const pixmap<float>   &g     = *static_cast<const pixmap<float>   *>(data.src);

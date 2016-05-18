@@ -61,6 +61,7 @@ YOCTO_UNIT_TEST_IMPL(ops2)
 
             gradient G;
             G.start(g,ch[0], xps, NULL);
+            
             server.flush();
             PNG.save("image_grad_r.png",g, NULL);
 
