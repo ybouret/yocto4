@@ -58,7 +58,6 @@ namespace yocto
                     gmax = max_of(gmax,xps[i].as<io_data>().gmax);
                 }
 
-                //std::cerr << "gmax=" << gmax << std::endl;
                 // finalize
                 if(gmax>0)
                 {
