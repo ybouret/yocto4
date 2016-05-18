@@ -27,6 +27,13 @@ namespace yocto
                 memory_from_user  //!< using local/static data
             };
 
+            enum position_type
+            {
+                at_lower, //!< x,y <=0
+                is_inner, //!< 0<x,y<w-1,h-1
+                at_upper  //!< x,y >= w-1,h-1
+            };
+
             typedef void * (*xshift_proc)(void *start, unit_t dx);
 
 
@@ -38,7 +45,7 @@ namespace yocto
             void             *entry;  //!< address or first item
             const memory_type model;
             xshift_proc       xshift;
-            
+
             //! allocate a bitmap
             explicit bitmap(const unit_t D, const unit_t W, const unit_t H);
 
@@ -86,7 +93,17 @@ namespace yocto
             void ldz() throw();
 
             void copy(const bitmap &bmp) throw(); //!< assume same sizes
-            
+
+            inline position_type x_position(const unit_t x) const throw()
+            {
+                return (x<=lower.x) ?  at_lower : ( (x>=upper.x) ? at_upper : is_inner );
+            }
+
+            inline position_type y_position(const unit_t y) const throw()
+            {
+                return (y<=lower.y) ?  at_lower : ( (y>=upper.y) ? at_upper : is_inner );
+            }
+
         private:
             YOCTO_DISABLE_ASSIGN(bitmap);
             union

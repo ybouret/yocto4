@@ -40,6 +40,10 @@ namespace yocto
                 return float2byte(greyscalef(R,G,B));
             }
 
+            template <typename T>
+            static T float_to(const float x) throw();
+
+
             //! the 4+4 coordinates around a single point
             static const vertex delta[8];
 
@@ -81,7 +85,20 @@ namespace yocto
 
         };
 
-        
+        template <>
+        inline float gist:: float_to<float>(const float x) throw()
+        {
+            return x;
+        }
+
+        template <>
+        inline uint8_t gist:: float_to<uint8_t>(const float x) throw()
+        {
+            return float2byte(x);
+        }
+
+
+
     }
 }
 

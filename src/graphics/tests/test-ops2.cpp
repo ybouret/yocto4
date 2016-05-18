@@ -40,16 +40,15 @@ YOCTO_UNIT_TEST_IMPL(ops2)
 
         pixmaps<uint8_t> ch(3,w,h);
 
-
+        get_red   get_r;
+        get_green get_g;
+        get_blue  get_b;
         {
             std::cerr << "--- split channels..." << std::endl;
             samples S;
             S.split(ch,pxm,xps,&server);
-            server.flush();
+            
 
-            get_red   get_r;
-            get_green get_g;
-            get_blue  get_b;
             PNG.save("image_r.png", ch[0], get_r, NULL);
             PNG.save("image_g.png", ch[1], get_g, NULL);
             PNG.save("image_b.png", ch[2], get_b, NULL);
@@ -57,14 +56,24 @@ YOCTO_UNIT_TEST_IMPL(ops2)
 
 
         {
+            std::cerr << "--- compute gradient..." << std::endl;
             pixmap<float> g(w,h);
 
             gradient G;
-            G.start(g,ch[0], xps, NULL);
-            
-            server.flush();
-            PNG.save("image_grad_r.png",g, NULL);
+            G.compute(ch[0],g,ch[0], xps, NULL);
+            PNG.save("image_grad_r.png",ch[0], get_r, NULL);
+            G.compute(ch[1],g,ch[1], xps, NULL);
+            PNG.save("image_grad_g.png",ch[1], NULL);
+            G.compute(ch[2],g,ch[2], xps, NULL);
+            PNG.save("image_grad_b.png",ch[2], NULL);
+        }
 
+        pixmap4 bmp(w,h);
+        {
+            std::cerr << "--- merge channels..." << std::endl;
+            samples S;
+            S.merge(ch,bmp,xps,&server);
+            PNG.save("image_grad.png",bmp,NULL);
         }
 
     }

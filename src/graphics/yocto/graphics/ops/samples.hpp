@@ -38,8 +38,28 @@ namespace yocto
                     data.tgt = &tgt;
                     xp.enqueue(this, &samples::split_cb<T,RGB_TYPE>,server);
                 }
-
+                if(server) server->flush();
             }
+
+            template <typename T,typename RGB_TYPE>
+            inline void merge(const pixmaps<T>             &src,
+                              pixmap<RGB_TYPE>             &tgt,
+                              xpatches                     &xps,
+                              threading::engine            *server)
+            {
+                const size_t nch = min_of<size_t>(src.size,sizeof(RGB_TYPE)/sizeof(T));
+                for(size_t i=xps.size();i>0;--i)
+                {
+                    xpatch  &xp   = xps[i];
+                    io_data &data = xp.make<io_data>();
+                    data.nch = nch;
+                    data.src = &src;
+                    data.tgt = &tgt;
+                    xp.enqueue(this, &samples::merge_cb<T,RGB_TYPE>,server);
+                }
+                if(server) server->flush();
+            }
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(samples);
@@ -67,8 +87,34 @@ namespace yocto
                         }
                     }
                 }
-                
             }
+
+            template <typename T,typename RGB_TYPE>
+            inline void merge_cb( xpatch &xp, lockable & )
+            {
+                io_data                &data  = xp.as<io_data>();
+                const pixmaps<T>       &src   = *static_cast<const pixmaps<T> *>(data.src);
+                pixmap<RGB_TYPE>       &tgt   = *static_cast<pixmap<RGB_TYPE> *>(data.tgt);
+                const size_t nch   = data.nch;
+                const vertex lower = xp.lower;
+                const vertex upper = xp.upper;
+                for(unit_t j=upper.y;j>=lower.y;--j)
+                {
+                    typename pixmap<RGB_TYPE>::row &t_j = tgt[j];
+                    for(unit_t i=upper.x;i>=lower.x;--i)
+                    {
+                        RGB_TYPE &C = t_j[i];
+                        typename RGB_TYPE::type *p = (typename RGB_TYPE::type *)&C;
+
+                        for(size_t k=0;k<nch;++k)
+                        {
+                            p[k] = src[k][j][i];
+                        }
+                    }
+                }
+
+            }
+
         };
     }
 }
