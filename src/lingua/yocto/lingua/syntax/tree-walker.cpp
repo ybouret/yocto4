@@ -125,8 +125,8 @@ namespace yocto
                             output->write('\'');
                             output->append(content.c_str(),content.size());
                             output->write('\'');
-                            output->write('\n');
                         }
+                        output->write('\n');
                     }
                     else
                     {
