@@ -11,11 +11,11 @@ using namespace math;
 
 namespace
 {
-    typedef array2D<double>       ScalarField2D;
-    typedef array2D<v2d<double> > VectorField2D;
+    typedef array2D<double>           ScalarField2D;
+    typedef array2D<point2d<double> > VectorField2D;
 
-    typedef array3D<double>       ScalarField3D;
-    typedef array3D<v3d<double> > VectorField3D;
+    typedef array3D<double>           ScalarField3D;
+    typedef array3D<point3d<double> > VectorField3D;
 
 
     template <typename ARR>

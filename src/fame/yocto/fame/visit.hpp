@@ -251,28 +251,28 @@ namespace yocto
             
             
             static inline
-            void set_variable_meta_data( visit_handle &vmd, type2type< math::v2d<float> > )
+            void set_variable_meta_data( visit_handle &vmd, type2type< point2d<float> > )
             {
                 VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_VECTOR );
                 VisIt_VariableMetaData_setNumComponents(vmd, 2);
             }
             
             static inline
-            void set_variable_meta_data( visit_handle &vmd, type2type< math::v2d<double> > )
+            void set_variable_meta_data( visit_handle &vmd, type2type< point2d<double> > )
             {
                 VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_VECTOR );
                 VisIt_VariableMetaData_setNumComponents(vmd, 2);
             }
             
             static inline
-            void set_variable_meta_data( visit_handle &vmd, type2type< math::v3d<float> > )
+            void set_variable_meta_data( visit_handle &vmd, type2type< point3d<float> > )
             {
                 VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_VECTOR );
                 VisIt_VariableMetaData_setNumComponents(vmd, 3);
             }
             
             static inline
-            void set_variable_meta_data( visit_handle &vmd, type2type< math::v3d<double> > )
+            void set_variable_meta_data( visit_handle &vmd, type2type< point3d<double> > )
             {
                 VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_VECTOR );
                 VisIt_VariableMetaData_setNumComponents(vmd, 3);
@@ -307,7 +307,7 @@ namespace yocto
             
             static inline
             void set_variable_data(visit_handle &h,
-                                   type2type< math::v2d<float> >,
+                                   type2type< point2d<float> >,
                                    const void  *entry,
                                    const size_t items)
             {
@@ -316,7 +316,7 @@ namespace yocto
             
             static inline
             void set_variable_data(visit_handle &h,
-                                   type2type< math::v2d<double> >,
+                                   type2type< point2d<double> >,
                                    const void  *entry,
                                    const size_t items)
             {
@@ -325,7 +325,7 @@ namespace yocto
             
             static inline
             void set_variable_data(visit_handle &h,
-                                   type2type< math::v3d<float> >,
+                                   type2type< point3d<float> >,
                                    const void  *entry,
                                    const size_t items)
             {
@@ -334,7 +334,7 @@ namespace yocto
             
             static inline
             void set_variable_data(visit_handle &h,
-                                   type2type< math::v3d<double> >,
+                                   type2type< point3d<double> >,
                                    const void  *entry,
                                    const size_t items)
             {
