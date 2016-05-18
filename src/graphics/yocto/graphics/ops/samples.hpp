@@ -12,14 +12,11 @@ namespace yocto
         class samples
         {
         public:
-            inline explicit samples() throw() {}
+            inline explicit samples() throw() : _nch(0), _tgt(0), _src(0) {}
             inline virtual ~samples() throw() {}
 
             struct io_data
             {
-                size_t      nch;
-                void       *tgt;
-                const void *src;
             };
 
             template <typename T,typename RGB_TYPE>
@@ -28,14 +25,12 @@ namespace yocto
                               xpatches               &xps,
                               threading::engine      *server)
             {
-                const size_t nch = min_of<size_t>(tgt.size,sizeof(RGB_TYPE)/sizeof(T));
+                _nch = min_of<size_t>(tgt.size,sizeof(RGB_TYPE)/sizeof(T));
+                _src = &src;
+                _tgt = &tgt;
                 for(size_t i=xps.size();i>0;--i)
                 {
                     xpatch  &xp   = xps[i];
-                    io_data &data = xp.make<io_data>();
-                    data.nch = nch;
-                    data.src = &src;
-                    data.tgt = &tgt;
                     xp.enqueue(this, &samples::split_cb<T,RGB_TYPE>,server);
                 }
                 if(server) server->flush();
@@ -47,14 +42,12 @@ namespace yocto
                               xpatches                     &xps,
                               threading::engine            *server)
             {
-                const size_t nch = min_of<size_t>(src.size,sizeof(RGB_TYPE)/sizeof(T));
+                _nch = min_of<size_t>(src.size,sizeof(RGB_TYPE)/sizeof(T));
+                _src = &src;
+                _tgt = &tgt;
                 for(size_t i=xps.size();i>0;--i)
                 {
                     xpatch  &xp   = xps[i];
-                    io_data &data = xp.make<io_data>();
-                    data.nch = nch;
-                    data.src = &src;
-                    data.tgt = &tgt;
                     xp.enqueue(this, &samples::merge_cb<T,RGB_TYPE>,server);
                 }
                 if(server) server->flush();
@@ -63,14 +56,16 @@ namespace yocto
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(samples);
+            size_t       _nch;
+            void  *      _tgt;
+            const void * _src;
 
             template <typename T,typename RGB_TYPE>
             inline void split_cb( xpatch &xp, lockable & )
             {
-                io_data                &data  = xp.as<io_data>();
-                pixmaps<T>             &tgt   = *static_cast<pixmaps<T> *>(data.tgt);
-                const pixmap<RGB_TYPE> &src   = *static_cast<const pixmap<RGB_TYPE> *>(data.src);
-                const size_t nch   = data.nch;
+                pixmaps<T>             &tgt   = *static_cast<pixmaps<T> *>(_tgt);
+                const pixmap<RGB_TYPE> &src   = *static_cast<const pixmap<RGB_TYPE> *>(_src);
+                const size_t nch   = _nch;
                 const vertex lower = xp.lower;
                 const vertex upper = xp.upper;
                 for(unit_t j=upper.y;j>=lower.y;--j)
@@ -92,10 +87,9 @@ namespace yocto
             template <typename T,typename RGB_TYPE>
             inline void merge_cb( xpatch &xp, lockable & )
             {
-                io_data                &data  = xp.as<io_data>();
-                const pixmaps<T>       &src   = *static_cast<const pixmaps<T> *>(data.src);
-                pixmap<RGB_TYPE>       &tgt   = *static_cast<pixmap<RGB_TYPE> *>(data.tgt);
-                const size_t nch   = data.nch;
+                const pixmaps<T>       &src   = *static_cast<const pixmaps<T> *>(_src);
+                pixmap<RGB_TYPE>       &tgt   = *static_cast<pixmap<RGB_TYPE> *>(_tgt);
+                const size_t nch   = _nch;
                 const vertex lower = xp.lower;
                 const vertex upper = xp.upper;
                 for(unit_t j=upper.y;j>=lower.y;--j)
