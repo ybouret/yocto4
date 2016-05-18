@@ -63,10 +63,12 @@ YOCTO_UNIT_TEST_IMPL(ops2)
             gradient G;
             G.compute(ch[0],g,ch[0], xps, NULL);
             PNG.save("image_grad_r.png",ch[0], get_r, NULL);
+
             G.compute(ch[1],g,ch[1], xps, NULL);
-            PNG.save("image_grad_g.png",ch[1], NULL);
+            PNG.save("image_grad_g.png",ch[1], get_g, NULL);
+
             G.compute(ch[2],g,ch[2], xps, NULL);
-            PNG.save("image_grad_b.png",ch[2], NULL);
+            PNG.save("image_grad_b.png",ch[2], get_b, NULL);
         }
 
         pixmap4 bmp(w,h);
@@ -78,9 +80,13 @@ YOCTO_UNIT_TEST_IMPL(ops2)
         }
 
         Histogram H;
-        H.update(pxm,xps,&server);
-        H.save("hist.dat");
-
+        {
+            std::cerr << "--- compute histogram..." << std::endl;
+            H.update(pxm,xps,&server);
+            H.save("hist.dat");
+            const size_t t = H.threshold();
+            std::cerr << "threshold=" << t << std::endl;
+        }
     }
 
 }

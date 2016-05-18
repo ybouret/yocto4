@@ -1,12 +1,12 @@
 #include "yocto/graphics/image/png.hpp"
 #include "yocto/graphics/image/jpeg.hpp"
 #include "yocto/graphics/image/tiff.hpp"
-#include "yocto/graphics/ops/hist.hpp"
-#include "yocto/graphics/ops/blob.hpp"
-#include "yocto/graphics/ops/channels.hpp"
-#include "yocto/graphics/ops/grad.hpp"
-#include "yocto/graphics/ops/stencil.hpp"
-#include "yocto/graphics/ops/blur.hpp"
+//#include "yocto/graphics/ops/hist.hpp"
+//#include "yocto/graphics/ops/blob.hpp"
+//#include "yocto/graphics/ops/channels.hpp"
+//#include "yocto/graphics/ops/grad.hpp"
+//#include "yocto/graphics/ops/stencil.hpp"
+//#include "yocto/graphics/ops/blur.hpp"
 #include "yocto/graphics/ops/bilinear.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/graphics/ops/blend.hpp"
@@ -19,6 +19,8 @@ using namespace graphics;
 
 YOCTO_UNIT_TEST_IMPL(ops)
 {
+
+#if 0
     image &IMG = image::instance();
 
     IMG.declare( new png_format()  );
@@ -27,21 +29,6 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
     const image::format &PNG = IMG["PNG"];
 
-#if 0
-    sorted_vector<int> blendval(256*256*256,as_capacity);
-    for(int u=0;u<256;++u)
-    {
-        for(int v=0;v<256;++v)
-        {
-            for(int alpha=0;alpha<256;++alpha)
-            {
-                const int ans = (u*(255-alpha) + v * alpha)/255;
-                (void) blendval.insert(ans);
-            }
-        }
-    }
-    std::cerr << "#values=" << blendval.size() << std::endl;
-#endif
 
 
     threading::engine server(true);
@@ -237,5 +224,6 @@ YOCTO_UNIT_TEST_IMPL(ops)
         
         
     }
+#endif
 }
 YOCTO_UNIT_TEST_DONE()

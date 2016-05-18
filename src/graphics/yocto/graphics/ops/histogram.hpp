@@ -5,6 +5,7 @@
 #include "yocto/graphics/xpatch.hpp"
 #include "yocto/graphics/rgb.hpp"
 #include "yocto/string.hpp"
+#include "yocto/code/bzset.hpp"
 
 namespace yocto
 {
@@ -79,6 +80,10 @@ namespace yocto
             }
 
 
+
+            //! Ostu threshold
+            size_t threshold() const throw();
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Histogram);
             const void *src;
@@ -89,6 +94,67 @@ namespace yocto
                 const pixmap<T> &pxm = *static_cast< const pixmap<T> * >(src);
                 Histogram &H = xp.as<Histogram>();
                 __update<T>(H.count,pxm,xp);
+            }
+        };
+
+
+        struct threshold
+        {
+            enum mode_type
+            {
+                keep_foreground,
+                keep_background
+            };
+
+            template <typename T>
+            inline static
+            void apply(pixmap<T>      &target,
+                       const size_t     t,
+                       const pixmap<T> &source,
+                       mode_type        m ) throw()
+            {
+                assert(source.w==target.w);
+                assert(source.h==target.h);
+                const unit_t w = source.w;
+                const unit_t h = source.h;
+
+                for(unit_t j=0;j<h;++j)
+                {
+                    const typename pixmap<T>::row &Sj = source[j];
+                    typename       pixmap<T>::row &Tj = target[j];
+
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        const T       &src = Sj[i];
+                        const size_t   lvl = project<T>(src);
+                        T             &tgt = Tj[i];
+                        switch(m)
+                        {
+                            case keep_foreground:
+                                if(lvl<=t)
+                                {
+                                    bzset(tgt);
+                                }
+                                else
+                                {
+                                    tgt = src;
+                                }
+                                break;
+
+                            case keep_background:
+                                if(t<=lvl)
+                                {
+                                    bzset(tgt);
+                                }
+                                else
+                                {
+                                    tgt = invert_color(src);
+                                }
+                                break;
+                        }
+                    }
+                }
+                
             }
         };
 
