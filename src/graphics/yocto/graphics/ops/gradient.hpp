@@ -84,8 +84,6 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(gradient);
 
-
-
             template <typename T>
             inline void evaluate( xpatch &xp, lockable & ) throw()
             {
@@ -154,7 +152,7 @@ namespace yocto
             }
 
             template <typename U>
-            void normalize( xpatch &xp, lockable &) throw()
+            inline void normalize( xpatch &xp, lockable &) throw()
             {
                 io_data               &data  = xp.as<io_data>(); assert(data.tgt); assert(data.dst);
                 const pixmap<float>   &g     = *(data.tgt);

@@ -86,7 +86,7 @@ namespace yocto
             inline void update_cb( xpatch &xp, lockable & ) throw()
             {
                 assert(src);
-                const pixmap<T> &pxm = *static_cast< pixmap<T> * >(src);
+                const pixmap<T> &pxm = *static_cast< const pixmap<T> * >(src);
                 Histogram &H = xp.as<Histogram>();
                 __update<T>(H.count,pxm,xp);
             }

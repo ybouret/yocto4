@@ -14,6 +14,11 @@ namespace yocto
             reset();
         }
 
+        Histogram:: ~Histogram() throw()
+        {
+        }
+        
+
         void Histogram:: reset() throw()
         {
             memset(count,0,sizeof(count));

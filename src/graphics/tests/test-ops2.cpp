@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/graphics/ops/gradient.hpp"
 #include "yocto/graphics/ops/samples.hpp"
+#include "yocto/graphics/ops/histogram.hpp"
 
 #include "yocto/graphics/image/png.hpp"
 #include "yocto/graphics/image/jpeg.hpp"
@@ -75,6 +76,10 @@ YOCTO_UNIT_TEST_IMPL(ops2)
             S.merge(ch,bmp,xps,&server);
             PNG.save("image_grad.png",bmp,NULL);
         }
+
+        Histogram H;
+        H.update(pxm,xps,&server);
+        H.save("hist.dat");
 
     }
 
