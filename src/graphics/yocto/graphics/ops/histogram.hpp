@@ -14,7 +14,7 @@ namespace yocto
 
 
         //! one histogram of data
-        class Histogram
+        class histogram
         {
         public:
             static const size_t bins=256;
@@ -22,8 +22,8 @@ namespace yocto
 
             word_type count[256];
 
-            explicit Histogram() throw();
-            virtual ~Histogram() throw();
+            explicit histogram() throw();
+            virtual ~histogram() throw();
 
             //! for parallel code
             template <typename T>
@@ -51,7 +51,7 @@ namespace yocto
                 __update(count, pxm, pxm);
             }
 
-            void collect( const Histogram &H ) throw();
+            void collect( const histogram &H ) throw();
 
             static void __reset(word_type *arr) throw();
             void reset() throw();                   //! everyting to 0
@@ -69,13 +69,13 @@ namespace yocto
                 for(size_t i=np;i>0;--i)
                 {
                     xpatch    &xp = xps[i];
-                    (void) xp.make<Histogram>();
-                    xp.enqueue(this, & Histogram::update_cb<T>, server);
+                    (void) xp.make<histogram>();
+                    xp.enqueue(this, & histogram::update_cb<T>, server);
                 }
                 if(server) server->flush();
                 for(size_t i=np;i>0;--i)
                 {
-                    collect( xps[i].as<Histogram>() );
+                    collect( xps[i].as<histogram>() );
                 }
             }
 
@@ -85,14 +85,14 @@ namespace yocto
             size_t threshold() const throw();
 
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(Histogram);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(histogram);
             const void *src;
             template <typename T>
             inline void update_cb( xpatch &xp, lockable & ) throw()
             {
                 assert(src);
                 const pixmap<T> &pxm = *static_cast< const pixmap<T> * >(src);
-                Histogram &H = xp.as<Histogram>();
+                histogram &H = xp.as<histogram>();
                 __update<T>(H.count,pxm,xp);
             }
         };

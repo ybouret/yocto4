@@ -8,23 +8,23 @@ namespace yocto
     namespace graphics
     {
 
-        Histogram:: Histogram() throw() :
+        histogram:: histogram() throw() :
         count()
         {
             reset();
         }
 
-        Histogram:: ~Histogram() throw()
+        histogram:: ~histogram() throw()
         {
         }
         
 
-        void Histogram:: reset() throw()
+        void histogram:: reset() throw()
         {
             memset(count,0,sizeof(count));
         }
 
-        void Histogram:: save(const string &hname) const
+        void histogram:: save(const string &hname) const
         {
             ios::wcstream fp(hname);
             for(size_t i=0;i<bins;++i)
@@ -33,13 +33,13 @@ namespace yocto
             }
         }
 
-        void Histogram:: save(const char *hname) const
+        void histogram:: save(const char *hname) const
         {
             const string id(hname);
             save(id);
         }
 
-        void Histogram:: collect( const Histogram &H ) throw()
+        void histogram:: collect( const histogram &H ) throw()
         {
             for(size_t i=0;i<bins;++i)
             {
@@ -57,10 +57,10 @@ namespace yocto
     namespace graphics
     {
         static inline
-        double get_full_variance(const Histogram::word_type *count, size_t t)
+        double get_full_variance(const histogram::word_type *count, size_t t)
         {
-            assert(t<Histogram::bins);
-            typedef Histogram::word_type word_t;
+            assert(t<histogram::bins);
+            typedef histogram::word_type word_t;
 
             //__________________________________________________________________
             //
@@ -98,7 +98,7 @@ namespace yocto
             //__________________________________________________________________
             word_t nf = 0;
             double mf = 0;
-            for(size_t i=t;i<Histogram::bins;++i)
+            for(size_t i=t;i<histogram::bins;++i)
             {
                 const word_t n = count[i];
                 nf += n;
@@ -113,7 +113,7 @@ namespace yocto
             if(nf>0)
             {
                 mf /= nf;
-                for(size_t i=t;i<Histogram::bins;++i)
+                for(size_t i=t;i<histogram::bins;++i)
                 {
                     const double d = double(i) - mf;
                     vf += double(count[i]) * d*d;
@@ -133,7 +133,7 @@ namespace yocto
         }
 
 
-        size_t Histogram:: threshold() const throw()
+        size_t histogram:: threshold() const throw()
         {
             size_t ans = 0;
             double opt = get_full_variance(count,ans);

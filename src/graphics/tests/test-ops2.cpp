@@ -79,13 +79,17 @@ YOCTO_UNIT_TEST_IMPL(ops2)
             PNG.save("image_grad.png",bmp,NULL);
         }
 
-        Histogram H;
+        histogram H;
         {
             std::cerr << "--- compute histogram..." << std::endl;
             H.update(pxm,xps,&server);
             H.save("hist.dat");
             const size_t t = H.threshold();
             std::cerr << "threshold=" << t << std::endl;
+            threshold::apply(bmp, t, pxm, threshold::keep_foreground);
+            PNG.save("image_fg.png", bmp, NULL);
+            threshold::apply(bmp, t, pxm, threshold::keep_background);
+            PNG.save("image_bg.png", bmp, NULL);
         }
     }
 
