@@ -8,6 +8,8 @@
 #include "yocto/graphics/image/jpeg.hpp"
 #include "yocto/graphics/image/tiff.hpp"
 
+#include "yocto/sys/timings.hpp"
+
 using namespace yocto;
 using namespace graphics;
 
@@ -23,7 +25,8 @@ YOCTO_UNIT_TEST_IMPL(ops2)
 
 
     threading::engine server(true);
-
+    timings           tmx;
+    
     if(argc>1)
     {
         const string filename = argv[1];
@@ -35,20 +38,35 @@ YOCTO_UNIT_TEST_IMPL(ops2)
         xpatches xps;
         xpatch::create(xps, pxm, &server);
 
+        xpatches seq;
+        xpatch::create(seq,pxm, NULL);
+
+
         std::cerr << "w=" << w << std::endl;
         std::cerr << "h=" << h << std::endl;
         std::cerr << "#patches=" << xps.size() << std::endl;
 
         pixmaps<uint8_t> ch(3,w,h);
 
+
         get_red   get_r;
         get_green get_g;
         get_blue  get_b;
+#define DURATION 3
+
         {
             std::cerr << "--- split channels..." << std::endl;
             samples S;
-            S.split(ch,pxm,xps,&server);
-            
+            std::cerr << "\tsequential" << std::endl;
+            YOCTO_TIMINGS(tmx, DURATION, S.split(ch,pxm,seq,NULL));
+            const double split_seq = tmx.speed;
+            std::cerr << "\tsplit_seq=" << split_seq << " fps" << std::endl;
+
+            std::cerr << "\tparallel" << std::endl;
+            YOCTO_TIMINGS(tmx,DURATION,S.split(ch,pxm,xps,&server));
+            const double split_par = tmx.speed;
+            std::cerr << "\tsplit_par=" << split_par << " fps" << std::endl;
+
 
             PNG.save("image_r.png", ch[0], get_r, NULL);
             PNG.save("image_g.png", ch[1], get_g, NULL);
