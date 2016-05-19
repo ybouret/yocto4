@@ -54,7 +54,8 @@ YOCTO_UNIT_TEST_IMPL(ops2)
         get_blue  get_b;
 #define DURATION 3
 
-        bool check_speedup = true;
+        bool check_speedup = false;
+        
 
         {
             std::cerr << "--- split channels..." << std::endl;
@@ -84,32 +85,55 @@ YOCTO_UNIT_TEST_IMPL(ops2)
 
         {
             std::cerr << "--- compute gradient..." << std::endl;
-            pixmap<float> g(w,h);
+            pixmap<float> gr(w,h);
+            pixmap<float> gg(w,h);
+            pixmap<float> gb(w,h);
+
             gradient G;
 
             if(check_speedup)
             {
                 std::cerr << "\tsequential" << std::endl;
-                YOCTO_TIMINGS(tmx, DURATION, G.compute(ch[0],g,ch[0], seq, NULL));
+                YOCTO_TIMINGS(tmx, DURATION, G.compute(ch[0],gr,ch[0], seq, NULL));
                 const double grad_seq = tmx.speed;
                 std::cerr << "\tgrad_seq=" << grad_seq << " fps" << std::endl;
 
                 std::cerr << "\tparallel" << std::endl;
-                YOCTO_TIMINGS(tmx, DURATION, G.compute(ch[0],g,ch[0], xps, &server));
+                YOCTO_TIMINGS(tmx, DURATION, G.compute(ch[0],gr,ch[0], xps, &server));
                 const double grad_par = tmx.speed;
                 std::cerr << "\tgrad_par=" << grad_par << " fps" << std::endl;
                 std::cerr << "\t\tspeedup=" << grad_par/grad_seq << std::endl;
 
             }
 
-            G.compute(ch[0],g,ch[0], xps, &server);
+            const float mr = G.compute(ch[0],gr,ch[0], xps, &server);
             PNG.save("image_grad_r.png",ch[0], get_r, NULL);
 
-            G.compute(ch[1],g,ch[1], xps, &server);
+            const float mg = G.compute(ch[1],gg,ch[1], xps, &server);
             PNG.save("image_grad_g.png",ch[1], get_g, NULL);
 
-            G.compute(ch[2],g,ch[2], xps, &server);
+            const float mb = G.compute(ch[2],gb,ch[2], xps, &server);
             PNG.save("image_grad_b.png",ch[2], get_b, NULL);
+
+            pixmap3 GG(w,h);
+            const float mc = max_of( max_of(mr,mg), mb );
+            if(mc>0)
+            {
+                const float gfac = 1.0 / mc;
+                for(unit_t j=0;j<h;++j)
+                {
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        RGB C(gist::float2byte(gr[j][i]*gfac),
+                              gist::float2byte(gg[j][i]*gfac),
+                              gist::float2byte(gb[j][i]*gfac));
+                        GG[j][i] = C;
+                    }
+                }
+            }
+            PNG.save("image_grad_rgb.png",GG, NULL);
+
+
         }
 
         pixmap4 bmp(w,h);
