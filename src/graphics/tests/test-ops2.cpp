@@ -55,7 +55,7 @@ YOCTO_UNIT_TEST_IMPL(ops2)
 #define DURATION 3
 
         bool check_speedup = false;
-        
+
 
         {
             std::cerr << "--- split channels..." << std::endl;
