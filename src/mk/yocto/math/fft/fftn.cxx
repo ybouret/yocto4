@@ -20,7 +20,6 @@ namespace yocto
             assert(1==isign||-1==isign);
 
             size_t  i1,i2,i3,i2rev,i3rev,ip1,ip2,ip3,ifp1,ifp2;
-            size_t  k1,k2;
 
             size_t ntot=1;
             for(size_t idim=1;idim<=ndim;++idim)
@@ -81,8 +80,8 @@ namespace yocto
                         {
                             for(i2=i1;i2<=ip3;i2+=ifp2)
                             {
-                                k1=i2;
-                                k2=k1+ifp1;
+                                const size_t k1=i2;
+                                const size_t k2=k1+ifp1;
                                 const size_t k1p1 = k1+1;
                                 const size_t k2p1 = k2+1;
                                 const real_t tempr=real_t(wr)*data[k2]  -real_t(wi)*data[k2p1];
@@ -105,7 +104,7 @@ namespace yocto
             const real_t coef = real_t(1.0/sqrt( double(ntot) ));
 #define _YOCTO_FFT_SCALE(INDEX) data[INDEX] *= coef
             YOCTO_LOOP_FUNC_(ntot<<1,_YOCTO_FFT_SCALE,1);
-
+            
             
         }
         
