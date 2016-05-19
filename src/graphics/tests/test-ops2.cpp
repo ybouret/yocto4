@@ -26,7 +26,7 @@ YOCTO_UNIT_TEST_IMPL(ops2)
 
     threading::engine server(true);
     timings           tmx;
-    
+
     if(argc>1)
     {
         const string filename = argv[1];
@@ -54,20 +54,28 @@ YOCTO_UNIT_TEST_IMPL(ops2)
         get_blue  get_b;
 #define DURATION 3
 
+        bool check_speedup = true;
+
         {
             std::cerr << "--- split channels..." << std::endl;
             samples S;
-            std::cerr << "\tsequential" << std::endl;
-            YOCTO_TIMINGS(tmx, DURATION, S.split(ch,pxm,seq,NULL));
-            const double split_seq = tmx.speed;
-            std::cerr << "\tsplit_seq=" << split_seq << " fps" << std::endl;
+            if(check_speedup)
+            {
+                std::cerr << "\tsequential" << std::endl;
+                YOCTO_TIMINGS(tmx, DURATION, S.split(ch,pxm,seq,NULL));
+                const double split_seq = tmx.speed;
+                std::cerr << "\tsplit_seq=" << split_seq << " fps" << std::endl;
 
-            std::cerr << "\tparallel" << std::endl;
-            YOCTO_TIMINGS(tmx,DURATION,S.split(ch,pxm,xps,&server));
-            const double split_par = tmx.speed;
-            std::cerr << "\tsplit_par=" << split_par << " fps" << std::endl;
+                std::cerr << "\tparallel" << std::endl;
+                YOCTO_TIMINGS(tmx,DURATION,S.split(ch,pxm,xps,&server));
+                const double split_par = tmx.speed;
+                std::cerr << "\tsplit_par=" << split_par << " fps" << std::endl;
 
+                std::cerr << "\t\tspeedup=" << split_par/split_seq << std::endl;
 
+            }
+
+            S.split(ch,pxm,xps,&server);
             PNG.save("image_r.png", ch[0], get_r, NULL);
             PNG.save("image_g.png", ch[1], get_g, NULL);
             PNG.save("image_b.png", ch[2], get_b, NULL);
@@ -77,15 +85,30 @@ YOCTO_UNIT_TEST_IMPL(ops2)
         {
             std::cerr << "--- compute gradient..." << std::endl;
             pixmap<float> g(w,h);
-
             gradient G;
-            G.compute(ch[0],g,ch[0], xps, NULL);
+
+            if(check_speedup)
+            {
+                std::cerr << "\tsequential" << std::endl;
+                YOCTO_TIMINGS(tmx, DURATION, G.compute(ch[0],g,ch[0], seq, NULL));
+                const double grad_seq = tmx.speed;
+                std::cerr << "\tgrad_seq=" << grad_seq << " fps" << std::endl;
+
+                std::cerr << "\tparallel" << std::endl;
+                YOCTO_TIMINGS(tmx, DURATION, G.compute(ch[0],g,ch[0], xps, &server));
+                const double grad_par = tmx.speed;
+                std::cerr << "\tgrad_par=" << grad_par << " fps" << std::endl;
+                std::cerr << "\t\tspeedup=" << grad_par/grad_seq << std::endl;
+
+            }
+
+            G.compute(ch[0],g,ch[0], xps, &server);
             PNG.save("image_grad_r.png",ch[0], get_r, NULL);
 
-            G.compute(ch[1],g,ch[1], xps, NULL);
+            G.compute(ch[1],g,ch[1], xps, &server);
             PNG.save("image_grad_g.png",ch[1], get_g, NULL);
 
-            G.compute(ch[2],g,ch[2], xps, NULL);
+            G.compute(ch[2],g,ch[2], xps, &server);
             PNG.save("image_grad_b.png",ch[2], get_b, NULL);
         }
 
@@ -93,6 +116,23 @@ YOCTO_UNIT_TEST_IMPL(ops2)
         {
             std::cerr << "--- merge channels..." << std::endl;
             samples S;
+
+            if(check_speedup)
+            {
+                std::cerr << "\tsequential" << std::endl;
+                YOCTO_TIMINGS(tmx, DURATION, S.merge(ch,bmp,seq,NULL) );
+                const double merge_seq = tmx.speed;
+                std::cerr << "\tmerge_seq=" << merge_seq << " fps" << std::endl;
+
+
+                std::cerr << "\tparallel" << std::endl;
+                YOCTO_TIMINGS(tmx, DURATION, S.merge(ch,bmp,xps,&server) );
+                const double merge_par = tmx.speed;
+                std::cerr << "\tmerge_par=" << merge_par << " fps" << std::endl;
+
+                std::cerr << "\t\tspeedup=" << merge_par/merge_seq << std::endl;
+            }
+
             S.merge(ch,bmp,xps,&server);
             PNG.save("image_grad.png",bmp,NULL);
         }
@@ -100,6 +140,24 @@ YOCTO_UNIT_TEST_IMPL(ops2)
         histogram H;
         {
             std::cerr << "--- compute histogram..." << std::endl;
+            if(check_speedup)
+            {
+                H.reset();
+                std::cerr << "\tsequential" << std::endl;
+                YOCTO_TIMINGS(tmx, DURATION, H.update(pxm,seq,NULL));
+                const double hist_seq = tmx.speed;
+                std::cerr << "\thist_seq=" << hist_seq << " fps" << std::endl;
+
+                H.reset();
+                std::cerr << "\tparallel" << std::endl;
+                YOCTO_TIMINGS(tmx, DURATION, H.update(pxm,xps,&server));
+                const double hist_par = tmx.speed;
+                std::cerr << "\thist_par=" << hist_par << " fps" << std::endl;
+                std::cerr << "\t\tspeedup=" << hist_par/hist_seq << std::endl;
+
+            }
+
+            H.reset();
             H.update(pxm,xps,&server);
             H.save("hist.dat");
             const size_t t = H.threshold();
@@ -110,6 +168,6 @@ YOCTO_UNIT_TEST_IMPL(ops2)
             PNG.save("image_bg.png", bmp, NULL);
         }
     }
-
+    
 }
 YOCTO_UNIT_TEST_DONE()
