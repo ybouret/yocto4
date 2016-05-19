@@ -4,7 +4,6 @@
 #include "yocto/graphics/rawpix.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/graphics/named-colors.hpp"
-#include "yocto/graphics/ops/blend.hpp"
 
 using namespace yocto;
 using namespace spade;
@@ -32,7 +31,7 @@ YOCTO_UNIT_TEST_IMPL(tr2d)
             tr[i].y = alea_lt(h);
         }
 
-        const graphics::RGB c = graphics::named_color::fetch(iter);
+        //const graphics::RGB c = graphics::named_color::fetch(iter);
         for(unit_t j=0;j<h;++j)
         {
             for(unit_t i=0;i<w;++i)
@@ -40,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(tr2d)
                 const vertex p(i,j);
                 if( point_in_triangle2d::check(p, tr[0], tr[1], tr[2], 0.001) )
                 {
-                    img[j][i] = graphics::blend::mix(img[j][i], c, 128);
+                    //img[j][i] = graphics::blend::mix(img[j][i], c, 128);
                 }
             }
         }

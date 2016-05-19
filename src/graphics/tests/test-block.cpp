@@ -3,7 +3,6 @@
 #include "yocto/graphics/image/tiff.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ptr/auto.hpp"
-#include "yocto/graphics/ops/fft.hpp"
 #include "yocto/graphics/ops/bilinear.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/graphics/ramp/cold_to_very_hot.hpp"
