@@ -15,7 +15,7 @@ YOCTO_UNIT_TEST_IMPL(init)
 
     type_glossary<MPI_Datatype> tg;
     tg.enroll<char>(MPI_CHAR);
-    tg.enroll<int8_t>(MPI_INT8_T);
+    //tg.enroll<int8_t>(MPI_INT8_T);
     
 
 }
