@@ -19,7 +19,7 @@ namespace yocto
             frame_t  *next;
             frame_t  *prev;
             ptrdiff_t bp;
-            ptrdiff_t tp;
+            ptrdiff_t lp;
         };
 
         virtual ~dynstack() throw()
@@ -47,16 +47,17 @@ namespace yocto
             {
                 frame_t *fc = object::acquire1<frame_t>();
                 fc->bp = f->bp;
-                fc->tp = f->tp;
+                fc->lp = f->lp;
                 hist.push_back(fc);
             }
         }
 
-        void save(const ptrdiff_t bp, const ptrdiff_t tp)
+        void save(const ptrdiff_t bp,
+                  const ptrdiff_t lp)
         {
             frame_t *f = pool.size ? pool.query() : object::acquire1<frame_t>();
             f->bp = bp;
-            f->tp = tp;
+            f->lp = lp;
             hist.push_back(f);
         }
 
