@@ -6,6 +6,7 @@
 #include "yocto/core/pool.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/object.hpp"
+#include "yocto/container/container.hpp"
 
 namespace yocto
 {
@@ -51,7 +52,13 @@ namespace yocto
             }
         }
 
-
+        void save(const ptrdiff_t bp, const ptrdiff_t tp)
+        {
+            frame_t *f = pool.size ? pool.query() : object::acquire1<frame_t>();
+            f->bp = bp;
+            f->tp = tp;
+            hist.push_back(f);
+        }
 
 
     private:
@@ -62,6 +69,7 @@ namespace yocto
     class dynstack_of : public dynstack
     {
     public:
+        YOCTO_ARGUMENTS_DECL_T;
 
         inline virtual ~dynstack_of() throw()
         {
@@ -108,6 +116,17 @@ namespace yocto
             __copy(other);
         }
 
+        inline void swap_with( dynstack_of &other ) throw()
+        {
+            hist.swap_with(other.hist);
+            pool.swap_with(other.pool);
+            cswap(items,other.items);
+            cswap(maxi_,other.maxi_);
+            cswap(addr_,other.addr_);
+            cswap(base_,other.base_);
+            cswap(last_,other.last_);
+        }
+
         //! #objects in current frame
         inline size_t size() const throw()
         {
@@ -116,8 +135,31 @@ namespace yocto
             return size_t(static_cast<ptrdiff_t>(last_-base_)-1);
         }
 
+        inline void push_frame()
+        {
+            this->save(static_cast<ptrdiff_t>(base_-addr_),
+                       static_cast<ptrdiff_t>(last_-addr_));
+        }
 
+        inline void reserve(size_t n)
+        {
+            if(n>0)
+            {
+                dynstack tmp(*this,n);
+                swap_with(tmp);
+            }
+        }
 
+        inline void push( param_type arg )
+        {
+            if(items>=maxi_)
+            {
+                reserve( container::next_increase(maxi_) );
+            }
+            assert(items<maxi_);
+            assert(last_<base_+items);
+            new ( last_ ) slot_type( new type(arg) );
+        }
 
 
     private:
