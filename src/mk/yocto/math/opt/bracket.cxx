@@ -8,76 +8,102 @@ namespace yocto {
 	namespace math {
 		
 		template <>
-		bool bracket<real_t>::inside(numeric<real_t>::function    & func,
+		void bracket<real_t>::inside(numeric<real_t>::function    & func,
 									 triplet<real_t>              & x,
 									 triplet<real_t>              & f )
 		{
-			static const real_t fmax = Sqrt(numeric<real_t>::ftol);     //!< numeric constraint
-			//==================================================================
-			//
-			// try to find x.b so that f.b <= f.a and f.b <= f.c
-			//
-			//==================================================================
-			
-			while( Fabs(x.c-x.a) > fmax * ( Fabs(x.a) + Fabs(x.c) ))
-			{
-				x.b = REAL(0.5)*(x.a + x.c);
-				f.b = func(x.b);
-				
-				if( f.b > f.a )
-				{
-					//----------------------------------------------------------
-					// a bump is detected between a and c
-					// move c at this bump !
-					//----------------------------------------------------------
-					x.c = x.b;
-					f.c = f.b;
-					continue;
-				}
-				else {
-					//-- going to b will decrease the function
-					assert( f.b <= f.a );
-					if( f.b > f.c )
-					{
-						//------------------------------------------------------
-						// the minimum lies between b and c
-						// move a at b
-						//------------------------------------------------------
-						x.a = x.b;
-						f.a = f.b;
-						continue;
-					}
-					else
-					{
-						//-- success !
-						assert( f.b <= f.c );
-						assert( f.b <= f.a );
-						assert( (x.a<=x.b&& x.b<=x.c) || ( x.a>=x.b && x.b>=x.c) );
-						return true;
-					}
-				}
-				
-			}
-			
-			//==================================================================
-			// no convergence=> one side is a minimum
-			// prepare the triplets so that minimize will work !
-			//==================================================================
-			if( f.a < f.c )
-			{
-				x.b = x.c = x.a;
-				f.b = f.c = f.a;
-			}
-			else
-			{
-				x.b = x.a = x.c;
-				f.b = f.a = f.c;
-			}
-			assert( f.b <= f.c );
-			assert( f.b <= f.a );
-			assert( (x.a<=x.b && x.b<=x.c) || ( x.a>=x.b && x.b>=x.c) );
-			return false;
-		}
+
+            // ordering..
+            if(x.a>x.c)
+            {
+                cswap(x.a, x.c);
+                cswap(f.a, f.c);
+            }
+
+            //__________________________________________________________________
+            //
+            // try to find x.b so that f.b <= f.a and f.b <= f.c
+            //__________________________________________________________________
+            const int GTA = 1;
+            const int GTC = 2;
+
+            // and at least one turn
+            double width = x.c-x.a; assert(width>=0);
+            for(;;)
+            {
+                x.b = clamp(x.a,x.a + REAL(0.5)*(x.c-x.a),x.c);
+                f.b = func(x.b);
+                assert(x.a<=x.b);
+                assert(x.b<=x.c);
+                int flag = 0;
+                if(f.b>f.c) flag |= GTC;
+                if(f.b>f.a) flag |= GTA;
+
+                switch(flag)
+                {
+
+                    case GTA:
+                        assert(f.b<=f.c);
+                        assert(f.b>f.a);
+                        // move c to b
+                        x.c = x.b;
+                        f.c = f.b;
+                        break;
+
+                    case GTC:
+                        assert(f.b<=f.a);
+                        assert(f.b>f.c);
+                        // move a to b
+                        x.a = x.b;
+                        f.a = f.b;
+                        break;
+
+                    case GTA|GTC:
+                        assert(f.b>f.c);
+                        assert(f.b>f.a);
+                        // got to make a choice..
+                        if(f.a<=f.c)
+                        {
+                            x.c = x.b;
+                            f.c = f.b;
+                        }
+                        else
+                        {
+                            x.a=x.b;
+                            f.a=f.b;
+                        }
+                        break;
+
+
+                    default:
+                        assert(f.b<=f.a);
+                        assert(f.b<=f.c);
+                        return;
+                }
+
+                const double new_width = x.c-x.a;
+                if(new_width>=width)
+                {
+                    // one min is numerically on the side
+                    break;
+                }
+
+                width = new_width;
+            }
+
+            // prepare the triplet so that minimize shall work...
+            if( f.a <= f.c )
+            {
+                x.b = x.c = x.a;
+                f.b = f.c = f.a;
+            }
+            else
+            {
+                x.b = x.a = x.c;
+                f.b = f.a = f.c;
+            }
+
+        }
 		
 #define SHFT(a,b,c,d) do{ (a)=(b);(b)=(c);(c)=(d); } while(false)
         

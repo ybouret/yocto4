@@ -25,10 +25,7 @@ static inline void optim(PROC &proc, T xtol)
     typename numeric<T>::function func( cfunctor(F<float>) );
     triplet<T> x = { 1, 0 , -1};
     triplet<T> f = { func(x.a), 0, func(x.c) };
-    if( ! bracket<T>::inside( func, x, f ) )
-    {
-        throw exception("Couldn't bracket !");
-    }
+    bracket<T>::inside( func, x, f );
     std::cerr << "x=" << x << std::endl;
     std::cerr << "f=" << f << std::endl;
     
