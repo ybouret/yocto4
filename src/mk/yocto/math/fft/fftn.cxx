@@ -19,7 +19,7 @@ namespace yocto
             assert(ndim>0);
             assert(1==isign||-1==isign);
 
-            size_t  i1,i2,i3,i2rev,i3rev,ip1,ip2,ip3,ifp1,ifp2;
+            size_t  i1,i2,i3,i2rev,ip1,ip2,ip3;
 
             size_t ntot=1;
             for(size_t idim=1;idim<=ndim;++idim)
@@ -46,10 +46,8 @@ namespace yocto
                         {
                             for(i3=i1;i3<=ip3;i3+=ip2)
                             {
-                                i3rev=i2rev+i3-i2;
+                                const size_t i3rev=(i2rev+i3)-i2;
                                 core::bswap<sizeof(complex<real_t>)>(&data[i3],&data[i3rev]);
-                                //cswap(data[i3],data[i3rev]);
-                                //cswap(data[i3+1],data[i3rev+1]);
                             }
                         }
                     }
@@ -62,11 +60,11 @@ namespace yocto
                     i2rev += ibit;
                 }
 
-                ifp1=ip1;
+                size_t ifp1=ip1;
                 const double sgn_two_pi = 6.28318530717958623199592693708837032318115234375 * isign;
                 while (ifp1 < ip2)
                 {
-                    ifp2  = ifp1 << 1;
+                    const size_t ifp2  = ifp1 << 1;
                     const double theta = sgn_two_pi/(ifp2/ip1);
                     double       wtemp = sin(0.5*theta);
                     const double wpr   = -2.0*wtemp*wtemp;
@@ -80,8 +78,8 @@ namespace yocto
                         {
                             for(i2=i1;i2<=ip3;i2+=ifp2)
                             {
-                                const size_t k1=i2;
-                                const size_t k2=k1+ifp1;
+                                const size_t k1   = i2;
+                                const size_t k2   = k1+ifp1;
                                 const size_t k1p1 = k1+1;
                                 const size_t k2p1 = k2+1;
                                 const real_t tempr=real_t(wr)*data[k2]  -real_t(wi)*data[k2p1];
