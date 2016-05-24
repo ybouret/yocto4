@@ -168,6 +168,7 @@ namespace yocto
         size_t     items;
         size_t     maxi_;
         slot_type *addr_;
+        
         slot_type *base_;
         slot_type *last_;
 
