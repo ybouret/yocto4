@@ -37,5 +37,13 @@ YOCTO_UNIT_TEST_IMPL(dynstack)
         dss.pop();
     }
 
+    for(size_t i=10+alea_leq(10);i>0;--i)
+    {
+        dss.push( gen<string>::get() );
+    }
+    std::cerr << "dss.size=" << dss.size() << "/items=" << dss.items() << std::endl;
+    dss.start_frame();
+    std::cerr << "dss.size=" << dss.size() << std::endl;
+
 }
 YOCTO_UNIT_TEST_DONE()

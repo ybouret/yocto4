@@ -37,8 +37,11 @@ namespace yocto
 
         void clean_history() throw()
         {
-            while(hist.size) pool.store( hist.pop_back() );
-                }
+            while(hist.size)
+            {
+                pool.store( hist.pop_back() );
+            }
+        }
 
         dynstack(const dynstack &other) :
         hist(),
@@ -91,7 +94,7 @@ assert(tail_+1==top_)
 
         inline dynstack_of() throw() :
         dynstack(),
-        items(0),
+        itms_(0),
         maxi_(0),
         addr_(0),
         YOCTO_DYNSTACK_CTOR()
@@ -101,7 +104,7 @@ assert(tail_+1==top_)
 
         inline dynstack_of(size_t n, const as_capacity_t &) :
         dynstack(),
-        items(0),
+        itms_(0),
         maxi_(n),
         addr_( memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
         YOCTO_DYNSTACK_CTOR()
@@ -111,7 +114,7 @@ assert(tail_+1==top_)
 
         inline dynstack_of(const dynstack_of &other) :
         dynstack(other),
-        items(0),
+        itms_(0),
         maxi_(other.size_),
         addr_( memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
         YOCTO_DYNSTACK_CTOR()
@@ -122,8 +125,8 @@ assert(tail_+1==top_)
         }
 
         inline dynstack_of(const dynstack_of &other, const size_t n) :
-        items(0),
-        maxi_(other.items+n),
+        itms_(0),
+        maxi_(other.itms_+n),
         addr_(memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
         YOCTO_DYNSTACK_CTOR()
         {
@@ -136,7 +139,7 @@ assert(tail_+1==top_)
         {
             hist.swap_with(other.hist);
             pool.swap_with(other.pool);
-            cswap(items,other.items);
+            cswap(itms_,other.itms_);
             cswap(maxi_,other.maxi_);
             cswap(addr_,other.addr_);
             cswap(head_,other.head_);
@@ -153,11 +156,24 @@ assert(tail_+1==top_)
             return size_t(static_cast<ptrdiff_t>(top_-head_));
         }
 
-        inline void save_frame()
+        inline size_t capacity() const throw()
+        {
+            return maxi_;
+        }
+
+        inline size_t items() const throw()
+        {
+            return itms_;
+        }
+
+        inline void start_frame()
         {
             YOCTO_DYNSTACK_CHECK();
             this->save(static_cast<ptrdiff_t>(head_-addr_),
                        static_cast<ptrdiff_t>(tail_-addr_));
+            head_ = top_;
+            tail_ = head_-1;
+            sub_  = head_-1;
         }
 
         inline void reserve(size_t n)
@@ -173,7 +189,7 @@ assert(tail_+1==top_)
 
         inline void push( param_type arg )
         {
-            if(items>=maxi_)
+            if(itms_>=maxi_)
             {
                 reserve( container::next_increase(maxi_) );
             }
@@ -182,7 +198,7 @@ assert(tail_+1==top_)
             new (top_) slot_type( new type(arg) );
             ++top_;
             ++tail_;
-            ++items;
+            ++itms_;
         }
 
         inline void pop() throw()
@@ -192,13 +208,22 @@ assert(tail_+1==top_)
             destruct<slot_type>(tail_);
             --tail_;
             --top_;
-            --items;
+            --itms_;
+        }
+
+        //! free current frame
+        inline void free() throw()
+        {
+            while(tail_>=head_)
+            {
+                pop();
+            }
         }
 
 
     private:
         typedef shared_ptr<T> slot_type;
-        size_t     items;
+        size_t     itms_;
         size_t     maxi_;
         slot_type *addr_;
 
@@ -221,11 +246,11 @@ assert(tail_+1==top_)
 
 
         // free all slots
-        inline void __free() throw()
+        inline void __free_all() throw()
         {
-            while(items>0)
+            while(itms_>0)
             {
-                destruct<slot_type>(&addr_[--items]);
+                destruct<slot_type>(&addr_[--itms_]);
             }
             reset();
             clean_history();
@@ -234,7 +259,7 @@ assert(tail_+1==top_)
         // free slots and release memory
         inline void __release() throw()
         {
-            __free();
+            __free_all();
             memory::kind<memory::global>::release_as<slot_type>(addr_, maxi_);
             reset();
         }
@@ -243,12 +268,12 @@ assert(tail_+1==top_)
         inline void __copy(const dynstack_of &other) throw()
         {
             assert(this!=&other);
-            assert(0==items);
-            assert(maxi_>=other.items);
-            while(items<other.items)
+            assert(0==itms_);
+            assert(maxi_>=other.itms_);
+            while(itms_<other.itms_)
             {
-                new ( &addr_[items] ) slot_type(other.addr_[items]);
-                ++items;
+                new ( &addr_[itms_] ) slot_type(other.addr_[itms_]);
+                ++itms_;
             }
             head_ = addr_ + static_cast<ptrdiff_t>(other.head_-other.addr_);
             tail_ = addr_ + static_cast<ptrdiff_t>(other.tail_-other.addr_);
@@ -256,7 +281,7 @@ assert(tail_+1==top_)
             top_  = tail_+1;
             YOCTO_DYNSTACK_CHECK();
         }
-
+        
     };
 }
 
