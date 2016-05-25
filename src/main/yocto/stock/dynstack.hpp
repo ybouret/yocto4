@@ -208,6 +208,45 @@ assert(tail_+1==top_)
 
         inline virtual const char *name() const throw() { return hidden::dynstack_name; }
 
+        inline type &peek() throw()
+        {
+            assert(height()>0);
+            return **tail_;
+        }
+
+        inline const_type &peek() const throw()
+        {
+            assert(height()>0);
+            return **tail_;
+        }
+
+        inline type &base() throw()
+        {
+            assert(height()>0);
+            return **head_;
+        }
+
+        inline const_type &base() const throw()
+        {
+            assert(height()>0);
+            return **head_;
+        }
+
+        inline type & operator[](int n) throw()
+        {
+            assert(abs(n)>0);
+            assert(abs(n)<=height());
+            if(n>0)
+            {
+                return *sub_[n];
+            }
+            else
+            {
+                return *top_[n];
+            }
+        }
+
+
     private:
         typedef shared_ptr<T> slot_type;
         size_t     itms_;

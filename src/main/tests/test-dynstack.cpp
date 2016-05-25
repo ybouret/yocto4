@@ -49,10 +49,19 @@ YOCTO_UNIT_TEST_IMPL(dynstack)
         dss.push( gen<string>::get() );
     }
     std::cerr << "dss.height=" << dss.height() << "/size=" << dss.size() << std::endl;
+    for(ptrdiff_t i=ptrdiff_t(dss.height());i>0;--i)
+    {
+        std::cerr << i << " : " << dss[i] << std::endl;
+    }
+    std::cerr << std::endl;;
+    for(ptrdiff_t i=-1;i>=-ptrdiff_t(dss.height());--i)
+    {
+        std::cerr << i << " : " << dss[i] << std::endl;
+    }
+
     dss.clear();
     std::cerr << "dss.height=" << dss.height() << "/size=" << dss.size() << std::endl;
 
-    
 
 }
 YOCTO_UNIT_TEST_DONE()
