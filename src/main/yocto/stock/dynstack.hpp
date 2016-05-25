@@ -7,6 +7,7 @@
 #include "yocto/core/list.hpp"
 #include "yocto/object.hpp"
 #include "yocto/container/container.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -37,7 +38,7 @@ namespace yocto
         void clean_history() throw()
         {
             while(hist.size) pool.store( hist.pop_back() );
-        }
+                }
 
         dynstack(const dynstack &other) :
         hist(),
@@ -66,6 +67,17 @@ namespace yocto
         YOCTO_DISABLE_ASSIGN(dynstack);
     };
 
+#define YOCTO_DYNSTACK_CTOR() \
+head_(addr_   ),  \
+tail_(head_-1 ),  \
+sub_( head_-1 ),  \
+top_( tail_+1 )
+
+#define YOCTO_DYNSTACK_CHECK() \
+assert(head_>=addr_);          \
+assert(head_-1==sub_);         \
+assert(tail_+1==top_)
+
     template <typename T>
     class dynstack_of : public dynstack
     {
@@ -82,22 +94,19 @@ namespace yocto
         items(0),
         maxi_(0),
         addr_(0),
-        head_(0),
-        tail_(head_-1),
-        sub_(head_-1),
-        top_(tail_+1)
-        {}
+        YOCTO_DYNSTACK_CTOR()
+        {
+            YOCTO_DYNSTACK_CHECK();
+        }
 
         inline dynstack_of(size_t n, const as_capacity_t &) :
         dynstack(),
         items(0),
-        maxi_(0),
+        maxi_(n),
         addr_( memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
-        head_(addr_  ),
-        tail_(head_-1),
-        sub_( head_-1),
-        top_( tail_+1)
+        YOCTO_DYNSTACK_CTOR()
         {
+            YOCTO_DYNSTACK_CHECK();
         }
 
         inline dynstack_of(const dynstack_of &other) :
@@ -105,24 +114,22 @@ namespace yocto
         items(0),
         maxi_(other.size_),
         addr_( memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
-        head_(addr_  ),
-        tail_(head_-1),
-        sub_( head_-1),
-        top_( tail_+1)
+        YOCTO_DYNSTACK_CTOR()
         {
+            YOCTO_DYNSTACK_CHECK();
             __copy(other);
+            YOCTO_DYNSTACK_CHECK();
         }
 
         inline dynstack_of(const dynstack_of &other, const size_t n) :
         items(0),
         maxi_(other.items+n),
         addr_(memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
-        head_(addr_  ),
-        tail_(head_-1),
-        sub_( head_-1),
-        top_( tail_+1)
+        YOCTO_DYNSTACK_CTOR()
         {
+            YOCTO_DYNSTACK_CHECK();
             __copy(other);
+            YOCTO_DYNSTACK_CHECK();
         }
 
         inline void swap_with( dynstack_of &other ) throw()
@@ -136,27 +143,31 @@ namespace yocto
             cswap(tail_,other.tail_);
             cswap(sub_, other.sub_);
             cswap(top_, other.top_);
+            YOCTO_DYNSTACK_CHECK();
         }
 
         //! #objects in current frame
         inline size_t size() const throw()
         {
-
-            return 0;
+            YOCTO_DYNSTACK_CHECK();
+            return size_t(static_cast<ptrdiff_t>(top_-head_));
         }
 
-        inline void push_frame()
+        inline void save_frame()
         {
+            YOCTO_DYNSTACK_CHECK();
             this->save(static_cast<ptrdiff_t>(head_-addr_),
                        static_cast<ptrdiff_t>(tail_-addr_));
         }
 
         inline void reserve(size_t n)
         {
+            std::cerr << "reserve(" << n << ")" << std::endl;
             if(n>0)
             {
-                dynstack tmp(*this,n);
+                dynstack_of tmp(*this,n);
                 swap_with(tmp);
+                YOCTO_DYNSTACK_CHECK();
             }
         }
 
@@ -166,7 +177,12 @@ namespace yocto
             {
                 reserve( container::next_increase(maxi_) );
             }
-
+            YOCTO_DYNSTACK_CHECK();
+            assert(top_<addr_+maxi_);
+            new (top_) slot_type( new type(arg) );
+            ++top_;
+            ++tail_;
+            ++items;
         }
 
 
@@ -175,7 +191,7 @@ namespace yocto
         size_t     items;
         size_t     maxi_;
         slot_type *addr_;
-        
+
         slot_type *head_;
         slot_type *tail_;
 
@@ -190,6 +206,7 @@ namespace yocto
             tail_ = head_-1;
             sub_  = head_-1;
             top_  = tail_+1;
+            YOCTO_DYNSTACK_CHECK();
         }
 
 
@@ -225,8 +242,9 @@ namespace yocto
             }
             head_ = addr_ + static_cast<ptrdiff_t>(other.head_-other.addr_);
             tail_ = addr_ + static_cast<ptrdiff_t>(other.tail_-other.addr_);
-            sub_ = head_-1;
-            top_ = tail_+1;
+            sub_  = head_-1;
+            top_  = tail_+1;
+            YOCTO_DYNSTACK_CHECK();
         }
 
     };
