@@ -10,3 +10,5 @@ ADD_LIBRARY(y-jbig ${srcs})
 ADD_EXECUTABLE(test-jbig yocto/jbig/tstcodec.c)
 TARGET_LINK_LIBRARIES(test-jbig y-jbig)
 
+INSTALL( TARGETS y-jbig ARCHIVE DESTINATION lib )
+INSTALL( FILES ${decl} DESTINATION include/yocto/jbig)
