@@ -43,13 +43,6 @@ namespace yocto
             vertex(1,-1),
             vertex(-1,-1)
         };
-
-#if 0
-        const size_t gist:: sdel[8][2] =
-        {
-
-        };
-#endif
         
     }
 
