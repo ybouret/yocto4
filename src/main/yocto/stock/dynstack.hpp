@@ -18,8 +18,8 @@ namespace yocto
         {
             frame_t  *next;
             frame_t  *prev;
-            ptrdiff_t bp;
-            ptrdiff_t lp;
+            ptrdiff_t head;
+            ptrdiff_t tail;
         };
 
         virtual ~dynstack() throw()
@@ -46,18 +46,18 @@ namespace yocto
             for(const frame_t *f = other.hist.head;f;f=f->next)
             {
                 frame_t *fc = object::acquire1<frame_t>();
-                fc->bp = f->bp;
-                fc->lp = f->lp;
+                fc->head = f->head;
+                fc->tail = f->tail;
                 hist.push_back(fc);
             }
         }
 
-        void save(const ptrdiff_t bp,
-                  const ptrdiff_t lp)
+        void save(const ptrdiff_t head,
+                  const ptrdiff_t tail)
         {
             frame_t *f = pool.size ? pool.query() : object::acquire1<frame_t>();
-            f->bp = bp;
-            f->lp = lp;
+            f->head = head;
+            f->tail = tail;
             hist.push_back(f);
         }
 
@@ -82,8 +82,10 @@ namespace yocto
         items(0),
         maxi_(0),
         addr_(0),
-        base_(0),
-        last_(base_+1)
+        head_(0),
+        tail_(head_-1),
+        sub_(head_-1),
+        top_(tail_+1)
         {}
 
         inline dynstack_of(size_t n, const as_capacity_t &) :
@@ -91,8 +93,10 @@ namespace yocto
         items(0),
         maxi_(0),
         addr_( memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
-        base_(addr_),
-        last_(base_+1)
+        head_(addr_  ),
+        tail_(head_-1),
+        sub_( head_-1),
+        top_( tail_+1)
         {
         }
 
@@ -101,8 +105,10 @@ namespace yocto
         items(0),
         maxi_(other.size_),
         addr_( memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
-        base_(addr_),
-        last_(base_+1)
+        head_(addr_  ),
+        tail_(head_-1),
+        sub_( head_-1),
+        top_( tail_+1)
         {
             __copy(other);
         }
@@ -111,8 +117,10 @@ namespace yocto
         items(0),
         maxi_(other.items+n),
         addr_(memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
-        base_(addr_),
-        last_(base_+1)
+        head_(addr_  ),
+        tail_(head_-1),
+        sub_( head_-1),
+        top_( tail_+1)
         {
             __copy(other);
         }
@@ -124,22 +132,23 @@ namespace yocto
             cswap(items,other.items);
             cswap(maxi_,other.maxi_);
             cswap(addr_,other.addr_);
-            cswap(base_,other.base_);
-            cswap(last_,other.last_);
+            cswap(head_,other.head_);
+            cswap(tail_,other.tail_);
+            cswap(sub_, other.sub_);
+            cswap(top_, other.top_);
         }
 
         //! #objects in current frame
         inline size_t size() const throw()
         {
-            assert(last_>base_);
-            assert(base_>=addr_);
-            return size_t(static_cast<ptrdiff_t>(last_-base_)-1);
+
+            return 0;
         }
 
         inline void push_frame()
         {
-            this->save(static_cast<ptrdiff_t>(base_-addr_),
-                       static_cast<ptrdiff_t>(last_-addr_));
+            this->save(static_cast<ptrdiff_t>(head_-addr_),
+                       static_cast<ptrdiff_t>(tail_-addr_));
         }
 
         inline void reserve(size_t n)
@@ -157,9 +166,7 @@ namespace yocto
             {
                 reserve( container::next_increase(maxi_) );
             }
-            assert(items<maxi_);
-            assert(last_<base_+items);
-            new ( last_ ) slot_type( new type(arg) );
+
         }
 
 
@@ -169,10 +176,22 @@ namespace yocto
         size_t     maxi_;
         slot_type *addr_;
         
-        slot_type *base_;
-        slot_type *last_;
+        slot_type *head_;
+        slot_type *tail_;
+
+        slot_type *sub_;
+        slot_type *top_;
 
         YOCTO_DISABLE_ASSIGN(dynstack_of);
+
+        inline void reset() throw()
+        {
+            head_ = addr_;
+            tail_ = head_-1;
+            sub_  = head_-1;
+            top_  = tail_+1;
+        }
+
 
         // free all slots
         inline void __free() throw()
@@ -181,7 +200,7 @@ namespace yocto
             {
                 destruct<slot_type>(&addr_[--items]);
             }
-            base_ = last_ = addr_;
+            reset();
             clean_history();
         }
 
@@ -190,7 +209,7 @@ namespace yocto
         {
             __free();
             memory::kind<memory::global>::release_as<slot_type>(addr_, maxi_);
-            base_ = last_ = 0;
+            reset();
         }
 
         // copy slots => reference
@@ -204,8 +223,10 @@ namespace yocto
                 new ( &addr_[items] ) slot_type(other.addr_[items]);
                 ++items;
             }
-            base_ = addr_+static_cast<ptrdiff_t>(other.base_-other.addr_);
-            last_ = addr_+static_cast<ptrdiff_t>(other.last_-other.addr_);
+            head_ = addr_ + static_cast<ptrdiff_t>(other.head_-other.addr_);
+            tail_ = addr_ + static_cast<ptrdiff_t>(other.tail_-other.addr_);
+            sub_ = head_-1;
+            top_ = tail_+1;
         }
 
     };
