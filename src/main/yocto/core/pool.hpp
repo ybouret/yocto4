@@ -60,8 +60,11 @@ namespace yocto
             inline void delete_with( void (*proc)(NODE *) ) throw()
             {
                 assert( proc );
-                while(size>0) proc( query() );
-                    }
+                while(size>0)
+                {
+                    proc( query() );
+                }
+            }
 
 
             template <typename ARGS>
@@ -74,7 +77,7 @@ namespace yocto
 
             inline void reset() throw() { top = NULL; size = 0; }
 
-            inline void swap_with( pool_of<NODE> &other )
+            inline void swap_with( pool_of<NODE> &other ) throw()
             {
                 cswap(size,other.size);
                 cswap(top, other.top);
@@ -103,8 +106,11 @@ namespace yocto
 
             inline void clear() throw()
             {
-                while(this->size>0) delete this->query();
-                    }
+                while(this->size>0)
+                {
+                    delete this->query();
+                }
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(pool_of_cpp);

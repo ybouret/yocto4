@@ -27,7 +27,7 @@ namespace yocto
     void dynstack:: save(const ptrdiff_t head,
                          const ptrdiff_t tail)
     {
-        frame_t *f = pool.size ? pool.query() : object::acquire1<frame_t>();
+        frame_t *f = (pool.size>0) ? pool.query() : object::acquire1<frame_t>();
         f->head = head;
         f->tail = tail;
         hist.push_back(f);
@@ -49,8 +49,13 @@ namespace yocto
             fc->tail = f->tail;
             hist.push_back(fc);
         }
+        assert(hist.size==other.hist.size);
     }
 
+    size_t dynstack:: frames() const throw()
+    {
+        return hist.size;
+    }
 
 
 }
