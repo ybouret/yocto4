@@ -7,10 +7,14 @@
 #include "yocto/core/list.hpp"
 #include "yocto/object.hpp"
 #include "yocto/container/container.hpp"
-#include <iostream>
 
 namespace yocto
 {
+
+    namespace hidden
+    {
+        extern const char dynstack_name[];
+    }
 
     class dynstack
     {
@@ -23,58 +27,34 @@ namespace yocto
             ptrdiff_t tail;
         };
 
-        virtual ~dynstack() throw()
-        {
-            while(hist.size) { object::release1(hist.pop_back()); }
-            while(pool.size) { object::release1(pool.query()); }
-        }
-
+        virtual ~dynstack() throw();
 
     protected:
-        explicit dynstack() throw() : hist(), pool() {}
+        explicit dynstack() throw();
+        dynstack(const dynstack &other);
+
         core::list_of<frame_t> hist;
         core::pool_of<frame_t> pool;
 
-        void clean_history() throw()
-        {
-            while(hist.size)
-            {
-                pool.store( hist.pop_back() );
-            }
-        }
+        void clean_history() throw();
 
-        dynstack(const dynstack &other) :
-        hist(),
-        pool()
-        {
-            for(const frame_t *f = other.hist.head;f;f=f->next)
-            {
-                frame_t *fc = object::acquire1<frame_t>();
-                fc->head = f->head;
-                fc->tail = f->tail;
-                hist.push_back(fc);
-            }
-        }
 
         void save(const ptrdiff_t head,
-                  const ptrdiff_t tail)
-        {
-            frame_t *f = pool.size ? pool.query() : object::acquire1<frame_t>();
-            f->head = head;
-            f->tail = tail;
-            hist.push_back(f);
-        }
-
+                  const ptrdiff_t tail);
 
     private:
         YOCTO_DISABLE_ASSIGN(dynstack);
     };
 
 #define YOCTO_DYNSTACK_CTOR() \
-head_(addr_   ),  \
-tail_(head_-1 ),  \
-sub_( head_-1 ),  \
+head_(addr_   ),              \
+tail_(head_-1 ),              \
+sub_( head_-1 ),              \
 top_( tail_+1 )
+
+#define YOCTO_DYNSTACK_MAKE()                                       \
+addr_(memory::kind<memory::global>::acquire_as<slot_type>(maxi_)),  \
+YOCTO_DYNSTACK_CTOR()
 
 #define YOCTO_DYNSTACK_CHECK() \
 assert(head_>=addr_);          \
@@ -82,7 +62,7 @@ assert(head_-1==sub_);         \
 assert(tail_+1==top_)
 
     template <typename T>
-    class dynstack_of : public dynstack
+    class dynstack_of : public container, public dynstack
     {
     public:
         YOCTO_ARGUMENTS_DECL_T;
@@ -106,8 +86,7 @@ assert(tail_+1==top_)
         dynstack(),
         itms_(0),
         maxi_(n),
-        addr_( memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
-        YOCTO_DYNSTACK_CTOR()
+        YOCTO_DYNSTACK_MAKE()
         {
             YOCTO_DYNSTACK_CHECK();
         }
@@ -116,8 +95,7 @@ assert(tail_+1==top_)
         dynstack(other),
         itms_(0),
         maxi_(other.size_),
-        addr_( memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
-        YOCTO_DYNSTACK_CTOR()
+        YOCTO_DYNSTACK_MAKE()
         {
             YOCTO_DYNSTACK_CHECK();
             __copy(other);
@@ -127,8 +105,7 @@ assert(tail_+1==top_)
         inline dynstack_of(const dynstack_of &other, const size_t n) :
         itms_(0),
         maxi_(other.itms_+n),
-        addr_(memory::kind<memory::global>::acquire_as<slot_type>(maxi_) ),
-        YOCTO_DYNSTACK_CTOR()
+        YOCTO_DYNSTACK_MAKE()
         {
             YOCTO_DYNSTACK_CHECK();
             __copy(other);
@@ -150,18 +127,18 @@ assert(tail_+1==top_)
         }
 
         //! #objects in current frame
-        inline size_t size() const throw()
+        inline size_t height() const throw()
         {
             YOCTO_DYNSTACK_CHECK();
             return size_t(static_cast<ptrdiff_t>(top_-head_));
         }
 
-        inline size_t capacity() const throw()
+        inline virtual size_t capacity() const throw()
         {
             return maxi_;
         }
 
-        inline size_t items() const throw()
+        inline virtual size_t size() const throw()
         {
             return itms_;
         }
@@ -176,9 +153,8 @@ assert(tail_+1==top_)
             sub_  = head_-1;
         }
 
-        inline void reserve(size_t n)
+        inline virtual void reserve(size_t n)
         {
-            std::cerr << "reserve(" << n << ")" << std::endl;
             if(n>0)
             {
                 dynstack_of tmp(*this,n);
@@ -204,7 +180,7 @@ assert(tail_+1==top_)
         inline void pop() throw()
         {
             assert(tail_>=head_);
-            assert(size()>0);
+            assert(height()>0);
             destruct<slot_type>(tail_);
             --tail_;
             --top_;
@@ -212,7 +188,7 @@ assert(tail_+1==top_)
         }
 
         //! free current frame
-        inline void free() throw()
+        inline void clear() throw()
         {
             while(tail_>=head_)
             {
@@ -220,6 +196,17 @@ assert(tail_+1==top_)
             }
         }
 
+        inline virtual void free() throw()
+        {
+            __free_all();
+        }
+
+        inline virtual void release() throw()
+        {
+            __release();
+        }
+
+        inline virtual const char *name() const throw() { return hidden::dynstack_name; }
 
     private:
         typedef shared_ptr<T> slot_type;
