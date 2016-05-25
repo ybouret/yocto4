@@ -14,7 +14,22 @@ namespace yocto
         typedef parallel::patch2D    patch;  //!< base class for patches
         typedef math::complex<float> cplx_t; //!< complex for graphics...
 
-
+        class vnode_type
+        {
+        public:
+            explicit vnode_type(const vertex &v) throw() : next(0), prev(0), vtx(v) {}
+            vnode_type(const vnode_type &node) throw() :   next(0), prev(0), vtx(node.vtx) {}
+            virtual ~vnode_type() throw() {}
+            
+            vnode_type *next;
+            vnode_type *prev;
+            vertex      vtx;
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(vnode_type);
+        };
+        
+        typedef core::list_of_cpp<vnode_type> vnode_list;
 
         struct gist
         {

@@ -3,6 +3,7 @@
 #include "yocto/graphics/ops/gradient.hpp"
 #include "yocto/graphics/ops/samples.hpp"
 #include "yocto/graphics/ops/histogram.hpp"
+#include "yocto/graphics/ops/blobs.hpp"
 
 #include "yocto/graphics/image/png.hpp"
 #include "yocto/graphics/image/jpeg.hpp"
@@ -162,6 +163,7 @@ YOCTO_UNIT_TEST_IMPL(ops2)
         }
 
         histogram H;
+        blobs     B(w,h);
         {
             std::cerr << "--- compute histogram..." << std::endl;
             if(check_speedup)
@@ -188,8 +190,19 @@ YOCTO_UNIT_TEST_IMPL(ops2)
             std::cerr << "threshold=" << t << std::endl;
             threshold::apply(bmp, t, pxm, threshold::keep_foreground);
             PNG.save("image_fg.png", bmp, NULL);
+            
+            get_named_color<size_t> blobColors;
+            std::cerr << "-- blobs from foreground..." << std::endl;
+            B.build(bmp);
+            std::cerr << "#blobs=" << B.current << std::endl;
+            PNG.save("image_fg_blobs.png", B, blobColors, NULL);
+            
             threshold::apply(bmp, t, pxm, threshold::keep_background);
             PNG.save("image_bg.png", bmp, NULL);
+            std::cerr << "-- blobs from background..." << std::endl;
+            B.build(bmp);
+            std::cerr << "#blobs=" << B.current << std::endl;
+            PNG.save("image_bg_blobs.png", B, blobColors, NULL);
         }
     }
     
