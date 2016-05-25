@@ -28,7 +28,6 @@ namespace yocto
                 assert(h==src.h);
                 assert(link==4||link==8);
                 ldz();
-                vstk.free();
                 for(unit_t j=0;j<h;++j)
                 {
                     // scan over rows
@@ -39,9 +38,15 @@ namespace yocto
                     {
                         // study where we are
                         size_t &B = B_j[i];
-                        if(B_j[i]<=0 && !is_zero_pixel(S_j[i]) )
+                        if( (B_j[i]<=0) && (!is_zero_pixel(S_j[i])) )
                         {
-
+                            // start a new blob
+                            B = ++current;
+                            
+                            //initialize stack
+                            vstk.free();
+                            
+                            
                         }
                     }
                 }
