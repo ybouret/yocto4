@@ -185,6 +185,16 @@ assert(tail_+1==top_)
             ++items;
         }
 
+        inline void pop() throw()
+        {
+            assert(tail_>=head_);
+            assert(size()>0);
+            destruct<slot_type>(tail_);
+            --tail_;
+            --top_;
+            --items;
+        }
+
 
     private:
         typedef shared_ptr<T> slot_type;
