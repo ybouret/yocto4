@@ -17,7 +17,7 @@ namespace yocto
         extern const char dynstack_name[];
     }
 
-    class dynstack
+    class stackmgr
     {
     public:
         struct frame_t
@@ -28,13 +28,13 @@ namespace yocto
             ptrdiff_t tail;
         };
 
-        virtual ~dynstack() throw();
+        virtual ~stackmgr() throw();
 
         size_t frames() const throw();
         
     protected:
-        explicit dynstack() throw();
-        dynstack(const dynstack &other);
+        explicit stackmgr() throw();
+        stackmgr(const stackmgr &other);
 
         core::list_of<frame_t> hist;
         core::pool_of<frame_t> pool;
@@ -46,8 +46,56 @@ namespace yocto
                   const ptrdiff_t tail);
 
     private:
-        YOCTO_DISABLE_ASSIGN(dynstack);
+        YOCTO_DISABLE_ASSIGN(stackmgr);
     };
+
+
+
+    template <typename T>
+    class dynstack
+    {
+    public:
+        YOCTO_ARGUMENTS_DECL_T;
+
+        virtual ~dynstack() throw() {}
+
+        //______________________________________________________________________
+        //
+        // virtual interface
+        //______________________________________________________________________
+        virtual ptrdiff_t    height() const throw() = 0;
+        virtual void         push( param_type )     = 0;
+        virtual void         pop()  throw()         = 0;
+        virtual type &       peek() throw()         = 0;
+        virtual const_type & peek() const throw()   = 0;
+        virtual type &       base() throw()         = 0;
+        virtual const_type & base() const throw()   = 0;
+        virtual type       & operator[](ptrdiff_t n) throw() = 0;
+        virtual const_type & operator[](ptrdiff_t n) const throw() = 0;
+
+        //______________________________________________________________________
+        //
+        // non virtual interface
+        //______________________________________________________________________
+
+        //! free current frame
+        inline void clear() throw()
+        {
+            while( height() > 0 )
+            {
+                pop();
+            }
+        }
+
+
+
+    protected:
+        explicit dynstack() throw() {}
+
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(dynstack);
+    };
+
 
 #define YOCTO_DYNSTACK_CTOR() \
 head_(addr_   ),              \
@@ -65,7 +113,7 @@ assert(head_-1==sub_);         \
 assert(tail_+1==top_)
 
     template <typename T>
-    class dynstack_of : public container, public dynstack
+    class dynstack_of : public container, public stackmgr, public dynstack<T>
     {
     public:
         YOCTO_ARGUMENTS_DECL_T;
@@ -78,7 +126,7 @@ assert(tail_+1==top_)
 
         //! default ctor: make empty stack
         inline dynstack_of() throw() :
-        dynstack(),
+        stackmgr(),
         itms_(0),
         maxi_(0),
         addr_(0),
@@ -89,7 +137,7 @@ assert(tail_+1==top_)
 
         //! ctor to acquire some memory
         inline dynstack_of(size_t n, const as_capacity_t &) :
-        dynstack(),
+        stackmgr(),
         itms_(0),
         maxi_(n),
         YOCTO_DYNSTACK_MAKE()
@@ -99,7 +147,7 @@ assert(tail_+1==top_)
 
         //! SOFT copy ctor
         inline dynstack_of(const dynstack_of &other) :
-        dynstack(other),
+        stackmgr(other),
         itms_(0),
         maxi_(other.size_),
         YOCTO_DYNSTACK_MAKE()
@@ -111,7 +159,7 @@ assert(tail_+1==top_)
 
         //! SOFT copy ctor with extra memory
         inline dynstack_of(const dynstack_of &other, const size_t n) :
-        dynstack(other),
+        stackmgr(other),
         itms_(0),
         maxi_(other.itms_+n),
         YOCTO_DYNSTACK_MAKE()
@@ -137,7 +185,8 @@ assert(tail_+1==top_)
         }
 
         //! #objects in current frame
-        inline ptrdiff_t height() const throw()
+        inline virtual
+        ptrdiff_t height() const throw()
         {
             YOCTO_DYNSTACK_CHECK();
             return (static_cast<ptrdiff_t>(top_-head_));
@@ -169,7 +218,7 @@ assert(tail_+1==top_)
         inline void pop_frame() throw()
         {
             assert(hist.size>0);
-            clear();
+            this->clear();
             // get frame
             frame_t *f = hist.pop_back();
             pool.store(f);
@@ -195,7 +244,8 @@ assert(tail_+1==top_)
 
 
         //! push at top of current frame
-        inline void push( param_type arg )
+        inline virtual
+        void push( param_type arg )
         {
             if(itms_>=maxi_)
             {
@@ -210,7 +260,8 @@ assert(tail_+1==top_)
         }
 
         //! pop from current frame
-        inline void pop() throw()
+        inline virtual
+        void pop() throw()
         {
             assert(tail_>=head_);
             assert(height()>0);
@@ -220,14 +271,6 @@ assert(tail_+1==top_)
             --itms_;
         }
 
-        //! free current frame
-        inline void clear() throw()
-        {
-            while(tail_>=head_)
-            {
-                pop();
-            }
-        }
 
         //! free all frames
         inline virtual void free() throw()
@@ -247,28 +290,32 @@ assert(tail_+1==top_)
 
 
         //! top of current frame
-        inline type &peek() throw()
+        inline virtual
+        type &peek() throw()
         {
             assert(height()>0);
             return **tail_;
         }
 
         //! top of current frame, const
-        inline const_type &peek() const throw()
+        inline virtual
+        const_type &peek() const throw()
         {
             assert(height()>0);
             return **tail_;
         }
 
         //! base of current frame
-        inline type &base() throw()
+        inline virtual
+        type &base() throw()
         {
             assert(height()>0);
             return **head_;
         }
 
         //! base of current frame, const
-        inline const_type &base() const throw()
+        inline virtual
+        const_type &base() const throw()
         {
             assert(height()>0);
             return **head_;
@@ -279,7 +326,8 @@ assert(tail_+1==top_)
          - 1<=n<=height()   : base+n
          - -1>=n>=-heigth() : top+n
          */
-        inline type & operator[](ptrdiff_t n) throw()
+        inline virtual
+        type & operator[](ptrdiff_t n) throw()
         {
             if(n>0)
             {
@@ -295,7 +343,8 @@ assert(tail_+1==top_)
         }
 
         //! access, const
-        inline const_type & operator[](ptrdiff_t n) const throw()
+        inline virtual
+        const_type & operator[](ptrdiff_t n) const throw()
         {
             if(n>0)
             {

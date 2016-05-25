@@ -7,7 +7,7 @@ using namespace yocto;
 namespace {
 
     template <typename T>
-    inline void dump_ds(const dynstack_of<T> &d )
+    inline void dump_ds(const dynstack<T> &d )
     {
         for(ptrdiff_t i=d.height();i>0;--i)
         {

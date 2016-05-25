@@ -8,14 +8,14 @@ namespace yocto
     }
 
 
-    dynstack:: ~dynstack() throw()
+    stackmgr:: ~stackmgr() throw()
     {
         while(hist.size) { object::release1(hist.pop_back()); }
         while(pool.size) { object::release1(pool.query()); }
     }
 
 
-    void dynstack:: clean_history() throw()
+    void stackmgr:: clean_history() throw()
     {
         while(hist.size)
         {
@@ -24,7 +24,7 @@ namespace yocto
     }
 
 
-    void dynstack:: save(const ptrdiff_t head,
+    void stackmgr:: save(const ptrdiff_t head,
                          const ptrdiff_t tail)
     {
         frame_t *f = (pool.size>0) ? pool.query() : object::acquire1<frame_t>();
@@ -33,12 +33,12 @@ namespace yocto
         hist.push_back(f);
     }
 
-    dynstack:: dynstack() throw() : hist(), pool()
+    stackmgr:: stackmgr() throw() : hist(), pool()
     {
     }
 
 
-    dynstack:: dynstack(const dynstack &other) :
+    stackmgr:: stackmgr(const stackmgr &other) :
     hist(),
     pool()
     {
@@ -52,7 +52,7 @@ namespace yocto
         assert(hist.size==other.hist.size);
     }
 
-    size_t dynstack:: frames() const throw()
+    size_t stackmgr:: frames() const throw()
     {
         return hist.size;
     }
