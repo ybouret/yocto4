@@ -1,6 +1,6 @@
 #include "yocto/stock/dynstack.hpp"
 #include "yocto/utest/run.hpp"
-#include "yocto/code/rand.hpp"
+#include "support.hpp"
 
 using namespace yocto;
 
@@ -15,9 +15,15 @@ YOCTO_UNIT_TEST_IMPL(dynstack)
 
     for(size_t i=10+alea_leq(100);i>0;--i)
     {
-        ds0.push( alea_leq(100) );
-        ds1.push( alea_leq(100) );
-        
+        ds0.push( gen<double>::get() );
+        ds1.push( gen<double>::get()  );
+    }
+
+
+    dynstack_of<string> dss;
+    for(size_t i=10+alea_leq(100);i>0;--i)
+    {
+        dss.push( gen<string>::get() );
     }
 }
 YOCTO_UNIT_TEST_DONE()
