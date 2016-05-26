@@ -27,7 +27,13 @@ namespace yocto
 
             friend  std::ostream & operator<<( std::ostream &os, const stencil &S );
 
-            
+            template <typename T>
+            void load(const pixmap<T> &pxm,
+                      const vertex    &v)
+            {
+                assert(pxm.has(v));
+            }
+
         };
 
     }
