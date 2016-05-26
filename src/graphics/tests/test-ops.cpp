@@ -4,6 +4,7 @@
 #include "yocto/graphics/ops/samples.hpp"
 #include "yocto/graphics/ops/histogram.hpp"
 #include "yocto/graphics/ops/blobs.hpp"
+#include "yocto/graphics/ops/stencil.hpp"
 
 #include "yocto/graphics/image/png.hpp"
 #include "yocto/graphics/image/jpeg.hpp"
@@ -28,6 +29,11 @@ YOCTO_UNIT_TEST_IMPL(ops)
     threading::engine server(true);
     timings           tmx;
 
+    stencil S;
+    S[-1][-1] = 2;
+    std::cerr << "S=" << S << std::endl;
+
+    
     if(argc>1)
     {
         const string filename = argv[1];

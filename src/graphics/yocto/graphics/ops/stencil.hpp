@@ -15,13 +15,19 @@ namespace yocto
         public:
             stencil() throw();
             ~stencil() throw();
+            stencil(const stencil &) throw();
+            stencil & operator=(const stencil &) throw();
 
             float     v[3][3];
             inline float * operator[](const unit_t dy) throw()
             {
-                assert(dy);
-                return v[dy+1];
+                assert(dy>=-1);assert(dy<=1);
+                return &v[dy+1][1];
             }
+
+            friend  std::ostream & operator<<( std::ostream &os, const stencil &S );
+
+            
         };
 
     }
