@@ -4,27 +4,42 @@
 #include "yocto/graphics/pixmap.hpp"
 #include "yocto/graphics/rgb.hpp"
 #include "yocto/stock/stack.hpp"
+#include "yocto/ptr/arc.hpp"
 
 namespace yocto
 {
     namespace graphics
     {
 
-        class blob : public object, vnode_list
+
+        class blob : public counted_object, public vnode_list
         {
         public:
-            blob *next;
-            blob *prev;
-            explicit blob() throw() : next(0), prev(0) {}
+            typedef arc_ptr<blob> ptr;
+            const size_t tag;
+            explicit blob(const size_t t) throw() : tag(t) {}
             virtual ~blob() throw() {}
-            
+
+            template <typename T>
+            void transfer( pixmap<T> &tgt, const pixmap<T> &src) const throw()
+            {
+                tgt.ldz();
+                for(const vnode_type *node = head; node; node=node->next)
+                {
+                    const vertex v = node->vtx;
+                    assert(tgt.has(v));
+                    assert(src.has(v));
+                    tgt[v] = src[v];
+                }
+            }
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
         };
         
         
         
-        class blobs : public pixmap<size_t>, core::list_of_cpp<blob>
+        class blobs : public pixmap<size_t>
         {
         public:
             explicit blobs(const unit_t W, const unit_t H);
@@ -32,20 +47,29 @@ namespace yocto
 
             size_t                  current;
             stack<vertex>           vstk;
+            vector<blob::ptr>       content;
 
             template <typename T>
             void build(const pixmap<T> &src,
                        const size_t     links = 4 )
             {
-                pixmap<size_t> &self = *this;
                 assert(w==src.w);
                 assert(h==src.h);
                 assert(links==4||links==8);
+
+                //______________________________________________________________
+                //
+                // initialize
+                //______________________________________________________________
+                pixmap<size_t> &self = *this;
                 ldz();
-                clear();
                 current = 0;
-                
+                content.free();
+
+                //______________________________________________________________
+                //
                 // first pass, build blob map
+                //______________________________________________________________
                 for(unit_t j=0;j<h;++j)
                 {
                     row &                          B_j = self[j];
@@ -77,10 +101,7 @@ namespace yocto
                         }
                     }
                 }
-                
-                //second pass: build blobs
-                
-
+                setup();
             }
 
         private:
@@ -103,6 +124,10 @@ namespace yocto
                 }
 
             }
+
+            // build content
+            void setup();
+            
         };
 
     }

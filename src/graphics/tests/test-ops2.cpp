@@ -196,13 +196,33 @@ YOCTO_UNIT_TEST_IMPL(ops2)
             B.build(bmp);
             std::cerr << "#blobs=" << B.current << std::endl;
             PNG.save("image_fg_blobs.png", B, blobColors, NULL);
-            
+
+            std::cerr << "#fg_content=" << B.content.size() << std::endl;
+            for(size_t i=1;i<=B.content.size();++i)
+            {
+                std::cerr << "\tfg_blob[" << i << "] => " << B.content[i]->size << " | tag=" << B.content[i]->tag << std::endl;
+            }
+
+            pixmap4 tgt(w,h);
+            if(B.content.size()>0)
+            {
+                const blob &big = *B.content[1];
+                big.transfer(tgt,bmp);
+            }
+            PNG.save("image_fg_big.png",tgt,NULL);
+
             threshold::apply(bmp, t, pxm, threshold::keep_background);
             PNG.save("image_bg.png", bmp, NULL);
             std::cerr << "-- blobs from background..." << std::endl;
             B.build(bmp);
             std::cerr << "#blobs=" << B.current << std::endl;
             PNG.save("image_bg_blobs.png", B, blobColors, NULL);
+            std::cerr << "#bg_content=" << B.content.size() << std::endl;
+            for(size_t i=1;i<=B.content.size();++i)
+            {
+                std::cerr << "\tbg_blob[" << i << "] => " << B.content[i]->size << " | tag=" << B.content[i]->tag << std::endl;
+            }
+
         }
     }
     
