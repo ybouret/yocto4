@@ -2,6 +2,19 @@
 #include "yocto/associative/map.hpp"
 #include "yocto/sort/quick.hpp"
 
+
+namespace yocto
+{
+    namespace graphics
+    {
+        blob:: ~blob() throw()
+        {
+        }
+
+        blob:: blob(const size_t t) throw() : tag(t) {}
+    }
+}
+
 namespace yocto
 {
     namespace graphics

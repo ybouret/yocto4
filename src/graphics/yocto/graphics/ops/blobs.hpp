@@ -11,14 +11,16 @@ namespace yocto
     namespace graphics
     {
 
-
+        //! a blob is a list of vertices
         class blob : public counted_object, public vnode_list
         {
         public:
             typedef arc_ptr<blob> ptr;
+
             const size_t tag;
-            explicit blob(const size_t t) throw() : tag(t) {}
-            virtual ~blob() throw() {}
+
+            explicit blob(const size_t t) throw();
+            virtual ~blob() throw();
 
             template <typename T>
             void transfer( pixmap<T> &tgt, const pixmap<T> &src) const throw()
@@ -59,16 +61,20 @@ namespace yocto
 
                 //______________________________________________________________
                 //
+                //
                 // initialize
+                //
                 //______________________________________________________________
                 pixmap<size_t> &self = *this;
-                ldz();
-                current = 0;
-                content.free();
+                ldz();             // clear pixmap
+                current = 0;       // blob counter/id
+                content.free();    // clear blobs
 
                 //______________________________________________________________
                 //
+                //
                 // first pass, build blob map
+                //
                 //______________________________________________________________
                 for(unit_t j=0;j<h;++j)
                 {
@@ -77,21 +83,33 @@ namespace yocto
 
                     for(unit_t i=0;i<w;++i)
                     {
+                        //______________________________________________________
+                        //
                         // study where we are
+                        //______________________________________________________
                         size_t &B = B_j[i];
                         if( (B_j[i]<=0) && (!is_zero_pixel(S_j[i])) )
                         {
+                            //__________________________________________________
+                            //
                             // start a new blob
+                            //__________________________________________________
                             B = ++current;
-                            
-                            //initialize stack
+
+                            //__________________________________________________
+                            //
+                            // initialize stack with valid neighbors
+                            //__________________________________________________
                             vstk.free();
                             {
                                 const vertex v(i,j);
                                 grow(v,src,links);
                             }
-                            
+
+                            //__________________________________________________
+                            //
                             // work on stack
+                            //__________________________________________________
                             while(vstk.size()>0)
                             {
                                 const vertex v = vstk.peek();
@@ -101,6 +119,14 @@ namespace yocto
                         }
                     }
                 }
+
+
+                //______________________________________________________________
+                //
+                //
+                // build contents: tagged blobs, by decreasing size
+                //
+                //______________________________________________________________
                 setup();
             }
 
