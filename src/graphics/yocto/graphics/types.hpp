@@ -62,6 +62,7 @@ namespace yocto
             //! the 4+4 coordinates around a single point
             static const vertex delta[8];
 
+            //! way to fill when on border
             enum filling
             {
                 fill_with_zero,
