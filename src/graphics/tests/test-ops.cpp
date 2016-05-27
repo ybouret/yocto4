@@ -5,6 +5,7 @@
 #include "yocto/graphics/ops/histogram.hpp"
 #include "yocto/graphics/ops/blobs.hpp"
 #include "yocto/graphics/ops/stencil.hpp"
+#include "yocto/graphics/ops/fft.hpp"
 
 #include "yocto/graphics/image/png.hpp"
 #include "yocto/graphics/image/jpeg.hpp"
@@ -230,6 +231,61 @@ YOCTO_UNIT_TEST_IMPL(ops)
             }
 
         }
+
+        pixmapf pgs(bmp,to_float<RGBA>,bmp);
+        PNG.save("image_gs.png", pgs, NULL);
+        
+        pixmapz pzm( next_power_of_two(w), next_power_of_two(h) );
+        fourier::forward(pzm,pgs);
+        {
+            float cmx = 0;
+            for(unit_t j=0;j<h;++j)
+            {
+                for(unit_t i=0;i<w;++i)
+                {
+                    cmx = max_of(cmx, pzm[j][i].mod());
+                }
+            }
+            std::cerr << "cmx=" << cmx << std::endl;
+            if(cmx>0)
+            {
+                for(unit_t j=0;j<h;++j)
+                {
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        pzm[j][i] /= cmx;
+                    }
+                }
+            }
+        }
+        get_gsz zproc;
+        PNG.save("image_fft.png", pzm, zproc, NULL);
+
+        fourier::reverse(pzm);
+        {
+            float cmx = 0;
+            for(unit_t j=0;j<h;++j)
+            {
+                for(unit_t i=0;i<w;++i)
+                {
+                    cmx = max_of(cmx, pzm[j][i].mod());
+                }
+            }
+            std::cerr << "cmx=" << cmx << std::endl;
+            if(cmx>0)
+            {
+                for(unit_t j=0;j<h;++j)
+                {
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        pzm[j][i] /= cmx;
+                    }
+                }
+            }
+        }
+        PNG.save("image_ifft.png", pzm, zproc, NULL);
+
+
     }
     
 }
