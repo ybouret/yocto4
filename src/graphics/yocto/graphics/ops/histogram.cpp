@@ -9,7 +9,8 @@ namespace yocto
     {
 
         histogram:: histogram() throw() :
-        count()
+        count(),
+	src(0)
         {
             reset();
         }

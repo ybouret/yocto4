@@ -24,7 +24,10 @@ namespace yocto
         }
 
         blobs:: blobs(const unit_t W, const unit_t H) :
-        pixmap<size_t>(W,H)
+        pixmap<size_t>(W,H),
+	current(0),
+	vstk(),
+	content()
         {
 
         }
