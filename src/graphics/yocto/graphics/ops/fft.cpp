@@ -27,6 +27,7 @@ namespace yocto
                 ntot *= nn[idim];
             }
 
+            --data;
             size_t nprev=1;
             for(size_t idim=ndim;idim>=1;--idim)
             {
@@ -97,7 +98,6 @@ namespace yocto
                 nprev *= n;
             }
 
-	    return;
             const real_t coef = real_t(1.0/sqrt( double(ntot) ));
 #define _YOCTO_FFT_SCALE(INDEX) data[INDEX] *= coef
             YOCTO_LOOP_FUNC_(ntot<<1,_YOCTO_FFT_SCALE,1);

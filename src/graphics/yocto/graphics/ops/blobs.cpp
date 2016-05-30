@@ -25,9 +25,9 @@ namespace yocto
 
         blobs:: blobs(const unit_t W, const unit_t H) :
         pixmap<size_t>(W,H),
-	current(0),
-	vstk(),
-	content()
+        current(0),
+        vstk(),
+        content()
         {
 
         }
@@ -49,7 +49,7 @@ namespace yocto
         {
             assert(0==content.size());
             content.ensure(current);
-            
+
             //__________________________________________________________________
             //
             // dispatch the blobs into one map
@@ -94,7 +94,7 @@ namespace yocto
                 const blob::ptr &b = *i;
                 content.push_back(b);
             }
-
+            
             // decreasing order
             quicksort(content,compare_blobs_size);
         }
