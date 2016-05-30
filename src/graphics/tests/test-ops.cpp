@@ -232,11 +232,24 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
         }
 
+        std::cerr << "-- testing fourier..." << std::endl;
         pixmapf pgs(bmp,to_float<RGBA>,bmp);
         PNG.save("image_gs.png", pgs, NULL);
         
         pixmapz pzm( next_power_of_two(w), next_power_of_two(h) );
         fourier::forward(pzm,pgs);
+
+        return 0;
+
+        {
+            pixmapz pzm2(pzm);
+            fourier::reverse(pzm2);
+            pgs.ldz();
+            //fourier::transfer(pgs, pzm2);
+            PNG.save("image_gs_fft_rev.png",pgs,NULL);
+        }
+
+
         {
             float cmx = 0;
             for(unit_t j=0;j<h;++j)

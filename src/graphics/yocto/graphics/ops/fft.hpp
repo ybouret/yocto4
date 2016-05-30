@@ -37,10 +37,15 @@ namespace yocto
                 const unit_t W = pz.w;
                 const size_t part_bytes = (W-w)*sizeof(cplx_t);
                 const size_t full_bytes = W*sizeof(cplx_t);
+                std::cerr << "w=" << w << "/W=" << W << std::endl;
+                std::cerr << "h=" << h << "/H=" << H << std::endl;
+                std::cerr << "part_bytes=" << part_bytes << std::endl;
+                std::cerr << "full_bytes=" << full_bytes << std::endl;
+
                 for(unit_t j=0;j<h;++j)
                 {
                     const typename pixmap<T>::row &rt = pt[j];
-                    pixmapz::row                  &rz = pz[j];
+                    cplx_t                        *rz = &pz[j][0];
                     for(unit_t i=0;i<w;++i)
                     {
                         rz[i] = real_t(rt[i]);
@@ -49,11 +54,31 @@ namespace yocto
                 }
                 for(unit_t j=h;j<H;++j)
                 {
+                    std::cerr << "zero bytesg@" << j << std::endl;
                     memset(&pz[j][0],0,full_bytes);
                 }
                 forward(pz);
             }
 
+            template <typename T> static inline
+            void transfer( pixmap<T> &tgt, const pixmapz &src ) throw()
+            {
+                assert(tgt.w<=src.w);
+                assert(tgt.h<=src.h);
+                const unit_t h = tgt.h;
+                const unit_t w = tgt.w;
+                for(unit_t j=0;j<h;++j)
+                {
+                    typename pixmap<T>::row &t_j = tgt[j];
+                    const    pixmapz::row   &s_j = src[j];
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        t_j[i] = T(s_j[i].re);
+                    }
+                }
+            }
+
+            
         };
 
     }
