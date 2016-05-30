@@ -37,10 +37,6 @@ namespace yocto
                 const unit_t W = pz.w;
                 const size_t part_bytes = (W-w)*sizeof(cplx_t);
                 const size_t full_bytes = W*sizeof(cplx_t);
-                std::cerr << "w=" << w << "/W=" << W << std::endl;
-                std::cerr << "h=" << h << "/H=" << H << std::endl;
-                std::cerr << "part_bytes=" << part_bytes << std::endl;
-                std::cerr << "full_bytes=" << full_bytes << std::endl;
 
                 for(unit_t j=0;j<h;++j)
                 {
@@ -54,7 +50,6 @@ namespace yocto
                 }
                 for(unit_t j=h;j<H;++j)
                 {
-                    std::cerr << "zero bytesg@" << j << std::endl;
                     memset(&pz[j][0],0,full_bytes);
                 }
                 forward(pz);
