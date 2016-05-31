@@ -34,7 +34,7 @@ namespace yocto
                     tgt[v] = src[v];
                 }
             }
-
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
         };
