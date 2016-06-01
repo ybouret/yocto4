@@ -10,37 +10,31 @@ namespace yocto
 
         blur:: ~blur() throw()
         {
+            
         }
 
-        blur:: blur(float sig) :
-        width(0),
-        top(0),
-        weight(0),
-        __data()
+        static inline
+        unit_t __blur_width(const float sig)
         {
-            // TODO: check sig
-            const float sig2    = sig*sig;
-            const float twosig2 = sig2+sig2;
-            const float exp_min = numeric<float>::epsilon * sqrtf(numeric<float>::two_pi*sig2);
-            const float len_max = (exp_min >= 1.0f) ? 0.0f : sqrtf( - twosig2 * logf(exp_min) );
-            std::cerr << "len_max=" << len_max << std::endl;
-            (unit_t &)width = max_of<unit_t>(1,ceilf(len_max));
-            (unit_t &)top   = width-1;
-            std::cerr << "width=" << width << std::endl;
-            __data.make(width+max_of<unit_t>(1,top*top));
-            weight = & __data[1];
-            for(unit_t i=0;i<width;)
+            const float exp_min = numeric<float>::epsilon;
+            const float len_max = (exp_min >= 1.0f) ? 0.0f : sqrtf( - 2.0*sig*sig* logf(exp_min) );
+            return max_of<unit_t>(1,ceilf(len_max));
+        }
+
+        blur:: blur(const float sig) :
+        pixmap<float>( __blur_width(sig), __blur_width(sig) ),
+        top(width.x-1)
+        {
+            const float den = 2.0f * sig * sig;
+            for(unit_t j=0;j<=top;++j)
             {
-                const float X   = float(i);
-                const float arg = (X*X)/twosig2;
-               __data[++i] = exp(-arg);
+                const float j2 = j*j;
+                for(unit_t i=0;i<=top;++i)
+                {
+                    const float i2 = i*i;
+                    (*this)[j][i]  = expf(-(i2*j2)/den);
+                }
             }
-
-            std::cerr << "weights=";
-            for(unit_t i=0;i<width;++i) std::cerr << " " << weight[i];
-            std::cerr << std::endl;
-            
-
         }
         
 

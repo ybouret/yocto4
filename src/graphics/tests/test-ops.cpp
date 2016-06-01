@@ -35,7 +35,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
     S[-1][-1] = 2;
     std::cerr << "S=" << S << std::endl;
 
-    
+
     if(argc>1)
     {
         const string filename = argv[1];
@@ -198,7 +198,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
             std::cerr << "threshold=" << t << std::endl;
             threshold::apply(bmp, t, pxm, threshold::keep_foreground);
             PNG.save("image_fg.png", bmp, NULL);
-            
+
             get_named_color<size_t> blobColors;
             std::cerr << "-- blobs from foreground..." << std::endl;
             B.build(bmp);
@@ -236,7 +236,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
         std::cerr << "-- testing fourier..." << std::endl;
         pixmapf pgs(bmp,to_float<RGBA>,bmp);
         PNG.save("image_gs.png", pgs, NULL);
-        
+
         pixmapz pzm( next_power_of_two(w), next_power_of_two(h) );
         fourier::forward(pzm,pgs);
 
@@ -298,19 +298,27 @@ YOCTO_UNIT_TEST_IMPL(ops)
         }
         PNG.save("image_ifft.png", pzm, zproc, NULL);
 
-
+        
         std::cerr << "-- blur" << std::endl;
-
+        
         pixmap4 blr(w,h);
-
+        
         for(int sig=1;sig<=5;++sig)
         {
+            std::cerr << "\tsig=" << sig << std::endl;
             blur bf(sig);
-            bf.apply_x<RGBA,uint8_t,3>(blr,pxm,xps, &server);
-            const string outname = vformat("image_blur%02d.png",sig);
-            PNG.save(outname, blr, NULL);
+            std::cerr << "\t\twidth=" << bf.width << std::endl;
+            {
+                const string outname = vformat("mask_blur%02d.png",sig);
+                PNG.save(outname, bf, NULL);
+            }
+            {
+                bf.apply<RGBA,uint8_t,3>(blr,pxm,xps, &server);
+                const string outname = vformat("image_blur%02d.png",sig);
+                PNG.save(outname, blr, NULL);
+            }
         }
-
+        
     }
     
 }
