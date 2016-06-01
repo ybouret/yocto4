@@ -10,7 +10,21 @@ namespace yocto
     namespace graphics
     {
 
-        class blur : public pixmap<float>
+        class blur_info
+        {
+        public:
+            virtual ~blur_info() throw();
+
+            const unit_t __width;
+            
+        protected:
+            explicit blur_info(const float sig);
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(blur_info);
+        };
+
+        class blur : public blur_info, public pixmap<float>
         {
         public:
             explicit blur(const float sig);
@@ -63,37 +77,51 @@ namespace yocto
                 const unit_t     yup  = src.upper.y;
 
 
-
+                float sum[NCH];
+                //______________________________________________________________
+                //
+                // ENTER: loop over rows
+                //______________________________________________________________
                 for(unit_t j=xp.lower.y;j<=xp.upper.y;++j)
                 {
                     typename pixmap<T>::row &tgt_j = tgt[j];
 
-                    const unit_t jinf = min_of<unit_t>(len,j);
-                    const unit_t jsup = min_of<unit_t>(len,yup-j);
+                    const int jinf = -int(min_of<unit_t>(len,j));
+                    const int jsup =  int(min_of<unit_t>(len,yup-j));
 
+                    //__________________________________________________________
+                    //
+                    // ENTER: loop over columns
+                    //__________________________________________________________
                     for(unit_t i=xp.lower.x;i<=xp.upper.x;++i)
                     {
-                        const unit_t iinf = min_of<unit_t>(len,i);
-                        const unit_t isup = min_of<unit_t>(len,xup-i);
+                        const int iinf = -int(min_of<unit_t>(len,i));
+                        const int isup =  int(min_of<unit_t>(len,xup-i));
 
-                        float sum[NCH];
+                        //______________________________________________________
+                        //
+                        // initialize mask
+                        //______________________________________________________
                         for(size_t ch=0;ch<NCH;++ch)
                         {
                             sum[ch] = 0;
                         }
                         float acc = 0;
 
-
-                        for(unit_t jj=-jinf;jj<=jsup;++jj)
+                        //______________________________________________________
+                        //
+                        // loop over mask
+                        //______________________________________________________
+                        for(int jj=jinf;jj<=jsup;++jj)
                         {
-                            const unit_t jjj = (jj<0) ? -jj : jj;
+                            const int                      jjj    = abs(jj);
                             const typename pixmap<T>::row &src_jj = src[j+jj];
-                            pixmap<float>::row            &coef_j = (*this)[jjj];
+                            const pixmap<float>::row      &coef_j = (*this)[jjj];
 
-                            for(unit_t ii=-iinf;ii<=isup;++ii)
+                            for(int ii=iinf;ii<=isup;++ii)
                             {
                                 const U     *p    = (const U *) &src_jj[i+ii];
-                                const unit_t iii  = (ii<0) ? -ii : ii;
+                                const int    iii  = abs(ii);
                                 const float  coef = coef_j[iii];
                                 for(size_t ch=0;ch<NCH;++ch)
                                 {
@@ -103,73 +131,31 @@ namespace yocto
                             }
                         }
 
-                        acc = 1.0f/acc;
-                        U *q = (U *)&tgt_j[i];
-                        for(size_t ch=0;ch<NCH;++ch)
-                        {
-                            q[ch] = U(clamp<float>(0,sum[ch]*acc,1));
-                        }
-
-
-                    }
-
-                }
-
-
-            }
-
-#if 0
-            template <typename T, typename U, size_t NCH>
-            inline void eval_x( xpatch &xp, lockable & ) throw()
-            {
-                assert(target);
-                assert(source);
-                const pixmap<T> &src  = *static_cast<const pixmap<T>*>(source);
-                pixmap<T>       &tgt  = *static_cast< pixmap<T>     *>(target);
-                const unit_t     top  = this->top;
-                const unit_t     xup  = src.upper.x;
-
-                float sum[NCH];
-
-                for(unit_t j=xp.lower.y;j<=xp.upper.y;++j)
-                {
-                    const typename pixmap<T>::row &src_j = src[j];
-                    typename       pixmap<T>::row &tgt_j = tgt[j];
-                    for(unit_t i=xp.lower.x;i<=xp.upper.x;++i)
-                    {
-                        const unit_t kinf = min_of<unit_t>(top,i);
-                        const unit_t ksup = min_of<unit_t>(top,xup-i);
-
-                        // accumulate
-                        for(size_t ch=0;ch<NCH;++ch)
-                        {
-                            sum[ch] = 0;
-                        }
-                        float acc = 0;
-
-                        for(unit_t k=-kinf;k<=ksup;++k)
-                        {
-                            const U    *p    = (const U*) &src_j[i+k];
-                            const float coef = weight[(k>=0)?k:-k];
-                            for(size_t ch=0;ch<NCH;++ch)
-                            {
-                                sum[ch] += float(p[ch])*coef;
-                            }
-                            acc += coef;
-                        }
-
-                        // transfer
-                        U *q = (U*)&tgt_j[i];
+                        //______________________________________________________
+                        //
+                        // compute new value(s)
+                        //______________________________________________________
                         acc  = 1.0f/acc;
+                        U *q = (U *)&tgt_j[i];
                         for(size_t ch=0;ch<NCH;++ch)
                         {
                             q[ch] = U(sum[ch]*acc);
                         }
+
                     }
+                    //__________________________________________________________
+                    //
+                    // LEAVE: loop over columns
+                    //__________________________________________________________
                 }
+                //______________________________________________________________
+                //
+                // LEAVE: loop over rows
+                //______________________________________________________________
+
             }
-#endif
-            
+
+
         };
         
     }

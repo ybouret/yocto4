@@ -8,22 +8,34 @@ namespace yocto
     namespace graphics
     {
 
-        blur:: ~blur() throw()
+        blur_info:: ~blur_info() throw()
         {
-            
         }
 
         static inline
         unit_t __blur_width(const float sig)
         {
-            const float exp_min = numeric<float>::epsilon;
-            const float len_max = (exp_min >= 1.0f) ? 0.0f : sqrtf( - 2.0*sig*sig* logf(exp_min) );
+            const float exp_min = 1.0f/256;
+            const float len_max = sqrtf( - 2.0*sig*sig*logf(exp_min) );
             return max_of<unit_t>(1,ceilf(len_max));
         }
 
+        blur_info:: blur_info(const float sig) :
+        __width( __blur_width(sig) )
+        {
+
+        }
+
+        blur:: ~blur() throw()
+        {
+            
+        }
+
+
         blur:: blur(const float sig) :
-        pixmap<float>( __blur_width(sig), __blur_width(sig) ),
-        top(width.x-1)
+        yocto::graphics::blur_info(sig),
+        pixmap<float>( __width, __width ),
+        top(__width-1)
         {
             const float den = 2.0f * sig * sig;
             for(unit_t j=0;j<=top;++j)
@@ -32,7 +44,7 @@ namespace yocto
                 for(unit_t i=0;i<=top;++i)
                 {
                     const float i2 = i*i;
-                    (*this)[j][i]  = expf(-(i2*j2)/den);
+                    (*this)[j][i]  = expf(-(i2+j2)/den );
                 }
             }
         }

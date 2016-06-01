@@ -238,6 +238,9 @@ YOCTO_UNIT_TEST_IMPL(ops)
         PNG.save("image_gs.png", pgs, NULL);
 
         pixmapz pzm( next_power_of_two(w), next_power_of_two(h) );
+        get_gsz zproc;
+        //PNG.save("image_fft_src.png", pzm, zproc, NULL);
+
         fourier::forward(pzm,pgs);
 
 
@@ -252,9 +255,9 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
         {
             float cmx = 0;
-            for(unit_t j=0;j<h;++j)
+            for(unit_t j=0;j<pzm.h;++j)
             {
-                for(unit_t i=0;i<w;++i)
+                for(unit_t i=0;i<pzm.w;++i)
                 {
                     cmx = max_of(cmx, pzm[j][i].mod());
                 }
@@ -262,24 +265,23 @@ YOCTO_UNIT_TEST_IMPL(ops)
             std::cerr << "cmx=" << cmx << std::endl;
             if(cmx>0)
             {
-                for(unit_t j=0;j<h;++j)
+                for(unit_t j=0;j<pzm.h;++j)
                 {
-                    for(unit_t i=0;i<w;++i)
+                    for(unit_t i=0;i<pzm.w;++i)
                     {
                         pzm[j][i] /= cmx;
                     }
                 }
             }
         }
-        get_gsz zproc;
         PNG.save("image_fft.png", pzm, zproc, NULL);
 
         fourier::reverse(pzm);
         {
             float cmx = 0;
-            for(unit_t j=0;j<h;++j)
+            for(unit_t j=0;j<pzm.h;++j)
             {
-                for(unit_t i=0;i<w;++i)
+                for(unit_t i=0;i<pzm.w;++i)
                 {
                     cmx = max_of(cmx, pzm[j][i].mod());
                 }
@@ -287,9 +289,9 @@ YOCTO_UNIT_TEST_IMPL(ops)
             std::cerr << "cmx=" << cmx << std::endl;
             if(cmx>0)
             {
-                for(unit_t j=0;j<h;++j)
+                for(unit_t j=0;j<pzm.h;++j)
                 {
-                    for(unit_t i=0;i<w;++i)
+                    for(unit_t i=0;i<pzm.w;++i)
                     {
                         pzm[j][i] /= cmx;
                     }
@@ -312,8 +314,9 @@ YOCTO_UNIT_TEST_IMPL(ops)
                 const string outname = vformat("mask_blur%02d.png",sig);
                 PNG.save(outname, bf, NULL);
             }
+
             {
-                bf.apply<RGBA,uint8_t,3>(blr,pxm,xps, &server);
+                bf.apply<RGBA,uint8_t,3>(blr,pxm,xps,&server);
                 const string outname = vformat("image_blur%02d.png",sig);
                 PNG.save(outname, blr, NULL);
             }
