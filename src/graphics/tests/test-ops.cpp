@@ -300,9 +300,15 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
 
         std::cerr << "-- blur" << std::endl;
+
+        pixmap4 blr(w,h);
+
         for(int sig=1;sig<=5;++sig)
         {
-            blur blr(sig);
+            blur bf(sig);
+            bf.apply_x<RGBA,uint8_t,3>(blr,pxm,xps, &server);
+            const string outname = vformat("image_blur%02d.png",sig);
+            PNG.save(outname, blr, NULL);
         }
 
     }
