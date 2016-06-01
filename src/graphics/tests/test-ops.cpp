@@ -6,6 +6,7 @@
 #include "yocto/graphics/ops/blobs.hpp"
 #include "yocto/graphics/ops/stencil.hpp"
 #include "yocto/graphics/ops/fft.hpp"
+#include "yocto/graphics/ops/blur.hpp"
 
 #include "yocto/graphics/image/png.hpp"
 #include "yocto/graphics/image/jpeg.hpp"
@@ -297,6 +298,12 @@ YOCTO_UNIT_TEST_IMPL(ops)
         }
         PNG.save("image_ifft.png", pzm, zproc, NULL);
 
+
+        std::cerr << "-- blur" << std::endl;
+        for(int sig=1;sig<=5;++sig)
+        {
+            blur blr(sig);
+        }
 
     }
     
