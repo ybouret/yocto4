@@ -4,6 +4,7 @@
 #include "yocto/graphics/pixmap.hpp"
 #include "yocto/graphics/xpatch.hpp"
 #include "yocto/code/utils.hpp"
+#include <cstdlib>
 
 namespace yocto
 {

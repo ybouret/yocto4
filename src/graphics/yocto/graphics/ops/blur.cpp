@@ -35,7 +35,7 @@ namespace yocto
         blur:: blur(const float sig) :
         yocto::graphics::blur_info(sig),
         pixmap<float>( __width, __width ),
-        top(__width-1)
+        top(__width-1), target(0), source(0)
         {
             const float den = 2.0f * sig * sig;
             for(unit_t j=0;j<=top;++j)
