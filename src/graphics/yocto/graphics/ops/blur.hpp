@@ -72,7 +72,7 @@ namespace yocto
                 const pixmap<T> &src  = *static_cast<const pixmap<T>*>(source);
                 pixmap<T>       &tgt  = *static_cast< pixmap<T>     *>(target);
 
-                const unit_t     len  = top;
+                const int        len  = top;
                 const unit_t     xup  = src.upper.x;
                 const unit_t     yup  = src.upper.y;
 
