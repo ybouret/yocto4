@@ -51,6 +51,19 @@ else
 fi
 
 ########################################################################
+## define build system
+########################################################################
+BUILD_SYSTEM=`uname -s`
+case $BUILD_SYSTEM in
+  "FreeBSD" | "Linux" | "SunOS" )
+		BUILD_TARGET=$BUILD_SYSTEM-`uname -m`
+		;;
+  *) 
+		BUILD_TARGET=$BUILD_SYSTEM
+		;;
+esac
+
+########################################################################
 ## Check Ninja
 ########################################################################
 BUILD_SPEC=""
@@ -123,15 +136,7 @@ case $BUILD_TOOLS in
   *) xerror "Unsuported BuildTools <$BUILD_TOOLS>";;
 esac
 
-BUILD_SYSTEM=`uname -s`
-case $BUILD_SYSTEM in
-  "FreeBSD" | "Linux" | "SunOS" )
-		BUILD_TARGET=$BUILD_SYSTEM-`uname -m`
-		;;
-  *) 
-		BUILD_TARGET=$BUILD_SYSTEM
-		;;
-esac
+
 
 cmake -E cmake_echo_color --blue "-- BUILD_SOURCE = <$BUILD_SOURCE>"
 cmake -E cmake_echo_color --blue "-- BUILD_TOOLS  = <$BUILD_TOOLS>"
