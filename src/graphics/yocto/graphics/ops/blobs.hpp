@@ -40,7 +40,7 @@ namespace yocto
         };
         
         
-        
+        // detecting connex regions
         class blobs : public pixmap<size_t>
         {
         public:

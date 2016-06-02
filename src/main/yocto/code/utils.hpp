@@ -9,25 +9,25 @@ namespace yocto
 	template <typename T>
 	inline T min_of( T a, T b )
 	{
-		return a < b ? a : b;
+		return (a<b) ? a : b;
 	}
 	
 	template <typename T>
 	inline T max_of( T a, T b )
 	{
-		return b < a ? a : b;
+		return (b<a) ? a : b;
 	}
 	
     template <typename T>
     inline int sign_of( T a )
     {
-        return a < 0 ? -1 : (  0 < a ? 1 : 0 );
+        return (a<0) ? -1 : (  (0<a) ? 1 : 0 );
     }
        
 	template <typename T>
 	inline T clamp( T amin, T a, T amax )
 	{
-		return a < amin ? amin : ( amax < a ? amax : a );
+		return (a<amin) ? amin : ( (amax<a) ? amax : a );
 	}
 	
 	//! integer hash

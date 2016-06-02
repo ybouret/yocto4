@@ -316,7 +316,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
             }
 
             {
-                bf.apply<RGBA,uint8_t,3>(blr,pxm,xps,&server);
+                bf.__apply<RGBA,uint8_t,3>(blr,pxm,xps,&server);
                 const string outname = vformat("image_blur%02d.png",sig);
                 PNG.save(outname, blr, NULL);
             }

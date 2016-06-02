@@ -17,7 +17,7 @@ namespace yocto
             virtual ~blur_info() throw();
 
             const unit_t __width;
-            
+
         protected:
             explicit blur_info(const float sig);
 
@@ -38,11 +38,11 @@ namespace yocto
             typename T,
             typename U,
             size_t   NCH>
-            inline void apply(pixmap<T>         &tgt,
-                              const pixmap<T>   &src,
-                              xpatches          &xps,
-                              threading::engine *server
-                              )
+            inline void __apply(pixmap<T>         &tgt,
+                                const pixmap<T>   &src,
+                                xpatches          &xps,
+                                threading::engine *server
+                                )
             {
                 source = &src;
                 target = &tgt;
@@ -53,8 +53,16 @@ namespace yocto
                 }
                 if(server) server->flush();
             }
-            
-            
+
+
+            inline void apply(pixmap<float>       &tgt,
+                              const pixmap<float> &src,
+                              xpatches            &xps,
+                              threading::engine   *server
+                              )
+            {
+                __apply<float, float, 1>(tgt, src, xps, server);
+            }
 
 
         private:
@@ -153,10 +161,10 @@ namespace yocto
                 //
                 // LEAVE: loop over rows
                 //______________________________________________________________
-
+                
             }
-
-
+            
+            
         };
         
     }
