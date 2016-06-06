@@ -17,6 +17,8 @@ namespace yocto
             if(depth<3) throw exception("bitmap::save(depth<3)");
             string ext = vfs::get_extension(filename); ext.to_lower();
             int    tid = 0;
+            bool   swp = false;
+
             if("bmp"==ext)
             {
                 tid = YGFX_IS_BMP;
@@ -25,11 +27,13 @@ namespace yocto
             if("ppm"==ext)
             {
                 tid = YGFX_IS_PPM;
+                swp = true;
             }
 
             if("eps"==ext)
             {
                 tid = YGFX_IS_EPS;
+                swp = true;
             }
 
             if(tid<=0) throw exception("bitmap::save(unhandled extension '%s')", ext.c_str());
@@ -38,6 +42,7 @@ namespace yocto
             ios::wcstream fp(filename);
             const int nx = w;
             const int ny = h;
+            int       size = 0;
             // HEADER
             switch (tid) {
                 case YGFX_IS_PPM:
@@ -58,43 +63,42 @@ namespace yocto
                     break;
 
                 case YGFX_IS_BMP:
-#if 0
                     /* Header 10 bytes */
-                    putc('B',fptr);
-                    putc('M',fptr);
+                    fp.write('B');
+                    fp.write('M');
                     size = nx * ny * 3 + 14 + 40;
-                    putc((size) % 256,fptr);
-                    putc((size / 256) % 256,fptr);
-                    putc((size / 65536) % 256,fptr);
-                    putc((size / 16777216),fptr);
-                    putc(0,fptr); putc(0,fptr);
-                    putc(0,fptr); putc(0,fptr);
+                    fp.write(size%256);
+                    fp.write((size/256)%256);
+                    fp.write((size / 65536) % 256);
+                    fp.write((size / 16777216));
+                    fp.write(0); fp.write(0); fp.write(0); fp.write(0);
+
                     /* Offset to image data */
-                    putc(14+40,fptr); putc(0,fptr); putc(0,fptr); putc(0,fptr);
+                    fp.write(14+40); fp.write(0); fp.write(0); fp.write(0);
+
                     /* Information header 40 bytes */
-                    putc(0x28,fptr); putc(0,fptr); putc(0,fptr); putc(0,fptr);
-                    putc((nx) % 256,fptr);
-                    putc((nx / 256) % 256,fptr);
-                    putc((nx / 65536) % 256,fptr);
-                    putc((nx / 16777216),fptr);
-                    putc((ny) % 256,fptr);
-                    putc((ny / 256) % 256,fptr);
-                    putc((ny / 65536) % 256,fptr);
-                    putc((ny / 16777216),fptr);
-                    putc(1,fptr); putc(0,fptr); /* One plane */
-                    putc(24,fptr); putc(0,fptr); /* 24 bits */
+                    fp.write(0x28); fp.write(0); fp.write(0); fp.write(0);
+                    fp.write((nx) % 256);
+                    fp.write((nx / 256) % 256);
+                    fp.write((nx / 65536) % 256);
+                    fp.write((nx / 16777216));
+                    fp.write((ny) % 256);
+                    fp.write((ny / 256) % 256);
+                    fp.write((ny / 65536) % 256);
+                    fp.write((ny / 16777216));
+                    fp.write(1); fp.write(0); /* One plane */
+                    fp.write(24); fp.write(0); /* 24 bits */
                     /* Compression type == 0 */
-                    putc(0,fptr); putc(0,fptr); putc(0,fptr); putc(0,fptr);
+                    fp.write(0); fp.write(0); fp.write(0); fp.write(0);
                     size = nx * ny * 3;
-                    putc((size) % 256,fptr);
-                    putc((size / 256) % 256,fptr);
-                    putc((size / 65536) % 256,fptr);
-                    putc((size / 16777216),fptr);
-                    putc(1,fptr); putc(0,fptr); putc(0,fptr); putc(0,fptr);
-                    putc(1,fptr); putc(0,fptr); putc(0,fptr); putc(0,fptr);
-                    putc(0,fptr); putc(0,fptr); putc(0,fptr); putc(0,fptr); /* No palette */
-                    putc(0,fptr); putc(0,fptr); putc(0,fptr); putc(0,fptr);
-#endif
+                    fp.write((size) % 256);
+                    fp.write((size / 256) % 256);
+                    fp.write((size / 65536) % 256);
+                    fp.write((size / 16777216));
+                    fp.write(1); fp.write(0); fp.write(0); fp.write(0);
+                    fp.write(1); fp.write(0); fp.write(0); fp.write(0);
+                    fp.write(0); fp.write(0); fp.write(0); fp.write(0); /* No palette */
+                    fp.write(0); fp.write(0); fp.write(0); fp.write(0);
                     break;
 
                 default:
@@ -102,10 +106,77 @@ namespace yocto
             }
 
             // BINARY DATA
+            int       linelength = 0;
+            const int top        = ny-1;
+            for(int j=0;j<ny;++j)
+            {
+                const int rowindex = swp ? (top-j) : j;
+                for(int i=0;i<nx;++i)
+                {
+                    const uint8_t *C = static_cast<const uint8_t *>(get(i,rowindex));
+                    const uint8_t  r = C[0];
+                    const uint8_t  g = C[1];
+                    const uint8_t  b = C[2];
+                    const uint8_t  m = gist::greyscale1(r,g,b);
+                    switch (tid) {
+                        case YGFX_IS_BMP:
+                            if(in_color)
+                            {
+                                fp.write(b); fp.write(g); fp.write(r);
+                            }
+                            else
+                            {
+                                fp.write(m); fp.write(m); fp.write(m);
+                            }
+                            break;
 
+                        case YGFX_IS_PPM:
+                            if(in_color)
+                            {
+                                fp.write(r); fp.write(g); fp.write(b);
+                            }
+                            else
+                            {
+                                fp.write(m); fp.write(m); fp.write(m);
+                            }
+                            break;
+
+                        case YGFX_IS_EPS:
+                            if(in_color)
+                            {
+                                fp("%02x%02x%02x",r,g,b);
+                                linelength += 6;
+                            }
+                            else
+                            {
+                                fp("%02x",m);
+                                linelength+=2;
+                            }
+                            if (linelength >= 72 || linelength >= nx) {
+                                fp("\n");
+                                linelength = 0;
+                            }
+                            break;
+                            
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            // EPILOG
+            switch(tid)
+            {
+                case YGFX_IS_EPS:
+                    fp("\n%%%%EOF\n");
+                    break;
+
+                default:
+                    break;
+            }
 
         }
-
+        
     }
-
+    
 }

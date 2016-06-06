@@ -50,7 +50,11 @@ YOCTO_UNIT_TEST_IMPL(img)
         // load
         std::cerr << "Loading RGBA" << std::endl;
         pixmap4 p4( IMG.load4(filename, NULL));
-        
+        p4.save("image4.bmp",true);
+        p4.save("image4.ppm",true);
+        p4.save("image4.eps",true);
+
+
         std::cerr << "Loading RGB" << std::endl;
         pixmap3 p3( IMG.load3(filename, NULL));
         
