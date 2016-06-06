@@ -4,6 +4,7 @@
 #include "yocto/graphics/rectangle.hpp"
 #include "yocto/counted-object.hpp"
 #include "yocto/ptr/arc.hpp"
+#include "yocto/string.hpp"
 
 namespace yocto
 {
@@ -72,9 +73,13 @@ namespace yocto
             //! clean memory
             virtual ~bitmap() throw();
             
-
+            //! check valid depth, throw on error
             static unit_t check_d(unit_t);
+
+            //! check valid width, throw on error
             static unit_t check_w(unit_t);
+
+            //! check valud height, throw on error
             static unit_t check_h(unit_t);
 
             //! address of first element of line 0<=j<h
@@ -85,11 +90,17 @@ namespace yocto
 
             //! get address of item i,j
             void        *get(const unit_t i,const unit_t j) throw();
+
+            //! wrapper to get address from vertex
             inline void *get(const vertex &v) throw() { return get(v.x,v.y); }
-            //! get address of item i,j
+
+            //! get address of item i,j, CONST
             const void *get(const unit_t i,const unit_t j) const throw();
+
+            //! wrapper to get address from vertex, CONST
             inline const void *get(const vertex &v) const throw() { return get(v.x,v.y); }
 
+            //! zero memory
             void ldz() throw();
 
             void copy(const bitmap &bmp) throw(); //!< assume same sizes
@@ -103,6 +114,17 @@ namespace yocto
             {
                 return (y<=lower.y) ?  at_lower : ( (y>=upper.y) ? at_upper : is_inner );
             }
+
+            //! save as uncompressed bitmap
+            /**
+             assuming RGB of RGBA !!!
+             - .bmp
+             - .ppm
+             - .eps
+             */
+            void save(const string &filename,
+                      const bool    in_color = true ) const;
+
 
         private:
             YOCTO_DISABLE_ASSIGN(bitmap);

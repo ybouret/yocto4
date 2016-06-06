@@ -8,7 +8,7 @@
 #include "yocto/math/triplet.hpp"
 
 namespace yocto {
-    
+
     namespace math {
 
         namespace kernel
@@ -17,9 +17,9 @@ namespace yocto {
             void minimize(typename numeric<T>::function &func,
                           triplet<T> &x,
                           triplet<T> &f);
-            
+
         }
-        
+
         //! (x.a <= x.b <= x.c) || (x.a>=x.b>=x.c) and f.b <= f.a and f.b <= f.c
         /**
          ftol will be internally checked
