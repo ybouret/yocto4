@@ -40,10 +40,11 @@ namespace yocto
 
             // open file
             ios::wcstream fp(filename);
-            const int nx = w;
-            const int ny = h;
-            int       size = 0;
-            // HEADER
+            const int     nx   = w;
+            const int     ny   = h;
+            int           size = 0;
+
+            // PROLOG
             switch (tid) {
                 case YGFX_IS_PPM:
                     fp("P6\n%d %d\n255\n",nx,ny);
@@ -157,7 +158,7 @@ namespace yocto
                                 linelength = 0;
                             }
                             break;
-                            
+
                         default:
                             break;
                     }
@@ -170,11 +171,11 @@ namespace yocto
                 case YGFX_IS_EPS:
                     fp("\n%%%%EOF\n");
                     break;
-
+                    
                 default:
                     break;
             }
-
+            
         }
         
     }

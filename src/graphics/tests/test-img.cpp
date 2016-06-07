@@ -53,7 +53,9 @@ YOCTO_UNIT_TEST_IMPL(img)
         p4.save("image4.bmp",true);
         p4.save("image4.ppm",true);
         p4.save("image4.eps",true);
-
+        p4.save("image4_gs.bmp",false);
+        p4.save("image4_gs.ppm",false);
+        p4.save("image4_gs.eps",false);
 
         std::cerr << "Loading RGB" << std::endl;
         pixmap3 p3( IMG.load3(filename, NULL));
