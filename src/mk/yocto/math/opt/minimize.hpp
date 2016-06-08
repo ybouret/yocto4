@@ -42,7 +42,12 @@ namespace yocto {
                             triplet<T> &x,
                             triplet<T> &f,
                             T          xtol);
-
+            
+            //! (x.a <= x.b <= x.c) || (x.a>=x.b>=x.c) and f.b <= f.a and f.b <= f.c
+            /**
+             - return true is isOK(x,f) returns true
+             - return false if xtol is reached or re-increasing space
+             */
             typedef functor<bool,TL2(const triplet<T>&,const triplet<T>&)> event;
             static bool run_until(event                         &isOK,
                                   typename numeric<T>::function &func,
