@@ -30,15 +30,27 @@ namespace yocto {
                       triplet<T> &f,
                       T ftol);
 
-        //! (x.a <= x.b <= x.c) || (x.a>=x.b>=x.c) and f.b <= f.a and f.b <= f.c
-        /**
-         based on xtol or re-increasing space
-         */
+        
         template <typename T>
-        void optimize(typename numeric<T>::function &func,
-                      triplet<T> &x,
-                      triplet<T> &f,
-                      T          xtol);
+        struct optimize1D
+        {
+            //! (x.a <= x.b <= x.c) || (x.a>=x.b>=x.c) and f.b <= f.a and f.b <= f.c
+            /**
+             based on xtol or re-increasing space
+             */
+            static void run(typename numeric<T>::function &func,
+                            triplet<T> &x,
+                            triplet<T> &f,
+                            T          xtol);
+
+            typedef functor<bool,TL2(const triplet<T>&,const triplet<T>&)> event;
+            static bool run_until(event                         &isOK,
+                                  typename numeric<T>::function &func,
+                                  triplet<T>                    &x,
+                                  triplet<T>                    &f,
+                                  T                              xtol);
+
+        };
 
     }
     

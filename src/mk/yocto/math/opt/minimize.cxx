@@ -106,10 +106,10 @@ namespace yocto {
 
 
         template <>
-        void optimize<real_t>(numeric<real_t>::function &func,
-                              triplet<real_t>           &x,
-                              triplet<real_t>           &f,
-                              real_t                     xtol )
+        void optimize1D<real_t>::run(numeric<real_t>::function &func,
+                                     triplet<real_t>           &x,
+                                     triplet<real_t>           &f,
+                                     real_t                     xtol )
         {
             assert(x.is_ordered());
             x.co_sort(f);
@@ -127,6 +127,37 @@ namespace yocto {
                 if(dx_curr<=xtol||dx_curr>=dx_prev) break;
                 dx_prev = dx_curr;
             }
+        }
+
+        template <>
+        bool optimize1D<real_t>::run_until(event                     &isOK,
+                                           numeric<real_t>::function &func,
+                                           triplet<real_t>           &x,
+                                           triplet<real_t>           &f,
+                                           real_t                     xtol )
+        {
+            assert(x.is_ordered());
+            x.co_sort(f);
+            assert(x.a<=x.b);
+            assert(x.b<=x.c);
+            assert(f.b<=f.a);
+            assert(f.b<=f.c);
+            xtol = Fabs(xtol);
+
+            real_t dx_prev = Fabs(x.c - x.a);
+            for(;;)
+            {
+                kernel::minimize<real_t>(func,x,f);
+                if(isOK(x,f))
+                {
+                    // short circuit
+                    return true;
+                }
+                const real_t dx_curr = Fabs(x.c-x.a);
+                if(dx_curr<=xtol||dx_curr>=dx_prev) break;
+                dx_prev = dx_curr;
+            }
+            return false;
         }
         
         
