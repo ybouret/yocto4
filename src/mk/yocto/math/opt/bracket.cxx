@@ -4,14 +4,16 @@
 #include "yocto/code/utils.hpp"
 
 namespace yocto {
-	
-	namespace math {
-		
-		template <>
-		void bracket<real_t>::inside(numeric<real_t>::function    & func,
-									 triplet<real_t>              & x,
-									 triplet<real_t>              & f )
-		{
+
+    namespace math {
+
+        template <>
+        void bracket<real_t>::inside(numeric<real_t>::function    & func,
+                                     triplet<real_t>              & x,
+                                     triplet<real_t>              & f )
+        {
+
+            static const real_t SHRINK = REAL(0.381966);
 
             // ordering..
             if(x.a>x.c)
@@ -31,7 +33,21 @@ namespace yocto {
             double width = x.c-x.a; assert(width>=0);
             for(;;)
             {
-                x.b = clamp(x.a,x.a + REAL(0.5)*(x.c-x.a),x.c);
+                if(f.a < f.c )
+                {
+                    x.b = clamp(x.a,x.a + SHRINK*(x.c-x.a),x.c);
+                }
+                else
+                {
+                    if(f.c<f.a)
+                    {
+                        x.b = clamp(x.a,x.c - SHRINK*(x.c-x.a),x.c);
+                    }
+                    else
+                    {
+                        x.b = clamp(x.a,x.a + REAL(0.5) * (x.c-x.a),x.c);
+                    }
+                }
                 f.b = func(x.b);
                 assert(x.a<=x.b);
                 assert(x.b<=x.c);
@@ -104,16 +120,16 @@ namespace yocto {
             }
 
         }
-		
+
 #define SHFT(a,b,c,d) do{ (a)=(b);(b)=(c);(c)=(d); } while(false)
-        
-		template <>
+
+        template <>
         void bracket<real_t>::expand( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f )
         {
             static const real_t GOLD = REAL(1.618034);
             static const real_t GLIM = REAL(10.0);
             static const real_t TINY = REAL(1e-20);
-            
+
             //------------------------------------------------------------------
             // assume f.a and f.b are computed
             //------------------------------------------------------------------
@@ -123,7 +139,7 @@ namespace yocto {
                 cswap(f.a,f.b);
             }
             assert(f.b<=f.a);
-            
+
             //------------------------------------------------------------------
             // now, we go downhill: initialize the third point
             //-----------------------------------------------------------------
@@ -131,13 +147,13 @@ namespace yocto {
             f.c = func(x.c);
             //std::cerr << "xinit:  " << x << std::endl;
             //std::cerr << "finit:  " << f << std::endl;
-            
+
             while( f.b > f.c )
             {
                 assert(f.b<=f.a);
                 assert(f.c<f.b);
                 assert(x.is_ordered());
-                
+
                 const real_t delta = x.c - x.a;
                 if( Fabs(delta) <= 0 )
                 {
@@ -145,7 +161,7 @@ namespace yocto {
                     x.a = x.b = x.c;
                     return;
                 }
-                
+
                 //--------------------------------------------------------------
                 // compute geometrical factors
                 //--------------------------------------------------------------
@@ -153,15 +169,15 @@ namespace yocto {
                 const real_t beta  = (x.c - x.b) / delta; assert(beta>=0);
                 const real_t A     =  f.a - f.b;          assert(A>=0);
                 const real_t B     =  f.b - f.c;          assert(B>0);
-                
+
                 //--------------------------------------------------------------
                 // compute curvature times determinant>0
                 //--------------------------------------------------------------
                 const real_t q     = beta * A - alpha * B;
-                
+
                 if( q > 0 )
                 {
-                    
+
                     //----------------------------------------------------------
                     // compute the probe and its limit
                     //----------------------------------------------------------
@@ -169,8 +185,8 @@ namespace yocto {
                     const real_t lam  = p / ( 2 * max_of(q,TINY) );  assert(lam>=0);
                     const real_t u    = x.b + lam * delta;
                     const real_t ulim = x.b + GLIM * (x.c - x.b);
-                    
-                    
+
+
                     if( (u-x.b)*(x.c-u) >= 0 )
                     {
                         //------------------------------------------------------
@@ -185,7 +201,7 @@ namespace yocto {
                             assert(x.is_ordered());
                             continue; // winner
                         }
-                        
+
                         if( fu >= f.b )
                         {
                             x.c = u;
@@ -194,10 +210,10 @@ namespace yocto {
                             assert(x.is_ordered());
                             continue; // winner
                         }
-                        
+
                         goto PROBE; // no interest
                     }
-                    
+
                     if( (u-x.c) * (ulim -u ) >= 0 )
                     {
                         //----------------------------------------------------------
@@ -210,7 +226,7 @@ namespace yocto {
                         assert(x.is_ordered());
                         continue;
                     }
-                    
+
                     //----------------------------------------------------------
                     // beyond ulim
                     //----------------------------------------------------------
@@ -220,7 +236,7 @@ namespace yocto {
                     assert(x.is_ordered());
                     continue;
                 }
-                
+
                 //--------------------------------------------------------------
                 // default magnification step
                 //--------------------------------------------------------------
@@ -235,7 +251,7 @@ namespace yocto {
             
         }
         
-		
-	} //math
-	
+        
+    } //math
+    
 }//yocto
