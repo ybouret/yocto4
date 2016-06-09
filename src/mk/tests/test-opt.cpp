@@ -29,7 +29,7 @@ static inline void optim(PROC &proc, T xtol)
     std::cerr << "x=" << x << std::endl;
     std::cerr << "f=" << f << std::endl;
     
-    proc( func,x,f,xtol);
+    proc(func,x,f,xtol);
     std::cerr << "min@" << x.b << " = " << f.b << std::endl;
     std::cerr << "\t\t#calls=" << call_counts << std::endl;
 }
@@ -47,8 +47,7 @@ YOCTO_UNIT_TEST_IMPL(opt)
     }
  
     std::cerr << "Double: " << std::endl;
-    optim<double>(minimize<double>,xtol);
-    //optim<double>(minimize_para<double>,xtol);
+    optim<double>(optimize1D<double>::run,xtol);
 }
 YOCTO_UNIT_TEST_DONE()
 
