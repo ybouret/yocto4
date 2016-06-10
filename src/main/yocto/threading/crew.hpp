@@ -40,7 +40,7 @@ namespace yocto
             void        *priv;
         };
 
-        //! a threading kernel, using a context
+        //! a threading kernel, using a context to know which data process
         typedef functor<void,TL1(context&)> kernel;
 
         //! interface to execute a kernel
@@ -88,6 +88,8 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(sequential_executor);
         };
 
+
+        //! a crew of threads, will call kernel on each context
         class crew : public layout, public kernel_executor
         {
         public:
@@ -122,6 +124,7 @@ namespace yocto
         public:
             const size_t failure; //!< set to rank+1 if failure
         };
+        
     };
 }
 
