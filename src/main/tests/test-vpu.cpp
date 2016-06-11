@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/threading/vpu.hpp"
-
+#include "yocto/code/unroll.hpp"
 using namespace yocto;
 
 
@@ -18,9 +18,19 @@ namespace
             std::cerr << "default id=" << id << std::endl;
         }
 
-        inline void operator()( threading::context &ctx, array<double> &data )
+        inline void operator()( threading::context &ctx, array<double> &data ) throw()
         {
 
+            size_t offset = 1;
+            size_t length = data.size();
+            ctx.split(offset, length);
+            localSum = 0;
+#define DO_SUM(I) localSum += data[I]
+            YOCTO_LOOP_FUNC(length, DO_SUM, offset);
+            {
+                YOCTO_LOCK(ctx.access);
+                std::cerr << "localSum=" << localSum << std::endl;
+            }
         }
 
 
@@ -29,6 +39,8 @@ namespace
 
     };
 }
+
+#include "yocto/sequence/vector.hpp"
 
 YOCTO_UNIT_TEST_IMPL(vpu)
 {
@@ -42,6 +54,10 @@ YOCTO_UNIT_TEST_IMPL(vpu)
     }
 
     cpu.compile<double>();
+
+    vector<double> data(1000);
+    for(size_t i=1;i<=data.size();++i) data[i] = i;
     
+    cpu.call(data);
 }
 YOCTO_UNIT_TEST_DONE()

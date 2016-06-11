@@ -56,7 +56,7 @@ namespace yocto
             {
                 assert( code.is_valid() );
                 source = target = &arrU;
-                simd( *code );
+                (*simd)( *code );
             }
 
 
