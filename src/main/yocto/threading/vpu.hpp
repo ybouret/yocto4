@@ -32,7 +32,7 @@ namespace yocto
         template <typename T>
         class processing_unit :
         public vpu,
-        slots_of<T>
+        public slots_of<T>
         {
         public:
             YOCTO_ARGUMENTS_DECL_T;
