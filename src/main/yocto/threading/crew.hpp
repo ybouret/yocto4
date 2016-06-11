@@ -74,9 +74,9 @@ namespace yocto
 
         //! sequential executor, for debugging or single thread run
         class sequential_executor :
+        public kernel_executor,
         public faked_lock,
-        public context,
-        public kernel_executor
+        public context
         {
         public:
             virtual ~sequential_executor() throw();

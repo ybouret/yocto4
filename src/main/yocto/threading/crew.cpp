@@ -49,9 +49,9 @@ namespace yocto
         sequential_executor:: ~sequential_executor() throw() {}
 
         sequential_executor:: sequential_executor() throw() :
+        kernel_executor(),
         faked_lock(),
-        context(0,1,*this),
-        kernel_executor()
+        context(0,1,*this)
         {
         }
 
