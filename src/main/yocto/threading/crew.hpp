@@ -22,10 +22,10 @@ namespace yocto
                     lockable       &the_lock) throw();
             virtual ~context() throw();
 
-            const size_t rank;   //!< 0-size-1
+            const size_t rank;   //!< 0..size-1
             const size_t size;   //!< how many contextes
             lockable    &access; //!< shared access
-            const size_t indx;   //!< 1-size
+            const size_t indx;   //!< 1..size
 
             template <typename T> inline
             void split(T &offset,T &length) const throw()

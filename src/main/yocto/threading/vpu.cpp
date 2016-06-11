@@ -11,15 +11,15 @@ namespace yocto
 
         vpu:: vpu( const kexec_ptr &kxp ) throw() :
         cores(kxp->num_threads()),
-        simd(kxp),
-        call(this, & vpu::__call )
+        simd(kxp)//,call(this, & vpu::__call )
         {
         }
 
-
+#if 0
         void vpu:: __call(context &ctx) throw()
         {
         }
+#endif
         
     }
 }

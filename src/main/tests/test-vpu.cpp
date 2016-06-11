@@ -10,14 +10,18 @@ namespace
     {
     public:
         const int id;
+        double    localSum;
 
         ~Processor() throw() {}
-        Processor() throw() : id(0)
+        Processor() throw() : id(0), localSum(0)
         {
             std::cerr << "default id=" << id << std::endl;
         }
 
-        
+        inline void operator()( threading::context &ctx, array<double> &data )
+        {
+
+        }
 
 
     private:
@@ -36,5 +40,8 @@ YOCTO_UNIT_TEST_IMPL(vpu)
     {
         cpu.push_back();
     }
+
+    cpu.compile<double>();
+    
 }
 YOCTO_UNIT_TEST_DONE()
