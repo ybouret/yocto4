@@ -10,45 +10,50 @@ namespace yocto
     namespace threading
     {
 
-        class VPU
+        class vpu
         {
         public:
             typedef shared_ptr<kernel_executor> kexec_ptr;
-            virtual ~VPU() throw();
+            virtual ~vpu() throw();
+
+            const size_t cores;
 
         protected:
-            explicit VPU(const kexec_ptr &kxp) throw();
-
+            explicit vpu(const kexec_ptr &kxp) throw();
+            
         private:
-            kexec_ptr SIMD;
-            kernel    CALL;
-            YOCTO_DISABLE_COPY_AND_ASSIGN(VPU);
-            void call( context & ) throw();
+            kexec_ptr simd;
+            kernel    call;
+            YOCTO_DISABLE_COPY_AND_ASSIGN(vpu);
+            void __call( context & ) throw();
         };
 
 
         template <typename T>
         class processing_unit :
-        public VPU,
+        public vpu,
         slots_of<T>
         {
         public:
+            YOCTO_ARGUMENTS_DECL_T;
+
             typedef slots_of<T> slots_type;
             virtual ~processing_unit() throw() {}
 
-            explicit processing_unit( const kexec_ptr &kxp ) :
-            VPU(kxp),
-            slots_type(kxp->num_threads())
+            explicit processing_unit(const kexec_ptr &kxp) :
+            vpu(kxp), slots_type(cores)
             {
             }
+
+
 
 
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(processing_unit);
         };
-
-
+        
+        
     }
 }
 

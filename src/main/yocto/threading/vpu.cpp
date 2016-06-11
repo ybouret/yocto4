@@ -5,18 +5,19 @@ namespace yocto
     namespace threading
     {
 
-        VPU:: ~VPU() throw()
+        vpu:: ~vpu() throw()
         {
         }
 
-        VPU:: VPU( const kexec_ptr &kxp ) throw() :
-        SIMD(kxp),
-        CALL(this, & VPU::call )
+        vpu:: vpu( const kexec_ptr &kxp ) throw() :
+        cores(kxp->num_threads()),
+        simd(kxp),
+        call(this, & vpu::__call )
         {
         }
 
 
-        void VPU:: call(context &ctx) throw()
+        void vpu:: __call(context &ctx) throw()
         {
         }
         

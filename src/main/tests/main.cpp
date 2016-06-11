@@ -110,7 +110,8 @@ YOCTO_UNIT_TEST_INIT(150)
     YOCTO_UNIT_TEST_DECL(barrier);
     YOCTO_UNIT_TEST_DECL(engine);
     YOCTO_UNIT_TEST_DECL(crew);
-
+    YOCTO_UNIT_TEST_DECL(vpu);
+    
 	YOCTO_UNIT_TEST_DECL(dist);
     YOCTO_UNIT_TEST_DECL(binary);
     
