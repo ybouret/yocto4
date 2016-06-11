@@ -29,10 +29,15 @@ namespace
             YOCTO_LOOP_FUNC(length, DO_SUM, offset);
             {
                 YOCTO_LOCK(ctx.access);
-                std::cerr << "localSum=" << localSum << std::endl;
+                { std::cerr << "localSum=" << localSum << std::endl; }
             }
         }
-
+                
+        inline void operator()( threading::context &ctx, array<double> &odata, const array<int> &idata ) throw()
+        {
+            
+        }
+        
 
     private:
         YOCTO_DISABLE_ASSIGN(Processor);
@@ -53,11 +58,18 @@ YOCTO_UNIT_TEST_IMPL(vpu)
         cpu.push_back();
     }
 
-    cpu.compile<double>();
-
     vector<double> data(1000);
-    for(size_t i=1;i<=data.size();++i) data[i] = i;
-    
+    vector<int>    idata(1000);
+
+    for(size_t i=1;i<=data.size();++i)
+    {
+        data[i]  = i;
+        idata[i] = i*i;
+    }
+    cpu.compile<double>();
     cpu.call(data);
+    
+    cpu.compile<double,int>();
+    
 }
 YOCTO_UNIT_TEST_DONE()

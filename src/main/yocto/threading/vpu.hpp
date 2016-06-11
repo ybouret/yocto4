@@ -51,6 +51,13 @@ namespace yocto
                 code.reset( new kernel(this, & processing_unit<T>::call1<U> ) );
             }
 
+            template <typename U,typename V>
+            inline void compile()
+            {
+                code.reset( new kernel(this, & processing_unit<T>::call2<U,V> ) );
+            }
+            
+            
             template <typename U>
             inline void call( array<U> &arrU ) throw()
             {
@@ -59,6 +66,14 @@ namespace yocto
                 (*simd)( *code );
             }
 
+            template <typename U, typename V>
+            inline void call( array<U> &arrU, const array<V> &arrV ) throw()
+            {
+                assert( code.is_valid() );
+                target = &arrU;
+                source = &arrV;
+                (*simd)( *code );
+            }
 
 
         private:
@@ -76,6 +91,19 @@ namespace yocto
                 array<U>   &arrU = *static_cast< array<U> *>(target);
                 self[ctx.rank](ctx,arrU);
             }
+            
+            template <typename U, typename V>
+            inline void call2( context &ctx ) throw()
+            {
+                assert(source); assert(target);
+                assert(this->size==cores);
+                slots_type &self = *this;
+                array<U>       &arrU = *static_cast< array<U>       *>(target);
+                const array<V> &arrV = *static_cast< const array<V> *>(source);
+                self[ctx.rank](ctx,arrU,arrV);
+            }
+
+            
         };
         
         
