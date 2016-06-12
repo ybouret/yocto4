@@ -18,7 +18,7 @@ namespace
             std::cerr << "default id=" << id << std::endl;
         }
 
-        inline void run( threading::context &ctx, array<double> &data ) throw()
+        inline void run( threading::context &ctx, array<double> &data , void *) throw()
         {
             size_t offset = 1;
             size_t length = data.size();
@@ -32,7 +32,7 @@ namespace
             }
         }
                 
-        inline void run( threading::context &ctx, array<double> &odata, const array<int> &idata ) throw()
+        inline void run( threading::context &ctx, array<double> &odata, const array<int> &idata , void *) throw()
         {
             size_t offset = 1;
             size_t length = idata.size();
@@ -79,10 +79,10 @@ YOCTO_UNIT_TEST_IMPL(vpu)
     }
     std::cerr << "one array" << std::endl;
     cpu.compile<double>();
-    cpu.call(data);
+    cpu.call(data,NULL);
     
     std::cerr << std::endl << "two arrays" << std::endl;
     cpu.compile<double,int>();
-    cpu.call(data,idata);
+    cpu.call(data,idata,NULL);
 }
 YOCTO_UNIT_TEST_DONE()

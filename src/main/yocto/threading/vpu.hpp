@@ -63,20 +63,22 @@ namespace yocto
             
             
             template <typename U>
-            inline void call( array<U> &arrU ) throw()
+            inline void call( array<U> &arrU, void *args) throw()
             {
                 assert( code.is_valid() );
                 source = target = &arrU;
-                (*simd)( *code );
+                params = args;
+                (*simd)(*code);
             }
 
             template <typename U, typename V>
-            inline void call( array<U> &arrU, const array<V> &arrV ) throw()
+            inline void call( array<U> &arrU, const array<V> &arrV , void *args) throw()
             {
                 assert( code.is_valid() );
                 target = &arrU;
                 source = &arrV;
-                (*simd)( *code );
+                params = args;
+                (*simd)(*code);
             }
 
 
@@ -85,7 +87,8 @@ namespace yocto
             auto_ptr<kernel> code;
             const void      *source;
             void            *target;
-
+            void            *params;
+            
             template <typename U>
             inline void call1( context &ctx ) throw()
             {
@@ -93,7 +96,7 @@ namespace yocto
                 assert(this->size==cores);
                 slots_type &self = *this;
                 array<U>   &arrU = *static_cast< array<U> *>(target);
-                self[ctx.rank].run(ctx,arrU);
+                self[ctx.rank].run(ctx,arrU,params);
             }
             
             template <typename U, typename V>
@@ -104,7 +107,7 @@ namespace yocto
                 slots_type &self = *this;
                 array<U>       &arrU = *static_cast< array<U>       *>(target);
                 const array<V> &arrV = *static_cast< const array<V> *>(source);
-                self[ctx.rank].run(ctx,arrU,arrV);
+                self[ctx.rank].run(ctx,arrU,arrV,params);
             }
 
             
