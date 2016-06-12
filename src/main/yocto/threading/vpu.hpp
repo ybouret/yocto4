@@ -11,6 +11,7 @@ namespace yocto
     namespace threading
     {
 
+        //! base class for virtual processing unit
         class vpu
         {
         public:
@@ -28,6 +29,7 @@ namespace yocto
         };
 
 
+        //! will associate one processor per core
         template <typename T>
         class processing_unit :
         public vpu,
@@ -45,12 +47,14 @@ namespace yocto
             {
             }
 
+            //! prepare a kernel to act on array<U>
             template <typename U>
             inline void compile()
             {
                 code.reset( new kernel(this, & processing_unit<T>::call1<U> ) );
             }
 
+            //! prepare a kernel to act on array<U> <= array<V>
             template <typename U,typename V>
             inline void compile()
             {
@@ -89,7 +93,7 @@ namespace yocto
                 assert(this->size==cores);
                 slots_type &self = *this;
                 array<U>   &arrU = *static_cast< array<U> *>(target);
-                self[ctx.rank](ctx,arrU);
+                self[ctx.rank].run(ctx,arrU);
             }
             
             template <typename U, typename V>
@@ -100,7 +104,7 @@ namespace yocto
                 slots_type &self = *this;
                 array<U>       &arrU = *static_cast< array<U>       *>(target);
                 const array<V> &arrV = *static_cast< const array<V> *>(source);
-                self[ctx.rank](ctx,arrU,arrV);
+                self[ctx.rank].run(ctx,arrU,arrV);
             }
 
             

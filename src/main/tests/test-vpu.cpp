@@ -18,9 +18,8 @@ namespace
             std::cerr << "default id=" << id << std::endl;
         }
 
-        inline void operator()( threading::context &ctx, array<double> &data ) throw()
+        inline void run( threading::context &ctx, array<double> &data ) throw()
         {
-
             size_t offset = 1;
             size_t length = data.size();
             ctx.split(offset, length);
@@ -29,13 +28,25 @@ namespace
             YOCTO_LOOP_FUNC(length, DO_SUM, offset);
             {
                 YOCTO_LOCK(ctx.access);
-                { std::cerr << "localSum=" << localSum << std::endl; }
+                { std::cerr << "localSum" << ctx.rank << "=" << localSum << std::endl; }
             }
         }
                 
-        inline void operator()( threading::context &ctx, array<double> &odata, const array<int> &idata ) throw()
+        inline void run( threading::context &ctx, array<double> &odata, const array<int> &idata ) throw()
         {
-            
+            size_t offset = 1;
+            size_t length = idata.size();
+            ctx.split(offset, length);
+            localSum = 0;
+            for(size_t i=offset,count=length;count-->0;++i)
+            {
+                odata[i] = idata[i];
+                localSum += odata[i];
+            }
+            {
+                YOCTO_LOCK(ctx.access);
+                { std::cerr << "localSum" << ctx.rank << "=" << localSum << std::endl; }
+            }
         }
         
 
@@ -63,13 +74,15 @@ YOCTO_UNIT_TEST_IMPL(vpu)
 
     for(size_t i=1;i<=data.size();++i)
     {
-        data[i]  = i;
-        idata[i] = i*i;
+        data[i]  = 1;
+        idata[i] = i;
     }
+    std::cerr << "one array" << std::endl;
     cpu.compile<double>();
     cpu.call(data);
     
+    std::cerr << std::endl << "two arrays" << std::endl;
     cpu.compile<double,int>();
-    
+    cpu.call(data,idata);
 }
 YOCTO_UNIT_TEST_DONE()
