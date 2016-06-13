@@ -33,6 +33,14 @@ namespace yocto
         //! will associate one processor per core
         /**
          processor must have a run(ctx,array,...,args) method
+
+         size_t offset = 1;
+         size_t length = idata.size();
+         ctx.split(offset, length);
+         for(size_t i=offset,count=length;count-->0;++i)
+         {
+         // do something...
+         }
          */
         template <typename T>
         class processing_unit :
