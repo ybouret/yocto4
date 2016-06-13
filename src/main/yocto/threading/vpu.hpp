@@ -48,6 +48,7 @@ namespace yocto
             explicit processing_unit(kernel_executor *kxp) :
             vpu(kxp),
             slots_type(cores),
+            code(NULL),
             source(0),
             target(0),
             params(0),
