@@ -18,14 +18,15 @@ namespace yocto
             typedef shared_ptr<kernel_executor> kexec_ptr;
             virtual ~vpu() throw();
 
-            const size_t cores;
-
         protected:
             kexec_ptr simd;
+            explicit  vpu(kernel_executor *kxp) throw();
 
-            explicit vpu(const kexec_ptr &kxp) throw();
-
+        private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(vpu);
+
+        public:
+            const size_t cores;
         };
 
 
@@ -44,7 +45,7 @@ namespace yocto
             typedef slots_of<T> slots_type;
             virtual ~processing_unit() throw() {}
 
-            explicit processing_unit(const kexec_ptr &kxp) :
+            explicit processing_unit(kernel_executor *kxp) :
             vpu(kxp),
             slots_type(cores),
             source(0),

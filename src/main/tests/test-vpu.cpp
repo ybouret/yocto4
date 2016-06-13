@@ -70,9 +70,7 @@ namespace
 
 YOCTO_UNIT_TEST_IMPL(vpu)
 {
-    threading::vpu::kexec_ptr             para( new threading::crew(true) );
-    threading::vpu::kexec_ptr             mono( new threading::sequential_executor() );
-    threading::processing_unit<Processor> cpu(para);
+    threading::processing_unit<Processor> cpu(new threading::crew(true));
 
     for(size_t i=0;i<cpu.cores;++i)
     {

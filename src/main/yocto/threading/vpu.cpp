@@ -9,9 +9,9 @@ namespace yocto
         {
         }
 
-        vpu:: vpu( const kexec_ptr &kxp ) throw() :
-        cores(kxp->num_threads()),
-        simd(kxp)//,call(this, & vpu::__call )
+        vpu:: vpu( kernel_executor *kxp ) throw() :
+        simd(kxp),
+        cores(simd->num_threads())
         {
         }
 
