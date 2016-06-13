@@ -76,8 +76,8 @@ namespace yocto
             {
                 code.reset( new kernel(this, & processing_unit<T>::call3<U,V,W> ) );
             }
-            
-            
+
+
             template <typename U>
             inline void call( array<U> &arrU, void *args) throw()
             {
@@ -127,7 +127,7 @@ namespace yocto
                 array<U>   &arrU = *static_cast< array<U> *>(target);
                 self[ctx.rank].run(ctx,arrU,params);
             }
-            
+
             template <typename U, typename V>
             inline void call2( context &ctx ) throw()
             {
@@ -152,8 +152,8 @@ namespace yocto
                 const array<W> &arrW = *static_cast< const array<W> *>(second);
                 self[ctx.rank].run(ctx,arrU,arrV,arrW,params);
             }
-
-
+            
+            
             
         };
         
