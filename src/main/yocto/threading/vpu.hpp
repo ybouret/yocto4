@@ -30,6 +30,9 @@ namespace yocto
 
 
         //! will associate one processor per core
+        /**
+         processor must have a run(ctx,array,...,args) method
+         */
         template <typename T>
         class processing_unit :
         public vpu,
@@ -42,8 +45,12 @@ namespace yocto
             virtual ~processing_unit() throw() {}
 
             explicit processing_unit(const kexec_ptr &kxp) :
-            vpu(kxp), slots_type(cores),
-            source(0), target(0)
+            vpu(kxp),
+            slots_type(cores),
+            source(0),
+            target(0),
+            params(0),
+            second(0)
             {
             }
 
@@ -59,6 +66,13 @@ namespace yocto
             inline void compile()
             {
                 code.reset( new kernel(this, & processing_unit<T>::call2<U,V> ) );
+            }
+
+            //! prepare a kernel to act on array<U> <= array<V>
+            template <typename U,typename V, typename W>
+            inline void compile()
+            {
+                code.reset( new kernel(this, & processing_unit<T>::call3<U,V,W> ) );
             }
             
             
@@ -81,6 +95,18 @@ namespace yocto
                 (*simd)(*code);
             }
 
+            template <typename U, typename V, typename W>
+            inline void call( array<U> &arrU, const array<V> &arrV , const array<W> &arrW, void *args) throw()
+            {
+                assert( code.is_valid() );
+                target = &arrU;
+                source = &arrV;
+                second = &arrW;
+                params = args;
+                (*simd)(*code);
+            }
+
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(processing_unit);
@@ -88,7 +114,8 @@ namespace yocto
             const void      *source;
             void            *target;
             void            *params;
-            
+            const void      *second; //!< second source
+
             template <typename U>
             inline void call1( context &ctx ) throw()
             {
@@ -109,6 +136,21 @@ namespace yocto
                 const array<V> &arrV = *static_cast< const array<V> *>(source);
                 self[ctx.rank].run(ctx,arrU,arrV,params);
             }
+
+            template <typename U, typename V, typename W>
+            inline void call3( context &ctx ) throw()
+            {
+                assert(source);
+                assert(target);
+                assert(second);
+                assert(this->size==cores);
+                slots_type &self = *this;
+                array<U>       &arrU = *static_cast< array<U>       *>(target);
+                const array<V> &arrV = *static_cast< const array<V> *>(source);
+                const array<W> &arrW = *static_cast< const array<W> *>(second);
+                self[ctx.rank].run(ctx,arrU,arrV,arrW,params);
+            }
+
 
             
         };
