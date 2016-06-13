@@ -1,5 +1,5 @@
 #ifndef YOCTO_FAME_ARRAY2D_INCLUDED
-#define YOCTO_FOVEA_ARRAY2D_INCLUDED 1
+#define YOCTO_FAME_ARRAY2D_INCLUDED 1
 
 #include "yocto/fame/array1d.hpp"
 

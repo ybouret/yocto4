@@ -120,7 +120,7 @@ namespace yocto
             //! helper
             inline const layout_of & __layout() const throw() { return *this; }
             
-            void store_offsets_of( const layout_of &sub, offsets_list &offsets ) const
+            inline void store_offsets_of( const layout_of &sub, offsets_list &offsets ) const
             {
                 assert(this->contains(sub));
                 __store_in(offsets, *this, sub, int2type<DIMENSIONS>() );

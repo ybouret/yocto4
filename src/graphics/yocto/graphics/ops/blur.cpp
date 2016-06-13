@@ -16,8 +16,8 @@ namespace yocto
         unit_t __blur_width(const float sig)
         {
             const float exp_min = 1.0f/256;
-            const float len_max = sqrtf( - 2.0*sig*sig*logf(exp_min) );
-            return max_of<unit_t>(1,ceilf(len_max));
+            const float len_max = sqrtf( - 2.0f*sig*sig*logf(exp_min) );
+            return max_of<unit_t>(1,unit_t(ceilf(len_max)));
         }
 
         blur_info:: blur_info(const float sig) :
@@ -40,10 +40,10 @@ namespace yocto
             const float den = 2.0f * sig * sig;
             for(unit_t j=0;j<=top;++j)
             {
-                const float j2 = j*j;
+                const float j2 = float(j*j);
                 for(unit_t i=0;i<=top;++i)
                 {
-                    const float i2 = i*i;
+                    const float i2 = float(i*i);
                     (*this)[j][i]  = expf(-(i2+j2)/den );
                 }
             }

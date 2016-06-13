@@ -117,10 +117,10 @@ namespace yocto
                 const size_t jp1   = j+1;
                 const size_t nn2mj = nn2 - j;
                 const size_t nn3mj = nn3 - j;
-                const real_t rep=(0.5)*(fft1[j]   + fft1[nn2mj]);
-                const real_t rem=(0.5)*(fft1[j]   - fft1[nn2mj]);
-                const real_t aip=(0.5)*(fft1[jp1] + fft1[nn3mj]);
-                const real_t aim=(0.5)*(fft1[jp1] - fft1[nn3mj]);
+                const real_t rep=REAL(0.5)*(fft1[j]   + fft1[nn2mj]);
+                const real_t rem=REAL(0.5)*(fft1[j]   - fft1[nn2mj]);
+                const real_t aip=REAL(0.5)*(fft1[jp1] + fft1[nn3mj]);
+                const real_t aim=REAL(0.5)*(fft1[jp1] - fft1[nn3mj]);
                 fft1[j]     =  rep;
                 fft1[jp1]   =  aim;
                 fft1[nn2mj] =  rep;

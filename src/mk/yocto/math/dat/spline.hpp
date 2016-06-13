@@ -129,8 +129,8 @@ namespace yocto {
                          const array<T>  &t,
                          const matrix<T> &P,
                          matrix<T>       &Q,
-                         const point2d<T>     LT = point2d<T>::zero,
-                         const point2d<T>     RT = point2d<T>::zero
+                         const point2d<T>     LT,
+                         const point2d<T>     RT
                          )
             {
                 assert(P.rows==2);

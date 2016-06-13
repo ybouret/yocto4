@@ -1,7 +1,6 @@
 #include "yocto/fame/split/quad-exchange.hpp"
 #include "yocto/fame/mesh/quad-mesh.hpp"
 #include "yocto/utest/run.hpp"
-
 #include "yocto/fame/array3d.hpp"
 
 using namespace yocto;
