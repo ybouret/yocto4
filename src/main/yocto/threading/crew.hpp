@@ -28,6 +28,22 @@ namespace yocto
             lockable    &access; //!< shared access
             const size_t indx;   //!< 1..size
 
+
+            //! splitting/using data
+            /**
+             - code example
+             size_t offset = 1;
+             size_t length = idata.size();
+             ctx.split(offset, length);
+             for(size_t i=offset,count=length;count-->0;++i)
+             {
+             // do something...
+             }
+             - or
+             #define DO_SOMETHING(I) process(I)
+             YOCTO_LOOP_FUNC(length,DO_SOMETHING,offset);
+             */
+
             template <typename T> inline
             void split(T &offset,T &length) const throw()
             {
