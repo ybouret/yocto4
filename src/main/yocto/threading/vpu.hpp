@@ -2,9 +2,9 @@
 #define YOCTO_THREADING_VPU_INCLUDED 1
 
 #include "yocto/threading/crew.hpp"
-#include "yocto/ptr/shared.hpp"
 #include "yocto/sequence/slots.hpp"
 #include "yocto/sequence/array.hpp"
+#include "yocto/ptr/arc.hpp"
 
 namespace yocto
 {
@@ -12,27 +12,30 @@ namespace yocto
     {
 
         //! base class for virtual processing unit
+        /**
+         a smart pointer to a kernel_executor
+         */
         class vpu
         {
         public:
-            typedef shared_ptr<kernel_executor> kexec_ptr;
             virtual ~vpu() throw();
 
         protected:
-            kexec_ptr simd;
+            arc_ptr<kernel_executor> simd;
             explicit  vpu(kernel_executor *kxp) throw();
-
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(vpu);
 
         public:
             const size_t cores;
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(vpu);
         };
 
 
         //! will associate one processor per core
         /**
          processor must have a run(ctx,array,...,args) method
+         processors must be built before use !
 
          size_t offset = 1;
          size_t length = idata.size();
@@ -78,7 +81,7 @@ namespace yocto
                 code.reset( new kernel(this, & processing_unit<T>::call2<U,V> ) );
             }
 
-            //! prepare a kernel to act on array<U> <= array<V>
+            //! prepare a kernel to act on array<U> <= array<V>,array<W>
             template <typename U,typename V, typename W>
             inline void compile()
             {
@@ -87,7 +90,8 @@ namespace yocto
 
 
             template <typename U>
-            inline void call( array<U> &arrU, void *args) throw()
+            inline void call(array<U> &arrU,
+                             void     *args) throw()
             {
                 assert( code.is_valid() );
                 source = target = &arrU;
@@ -96,7 +100,9 @@ namespace yocto
             }
 
             template <typename U, typename V>
-            inline void call( array<U> &arrU, const array<V> &arrV , void *args) throw()
+            inline void call(array<U>       &arrU,
+                             const array<V> &arrV,
+                             void           *args) throw()
             {
                 assert( code.is_valid() );
                 target = &arrU;
@@ -106,7 +112,10 @@ namespace yocto
             }
 
             template <typename U, typename V, typename W>
-            inline void call( array<U> &arrU, const array<V> &arrV , const array<W> &arrW, void *args) throw()
+            inline void call(array<U>       &arrU,
+                             const array<V> &arrV,
+                             const array<W> &arrW,
+                             void           *args) throw()
             {
                 assert( code.is_valid() );
                 target = &arrU;
@@ -129,35 +138,36 @@ namespace yocto
             template <typename U>
             inline void call1( context &ctx ) throw()
             {
-                assert(source); assert(target);
-                assert(this->size==cores);
+                assert(source); assert(target); assert(this->size==cores);
+
                 slots_type &self = *this;
                 array<U>   &arrU = *static_cast< array<U> *>(target);
+
                 self[ctx.rank].run(ctx,arrU,params);
             }
 
             template <typename U, typename V>
             inline void call2( context &ctx ) throw()
             {
-                assert(source); assert(target);
-                assert(this->size==cores);
-                slots_type &self = *this;
+                assert(source); assert(target); assert(this->size==cores);
+
+                slots_type     &self = *this;
                 array<U>       &arrU = *static_cast< array<U>       *>(target);
                 const array<V> &arrV = *static_cast< const array<V> *>(source);
+
                 self[ctx.rank].run(ctx,arrU,arrV,params);
             }
 
             template <typename U, typename V, typename W>
             inline void call3( context &ctx ) throw()
             {
-                assert(source);
-                assert(target);
-                assert(second);
-                assert(this->size==cores);
-                slots_type &self = *this;
+                assert(source); assert(target); assert(second); assert(this->size==cores);
+
+                slots_type     &self = *this;
                 array<U>       &arrU = *static_cast< array<U>       *>(target);
                 const array<V> &arrV = *static_cast< const array<V> *>(source);
                 const array<W> &arrW = *static_cast< const array<W> *>(second);
+
                 self[ctx.rank].run(ctx,arrU,arrV,arrW,params);
             }
             

@@ -9,17 +9,13 @@ namespace yocto
         {
         }
 
-        vpu:: vpu( kernel_executor *kxp ) throw() :
+
+        vpu:: vpu(kernel_executor *kxp) throw() :
         simd(kxp),
         cores(simd->num_threads())
         {
         }
 
-#if 0
-        void vpu:: __call(context &ctx) throw()
-        {
-        }
-#endif
-        
+
     }
 }

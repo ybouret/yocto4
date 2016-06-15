@@ -7,6 +7,7 @@
 #include "yocto/threading/condition.hpp"
 #include "yocto/functor.hpp"
 #include "yocto/parallel/basic.hpp"
+#include "yocto/counted-object.hpp"
 
 namespace yocto
 {
@@ -44,7 +45,7 @@ namespace yocto
         typedef functor<void,TL1(context&)> kernel;
 
         //! interface to execute a kernel
-        class kernel_executor : public object
+        class kernel_executor : public counted_object
         {
         public:
             const size_t failure;
