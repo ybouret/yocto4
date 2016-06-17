@@ -84,10 +84,15 @@ namespace yocto
             natural::split(q, r, num, den);
             double ans = q.to_real();
 
-            const size_t nd = den.bits();
+            const size_t nd  = den.bits();
+            double       fac = 1;
             for(size_t i=1;i<=nd;++i)
             {
-                
+                const natural n = r*10;
+                natural::split(q,r,n,den);
+                fac *= 0.1;
+                const double x = q.to_real();
+                ans += fac*x;
             }
             return ans;
         }

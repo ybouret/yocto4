@@ -45,6 +45,7 @@ YOCTO_UNIT_TEST_IMPL(mpq)
         math::tao::mmul(P, M0, IM);
         std::cerr << "P=" << P << std::endl;
     }
-    
+
+
 }
 YOCTO_UNIT_TEST_DONE()

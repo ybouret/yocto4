@@ -166,6 +166,27 @@ inline friend bool operator OP(const rational &lhs, const rational  &rhs) throw(
             YOCTO_MPQ_CMP(>)
             YOCTO_MPQ_CMP(<)
 
+            //__________________________________________________________________
+            //
+            //
+            // approximation
+            //
+            //__________________________________________________________________
+            inline double to_double() const
+            {
+                switch(num.s)
+                {
+                    case __zero:
+                        break;
+
+                    case __positive:
+                        return natural::ratio_of(num.n,den);
+
+                    case __negative:
+                        return -natural::ratio_of(num.n,den);
+                }
+                return 0.0;
+            }
         };
     }
 
@@ -175,9 +196,9 @@ inline friend bool operator OP(const rational &lhs, const rational  &rhs) throw(
     {
         inline static mpq zero()    { return mpq();  }
         inline static mpq one()     { return mpq(1); }
-        inline static mpq minimum() { return mpq(); }
+        inline static mpq minimum() { return mpq();  }
     };
-
+    
     namespace math
     {
         inline mpq Fabs(const mpq &r)
