@@ -50,6 +50,7 @@ inline natural & operator OP1 ( const word_t   rhs ) { natural tmp = (*this) OP 
             natural(const word_t);       //!< any word
             natural(const natural &);    //!< copy constructor
             natural(const void *buf, const size_t len);
+            natural(const memory::ro_buffer &buf);
 
             //!< default n bytes, MUST be updated
             natural(size_t n, const as_capacity_t &);

@@ -62,6 +62,16 @@ namespace yocto
             memcpy(byte,buf,len);
             update();
         }
-        
+
+        natural::natural(const memory::ro_buffer &buf) :
+        maxi( buf.length() ),
+        size( buf.length() ),
+        byte( build(maxi)  )
+        {
+            memcpy(byte,buf.ro(),size);
+            update();
+        }
+
+
     }
 }

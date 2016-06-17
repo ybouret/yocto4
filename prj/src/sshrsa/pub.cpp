@@ -3,7 +3,7 @@
 #include "yocto/ios/imstream.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/fs/vfs.hpp"
-#include "yocto/mpa/natural.hpp"
+#include "yocto/mpl/natural.hpp"
 
 #include "yocto/exception.hpp"
 
@@ -65,11 +65,9 @@ int main(int argc, char *argv[] )
         load_string(fp,s);
         std::cerr << "hdr=" << s << std::endl;
         load_string(fp,s);
-        mpn e(s);
-        std::cerr << "e=" << e << std::endl;
+        mpn e(s); std::cerr << "e=" << e << std::endl;
         load_string(fp,s);
-        mpn m(s);
-        std::cerr << "m.bits=" << m.bits() << std::endl;
+        mpn m(s); std::cerr << "m.bits=" << m.bits() << std::endl;
 
         
         return 0;

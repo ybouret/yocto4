@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0303 
 header_name {.h} 
 code_name {.cxx}
 Function {make_window()} {open
@@ -11,7 +11,7 @@ Function {make_window()} {open
     Fl_Button {} {
       label {&Quit!}
       callback {Hello->hide();} selected
-      xywh {135 65 70 30} box ROUND_UP_BOX
+      xywh {65 50 120 50} box ROUND_UP_BOX
     }
   }
 } 
