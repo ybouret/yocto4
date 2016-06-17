@@ -37,8 +37,8 @@ namespace yocto
         }
 
         natural:: natural( const natural &other ) :
-        maxi( other.size ),
-        size( other.size ),
+        maxi( other.size  ),
+        size( other.size  ),
         byte( build(maxi) )
         {
             YOCTO_CHECK_MPN(other);
@@ -71,7 +71,7 @@ namespace yocto
             memcpy(byte,buf.ro(),size);
             update();
         }
-
-
+        
+        
     }
 }

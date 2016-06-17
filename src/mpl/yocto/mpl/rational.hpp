@@ -35,8 +35,8 @@ namespace yocto
 
             inline rational(const integer  &x) : num(x), den(1) {}
             inline rational(const integer_t x) : num(x), den(1) {}
-            inline rational(const integer &x, const natural &y) : num(x), den(y) { update(); }
-            inline rational(const integer_t x, const word_t  y) : num(x), den(y) { update(); }
+            inline rational(const integer  &x, const natural &y) : num(x), den(y) { update(); }
+            inline rational(const integer_t x, const word_t   y) : num(x), den(y) { update(); }
 
             inline void update()
             {

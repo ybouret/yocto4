@@ -150,7 +150,7 @@ inline natural & operator OP1 ( const word_t   rhs ) { natural tmp = (*this) OP 
             
             static natural get(ios::bitio &Q, const size_t n);
             void   save( ios::ostream &) const;
-            static natural load( ios::istream &);
+            static natural load(ios::istream &);
             static natural hex2mpn( const string &s );
             static natural dec2mpn( const string &s );
             static natural parse(const string &s);
@@ -286,6 +286,7 @@ inline friend bool operator OP (const word_t   lhs, const natural &rhs) throw() 
                 xch(ans);
                 return *this;
             }
+            
             inline friend
             natural operator<<(const natural &lhs, const size_t n) { return natural::shl(lhs,n); }
             inline
