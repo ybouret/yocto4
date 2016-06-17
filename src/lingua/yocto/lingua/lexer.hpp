@@ -11,7 +11,7 @@ namespace yocto
     {
 
         //! transform a source of t_char in a source of lexemes
-        class lexer : public object
+        class lexer : public virtual object
         {
         public:
             explicit lexer(const string &id, const  string &root_id);

@@ -16,11 +16,11 @@ YOCTO_UNIT_TEST_IMPL(parser)
     shared_ptr<Seem::Parser> P( Seem::CreateParser(true) );
     ios::icstream            fp(ios::cstdin);
 
-    auto_ptr<lingua::syntax::xnode> tree( P->parse(fp) );
+    auto_ptr<Seem::XNode> tree( P->parse(fp) );
     tree->graphviz(       P->grammar::name + "_output.dot" );
     ios::graphviz_render( P->grammar::name + "_output.dot" );
 
-    lingua::syntax::tree_walker walker(*P);
+    Seem::TreeWalker walker(*P);
     std::cerr << "-- WALKING..." << std::endl;
     ios::ocstream output( ios::cstderr );
     walker.walk(tree.__get(), &output);

@@ -12,7 +12,7 @@ namespace yocto
 
             class xgen;
             
-            class grammar : public object
+            class grammar : public virtual object
             {
             public:
                 virtual ~grammar() throw();
