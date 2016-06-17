@@ -1,13 +1,22 @@
 FILE( GLOB decl yocto/seem/*.hpp )
 FILE( GLOB impl yocto/seem/*.cpp )
 SET( srcs ${decl} ${impl} )
-
 INSTALL( FILES ${decl} DESTINATION include/yocto/seem )
-SOURCE_GROUP( seem FILES ${srcs} )
+
+SET(SEEM_GRAM yocto/seem/seem.g)
+SET(SEEM_INCL yocto/seem/seem.inc)
+
+ADD_CUSTOM_COMMAND(
+OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${SEEM_INCL}
+COMMAND file2data ${CMAKE_CURRENT_SOURCE_DIR}/${SEEM_GRAM} ${CMAKE_CURRENT_SOURCE_DIR}/${SEEM_INCL}
+DEPENDS file2data ${CMAKE_CURRENT_SOURCE_DIR}/${SEEM_GRAM}
+)
+
+SOURCE_GROUP( seem FILES ${srcs} ${SEEM_GRAM} ${SEEM_INCL} )
 
 INCLUDE_DIRECTORIES( . ../main ../lingua)
 
-ADD_LIBRARY(y-seem STATIC  ${srcs} )
+ADD_LIBRARY(y-seem STATIC  ${srcs} ${SEEM_GRAM} ${SEEM_INCL})
 	
 INSTALL( TARGETS y-seem ARCHIVE DESTINATION lib )
 
