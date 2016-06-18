@@ -28,7 +28,7 @@ namespace yocto
                             {
                                 delete tmp.pop_back();
                             }
-                        }   break;
+                        } break;
 
                         case 1: assert("LXR" ==node->label());
                         {
@@ -39,8 +39,15 @@ namespace yocto
                                 load_plugin(id, node); // make a plugin
                                 delete tmp.pop_back(); // remove from top level
                             }
-                        }
-                            break;
+                        } break;
+
+                        case 2: assert("SEM" == node->label() );
+                        {
+                            const string id = node->ch->head->lx->to_string(1,0); // remove '$'
+                            std::cerr << "\t\twill process ''" << id << "''" << std::endl;
+                            delete tmp.pop_back();
+                        } break;
+
 
                         default:
                             throw exception("xgen.initialize(unexpected '%s')", node->label().c_str());

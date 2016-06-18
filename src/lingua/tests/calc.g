@@ -28,4 +28,4 @@ END     : ';' ;
 LPAREN  : '(' ;
 RPAREN  : ')' ;
 
-//$no_single : expr multExpr;
+$no_single : expr multExpr;

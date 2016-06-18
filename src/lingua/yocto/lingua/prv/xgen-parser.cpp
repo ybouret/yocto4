@@ -9,6 +9,9 @@
 
 #include "yocto/ios/imstream.hpp"
 
+#include <iostream>
+
+
 namespace yocto
 {
     namespace lingua
@@ -103,12 +106,21 @@ namespace yocto
                 LXR << one_or_more(RXP);
                 LXR << END;
 
-
+                //______________________________________________________________
+                //
+                // SEMANTIC RULE DECLARATION
+                //______________________________________________________________
+                Agg &SEM = agg("SEM");
+                SEM << terminal("SM","${ID}");
+                SEM << COLON;
+                SEM << one_or_more(ID);
+                SEM << END;
+                
                 //______________________________________________________________
                 //
                 // assemble parser grammar
                 //______________________________________________________________
-                GRAMMAR << zero_or_more(choice(RULE,LXR));
+                GRAMMAR << zero_or_more(choice(RULE,LXR,SEM));
 
                 //__________________________________________________________________
                 //
@@ -132,10 +144,13 @@ namespace yocto
                 //______________________________________________________________
                 if(output_files)
                 {
+                    std::cerr << "Generating XGEN.PNG" << std::endl;
                     graphviz("xgen.dot");
                     ios::graphviz_render("xgen.dot");
                 }
 
+                check_consistency();
+                
             }
 
         }

@@ -20,7 +20,8 @@ namespace yocto
             static const char *kw_top[] =
             {
                 "RULE",
-                "LXR"
+                "LXR",
+                "SEM"
             };
             
             static const char *kw_sub[] =
