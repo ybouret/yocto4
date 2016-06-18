@@ -294,6 +294,25 @@ namespace yocto
 
             }
 
+
+            void   grammar:: no_single(const string &aggID)
+            {
+                for(rule *r = rules.head;r;r=r->next)
+                {
+                    if(aggID == r->label)
+                    {
+                        if(r->uuid != aggregate::UUID )
+                        {
+                            throw exception("%s.no_single('%s' is not an aggregate)", name.c_str(), aggID.c_str());
+                        }
+                        r->flags = property::noSingle;
+                        return;
+                    }
+                }
+                throw exception("%s.no_single('%s' not found)",name.c_str(),aggID.c_str());
+            }
+
+
         }
 
     }
@@ -330,17 +349,5 @@ namespace yocto
     }
 }
 
-#include <iostream>
-namespace yocto
-{
-    namespace lingua
-    {
-        namespace syntax
-        {
-
-        }
-        
-    }
-}
 
 

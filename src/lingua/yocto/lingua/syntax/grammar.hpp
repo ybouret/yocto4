@@ -41,6 +41,7 @@ namespace yocto
                 void   check_consistency() const;
                 rule & append( rule *r );
 
+                void   no_single(const string &aggID);
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);

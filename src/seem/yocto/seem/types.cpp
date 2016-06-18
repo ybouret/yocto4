@@ -22,6 +22,9 @@ namespace yocto
         impl( CreateSeemParser(emitFiles) ),
         gram( & *impl )
         {
+            gram->no_single("AXP");
+            gram->no_single("MXP");
+            gram->no_single("PXP");
         }
         
     }
