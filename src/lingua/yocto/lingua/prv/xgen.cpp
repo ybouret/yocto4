@@ -56,7 +56,8 @@ namespace yocto
             hmod(YOCTO_MPERF_FOR(kw_mod)),
             hres(YOCTO_MPERF_FOR(kw_res)),
             icom(0),
-            verbose(verb)
+            verbose(verb),
+            no_single()
             {
             }
 

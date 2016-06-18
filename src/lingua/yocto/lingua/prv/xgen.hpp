@@ -8,6 +8,7 @@
 #include "yocto/ptr/auto.hpp"
 
 #include "yocto/hashing/mph.hpp"
+#include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
 {
@@ -52,7 +53,8 @@ namespace yocto
                 hashing::mperf           hres;    //!< reserved words: drop, endl, comment
                 int                      icom;    //!< index for comment
                 const bool               verbose;
-                
+                sorted_vector<string>    no_single;
+
                 void create_leading_rule(const xnode *top);
                 void create_lexical_rule(const xnode *top);
                 
@@ -66,7 +68,7 @@ namespace yocto
                 rule       &fetch_rxp(const string &label); //!< return existing or new regexp terminal
                 rule       &fetch_raw(const string &label); //!< return existing or new raw    terminal
 
-
+                void        check_sem(const xnode *node);
 
                 //! grow parent from child node
                 void grow(compound &parent, const xnode *node);

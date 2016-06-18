@@ -45,6 +45,7 @@ namespace yocto
                         {
                             const string id = node->ch->head->lx->to_string(1,0); // remove '$'
                             std::cerr << "\t\twill process ''" << id << "''" << std::endl;
+                            check_sem(node);
                             delete tmp.pop_back();
                         } break;
 
@@ -55,6 +56,12 @@ namespace yocto
 
                 }
                 top_level.swap_with(tmp);
+            }
+
+
+            void xgen:: check_sem(const xnode *node)
+            {
+
             }
 
             void xgen::load_plugin(const string &id, xnode *node)
