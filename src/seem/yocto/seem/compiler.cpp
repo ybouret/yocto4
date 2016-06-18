@@ -1,4 +1,5 @@
 #include "yocto/seem/compiler.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {
@@ -7,6 +8,21 @@ namespace yocto
         Compiler:: ~Compiler() throw()
         {
         }
-        
+
+        Compiler:: Compiler(const bool emitFiles) :
+        parser(emitFiles),
+        walker( * parser.gram )
+        {
+        }
+
+
+        void Compiler:: compile( ios::istream &fp )
+        {
+            parser.impl->restart();
+            auto_ptr<XNode> tree( parser.impl->parse(fp) );
+            
+        }
+
+
     }
 }

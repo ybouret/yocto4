@@ -13,14 +13,14 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(parser)
 {
-    shared_ptr<Seem::Parser> P( Seem::CreateParser(true) );
+    Seem::Parser             P( true );
     ios::icstream            fp(ios::cstdin);
 
-    auto_ptr<Seem::XNode> tree( P->parse(fp) );
-    tree->graphviz(       P->grammar::name + "_output.dot" );
-    ios::graphviz_render( P->grammar::name + "_output.dot" );
+    auto_ptr<Seem::XNode> tree( P.impl->parse(fp) );
+    tree->graphviz(       P.gram->name + "_output.dot" );
+    ios::graphviz_render( P.gram->name + "_output.dot" );
 
-    Seem::TreeWalker walker(*P);
+    Seem::TreeWalker walker(*P.gram);
     std::cerr << "-- WALKING..." << std::endl;
     ios::ocstream output( ios::cstderr );
     walker.walk(tree.__get(), &output);

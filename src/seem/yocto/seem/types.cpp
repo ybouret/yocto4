@@ -9,10 +9,20 @@ namespace yocto
 #include "seem.inc"
         };
 
-        Parser *CreateParser(const bool emitFiles)
+        static lingua::parser *CreateSeemParser(const bool emitFiles)
         {
             return lingua::parser::generate(grammar_data,sizeof(grammar_data),emitFiles);
         }
 
+        Parser:: ~Parser() throw()
+        {
+        }
+
+        Parser:: Parser(const bool emitFiles) :
+        impl( CreateSeemParser(emitFiles) ),
+        gram( & *impl )
+        {
+        }
+        
     }
 }

@@ -8,7 +8,7 @@ namespace yocto
 {
     namespace lingua
     {
-        class parser : public syntax::grammar, public lexer, public counted
+        class parser : public syntax::grammar, public lexer
         {
         public:
             typedef syntax::rule      Rule;
