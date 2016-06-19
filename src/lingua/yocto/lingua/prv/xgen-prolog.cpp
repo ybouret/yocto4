@@ -63,11 +63,28 @@ namespace yocto
             void xgen:: check_sem(const string &id,
                                   const xnode  *node)
             {
+                ordered<string> *target = NULL;
+                
+                if( "no_single" == id )
+                {
+                    target = & no_single;
+                }
+                
+                if(!target)
+                {
+                    throw exception("unhandled semantic modifier '%s'", id.c_str());
+                }
+                
                 for(;node;node=node->next)
                 {
                     const string ruleID = node->lx->to_string();
                     std::cerr << "\t\t" << id << " <= " << ruleID << std::endl;
+                    if( !target->insert(ruleID) )
+                    {
+                        throw exception("multiple rule '%s' for ''%s''", ruleID.c_str(), id.c_str());
+                    }
                 }
+                
             }
             
             void xgen::load_plugin(const string &id, xnode *node)
