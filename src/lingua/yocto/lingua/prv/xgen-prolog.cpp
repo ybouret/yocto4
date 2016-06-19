@@ -43,9 +43,10 @@ namespace yocto
 
                         case 2: assert("SEM" == node->label() );
                         {
-                            const string id = node->ch->head->lx->to_string(1,0); // remove '$'
+                            const xnode * sub = node->ch->head;
+                            const string  id  = sub->lx->to_string(1,0); // remove '$'
                             std::cerr << "\t\twill process ''" << id << "''" << std::endl;
-                            check_sem(node);
+                            check_sem(id,sub->next);
                             delete tmp.pop_back();
                         } break;
 
@@ -59,11 +60,16 @@ namespace yocto
             }
 
 
-            void xgen:: check_sem(const xnode *node)
+            void xgen:: check_sem(const string &id,
+                                  const xnode  *node)
             {
-
+                for(;node;node=node->next)
+                {
+                    const string ruleID = node->lx->to_string();
+                    std::cerr << "\t\t" << id << " <= " << ruleID << std::endl;
+                }
             }
-
+            
             void xgen::load_plugin(const string &id, xnode *node)
             {
                 assert("LXR"==node->label());
