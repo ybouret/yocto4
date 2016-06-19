@@ -141,6 +141,10 @@ namespace yocto
                     xprs->top_level(**ppTop);
                 }
 
+                //______________________________________________________________
+                //
+                // optimizing
+                //______________________________________________________________
                 YXGEN_OUT("-- optimizing");
                 optimize();
 
@@ -151,10 +155,25 @@ namespace yocto
                     ios::graphviz_render(xprs->grammar::name + ".dot");
                 }
 
-
+                //______________________________________________________________
+                //
+                // chekcing consistency
+                //______________________________________________________________
                 YXGEN_OUT("-- checking consistency");
                 xprs->check_consistency();
-
+                
+                //______________________________________________________________
+                //
+                // changind some semantics
+                //______________________________________________________________
+                {
+                    const size_t nn = no_single.size();
+                    for(size_t i=1;i<=nn;++i)
+                    {
+                        xprs->no_single( no_single[i] );
+                    }
+                }
+                
                 YXGEN_OUT("-- parser is ready");
                 return xprs.yield();
             }
