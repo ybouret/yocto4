@@ -1,6 +1,8 @@
 #include "yocto/seem/compiler.hpp"
 #include "yocto/ptr/auto.hpp"
 
+#include "yocto/ios/graphviz.hpp"
+
 namespace yocto
 {
     namespace Seem
@@ -20,6 +22,12 @@ namespace yocto
         {
             parser.impl->restart();
             auto_ptr<XNode> tree( parser.impl->parse(fp) );
+
+            {
+                const string dotname = parser.gram->name + "_output.dot";
+                tree->graphviz(dotname);
+                ios::graphviz_render(dotname);
+            }
             
         }
 

@@ -68,7 +68,7 @@ namespace yocto
                 rule       &fetch_rxp(const string &label); //!< return existing or new regexp terminal
                 rule       &fetch_raw(const string &label); //!< return existing or new raw    terminal
 
-                void        check_sem(const string &id, const xnode *node);
+                void        check_semantic(const string &id, const xnode *node);
 
                 //! grow parent from child node
                 void grow(compound &parent, const xnode *node);

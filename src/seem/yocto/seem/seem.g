@@ -1,3 +1,4 @@
+// Simple Expression Evaluator Module
 .seem;
 
 // additive expression
@@ -23,8 +24,9 @@ LPAREN   : '(';
 RPAREN   : ')';
 NUMBER   : "[:digit:]+([.][:digit:]+)?";
 ID       : "([:alpha:]|_)([:word:]|_)*";
-//END      : ';';
 
 //lexical extra rules
 @drop : "[:blank:]";
 @endl : "[:endl:]";
+
+$no_single: AXP MXP PXP;

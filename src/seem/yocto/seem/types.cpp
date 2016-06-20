@@ -9,7 +9,8 @@ namespace yocto
 #include "seem.inc"
         };
 
-        static lingua::parser *CreateSeemParser(const bool emitFiles)
+        static inline
+        lingua::parser *CreateSeemParser(const bool emitFiles)
         {
             return lingua::parser::generate(grammar_data,sizeof(grammar_data),emitFiles);
         }
@@ -22,9 +23,6 @@ namespace yocto
         impl( CreateSeemParser(emitFiles) ),
         gram( & *impl )
         {
-            gram->no_single("AXP");
-            gram->no_single("MXP");
-            gram->no_single("PXP");
         }
         
     }

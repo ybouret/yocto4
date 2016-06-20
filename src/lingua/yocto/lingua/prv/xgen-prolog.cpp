@@ -46,7 +46,7 @@ namespace yocto
                             const xnode * sub = node->ch->head;
                             const string  id  = sub->lx->to_string(1,0); // remove '$'
                             std::cerr << "\t\twill process ''" << id << "''" << std::endl;
-                            check_sem(id,sub->next);
+                            check_semantic(id,sub->next);
                             delete tmp.pop_back();
                         } break;
 
@@ -60,33 +60,41 @@ namespace yocto
             }
 
 
-            void xgen:: check_sem(const string &id,
-                                  const xnode  *node)
+            void xgen:: check_semantic(const string &id,
+                                       const xnode  *node)
             {
+                //______________________________________________________________
+                //
+                // choosing where to store info
+                //______________________________________________________________
                 ordered<string> *target = NULL;
-                
+
                 if( "no_single" == id )
                 {
                     target = & no_single;
                 }
-                
+
                 if(!target)
                 {
-                    throw exception("unhandled semantic modifier '%s'", id.c_str());
+                    throw exception("xgen.check_semantic(unhandled modifier '%s')", id.c_str());
                 }
-                
+
+                //______________________________________________________________
+                //
+                // storing
+                //______________________________________________________________
                 for(;node;node=node->next)
                 {
                     const string ruleID = node->lx->to_string();
-                    std::cerr << "\t\t" << id << " <= " << ruleID << std::endl;
+                    YXGEN_OUT("\t\t" << id << " <= " << ruleID );
                     if( !target->insert(ruleID) )
                     {
-                        throw exception("multiple rule '%s' for ''%s''", ruleID.c_str(), id.c_str());
+                        throw exception("xgen.check_semantic(multiple rule '%s' for ''%s'')", ruleID.c_str(), id.c_str());
                     }
                 }
-                
+
             }
-            
+
             void xgen::load_plugin(const string &id, xnode *node)
             {
                 assert("LXR"==node->label());
@@ -98,7 +106,7 @@ namespace yocto
                 assert(args.head->terminal);
                 const string plg = args.head->lx->to_string();
                 YXGEN_OUT("loading plugin <" << plg << "> as " << id);
-                
+
                 if("cstring" == plg)
                 {
                     ld_cstring(id,args);
@@ -137,7 +145,7 @@ namespace yocto
                     throw exception("plugin<rstring>: unexpected multiple '%s'", id.c_str());
                 }
             }
-            
+
 
             bool xgen:: is_alias(const xnode *node)
             {
@@ -173,13 +181,13 @@ namespace yocto
                         }
                         return true;
                     }
-
-
+                    
+                    
                 }
                 return false;
             }
         }
-
+        
     }
-
+    
 }

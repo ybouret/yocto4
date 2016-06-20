@@ -11,9 +11,7 @@ namespace yocto
     {
         typedef lingua::syntax::xnode       XNode;
         typedef lingua::syntax::tree_walker TreeWalker;
-
-        //lingua::parser *CreateSeemParser(const bool emitFiles=false);
-
+        
         class Parser
         {
         public:
