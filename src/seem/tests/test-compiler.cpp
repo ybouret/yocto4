@@ -12,6 +12,7 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 {
     Seem::Compiler cmp(true);
     cmp.parser.gram->display();
+    lingua::syntax::analyzer A( *cmp.parser.gram );
     
     ios::icstream  fp( ios::cstdin );
     cmp.compile(fp);

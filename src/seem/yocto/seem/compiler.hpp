@@ -2,6 +2,7 @@
 #define YOCTO_SEEM_COMPILER_INCLUDED 1
 
 #include "yocto/seem/types.hpp"
+#include "yocto/lingua/syntax/analyzer.hpp"
 
 namespace yocto
 {
