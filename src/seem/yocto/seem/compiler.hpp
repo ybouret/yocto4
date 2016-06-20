@@ -18,7 +18,7 @@ namespace yocto
             TreeWalker walker;
 
             void compile( ios::istream &fp );
-
+            
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Compiler);
