@@ -130,11 +130,15 @@ namespace yocto
                     }
                     else
                     {
-                        term_proc *pProc = term_procs.search(label);
+                        term_proc   *pProc   = term_procs.search(label);
+                        const string content = node->lx->to_string();
                         if(pProc)
                         {
-                            const string content = node->lx->to_string();
                             (*pProc)(content);
+                        }
+                        else
+                        {
+                            std::cerr << "// +" << label << " '" << content << "'" << std::endl;
                         }
                     }
                 }
@@ -163,6 +167,10 @@ namespace yocto
                         if(pCall)
                         {
                             (*pCall)(local_ns);
+                        }
+                        else
+                        {
+                            std::cerr << "// @" << label << " /" << local_ns << std::endl;
                         }
                     }
                 }

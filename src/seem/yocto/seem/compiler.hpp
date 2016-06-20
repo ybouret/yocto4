@@ -22,7 +22,11 @@ namespace yocto
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Compiler);
-
+            void OnNumber(const string &content);
+            void OnID(const string &content);
+            void OnAXP(const size_t ns);
+            void OnMXP(const size_t ns);
+            void OnPXP(const size_t ns);
         };
 
     }

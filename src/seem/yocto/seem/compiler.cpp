@@ -16,6 +16,12 @@ namespace yocto
         parser(emitFiles),
         walker( * parser.gram )
         {
+            //__________________________________________________________________
+            //
+            // registering methods
+            //__________________________________________________________________
+            walker.on_term("NUMBER", this, & Compiler::OnNumber);
+            walker.on_term("ID",     this, & Compiler::OnID);
         }
 
 
@@ -43,11 +49,32 @@ namespace yocto
             //
             // compile: walk...
             //__________________________________________________________________
-            ios::ocstream out( ios::cstderr );
-            walker.walk( tree.__get(), &out );
+            //ios::ocstream out( ios::cstderr );
+            walker.walk( tree.__get(), NULL );
             
         }
 
+    }
+}
 
+#include <iostream>
+namespace yocto
+{
+    namespace Seem
+    {
+        void Compiler::OnNumber(const string &content)
+        {
+            std::cerr << "pushf " << content << std::endl;
+        }
+
+        void Compiler::OnID(const string &content)
+        {
+            std::cerr << "push '" << content << "'" << std::endl;
+        }
+
+        void Compiler:: OnAXP(const size_t ns)
+        {
+            std::cerr << "axp /" << ns << std::endl;
+        }
     }
 }

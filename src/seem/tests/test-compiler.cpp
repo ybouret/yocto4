@@ -11,6 +11,8 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(compiler)
 {
     Seem::Compiler cmp(true);
+    cmp.parser.gram->display();
+    
     ios::icstream  fp( ios::cstdin );
     cmp.compile(fp);
 

@@ -321,6 +321,9 @@ namespace yocto
 
 
 #include "yocto/ios/ocstream.hpp"
+#include <iostream>
+#include "yocto/sequence/vector.hpp"
+#include "yocto/sort/quick.hpp"
 
 namespace yocto
 {
@@ -345,6 +348,61 @@ namespace yocto
                 const string F(filename);
                 graphviz(F);
             }
+
+
+            void   grammar:: display() const
+            {
+                std::cerr << "|- Grammar '" << name << "' content:" << std::endl;
+                vector<string> Terms(rules.size,as_capacity);
+                vector<string> Rules(rules.size,as_capacity);
+
+
+                for(const rule *r = rules.head;r;r=r->next)
+                {
+                    const uint32_t flags = r->flags;
+                    switch(flags)
+                    {
+                        case property::standard:
+                        case property::univocal:
+                        case property::noSingle:
+                            switch(r->uuid)
+                        {
+                            case terminal::UUID:
+                                Terms.push_back(r->label);
+                                break;
+
+                            case aggregate::UUID:
+                                Rules.push_back(r->label);
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        default:
+                            break;
+                    }
+                }
+                quicksort(Terms);
+                quicksort(Rules);
+
+                std::cerr << "|_Terminals:" << std::endl;
+                for(size_t i=1;i<=Terms.size();++i)
+                {
+                    std::cerr << "  |_" << Terms[i] << std::endl;
+                }
+                std::cerr << "|_Internals:" << std::endl;
+                for(size_t i=1;i<=Rules.size();++i)
+                {
+                    std::cerr << "  |_" << Rules[i] << std::endl;
+                }
+                std::cerr << "|- --------" << std::endl;
+                std::cerr << std::endl;
+
+            }
+
+
+
         }
     }
 }
