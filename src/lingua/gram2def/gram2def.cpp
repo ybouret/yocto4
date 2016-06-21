@@ -53,8 +53,10 @@ YOCTO_PROGRAM_START()
     if(argc>2)             pfp.reset( new ios::wcstream(argv[2])  );
     ios::ostream &fp = *pfp;
     const string pfx;
-    hashing::mperf::emit_defines(fp,Terms,pfx);
-    hashing::mperf::emit_defines(fp,Rules,pfx);
+    fp << "// TERMINAL\n";
+    hashing::mperf::emit_defines(fp,Terms,pfx,0);
+    fp << "// INTERNAL\n";
+    hashing::mperf::emit_defines(fp,Rules,pfx,Terms.size());
 
 }
 YOCTO_PROGRAM_END()

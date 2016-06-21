@@ -83,7 +83,8 @@ namespace yocto
 
             static void emit_defines(ios::ostream        &fp,
                                      const array<string> &keywords,
-                                     const string        &prefix);
+                                     const string        &prefix,
+                                     const size_t         offset=0);
 
 
         private:
