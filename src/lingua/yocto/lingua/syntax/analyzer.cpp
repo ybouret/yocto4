@@ -117,7 +117,7 @@ namespace yocto
                     }
                     else
                     {
-                        term_proc   *pProc   = NULL;
+                        term_proc   *pProc   = onTerm.__get();
                         const string content = node->lx->to_string();
                         if(pProc)
                         {
@@ -149,7 +149,7 @@ namespace yocto
                     }
                     else
                     {
-                        rule_proc *pCall = NULL;
+                        rule_proc *pCall = onRule.__get();
                         if(pCall)
                         {
                             (*pCall)(label,local_ns);

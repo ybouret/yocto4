@@ -2,7 +2,6 @@
 #define YOCTO_SEEM_TYPES_INCLUDED 1
 
 #include "yocto/lingua/parser.hpp"
-#include "yocto/lingua/syntax/tree-walker.hpp"
 #include "yocto/ptr/arc.hpp"
 
 namespace yocto
@@ -10,7 +9,6 @@ namespace yocto
     namespace Seem
     {
         typedef lingua::syntax::xnode       XNode;
-        typedef lingua::syntax::tree_walker TreeWalker;
         
         class Parser
         {

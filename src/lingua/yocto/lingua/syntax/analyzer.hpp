@@ -22,16 +22,35 @@ namespace yocto
 
                 void walk(const xnode *tree, ios::ostream *fp);
 
+                //! declare something to do with terminal
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER >
+                inline void on_term( OBJECT_POINTER host, METHOD_POINTER method)
+                {
+                    onTerm.reset( new term_proc(host,method) );
+                }
+
+                //! declare something to do with internal rule
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER >
+                inline void on_rule( OBJECT_POINTER host, METHOD_POINTER method)
+                {
+                    onRule.reset( new rule_proc(host,method) );
+                }
+
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(analyzer);
                 auto_ptr<term_proc> onTerm;
                 auto_ptr<rule_proc> onRule;
-                int                depth;
+                int                 depth;
                 size_t              max_label_length;
                 ios::ostream       *output;
                 void __walk( const xnode *node, size_t &ns);
                 void emit(const string &label);
-
             };
         }
     }
