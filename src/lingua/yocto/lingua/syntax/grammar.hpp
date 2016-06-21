@@ -2,6 +2,7 @@
 #define YOCTO_LINGUA_SYNTAX_GRAMMAR_INCLUDED 1
 
 #include "yocto/lingua/syntax/compound.hpp"
+#include "yocto/sequence/vector.hpp"
 
 namespace yocto
 {
@@ -45,6 +46,11 @@ namespace yocto
 
                 void   display() const;
                 size_t num_rules() const throw();
+
+
+                // return max_length of labels
+                size_t collect(vector<string> &Terms,
+                               vector<string> &Rules) const;
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);

@@ -23,31 +23,9 @@ YOCTO_PROGRAM_START()
     ios::icstream           inp(gramfile);
     auto_ptr<parser>        P( parser::generate(inp) );
     const syntax::grammar  &G = *P;
-    vector<string>          Terms(G.num_rules(),as_capacity);
-    vector<string>          Rules(G.num_rules(),as_capacity);
-    for(const syntax::rule *r = G.top_level();r;r=r->next)
-    {
-        if(r->flags==property::jettison)
-            continue;
-
-        switch(r->uuid)
-        {
-            case syntax::terminal::UUID:
-                Terms.push_back(r->label);
-                break;
-
-            case syntax::aggregate::UUID:
-                Rules.push_back(r->label);
-                break;
-
-            default:
-                break;
-        }
-
-    }
-
-    quicksort(Terms);
-    quicksort(Rules);
+    vector<string>          Terms;
+    vector<string>          Rules;
+    (void)G.collect(Terms,Rules);
 
     auto_ptr<ios::ostream> pfp( new ios::ocstream( ios::cstdout ) );
     if(argc>2)             pfp.reset( new ios::wcstream(argv[2])  );

@@ -3,6 +3,7 @@
 
 #include "yocto/lingua/syntax/grammar.hpp"
 #include "yocto/ptr/auto.hpp"
+#include "yocto/hashing/mph.hpp"
 
 namespace yocto
 {
@@ -40,12 +41,17 @@ namespace yocto
                     onRule.reset( new rule_proc(host,method) );
                 }
 
+                int hash_term(const string &label) const throw();
+                int hash_rule(const string &label) const throw();
+
 
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(analyzer);
                 auto_ptr<term_proc> onTerm;
                 auto_ptr<rule_proc> onRule;
+                hashing::mperf      hterm;
+                hashing::mperf      hrule;
                 int                 depth;
                 size_t              max_label_length;
                 ios::ostream       *output;

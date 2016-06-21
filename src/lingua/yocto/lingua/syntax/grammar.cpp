@@ -105,7 +105,7 @@ namespace yocto
             {
                 return rules.head;
             }
-            
+
             rule & grammar:: append(rule *r)
             {
                 assert(r);
@@ -322,8 +322,8 @@ namespace yocto
 
 #include "yocto/ios/ocstream.hpp"
 #include <iostream>
-#include "yocto/sequence/vector.hpp"
 #include "yocto/sort/quick.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -354,13 +354,14 @@ namespace yocto
                 return rules.size;
             }
 
-            void   grammar:: display() const
+            size_t grammar::collect(vector<string> &Terms,
+                                  vector<string> &Rules) const
             {
-                std::cerr << "|- Grammar '" << name << "' content:" << std::endl;
-                vector<string> Terms(rules.size,as_capacity);
-                vector<string> Rules(rules.size,as_capacity);
-
-
+                Terms.free();
+                Rules.free();
+                Terms.ensure(rules.size);
+                Rules.ensure(rules.size);
+                size_t ans = 0;
                 for(const rule *r = rules.head;r;r=r->next)
                 {
                     const uint32_t flags = r->flags;
@@ -373,10 +374,12 @@ namespace yocto
                         {
                             case terminal::UUID:
                                 Terms.push_back(r->label);
+                                ans = max_of(ans,r->label.size());
                                 break;
 
                             case aggregate::UUID:
                                 Rules.push_back(r->label);
+                                ans = max_of(ans,r->label.size());
                                 break;
 
                             default:
@@ -389,6 +392,17 @@ namespace yocto
                 }
                 quicksort(Terms);
                 quicksort(Rules);
+                return ans;
+            }
+
+
+            void   grammar:: display() const
+            {
+                std::cerr << "|- Grammar '" << name << "' content:" << std::endl;
+                vector<string> Terms;
+                vector<string> Rules;
+                collect(Terms,Rules);
+
 
                 std::cerr << "|_Terminals:" << std::endl;
                 for(size_t i=1;i<=Terms.size();++i)
@@ -402,11 +416,11 @@ namespace yocto
                 }
                 std::cerr << "|- --------" << std::endl;
                 std::cerr << std::endl;
-
+                
             }
-
-
-
+            
+            
+            
         }
     }
 }

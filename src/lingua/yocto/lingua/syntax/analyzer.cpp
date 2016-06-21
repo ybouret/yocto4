@@ -6,6 +6,8 @@
 #include "yocto/code/utils.hpp"
 
 #include <iostream>
+#include "yocto/ios/graphviz.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -20,51 +22,72 @@ namespace yocto
             analyzer:: analyzer(const grammar &g) :
             onTerm(NULL),
             onRule(NULL),
+            hterm(),
+            hrule(),
+            depth(0),
             max_label_length(0),
             output(NULL)
             {
 
-                const size_t   nr = g.num_rules();
-                vector<string> Terms(nr,as_capacity);
-                vector<string> Rules(nr,as_capacity);
+                vector<string> Terms;
+                vector<string> Rules;
+                max_label_length = g.collect(Terms,Rules);
 
-                for(const rule *r = g.top_level();r;r=r->next)
+                int j = 0;
+                for(size_t i=1;i<=Terms.size();++i)
                 {
-                    if(r->flags==property::jettison)
-                        continue;
-
-                    switch(r->uuid)
-                    {
-                        case terminal::UUID:
-                            Terms.push_back(r->label);
-                            max_label_length = max_of(max_label_length,r->label.size());
-                            break;
-                            
-                        case aggregate::UUID:
-                            Rules.push_back(r->label);
-                            max_label_length = max_of(max_label_length,r->label.size());
-                            break;
-
-                        default:
-                            break;
-                    }
+                    hterm.insert(Terms[i], ++j);
                 }
+                hterm.optimize();
 
-                quicksort(Terms);
-                quicksort(Rules);
+                hterm.graphviz("hterm.dot");
+                ios::graphviz_render("hterm.dot");
+
+                for(size_t i=1;i<=Rules.size();++i)
+                {
+                    hrule.insert(Rules[i], ++j);
+                }
+                hrule.optimize();
+
+                hrule.graphviz("hrule.dot");
+                ios::graphviz_render("hrule.dot");
+
+
                 std::cerr << "|_Terms" << std::endl;
                 for(size_t i=1;i<=Terms.size();++i)
                 {
-                    std::cerr << "  |_" << Terms[i] << std::endl;
+                    std::cerr << "  |_" << Terms[i];
+                    for(size_t k=Terms[i].size();k<=max_label_length;++k) std::cerr << ' ';
+                    std::cerr << " @" << hterm(Terms[i]) << std::endl;
                 }
+                
                 std::cerr << "|_Rules" << std::endl;
                 for(size_t i=1;i<=Rules.size();++i)
                 {
-                    std::cerr << "  |_" << Rules[i] << std::endl;
+                    std::cerr << "  |_" << Rules[i];
+                    for(size_t k=Rules[i].size();k<=max_label_length;++k) std::cerr << ' ';
+                    std::cerr << " @" << hrule(Rules[i]) << std::endl;
                 }
                 
             }
-            
+
+            int analyzer:: hash_term(const string &label) const throw()
+            {
+                const int ans = hterm(label);
+                if(ans<0)
+                    throw exception("syntax::analyzer(unknown terminal '%s')", label.c_str());
+                return ans;
+            }
+
+            int analyzer:: hash_rule(const string &label) const throw()
+            {
+                const int ans = hrule(label);
+                if(ans<0)
+                    throw exception("syntax::analyzer(unknown rule '%s')", label.c_str());
+                return ans;
+            }
+
+
         }
     }
 }

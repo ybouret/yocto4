@@ -60,6 +60,9 @@ namespace yocto
 {
     namespace Seem
     {
+        
+#include "seem.def"
+
         void Compiler:: on_term(const string &label,
                                 const string &content)
         {
