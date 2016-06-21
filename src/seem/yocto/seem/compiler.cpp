@@ -67,13 +67,25 @@ namespace yocto
                                 const string &content)
         {
             std::cerr << "+" << label << "='" << content << "'" << std::endl;
-
+            switch(walker.hash_term(label))
+            {
+                case NUMBER:
+                    break;
+                    
+                default:
+                    break;
+            }
         }
 
         void Compiler:: on_rule(const string &label,
                                 const size_t ns)
         {
             std::cerr << "@" << label << "/" << ns << std::endl;
+            switch(walker.hash_term(label))
+            {
+                default:
+                    break;
+            }
         }
 
     }
