@@ -100,6 +100,7 @@ ADD_TEST(variadic    test-main variadic)
 ADD_TEST(Points      test-main points)
 ADD_TEST(Splitting   test-main splitting)
 ADD_TEST(DynStack    test-main dynstack)
+ADD_TEST(HTree       test-main htree)
 
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
