@@ -84,7 +84,7 @@ namespace
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ptr/auto.hpp"
 
-#include "yocto/lingua/syntax/tree-walker.hpp"
+#include "yocto/lingua/syntax/analyzer.hpp"
 
 YOCTO_UNIT_TEST_IMPL(grammar)
 {
@@ -103,9 +103,9 @@ YOCTO_UNIT_TEST_IMPL(grammar)
     tree->graphviz("tree.dot");
     ios::graphviz_render("tree.dot");
 
-    syntax::tree_walker walker(G);
+    syntax::analyzer walker(G);
     std::cerr << "WALKING..." << std::endl;
-    walker.walk(tree.__get());
+    walker.walk(tree.__get(),NULL);
 
 
 }

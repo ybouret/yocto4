@@ -310,8 +310,8 @@ namespace yocto
                 const string def = prefix+kw;
                 const string ans = def2cpp(def);
                 fp << "#define " << ans;
-                for(size_t i=ans.size();i<=max_len;++i) fp << ' ';
-                fp("0x%04x\n", unsigned(j));
+                for(size_t i=kw.size();i<=max_len;++i) fp << ' ';
+                fp(" 0x%04x\n", unsigned(j));
             }
 
         }

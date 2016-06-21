@@ -14,12 +14,13 @@ using namespace lingua;
 
 YOCTO_PROGRAM_START()
 {
-    if(argc<=1)
+    if(argc<=2)
     {
-        throw exception("usage: %s grammar_file [output_file]", program);
+        throw exception("usage: %s PREFIX grammar_file [output_file]", program);
     }
 
-    const string            gramfile = argv[1];
+    const string            prefix   = argv[1];
+    const string            gramfile = argv[2];
     ios::icstream           inp(gramfile);
     auto_ptr<parser>        P( parser::generate(inp) );
     const syntax::grammar  &G = *P;
@@ -28,13 +29,12 @@ YOCTO_PROGRAM_START()
     (void)G.collect(Terms,Rules);
 
     auto_ptr<ios::ostream> pfp( new ios::ocstream( ios::cstdout ) );
-    if(argc>2)             pfp.reset( new ios::wcstream(argv[2])  );
+    if(argc>3)             pfp.reset( new ios::wcstream(argv[3])  );
     ios::ostream &fp = *pfp;
-    const string pfx;
     fp << "// TERMINAL\n";
-    hashing::mperf::emit_defines(fp,Terms,pfx,0);
+    hashing::mperf::emit_defines(fp,Terms,prefix,0);
     fp << "// INTERNAL\n";
-    hashing::mperf::emit_defines(fp,Rules,pfx,Terms.size());
+    hashing::mperf::emit_defines(fp,Rules,prefix,Terms.size());
 
 }
 YOCTO_PROGRAM_END()

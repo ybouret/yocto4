@@ -1,14 +1,14 @@
 // TERMINAL
-#define DIV    0x0001
-#define ID     0x0002
-#define MINUS  0x0003
-#define MOD    0x0004
-#define MUL    0x0005
-#define NUMBER 0x0006
-#define PLUS   0x0007
+#define SEEM_DIV     0x0001
+#define SEEM_ID      0x0002
+#define SEEM_MINUS   0x0003
+#define SEEM_MOD     0x0004
+#define SEEM_MUL     0x0005
+#define SEEM_NUMBER  0x0006
+#define SEEM_PLUS    0x0007
 // INTERNAL
-#define ARGS 0x0008
-#define AXP  0x0009
-#define FUNC 0x000a
-#define MXP  0x000b
-#define PXP  0x000c
+#define SEEM_ARGS  0x0008
+#define SEEM_AXP   0x0009
+#define SEEM_FUNC  0x000a
+#define SEEM_MXP   0x000b
+#define SEEM_PXP   0x000c

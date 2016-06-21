@@ -4,7 +4,7 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/ocstream.hpp"
-#include "yocto/lingua/syntax/tree-walker.hpp"
+#include "yocto/lingua/syntax/analyzer.hpp"
 
 using namespace yocto;
 using namespace lingua;
@@ -29,7 +29,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
             tree->graphviz( P->grammar::name + "_output.dot" );
             ios::graphviz_render( P->grammar::name + "_output.dot" );
 
-            syntax::tree_walker walker(*P);
+            syntax::analyzer walker(*P);
             std::cerr << "-- WALKING..." << std::endl;
             ios::ocstream output( ios::cstderr );
             walker.walk(tree.__get(), &output);

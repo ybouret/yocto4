@@ -69,7 +69,7 @@ namespace yocto
             std::cerr << "+" << label << "='" << content << "'" << std::endl;
             switch(walker.hash_term(label))
             {
-                case NUMBER:
+                case SEEM_NUMBER:
                     break;
                     
                 default:
