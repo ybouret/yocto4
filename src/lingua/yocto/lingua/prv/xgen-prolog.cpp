@@ -45,7 +45,7 @@ namespace yocto
                         {
                             const xnode * sub = node->ch->head;
                             const string  id  = sub->lx->to_string(1,0); // remove '$'
-                            std::cerr << "\t\twill process ''" << id << "''" << std::endl;
+                            //std::cerr << "\t\twill process ''" << id << "''" << std::endl;
                             check_semantic(id,sub->next);
                             delete tmp.pop_back();
                         } break;

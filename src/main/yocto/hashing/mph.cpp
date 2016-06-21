@@ -266,6 +266,43 @@ namespace yocto
 
         }
 
+        static inline
+        string def2cpp( const string &def )
+        {
+            string ans(def.size(),as_capacity);
+            const size_t n = def.size();
+            for(size_t i=0;i<n;++i)
+            {
+                uint8_t C = uint8_t(def[i]);
+                if( ( C>='0'&&C<='9') ||
+                    ( C>='A'&&C<='Z') ||
+                    ( C>='a'&&C<='z') )
+                {
+                    ans += char(C);
+                }
+                else
+                {
+                    ans += '_';
+                }
+            }
+            return ans;
+        }
+        void mperf::emit_defines(ios::ostream        &fp,
+                                 const array<string> &keywords,
+                                 const string        &prefix)
+        {
+            const size_t count = keywords.size();
+            mperf        H;
+            for(size_t i=1;i<=count;++i)
+            {
+                const string &kw = keywords[i];
+                H.insert(kw,i);
+                const string def = prefix+kw;
+                const string ans = def2cpp(def);
+                fp << "#define " << ans << " " << i << "\n";
+            }
+        }
+
     }
 
 }

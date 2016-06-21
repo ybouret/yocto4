@@ -4,7 +4,7 @@
 #include "yocto/core/list.hpp"
 #include "yocto/string.hpp"
 #include "yocto/ios/ostream.hpp"
-
+#include "yocto/sequence/array.hpp"
 
 namespace yocto
 {
@@ -80,6 +80,11 @@ namespace yocto
             }
 
             void release() throw();
+
+            static void emit_defines(ios::ostream        &fp,
+                                     const array<string> &keywords,
+                                     const string        &prefix);
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(mperf);
