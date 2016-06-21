@@ -105,6 +105,11 @@ namespace yocto
         inline size_t size()  const throw() { return size_; }
         inline size_t nodes() const throw() { return nodes_; }
 
+
+        //______________________________________________________________________
+        //
+        // insertion
+        //______________________________________________________________________
         inline bool insert(const void  *buffer,
                            const size_t buflen,
                            pointer_type pobj )
@@ -169,15 +174,56 @@ namespace yocto
             return this->insert(buf.ro(),buf.length(),pobj);
         }
 
+        inline const_type *find(const void  *buffer,
+                                const size_t buflen) const throw()
+        {
+            assert(!(0==buffer&&buflen>0));
+            const node_type *curr = root;
+            const uint8_t   *addr = static_cast<const uint8_t *>(buffer);
 
+            for(size_t i=buflen;i>0;--i)
+            {
+                const uint8_t code  = *(addr++);
+                bool          found = false;
+
+                for(const node_type *node=curr->chld.head;node;node=node->next)
+                {
+                    if(code==node->code)
+                    {
+                        found = true;
+                        curr  = node;
+                        break;
+                    }
+                }
+
+                if(!found)
+                {
+                    return NULL;
+                }
+            }
+            
+            return curr->data; //!< may be null
+        }
+
+        inline const_type *find(const char *txt) const throw()
+        {
+            return this->find(txt,length_of(txt));
+        }
+
+        inline const_type *find(const memory::ro_buffer &buf) const throw()
+        {
+            return this->find(buf.ro(),buf.length());
+        }
+        
+        
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(htree);
         node_type *root;
         size_t     size_;
         size_t     nodes_;
     };
-
-
+    
+    
 }
 
 #endif
