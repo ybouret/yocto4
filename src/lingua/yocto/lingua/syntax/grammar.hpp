@@ -44,6 +44,7 @@ namespace yocto
                 void   no_single(const string &aggID);
 
                 void   display() const;
+                size_t num_rules() const throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);

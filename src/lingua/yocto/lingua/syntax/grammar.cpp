@@ -349,6 +349,10 @@ namespace yocto
                 graphviz(F);
             }
 
+            size_t grammar:: num_rules() const throw()
+            {
+                return rules.size;
+            }
 
             void   grammar:: display() const
             {
