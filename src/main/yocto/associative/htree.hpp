@@ -4,10 +4,11 @@
 #include "yocto/container/container.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/type/args.hpp"
-#include "yocto/ptr/auto.hpp"
 #include "yocto/string.hpp"
 #include "yocto/sort/merge.hpp"
 #include "yocto/comparator.hpp"
+#include "yocto/code/round.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 namespace yocto
 {
@@ -19,7 +20,7 @@ namespace yocto
     {
     public:
         YOCTO_ARGUMENTS_DECL_T;
-        typedef type *pointer_type;
+        typedef void (*print_proc)(const_type &,ios::ostream&);
 
         class node_type
         {
@@ -31,6 +32,7 @@ namespace yocto
             const uint8_t code; //!< associated byte
             list_type     chld; //!< child(ren) nodes
             unsigned      freq; //!< frequency
+            uint64_t      wksp[ YOCTO_U64_FOR_ITEM(T) ];
 
             //! default ctor
             inline node_type(const uint8_t C) throw() :
@@ -39,7 +41,8 @@ namespace yocto
             prev(0),
             code(C),
             chld(),
-            freq(0)
+            freq(0),
+            wksp()
             {
             }
 
@@ -48,13 +51,21 @@ namespace yocto
             {
                 if(data)
                 {
-                    delete data;
+                    destruct<mutable_type>(data);
                     data = 0;
                 }
             }
 
-            YOCTO_MAKE_OBJECT
+            //! build data into workspace
+            inline void build(param_type args)
+            {
+                assert(NULL==data);
+                mutable_type *addr = (mutable_type *) &wksp[0];
+                new (addr) mutable_type(args);
+                data = addr;
+            }
 
+            //! optimize by frequencies
             inline void optimize() throw()
             {
                 for(node_type *node=chld.head;node;node=node->next)
@@ -64,11 +75,51 @@ namespace yocto
                 core::merging<node_type>::sort(chld,self_compare,NULL);
             }
 
+            YOCTO_MAKE_OBJECT
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
-            static inline void self_compare(const node_type *lhs,const node_type *rhs,void *) throw()
+            static inline int self_compare(const node_type *lhs,const node_type *rhs,void *) throw()
             {
                 return __compare_decreasing(lhs->freq,rhs->freq);
+            }
+
+        public:
+            inline void viz(ios::ostream &fp, print_proc proc) const
+            {
+                fp.viz(this);
+                const char *shape = (data!=NULL) ? "egg" : "box";
+                fp("[shape=%s,label=\"",shape);
+                if(code>=32&&code<127)
+                {
+                    fp("%c",char(code));
+                }
+                else
+                {
+                    fp("x%02x",unsigned(code));
+                }
+                if(freq>1)
+                {
+                    fp("#%u", unsigned(freq) );
+                }
+                if(data!=NULL)
+                {
+                    if(proc)
+                    {
+                        proc(*data,fp);
+                    }
+                    else
+                    {
+                        fp("*");
+                    }
+                }
+                fp << "\"];\n";
+                for(const node_type *node=chld.head;node;node=node->next)
+                {
+                    node->viz(fp,proc);
+                    fp.viz(this); fp << " -> "; fp.viz(node);
+                    fp << ";\n";
+                }
             }
         };
 
@@ -96,20 +147,21 @@ namespace yocto
 
         //______________________________________________________________________
         //
-        // insertion
+        //! insertion
         //______________________________________________________________________
         inline bool insert(const void  *buffer,
                            const size_t buflen,
-                           pointer_type pobj )
+                           param_type   args)
         {
-            assert(pobj); assert( !(0==buffer&&buflen>0) );
-            auto_ptr<type> guard(pobj);
+            assert( !(0==buffer&&buflen>0) );
+
             //__________________________________________________________________
             //
             // initialize look up: start from root
             //__________________________________________________________________
-            const uint8_t *addr = static_cast<const uint8_t *>(buffer);
-            node_type     *curr = root;
+            const uint8_t                 *addr = static_cast<const uint8_t *>(buffer);
+            node_type                     *curr = root;
+            typename node_type::list_type *from = NULL;
 
             //__________________________________________________________________
             //
@@ -125,7 +177,9 @@ namespace yocto
                     if(code==node->code)
                     {
                         found = true;
+                        from  = & (curr->chld);
                         curr  = node;
+                        assert(from->owns(curr));
                         ++(curr->freq);
                         break;
                     }
@@ -134,41 +188,77 @@ namespace yocto
                 if(!found)
                 {
                     curr->chld.push_back( new node_type(code) );
+                    from  = &(curr->chld);
                     curr = curr->chld.tail;
+                    assert(from->owns(curr));
                     ++nodes_;
                 }
             }
 
+            //__________________________________________________________________
+            //
+            // found where we are
+            //__________________________________________________________________
             if(0!=curr->data)
             {
                 // node already occupied !
                 return false;
             }
 
-            curr->data = guard.yield();
+            //__________________________________________________________________
+            //
+            // build data
+            //__________________________________________________________________
+            try
+            {
+                curr->build(args);
+            }
+            catch(...)
+            {
+                if(from)
+                {
+                    delete from->unlink(curr);
+                    --nodes_;
+                }
+            }
             ++size_;
             return true;
         }
 
-        inline bool insert(const char  *txt,
-                           pointer_type pobj)
+        //!insertion wrapper
+        inline bool insert(const char  *text,
+                           param_type   args)
         {
-            return this->insert(txt,length_of(txt),pobj);
+            return this->insert(text,length_of(text),args);
         }
 
-        inline bool insert(const memory::ro_buffer &buf,
-                           pointer_type             pobj)
+        //! insertion wrapper
+        inline bool insert(const memory::ro_buffer &buff,
+                           param_type               args)
         {
-            return this->insert(buf.ro(),buf.length(),pobj);
+            return this->insert(buff.ro(),buff.length(),args);
         }
 
+        //______________________________________________________________________
+        //
+        //! look up, CONST
+        //______________________________________________________________________
         inline const_type *find(const void  *buffer,
                                 const size_t buflen) const throw()
         {
             assert(!(0==buffer&&buflen>0));
+
+            //__________________________________________________________________
+            //
+            // Initialize travel
+            //__________________________________________________________________
             const node_type *curr = root;
             const uint8_t   *addr = static_cast<const uint8_t *>(buffer);
 
+            //__________________________________________________________________
+            //
+            // Travelling down
+            //__________________________________________________________________
             for(size_t i=buflen;i>0;--i)
             {
                 const uint8_t code  = *(addr++);
@@ -193,17 +283,27 @@ namespace yocto
             return curr->data; //!< may be null
         }
 
+        //! lookup wrapper
         inline const_type *find(const char *txt) const throw()
         {
             return this->find(txt,length_of(txt));
         }
 
+        //! lookup wrapper
         inline const_type *find(const memory::ro_buffer &buf) const throw()
         {
             return this->find(buf.ro(),buf.length());
         }
-        
-        
+
+        inline void graphviz( const string &filename, print_proc proc) const
+        {
+            ios::ocstream fp(filename,false);
+            fp << "digraph G{\n";
+            root->viz(fp,proc);
+            fp << "}\n";
+        }
+
+
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(htree);
         node_type *root;
