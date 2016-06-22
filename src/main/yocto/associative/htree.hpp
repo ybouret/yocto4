@@ -32,7 +32,6 @@ namespace yocto
             const uint8_t code; //!< associated byte
             list_type     chld; //!< child(ren) nodes
             unsigned      freq; //!< frequency
-            uint64_t      wksp[ YOCTO_U64_FOR_ITEM(T) ];
 
             //! default ctor
             inline node_type(const uint8_t C) throw() :
@@ -41,8 +40,7 @@ namespace yocto
             prev(0),
             code(C),
             chld(),
-            freq(0),
-            wksp()
+            freq(0)
             {
             }
 
@@ -52,7 +50,7 @@ namespace yocto
                 if(data)
                 {
                     destruct<mutable_type>(data);
-                    data = 0;
+                    object::release1<mutable_type>(data);
                 }
             }
 
@@ -60,9 +58,16 @@ namespace yocto
             inline void build(param_type args)
             {
                 assert(NULL==data);
-                mutable_type *addr = (mutable_type *) &wksp[0];
-                new (addr) mutable_type(args);
-                data = addr;
+                data = object::acquire1<mutable_type>();
+                try
+                {
+                    new (data) mutable_type(args);
+                }
+                catch(...)
+                {
+                    object::release1<mutable_type>(data);
+                    throw;
+                }
             }
 
             //! optimize by frequencies
@@ -81,7 +86,15 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
             static inline int self_compare(const node_type *lhs,const node_type *rhs,void *) throw()
             {
-                return __compare_decreasing(lhs->freq,rhs->freq);
+                const int ans = __compare_decreasing(lhs->freq,rhs->freq);
+                if(0!=ans)
+                {
+                    return ans;
+                }
+                else
+                {
+                    return __compare(lhs->code,rhs->code);
+                }
             }
 
         public:
@@ -143,7 +156,7 @@ namespace yocto
 
         inline size_t size()  const throw() { return size_;  }
         inline size_t nodes() const throw() { return nodes_; }
-
+        inline size_t bytes() const throw() { return sizeof(T) * size_ + sizeof(node_type) * nodes_; }
 
         //______________________________________________________________________
         //

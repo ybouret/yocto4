@@ -58,7 +58,15 @@ namespace yocto
                                               const mperf::node_type *rhs,
                                               void *) throw()
         {
-            return __compare_decreasing(lhs->freq,rhs->freq);
+            const int ans = __compare_decreasing(lhs->freq,rhs->freq);
+            if(ans!=0)
+            {
+                return ans;
+            }
+            else
+            {
+                return __compare(lhs->code,rhs->code);
+            }
         }
 
         void mperf::node_type:: optimize() throw()

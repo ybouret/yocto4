@@ -17,7 +17,7 @@ namespace
 
 YOCTO_UNIT_TEST_IMPL(htree)
 {
-    htree<double> H;
+    htree<double>  H;
     vector<string> keys;
 
 #if 0
@@ -68,5 +68,8 @@ YOCTO_UNIT_TEST_IMPL(htree)
 
     std::cerr << "#nodes=" << H.nodes() << std::endl;
     std::cerr << "#size =" << H.size() << "/" << keys.size() << std::endl;
+
+    std::cerr << "#bytes=" << H.bytes() << std::endl;
+    
 }
 YOCTO_UNIT_TEST_DONE()
