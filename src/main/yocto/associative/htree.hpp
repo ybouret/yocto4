@@ -6,44 +6,14 @@
 #include "yocto/type/args.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/string.hpp"
+#include "yocto/sort/merge.hpp"
+#include "yocto/comparator.hpp"
 
 namespace yocto
 {
 
-#if 0
-    namespace core
-    {
-        class htree
-        {
-        public:
-            class node_type
-            {
-            public:
-                typedef core::list_of_cpp<node_type> list_type;
-                node_type      *next; //!< for list
-                node_type      *prev; //!< for list
-                const int       hash; //!< in-order hash code
-                const uint8_t   code; //!< associated byte
-                list_type       chld; //!< child(ren) nodes
-                unsigned        freq; //!< frequency
-
-                ~node_type() throw();
-                node_type(const uint8_t C) throw();
-
-                void viz( ios::ostream &fp ) const; //!< output graphviz
-                void optimize() throw(); //!< order by decreasing frequency
-
-
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
-            };
-
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(htree);
-        };
-    }
-#endif
-
+    
+    //! code based on minimal perfect hashing method
     template <typename T>
     class htree
     {
@@ -55,7 +25,7 @@ namespace yocto
         {
         public:
             typedef core::list_of_cpp<node_type> list_type;
-            mutable_type *data; //!< dynamically associated data
+            mutable_type *data; //!< dynamically associated data, NULL=no data
             node_type    *next; //!< for list
             node_type    *prev; //!< for list
             const uint8_t code; //!< associated byte
@@ -85,8 +55,21 @@ namespace yocto
 
             YOCTO_MAKE_OBJECT
 
+            inline void optimize() throw()
+            {
+                for(node_type *node=chld.head;node;node=node->next)
+                {
+                    node->optimize();
+                }
+                core::merging<node_type>::sort(chld,self_compare,NULL);
+            }
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
+            static inline void self_compare(const node_type *lhs,const node_type *rhs,void *) throw()
+            {
+                return __compare_decreasing(lhs->freq,rhs->freq);
+            }
         };
 
         inline explicit htree() :
@@ -102,7 +85,12 @@ namespace yocto
             root = 0;
         }
 
-        inline size_t size()  const throw() { return size_; }
+        inline void optimize() throw()
+        {
+            root->optimize();
+        }
+
+        inline size_t size()  const throw() { return size_;  }
         inline size_t nodes() const throw() { return nodes_; }
 
 
