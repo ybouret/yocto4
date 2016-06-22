@@ -34,7 +34,6 @@ YOCTO_UNIT_TEST_IMPL(htree)
             keys.push_back(key);
         }
     }
-
 #else
     for(size_t i=10+alea_lt(10);i>0;--i)
     {
@@ -70,6 +69,6 @@ YOCTO_UNIT_TEST_IMPL(htree)
     std::cerr << "#size =" << H.size() << "/" << keys.size() << std::endl;
 
     std::cerr << "#bytes=" << H.bytes() << std::endl;
-    
+
 }
 YOCTO_UNIT_TEST_DONE()
