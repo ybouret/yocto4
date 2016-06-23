@@ -34,6 +34,8 @@ namespace yocto
                     tgt[v] = src[v];
                 }
             }
+
+            vertex extension() const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);

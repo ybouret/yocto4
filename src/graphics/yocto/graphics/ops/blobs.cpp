@@ -1,7 +1,7 @@
 #include "yocto/graphics/ops/blobs.hpp"
 #include "yocto/associative/map.hpp"
 #include "yocto/sort/quick.hpp"
-
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -12,6 +12,34 @@ namespace yocto
         }
 
         blob:: blob(const size_t t) throw() : tag(t) {}
+
+
+        vertex blob:: extension() const throw()
+        {
+            if(size>0)
+            {
+                const vnode_type *node = head;
+                vertex vmin = node->vtx;
+                vertex vmax = node->vtx;
+                for(node=node->next;node;node=node->next)
+                {
+                    const vertex tmp = node->vtx;
+                    vmin.x = min_of(vmin.x,tmp.x);
+                    vmax.x = max_of(vmax.x,tmp.x);
+                    vmin.y = min_of(vmin.y,tmp.y);
+                    vmax.y = max_of(vmax.y,tmp.y);
+                }
+                vmax -= vmin;
+                ++vmax.x;
+                ++vmax.y;
+                return vmax;
+            }
+            else
+            {
+                return vertex(0,0);
+            }
+        }
+
     }
 }
 
