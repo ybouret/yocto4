@@ -25,7 +25,7 @@ namespace yocto
             template <typename T>
             void transfer( pixmap<T> &tgt, const pixmap<T> &src) const throw()
             {
-                tgt.ldz();
+                //tgt.ldz();
                 for(const vnode_type *node = head; node; node=node->next)
                 {
                     const vertex v = node->vtx;
