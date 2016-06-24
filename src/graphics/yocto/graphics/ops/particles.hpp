@@ -2,19 +2,19 @@
 #define YOCTO_GRAPHICS_OPS_PARTICLES_INCLUDED 1
 
 #include "yocto/graphics/rawpix.hpp"
+#include "yocto/ptr/arc.hpp"
 
 namespace yocto
 {
     namespace graphics
     {
-        class active_vertex
+        class active_vertex : public counted_object
         {
         public:
+            typedef arc_ptr<active_vertex> ptr;
+
             ~active_vertex() throw();
             active_vertex(const vertex v);
-
-            
-
 
 
         private:
