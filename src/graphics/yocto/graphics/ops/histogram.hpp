@@ -14,7 +14,7 @@ namespace yocto
 
 
         //! one histogram of data
-        class histogram
+        class Histogram
         {
         public:
             static const size_t bins=256;
@@ -22,8 +22,8 @@ namespace yocto
 
             word_type count[256];
 
-            explicit histogram() throw();
-            virtual ~histogram() throw();
+            explicit Histogram() throw();
+            virtual ~Histogram() throw();
 
             //! for parallel code
             template <typename T>
@@ -51,7 +51,7 @@ namespace yocto
                 __update(count, pxm, pxm);
             }
 
-            void collect( const histogram &H ) throw();
+            void collect( const Histogram &H ) throw();
 
             static void __reset(word_type *arr) throw();
             void reset() throw();                   //! everyting to 0
@@ -69,13 +69,13 @@ namespace yocto
                 for(size_t i=np;i>0;--i)
                 {
                     xpatch    &xp = xps[i];
-                    (void) xp.make<histogram>();
-                    xp.enqueue(this, & histogram::update_cb<T>, server);
+                    (void) xp.make<Histogram>();
+                    xp.enqueue(this, & Histogram::update_cb<T>, server);
                 }
                 if(server) server->flush();
                 for(size_t i=np;i>0;--i)
                 {
-                    collect( xps[i].as<histogram>() );
+                    collect( xps[i].as<Histogram>() );
                 }
             }
 
@@ -85,14 +85,14 @@ namespace yocto
             size_t threshold() const throw();
 
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(histogram);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Histogram);
             const void *src;
             template <typename T>
             inline void update_cb( xpatch &xp, lockable & ) throw()
             {
                 assert(src);
                 const pixmap<T> &pxm = *static_cast< const pixmap<T> * >(src);
-                histogram &H = xp.as<histogram>();
+                Histogram &H = xp.as<Histogram>();
                 __update<T>(H.count,pxm,xp);
             }
         };
@@ -154,12 +154,27 @@ namespace yocto
                         }
                     }
                 }
-                
+
             }
         };
 
+        template <typename T>
+        size_t separate(const threshold::mode_type mode,
+                        pixmap<T>                 &target,
+                        const pixmap<T>           &source,
+                        xpatches                  &xps,
+                        threading::engine         *server)
+        {
+            Histogram H;
+            H.update(source, xps, server);
+            const size_t t = H.threshold();
+            threshold::apply(target,t,source,mode);
+            return t;
+        }
+        
+        
     }
-
+    
 }
 
 #endif

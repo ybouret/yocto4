@@ -170,7 +170,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
             PNG.save("image_grad.png",bmp,NULL);
         }
 
-        histogram H;
+        Histogram H;
         blobs     B(w,h);
         {
             std::cerr << "--- compute histogram..." << std::endl;

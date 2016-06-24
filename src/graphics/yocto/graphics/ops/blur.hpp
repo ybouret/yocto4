@@ -49,7 +49,7 @@ namespace yocto
                 for(size_t p=xps.size();p>0;--p)
                 {
                     xpatch &xp = xps[p];
-                    xp.enqueue(this, & blur::eval_x<T,U,NCH>, server);
+                    xp.enqueue(this, & blur::eval<T,U,NCH>, server);
                 }
                 if(server) server->flush();
             }
@@ -74,7 +74,7 @@ namespace yocto
 
 
             template <typename T, typename U, size_t NCH>
-            inline void eval_x( xpatch &xp, lockable & ) throw()
+            inline void eval( xpatch &xp, lockable & ) throw()
             {
                 assert(target);
                 assert(source);
@@ -166,7 +166,19 @@ namespace yocto
             
             
         };
-        
+
+        template <typename T>
+        inline void apply_blur(const float          sig,
+                               pixmap<T>           &dst,
+                               const pixmap<T>     &src,
+                               xpatches            &xps,
+                               threading::engine   *server)
+        {
+            blur B(sig);
+            B.apply(dst,src,xps,server);
+        }
+
+
     }
 }
 

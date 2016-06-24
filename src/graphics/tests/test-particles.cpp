@@ -62,7 +62,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
 
         std::cerr << "-- Creating Histogram" << std::endl;
-        histogram H;
+        Histogram H;
         H.update(pgs,xps, &server);
         pixmapf fg(w,h);
 

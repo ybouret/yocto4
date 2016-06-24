@@ -10,6 +10,7 @@ namespace yocto
     namespace graphics
     {
 
+        //! will compute gradient
         class gradient
         {
         public:
@@ -173,9 +174,20 @@ namespace yocto
                 }
             }
         };
-        
+
+        template <typename T,typename U>
+        inline float compute_gradient(pixmap<U>          &dst,
+                                      pixmap<float>      &grd,
+                                      const pixmap<T>    &img,
+                                      xpatches           &xps,
+                                      threading::engine *server)
+        {
+            pixmap<float> g(dst.w,dst.h);
+            gradient      G;
+            return G.compute(dst,g,img,xps,server);
+        }
+
     }
-    
 }
 
 #endif
