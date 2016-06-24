@@ -117,7 +117,7 @@ namespace yocto
 
             //! save as uncompressed bitmap
             /**
-             assuming RGB of RGBA !!!
+             assuming RGB or RGBA !!!
              - .bmp
              - .ppm
              - .eps
