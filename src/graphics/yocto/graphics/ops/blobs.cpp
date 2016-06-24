@@ -14,6 +14,12 @@ namespace yocto
         blob:: blob(const size_t t) throw() : tag(t) {}
 
 
+        blob:: blob(const blob &other) :
+        vnode_list(other),
+        tag(other.tag)
+        {
+        }
+
         vertex blob:: extension() const throw()
         {
             if(size>0)
@@ -40,6 +46,7 @@ namespace yocto
             }
         }
 
+#if 0
         static inline bool is_in_list( const vnode_list &L, const vertex &v )
         {
             for(const vnode_type *node=L.head;node;node=node->next)
@@ -79,6 +86,7 @@ namespace yocto
             }
 
         }
+#endif
 
     }
 }

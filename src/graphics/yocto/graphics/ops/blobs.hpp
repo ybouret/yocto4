@@ -21,9 +21,11 @@ namespace yocto
 
             explicit blob(const size_t t) throw();
             virtual ~blob() throw();
+            blob(const blob &other);
 
+            //! transfer part of the image
             template <typename T>
-            void transfer( pixmap<T> &tgt, const pixmap<T> &src) const throw()
+            void transfer( pixmap<T> &tgt, const pixmap<T> &src) const
             {
                 for(const vnode_type *node = head; node; node=node->next)
                 {
@@ -34,12 +36,24 @@ namespace yocto
                 }
             }
 
+            template <typename T>
+            void transfer( pixmap<T> &tgt, const T value) const
+            {
+                for(const vnode_type *node = head; node; node=node->next)
+                {
+                    const vertex v = node->vtx;
+                    assert(tgt.has(v));
+                    tgt[v] = value;
+                }
+            }
+
+
             vertex extension() const throw();
-            void   dilate(const unit_t w, const unit_t h, const size_t links);
+            //void   dilate(const unit_t w, const unit_t h, const size_t links);
 
 
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
+            YOCTO_DISABLE_ASSIGN(blob);
         };
 
 

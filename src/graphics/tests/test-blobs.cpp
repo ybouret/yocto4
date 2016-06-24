@@ -52,10 +52,7 @@ YOCTO_UNIT_TEST_IMPL(blobs)
 
         if(Blobs.content.size()>0)
         {
-            blob    &b1 = *Blobs.content[1];
-            pixmap3 I1(w,h);
-            b1.transfer(I1,fg);
-
+            
         }
 
 
