@@ -36,12 +36,12 @@ namespace yocto
             }
 
             vertex extension() const throw();
-            
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
         };
-        
-        
+
+
         // detecting connex regions
         class blobs : public pixmap<size_t>
         {
@@ -155,11 +155,28 @@ namespace yocto
 
             // build content
             void setup();
-            
+
         };
 
+        template <typename T>
+        inline void build_blobs(sequence<blob::ptr> &seq,
+                                const pixmap<T>     &src,
+                                const size_t         links)
+        {
+            seq.free();
+            blobs B(src.w,src.h);
+            B.build(src,links);
+            const vector<blob::ptr> &content = B.content;
+            const size_t             count   = content.size();
+            seq.ensure(count);
+            for(size_t i=1;i<=count;++i)
+            {
+                seq.push_back(content[i]);
+            }
+        }
+        
     }
-
+    
 }
 
 #endif
