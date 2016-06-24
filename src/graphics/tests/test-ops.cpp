@@ -201,7 +201,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
             get_named_color<size_t> blobColors;
             std::cerr << "-- blobs from foreground..." << std::endl;
-            B.build(bmp);
+            B.build(bmp,4);
             std::cerr << "#blobs=" << B.current << std::endl;
             PNG.save("image_fg_blobs.png", B, blobColors, NULL);
 
@@ -222,7 +222,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
             threshold::apply(bmp, t, pxm, threshold::keep_background);
             PNG.save("image_bg.png", bmp, NULL);
             std::cerr << "-- blobs from background..." << std::endl;
-            B.build(bmp);
+            B.build(bmp,4);
             std::cerr << "#blobs=" << B.current << std::endl;
             PNG.save("image_bg_blobs.png", B, blobColors, NULL);
             std::cerr << "#bg_content=" << B.content.size() << std::endl;

@@ -73,7 +73,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
         std::cerr << "-- Making blobs..." << std::endl;
 
         blobs B(w,h);
-        B.build(fg);
+        B.build(fg,4);
         get_named_color<size_t> blobColors;
         std::cerr << "#blobs=" << B.current << std::endl;
         PNG.save("image_fg_blobs.png", B, blobColors, NULL);

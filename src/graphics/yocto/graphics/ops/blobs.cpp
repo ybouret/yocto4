@@ -40,6 +40,46 @@ namespace yocto
             }
         }
 
+        static inline bool is_in_list( const vnode_list &L, const vertex &v )
+        {
+            for(const vnode_type *node=L.head;node;node=node->next)
+            {
+                if(v==node->vtx) return true;
+            }
+            return false;
+        }
+
+        void blob::dilate(const unit_t w, const unit_t h, const size_t links)
+        {
+            assert(4==links||8==links);
+            vnode_list acc;
+
+            // accumulate single new points
+            for(const vnode_type *node = head; node; node=node->next )
+            {
+                const vertex v = node->vtx;
+                for(size_t k=0;k<links;++k)
+                {
+                    const vertex tmp = v + gist::delta[k];
+                    if(tmp.x>=0&&tmp.x<w&&tmp.y>=0&&tmp.y<h)
+                    {
+                        if( !is_in_list(acc,tmp) && !is_in_list(*this,tmp) )
+                        {
+                            acc.push_back( new vnode_type(tmp) );
+                        }
+                    }
+                }
+            }
+
+            while(acc.size>0)
+            {
+                vnode_type *node = acc.pop_back();
+                assert( !is_in_list(*this,node->vtx) );
+                push_back( node );
+            }
+
+        }
+
     }
 }
 

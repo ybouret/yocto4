@@ -25,7 +25,6 @@ namespace yocto
             template <typename T>
             void transfer( pixmap<T> &tgt, const pixmap<T> &src) const throw()
             {
-                //tgt.ldz();
                 for(const vnode_type *node = head; node; node=node->next)
                 {
                     const vertex v = node->vtx;
@@ -36,6 +35,8 @@ namespace yocto
             }
 
             vertex extension() const throw();
+            void   dilate(const unit_t w, const unit_t h, const size_t links);
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(blob);
@@ -55,7 +56,7 @@ namespace yocto
 
             template <typename T>
             void build(const pixmap<T> &src,
-                       const size_t     links = 4 )
+                       const size_t     links)
             {
                 assert(w==src.w);
                 assert(h==src.h);

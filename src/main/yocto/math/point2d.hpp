@@ -92,6 +92,18 @@ namespace yocto
         inline type       &operator[](const size_t indx) throw()       { assert(1==indx||2==indx); return *((&x-1)+indx); }
         inline const_type &operator[](const size_t indx) const throw() { assert(1==indx||2==indx); return *((&x-1)+indx); }
         inline type norm() const throw() { return math::Sqrt(x*x+y*y); }
+
+        // equal operator for integer types only
+        inline friend bool operator==(const point2d &lhs, const point2d &rhs) throw()
+        {
+            return (lhs.x==rhs.x) && (lhs.y==rhs.y);
+        }
+
+        inline friend bool operator!=(const point2d &lhs, const point2d &rhs) throw()
+        {
+            return (lhs.x!=rhs.x) || (lhs.y!=rhs.y);
+        }
+
     };
 
 
