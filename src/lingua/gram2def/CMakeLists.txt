@@ -1,6 +1,0 @@
-INCLUDE_DIRECTORIES(.. ../../main)
-
-ADD_EXECUTABLE(gram2def gram2def.cpp)
-TARGET_LINK_YOCTO(gram2def lingua)
-
-INSTALL( TARGETS gram2def RUNTIME DESTINATION bin )

@@ -1,4 +1,4 @@
-// TERMINAL
+// #TERMINAL=7
 #define SEEM_DIV     0x0001
 #define SEEM_ID      0x0002
 #define SEEM_MINUS   0x0003
@@ -6,7 +6,7 @@
 #define SEEM_MUL     0x0005
 #define SEEM_NUMBER  0x0006
 #define SEEM_PLUS    0x0007
-// INTERNAL
+// #INTERNAL=5
 #define SEEM_ARGS  0x0008
 #define SEEM_AXP   0x0009
 #define SEEM_FUNC  0x000a

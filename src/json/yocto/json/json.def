@@ -1,10 +1,10 @@
-// TERMINAL
+// #TERMINAL=5
 #define JSON_false   0x0001
 #define JSON_null    0x0002
 #define JSON_number  0x0003
 #define JSON_string  0x0004
 #define JSON_true    0x0005
-// INTERNAL
+// #INTERNAL=6
 #define JSON_empty_array   0x0006
 #define JSON_empty_object  0x0007
 #define JSON_heavy_array   0x0008

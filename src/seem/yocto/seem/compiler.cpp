@@ -56,6 +56,8 @@ namespace yocto
     }
 }
 
+#include "yocto/exception.hpp"
+
 namespace yocto
 {
     namespace Seem
@@ -66,24 +68,48 @@ namespace yocto
         void Compiler:: on_term(const string &label,
                                 const string &content)
         {
-            std::cerr << "+" << label << "='" << content << "'" << std::endl;
-            switch(walker.hash_term(label))
+            //std::cerr << "+" << label << "='" << content << "'" << std::endl;
+            const int code = walker.hash_term(label);
+            switch(code)
             {
                 case SEEM_NUMBER:
+                    std::cerr << "push num " << content << std::endl;
                     break;
-                    
+
+                case SEEM_ID:
+                    std::cerr << "push id " << content << std::endl;
+                    break;
+
+
+                case SEEM_PLUS:
+                case SEEM_MINUS:
+                case SEEM_MUL:
+                case SEEM_DIV:
+                case SEEM_MOD:
+                    std::cerr << "push op " << label << std::endl;
+                    break;
+
                 default:
+                    throw exception("NOT Implemented Term '%s'", label.c_str());
                     break;
             }
         }
 
         void Compiler:: on_rule(const string &label,
-                                const size_t ns)
+                                const size_t  ns)
         {
-            std::cerr << "@" << label << "/" << ns << std::endl;
             switch(walker.hash_rule(label))
             {
+                case SEEM_AXP:
+                case SEEM_MXP:
+                case SEEM_PXP:
+                case SEEM_ARGS:
+                case SEEM_FUNC:
+                    std::cerr << "call " << label << "/" << ns << std::endl;
+                    break;
+
                 default:
+                    throw exception("NOT Implemented Rule '%s'", label.c_str());
                     break;
             }
         }

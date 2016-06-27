@@ -31,9 +31,9 @@ YOCTO_PROGRAM_START()
     auto_ptr<ios::ostream> pfp( new ios::ocstream( ios::cstdout ) );
     if(argc>3)             pfp.reset( new ios::wcstream(argv[3])  );
     ios::ostream &fp = *pfp;
-    fp << "// TERMINAL\n";
+    fp("// #TERMINAL=%u\n",unsigned(Terms.size()));;
     hashing::mperf::emit_defines(fp,Terms,prefix,0);
-    fp << "// INTERNAL\n";
+    fp("// #INTERNAL=%u\n",unsigned(Rules.size()));;
     hashing::mperf::emit_defines(fp,Rules,prefix,Terms.size());
 
 }
