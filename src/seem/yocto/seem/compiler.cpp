@@ -3,6 +3,7 @@
 
 #include "yocto/ios/graphviz.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/ios/osstream.hpp"
 
 #include <iostream>
 
@@ -16,15 +17,17 @@ namespace yocto
 
         Compiler:: Compiler(const bool emitFiles) :
         parser(emitFiles),
-        walker( * parser.gram )
+        walker( * parser.gram ),
+        out(0)
         {
             walker.on_term( this, & Compiler::on_term );
             walker.on_rule( this, & Compiler::on_rule );
         }
 
 
-        void Compiler:: compile( ios::istream &fp )
+        void Compiler:: run( ios::ostream &bin, ios::istream &fp )
         {
+            out = &bin;
             //__________________________________________________________________
             //
             // prepare parser
@@ -53,10 +56,18 @@ namespace yocto
             
         }
 
+        void Compiler:: run( string       &bin, ios::istream &fp )
+        {
+            bin.clear();
+            ios::osstream out(bin);
+            run(out,fp);
+        }
+
     }
 }
 
 #include "yocto/exception.hpp"
+#include "yocto/ios/net-string.hpp"
 
 namespace yocto
 {
@@ -69,15 +80,16 @@ namespace yocto
                                 const string &content)
         {
             //std::cerr << "+" << label << "='" << content << "'" << std::endl;
+            assert(out);
+            ios::ostream &bin = *out;
             const int code = walker.hash_term(label);
             switch(code)
             {
                 case SEEM_NUMBER:
-                    std::cerr << "push num " << content << std::endl;
-                    break;
-
                 case SEEM_ID:
-                    std::cerr << "push id " << content << std::endl;
+                    bin.emit<OpCode>(code);
+                    ios::net_string::write(content,bin);
+                    std::cerr << "push " << label << " " << content << std::endl;
                     break;
 
 
@@ -86,7 +98,7 @@ namespace yocto
                 case SEEM_MUL:
                 case SEEM_DIV:
                 case SEEM_MOD:
-                    std::cerr << "push op " << label << std::endl;
+                    std::cerr << "push " << label << std::endl;
                     break;
 
                 default:
@@ -98,17 +110,21 @@ namespace yocto
         void Compiler:: on_rule(const string &label,
                                 const size_t  ns)
         {
-            switch(walker.hash_rule(label))
+            assert(out);
+            ios::ostream &bin = *out;
+            const int    code = walker.hash_rule(label);
+            switch(code)
             {
                 case SEEM_AXP:
                 case SEEM_MXP:
                 case SEEM_PXP:
                 case SEEM_FUNC:
+                case SEEM_ARGS:
+                    bin.emit<OpCode>(code);
+                    bin.emit<OpCode>(ns);
                     std::cerr << "call " << label << "/" << ns << std::endl;
                     break;
-
-                case SEEM_ARGS: // wrapper for FUNC
-                    break;
+                    
 
                 default:
                     throw exception("NOT Implemented Rule '%s'", label.c_str());

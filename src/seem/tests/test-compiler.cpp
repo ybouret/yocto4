@@ -13,8 +13,12 @@ YOCTO_UNIT_TEST_IMPL(compiler)
     Seem::Compiler cmp(true);
     
     ios::icstream  fp( ios::cstdin );
-    cmp.compile(fp);
+    string         code;
+    cmp.run(code,fp);
 
+
+    ios::wcstream  bin( "bin.dat" );
+    bin << code;
 }
 YOCTO_UNIT_TEST_DONE()
 

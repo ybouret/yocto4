@@ -9,7 +9,7 @@ namespace yocto
     namespace Seem
     {
         typedef lingua::syntax::xnode       XNode;
-        
+        typedef uint32_t                    OpCode;
         class Parser
         {
         public:
