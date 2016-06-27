@@ -40,7 +40,7 @@ namespace yocto
 
         const char image::name[] = "image";
 
-        void image:: declare( format *fmt )
+        const image::format & image:: declare( format *fmt )
         {
             assert(fmt);
             format::pointer p(fmt);
@@ -48,6 +48,7 @@ namespace yocto
             {
                 throw exception("multiple image format '%s'", fmt->name.c_str());
             }
+            return *p;
         }
 
         const image::format & image:: operator[](const string &id) const

@@ -45,7 +45,7 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(format);
             };
 
-            void declare( format *fmt );
+            const image::format &declare( format *fmt );
 
             const format & operator[](const string &) const;
             const format & operator[](const char   *) const;
