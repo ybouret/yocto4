@@ -103,9 +103,11 @@ namespace yocto
                 case SEEM_AXP:
                 case SEEM_MXP:
                 case SEEM_PXP:
-                case SEEM_ARGS:
                 case SEEM_FUNC:
                     std::cerr << "call " << label << "/" << ns << std::endl;
+                    break;
+
+                case SEEM_ARGS: // wrapper for FUNC
                     break;
 
                 default:
