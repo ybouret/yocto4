@@ -71,7 +71,7 @@ namespace yocto
                 
             }
 
-            int analyzer:: hash_term(const string &label) const throw()
+            int analyzer:: hash_term(const string &label) const
             {
                 const int ans = hterm(label);
                 if(ans<0)
@@ -79,7 +79,7 @@ namespace yocto
                 return ans;
             }
 
-            int analyzer:: hash_rule(const string &label) const throw()
+            int analyzer:: hash_rule(const string &label) const
             {
                 const int ans = hrule(label);
                 if(ans<0)

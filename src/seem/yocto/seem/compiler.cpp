@@ -81,7 +81,7 @@ namespace yocto
                                 const size_t ns)
         {
             std::cerr << "@" << label << "/" << ns << std::endl;
-            switch(walker.hash_term(label))
+            switch(walker.hash_rule(label))
             {
                 default:
                     break;

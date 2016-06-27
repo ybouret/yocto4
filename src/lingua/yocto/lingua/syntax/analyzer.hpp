@@ -41,8 +41,8 @@ namespace yocto
                     onRule.reset( new rule_proc(host,method) );
                 }
 
-                int hash_term(const string &label) const throw();
-                int hash_rule(const string &label) const throw();
+                int hash_term(const string &label) const;
+                int hash_rule(const string &label) const;
 
 
 
