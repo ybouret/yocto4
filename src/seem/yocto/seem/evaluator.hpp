@@ -16,16 +16,13 @@ namespace yocto
             virtual ~Evaluator() throw();
 
             double run(ios::istream &fp);
-
+            
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Evaluator);
             class VirtualMachine;
             Parser                    parser;
             auto_ptr<VirtualMachine>  vm;
-
-            //void on_term( const string &label, const string &content );
-            //void on_rule( const string &label, const size_t  ns      );
         };
 
     }
