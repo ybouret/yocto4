@@ -74,9 +74,42 @@ namespace yocto
                 return ch->head;
             }
 
+
+                  }
+    }
+}
+
+#include "yocto/ios/net-string.hpp"
+namespace yocto
+{
+    namespace lingua
+    {
+        namespace syntax
+        {
+            void xnode:: save(ios::ostream &fp) const
+            {
+                ios::net_string::write(label(),fp);
+                if(terminal)
+                {
+                    fp.emit<uint8_t>(1);
+                    const string content = lx->to_string();
+                    ios::net_string::write(content,fp);
+                }
+                else
+                {
+                    fp.emit<uint8_t>(0);
+                    fp.emit<uint32_t>( ch->size );
+                    for(const xnode *sub = ch->head;sub;sub=sub->next)
+                    {
+                        sub->save(fp);
+                    }
+                }
+            }
+
         }
     }
 }
+
 
 
 #include "yocto/lingua/syntax/term.hpp"

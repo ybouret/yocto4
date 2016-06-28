@@ -29,6 +29,11 @@ YOCTO_UNIT_TEST_IMPL(gen)
             tree->graphviz( P->grammar::name + "_output.dot" );
             ios::graphviz_render( P->grammar::name + "_output.dot" );
 
+            {
+                ios::wcstream bin( P->grammar::name + "_output.bin");
+                tree->save(bin);
+            }
+
             syntax::analyzer walker(*P);
             std::cerr << "-- WALKING..." << std::endl;
             ios::ocstream output( ios::cstderr );

@@ -60,6 +60,9 @@ namespace yocto
                 static xnode *ast(xnode *node) throw();
 
                 YOCTO_MAKE_OBJECT
+
+                void save(ios::ostream &fp) const;
+
             private:
                 xnode();
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xnode);
