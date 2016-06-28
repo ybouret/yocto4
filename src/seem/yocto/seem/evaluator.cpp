@@ -2,6 +2,9 @@
 #include "yocto/ios/graphviz.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/string/conv.hpp"
+#include "yocto/associative/htree.hpp"
+#include "yocto/container/cslot.hpp"
+#include "yocto/sequence/lw-array.hpp"
 
 #include <cmath>
 
@@ -132,12 +135,17 @@ namespace yocto
         class Evaluator:: VirtualMachine :  public object
         {
         public:
+            htree<double>            variables;
+            htree<Function>          functions;
             lingua::syntax::analyzer engine;
             Atoms                    tstack;
-            Atoms                    astack;
+            //Atoms                    astack;
 
             explicit VirtualMachine( const lingua::syntax::grammar &G ) :
-            engine(G)
+            variables(),
+            functions(),
+            engine(G),
+            tstack()
             {
                 engine.on_term(this, & VirtualMachine::OnTerm );
                 engine.on_rule(this, & VirtualMachine::OnRule );
@@ -145,6 +153,41 @@ namespace yocto
 
             virtual ~VirtualMachine() throw()
             {
+            }
+
+            void SetVariable(const string &name, const double value)
+            {
+                double *pvar = variables.find(name);
+                if(pvar)
+                {
+                    *pvar = value;
+                }
+                else
+                {
+                    if(!variables.insert(name,value))
+                    {
+                        throw exception("Seem: unexpected failure to SetVariable(%s,%g)", name.c_str(),value);
+                    }
+                    variables.optimize();
+                }
+
+            }
+
+            void SetFunction(const string &name, const Function &fn )
+            {
+                Function *pfn = functions.find(name);
+                if(pfn)
+                {
+                    *pfn  = fn;
+                }
+                else
+                {
+                    if( !functions.insert(name,fn) )
+                    {
+                        throw exception("Seem: unexpected failure to SetFunction(%s)", name.c_str());
+                    }
+                    functions.optimize();
+                }
             }
 
             inline void OnTerm(const string &label, const string &content)
@@ -187,13 +230,9 @@ namespace yocto
 
                     case SEEM_ARGS: {
                         assert(tstack.size>=ns);
-                        astack.push_back( new Atom(SEEM_ARGS,0,label) );
-                        Atoms *args = astack.tail->args;
-                        for(size_t i=1;i<=ns;++i)
-                        {
-                            args->push_front( tstack.pop_back() );
-                        }
-                        std::cerr << "args=" << *(astack.tail) << std::endl;
+                        auto_ptr<Atom> pArgs( new Atom(SEEM_ARGS,0,label) );
+                        Fetch( *(pArgs->args), ns );
+                        tstack.push_back( pArgs.yield() );
                     } break;
 
                     case SEEM_AXP: OnAXP(ns); break;
@@ -202,10 +241,7 @@ namespace yocto
 
                     case SEEM_PXP: OnPXP(ns); break;
 
-                    case SEEM_FUNC:
-                    {
-
-                    }   break;
+                    case SEEM_FUNC: OnFUNC(ns); break;
 
                     default:
                         throw exception("unhandled terminal '%s'", label.c_str());
@@ -219,6 +255,12 @@ namespace yocto
                 {
                     case SEEM_NUMBER: return a->number;
                     case SEEM_ID:
+                    {
+                        const string  name = *(a->id);
+                        const double *pvar = variables.find(name);
+                        if(!pvar) throw exception("Seem: ToNumber(no '%s')", name.c_str());
+                        return *pvar;
+                    }
 
                     default:
                         throw exception("Seem: illegal ToNumber call");
@@ -323,11 +365,49 @@ namespace yocto
                 tstack.push_back( new Atom(ans) );
             }
 
+            //__________________________________________________________________
+            //
+            // calling func
+            //__________________________________________________________________
+            inline void OnFUNC(const size_t ns)
+            {
+                assert(2==ns);
+                Atoms ctx;
+                Fetch(ctx,2);
+                //std::cerr << "call " << *(ctx.head) << *(ctx.tail) << std::endl;
+
+                // looking for function
+                assert(SEEM_ID==ctx.head->code);
+                const string &name = *(ctx.head->id);
+                Function     *pfn  = functions.find(name);
+                if(!pfn)
+                {
+                    throw exception("Seem: unknown function '%s'", name.c_str());
+                }
+
+                // building args
+                assert(SEEM_ARGS==ctx.tail->code);
+                const Atoms     &args = *(ctx.tail->args);
+                const size_t     na   = args.size;
+                cslot            slot( na * sizeof(double) );
+                double          *addr = static_cast<double *>(slot.data);
+                lw_array<double> params(addr,na);
+                for(const Atom *a = args.head;a;a=a->next)
+                {
+                    *(addr++) = ToNumber(a);
+                }
+
+                std::cerr << "==> " << name << "(" << params << ")" << std::endl;
+                const double ans = (*pfn)(params);
+                tstack.push_back( new Atom(ans) );
+            }
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(VirtualMachine);
         };
     }
 }
+
 
 namespace yocto
 {
@@ -344,7 +424,36 @@ namespace yocto
         parser(false),
         vm( new VirtualMachine( *parser.gram ) )
         {
-            std::cerr << "sizeof(Evaluator::VirtualMachine)=" << sizeof(VirtualMachine) << std::endl;
+            //__________________________________________________________________
+            // declare some function
+            //__________________________________________________________________
+#define Y_SEEM_DECL(NAME) SetCFunction(#NAME,NAME)
+            Y_SEEM_DECL(cos);
+            Y_SEEM_DECL(sin);
+            Y_SEEM_DECL(tan);
+            Y_SEEM_DECL(acos);
+            Y_SEEM_DECL(asin);
+            Y_SEEM_DECL(atan);
+
+            Y_SEEM_DECL(cosh);
+            Y_SEEM_DECL(sinh);
+            Y_SEEM_DECL(tanh);
+
+            Y_SEEM_DECL(exp);
+            Y_SEEM_DECL(log);
+            Y_SEEM_DECL(log10);
+
+            Y_SEEM_DECL(sqrt);
+
+            Y_SEEM_DECL(ceil);
+            Y_SEEM_DECL(floor);
+            Y_SEEM_DECL(fabs);
+
+#define Y_SEEM_DECL2(NAME) SetCFunction2(#NAME,NAME)
+
+            Y_SEEM_DECL2(atan2);
+            Y_SEEM_DECL2(pow);
+
         }
 
         double Evaluator:: run(ios::istream &fp)
@@ -377,10 +486,92 @@ namespace yocto
             
             return 0;
         }
-        
-        
+
+
+        void Evaluator:: SetVariable(const string &name, const double value)
+        {
+            vm->SetVariable(name,value);
+        }
+
+        void Evaluator:: SetVariable(const char *name, const double value)
+        {
+            const string NAME(name);
+            vm->SetVariable(NAME,value);
+        }
+
+        void Evaluator:: SetFunction(const string &name, const Function &fn)
+        {
+            vm->SetFunction(name,fn);
+        }
+
+        void Evaluator:: SetFunction(const char *name, const Function &fn)
+        {
+            const string NAME(name);
+            vm->SetFunction(NAME,fn);
+        }
+
+        namespace
+        {
+
+            class __CFunction
+            {
+            public:
+                Evaluator::CFunction proc;
+                inline  __CFunction(const Evaluator::CFunction fn) throw() : proc(fn) { assert(proc); }
+                inline ~__CFunction() throw() {}
+                inline  __CFunction(const __CFunction &other) throw() : proc(other.proc) {}
+
+                inline double operator()(const array<double> &arr)
+                {
+                    assert(1==arr.size());
+                    assert(proc);
+                    return proc(arr[1]);
+                }
+
+            private:
+                YOCTO_DISABLE_ASSIGN(__CFunction);
+            };
+        }
+
+        void Evaluator:: SetCFunction(const char *name, CFunction proc)
+        {
+            const __CFunction wrapper(proc);
+            SetFunction(name,wrapper);
+        }
+
+        namespace
+        {
+            class __CFunction2
+            {
+            public:
+                Evaluator::CFunction2 proc;
+                inline  __CFunction2(const Evaluator::CFunction2 fn) throw() : proc(fn) { assert(proc); }
+                inline ~__CFunction2() throw() {}
+                inline  __CFunction2(const __CFunction2 &other) throw() : proc(other.proc) {}
+
+                inline double operator()(const array<double> &arr)
+                {
+                    assert(2==arr.size());
+                    assert(proc);
+                    return proc(arr[1],arr[2]);
+                }
+
+            private:
+                YOCTO_DISABLE_ASSIGN(__CFunction);
+            };
+
+        }
+
+
+        void Evaluator:: SetCFunction2(const char *name, CFunction2 proc )
+        {
+            const __CFunction2 wrapper(proc);
+            SetFunction(name,wrapper);
+        }
+
+
     }
-    
+
 }
 
 

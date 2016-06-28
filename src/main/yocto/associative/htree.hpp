@@ -259,6 +259,62 @@ namespace yocto
         inline const_type *find(const void  *buffer,
                                 const size_t buflen) const throw()
         {
+            return lookup(buffer,buflen);
+        }
+
+        //! lookup CONST wrapper
+        inline const_type *find(const char *txt) const throw()
+        {
+            return lookup(txt,length_of(txt));
+        }
+
+        //! lookup CONST wrapper
+        inline const_type *find(const memory::ro_buffer &buf) const throw()
+        {
+            return lookup(buf.ro(),buf.length());
+        }
+
+        //______________________________________________________________________
+        //
+        //! look up
+        //______________________________________________________________________
+        inline type *find(const void  *buffer,
+                          const size_t buflen)  throw()
+        {
+            return (type *)lookup(buffer,buflen);
+        }
+
+        //! lookup CONST wrapper
+        inline  type *find(const char *txt) throw()
+        {
+            return (type*)lookup(txt,length_of(txt));
+        }
+
+        //! lookup CONST wrapper
+        inline type *find(const memory::ro_buffer &buf) throw()
+        {
+            return (type*)lookup(buf.ro(),buf.length());
+        }
+
+
+        inline void graphviz( const string &filename, print_proc proc) const
+        {
+            ios::ocstream fp(filename,false);
+            fp << "digraph G{\n";
+            root->viz(fp,proc);
+            fp << "}\n";
+        }
+
+
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(htree);
+        node_type *root;
+        size_t     size_;
+        size_t     nodes_;
+
+        inline const_type *lookup(const void  *buffer,
+                                const size_t buflen) const throw()
+        {
             assert(!(0==buffer&&buflen>0));
 
             //__________________________________________________________________
@@ -292,36 +348,10 @@ namespace yocto
                     return NULL;
                 }
             }
-            
+
             return curr->data; //!< may be null
         }
 
-        //! lookup wrapper
-        inline const_type *find(const char *txt) const throw()
-        {
-            return this->find(txt,length_of(txt));
-        }
-
-        //! lookup wrapper
-        inline const_type *find(const memory::ro_buffer &buf) const throw()
-        {
-            return this->find(buf.ro(),buf.length());
-        }
-
-        inline void graphviz( const string &filename, print_proc proc) const
-        {
-            ios::ocstream fp(filename,false);
-            fp << "digraph G{\n";
-            root->viz(fp,proc);
-            fp << "}\n";
-        }
-
-
-    private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(htree);
-        node_type *root;
-        size_t     size_;
-        size_t     nodes_;
     };
     
     
