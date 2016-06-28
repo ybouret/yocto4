@@ -3,6 +3,8 @@
 #include "yocto/exception.hpp"
 #include "yocto/string/conv.hpp"
 
+#include <cmath>
+
 namespace yocto
 {
     namespace Seem
@@ -44,7 +46,7 @@ namespace yocto
                     }
                 }
 
-                explicit Atom(const int user_code, const void *data, const string &label) :
+                inline explicit Atom(const int user_code, const void *data, const string &label) :
                 next(0), prev(0), code(user_code)
                 {
                     switch(code)
@@ -78,14 +80,56 @@ namespace yocto
                     }
                 }
 
+                inline explicit Atom(const double value) throw() :
+                next(0), prev(0), code(SEEM_NUMBER)
+                {
+                    number = value;
+                    std::cerr << "push number " << number << std::endl;
+                }
+
+                inline friend std::ostream & operator<<( std::ostream &os, const Atom &a )
+                {
+                    switch(a.code)
+                    {
+                        case SEEM_NUMBER:
+                            os << "<" << a.number << ">";
+                            break;
+
+                        case SEEM_ID:
+                            os << "'" << *(a.id) << "'";
+                            break;
+
+                        case SEEM_PLUS:   os << "PLUS";  break;
+                        case SEEM_MINUS:  os << "MINUS"; break;
+                        case SEEM_MUL:    os << "MUL";   break;
+                        case SEEM_DIV:    os << "DIV";   break;
+                        case SEEM_MOD:    os << "MOD";   break;
+                            break;
+
+                        case SEEM_ARGS:
+                            os << '(';
+                            for(const Atom *sub = a.args->head;sub;sub=sub->next)
+                            {
+                                os << *sub;
+                                if(sub->next) os << ',';
+                            }
+                            os << ')';
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    return os;
+                }
+
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Atom);
             };
         }
 
-        class Evaluator:: VirtualMachine :
-        public object
+        class Evaluator:: VirtualMachine :  public object
         {
         public:
             lingua::syntax::analyzer engine;
@@ -123,6 +167,17 @@ namespace yocto
                 }
             }
 
+
+            inline
+            void Fetch( Atoms &ops, const size_t ns ) throw()
+            {
+                assert(tstack.size>=ns);
+                for(size_t i=ns;i>0;--i)
+                {
+                    ops.push_front( tstack.pop_back() );
+                }
+            }
+
             inline void OnRule(const string &label, const size_t ns)
             {
                 std::cerr << "call " << label << "/" << ns << std::endl;
@@ -138,17 +193,72 @@ namespace yocto
                         {
                             args->push_front( tstack.pop_back() );
                         }
+                        std::cerr << "args=" << *(astack.tail) << std::endl;
                     } break;
 
                     case SEEM_AXP:
-                    case SEEM_MXP:
+                    {
+
+                    } break;
+
+                    case SEEM_MXP: OnMXP(ns); break;
+
                     case SEEM_PXP:
+                    {
+                    }   break;
+
                     case SEEM_FUNC:
-                        break;
-                        
+                    {
+
+                    }   break;
+
                     default:
                         throw exception("unhandled terminal '%s'", label.c_str());
                 }
+            }
+
+            inline double ToNumber( const Atom *a ) const
+            {
+                assert(a);
+                switch(a->code)
+                {
+                    case SEEM_NUMBER: return a->number;
+                    case SEEM_ID:
+
+                    default:
+                        throw exception("Seem: illegal ToNumber call");
+                }
+            }
+
+            inline
+            void OnMXP(const size_t ns)
+            {
+                std::cerr << "==> MXP" << std::endl;
+                assert( 0 != (1&ns) );
+                Atoms ops;
+                Fetch(ops,ns);
+
+                Atom  *a   = ops.head;
+                double ans = ToNumber(a);
+                a=a->next;
+                while(a)
+                {
+                    assert(a->next);
+                    const int    op  = a->code;     a=a->next;
+                    const double rhs = ToNumber(a); a=a->next;
+                    switch(op)
+                    {
+                        case SEEM_MUL: ans *= rhs; break;
+                        case SEEM_DIV: ans /= rhs; break;
+                        case SEEM_MOD: ans = fmod(ans,rhs); break;
+                        default:
+                            throw exception("Seem: illegal MXP op");
+                    }
+                }
+
+
+                tstack.push_back( new Atom(ans) );
+
             }
 
 
@@ -170,9 +280,10 @@ namespace yocto
 
 
         Evaluator:: Evaluator() :
-        parser(true),
+        parser(false),
         vm( new VirtualMachine( *parser.gram ) )
         {
+            std::cerr << "sizeof(Evaluator::VirtualMachine)=" << sizeof(VirtualMachine) << std::endl;
         }
 
         double Evaluator:: run(ios::istream &fp)
@@ -183,26 +294,32 @@ namespace yocto
             //__________________________________________________________________
             parser.impl->restart();
             auto_ptr<XNode> tree( parser.impl->parse(fp) );
-
+            
             {
                 const string dotname = parser.gram->name + "_output.dot";
                 tree->graphviz(dotname);
                 ios::graphviz_render(dotname);
             }
-
+            
             //__________________________________________________________________
             //
             // compile: walk...
             //__________________________________________________________________
             std::cerr << "--Walking..." << std::endl;
             vm->engine.walk( tree.__get(), NULL );
-
+            
+            std::cerr << "TermStack:" << std::endl;
+            for(const Atom *a = vm->tstack.head;a;a=a->next)
+            {
+                std::cerr << "\t" << *a << std::endl;
+            }
+            
             return 0;
         }
-
-
+        
+        
     }
-
+    
 }
 
 

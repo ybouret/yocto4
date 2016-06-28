@@ -40,19 +40,23 @@ namespace yocto
                 }
                 hterm.optimize();
 
+#if 0
                 hterm.graphviz("hterm.dot");
                 ios::graphviz_render("hterm.dot");
-
+#endif
+                
                 for(size_t i=1;i<=Rules.size();++i)
                 {
                     hrule.insert(Rules[i], ++j);
                 }
                 hrule.optimize();
 
+
+
+
+#if 0
                 hrule.graphviz("hrule.dot");
                 ios::graphviz_render("hrule.dot");
-
-
                 std::cerr << "|_Terms" << std::endl;
                 for(size_t i=1;i<=Terms.size();++i)
                 {
@@ -68,7 +72,7 @@ namespace yocto
                     for(size_t k=Rules[i].size();k<=max_label_length;++k) std::cerr << ' ';
                     std::cerr << " @" << hrule(Rules[i]) << std::endl;
                 }
-                
+#endif
             }
 
             int analyzer:: hash_term(const string &label) const
