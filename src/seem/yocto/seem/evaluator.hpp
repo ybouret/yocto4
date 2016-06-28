@@ -24,7 +24,23 @@ namespace yocto
 
             double eval(const vCode &vcode);
 
-            
+            inline double run(ios::istream &fp)
+            {
+                const vCode vcode = compile(fp);
+                return eval(vcode);
+            }
+
+            inline double run(const string &fp)
+            {
+                const vCode vcode = compile(fp);
+                return eval(vcode);
+            }
+
+            inline double run(const char *fp)
+            {
+                const vCode vcode = compile(fp);
+                return eval(vcode);
+            }
 
 
             void SetVariable(const string &name, const double value);

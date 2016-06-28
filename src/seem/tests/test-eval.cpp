@@ -18,8 +18,7 @@ YOCTO_UNIT_TEST_IMPL(eval)
     for(int i=1;i<argc;++i)
     {
         const char *expr = argv[i];
-        Seem::vCode code = SEEM.compile(expr);
-        std::cerr << expr << "=" << SEEM.eval(code) << std::endl;
+        std::cerr << expr << "=" << SEEM.run(expr) << std::endl;
     }
 
 
