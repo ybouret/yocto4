@@ -11,6 +11,7 @@ namespace yocto
         namespace syntax
         {
             class rule;
+            class grammar;
             class                            xnode;
             typedef core::list_of_cpp<xnode> xlist;
 
@@ -62,6 +63,7 @@ namespace yocto
                 YOCTO_MAKE_OBJECT
 
                 void save(ios::ostream &fp) const;
+                static xnode *load(ios::istream &fp,const grammar &G);
 
             private:
                 xnode();

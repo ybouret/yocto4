@@ -26,12 +26,23 @@ YOCTO_UNIT_TEST_IMPL(gen)
         {
             ios::icstream fp( ios::cstdin );
             auto_ptr<syntax::xnode> tree( P->parse(fp) );
-            tree->graphviz( P->grammar::name + "_output.dot" );
-            ios::graphviz_render( P->grammar::name + "_output.dot" );
+            const string outname =P->grammar::name + "_output.dot";
+            tree->graphviz(outname);
+            ios::graphviz_render(outname);
+
+            const string binfile =P->grammar::name + "_output.bin";
+            {
+                ios::wcstream bin(binfile);
+                tree->save(bin);
+            }
 
             {
-                ios::wcstream bin( P->grammar::name + "_output.bin");
-                tree->save(bin);
+                ios::icstream bin(binfile);
+                auto_ptr<syntax::xnode> backup( syntax::xnode::load(bin, *P) );
+                const string backname =P->grammar::name + "_backup.dot";
+                backup->graphviz(backname);
+                ios::graphviz_render(backname);
+
             }
 
             syntax::analyzer walker(*P);

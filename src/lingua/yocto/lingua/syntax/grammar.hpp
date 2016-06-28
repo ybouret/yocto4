@@ -52,6 +52,9 @@ namespace yocto
                 size_t collect(vector<string> &Terms,
                                vector<string> &Rules) const;
 
+                const rule *query( const string &label ) const;
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
                 void check(const string &label) const;

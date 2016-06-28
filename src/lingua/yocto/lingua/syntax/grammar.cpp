@@ -3,7 +3,7 @@
 #include "yocto/lingua/syntax/term.hpp"
 #include "yocto/lingua/syntax/joker.hpp"
 
-#include "yocto/exception.hpp"
+#include "yocto/exceptions.hpp"
 
 namespace yocto
 {
@@ -420,10 +420,65 @@ namespace yocto
             }
             
             
-            
+            const rule * grammar:: query( const string &label ) const
+            {
+                for(const rule *r=rules.head;r;r=r->next)
+                {
+                    if(label==r->label) return r;
+                }
+                throw imported::exception("grammar.query","no rule '%s' in [%s]", label.c_str(), name.c_str());
+            }
+
         }
     }
 }
+
+#include "yocto/ios/net-string.hpp"
+
+namespace yocto
+{
+    namespace lingua
+    {
+        namespace syntax
+        {
+            xnode * xnode:: load(ios::istream &fp, const grammar &G)
+            {
+                string rule_label;
+                if(! ios::net_string::read(fp,rule_label) )
+                {
+                    throw exception("xnode: no rule label!");
+                }
+
+                const rule *r = G.query(rule_label);
+                if( 1 == fp.read<uint8_t>() )
+                {
+                    // terminal
+                    string content;
+                    if( ! ios::net_string::read(fp,content) )
+                    {
+                        throw exception("xnode: missing content for '%s'", rule_label.c_str());
+                    }
+                    token   tkn(content);
+                    lexeme *lx = new lexeme(r->label,1,tkn);
+                    return xnode::create(*r,lx);
+                }
+                else
+                {
+                    const size_t    n = fp.read<uint32_t>();
+                    auto_ptr<xnode> p( xnode::create(*r) );
+                    for(size_t i=1;i<=n;++i)
+                    {
+                        p->ch->push_back( xnode::load(fp,G) );
+                        p->ch->tail->parent = p->ch->tail;
+                    }
+                    return p.yield();
+                }
+
+            }
+        }
+    }
+}
+
 
 
 
