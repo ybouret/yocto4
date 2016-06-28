@@ -43,5 +43,12 @@ namespace yocto
             return compile(fp);
         }
 
+        vCode Compiler:: load( ios::istream &fp ) const
+        {
+            const vCode ans( vNode::load(fp,*gram) );
+            return ans;
+        }
+
+
     }
 }

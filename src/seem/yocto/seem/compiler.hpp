@@ -23,6 +23,8 @@ namespace yocto
             vCode compile(const string &s);
             vCode compile(const char   *s);
 
+            vCode load( ios::istream &fp ) const;
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Compiler);
             arc_ptr<lingua::parser>                impl;
