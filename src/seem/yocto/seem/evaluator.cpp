@@ -196,16 +196,11 @@ namespace yocto
                         std::cerr << "args=" << *(astack.tail) << std::endl;
                     } break;
 
-                    case SEEM_AXP:
-                    {
-
-                    } break;
+                    case SEEM_AXP: OnAXP(ns); break;
 
                     case SEEM_MXP: OnMXP(ns); break;
 
-                    case SEEM_PXP:
-                    {
-                    }   break;
+                    case SEEM_PXP: OnPXP(ns); break;
 
                     case SEEM_FUNC:
                     {
@@ -230,16 +225,21 @@ namespace yocto
                 }
             }
 
+            //__________________________________________________________________
+            //
+            // executing MXP
+            //__________________________________________________________________
             inline
             void OnMXP(const size_t ns)
             {
-                std::cerr << "==> MXP" << std::endl;
+                //std::cerr << "==> MXP/" << ns << std::endl;
                 assert( 0 != (1&ns) );
                 Atoms ops;
                 Fetch(ops,ns);
 
-                Atom  *a   = ops.head;
-                double ans = ToNumber(a);
+                const Atom  *a   = ops.head;
+                double       ans = ToNumber(a);
+
                 a=a->next;
                 while(a)
                 {
@@ -255,12 +255,73 @@ namespace yocto
                             throw exception("Seem: illegal MXP op");
                     }
                 }
-
-
                 tstack.push_back( new Atom(ans) );
-
             }
 
+            //__________________________________________________________________
+            //
+            // executing PXP
+            //__________________________________________________________________
+            inline
+            void OnPXP(const size_t ns)
+            {
+                //std::cerr << "==> PXP/" << ns << std::endl;
+                assert(ns>=2);
+                Atoms ops;
+                Fetch(ops,ns);
+
+                const Atom  *a   = ops.head;
+                double       ans = ToNumber(a);
+                for(a=a->next;a;a=a->next)
+                {
+                    ans = pow( ans, ToNumber(a) );
+                }
+                tstack.push_back( new Atom(ans) );
+            }
+
+            //__________________________________________________________________
+            //
+            // executing AXP
+            //__________________________________________________________________
+            inline
+            void OnAXP(const size_t ns)
+            {
+                //std::cerr << "==> AXP/" << ns << std::endl;
+                Atoms ops;
+                Fetch(ops,ns);
+
+                bool        neg = false;
+                const Atom *a   = ops.head;
+                switch(a->code)
+                {
+                    case SEEM_MINUS: neg=true;
+                    case SEEM_PLUS:  a=a->next;
+                        break;
+
+                    default:
+                        break;
+                }
+                assert(a);
+                double ans = ToNumber(a);
+                if(neg) { ans=-ans; }
+
+                a=a->next;
+                while(a)
+                {
+                    assert(a->next);
+                    const int    op  = a->code;     a=a->next;
+                    const double rhs = ToNumber(a); a=a->next;
+                    switch(op)
+                    {
+                        case SEEM_PLUS:  ans += rhs; break;
+                        case SEEM_MINUS: ans -= rhs; break;
+                        default:
+                            throw exception("Seem: illegal AXP op");
+                    }
+                }
+
+                tstack.push_back( new Atom(ans) );
+            }
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(VirtualMachine);
