@@ -1,6 +1,6 @@
 #include "yocto/seem/evaluator.hpp"
 #include "yocto/ios/graphviz.hpp"
-#include "yocto/exception.hpp"
+#include "yocto/exceptions.hpp"
 #include "yocto/string/conv.hpp"
 #include "yocto/associative/htree.hpp"
 #include "yocto/container/cslot.hpp"
@@ -177,7 +177,7 @@ namespace yocto
                 {
                     if(!variables.insert(name,value))
                     {
-                        throw exception("Seem: unexpected failure to SetVariable(%s,%g)", name.c_str(),value);
+                        throw imported::exception("Seem.VM","unexpected failure to SetVariable(%s,%g)", name.c_str(),value);
                     }
                     variables.optimize();
                 }
@@ -196,7 +196,7 @@ namespace yocto
                 {
                     if( !functions.insert(name,fn) )
                     {
-                        throw exception("Seem: unexpected failure to SetFunction(%s)", name.c_str());
+                        throw imported::exception("Seem.VM","unexpected failure to SetFunction(%s)", name.c_str());
                     }
                     functions.optimize();
                 }
@@ -219,7 +219,7 @@ namespace yocto
                         break;
 
                     default:
-                        throw exception("Seem: unhandled terminal '%s'", label.c_str());
+                        throw imported::exception("Seem.VM.OnTerm","unhandled terminal '%s'", label.c_str());
                 }
             }
 
@@ -255,7 +255,7 @@ namespace yocto
                     case SEEM_FUNC: OnFUNC(ns); break;
 
                     default:
-                        throw exception("Seem: unhandled internal '%s'", label.c_str());
+                        throw imported::exception("Seem.Vm.OnRule","unhandled internal '%s'", label.c_str());
                 }
             }
 
@@ -276,7 +276,7 @@ namespace yocto
                     }
 
                     default:
-                        throw exception("Seem: illegal ToNumber call");
+                        throw imported::exception("Seem.VM.ToNumber","illegal value type");
                 }
             }
 
@@ -306,7 +306,7 @@ namespace yocto
                         case SEEM_DIV: ans /= rhs; break;
                         case SEEM_MOD: ans = fmod(ans,rhs); break;
                         default:
-                            throw exception("Seem: illegal MXP op");
+                            throw imported::exception("Seem.VM.MXP","illegal operand");
                     }
                 }
                 tstack.push_back( new Atom(ans) );
@@ -368,7 +368,7 @@ namespace yocto
                         case SEEM_PLUS:  ans += rhs; break;
                         case SEEM_MINUS: ans -= rhs; break;
                         default:
-                            throw exception("Seem: illegal AXP op");
+                            throw imported::exception("Seem.VM.AXP","illegal operand");
                     }
                 }
 
@@ -399,7 +399,7 @@ namespace yocto
                 Function     *pfn  = functions.find(name);
                 if(!pfn)
                 {
-                    throw exception("Seem: unknown function '%s'", name.c_str());
+                    throw imported::exception("Seem.VM.FUNC", "unknown function '%s'", name.c_str());
                 }
 
                 //______________________________________________________________
@@ -432,7 +432,7 @@ namespace yocto
                 engine.walk(tree,NULL);
                 if(tstack.size!=1)
                 {
-                    throw exception("Seem: stack too large");
+                    throw imported::exception("Seem.VM.evaluate","resulting stack too large");
                 }
                 const double ans = ToNumber(tstack.tail);
                 tstack.clear();
