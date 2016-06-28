@@ -426,7 +426,7 @@ namespace yocto
 
 
             //get a tree
-            inline double evaluate( const XNode *tree )
+            inline double evaluate( const vNode *tree )
             {
                 tstack.clear();
                 engine.walk(tree,NULL);
@@ -458,10 +458,11 @@ namespace yocto
 
 
         Evaluator:: Evaluator() :
-        parser(false),
-        vm( new VirtualMachine( *parser.gram ) )
+        Compiler(false),
+        vm( new VirtualMachine( *gram ) )
         {
             //__________________________________________________________________
+            //
             // declare some function
             //__________________________________________________________________
 #define Y_SEEM_DECL(NAME) SetCFunction(#NAME,NAME)
@@ -493,32 +494,9 @@ namespace yocto
 
         }
 
-        double Evaluator:: run(ios::istream &fp)
+        double Evaluator:: eval(const vCode &vcode)
         {
-            //__________________________________________________________________
-            //
-            // parse expresssion
-            //__________________________________________________________________
-            parser.impl->restart();
-            auto_ptr<XNode> tree( parser.impl->parse(fp) );
-
-#if 0
-            {
-                const string dotname = parser.gram->name + "_output.dot";
-                tree->graphviz(dotname);
-                ios::graphviz_render(dotname);
-            }
-#endif
-            
-            //__________________________________________________________________
-            //
-            // compile: walk...
-            //__________________________________________________________________
-            const double ans = vm->evaluate( tree.__get() );
-            
-
-            
-            return ans;
+            return vm->evaluate( vcode.__get() );
         }
 
 
@@ -608,23 +586,4 @@ namespace yocto
 
 }
 
-#include "yocto/ios/imstream.hpp"
-
-namespace yocto
-{
-    namespace Seem
-    {
-        double Evaluator:: run(const string  &s)
-        {
-            ios::imstream fp(s);
-            return run(fp);
-        }
-
-        double Evaluator:: run(const char *s)
-        {
-            ios::imstream fp( s, length_of(s) );
-            return run(fp);
-        }
-    }
-}
 

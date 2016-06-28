@@ -12,13 +12,14 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(eval)
 {
 
-    Seem::Evaluator eval;
-    eval.SetVariable("x", 0.1);
+    Seem::Evaluator SEEM;
+    SEEM.SetVariable("x", 0.1);
 
     for(int i=1;i<argc;++i)
     {
         const char *expr = argv[i];
-        std::cerr << expr << "=" << eval.run(expr) << std::endl;
+        Seem::vCode code = SEEM.compile(expr);
+        std::cerr << expr << "=" << SEEM.eval(code) << std::endl;
     }
 
 

@@ -1,7 +1,7 @@
 #ifndef YOCTO_SEEM_EVALUATOR_INCLUDED
 #define YOCTO_SEEM_EVALUATOR_INCLUDED 1
 
-#include "yocto/seem/types.hpp"
+#include "yocto/seem/compiler.hpp"
 #include "yocto/lingua/syntax/analyzer.hpp"
 
 namespace yocto
@@ -12,8 +12,8 @@ namespace yocto
         //! Generic Function Interface
         typedef functor<double,TL1(const array<double>&)> Function;
 
-        //! Evaluator: parse and use a virtual machine
-        class Evaluator
+        //! Evaluator
+        class Evaluator : public Compiler
         {
         public:
             typedef double (*CFunction)(double);
@@ -22,9 +22,10 @@ namespace yocto
             explicit Evaluator();
             virtual ~Evaluator() throw();
 
-            double run(ios::istream &fp);
-            double run(const string  &s);
-            double run(const char    *s);
+            double eval(const vCode &vcode);
+
+            
+
 
             void SetVariable(const string &name, const double value);
             void SetVariable(const char   *name, const double value);
@@ -39,7 +40,6 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Evaluator);
             class VirtualMachine;
-            Parser                    parser;
             auto_ptr<VirtualMachine>  vm;
         };
 
