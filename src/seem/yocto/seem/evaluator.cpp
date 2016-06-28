@@ -459,6 +459,7 @@ namespace yocto
 
         Evaluator:: ~Evaluator() throw()
         {
+            delete vm;
         }
 
 

@@ -18,6 +18,7 @@ namespace yocto
         public:
             typedef double (*CFunction)(double);
             typedef double (*CFunction2)(double,double);
+            typedef arc_ptr<Evaluator>  Pointer;
 
             explicit Evaluator();
             virtual ~Evaluator() throw();
@@ -56,8 +57,47 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Evaluator);
             class VirtualMachine;
-            auto_ptr<VirtualMachine>  vm;
+            VirtualMachine *vm;
+
+        public:
+
+            class Proxy
+            {
+            public:
+                const string       vname;
+                Evaluator::Pointer vexec;
+                const vCode        vcode;
+
+                ~Proxy() throw() {}
+                Proxy(const string             &user_vname,
+                      const Evaluator::Pointer &user_vexec,
+                      const vCode              &user_vcode) :
+                vname(user_vname),
+                vexec(user_vexec),
+                vcode(user_vcode)
+                {
+                }
+
+                Proxy(const Proxy &other) :
+                vname(other.vname),
+                vexec(other.vexec),
+                vcode(other.vcode)
+                {
+                }
+
+                inline double operator()(const double value)
+                {
+                    vexec->SetVariable(vname,value);
+                    return vexec->eval(vcode);
+                }
+
+
+            private:
+                YOCTO_DISABLE_ASSIGN(Proxy);
+            };
         };
+
+
 
     }
 

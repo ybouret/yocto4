@@ -13,7 +13,7 @@ namespace yocto
         typedef lingua::syntax::xnode   vNode;
         typedef shared_ptr<const vNode> vCode;
 
-        class Compiler
+        class Compiler : public counted_object
         {
         public:
             virtual ~Compiler() throw();
