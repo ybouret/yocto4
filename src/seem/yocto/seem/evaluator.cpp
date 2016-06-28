@@ -16,15 +16,17 @@ namespace yocto
 
         namespace
         {
+
             class Atom;
             typedef core::list_of_cpp<Atom> Atoms;
 
+            //! variant class for a dynamic stack
             class Atom : public object
             {
             public:
-                Atom     *next;
-                Atom     *prev;
-                const int code;
+                Atom     *next; //!< for Atoms
+                Atom     *prev; //!< for Atoms
+                const int code; //!< one of the SEEM_
                 union
                 {
                     double  number;
@@ -32,6 +34,7 @@ namespace yocto
                     Atoms  *args;
                 };
 
+                //! default destructor
                 inline virtual ~Atom() throw()
                 {
                     switch(code)
@@ -49,8 +52,13 @@ namespace yocto
                     }
                 }
 
-                inline explicit Atom(const int user_code, const void *data, const string &label) :
-                next(0), prev(0), code(user_code)
+                //! transform a terminal into an atom
+                inline explicit Atom(const int     user_code,
+                                     const void   *data,
+                                     const string &label) :
+                next(0),
+                prev(0),
+                code(user_code)
                 {
                     switch(code)
                     {
@@ -80,8 +88,11 @@ namespace yocto
                     }
                 }
 
+                //! Transform a real into an atom
                 inline explicit Atom(const double value) throw() :
-                next(0), prev(0), code(SEEM_NUMBER)
+                next(0),
+                prev(0),
+                code(SEEM_NUMBER)
                 {
                     number = value;
                 }
@@ -129,6 +140,7 @@ namespace yocto
             };
         }
 
+        //! stack based virtual machine
         class Evaluator:: VirtualMachine :  public object
         {
         public:
@@ -136,8 +148,8 @@ namespace yocto
             htree<Function>          functions;
             lingua::syntax::analyzer engine;
             Atoms                    tstack;
-            //Atoms                    astack;
 
+            //! constructor: prepare syntax analyzer
             explicit VirtualMachine( const lingua::syntax::grammar &G ) :
             variables(),
             functions(),
@@ -148,10 +160,12 @@ namespace yocto
                 engine.on_rule(this, & VirtualMachine::OnRule );
             }
 
+            //! default destructor
             virtual ~VirtualMachine() throw()
             {
             }
 
+            //! register a variable value
             void SetVariable(const string &name, const double value)
             {
                 double *pvar = variables.find(name);
@@ -170,6 +184,7 @@ namespace yocto
 
             }
 
+            //! register a function name
             void SetFunction(const string &name, const Function &fn )
             {
                 Function *pfn = functions.find(name);
@@ -187,6 +202,7 @@ namespace yocto
                 }
             }
 
+            //! push term on stack
             inline void OnTerm(const string &label, const string &content)
             {
                 const int code = engine.hash_term(label);
@@ -203,11 +219,12 @@ namespace yocto
                         break;
 
                     default:
-                        throw exception("unhandled terminal '%s'", label.c_str());
+                        throw exception("Seem: unhandled terminal '%s'", label.c_str());
                 }
             }
 
 
+            //! extract global to local stack, reverse order
             inline
             void Fetch( Atoms &ops, const size_t ns ) throw()
             {
@@ -218,6 +235,7 @@ namespace yocto
                 }
             }
 
+            //! transform stack according to internal
             inline void OnRule(const string &label, const size_t ns)
             {
                 const int code = engine.hash_rule(label);
@@ -231,19 +249,18 @@ namespace yocto
                         tstack.push_back( pArgs.yield() );
                     } break;
 
-                    case SEEM_AXP: OnAXP(ns); break;
-
-                    case SEEM_MXP: OnMXP(ns); break;
-
-                    case SEEM_PXP: OnPXP(ns); break;
-
+                    case SEEM_AXP:  OnAXP(ns);  break;
+                    case SEEM_MXP:  OnMXP(ns);  break;
+                    case SEEM_PXP:  OnPXP(ns);  break;
                     case SEEM_FUNC: OnFUNC(ns); break;
 
                     default:
-                        throw exception("unhandled terminal '%s'", label.c_str());
+                        throw exception("Seem: unhandled internal '%s'", label.c_str());
                 }
             }
 
+
+            //! get numeric value from number or variable
             inline double ToNumber( const Atom *a ) const
             {
                 assert(a);
@@ -270,7 +287,6 @@ namespace yocto
             inline
             void OnMXP(const size_t ns)
             {
-                //std::cerr << "==> MXP/" << ns << std::endl;
                 assert( 0 != (1&ns) );
                 Atoms ops;
                 Fetch(ops,ns);
@@ -303,7 +319,6 @@ namespace yocto
             inline
             void OnPXP(const size_t ns)
             {
-                //std::cerr << "==> PXP/" << ns << std::endl;
                 assert(ns>=2);
                 Atoms ops;
                 Fetch(ops,ns);
@@ -324,7 +339,6 @@ namespace yocto
             inline
             void OnAXP(const size_t ns)
             {
-                //std::cerr << "==> AXP/" << ns << std::endl;
                 Atoms ops;
                 Fetch(ops,ns);
 
@@ -368,11 +382,18 @@ namespace yocto
             inline void OnFUNC(const size_t ns)
             {
                 assert(2==ns);
+                //______________________________________________________________
+                //
+                // make a local stack
+                //______________________________________________________________
+
                 Atoms ctx;
                 Fetch(ctx,2);
-                //std::cerr << "call " << *(ctx.head) << *(ctx.tail) << std::endl;
 
+                //______________________________________________________________
+                //
                 // looking for function
+                //______________________________________________________________
                 assert(SEEM_ID==ctx.head->code);
                 const string &name = *(ctx.head->id);
                 Function     *pfn  = functions.find(name);
@@ -381,7 +402,10 @@ namespace yocto
                     throw exception("Seem: unknown function '%s'", name.c_str());
                 }
 
+                //______________________________________________________________
+                //
                 // building args
+                //______________________________________________________________
                 assert(SEEM_ARGS==ctx.tail->code);
                 const Atoms     &args = *(ctx.tail->args);
                 const size_t     na   = args.size;
@@ -393,21 +417,19 @@ namespace yocto
                     *(addr++) = ToNumber(a);
                 }
 
-                const double ans = (*pfn)(params);
-                tstack.push_back( new Atom(ans) );
+                //______________________________________________________________
+                //
+                // push result on stack
+                //______________________________________________________________
+                tstack.push_back( new Atom( (*pfn)(params) ) );
             }
 
-            double evaluate( const XNode *tree )
+
+            //get a tree
+            inline double evaluate( const XNode *tree )
             {
                 tstack.clear();
                 engine.walk(tree,NULL);
-#if 0
-                std::cerr << "TermStack:" << std::endl;
-                for(const Atom *a = tstack.head;a;a=a->next)
-                {
-                    std::cerr << "\t" << *a << std::endl;
-                }
-#endif
                 if(tstack.size!=1)
                 {
                     throw exception("Seem: stack too large");

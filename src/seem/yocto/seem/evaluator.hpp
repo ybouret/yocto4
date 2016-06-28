@@ -9,8 +9,10 @@ namespace yocto
     namespace Seem
     {
 
+        //! Generic Function Interface
         typedef functor<double,TL1(const array<double>&)> Function;
 
+        //! Evaluator: parse and use a virtual machine
         class Evaluator
         {
         public:
