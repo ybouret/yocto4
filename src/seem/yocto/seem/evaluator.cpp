@@ -446,11 +446,16 @@ namespace yocto
 }
 
 
+#include "yocto/math/types.hpp"
 namespace yocto
 {
     namespace Seem
     {
 
+        static inline double heaviside(double x) throw()
+        {
+            return (x<0) ? 0.0 : 1;
+        }
 
         Evaluator:: ~Evaluator() throw()
         {
@@ -461,6 +466,13 @@ namespace yocto
         Compiler(false),
         vm( new VirtualMachine( *gram ) )
         {
+
+            //__________________________________________________________________
+            //
+            // declare some values
+            //__________________________________________________________________
+            SetVariable("pi", math::numeric<double>::pi);
+
             //__________________________________________________________________
             //
             // declare some function
@@ -487,10 +499,13 @@ namespace yocto
             Y_SEEM_DECL(floor);
             Y_SEEM_DECL(fabs);
 
+            Y_SEEM_DECL(heaviside);
+
 #define Y_SEEM_DECL2(NAME) SetCFunction2(#NAME,NAME)
 
             Y_SEEM_DECL2(atan2);
             Y_SEEM_DECL2(pow);
+
 
         }
 
