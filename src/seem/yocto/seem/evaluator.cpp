@@ -57,13 +57,11 @@ namespace yocto
                         case SEEM_NUMBER:
                             assert(data);
                             number = strconv::to<double>( *(const string *)data, "number" );
-                            std::cerr << "push " << label << "=" << number << std::endl;
                             break;
 
                         case SEEM_ID:
                             assert(data);
                             id     = new string( *(const string *)data );
-                            std::cerr << "push " << label << " " << *id << std::endl;
                             break;
 
                         case SEEM_PLUS:
@@ -71,7 +69,6 @@ namespace yocto
                         case SEEM_MUL:
                         case SEEM_DIV:
                         case SEEM_MOD:
-                            std::cerr << "push " << label << std::endl;
                             break;
 
                         case SEEM_ARGS:
@@ -87,9 +84,9 @@ namespace yocto
                 next(0), prev(0), code(SEEM_NUMBER)
                 {
                     number = value;
-                    std::cerr << "push number " << number << std::endl;
                 }
 
+#if 0
                 inline friend std::ostream & operator<<( std::ostream &os, const Atom &a )
                 {
                     switch(a.code)
@@ -125,7 +122,7 @@ namespace yocto
 
                     return os;
                 }
-
+#endif
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Atom);
@@ -223,7 +220,6 @@ namespace yocto
 
             inline void OnRule(const string &label, const size_t ns)
             {
-                std::cerr << "call " << label << "/" << ns << std::endl;
                 const int code = engine.hash_rule(label);
                 switch(code)
                 {
@@ -397,9 +393,28 @@ namespace yocto
                     *(addr++) = ToNumber(a);
                 }
 
-                std::cerr << "==> " << name << "(" << params << ")" << std::endl;
                 const double ans = (*pfn)(params);
                 tstack.push_back( new Atom(ans) );
+            }
+
+            double evaluate( const XNode *tree )
+            {
+                tstack.clear();
+                engine.walk(tree,NULL);
+#if 0
+                std::cerr << "TermStack:" << std::endl;
+                for(const Atom *a = tstack.head;a;a=a->next)
+                {
+                    std::cerr << "\t" << *a << std::endl;
+                }
+#endif
+                if(tstack.size!=1)
+                {
+                    throw exception("Seem: stack too large");
+                }
+                const double ans = ToNumber(tstack.tail);
+                tstack.clear();
+                return ans;
             }
 
         private:
@@ -464,27 +479,24 @@ namespace yocto
             //__________________________________________________________________
             parser.impl->restart();
             auto_ptr<XNode> tree( parser.impl->parse(fp) );
-            
+
+#if 0
             {
                 const string dotname = parser.gram->name + "_output.dot";
                 tree->graphviz(dotname);
                 ios::graphviz_render(dotname);
             }
+#endif
             
             //__________________________________________________________________
             //
             // compile: walk...
             //__________________________________________________________________
-            std::cerr << "--Walking..." << std::endl;
-            vm->engine.walk( tree.__get(), NULL );
+            const double ans = vm->evaluate( tree.__get() );
             
-            std::cerr << "TermStack:" << std::endl;
-            for(const Atom *a = vm->tstack.head;a;a=a->next)
-            {
-                std::cerr << "\t" << *a << std::endl;
-            }
+
             
-            return 0;
+            return ans;
         }
 
 
@@ -574,5 +586,23 @@ namespace yocto
 
 }
 
+#include "yocto/ios/imstream.hpp"
 
+namespace yocto
+{
+    namespace Seem
+    {
+        double Evaluator:: run(const string  &s)
+        {
+            ios::imstream fp(s);
+            return run(fp);
+        }
+
+        double Evaluator:: run(const char *s)
+        {
+            ios::imstream fp( s, length_of(s) );
+            return run(fp);
+        }
+    }
+}
 

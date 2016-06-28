@@ -11,12 +11,16 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(eval)
 {
-    ios::icstream  fp( ios::cstdin );
 
     Seem::Evaluator eval;
     eval.SetVariable("x", 0.1);
-    eval.SetCFunction("cos", cos);
-    eval.run(fp);
+
+    for(int i=1;i<argc;++i)
+    {
+        const char *expr = argv[i];
+        std::cerr << expr << "=" << eval.run(expr) << std::endl;
+    }
+
 
 }
 YOCTO_UNIT_TEST_DONE()

@@ -21,6 +21,8 @@ namespace yocto
             virtual ~Evaluator() throw();
 
             double run(ios::istream &fp);
+            double run(const string  &s);
+            double run(const char    *s);
 
             void SetVariable(const string &name, const double value);
             void SetVariable(const char   *name, const double value);
