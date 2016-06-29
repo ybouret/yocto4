@@ -112,7 +112,7 @@ namespace yocto
             char        *cmd = sim.iobuff(0);
             const size_t len = sim.iobuff.length();
             size_t       num = 0;
-            memset(cmd,len,0);
+            memset(cmd,0,len);
             
             if( sim.is_first )
             {
