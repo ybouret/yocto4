@@ -108,12 +108,11 @@ namespace yocto
             {
                 item_type &item = items[i];
                 (char_type &)(item.data) = char_type(i);
-                item.freq                = 0;
+                item.freq                = 1;
                 item.code                = 0;
                 item.bits                = 0;
             }
 
-            items[NYT].freq = 1;
         }
 
         void huffman::alphabet:: display( std::ostream &os ) const
@@ -131,6 +130,7 @@ namespace yocto
 
         void huffman:: alphabet:: rescale() throw()
         {
+            std::cerr << "RESCALE!" << std::endl;
 #define YHUFF_RESCALE(I) freq_type &freq = items[I].freq; if(freq>0) { (freq >>= 1) |= 1; }
             YOCTO_LOOP_FUNC_(max_items,YHUFF_RESCALE,0);
         }
@@ -189,11 +189,11 @@ namespace yocto
             fp.viz(this);
             if(data>=0)
             {
-                fp(" [label=\"%s #%u\"];\n", item_text(data), unsigned(freq) );
+                fp(" [label=\"%s #%u @%u\"];\n", item_text(data), unsigned(freq), unsigned(bits) );
             }
             else
             {
-                fp(" [label=\"#%u\"];\n", unsigned(freq));
+                fp(" [label=\"#%u @%u\"];\n", unsigned(freq), unsigned(bits) );
             }
             if(left)
             {
@@ -235,34 +235,45 @@ namespace yocto
         huffman::node_type *huffman::tree_type::build_for(alphabet &alpha)
         {
             root = NULL;
+        TRY_BUILD:
             {
-                //! transfert all freq>0
+                //______________________________________________________________
+                //
+                // transfert all freq>0
+                //______________________________________________________________
                 nheap.free();
-                for(size_t i=0;i<max_bytes;++i)
+                size_t i=0;
+                for(;i<max_items;++i)
                 {
                     item_type &item = alpha[i];
                     assert(i==item.data);
                     if(item.freq>0)
                     {
-                        node_type *node =new (&nodes[i]) node_type(item.data,item.freq);
-                        
-                        nheap.__push(node);
+                        node_type *node = new (&nodes[i]) node_type(item.data,item.freq);
+                        node->bits      = 1;
+                        nheap.push(node);
                     }
                 }
 
                 assert(nheap.size()>=1);
 
                 //! head/tree build
-                size_t i = max_bytes;
                 while(nheap.size()>1)
                 {
                     assert(i<max_nodes);
-                    node_type *left   = nheap.pop();
-                    node_type *right  = nheap.pop();
+                    node_type   *left   = nheap.pop();
+                    node_type   *right  = nheap.pop();
+                    const size_t pbits  = 1+max_of(left->bits,right->bits);
+                    if(pbits>max_bits)
+                    {
+                        alpha.rescale();
+                        goto TRY_BUILD;
+                    }
                     node_type *parent = new (&nodes[i++]) node_type(INS,left->freq+right->freq);
                     parent->left  = left;
                     parent->right = right;
-                    nheap.__push(parent);
+                    parent->bits  = pbits;
+                    nheap.push(parent);
                 }
 
                 assert(1==nheap.size());

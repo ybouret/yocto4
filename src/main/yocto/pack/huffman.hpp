@@ -46,7 +46,7 @@ namespace yocto
             static const char *item_text(const char_type ch) throw();
             static string      item_code(const code_type code, const size_t bits);
 
-            //! the alphabet, manage items and their frequencies
+            //! the alphabet, manage max_items and their frequencies
             class alphabet
             {
             public:
@@ -69,7 +69,7 @@ namespace yocto
                 item_type *items; //!< for items
             };
 
-            static const size_t max_nodes = 2 * max_items - 1;
+            static const size_t max_nodes = (2 * max_items) - 1;
             static const size_t max_bits  = 16;
 
             class node_type
