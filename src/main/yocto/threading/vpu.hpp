@@ -13,7 +13,8 @@ namespace yocto
 
         //! base class for virtual processing unit
         /**
-         a smart pointer to a kernel_executor
+         a smart pointer to a kernel_executor which
+         is used in a SIMD way.
          */
         class vpu
         {
@@ -32,7 +33,7 @@ namespace yocto
         };
 
 
-        //! will associate one processor per core
+        //! will associate one virtual processor per core
         /**
          processor must have a run(ctx,array,...,args) method
          processors must be built before use !

@@ -46,15 +46,15 @@ namespace yocto
                 //
                 // virtual interface
                 //______________________________________________________________
-                virtual void viz(ios::ostream &fp) const = 0;
-                virtual bool admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const = 0;
-                virtual bool admit_empty() const throw() = 0;
+                virtual void  viz(ios::ostream &fp) const = 0;
+                virtual bool  admit(YOCTO_LINGUA_SYNTAX_RULE_ADMIT_ARGS) const = 0;
+                virtual bool  admit_empty() const throw() = 0;
 
                 //______________________________________________________________
                 //
                 // non virtual interface
                 //______________________________________________________________
-                inline const string & key() const throw() { return label; }
+                const string & key() const throw();
 
                 template <typename T>
                 T &as() throw()

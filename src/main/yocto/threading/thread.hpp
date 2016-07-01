@@ -104,8 +104,7 @@ namespace yocto
 			const bool       stop; //!< internal flag
 			thread          *next; //!< for threads
             thread          *prev; //!< for threads
-            //bin2id<handle_t> hrid; //!< human-readable value
-
+            
             vslot  &check_code(); //!< on-the-fly allocate code if needed
 
 		};

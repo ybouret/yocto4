@@ -28,12 +28,13 @@ namespace yocto
         {
         }
 
+#if 1
         vslot &thread:: check_code()
         {
             if(!code.is_valid()) code.reset( new vslot() );
             return *code;
         }
-        
+#endif
         //======================================================================
         //
         // thread creation with a shared mutex
@@ -102,7 +103,7 @@ namespace yocto
             memset( &identifier, 0, sizeof(identifier));
             memset( &proc,       0, sizeof(proc)   );
             memset( &data,       0, sizeof(data)   );
-            if(code.is_valid())  code->free();
+            //if(code.is_valid())  code->free();
             (bool&)stop = true;
         }
         

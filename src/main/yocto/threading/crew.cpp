@@ -232,9 +232,9 @@ namespace yocto
         void crew::worker_call(void *args) throw()
         {
             assert(args);
-            context &Cntx  = *static_cast<context *>(args); assert(Cntx.priv);
-            crew    &Crew  = *static_cast<crew    *>(Cntx.priv);
-            Crew.worker_loop(Cntx);
+            context &the_context  = *static_cast<context *>(args); assert(NULL!=the_context.priv);
+            crew    &the_crew     = *static_cast<crew    *>(the_context.priv);
+            the_crew.worker_loop(the_context);
         }
 
     }

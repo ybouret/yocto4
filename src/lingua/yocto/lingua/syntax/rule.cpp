@@ -22,6 +22,21 @@ namespace yocto
             {
             }
 
+#if 0
+            rule:: rule(const rule &other) :
+            next(0),
+            prev(0),
+            label(other.label),
+            flags(other.flags),
+            uuid(other.uuid),
+            self(0),
+            prv(other.prv)
+            {
+
+            }
+#endif
+
+
 
             void rule:: grow( xnode * &tree, xnode *leaf ) const throw()
             {
@@ -37,6 +52,11 @@ namespace yocto
                     assert(false==tree->terminal);
                     tree->push_back(leaf);
                 }
+            }
+
+            const string & rule::key() const throw()
+            {
+                return label;
             }
 
         }
