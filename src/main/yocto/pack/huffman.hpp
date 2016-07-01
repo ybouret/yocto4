@@ -30,14 +30,16 @@ namespace yocto
             public:
                 const char_type data; //!< identity
                 freq_type       freq; //!< frequency
-
+                char_type       code; //!< current code
+                size_t          bits; //!< current bits
+                
                 item_type(const char_type data) throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(item_type);
                 ~item_type() throw();
             };
-
+            static const char *item_text(const char_type ch) throw();
 
             //! the alphabet, manage items and their frequencies
             class alphabet
@@ -49,14 +51,17 @@ namespace yocto
                 void rescale() throw();    //!< scale down frequencies
 
                 void update(const char c) throw();
-                void enable_nyt() throw();
                 void enable_end() throw();
+
+                item_type & operator[](const size_t i) throw();
+
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(alphabet);
                 size_t     size;  //!< num items
                 size_t     itnum; //!< for memory
                 item_type *items; //!< for items
+                void enable_nyt() throw();
             };
 
             static const size_t max_nodes = 2 * max_items - 1;
@@ -72,7 +77,7 @@ namespace yocto
 
                 node_type(const char_type ch, const freq_type fr) throw();
 
-
+                void viz(ios::ostream &fp) const;
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
@@ -96,8 +101,12 @@ namespace yocto
                 tree_type();
                 ~tree_type() throw();
 
+                void build_for( alphabet &alpha );
+                void graphviz(const string &filename) const;
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(tree_type);
+                node_type *root;
                 size_t     count; //!< for memory
                 node_type *nodes; //!< allocated
                 heap_type  nheap; //!< node head
