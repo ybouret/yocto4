@@ -21,6 +21,7 @@ YOCTO_UNIT_TEST_IMPL(huff)
     Alpha.display(std::cerr);
 
     Tree.build_for(Alpha);
+    Alpha.display(std::cerr);
     Tree.graphviz("huff.dot");
     ios::graphviz_render("huff.dot");
 }

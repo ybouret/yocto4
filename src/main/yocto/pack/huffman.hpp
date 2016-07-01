@@ -18,8 +18,8 @@ namespace yocto
             typedef unsigned code_type; //!< internal code type
 
             static const size_t    max_bytes = 256; //!< regular bytes
-            static const size_t    max_ctrls = 2;   //!< control code
-            static const size_t    max_items = max_bytes+max_ctrls;
+            static const size_t    num_ctrls = 2;   //!< control code
+            static const size_t    max_items = max_bytes+num_ctrls;
             static const char_type NYT       = max_bytes;
             static const char_type END       = NYT+1;
             static const char_type INS       = -1;
@@ -30,7 +30,7 @@ namespace yocto
             public:
                 const char_type data; //!< identity
                 freq_type       freq; //!< frequency
-                char_type       code; //!< current code
+                code_type       code; //!< current code
                 size_t          bits; //!< current bits
                 
                 item_type(const char_type data) throw();
@@ -72,15 +72,18 @@ namespace yocto
             static const size_t max_nodes = (2 * max_items) - 1;
             static const size_t max_bits  = 16;
 
+            //! node to build encoding tree
             class node_type
             {
             public:
-                node_type      *left;
-                node_type      *right;
-                const freq_type freq;
-                const char_type data;
-                size_t          bits;
-                
+                node_type      *left;   //!< left node
+                node_type      *right;  //!< right node
+                node_type      *parent; //!< parent node
+                const freq_type freq;   //!< cumulative frequency
+                const char_type data;   //!< associated data: INS,0..MAX_ITEMS-1
+                size_t          bits;   //!< height
+                code_type       cbit;   //!< coding bit
+
                 node_type(const char_type ch, const freq_type fr) throw();
 
                 void viz(ios::ostream &fp) const;
@@ -91,6 +94,7 @@ namespace yocto
             };
 
 
+            //! class for internal heap
             struct node_comparator
             {
                 inline int operator()(const node_type &lhs, const node_type &rhs) const throw()
@@ -99,8 +103,10 @@ namespace yocto
                 }
             };
 
+            //! internal heap
             typedef heap<node_type,node_comparator> heap_type;
 
+            //! the tree
             class tree_type
             {
             public:

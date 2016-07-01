@@ -17,13 +17,13 @@ namespace yocto
             switch(ch)
             {
                 case NYT: s[0] = 'N'; s[1] = 'Y'; s[2] = 'T'; break;
-                case END: s[0] = 'E'; s[1] = 'N'; s[2] = 'D';break;
-                case INS: s[0] = 'I'; s[1] = 'N'; s[2] = 'S';break;
+                case END: s[0] = 'E'; s[1] = 'N'; s[2] = 'D'; break;
+                case INS: s[0] = 'I'; s[1] = 'N'; s[2] = 'S'; break;
 
                 default:
                     if(ch<32||ch>=127)
                     {
-                        s[0] = 'x'; memcpy(&s[1], hexa_text[unsigned(ch)&0xff],2);
+                        s[0] = 'x'; memcpy(&s[1],hexa_text[unsigned(ch)&0xff],2);
                     }
                     else
                     {
@@ -59,9 +59,9 @@ namespace yocto
         std::ostream & operator<<(std::ostream &os, const huffman::item_type &item )
         {
 
-            std::cerr << huffman::item_text(item.code) << ":#";
+            std::cerr << huffman::item_text(item.data) << ":freq=";
             std::cerr << std::setw(6) << item.freq;
-            std::cerr << ":@" << std::setw(2) << item.bits << ":" << huffman::item_code(item.code, item.bits);
+            std::cerr << ":bits=" << std::setw(2) << item.bits << "[" << huffman::item_code(item.code, item.bits) << "]";
 
             return os;
         }
@@ -107,6 +107,7 @@ namespace yocto
             for(size_t i=max_bytes;i<max_items;++i)
             {
                 item_type &item = items[i];
+
                 (char_type &)(item.data) = char_type(i);
                 item.freq                = 1;
                 item.code                = 0;
@@ -118,7 +119,7 @@ namespace yocto
         void huffman::alphabet:: display( std::ostream &os ) const
         {
             os << "#Alphabet=" << size << std::endl;
-            for(size_t i=0;i<max_bytes;++i)
+            for(size_t i=0;i<max_items;++i)
             {
                 if(items[i].freq>0)
                 {
@@ -177,6 +178,7 @@ namespace yocto
         huffman:: node_type:: node_type(const char_type ch, const freq_type fr) throw() :
         left(0),
         right(0),
+        parent(0),
         freq(fr),
         data(ch),
         bits(0)
@@ -189,11 +191,11 @@ namespace yocto
             fp.viz(this);
             if(data>=0)
             {
-                fp(" [label=\"%s #%u @%u\"];\n", item_text(data), unsigned(freq), unsigned(bits) );
+                fp(" [label=\"%s freq=%u bits%u\"];\n", item_text(data), unsigned(freq), unsigned(bits) );
             }
             else
             {
-                fp(" [label=\"#%u @%u\"];\n", unsigned(freq), unsigned(bits) );
+                fp(" [label=\"freq=%u bits=%u\"];\n", unsigned(freq), unsigned(bits) );
             }
             if(left)
             {
@@ -273,6 +275,9 @@ namespace yocto
                     parent->left  = left;
                     parent->right = right;
                     parent->bits  = pbits;
+                    left->parent  = right->parent = parent;
+                    left->cbit  = 0;
+                    right->cbit = 1;
                     nheap.push(parent);
                 }
 
@@ -280,6 +285,31 @@ namespace yocto
                 root = nheap.pop();
             }
             assert(root);
+
+            //______________________________________________________________
+            //
+            // encoding
+            //______________________________________________________________
+            for(size_t i=0;i<max_items;++i)
+            {
+                item_type &item = alpha[i];
+                if(item.freq>0)
+                {
+                    code_type &code = item.code;
+                    size_t    &bits = item.bits;
+                    code = 0;
+                    bits = 0;
+                    const node_type *curr = &nodes[i];
+                    while(curr->parent)
+                    {
+                        ++bits;
+                        code <<= 1;
+                        code |=  curr->cbit;
+                        curr  = curr->parent;
+                    }
+                }
+            }
+
             return root;
         }
 
