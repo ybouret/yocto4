@@ -1,6 +1,8 @@
 #include "yocto/pack/huffman.hpp"
 #include "yocto/code/utils.hpp"
 #include <cstring>
+#include <iostream>
+#include <iomanip>
 
 namespace yocto
 {
@@ -11,7 +13,7 @@ namespace yocto
         {
             static char s[4] = { 0, 0, 0, 0 };
             assert(ch>=-1);
-            assert(ch<max_items);
+            assert(ch<int(max_items));
             switch(ch)
             {
                 case NYT: s[0] = 'N'; s[1] = 'Y'; s[2] = 'T'; break;
@@ -21,23 +23,50 @@ namespace yocto
                 default:
                     if(ch<32||ch>=127)
                     {
-                        s[0] = 'x'; memcpy(s+1, hexa_text[unsigned(ch)&0xff],2);
+                        s[0] = 'x'; memcpy(&s[1], hexa_text[unsigned(ch)&0xff],2);
                     }
                     else
                     {
-                        s[0] = ' ';
+                        s[0] = '\'';
                         s[1] = char(ch);
-                        s[2] = ' ';
+                        s[2] = '\'';
                     }
             }
             return s;
         }
 
+        string huffman:: item_code(const code_type code, const size_t bits)
+        {
+            string ans;
+            for(size_t i=0;i<bits;++i)
+            {
+                const size_t bit = 1 << i;
+                ans.append( (0!=(code&bit) ) ? '1' : '0' );
+            }
+            mreverse((char *)(ans.rw()), ans.size());
+            return ans;
+        }
+
+
         huffman:: item_type:: item_type(const char_type ch) throw() :
         data(ch),
-        freq(0)
+        freq(0),
+        code(data),
+        bits(8)
         {
         }
+
+        std::ostream & operator<<(std::ostream &os, const huffman::item_type &item )
+        {
+
+            std::cerr << huffman::item_text(item.code) << ":#";
+            std::cerr << std::setw(6) << item.freq;
+            std::cerr << ":@" << std::setw(2) << item.bits << ":" << huffman::item_code(item.code, item.bits);
+
+            return os;
+        }
+
+
     }
 }
 
@@ -48,9 +77,11 @@ namespace yocto
     namespace pack
     {
         huffman:: alphabet:: alphabet() :
+        size(0),
         itnum( max_items ),
         items( memory::kind<memory::global>::acquire_as<item_type>(itnum) )
         {
+            initialize();
         }
 
         huffman:: alphabet:: ~alphabet() throw()
@@ -81,7 +112,20 @@ namespace yocto
                 item.code                = 0;
                 item.bits                = 0;
             }
-            enable_nyt();
+
+            items[NYT].freq = 1;
+        }
+
+        void huffman::alphabet:: display( std::ostream &os ) const
+        {
+            os << "#Alphabet=" << size << std::endl;
+            for(size_t i=0;i<max_bytes;++i)
+            {
+                if(items[i].freq>0)
+                {
+                    std::cerr << items[i] << std::endl;
+                }
+            }
         }
 
 
@@ -109,7 +153,6 @@ namespace yocto
                     ++freq;
                     break;
             }
-            items[NYT].freq = 1;
         }
 
 
@@ -135,7 +178,8 @@ namespace yocto
         left(0),
         right(0),
         freq(fr),
-        data(ch)
+        data(ch),
+        bits(0)
         {
 
         }
@@ -143,16 +187,23 @@ namespace yocto
         void huffman:: node_type:: viz(ios::ostream &fp) const
         {
             fp.viz(this);
-            fp(" label=\"%s#%u\"\n", item_text(data), unsigned(freq) );
+            if(data>=0)
+            {
+                fp(" [label=\"%s #%u\"];\n", item_text(data), unsigned(freq) );
+            }
+            else
+            {
+                fp(" [label=\"#%u\"];\n", unsigned(freq));
+            }
             if(left)
             {
                 left->viz(fp);
-                fp.viz(this); fp << "->"; fp.viz(left);
+                fp.viz(this); fp << "->"; fp.viz(left); fp << " [label=\"0\"];\n";
             }
             if(right)
             {
                 right->viz(fp);
-                fp.viz(this); fp << "->"; fp.viz(right);
+                fp.viz(this); fp << "->"; fp.viz(right); fp << " [label=\"1\"];\n";
             }
         }
 
@@ -181,7 +232,7 @@ namespace yocto
             memory::kind<memory::global>::release_as<node_type>(nodes,count);
         }
 
-        void huffman::tree_type::build_for(alphabet &alpha)
+        huffman::node_type *huffman::tree_type::build_for(alphabet &alpha)
         {
             root = NULL;
             {
@@ -190,9 +241,12 @@ namespace yocto
                 for(size_t i=0;i<max_bytes;++i)
                 {
                     item_type &item = alpha[i];
+                    assert(i==item.data);
                     if(item.freq>0)
                     {
-                        nheap.push(new (&nodes[i]) node_type(item.data,item.freq));
+                        node_type *node =new (&nodes[i]) node_type(item.data,item.freq);
+                        
+                        nheap.__push(node);
                     }
                 }
 
@@ -206,12 +260,16 @@ namespace yocto
                     node_type *left   = nheap.pop();
                     node_type *right  = nheap.pop();
                     node_type *parent = new (&nodes[i++]) node_type(INS,left->freq+right->freq);
-                    nheap.push(parent);
+                    parent->left  = left;
+                    parent->right = right;
+                    nheap.__push(parent);
                 }
 
                 assert(1==nheap.size());
                 root = nheap.pop();
             }
+            assert(root);
+            return root;
         }
 
         void huffman::tree_type:: graphviz(const string &filename) const
@@ -219,6 +277,7 @@ namespace yocto
             assert(root);
             ios::wcstream fp(filename);
             fp << "digraph G {\n";
+            fp << "rankdir=\"TB\";\n";
             root->viz(fp);
             fp << "}\n";
         }

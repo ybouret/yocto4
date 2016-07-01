@@ -35,11 +35,16 @@ namespace yocto
                 
                 item_type(const char_type data) throw();
 
+                friend std::ostream & operator<<(std::ostream &, const item_type &);
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(item_type);
                 ~item_type() throw();
             };
+
             static const char *item_text(const char_type ch) throw();
+            static string      item_code(const code_type code, const size_t bits);
 
             //! the alphabet, manage items and their frequencies
             class alphabet
@@ -55,13 +60,13 @@ namespace yocto
 
                 item_type & operator[](const size_t i) throw();
 
+                void display( std::ostream &os ) const;
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(alphabet);
                 size_t     size;  //!< num items
                 size_t     itnum; //!< for memory
                 item_type *items; //!< for items
-                void enable_nyt() throw();
             };
 
             static const size_t max_nodes = 2 * max_items - 1;
@@ -74,7 +79,8 @@ namespace yocto
                 node_type      *right;
                 const freq_type freq;
                 const char_type data;
-
+                size_t          bits;
+                
                 node_type(const char_type ch, const freq_type fr) throw();
 
                 void viz(ios::ostream &fp) const;
@@ -87,7 +93,7 @@ namespace yocto
 
             struct node_comparator
             {
-                inline int operator()(const node_type &lhs, const node_type &rhs) throw()
+                inline int operator()(const node_type &lhs, const node_type &rhs) const throw()
                 {
                     return __compare_decreasing(lhs.freq,rhs.freq);
                 }
@@ -101,7 +107,7 @@ namespace yocto
                 tree_type();
                 ~tree_type() throw();
 
-                void build_for( alphabet &alpha );
+                node_type *build_for( alphabet &alpha );
                 void graphviz(const string &filename) const;
 
             private:
