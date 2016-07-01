@@ -35,34 +35,44 @@ namespace yocto
             return s;
         }
 
-        string huffman:: item_code(const code_type code, const size_t bits)
+        const char *huffman:: code_text(const code_type &code)
         {
-            string ans;
-            for(size_t i=0;i<bits;++i)
+            static char s[max_bits+1];
+            assert(code.size<=max_bits);
+            size_t i=0;
+            for(const code_bit *node=code.head;node;node=node->next)
             {
-                const size_t bit = 1 << i;
-                ans.append( (0!=(code&bit) ) ? '1' : '0' );
+                s[i++] = (node->flag) ? '1' : '0';
             }
-            mreverse((char *)(ans.rw()), ans.size());
-            return ans;
+            while(i<=max_bits)
+            {
+                s[i++] = 0;
+            }
+            return s;
         }
 
 
         huffman:: item_type:: item_type(const char_type ch) throw() :
         data(ch),
-        freq(0),
-        code(data),
-        bits(8)
+        freq(0)
         {
         }
+
+        void huffman::item_type:: emit( ios::bitio &IO ) const
+        {
+            for(const code_bit *node=code.head;node;node=node->next)
+            {
+                IO.push(node->flag);
+            }
+        }
+
 
         std::ostream & operator<<(std::ostream &os, const huffman::item_type &item )
         {
 
             std::cerr << huffman::item_text(item.data) << ":freq=";
             std::cerr << std::setw(6) << item.freq;
-            std::cerr << ":bits=" << std::setw(2) << item.bits << "[" << huffman::item_code(item.code, item.bits) << "]";
-
+            std::cerr << ":bits=" << std::setw(2) << item.code.size << "[" << huffman::code_text(item.code) << "]";
             return os;
         }
 
@@ -76,42 +86,53 @@ namespace yocto
 {
     namespace pack
     {
-        huffman:: alphabet:: alphabet() :
+        huffman:: alphabet:: alphabet( code_pool &cache ) :
         size(0),
         itnum( max_items ),
         items( memory::kind<memory::global>::acquire_as<item_type>(itnum) )
         {
-            initialize();
+            initialize(cache);
         }
 
         huffman:: alphabet:: ~alphabet() throw()
         {
+            for(size_t i=0;i<max_items;++i)
+            {
+                items[i].code.clear();
+            }
             memory::kind<memory::global>::release_as<item_type>(items,itnum);
         }
 
 
-        void huffman::alphabet::initialize() throw()
+        void huffman::alphabet::initialize( code_pool &cache ) throw()
         {
-            size = 0;
-            
+            (size_t&)size = 0;
+            discard_in(cache);
+
+            // build code from byte
             for(size_t i=0;i<max_bytes;++i)
             {
                 item_type &item = items[i];
 
                 (char_type &)(item.data) = char_type(i);
                 item.freq                = 0;
-                item.code                = char_type(i);
-                item.bits                = 8;
+                for(int j=7;j>=0;--j)
+                {
+                    const size_t mask = (1<<j);
+                    code_bit    *node = cache.size ? cache.query() : new code_bit();
+                    node->flag        = 0 != (mask&i);
+                    item.code.push_back(node);
+                }
+                assert(8==item.code.size);
             }
 
+            // no bits for controls so far
             for(size_t i=max_bytes;i<max_items;++i)
             {
                 item_type &item = items[i];
 
                 (char_type &)(item.data) = char_type(i);
                 item.freq                = 1;
-                item.code                = 0;
-                item.bits                = 0;
             }
 
         }
@@ -131,7 +152,7 @@ namespace yocto
 
         void huffman:: alphabet:: rescale() throw()
         {
-            std::cerr << "RESCALE!" << std::endl;
+            //std::cerr << "RESCALE!" << std::endl;
 #define YHUFF_RESCALE(I) freq_type &freq = items[I].freq; if(freq>0) { (freq >>= 1) |= 1; }
             YOCTO_LOOP_FUNC_(max_items,YHUFF_RESCALE,0);
         }
@@ -144,7 +165,7 @@ namespace yocto
                 case 0:
                     assert(size<max_bytes);
                     ++freq;
-                    if(++size>=max_bytes)
+                    if(++( (size_t&)size) >=max_bytes)
                     {
                         items[NYT].freq = 0;
                     }
@@ -157,15 +178,22 @@ namespace yocto
         }
 
 
-        void huffman::alphabet:: enable_end() throw()
-        {
-            items[END].freq = 1;
-        }
-
         huffman::item_type & huffman::alphabet:: operator[](const size_t i) throw()
         {
             assert(i<max_items);
             return items[ i ];
+        }
+
+        void huffman::alphabet:: discard_in( code_pool &cache ) throw()
+        {
+            for(size_t i=0;i<max_items;++i)
+            {
+                code_type &code = items[i].code;
+                while(code.size)
+                {
+                    cache.store( code.pop_back() );
+                }
+            }
         }
 
     }
@@ -221,10 +249,11 @@ namespace yocto
     {
 
         huffman:: tree_type:: tree_type() :
-        root(0),
         count( max_nodes ),
         nodes( memory::kind<memory::global>::acquire_as<node_type>(count) ),
-        nheap( max_nodes, as_capacity )
+        nheap( max_nodes, as_capacity ),
+        root(NULL),
+        cache()
         {
         }
 
@@ -254,7 +283,10 @@ namespace yocto
                         node_type *node = new (&nodes[i]) node_type(item.data,item.freq);
                         node->bits      = 1;
                         nheap.push(node);
+                        code_type &code = item.code;
+                        while(code.size) cache.store(code.pop_back());
                     }
+
                 }
 
                 assert(nheap.size()>=1);
@@ -276,8 +308,8 @@ namespace yocto
                     parent->right = right;
                     parent->bits  = pbits;
                     left->parent  = right->parent = parent;
-                    left->cbit  = 0;
-                    right->cbit = 1;
+                    left->flag    = false; // will code 0
+                    right->flag   = true;  // will code 1
                     nheap.push(parent);
                 }
 
@@ -286,25 +318,23 @@ namespace yocto
             }
             assert(root);
 
-            //______________________________________________________________
+
+            //__________________________________________________________________
             //
             // encoding
-            //______________________________________________________________
+            //__________________________________________________________________
             for(size_t i=0;i<max_items;++i)
             {
                 item_type &item = alpha[i];
                 if(item.freq>0)
                 {
-                    code_type &code = item.code;
-                    size_t    &bits = item.bits;
-                    code = 0;
-                    bits = 0;
+                    code_type       &code = item.code;
                     const node_type *curr = &nodes[i];
                     while(curr->parent)
                     {
-                        ++bits;
-                        code <<= 1;
-                        code |=  curr->cbit;
+                        code_bit  *node = (cache.size>0) ? cache.query() : new code_bit();
+                        node->flag      = curr->flag;
+                        code.push_front(node);
                         curr  = curr->parent;
                     }
                 }
@@ -328,5 +358,113 @@ namespace yocto
     }
 
 }
+
+
+namespace yocto
+{
+    namespace pack
+    {
+
+        huffman::codec_type:: codec_type() :
+        tree(),
+        alpha(tree.cache),
+        bio(max_bits,as_capacity)
+        {
+        }
+
+        huffman:: codec_type:: ~codec_type() throw()
+        {
+        }
+        
+        void huffman::codec_type:: cleanup() throw()
+        {
+            alpha.initialize(tree.cache);
+            bio.free();
+            Q.free();
+        }
+        
+    }
+
+}
+
+namespace yocto
+{
+    namespace pack
+    {
+
+        huffman:: encoder:: encoder() : codec_type()
+        {
+        }
+
+        huffman:: encoder:: ~encoder() throw()
+        {
+        }
+
+        void huffman:: encoder:: reset() throw()
+        {
+            cleanup();
+        }
+
+        void huffman:: encoder:: write(char C)
+        {
+            //__________________________________________________________________
+            //
+            // administrativia
+            //__________________________________________________________________
+            const item_type &item = alpha[ uint8_t(C) ];
+            if(item.freq<=0)
+            {
+                if(alpha.size>0)
+                {
+                    //std::cerr << item_text(NYT) << "/" << alpha[NYT].code.size << std::endl;
+                    alpha[NYT].emit(bio);
+                }
+            }
+
+            //__________________________________________________________________
+            //
+            // use current model
+            //__________________________________________________________________
+            //std::cerr << item_text(C) << "/" << item.code.size << std::endl;
+            item.emit(bio);
+
+            //__________________________________________________________________
+            //
+            // bits to bytes
+            //__________________________________________________________________
+            while(bio.size()>=8)
+            {
+                Q.push_back(bio.pop_full<uint8_t>());
+            }
+
+            //__________________________________________________________________
+            //
+            // update model
+            //__________________________________________________________________
+            alpha.update(C);
+            (void) tree.build_for(alpha);
+        }
+
+        void huffman:: encoder:: flush()
+        {
+            //__________________________________________________________________
+            //
+            // send END
+            //__________________________________________________________________
+            alpha[END].emit(bio);
+            bio.fill_to_byte_with(false);
+            while(bio.size()>=8)
+            {
+                Q.push_back(bio.pop_full<uint8_t>());
+            }
+            assert(0==bio.size());
+        }
+        
+    }
+
+}
+
+
+
 
 

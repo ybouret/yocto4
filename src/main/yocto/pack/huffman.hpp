@@ -1,8 +1,11 @@
 #ifndef YOCTO_PACK_HUFFMAN_INCLUDED
 #define YOCTO_PACK_HUFFMAN_INCLUDED 1
 
-#include "yocto/ios/codec.hpp"
+#include "yocto/pack/q-codec.hpp"
 #include "yocto/ordered/heap.hpp"
+#include "yocto/core/list.hpp"
+#include "yocto/core/pool.hpp"
+#include "yocto/ios/bitio.hpp"
 
 namespace yocto
 {
@@ -13,9 +16,26 @@ namespace yocto
         struct huffman
         {
 
-            typedef int      char_type; //!< internal representation of chars
-            typedef size_t   freq_type; //!< frequency
-            typedef unsigned code_type; //!< internal code type
+            class code_bit
+            {
+            public:
+                code_bit *next;
+                code_bit *prev;
+                bool       flag;
+                YOCTO_MAKE_OBJECT
+                inline  code_bit() throw() : next(0), prev(0), flag(false) {}
+                inline ~code_bit() throw() {}
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(code_bit);
+            };
+
+            typedef core::list_of_cpp<code_bit> code_type;
+            typedef core::pool_of_cpp<code_bit> code_pool;
+            typedef int                         char_type; //!< internal representation of chars
+            typedef size_t                      freq_type; //!< frequency
+
+
 
             static const size_t    max_bytes = 256; //!< regular bytes
             static const size_t    num_ctrls = 2;   //!< control code
@@ -31,12 +51,12 @@ namespace yocto
                 const char_type data; //!< identity
                 freq_type       freq; //!< frequency
                 code_type       code; //!< current code
-                size_t          bits; //!< current bits
                 
                 item_type(const char_type data) throw();
 
                 friend std::ostream & operator<<(std::ostream &, const item_type &);
 
+                void emit( ios::bitio &IO ) const;
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(item_type);
@@ -44,27 +64,28 @@ namespace yocto
             };
 
             static const char *item_text(const char_type ch) throw();
-            static string      item_code(const code_type code, const size_t bits);
+            static const char *code_text(const code_type &code);
 
             //! the alphabet, manage max_items and their frequencies
             class alphabet
             {
             public:
-                alphabet();
+                alphabet( code_pool &cache );
                 ~alphabet() throw();
-                void initialize() throw(); //!< assign code/bits/freq
+                void initialize( code_pool &cache ) throw(); //!< assign code/bits/freq
+                void discard_in( code_pool &cache ) throw(); //!< clean up codes
+
                 void rescale() throw();    //!< scale down frequencies
 
                 void update(const char c) throw();
-                void enable_end() throw();
-
+                
                 item_type & operator[](const size_t i) throw();
 
                 void display( std::ostream &os ) const;
 
+                const size_t     size;  //!< num items
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(alphabet);
-                size_t     size;  //!< num items
                 size_t     itnum; //!< for memory
                 item_type *items; //!< for items
             };
@@ -82,7 +103,7 @@ namespace yocto
                 const freq_type freq;   //!< cumulative frequency
                 const char_type data;   //!< associated data: INS,0..MAX_ITEMS-1
                 size_t          bits;   //!< height
-                code_type       cbit;   //!< coding bit
+                bool            flag;   //!< coding bit
 
                 node_type(const char_type ch, const freq_type fr) throw();
 
@@ -106,7 +127,7 @@ namespace yocto
             //! internal heap
             typedef heap<node_type,node_comparator> heap_type;
 
-            //! the tree
+            //! a huffman tree
             class tree_type
             {
             public:
@@ -118,11 +139,46 @@ namespace yocto
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(tree_type);
-                node_type *root;
                 size_t     count; //!< for memory
                 node_type *nodes; //!< allocated
                 heap_type  nheap; //!< node head
+                node_type *root;
+            public:
+                code_pool  cache;
             };
+
+
+            //! base class for codec
+            class codec_type : public q_codec
+            {
+            public:
+                virtual ~codec_type() throw();
+
+            protected:
+                explicit codec_type();
+                tree_type  tree;
+                alphabet   alpha;
+                ios::bitio bio;
+                void       cleanup() throw(); //! alpha, bio, tree...
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(codec_type);
+            };
+
+            class encoder : public codec_type
+            {
+            public:
+                explicit encoder();
+                virtual ~encoder() throw();
+
+                virtual void reset() throw();
+                virtual void write(char C);
+                virtual void flush();
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(encoder);
+            };
+
 
 
         };
