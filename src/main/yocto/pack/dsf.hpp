@@ -30,6 +30,7 @@ namespace yocto
                     FreqType Freq;
                     CodeType Code;
                     size_t   Bits;
+                    Item   **Slot;
                 };
 
 
@@ -41,7 +42,7 @@ namespace yocto
                 const Item & operator[](const CharType ch) const throw();
                 void display() const;
 
-                void update(const char c) throw();
+                void update(const char c);// throw();
 
 
                 const size_t size;
@@ -54,6 +55,7 @@ namespace yocto
                 void    *wksp;  //!< for memory
 
                 void initialize() throw();
+                void __check(const int line);
             };
 
 

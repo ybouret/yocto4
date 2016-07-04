@@ -3,11 +3,13 @@
 #include <cstring>
 #include <iostream>
 #include <iomanip>
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
     namespace pack
     {
+#define YDSF_CHECK 1
 
         DSF:: Alphabet:: Alphabet() :
         size(0),
@@ -20,6 +22,9 @@ namespace yocto
             items = (Item *)wksp;
             store = (Item **)( ( (char*)wksp) +  MaxItems * sizeof(Item) );
             initialize();
+#if defined(YDSF_CHECK)
+            __check(__LINE__);
+#endif
         }
 
         void DSF::Alphabet:: initialize() throw()
@@ -32,6 +37,7 @@ namespace yocto
                 item.Freq  = 0;
                 item.Code  = CodeType(i);
                 item.Bits  = 8;
+                item.Slot  = 0;
             }
 
             for(size_t i=MaxBytes;i<MaxItems;++i)
@@ -41,12 +47,13 @@ namespace yocto
                 item.Freq  = 1;
                 item.Code  = 0;
                 item.Bits  = 0;
+                item.Slot  = 0;
             }
 
 
             count = 2;
-            store[0] = items+NYT;
-            store[1] = items+END;
+            store[0] = items+NYT; items[NYT].Slot = store+0;
+            store[1] = items+END; items[END].Slot = store+1;
 
         }
 
@@ -78,6 +85,7 @@ namespace yocto
             return s;
         }
 
+
         void DSF::Alphabet:: display() const
         {
             std::cerr << "alphabet.size  =" << size << std::endl;
@@ -94,7 +102,28 @@ namespace yocto
         }
 
 
-        void DSF:: Alphabet:: update(const char c) throw()
+
+        void DSF:: Alphabet:: __check(const int line)
+        {
+            const unsigned n  = count;
+            for(unsigned i=0;i<n;++i)
+            {
+                Item **slot = store+i;
+                if( 0 == *slot ) throw exception("null slot[%u]",i);
+                Item  *item = *slot;
+                if(item->Slot!=slot) throw exception("bad slot[%u] linking...",i);
+                if(item->Freq<=0)    throw exception("invalid frequency at slot[%u]",i);
+            }
+            const unsigned nm1=n-1;
+            for(unsigned i=0;i<nm1;++i)
+            {
+                Item **curr = store+i; assert(0!=curr[0]); assert(0!=curr[1]);
+                if(curr[0]->Freq>curr[1]->Freq) throw exception("bad ranking at slot[%u]...",i);
+            }
+
+        }
+
+        void DSF:: Alphabet:: update(const char c) //throw()
         {
             Item *item = &items[uint8_t(c)];
 
@@ -109,28 +138,80 @@ namespace yocto
                 assert(size<MaxBytes);
                 ++( (size_t&)size );
 
+
                 // check if all bytes are accounted for
                 if(size>=MaxBytes)
                 {
                     // remove NYT from coding system...
-                    assert(1==item[NYT].Freq);
-                    item[NYT].Freq=0;
-                    assert( &item[NYT] == store[0] );
+                    assert(&items[NYT] == store[0] );
+                    assert(1==items[NYT].Freq);
                     assert(count>1);
-                    memmove(store[0],store[1], --count*sizeof(Item*) );
+
+                    item[NYT].Freq=0;
+                    item[NYT].Slot=0;
+
+                    --count;
+                    for(size_t i=0;i<count;++i)
+                    {
+                        Item **slot = store+i;
+                        *slot = *(slot+1);
+                        (*slot)->Slot = slot;
+                    }
+
                 }
+
 
                 // append to store
                 Item **curr = &store[count++];
                 *curr = item;
+                item->Slot = curr;
+                item->Freq = 1;
+                // move into position
+
+                Item **prev = curr-1;
+                while(prev>store)
+                {
+                    Item *curr_item = *curr;
+                    Item *prev_item = *prev;
+                    if(prev_item->Freq<=curr_item->Freq)
+                    {
+                        break;
+                    }
+                    *curr = prev_item;
+                    *prev = curr_item;
+                    curr_item->Slot = prev;
+                    prev_item->Slot = curr;
+                    curr = prev;
+                    prev = curr-1;
+                }
             }
             else
             {
+                ++(item->Freq);
+                Item **curr = item->Slot;
+                Item **last = store+count;
 
+                Item **next = curr+1;
+                while(next<last)
+                {
+                    Item *curr_item = *curr;
+                    Item *next_item = *next;
+                    if(curr_item->Freq<=next_item->Freq)
+                    {
+                        break;
+                    }
+                    *curr = next_item;
+                    *next = curr_item;
+                    curr_item->Slot = next;
+                    next_item->Slot = curr;
+                    curr = next;
+                    next = curr+1;
+                }
+                
             }
 
         }
-
+        
 
 
     }

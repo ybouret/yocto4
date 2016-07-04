@@ -1,5 +1,6 @@
 #include "yocto/pack/dsf.hpp"
 #include "yocto/utest/run.hpp"
+#include "yocto/ios/icstream.hpp"
 
 using namespace yocto;
 using namespace pack;
@@ -11,5 +12,13 @@ YOCTO_UNIT_TEST_IMPL(dsf)
     DSF::Alphabet alpha;
     alpha.display();
 
+    ios::icstream fp( ios::cstdin );
+    char C = 0;
+    while( fp.query(C) )
+    {
+        alpha.update(C);
+    }
+
+    alpha.display();
 }
 YOCTO_UNIT_TEST_DONE()
