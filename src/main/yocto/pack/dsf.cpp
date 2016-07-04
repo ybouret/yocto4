@@ -271,24 +271,30 @@ namespace yocto
                 Node *node = stack.query();
 
                 assert(node->count>=2);
-                assert(inode<MaxNodes); Node *left   = &node[inode++]; YDSF_CLEAN(left);
-                assert(inode<MaxNodes); Node *right  = &node[inode++]; YDSF_CLEAN(right);
+                assert(inode<MaxNodes); Node *left   = &node[++inode]; YDSF_CLEAN(left);
+                assert(inode<MaxNodes); Node *right  = &node[++inode]; YDSF_CLEAN(right);
                 node->left  = left;
                 node->right = right;
 
                 assert(node->count>=2);
                 std::cerr << "SPLITTING " << node->count << " nodes.." << std::endl;
-                //split
+                //split: find i_cut in 0..count-1
                 Item       **start = node->start;
                 const size_t count = node->count;
-                size_t       i_cut = 0;
-                size_t       Lsum  = start[0]->Freq;
-                size_t       Rsum  = start[1]->Freq;
-                for(size_t i=2;i<count;++i) { Rsum += start[i]->Freq; }
-                size_t       delta = (Lsum<Rsum) ? Rsum-Lsum : Lsum-Rsum;
                 const size_t i_max = count-1;
+
+                // assume i_cut is 1
+                size_t       i_cut = 0;
+                size_t       Lsum  = start[0]->Freq; // sum 0..i_cut
+                size_t       Rsum  = start[1]->Freq; // sum i_cut+1..i_max
+                for(size_t i=2;i<=i_max;++i)
+                {
+                    Rsum += start[i]->Freq;
+                }
+                size_t       delta = (Lsum<Rsum) ? Rsum-Lsum : Lsum-Rsum;
+
                 std::cerr << "\tdelta=" << delta << std::endl;
-                for(;i_cut<i_max;++i_cut)
+                for(++i_cut;i_cut<=i_max;++i_cut)
                 {
                     const size_t freq = start[i_cut]->Freq;
                     Lsum += freq;
