@@ -2,7 +2,7 @@
 #define YOCTO_PACK_DSF_INCLUDED 1
 
 #include "yocto/ios/codec.hpp"
-#include "yocto/core/list.hpp"
+#include "yocto/core/pool.hpp"
 
 namespace yocto
 {
@@ -19,31 +19,30 @@ namespace yocto
             typedef unsigned    CodeType;
             static  const       CharType END = 256;
             static  const       CharType NYT = 257;
-            static  const       CharType INS = -1;
 
+            //! info about a char
+            struct Item
+            {
+                CharType Char;
+                FreqType Freq;
+                CodeType Code;
+                size_t   Bits;
+                Item   **Slot;
+            };
+
+
+            class Tree;
+
+            //! bookeeping used char, ordered by increasing frequencies
             class Alphabet
             {
             public:
-                struct Item
-                {
-                    CharType Char;
-                    FreqType Freq;
-                    CodeType Code;
-                    size_t   Bits;
-                    Item   **Slot;
-                };
-
-
-
-
                 Alphabet();
                 ~Alphabet() throw();
 
-                const Item & operator[](const CharType ch) const throw();
                 void display() const;
-
-                void update(const char c);// throw();
-
+                void update(const char c) throw();
+                void rescale() throw();
 
                 const size_t size;
             private:
@@ -56,6 +55,38 @@ namespace yocto
 
                 void initialize() throw();
                 void __check(const int line);
+                friend class Tree;
+            };
+
+
+            struct Node
+            {
+                Node  *left;
+                Node  *right;
+                Node  *next;
+                Item **start;
+                size_t count;
+                typedef core::pool_of<Node> Stack;
+                void viz( ios::ostream &fp ) const;
+            };
+
+
+            class Tree
+            {
+            public:
+                static const size_t MaxNodes = 2*MaxItems;
+                Tree();
+                ~Tree() throw();
+
+                void build_using( Alphabet &alphabet );
+                void graphviz( const string &filename ) const;
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
+                Node          *nodes;
+                Node::Stack    stack;
+                size_t         wlen;
+                void          *wksp;
             };
 
 

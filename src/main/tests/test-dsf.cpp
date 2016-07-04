@@ -1,13 +1,14 @@
 #include "yocto/pack/dsf.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/ios/icstream.hpp"
+#include "yocto/ios/graphviz.hpp"
 
 using namespace yocto;
 using namespace pack;
 
 YOCTO_UNIT_TEST_IMPL(dsf)
 {
-    std::cerr << "sizeof(DSF::Alphabet::Item)=" << sizeof(DSF::Alphabet::Item) << std::endl;
+    std::cerr << "sizeof(DSF::Item)=" << sizeof(DSF::Item) << std::endl;
 
     DSF::Alphabet alpha;
     alpha.display();
@@ -20,5 +21,11 @@ YOCTO_UNIT_TEST_IMPL(dsf)
     }
 
     alpha.display();
+
+    std::cerr << "BUILDING TREE" << std::endl;
+    DSF::Tree tree;
+    tree.build_using(alpha);
+    tree.graphviz("dsf.dot");
+    ios::graphviz_render("dsf.dot",false);
 }
 YOCTO_UNIT_TEST_DONE()

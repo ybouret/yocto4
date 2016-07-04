@@ -123,7 +123,7 @@ namespace yocto
 
         }
 
-        void DSF:: Alphabet:: update(const char c) //throw()
+        void DSF:: Alphabet:: update(const char c) throw()
         {
             Item *item = &items[uint8_t(c)];
 
@@ -166,8 +166,8 @@ namespace yocto
                 *curr = item;
                 item->Slot = curr;
                 item->Freq = 1;
-                // move into position
 
+                // move into position
                 Item **prev = curr-1;
                 while(prev>store)
                 {
@@ -187,6 +187,7 @@ namespace yocto
             }
             else
             {
+                // update frequency and check position
                 ++(item->Freq);
                 Item **curr = item->Slot;
                 Item **last = store+count;
@@ -207,12 +208,167 @@ namespace yocto
                     curr = next;
                     next = curr+1;
                 }
-                
+
             }
 
         }
-        
+
+        void DSF:: Alphabet:: rescale() throw()
+        {
+            std::cerr << "Rescale" << std::endl;
+            for(size_t i=0;i<count;++i)
+            {
+                (store[i]->Freq >>= 1) |= 1;
+            }
+        }
 
 
     }
 }
+
+#include "yocto/ios/ocstream.hpp"
+
+namespace yocto
+{
+    namespace pack
+    {
+        DSF:: Tree:: Tree() :
+        nodes(0),
+        wlen( MaxNodes * sizeof(Node) ),
+        wksp( memory::kind<memory::global>::acquire(wlen) )
+        {
+            nodes = (Node *)wksp;
+        }
+
+
+        DSF:: Tree:: ~Tree() throw()
+        {
+            stack.reset();
+            memory::kind<memory::global>::release(wksp,wlen);
+        }
+
+#define YDSF_CLEAN(NODE) do { Node *tmp = NODE; tmp->left=tmp->right=0; } while(false)
+
+        void DSF:: Tree:: build_using( Alphabet &alphabet )
+        {
+            assert(alphabet.count>=2);
+
+            //__________________________________________________________________
+            //
+            // initialize nodes
+            //__________________________________________________________________
+            {
+                Node *ini = &nodes[0];
+                YDSF_CLEAN(ini);
+                ini->start = alphabet.store;
+                ini->count = alphabet.count;
+                stack.store(ini);
+            }
+
+            size_t inode = 0;
+            while( stack.size )
+            {
+                Node *node = stack.query();
+
+                assert(node->count>=2);
+                assert(inode<MaxNodes); Node *left   = &node[inode++]; YDSF_CLEAN(left);
+                assert(inode<MaxNodes); Node *right  = &node[inode++]; YDSF_CLEAN(right);
+                node->left  = left;
+                node->right = right;
+
+                assert(node->count>=2);
+                std::cerr << "SPLITTING " << node->count << " nodes.." << std::endl;
+                //split
+                Item       **start = node->start;
+                const size_t count = node->count;
+                size_t       i_cut = 0;
+                size_t       Lsum  = start[0]->Freq;
+                size_t       Rsum  = start[1]->Freq;
+                for(size_t i=2;i<count;++i) { Rsum += start[i]->Freq; }
+                size_t       delta = (Lsum<Rsum) ? Rsum-Lsum : Lsum-Rsum;
+                const size_t i_max = count-1;
+                std::cerr << "\tdelta=" << delta << std::endl;
+                for(;i_cut<i_max;++i_cut)
+                {
+                    const size_t freq = start[i_cut]->Freq;
+                    Lsum += freq;
+                    Rsum -= freq;
+                    const size_t dtemp = (Lsum<Rsum) ? Rsum-Lsum : Lsum-Rsum;
+                    std::cerr << "\tdtemp=" << dtemp << std::endl;
+                    if(dtemp<=delta)
+                    {
+                        delta = dtemp;
+                    }
+                    else
+                    {
+                        --i_cut;
+                        break;
+                    }
+                }
+
+                //make nodes
+                std::cerr << "\tI_CUT=" << i_cut << std::endl;
+                left->start = start;
+                left->count = i_cut+1;
+                std::cerr << "\t\tLEFT COUNT=" << left->count << std::endl;
+                if(left->count>1)
+                {
+                    stack.store(left);
+                }
+
+                right->start = start+left->count;
+                right->count = count-left->count;
+                std::cerr << "\t\tRIGHT COUNT=" << right->count << std::endl;
+                if(right->count>1)
+                {
+                    stack.store(right);
+                }
+                assert(left->count+right->count==count);
+            }
+
+            std::cerr << "inode=" << inode << "/" << alphabet.count << std::endl;
+        }
+
+
+        void DSF:: Node:: viz( ios::ostream &fp ) const
+        {
+            fp.viz(this);
+            if(1==count)
+            {
+                fp(" [label=\"%s,freq=%u\"];\n", Char2Text(start[0]->Char), unsigned(start[0]->Freq) );
+            }
+            else
+            {
+                unsigned sum = 0;
+                for(size_t i=0;i<count;++i)
+                {
+                    sum += start[i]->Freq;
+                }
+                fp(" [label=\"freq=%u\"];\n",sum);
+            }
+
+            if(left)
+            {
+                left->viz(fp);
+                fp.viz(this); fp( "->" ); fp.viz(left); fp(" [label=1];\n");
+            }
+
+            if(right)
+            {
+                right->viz(fp);
+                fp.viz(this); fp( "->" ); fp.viz(right); fp(" [label=0];\n");
+            }
+        }
+        
+        
+        void DSF::Tree:: graphviz( const string &filename ) const
+        {
+            ios::wcstream fp(filename);
+            fp << "digraph G{\n"; nodes->viz(fp); fp << "}\n";
+        }
+        
+        
+        
+    }
+}
+
