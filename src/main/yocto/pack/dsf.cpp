@@ -252,10 +252,11 @@ namespace yocto
         void DSF:: Tree:: build_using( Alphabet &alphabet )
         {
             assert(alphabet.count>=2);
-
+            FreqType freqs[MaxItems];
+            
             //__________________________________________________________________
             //
-            // initialize nodes
+            // initialize nodes a.k.a segments
             //__________________________________________________________________
             {
                 Node *ini = &nodes[0];
@@ -278,58 +279,20 @@ namespace yocto
 
                 assert(node->count>=2);
                 std::cerr << "SPLITTING " << node->count << " nodes.." << std::endl;
-                //split: find i_cut in 0..count-1
                 Item       **start = node->start;
                 const size_t count = node->count;
-                const size_t i_max = count-1;
-
-                // assume i_cut is 1
-                size_t       i_cut = 0;
-                size_t       Lsum  = start[0]->Freq; // sum 0..i_cut
-                size_t       Rsum  = start[1]->Freq; // sum i_cut+1..i_max
-                for(size_t i=2;i<=i_max;++i)
+                
+                // build cumulative function inf freqs
+                FreqType Lambda = 0;
+                for(size_t i=0;i<count;++i)
                 {
-                    Rsum += start[i]->Freq;
+                    const FreqType lam = start[i]->Freq;
+                    freqs[i] += (Lambda += lam);
                 }
-                size_t       delta = (Lsum<Rsum) ? Rsum-Lsum : Lsum-Rsum;
-
-                std::cerr << "\tdelta=" << delta << std::endl;
-                for(++i_cut;i_cut<=i_max;++i_cut)
-                {
-                    const size_t freq = start[i_cut]->Freq;
-                    Lsum += freq;
-                    Rsum -= freq;
-                    const size_t dtemp = (Lsum<Rsum) ? Rsum-Lsum : Lsum-Rsum;
-                    std::cerr << "\tdtemp=" << dtemp << std::endl;
-                    if(dtemp<=delta)
-                    {
-                        delta = dtemp;
-                    }
-                    else
-                    {
-                        --i_cut;
-                        break;
-                    }
-                }
-
-                //make nodes
-                std::cerr << "\tI_CUT=" << i_cut << std::endl;
-                left->start = start;
-                left->count = i_cut+1;
-                std::cerr << "\t\tLEFT COUNT=" << left->count << std::endl;
-                if(left->count>1)
-                {
-                    stack.store(left);
-                }
-
-                right->start = start+left->count;
-                right->count = count-left->count;
-                std::cerr << "\t\tRIGHT COUNT=" << right->count << std::endl;
-                if(right->count>1)
-                {
-                    stack.store(right);
-                }
-                assert(left->count+right->count==count);
+#define YSDF_ABS(A,B) ((A)<(B)) ? (B)-(A) : (A)-(B);
+                
+                
+                exit(1);
             }
 
             std::cerr << "inode=" << inode << "/" << alphabet.count << std::endl;
