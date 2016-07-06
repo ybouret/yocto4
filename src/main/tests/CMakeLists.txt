@@ -1,6 +1,8 @@
 
 FILE(GLOB test_srcs test-*.cpp *.hpp)
-ADD_EXECUTABLE(test-main main.cpp ${test_srcs})
+INCLUDE_DIRECTORIES(../../kr)
+ADD_EXECUTABLE(test-main main.cpp ${test_srcs} ../../kr/yocto/hashing/md5.cpp)
+
 TARGET_LINK_YOCTO( test-main )
 IF( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 	TARGET_LINK_LIBRARIES( test-main dl )
