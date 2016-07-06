@@ -11,15 +11,16 @@ namespace yocto
         //! Dynamic Shannon-Fano
         struct DSF
         {
-            static const size_t MaxBytes = 256;
-            static const size_t NumCtrls = 2;
-            static const size_t MaxItems = MaxBytes+NumCtrls;
-            typedef int         CharType;
-            typedef size_t      FreqType;
-            typedef unsigned    CodeType;
-            static  const       CharType END = 256;
-            static  const       CharType NYT = 257;
-
+            static const size_t  MaxBytes = 256;
+            static const size_t  NumCtrls = 2;
+            static const size_t  MaxItems = MaxBytes+NumCtrls;
+            typedef int          CharType;
+            typedef size_t       FreqType;
+            typedef unsigned     CodeType;
+            static  const        CharType END = 256;
+            static  const        CharType NYT = 257;
+            static  const size_t MaxBits      = 16;
+            
             //! info about a char
             struct Item
             {

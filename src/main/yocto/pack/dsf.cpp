@@ -72,7 +72,7 @@ namespace yocto
                 case DSF::NYT: s[0]='N'; s[1]='Y'; s[2]='T'; break;
                 case DSF::END: s[0]='E'; s[1]='N'; s[2]='D'; break;
                 default:
-                    if(ch>=32&&ch<127)
+                    if( (ch>=32&&ch<127) && ch != '\"' )
                     {
                         s[0] = '\''; s[1]=char(ch); s[2] = '\'';
                     }
@@ -96,6 +96,11 @@ namespace yocto
                 std::cerr << "freq=" << std::setw(6) << item->Freq << ":";
                 std::cerr << "bits=" << std::setw(2) << item->Bits << ":";
                 std::cerr << "[";
+                for(size_t i=item->Bits;i>0;--i)
+                {
+                    const size_t bit = 1 << (i-1);
+                    std::cerr <<  (0!=(bit&item->Code) ?'1':'0');
+                }
                 std::cerr << "]";
                 std::cerr << std::endl;
             }
@@ -255,79 +260,133 @@ namespace yocto
         }
 
 
+        static inline bool updateCodes(DSF::Item         **it,
+                                       const size_t        ni,
+                                       const DSF::CodeType bit) throw()
+        {
+            for(size_t i=0;i<ni;++i)
+            {
+                DSF::Item &item = *it[i];
+                if( ++item.Bits > DSF::MaxBits )
+                {
+                    return false;
+                }
+                (item.Code<<=1)|=bit;
+            }
+            return true;
+        }
+
         void DSF:: Tree:: build_using( Alphabet &alphabet )
         {
             assert(alphabet.count>=2);
             FreqType freqs[MaxItems];
 
+        BUILD_TREE:
 #define YDSF_CLEAN(NODE) do { Node *tmp = (NODE); tmp->left=tmp->right=0; } while(false)
             //__________________________________________________________________
             //
             // initialize nodes a.k.a segments
             //__________________________________________________________________
             {
+                Item        **it = alphabet.store;
+                const size_t  ni = alphabet.count;
+                for(size_t i=0;i<ni;++i)
+                {
+                    Item &item = *it[i];
+                    item.Bits = 0;
+                    item.Code = 0;
+                }
                 Node *ini = &nodes[0];
                 YDSF_CLEAN(ini);
-                ini->start = alphabet.store;
-                ini->count = alphabet.count;
+                ini->start = it;
+                ini->count = ni;
                 stack.store(ini);
+
             }
 
             size_t inode = 0;
-            while( stack.size )
+            while(stack.size>0)
             {
                 Node *node = stack.query();
 
                 assert(node->count>=2);
-                assert(inode<MaxNodes); Node *left   = &node[++inode]; YDSF_CLEAN(left);
-                assert(inode<MaxNodes); Node *right  = &node[++inode]; YDSF_CLEAN(right);
+                assert(inode<MaxNodes); Node *left   = &nodes[++inode]; YDSF_CLEAN(left);
+                assert(inode<MaxNodes); Node *right  = &nodes[++inode]; YDSF_CLEAN(right);
                 node->left  = left;
                 node->right = right;
 
                 assert(node->count>=2);
-                std::cerr << "SPLITTING " << node->count << " nodes.." << std::endl;
                 Item       **start = node->start;
                 const size_t count = node->count;
-                
-                // build cumulative function and freqs
-                FreqType Lambda = 0;
-                for(size_t i=0;i<count;++i)
-                {
-                    const FreqType lam = start[i]->Freq;
-                    freqs[i] = (Lambda += lam);
-                    //std::cerr << "#" << std::setw(2) << i << " : freq=" << std::setw(4) << lam << " => " << Lambda << std::endl;
-                }
 
-                // find the Shannon-Fano criteria
-                const size_t I_max = count-1;
-                size_t       I_cut = 0;
-                size_t       delta = __delta_abs(Lambda, freqs[I_cut] << 1);
-                for(size_t i=1;i<I_max;++i)
+                //______________________________________________________________
+                //
+                // Split...
+                //______________________________________________________________
+                if(2==count)
                 {
-                    const size_t dtemp = __delta_abs(Lambda,freqs[i]<<1);
-                    if(dtemp<=delta)
+                    left->start = start;    left->count = 1;
+                    right->start = start+1; right->count = 1;
+                }
+                else
+                {
+                    // build cumulative function and freqs
+                    FreqType Lambda = 0;
+                    for(size_t i=0;i<count;++i)
                     {
-                        I_cut = i;
-                        delta = dtemp;
+                        const FreqType lam = start[i]->Freq;
+                        freqs[i] = (Lambda += lam);
                     }
+
+                    // find the Shannon-Fano criteria
+                    const size_t I_max = count-1;
+                    size_t       I_cut = 0;
+                    size_t       delta = __delta_abs(Lambda, freqs[I_cut] << 1);
+                    for(size_t i=1;i<I_max;++i)
+                    {
+                        const size_t dtemp = __delta_abs(Lambda,freqs[i]<<1);
+                        if(dtemp<=delta)
+                        {
+                            I_cut = i;
+                            delta = dtemp;
+                        }
+                    }
+
+                    //cut according to criteria
+                    const size_t  nleft = I_cut+1;
+                    left->start = start;
+                    left->count = nleft;
+                    if(left->count>1)
+                    {
+                        stack.store(left);
+                    }
+
+                    right->start = start+nleft;
+                    right->count = count-nleft;
+                    if(right->count>1)
+                    {
+                        stack.store(right);
+                    }
+
                 }
 
-                //cut
-                std::cerr << "Cut at " << I_cut << " / delta=" << delta << std::endl;
-                const size_t  nleft = I_cut+1;
-                left->start = start;
-                left->count = nleft;
-                if(left->count>1)
+                //______________________________________________________________
+                //
+                // update codes
+                //______________________________________________________________
+                if(!updateCodes(left->start,left->count,1))
                 {
-                    stack.store(left);
+                    alphabet.rescale();
+                    goto BUILD_TREE;
+                }
+                
+                if(!updateCodes(right->start,right->count,0))
+                {
+                    alphabet.rescale();
+                    goto BUILD_TREE;
                 }
 
-                right->start = start+nleft;
-                right->count = count-nleft;
-                if(right->count>1)
-                {
-                    stack.store(right);
-                }
+
             }
 
             std::cerr << "inode=" << inode << "/" << alphabet.count << std::endl;
@@ -336,6 +395,9 @@ namespace yocto
 
         void DSF:: Node:: viz( ios::ostream &fp ) const
         {
+            assert(start);
+            assert(count>0);
+
             fp.viz(this);
             if(1==count)
             {
@@ -350,13 +412,13 @@ namespace yocto
                 }
                 fp(" [label=\"freq=%u\"];\n",sum);
             }
-
+            
             if(left)
             {
                 left->viz(fp);
                 fp.viz(this); fp( "->" ); fp.viz(left); fp(" [label=1];\n");
             }
-
+            
             if(right)
             {
                 right->viz(fp);
