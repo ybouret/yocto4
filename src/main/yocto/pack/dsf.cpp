@@ -75,7 +75,7 @@ namespace yocto
         {
             static char s[4] = {0,0,0,0};
             assert(ch>=0);
-            assert(ch<DSF::MaxItems);
+            assert(ch<int(DSF::MaxItems));
             switch(ch)
             {
                 case DSF::NYT: s[0]='N'; s[1]='Y'; s[2]='T'; break;
@@ -238,7 +238,7 @@ namespace yocto
         const DSF::Item & DSF::Alphabet:: operator[](const CharType C) const throw()
         {
             assert(C>=0);
-            assert(C<MaxItems);
+            assert(C<int(MaxItems));
             return items[ C ];
         }
 
