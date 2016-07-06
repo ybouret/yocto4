@@ -9,6 +9,13 @@ namespace yocto
 {
     namespace pack
     {
+
+        void   DSF::Item::  emit( ios::bitio &bio ) const
+        {
+            bio.push(Code,Bits);
+        }
+
+
 #define YDSF_CHECK 1
 
         DSF:: Alphabet:: Alphabet() :
@@ -227,6 +234,12 @@ namespace yocto
             }
         }
 
+        const DSF::Item & DSF::Alphabet:: operator[](const CharType C) const throw()
+        {
+            assert(C>=0);
+            assert(C<MaxItems);
+            return items[ C ];
+        }
 
     }
 }
@@ -276,13 +289,19 @@ namespace yocto
             return true;
         }
 
+        void DSF:: Tree:: initialize() throw()
+        {
+            memset(wksp,0,wlen);
+        }
+
+
         void DSF:: Tree:: build_using( Alphabet &alphabet )
         {
             assert(alphabet.count>=2);
             FreqType freqs[MaxItems];
 
         BUILD_TREE:
-#define YDSF_CLEAN(NODE) do { Node *tmp = (NODE); tmp->left=tmp->right=0; } while(false)
+#define YDSF_CLEAN(NODE) do { Node *tmp = (NODE); tmp->next=tmp->left=tmp->right=0; } while(false)
             //__________________________________________________________________
             //
             // initialize nodes a.k.a segments
@@ -300,8 +319,8 @@ namespace yocto
                 YDSF_CLEAN(ini);
                 ini->start = it;
                 ini->count = ni;
+                stack.reset();
                 stack.store(ini);
-
             }
 
             size_t inode = 0;
@@ -310,8 +329,8 @@ namespace yocto
                 Node *node = stack.query();
 
                 assert(node->count>=2);
-                assert(inode<MaxNodes); Node *left   = &nodes[++inode]; YDSF_CLEAN(left);
-                assert(inode<MaxNodes); Node *right  = &nodes[++inode]; YDSF_CLEAN(right);
+                ++inode; assert(inode<MaxNodes); Node *left   = &nodes[inode]; YDSF_CLEAN(left);
+                ++inode; assert(inode<MaxNodes); Node *right  = &nodes[inode]; YDSF_CLEAN(right);
                 node->left  = left;
                 node->right = right;
 
@@ -389,7 +408,7 @@ namespace yocto
 
             }
 
-            std::cerr << "inode=" << inode << "/" << alphabet.count << std::endl;
+            //std::cerr << "inode=" << inode << "/" << alphabet.count << std::endl;
         }
 
 
@@ -436,5 +455,93 @@ namespace yocto
         
         
     }
+}
+
+
+namespace yocto
+{
+    namespace pack
+    {
+        DSF:: Codec:: ~Codec() throw()
+        {
+        }
+
+        DSF:: Codec:: Codec() :
+        alphabet(),
+        tree(),
+        bio(2*MaxBits,as_capacity)
+        {
+            tree.build_using(alphabet);
+        }
+
+        void DSF:: Codec:: clear() throw()
+        {
+            alphabet.initialize();
+            tree.initialize();
+            bio.free();
+            tree.build_using(alphabet);
+        }
+
+    }
+}
+
+namespace yocto
+{
+    namespace pack
+    {
+        DSF:: Encoder:: ~Encoder() throw()
+        {
+        }
+
+        DSF:: Encoder:: Encoder() : Codec()
+        {
+        }
+
+        void DSF:: Encoder:: reset() throw()
+        {
+            clear();
+        }
+
+        void DSF:: Encoder:: write(char C)
+        {
+            const uint8_t B(C);
+            const Item &item = alphabet[B];
+
+            // check if we need to emit NYT
+            if(item.Freq<=0)
+            {
+                assert(alphabet.size<MaxBytes);
+                if(alphabet.size>0)
+                {
+                    alphabet[NYT].emit(bio);
+                }
+            }
+
+            // emit current encoding
+            alphabet[B].emit(bio);
+
+            // update model
+            alphabet.update(C);
+            tree.build_using(alphabet);
+
+            // transfer to queue
+            while(bio.size()>=8)
+            {
+                Q.push_back( bio.pop_full<uint8_t>() );
+            }
+        }
+
+        void DSF:: Encoder:: flush()
+        {
+            alphabet[END].emit(bio);
+            bio.fill_to_byte_with(false);
+            while(bio.size()>=8)
+            {
+                Q.push_back( bio.pop_full<uint8_t>() );
+            }
+        }
+
+    }
+
 }
 

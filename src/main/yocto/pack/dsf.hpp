@@ -3,6 +3,8 @@
 
 #include "yocto/ios/codec.hpp"
 #include "yocto/core/pool.hpp"
+#include "yocto/pack/q-codec.hpp"
+#include "yocto/ios/bitio.hpp"
 
 namespace yocto
 {
@@ -29,6 +31,7 @@ namespace yocto
                 CodeType Code;
                 size_t   Bits;
                 Item   **Slot;
+                void     emit( ios::bitio &bio ) const;
             };
 
 
@@ -43,7 +46,10 @@ namespace yocto
 
                 void display() const;
                 void update(const char c) throw();
-                void rescale() throw();
+                void rescale()    throw();
+                void initialize() throw();
+
+                const Item & operator[](const CharType C) const throw();
 
                 const size_t size;
             private:
@@ -54,7 +60,6 @@ namespace yocto
                 size_t   wlen;  //!< for memory
                 void    *wksp;  //!< for memory
 
-                void initialize() throw();
                 void __check(const int line);
                 friend class Tree;
             };
@@ -81,6 +86,7 @@ namespace yocto
 
                 void build_using( Alphabet &alphabet );
                 void graphviz( const string &filename ) const;
+                void initialize() throw();
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
@@ -90,6 +96,37 @@ namespace yocto
                 void          *wksp;
             };
 
+            class Codec : public q_codec
+            {
+            public:
+                virtual ~Codec() throw();
+
+            protected:
+                Alphabet   alphabet;
+                Tree       tree;
+                ios::bitio bio;
+                
+                void     clear() throw();
+                explicit Codec();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Codec);
+            };
+
+
+            class Encoder : public Codec
+            {
+            public:
+                explicit Encoder();
+                virtual ~Encoder() throw();
+
+                virtual void reset() throw();
+                virtual void write(char C);
+                virtual void flush();
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Encoder);
+            };
 
         };
     }
