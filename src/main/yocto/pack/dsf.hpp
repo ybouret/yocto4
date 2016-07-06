@@ -88,6 +88,8 @@ namespace yocto
                 void graphviz( const string &filename ) const;
                 void initialize() throw();
 
+                const Node *root() const throw();
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
                 Node          *nodes;
@@ -106,7 +108,7 @@ namespace yocto
                 Tree       tree;
                 ios::bitio bio;
                 
-                void     clear() throw();
+                void     cleanup() throw();
                 explicit Codec();
                 
             private:
@@ -114,6 +116,7 @@ namespace yocto
             };
 
 
+            //! encoder implementation
             class Encoder : public Codec
             {
             public:
@@ -126,6 +129,30 @@ namespace yocto
 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Encoder);
+            };
+
+            //! decoder implementation
+            class Decoder : public Codec
+            {
+            public:
+                explicit Decoder();
+                virtual ~Decoder() throw();
+
+                virtual void reset() throw();
+                virtual void write(char C);
+                virtual void flush();
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Decoder);
+                enum wait_status
+                {
+                    wait_for8,
+                    wait_for1
+                };
+                wait_status status;
+                const Node *walker;
+                void on_new(const char C);
+
             };
 
         };

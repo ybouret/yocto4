@@ -452,8 +452,12 @@ namespace yocto
             fp << "digraph G{\n"; nodes->viz(fp); fp << "}\n";
         }
         
-        
-        
+        const DSF::Node * DSF::Tree:: root() const throw()
+        {
+            return &nodes[0];
+        }
+
+
     }
 }
 
@@ -474,12 +478,13 @@ namespace yocto
             tree.build_using(alphabet);
         }
 
-        void DSF:: Codec:: clear() throw()
+        void DSF:: Codec:: cleanup() throw()
         {
             alphabet.initialize();
             tree.initialize();
             bio.free();
             tree.build_using(alphabet);
+            clear();
         }
 
     }
@@ -499,7 +504,7 @@ namespace yocto
 
         void DSF:: Encoder:: reset() throw()
         {
-            clear();
+            cleanup();
         }
 
         void DSF:: Encoder:: write(char C)
@@ -544,4 +549,119 @@ namespace yocto
     }
 
 }
+
+
+namespace yocto
+{
+    namespace pack
+    {
+        DSF:: Decoder:: ~Decoder() throw()
+        {
+
+        }
+
+        DSF:: Decoder:: Decoder() :
+        status(wait_for8),
+        walker(0)
+        {
+
+        }
+
+        void DSF:: Decoder:: reset() throw()
+        {
+            cleanup();
+            status = wait_for8;
+            walker = 0;
+        }
+
+        void DSF:: Decoder:: flush()
+        {
+        }
+
+
+        void DSF:: Decoder:: on_new(const char C)
+        {
+            Q.push_back(C);
+            alphabet.update(C);
+            tree.build_using(alphabet);
+            walker = tree.root();
+            assert(walker->count>1);
+            status = wait_for1;
+        }
+
+
+        void DSF:: Decoder:: write(char C)
+        {
+            bio.push_full<uint8_t>(C);
+            while( bio.size() )
+            {
+                switch(status)
+                {
+                        //______________________________________________________
+                        //
+                        // we need a byte
+                        //______________________________________________________
+                    case wait_for8:
+                        assert(0==walker);
+                        if(bio.size()<8)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            const char C = char(bio.pop_full<uint8_t>());
+                            on_new(C);
+                        }
+                        break;
+
+                        //______________________________________________________
+                        //
+                        // we walk down the tree
+                        //______________________________________________________
+                    case wait_for1: {
+                        assert(walker);
+                        assert(walker->count>1);
+                        assert(walker->left);
+                        assert(walker->right);
+
+                        // walk down the tree
+                        const bool flag = bio.pop();
+                        if(flag)
+                        {
+                            walker = walker->left;
+                        }
+                        else
+                        {
+                            walker = walker->right;
+                        }
+
+                        // is it the end ?
+                        if(1==walker->count)
+                        {
+                            assert(0==walker->left);
+                            assert(0==walker->right);
+                            const CharType ch = walker->start[0]->Char;
+                            switch(ch)
+                            {
+                                case END: bio.free(); walker=0; status=wait_for8; break;
+                                case NYT: walker=0; status=wait_for8; break;
+                                default:  on_new(char(ch));
+                            }
+                        }
+                    } break;
+                        //______________________________________________________
+
+
+                }
+            }
+            // end decoding
+        }
+
+
+
+    }
+
+}
+
+
 
