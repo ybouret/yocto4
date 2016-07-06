@@ -519,6 +519,8 @@ namespace yocto
                 if(alphabet.size>0)
                 {
                     alphabet[NYT].emit(bio);
+                    std::cerr << "<NYT:" <<  int(B) << ">" << std::endl;
+                    assert(alphabet[B].Bits==8);
                 }
             }
 
@@ -544,6 +546,7 @@ namespace yocto
             {
                 Q.push_back( bio.pop_full<uint8_t>() );
             }
+            assert(0==bio.size());
         }
 
     }
@@ -581,6 +584,7 @@ namespace yocto
 
         void DSF:: Decoder:: on_new(const char C)
         {
+            std::cerr << int(uint8_t(C));// << std::endl;
             Q.push_back(C);
             alphabet.update(C);
             tree.build_using(alphabet);
@@ -609,8 +613,7 @@ namespace yocto
                         }
                         else
                         {
-                            const char C = char(bio.pop_full<uint8_t>());
-                            on_new(C);
+                            on_new(bio.pop_full<uint8_t>());
                         }
                         break;
 
@@ -643,9 +646,21 @@ namespace yocto
                             const CharType ch = walker->start[0]->Char;
                             switch(ch)
                             {
-                                case END: bio.free(); walker=0; status=wait_for8; break;
-                                case NYT: walker=0; status=wait_for8; break;
-                                default:  on_new(char(ch));
+                                case END: std::cerr << "<END>" << std::endl;
+                                    bio.free(); walker=0; status=wait_for8;
+                                    break;
+
+                                case NYT:
+                                    std::cerr << "<NYT>";
+                                    walker=0;
+                                    status=wait_for8;
+                                    break;
+
+                                default:
+                                    assert(ch>=0);
+                                    assert(ch<256);
+                                    on_new(char(ch));
+                                    break;
                             }
                         }
                     } break;
