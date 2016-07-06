@@ -12,7 +12,6 @@ using namespace pack;
 YOCTO_UNIT_TEST_IMPL(dsf)
 {
     DSF::Encoder Q;
-    move_to_front MTF;
 
     ios::icstream fp( ios::cstdin  );
     ios::ocstream op( ios::cstdout );
@@ -27,7 +26,8 @@ YOCTO_UNIT_TEST_IMPL(dsf)
             std::cerr << ".";
             std::cerr.flush();
         }
-        Q.write( MTF.encode(C) );
+        Q.write( C );
+
         while( Q.query(C) )
         {
             op.write(C);
@@ -49,7 +49,6 @@ YOCTO_UNIT_TEST_DONE()
 YOCTO_UNIT_TEST_IMPL(undsf)
 {
     DSF::Decoder  Q;
-    move_to_front MTF;
 
     ios::icstream fp( ios::cstdin  );
     ios::ocstream op( ios::cstdout );
@@ -62,7 +61,7 @@ YOCTO_UNIT_TEST_IMPL(undsf)
         Q.write(C);
         while( Q.query( C ) )
         {
-            op.write( MTF.decode(C) );
+            op.write( C );
             ++out;
         }
     }
@@ -70,7 +69,7 @@ YOCTO_UNIT_TEST_IMPL(undsf)
     Q.flush();
     while( Q.query(C) )
     {
-        op.write( MTF.decode(C) );
+        op.write( C );
         ++out;
     }
 
