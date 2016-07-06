@@ -2,7 +2,6 @@
 #define YOCTO_PACK_DSF_INCLUDED 1
 
 #include "yocto/ios/codec.hpp"
-#include "yocto/core/pool.hpp"
 #include "yocto/pack/q-codec.hpp"
 #include "yocto/ios/bitio.hpp"
 
@@ -94,7 +93,6 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
                 Node          *nodes;
-                Node::Stack    stack;
                 size_t         wlen;
                 void          *wksp;
             };

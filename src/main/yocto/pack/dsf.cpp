@@ -269,7 +269,6 @@ namespace yocto
 
         DSF:: Tree:: ~Tree() throw()
         {
-            stack.reset();
             memory::kind<memory::global>::release(wksp,wlen);
         }
 
@@ -300,6 +299,7 @@ namespace yocto
         {
             assert(alphabet.count>=2);
             FreqType freqs[MaxItems];
+            core::pool_of<Node> stack;
 
         BUILD_TREE:
 #define YDSF_CLEAN(NODE) do { Node *tmp = (NODE); tmp->next=tmp->left=tmp->right=0; } while(false)
