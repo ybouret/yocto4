@@ -241,19 +241,26 @@ namespace yocto
         }
 
 
+        static inline
+        DSF::FreqType __delta_abs(const DSF::FreqType lhs,
+                                  const DSF::FreqType rhs) throw()
+        {
+            return (lhs<rhs) ? (rhs-lhs) : (lhs-rhs);
+        }
+
         DSF:: Tree:: ~Tree() throw()
         {
             stack.reset();
             memory::kind<memory::global>::release(wksp,wlen);
         }
 
-#define YDSF_CLEAN(NODE) do { Node *tmp = NODE; tmp->left=tmp->right=0; } while(false)
 
         void DSF:: Tree:: build_using( Alphabet &alphabet )
         {
             assert(alphabet.count>=2);
             FreqType freqs[MaxItems];
-            
+
+#define YDSF_CLEAN(NODE) do { Node *tmp = (NODE); tmp->left=tmp->right=0; } while(false)
             //__________________________________________________________________
             //
             // initialize nodes a.k.a segments
@@ -282,17 +289,45 @@ namespace yocto
                 Item       **start = node->start;
                 const size_t count = node->count;
                 
-                // build cumulative function inf freqs
+                // build cumulative function and freqs
                 FreqType Lambda = 0;
                 for(size_t i=0;i<count;++i)
                 {
                     const FreqType lam = start[i]->Freq;
-                    freqs[i] += (Lambda += lam);
+                    freqs[i] = (Lambda += lam);
+                    //std::cerr << "#" << std::setw(2) << i << " : freq=" << std::setw(4) << lam << " => " << Lambda << std::endl;
                 }
-#define YSDF_ABS(A,B) ((A)<(B)) ? (B)-(A) : (A)-(B);
-                
-                
-                exit(1);
+
+                // find the Shannon-Fano criteria
+                const size_t I_max = count-1;
+                size_t       I_cut = 0;
+                size_t       delta = __delta_abs(Lambda, freqs[I_cut] << 1);
+                for(size_t i=1;i<I_max;++i)
+                {
+                    const size_t dtemp = __delta_abs(Lambda,freqs[i]<<1);
+                    if(dtemp<=delta)
+                    {
+                        I_cut = i;
+                        delta = dtemp;
+                    }
+                }
+
+                //cut
+                std::cerr << "Cut at " << I_cut << " / delta=" << delta << std::endl;
+                const size_t  nleft = I_cut+1;
+                left->start = start;
+                left->count = nleft;
+                if(left->count>1)
+                {
+                    stack.store(left);
+                }
+
+                right->start = start+nleft;
+                right->count = count-nleft;
+                if(right->count>1)
+                {
+                    stack.store(right);
+                }
             }
 
             std::cerr << "inode=" << inode << "/" << alphabet.count << std::endl;
