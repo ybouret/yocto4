@@ -12,7 +12,13 @@ namespace yocto
 
         void   DSF::Item::  emit( ios::bitio &bio ) const
         {
-            bio.push(Code,Bits);
+            //bio.push(Code,Bits);
+            const CodeType code = Code;
+            for(size_t ibit=Bits;ibit>0;)
+            {
+                const size_t bit = 1 << (--ibit);
+                bio.push(0 != (bit&code));
+            }
         }
 
 
@@ -344,7 +350,7 @@ namespace yocto
                 //______________________________________________________________
                 if(2==count)
                 {
-                    left->start = start;    left->count = 1;
+                    left->start  = start;   left->count  = 1;
                     right->start = start+1; right->count = 1;
                 }
                 else
@@ -519,18 +525,19 @@ namespace yocto
                 if(alphabet.size>0)
                 {
                     alphabet[NYT].emit(bio);
-                    std::cerr << "<NYT>";
+                    //std::cerr << "<NYT>";
                     assert(alphabet[B].Bits==8);
                 }
             }
 
             // emit current encoding
             alphabet[B].emit(bio);
-            std::cerr << int(B) << "/";
+            //std::cerr << int(B) << ":" << alphabet[B].Bits << "/";
 
             // update model
             alphabet.update(C);
             tree.build_using(alphabet);
+            
 
             // transfer to queue
             while(bio.size()>=8)
@@ -585,13 +592,14 @@ namespace yocto
 
         void DSF:: Decoder:: on_new(const char C)
         {
-            std::cerr << int(uint8_t(C)) << "/";
+            //const uint8_t B(C);
+            //std::cerr << int(B) << ":" << alphabet[C].Bits << "/";
             Q.push_back(C);
             alphabet.update(C);
             tree.build_using(alphabet);
             walker = tree.root();
             assert(walker->count>1);
-            status = wait_for1;
+            status = wait_for1; //std::cerr << "[";
         }
 
 
@@ -614,7 +622,13 @@ namespace yocto
                         }
                         else
                         {
-                            on_new(bio.pop_full<uint8_t>());
+                            uint8_t ans = 0;
+                            for(size_t i=0;i<8;++i)
+                            {
+                                ans <<= 1;
+                                if(bio.pop()) ans |= 1;
+                            }
+                            on_new(ans);
                         }
                         break;
 
@@ -632,27 +646,32 @@ namespace yocto
                         const bool flag = bio.pop();
                         if(flag)
                         {
+                            //std::cerr << "1";
                             walker = walker->left;
                         }
                         else
                         {
                             walker = walker->right;
+                            //std::cerr << "0";
                         }
 
                         // is it the end ?
                         if(1==walker->count)
                         {
+                            //std::cerr << "]";
                             assert(0==walker->left);
                             assert(0==walker->right);
                             const CharType ch = walker->start[0]->Char;
                             switch(ch)
                             {
-                                case END: std::cerr << "<END>" << std::endl;
-                                    bio.free(); walker=0; status=wait_for8;
+                                case END: //std::cerr << "<END>" << std::endl;
+                                    bio.free();
+                                    walker=0;
+                                    status=wait_for8;
                                     break;
 
                                 case NYT:
-                                    std::cerr << "<NYT>";
+                                    //std::cerr << "<NYT>";
                                     walker=0;
                                     status=wait_for8;
                                     break;
