@@ -35,6 +35,8 @@ namespace yocto
 	
 	extern const char  hexa_char[16];
     extern const char *hexa_text[256];
+    extern const char *hexa_text_lower[256];
+
 	int                hex2dec( char c ) throw();
 	
 	template <typename T>

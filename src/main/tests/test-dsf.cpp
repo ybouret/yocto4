@@ -63,7 +63,7 @@ YOCTO_UNIT_TEST_IMPL(dsf)
     H.get(key,sizeof(key));
     for(size_t i=0;i<sizeof(key);++i)
     {
-        std::cerr << hexa_text[key[i]];
+        std::cerr << hexa_text_lower[key[i]];
     }
     std::cerr << std::endl;
 
@@ -71,7 +71,7 @@ YOCTO_UNIT_TEST_IMPL(dsf)
     G.get(key,sizeof(key));
     for(size_t i=0;i<sizeof(key);++i)
     {
-        std::cerr << hexa_text[key[i]];
+        std::cerr << hexa_text_lower[key[i]];
     }
     std::cerr << std::endl;
 
