@@ -519,13 +519,14 @@ namespace yocto
                 if(alphabet.size>0)
                 {
                     alphabet[NYT].emit(bio);
-                    std::cerr << "<NYT:" <<  int(B) << ">" << std::endl;
+                    std::cerr << "<NYT>";
                     assert(alphabet[B].Bits==8);
                 }
             }
 
             // emit current encoding
             alphabet[B].emit(bio);
+            std::cerr << int(B) << "/";
 
             // update model
             alphabet.update(C);
@@ -584,7 +585,7 @@ namespace yocto
 
         void DSF:: Decoder:: on_new(const char C)
         {
-            std::cerr << int(uint8_t(C));// << std::endl;
+            std::cerr << int(uint8_t(C)) << "/";
             Q.push_back(C);
             alphabet.update(C);
             tree.build_using(alphabet);
