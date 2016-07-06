@@ -12,7 +12,6 @@ namespace yocto
 
         void   DSF::Item::  emit( ios::bitio &bio ) const
         {
-            //bio.push(Code,Bits);
             const CodeType code = Code;
             for(size_t ibit=Bits;ibit>0;)
             {
@@ -35,9 +34,6 @@ namespace yocto
             items = (Item *)wksp;
             store = (Item **)( ( (char*)wksp) +  MaxItems * sizeof(Item) );
             initialize();
-#if defined(YDSF_CHECK)
-            __check(__LINE__);
-#endif
         }
 
         void DSF::Alphabet:: initialize() throw()
@@ -233,7 +229,6 @@ namespace yocto
 
         void DSF:: Alphabet:: rescale() throw()
         {
-            std::cerr << "Rescale" << std::endl;
             for(size_t i=0;i<count;++i)
             {
                 (store[i]->Freq >>= 1) |= 1;
@@ -488,9 +483,9 @@ namespace yocto
         {
             alphabet.initialize();
             tree.initialize();
-            bio.free();
             tree.build_using(alphabet);
-            clear();
+            bio.free();
+            clear(); // clear the queue
         }
 
     }
@@ -518,7 +513,10 @@ namespace yocto
             const uint8_t B(C);
             const Item &item = alphabet[B];
 
+            //__________________________________________________________________
+            //
             // check if we need to emit NYT
+            //__________________________________________________________________
             if(item.Freq<=0)
             {
                 assert(alphabet.size<MaxBytes);
@@ -530,16 +528,24 @@ namespace yocto
                 }
             }
 
+            //__________________________________________________________________
+            //
             // emit current encoding
+            //__________________________________________________________________
             alphabet[B].emit(bio);
-            //std::cerr << int(B) << ":" << alphabet[B].Bits << "/";
 
+            //__________________________________________________________________
+            //
             // update model
+            //__________________________________________________________________
             alphabet.update(C);
             tree.build_using(alphabet);
             
 
+            //__________________________________________________________________
+            //
             // transfer to queue
+            //__________________________________________________________________
             while(bio.size()>=8)
             {
                 Q.push_back( bio.pop_full<uint8_t>() );
@@ -592,14 +598,12 @@ namespace yocto
 
         void DSF:: Decoder:: on_new(const char C)
         {
-            //const uint8_t B(C);
-            //std::cerr << int(B) << ":" << alphabet[C].Bits << "/";
             Q.push_back(C);
             alphabet.update(C);
             tree.build_using(alphabet);
             walker = tree.root();
             assert(walker->count>1);
-            status = wait_for1; //std::cerr << "[";
+            status = wait_for1;
         }
 
 
@@ -646,32 +650,28 @@ namespace yocto
                         const bool flag = bio.pop();
                         if(flag)
                         {
-                            //std::cerr << "1";
                             walker = walker->left;
                         }
                         else
                         {
                             walker = walker->right;
-                            //std::cerr << "0";
                         }
 
                         // is it the end ?
                         if(1==walker->count)
                         {
-                            //std::cerr << "]";
                             assert(0==walker->left);
                             assert(0==walker->right);
                             const CharType ch = walker->start[0]->Char;
                             switch(ch)
                             {
-                                case END: //std::cerr << "<END>" << std::endl;
+                                case END:
                                     bio.free();
                                     walker=0;
                                     status=wait_for8;
                                     break;
 
                                 case NYT:
-                                    //std::cerr << "<NYT>";
                                     walker=0;
                                     status=wait_for8;
                                     break;

@@ -65,6 +65,7 @@ namespace yocto
             };
 
 
+            //! a tree node is a Shannon-Fano Segment...
             struct Node
             {
                 Node  *left;
@@ -104,10 +105,10 @@ namespace yocto
                 virtual ~Codec() throw();
 
             protected:
-                Alphabet   alphabet;
-                Tree       tree;
-                ios::bitio bio;
-                
+                Alphabet      alphabet;
+                Tree          tree;
+                ios::bitio    bio;
+
                 void     cleanup() throw();
                 explicit Codec();
                 
