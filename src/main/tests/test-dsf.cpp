@@ -72,6 +72,6 @@ YOCTO_UNIT_TEST_IMPL(undsf)
         op.write( C );
         ++out;
     }
-
+    std::cerr << "inp=" << inp << ", out=" << out << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
