@@ -37,7 +37,18 @@ namespace yocto
 				}
 			}
 		}
-		
+
+        static inline void __set_binary_IO(FILE *handle)
+        {
+#if defined(YOCTO_WIN)
+#if defined(_MSC_VER)
+            _setmode( _fileno(handle) , O_BINARY);
+#else
+            setmode( fileno(handle) , O_BINARY);
+#endif
+#endif
+        }
+
 		cfile:: cfile( const char *filename, const char *mode ) :
 		local_file( is_regular ),
 		handle( NULL ),
@@ -53,30 +64,27 @@ namespace yocto
 				throw libc::exception( errno, "fopen(%s,%s)", filename,mode );
 			}
 			
-#if defined(YOCTO_WIN)
-#if defined(_MSC_VER)
-			_setmode( _fileno(handle) , O_BINARY);
-#else
-			setmode( fileno(handle) , O_BINARY);
-#endif
-#endif
-		}
+            __set_binary_IO(handle);
+        }
 		
 		cfile:: cfile( const cstdin_t  &) : local_file( is_stdin ), handle( stdin ), last_close(NULL)
 		{
 			if( !handle ) throw exception("no STDIN!");
+            __set_binary_IO(handle);
 		}
-		
+
 		cfile:: cfile( const cstdout_t  &) : local_file( is_stdout ), handle( stdout ), last_close(NULL)
 		{
 			if( !handle ) throw exception("no STDOUT!");
+            __set_binary_IO(handle);
 		}
-		
+
 		cfile:: cfile( const cstderr_t  &) : local_file( is_stderr ), handle( stderr ), last_close(NULL)
 		{
 			if( !handle ) throw exception("no STDERR!");
+            __set_binary_IO(handle);
 		}
-		
+
 		void cfile:: bufferize( memory::rw_buffer &buf )
 		{
 			YOCTO_GIANT_LOCK();
