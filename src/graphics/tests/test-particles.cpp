@@ -36,6 +36,8 @@ YOCTO_UNIT_TEST_IMPL(pa)
         xpatches xps;
         xpatch::create(xps, bmp, &server);
 
+        
+
 
         std::cerr << "-- Looking Up Foreground..." << std::endl;
         pixmap3 fg(w,h);
@@ -83,11 +85,32 @@ YOCTO_UNIT_TEST_IMPL(pa)
             PNG.save("image_big3.png",part, NULL);
         }
 
-        // dilate.fusion
+        // 
         tmap.build(fg,links);
         pa.load(tmap);
+        std::cerr << "#pa_org=" << pa.size() << std::endl;
         {
+            part.ldz();
+            for(size_t i=1;i<=pa.size();++i)
+            {
+                pa[i]->split_using(tmap);
+                pa[i]->transfer_contour(part, named_color::fetch(i));
+            }
+            PNG.save("image_pa_contours.png",part,NULL);
 
+        }
+
+        {
+            std::cerr << "-- Fusion" << std::endl;
+            pa.fusion(tmap);
+            PNG.save("image_tag2.png",tmap,tag2color,NULL);
+            part.ldz();
+            for(size_t i=1;i<=pa.size();++i)
+            {
+                pa[i]->transfer_contour(part, named_color::fetch(i));
+            }
+            PNG.save("image_pa_contours2.png",part,NULL);
+            std::cerr << "#pa_new=" << pa.size() << std::endl;
         }
 
 

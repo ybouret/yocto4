@@ -20,7 +20,7 @@ namespace yocto
             particle(const particle &other);
 
             const size_t tag;
-            
+
             //! transfer part of the image
             template <typename T>
             void transfer( pixmap<T> &tgt, const pixmap<T> &src) const
@@ -75,6 +75,18 @@ namespace yocto
 
             }
 
+            template <typename T>
+            void transfer_contour(pixmap<T>       &tgt,
+                                  const T contour_value) const
+            {
+                for(const vnode_type *node = border.head; node; node=node->next)
+                {
+                    const vertex v = node->vtx;
+                    assert(tgt.has(v));
+                    tgt[v] = contour_value;
+                }
+            }
+
             //! dilate using borders, split if necessary
             /**
              the points are regrouped
@@ -101,16 +113,16 @@ namespace yocto
             explicit particles() throw();
             virtual ~particles() throw();
             void sort() throw();
-
+            
             void load( const tagmap &tmap );
-
+            
             void fusion( tagmap &tmap);
-
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(particles);
         };
-
-
+        
+        
     }
 }
 

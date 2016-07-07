@@ -1,8 +1,11 @@
 #include "yocto/graphics/ops/particles.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/math/types.hpp"
 
 namespace yocto
 {
+
+    using namespace math;
 
     namespace graphics
     {
@@ -111,7 +114,7 @@ namespace yocto
                     }
                 }
             }
-            std::cerr << "#new point from dilate=" << size << std::endl;
+            //std::cerr << "#new point from dilate=" << size << std::endl;
             const size_t extra = size;
             regroup();
             return extra;
@@ -122,13 +125,16 @@ namespace yocto
         {
             assert(0==size);
             assert(0==other.size);
+
             const vnode_type *lhs_start = this->border.head;
             const vnode_type *rhs_start = other.border.head;
+
             for(const vnode_type *lhs = lhs_start; lhs; lhs=lhs->next )
             {
                 for(const vnode_type *rhs=rhs_start; rhs; rhs=rhs->next)
                 {
-                    if(lhs->vtx==rhs->vtx)
+                    const vertex dv = rhs->vtx-lhs->vtx;
+                    if(Fabs(dv.x)<=1&&Fabs(dv.y)<=1)
                     {
                         return true;
                     }
@@ -218,17 +224,58 @@ namespace yocto
             sort();
         }
 
+        static inline
+        void __reassign( particle &p, vnode_list &l, tagmap &tmap ) throw()
+        {
+            const size_t tag = p.tag;
+            while(l.size)
+            {
+                vnode_type *node = l.pop_back();
+                assert(tmap.has(node->vtx));
+                tmap[node->vtx] = tag;
+                p.push_back(node);
+            }
+        }
+
         void particles:: fusion( tagmap &tmap )
         {
-            _particles &self = *this;
-            const size_t n = 0;
+            _particles  &self = *this;
+            const size_t n    = self.size();
             for(size_t i=1;i<=n;++i)
             {
                 self[i]->dilate_with(tmap);
                 self[i]->split_using(tmap);
             }
-            
 
+            for(size_t i=1;i<self.size();++i)
+            {
+                particle &lhs = *self[i];
+                for(size_t j=i+1;j<=self.size();)
+                {
+                    particle &rhs = *self[j];
+                    if(lhs.touches(rhs))
+                    {
+                        std::cerr << "contact " << lhs.tag << "/" << rhs.tag << std::endl;
+                        __reassign(lhs,rhs.inside,tmap);
+                        __reassign(lhs,rhs.border,tmap);
+                        lhs.regroup();
+                        lhs.split_using(tmap);
+                        for(size_t k=j;k<self.size();++k)
+                        {
+                            bswap(self[k],self[k+1]);
+                        }
+                        assert(0==self[self.size()]->size);
+                        assert(0==self[self.size()]->inside.size);
+                        assert(0==self[self.size()]->border.size);
+                        self.pop_back();
+                    }
+                    else
+                    {
+                        ++j;
+                    }
+                }
+            }
+            sort();
         }
 
 
