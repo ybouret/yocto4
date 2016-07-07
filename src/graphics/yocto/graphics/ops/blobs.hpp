@@ -56,7 +56,7 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(blob);
         };
 
-
+        
         // detecting connex regions
         class blobs : public pixmap<size_t>
         {

@@ -7,6 +7,7 @@
 #include "yocto/graphics/ops/blobs.hpp"
 #include "yocto/graphics/ops/gradient.hpp"
 #include "yocto/graphics/ops/blur.hpp"
+#include "yocto/graphics/ops/particles.hpp"
 
 using namespace yocto;
 using namespace graphics;
@@ -28,66 +29,34 @@ YOCTO_UNIT_TEST_IMPL(pa)
         const string filename = argv[1];
         std::cerr << "-- Loading RGB" << std::endl;
         pixmap3 bmp( IMG.load3(filename, NULL)); PNG.save("image.png",    bmp, NULL);
-        pixmapf pgs(bmp,to_float<RGB>,bmp);      PNG.save("image_gs.png", pgs, NULL);
-        const unit_t w = pgs.w;
-        const unit_t h = pgs.h;
+        const unit_t w = bmp.w;
+        const unit_t h = bmp.h;
 
+        std::cerr << "-- Preparing Patches" << std::endl;
         xpatches xps;
         xpatch::create(xps, bmp, &server);
 
 
+        std::cerr << "-- Looking Up Foreground..." << std::endl;
+        pixmap3 fg(w,h);
+        separate(threshold::keep_foreground,fg,bmp, xps, &server);
+        PNG.save("image_fg.png",fg, NULL);
 
+        std::cerr << "-- Building Initial Tag Map" << std::endl;
+        tagmap tmap(w,h);
+        tmap.build(fg,8);
 
-        pixmapf  grd(w,h);
-        {
-            pixmapf  tmp(w,h);
-            gradient G;
-            G.compute(grd, tmp, pgs, xps, &server);
-        }
-        PNG.save("image_grd0.png", grd, NULL);
-
-        pixmapf blr(w,h);
-        {
-            pixmapf  tmp(w,h);
-            gradient G;
-            for(float sig=0.5f;sig<=2.0f;sig+=0.5f)
-            {
-                blur B(sig);
-                B.apply(blr,pgs,xps,&server);
-                G.compute(grd, tmp, blr, xps, &server);
-                PNG.save( vformat("image_grd%g.png",sig), grd, NULL);
-            }
-
-        }
-
-
-        std::cerr << "-- Creating Histogram" << std::endl;
-        Histogram H;
-        H.update(pgs,xps, &server);
-        pixmapf fg(w,h);
-
-        std::cerr << "-- Thresholding" << std::endl;
-        threshold::apply(fg, H.threshold(), pgs, threshold::keep_foreground);
-        PNG.save("image_fg.png",fg,NULL);
-
-        std::cerr << "-- Making blobs..." << std::endl;
-
-        blobs B(w,h);
-        B.build(fg,4);
-        get_named_color<size_t> blobColors;
-        std::cerr << "#blobs=" << B.current << std::endl;
-        PNG.save("image_fg_blobs.png", B, blobColors, NULL);
-
-        return 0;
-
-        pixmap3 tgt(w,h);
-        if(B.content.size()>0)
-        {
-            const blob &big = *B.content[1];
-            big.transfer(tgt,bmp);
-        }
-        PNG.save("image_fg_main.png",tgt,NULL);
+        get_named_color<size_t> tag2color;
+        PNG.save("image_tag.png",tmap,tag2color,NULL);
         
+        particles pa;
+        pa.load(tmap);
+        std::cerr << "#particles=" << pa.size() << std::endl;
+        for(size_t i=1;i<=pa.size();++i)
+        {
+            std::cerr << "size#" << i << "=" << pa[i]->size << std::endl;
+        }
+
     }
     
 }
