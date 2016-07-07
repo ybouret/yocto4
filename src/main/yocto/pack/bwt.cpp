@@ -2,7 +2,8 @@
 #include "yocto/sequence/lw-array.hpp"
 #include "yocto/sort/quick.hpp"
 #include "yocto/memory/global.hpp"
-
+#include "yocto/code/unroll.hpp"
+#include <cstring>
 
 namespace yocto
 {
@@ -43,10 +44,11 @@ namespace yocto
 			const uint8_t    *buf_in  = (const uint8_t *)input;
 			uint8_t          *buf_out = (uint8_t       *)output;
 			
-			for( size_t i=0; i < size; ++i )
-				indices[i] = i;
+
             if(size>0)
 			{
+#define YBWT_INIT_INDEX(I) indices[I] = I
+                YOCTO_LOOP_FUNC_(size,YBWT_INIT_INDEX,0);
                 lw_array<size_t>  arr( indices, size );
                 rotlexdat         cmp = { buf_in, size };
                 quicksort( arr, cmp );
@@ -84,8 +86,7 @@ namespace yocto
 			size_t         buckets[256];
 			const uint8_t *buf_in  = (const uint8_t *)input;
 			uint8_t       *buf_out = (uint8_t *)output;
-			for(size_t i=0;i<256;++i) buckets[i] = 0;
-			
+            memset(buckets,0,sizeof(buckets));
             
 			for( size_t i=0; i < size; ++i )
 			{

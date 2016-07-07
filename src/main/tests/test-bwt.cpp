@@ -67,13 +67,16 @@ namespace
                  array<uint8_t> &input2,
                  pack::bwt::common16 &BWT)
     {
+        std::cerr << "+";std::cerr.flush();
         const uint16_t pidx = BWT.encode( &output[1], &input[1], input.size() );
+        std::cerr << "-"; std::cerr.flush();
         BWT.decode(&input2[1], &output[1], input.size(), pidx);
         for(size_t i=1;i<=input.size();++i)
         {
             if( input2[i] != input[i] )
                 throw exception("encode/decode error for size=%u", unsigned(input.size()));
         }
+        std::cerr << "." << std::endl;
     }
     
 }
