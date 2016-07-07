@@ -43,8 +43,9 @@ YOCTO_UNIT_TEST_IMPL(pa)
         PNG.save("image_fg.png",fg, NULL);
 
         std::cerr << "-- Building Initial Tag Map" << std::endl;
+        const size_t links = 8;
         tagmap tmap(w,h);
-        tmap.build(fg,8);
+        tmap.build(fg,links);
 
         get_named_color<size_t> tag2color;
         PNG.save("image_tag.png",tmap,tag2color,NULL);
@@ -52,12 +53,48 @@ YOCTO_UNIT_TEST_IMPL(pa)
         particles pa;
         pa.load(tmap);
         std::cerr << "#particles=" << pa.size() << std::endl;
-        for(size_t i=1;i<=pa.size();++i)
+
+        pixmap3 part(w,h);
+
+        if(pa.size())
         {
-            std::cerr << "size#" << i << "=" << pa[i]->size << std::endl;
+            particle &big = *pa[1];
+            std::cerr << "big.size=" << big.size << std::endl;
+            std::cerr << "-- Pick up big particle" << std::endl;
+            big.transfer(part,fg);
+            PNG.save("image_big.png",part, NULL);
+
+            std::cerr << "-- Split particle border" << std::endl;
+            big.split_using(tmap);
+            std::cerr << "big.border=" << big.border.size << std::endl;
+            part.ldz();
+            big.transfer_with_contour(part,fg,named_color::get("yellow"));
+            PNG.save("image_big2.png",part, NULL);
+
+            std::cerr << "-- Dilate particle..." << std::endl;
+            big.dilate_with(tmap);
+
+            std::cerr << "-- Split again!" << std::endl;
+            big.split_using(tmap);
+            part.ldz();
+
+            std::cerr << "-- Transfer new border..." << std::endl;
+            big.transfer_with_contour(part,fg,named_color::get("red"));
+            PNG.save("image_big3.png",part, NULL);
         }
 
+        // dilate.fusion
+        tmap.build(fg,links);
+        pa.load(tmap);
+        {
+
+        }
+
+
+
     }
-    
+
+    std::cerr << "sizeof(particle) =" << sizeof(particle)  << std::endl;
+    std::cerr << "sizeof(particles)=" << sizeof(particles) << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

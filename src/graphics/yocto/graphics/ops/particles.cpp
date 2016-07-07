@@ -1,5 +1,5 @@
 #include "yocto/graphics/ops/particles.hpp"
-
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -13,15 +13,131 @@ namespace yocto
 
         particle:: particle(const size_t t) throw() :
         vnode_list(),
-        tag(t)
+        tag(t),
+        inside(),
+        border()
         {
         }
 
         particle:: particle(const particle &other) :
         vnode_list(other),
-        tag(other.tag)
+        tag(other.tag),
+        inside(other.inside),
+        border(other.border)
         {
         }
+
+        vertex particle:: compute_extension() throw()
+        {
+            vertex v;
+            if(size>0)
+            {
+                vertex vmin = head->vtx;
+                vertex vmax = head->vtx;
+                for(const vnode_type *node=head->next;node;node=node->next)
+                {
+                    const vertex tmp = node->vtx;
+                    vmin.x = min_of(vmin.x,tmp.x);
+                    vmin.y = min_of(vmin.y,tmp.y);
+
+                    vmax.x = max_of(vmax.x,tmp.x);
+                    vmax.y = max_of(vmax.y,tmp.y);
+                }
+                v=vmax-vmin;
+            }
+            return v;
+        }
+
+        void particle:: regroup() throw()
+        {
+            merge_back(inside);
+            merge_back(border);
+        }
+
+
+        void particle:: split_using(const tagmap &tmap) throw()
+        {
+            const size_t links=8;
+            regroup();
+            while(size>0)
+            {
+                vnode_type  *node = pop_back();
+                const vertex vorg = node->vtx;
+                size_t       count = 0;
+                for(size_t i=0;i<links;++i)
+                {
+                    vertex   probe = vorg + gist::delta[i];
+                    if(tmap.has(probe))
+                    {
+                        const size_t value = tmap[probe];
+                        if(value==tag)
+                        {
+                            ++count;
+                        }
+                    }
+                }
+                if(count>=links)
+                {
+                    inside.push_back(node);
+                }
+                else
+                {
+                    border.push_back(node);
+                }
+            }
+        }
+
+        size_t particle:: dilate_with( tagmap &tmap ) throw()
+        {
+            if(size>0)
+            {
+                split_using(tmap);
+            }
+            const size_t links=8;
+            for(const vnode_type *node=border.head;node;node=node->next)
+            {
+                const vertex vorg = node->vtx;
+                for(size_t i=0;i<links;++i)
+                {
+                    vertex   probe = vorg + gist::delta[i];
+                    if(tmap.has(probe))
+                    {
+                        size_t &value = tmap[probe];
+                        if(0==value)
+                        {
+                            push_back( new vnode_type(probe) );
+                            value = tag;
+                        }
+                    }
+                }
+            }
+            std::cerr << "#new point from dilate=" << size << std::endl;
+            const size_t extra = size;
+            regroup();
+            return extra;
+        }
+
+
+        bool particle:: touches( const particle &other ) const throw()
+        {
+            assert(0==size);
+            assert(0==other.size);
+            const vnode_type *lhs_start = this->border.head;
+            const vnode_type *rhs_start = other.border.head;
+            for(const vnode_type *lhs = lhs_start; lhs; lhs=lhs->next )
+            {
+                for(const vnode_type *rhs=rhs_start; rhs; rhs=rhs->next)
+                {
+                    if(lhs->vtx==rhs->vtx)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
 
     }
 
@@ -101,6 +217,20 @@ namespace yocto
             }
             sort();
         }
+
+        void particles:: fusion( tagmap &tmap )
+        {
+            _particles &self = *this;
+            const size_t n = 0;
+            for(size_t i=1;i<=n;++i)
+            {
+                self[i]->dilate_with(tmap);
+                self[i]->split_using(tmap);
+            }
+            
+
+        }
+
 
     }
 }
