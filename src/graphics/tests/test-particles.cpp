@@ -9,6 +9,7 @@
 #include "yocto/graphics/ops/blur.hpp"
 #include "yocto/graphics/ops/particles.hpp"
 #include "yocto/graphics/ops/differential.hpp"
+#include "yocto/graphics/ops/median.hpp"
 
 using namespace yocto;
 using namespace graphics;
@@ -53,6 +54,11 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
         diff.compute(grd, pgs, use_laplacian, xps, &server);
         PNG.save("image_lap.png",grd, NULL);
+
+        median  med;
+        pixmapf pmd(w,h);
+        med.filter(pmd,pgs, xps, &server);
+        PNG.save("image_med.png",pmd, NULL);
 
 
         return 0;
