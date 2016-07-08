@@ -131,6 +131,9 @@ namespace yocto
             void split_all_using( const tagmap &tmap ) throw();
             void regroup_all() throw();
 
+            void discard(const size_t min_size, tagmap &tmap) throw();
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(particles);
         };

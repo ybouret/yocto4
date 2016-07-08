@@ -47,6 +47,8 @@ namespace yocto
                     vmax.y = max_of(vmax.y,tmp.y);
                 }
                 v=vmax-vmin;
+                ++v.x;
+                ++v.y;
             }
             return v;
         }
@@ -344,3 +346,29 @@ namespace yocto
     }
 }
 
+
+
+namespace yocto
+{
+    namespace graphics
+    {
+        void particles:: discard(const size_t min_size, tagmap &tmap) throw()
+        {
+            _particles  &self = *this;
+            while(self.size()>0)
+            {
+                particle &p = *self.back();
+                p.regroup();
+                if(p.size>=min_size) break;
+                while(p.size)
+                {
+                    vnode_type *node = p.pop_back();
+                    assert(tmap.has(node->vtx));
+                    assert(p.tag==tmap[node->vtx]);
+                    tmap[node->vtx] = 0;
+                }
+                self.pop_back();
+            }
+        }
+    }
+}

@@ -92,9 +92,14 @@ YOCTO_UNIT_TEST_IMPL(pa)
         PNG.save("image_part.png",part,NULL);
 
         pa.regroup_all();
-        
+        for(size_t i=1;i<=pa.size();++i)
+        {
+            particle &p = *pa[i];
+            std::cerr << "#pixels =" << p.size << std::endl;
+            std::cerr << "|_AABB  =" << p.compute_extension() << std::endl;
+        }
 
-
+        pa.discard(10,tmap);
 
     }
 
