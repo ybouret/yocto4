@@ -14,10 +14,7 @@
 using namespace yocto;
 using namespace graphics;
 
-static inline float rgb2f(const RGB &C)
-{
-    return gist::greyscalef(C.r,C.g,C.b);
-}
+
 
 YOCTO_UNIT_TEST_IMPL(pa)
 {
@@ -34,8 +31,13 @@ YOCTO_UNIT_TEST_IMPL(pa)
     if(argc>1)
     {
         const string filename = argv[1];
-        std::cerr << "-- Loading RGB" << std::endl;
-        pixmap3 bmp( IMG.load3(filename, NULL)); PNG.save("image.png",    bmp, NULL);
+        std::cerr << "-- Loading image" << std::endl;
+        pixmapf bmp( IMG.loadf(filename,NULL) );
+        PNG.save("image_gs.png",bmp, NULL);
+
+        pixmap3 img( IMG.load3(filename,NULL) );
+
+
         const unit_t w = bmp.w;
         const unit_t h = bmp.h;
 
@@ -43,114 +45,59 @@ YOCTO_UNIT_TEST_IMPL(pa)
         xpatches xps;
         xpatch::create(xps, bmp, &server);
 
-        std::cerr << "-- converting to grey scale" << std::endl;
-        pixmapf      pgs(bmp,rgb2f,bmp);
-        pixmapf      grd(w,h);
-        PNG.save("image_gs.png",pgs, NULL);
-        differential diff(w,h);
+        pixmapf grd(w,h);
+        {
+            differential diff(w,h);
+            std::cerr << "-- Compute Gradient" << std::endl;
+            diff.compute(grd, bmp, use_gradient, xps, &server);
+            PNG.save("image_grd.png",grd, NULL);
+        }
 
-        std::cerr << "-- Compute Gradient" << std::endl;
-        diff.compute(grd, pgs, use_gradient, xps, &server);
-        PNG.save("image_grd.png",grd, NULL);
+        pixmapf flt(w,h);
+        {
+            filter F;
+            F.apply(flt,grd, filter_median, xps, &server);
+            PNG.save("image_flt.png",flt, NULL);
+        }
 
-
-        std::cerr << "-- Compute Laplacian" << std::endl;
-        diff.compute(grd, pgs, use_laplacian, xps, &server);
-        PNG.save("image_lap.png",grd, NULL);
-
-        filter  F;
-        pixmapf pmd(w,h);
-        std::cerr << "-- Filter By Median" << std::endl;
-        F.apply(pmd,grd, filter_median, xps, &server);
-        PNG.save("image_med.png",pmd, NULL);
-
-#if 0
-        std::cerr << "-- Filter By Average" << std::endl;
-        F.apply(pmd,pgs, filter_average, xps, &server);
-        PNG.save("image_ave.png",pmd, NULL);
-#endif
-
-        return 0;
 
         std::cerr << "-- Looking Up Foreground..." << std::endl;
-        pixmap3 fg(w,h);
-        separate(threshold::keep_foreground,fg,bmp, xps, &server);
+        pixmapf fg(w,h);
+        separate(threshold::keep_foreground,fg,flt,xps,&server);
         PNG.save("image_fg.png",fg, NULL);
 
         std::cerr << "-- Building Initial Tag Map" << std::endl;
-        const size_t links = 8;
         tagmap tmap(w,h);
-        tmap.build(fg,links);
+        tmap.build(fg,8);
 
         get_named_color<size_t> tag2color;
         PNG.save("image_tag.png",tmap,tag2color,NULL);
-        
+
+        std::cerr << "-- Create initial particles" << std::endl;
         particles pa;
         pa.load(tmap);
         std::cerr << "#particles=" << pa.size() << std::endl;
 
+        std::cerr << "-- Finding Borders..." << std::endl;
+        pa.split_all_using(tmap);
+
         pixmap3 part(w,h);
 
-        if(pa.size())
+        part.copy(img);
+        for(size_t i=1;i<=pa.size();++i)
         {
-            particle &big = *pa[1];
-            std::cerr << "big.size=" << big.size << std::endl;
-            std::cerr << "-- Pick up big particle" << std::endl;
-            big.transfer(part,fg);
-            PNG.save("image_big.png",part, NULL);
-
-            std::cerr << "-- Split particle border" << std::endl;
-            big.split_using(tmap);
-            std::cerr << "big.border=" << big.border.size << std::endl;
-            part.ldz();
-            big.transfer_with_contour(part,fg,named_color::get("yellow"));
-            PNG.save("image_big2.png",part, NULL);
-
-            std::cerr << "-- Dilate particle..." << std::endl;
-            big.dilate_with(tmap);
-
-            std::cerr << "-- Split again!" << std::endl;
-            big.split_using(tmap);
-            part.ldz();
-
-            std::cerr << "-- Transfer new border..." << std::endl;
-            big.transfer_with_contour(part,fg,named_color::get("red"));
-            PNG.save("image_big3.png",part, NULL);
+            pa[i]->transfer_contour(part, named_color::fetch( pa.size()+i*i ));
         }
 
-        // 
-        tmap.build(fg,links);
-        pa.load(tmap);
-        std::cerr << "#pa_org=" << pa.size() << std::endl;
-        {
-            part.ldz();
-            for(size_t i=1;i<=pa.size();++i)
-            {
-                pa[i]->split_using(tmap);
-                pa[i]->transfer_contour(part, named_color::fetch(i));
-            }
-            PNG.save("image_pa_contours.png",part,NULL);
+        PNG.save("image_part.png",part,NULL);
 
-        }
-
-        {
-            std::cerr << "-- Fusion" << std::endl;
-            pa.fusion(tmap);
-            PNG.save("image_tag2.png",tmap,tag2color,NULL);
-            part.ldz();
-            for(size_t i=1;i<=pa.size();++i)
-            {
-                pa[i]->transfer_contour(part, named_color::fetch(i));
-            }
-            PNG.save("image_pa_contours2.png",part,NULL);
-            std::cerr << "#pa_new=" << pa.size() << std::endl;
-        }
+        pa.regroup_all();
+        
 
 
 
     }
 
-    std::cerr << "sizeof(particle) =" << sizeof(particle)  << std::endl;
-    std::cerr << "sizeof(particles)=" << sizeof(particles) << std::endl;
+
 }
 YOCTO_UNIT_TEST_DONE()

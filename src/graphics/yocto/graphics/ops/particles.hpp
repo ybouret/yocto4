@@ -34,6 +34,7 @@ namespace yocto
                 }
             }
 
+            //! set target
             template <typename T>
             void transfer( pixmap<T> &tgt, const T value) const
             {
@@ -45,13 +46,17 @@ namespace yocto
                 }
             }
 
-            vertex compute_extension() throw();
+
+            //! compute extension 'a la' bounding box
+            vertex compute_extension() const throw();
 
             vnode_list inside;
             vnode_list border;
 
+            //! merge inside and border inside this.
             void regroup() throw();
 
+            //! split this into inside and border
             void split_using(const tagmap &tmap ) throw();
 
             template <typename T>
@@ -94,8 +99,14 @@ namespace yocto
              */
             size_t dilate_with( tagmap &tmap ) throw();
 
+            //! erode using borders, split if necessary
+            /**
+             remove border points touching this tag.
+             the points are regrouped.
+             */
+            void   erode_with( tagmap &tmap ) throw();
 
-            //! one border in common...
+            //! borders are touching, MUST be splitted
             bool touches( const particle &other ) const throw();
 
         private:
@@ -117,7 +128,9 @@ namespace yocto
             void load( const tagmap &tmap );
             
             void fusion( tagmap &tmap);
-            
+            void split_all_using( const tagmap &tmap ) throw();
+            void regroup_all() throw();
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(particles);
         };

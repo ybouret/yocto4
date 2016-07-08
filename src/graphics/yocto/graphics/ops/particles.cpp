@@ -30,7 +30,7 @@ namespace yocto
         {
         }
 
-        vertex particle:: compute_extension() throw()
+        vertex particle:: compute_extension() const throw()
         {
             vertex v;
             if(size>0)
@@ -114,11 +114,53 @@ namespace yocto
                     }
                 }
             }
-            //std::cerr << "#new point from dilate=" << size << std::endl;
             const size_t extra = size;
             regroup();
             return extra;
         }
+
+        void particle:: erode_with( tagmap &tmap ) throw()
+        {
+            if(size>0)
+            {
+                split_using(tmap);
+            }
+            assert(this->size==0);
+
+            const size_t links=8;
+            while(border.size)
+            {
+                vnode_type  *node = border.pop_back();
+                const vertex vorg = node->vtx;
+                bool         kill = false;
+
+                // do I have a neighbour with my tag
+                for(size_t i=0;i<links;++i)
+                {
+                    vertex   probe = vorg + gist::delta[i];
+                    if(tmap.has(probe))
+                    {
+                        if(tag==tmap[probe])
+                        {
+                            kill = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(kill)
+                {
+                    tmap[vorg] = 0;
+                    delete node;
+                }
+                else
+                {
+                    push_back(node);
+                }
+            }
+            regroup();
+        }
+
 
 
         bool particle:: touches( const particle &other ) const throw()
@@ -276,6 +318,26 @@ namespace yocto
                 }
             }
             sort();
+        }
+
+        void particles:: split_all_using( const tagmap &tmap ) throw()
+        {
+            _particles  &self = *this;
+            const size_t n    = self.size();
+            for(size_t i=1;i<=n;++i)
+            {
+                self[i]->split_using(tmap);
+            }
+        }
+
+        void particles:: regroup_all() throw()
+        {
+            _particles  &self = *this;
+            const size_t n    = self.size();
+            for(size_t i=1;i<=n;++i)
+            {
+                self[i]->regroup();
+            }
         }
 
 
