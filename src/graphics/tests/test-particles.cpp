@@ -57,8 +57,11 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
         filter  F;
         pixmapf pmd(w,h);
-        F.apply(pmd,pgs, xps, &server);
+        F.apply(pmd,pgs, filter_median, xps, &server);
         PNG.save("image_med.png",pmd, NULL);
+
+        F.apply(pmd,pgs, filter_average, xps, &server);
+        PNG.save("image_ave.png",pmd, NULL);
 
 
         return 0;
