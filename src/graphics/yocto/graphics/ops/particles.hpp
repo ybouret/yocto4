@@ -103,8 +103,9 @@ namespace yocto
             /**
              remove border points touching this tag.
              the points are regrouped.
+             \return the number of eroded points
              */
-            void   erode_with( tagmap &tmap ) throw();
+            size_t   erode_with( tagmap &tmap ) throw();
 
             //! borders are touching, MUST be splitted
             bool touches( const particle &other ) const throw();
@@ -126,8 +127,13 @@ namespace yocto
             void sort() throw();
             
             void load( const tagmap &tmap );
+
+
+            void   dilate_and_join( tagmap       &tmap );
+
+            //! erode all particles, return #suppressed
+            size_t erode_and_check( tagmap       &tmap );
             
-            void fusion( tagmap &tmap);
             void split_all_using( const tagmap &tmap ) throw();
             void regroup_all() throw();
 

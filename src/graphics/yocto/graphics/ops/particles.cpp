@@ -121,46 +121,44 @@ namespace yocto
             return extra;
         }
 
-        void particle:: erode_with( tagmap &tmap ) throw()
+        size_t particle:: erode_with( tagmap &tmap ) throw()
         {
-            if(size>0)
-            {
-                split_using(tmap);
-            }
+            // intialize the particle
+            regroup();
+            split_using(tmap);
             assert(this->size==0);
+            size_t count = 0;
 
-            const size_t links=8;
             while(border.size)
             {
-                vnode_type  *node = border.pop_back();
-                const vertex vorg = node->vtx;
-                bool         kill = false;
-
-                // do I have a neighbour with my tag
-                for(size_t i=0;i<links;++i)
+                vnode_type *node = border.pop_back();
+                bool        kill = false;
+                for(const vnode_type *sub = inside.head;sub;sub=sub->next)
                 {
-                    vertex   probe = vorg + gist::delta[i];
-                    if(tmap.has(probe))
+                    if( gist::are_touching(node->vtx,sub->vtx) )
                     {
-                        if(tag==tmap[probe])
-                        {
-                            kill = true;
-                            break;
-                        }
+                        kill = true;
+                        break;
                     }
+
                 }
 
                 if(kill)
                 {
-                    tmap[vorg] = 0;
+                    assert(tmap.has(node->vtx));
+                    tmap[node->vtx] = 0;
                     delete node;
+                    ++count;
                 }
                 else
                 {
-                    push_back(node);
+                    this->push_back(node);
                 }
+
             }
+
             regroup();
+            return count;
         }
 
 
@@ -177,8 +175,7 @@ namespace yocto
             {
                 for(const vnode_type *rhs=rhs_start; rhs; rhs=rhs->next)
                 {
-                    const vertex dv = rhs->vtx-lhs->vtx;
-                    if(Fabs(dv.x)<=1&&Fabs(dv.y)<=1)
+                    if(gist::are_touching(lhs->vtx,rhs->vtx))
                     {
                         return true;
                     }
@@ -281,7 +278,7 @@ namespace yocto
             }
         }
 
-        void particles:: fusion( tagmap &tmap )
+        void particles:: dilate_and_join( tagmap &tmap )
         {
             _particles  &self = *this;
             const size_t n    = self.size();
@@ -321,6 +318,21 @@ namespace yocto
             }
             sort();
         }
+
+
+        size_t particles:: erode_and_check( tagmap &tmap )
+        {
+            _particles  &self = *this;
+            const size_t n    = self.size();
+            size_t count = 0;
+            for(size_t i=1;i<=n;++i)
+            {
+                count += self[i]->erode_with(tmap);
+            }
+            sort();
+            return count;
+        }
+
 
         void particles:: split_all_using( const tagmap &tmap ) throw()
         {

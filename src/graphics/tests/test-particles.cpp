@@ -99,7 +99,28 @@ YOCTO_UNIT_TEST_IMPL(pa)
             std::cerr << "|_AABB  =" << p.compute_extension() << std::endl;
         }
 
+
+        {
+            std::cerr << "Full Erosion..." << std::endl;
+            while(pa.erode_and_check(tmap)>0)
+            {
+                //break;
+            }
+
+            pa.regroup_all();
+            pa.split_all_using(tmap);
+            part.copy(img);
+            for(size_t i=1;i<=pa.size();++i)
+            {
+                pa[i]->transfer_contour(part, named_color::fetch( pa.size()+i*i ));
+            }
+            PNG.save("image_part2.png",part,NULL);
+
+        }
+
         pa.discard(10,tmap);
+
+
 
     }
 

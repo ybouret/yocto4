@@ -39,6 +39,12 @@ namespace yocto
                 if(lhs.x==rhs.x&&lhs.y==rhs.y) return 0; else return -1;
             }
 
+            static inline bool are_touching(const vertex &lhs, const vertex &rhs) throw()
+            {
+                const vertex d = lhs-rhs;
+                return (d.x>=-1) && (d.x<=1) && (d.y>=-1) && (d.y<=1);
+            }
+
             static const  float   unit_float[256];
             static inline uint8_t float2byte(const float x) throw() { return uint8_t(floorf(255.0f*x+0.5f)); }
 
