@@ -43,26 +43,32 @@ YOCTO_UNIT_TEST_IMPL(pa)
         xpatches xps;
         xpatch::create(xps, bmp, &server);
 
+        std::cerr << "-- converting to grey scale" << std::endl;
         pixmapf      pgs(bmp,rgb2f,bmp);
         pixmapf      grd(w,h);
         PNG.save("image_gs.png",pgs, NULL);
         differential diff(w,h);
 
+        std::cerr << "-- Compute Gradient" << std::endl;
         diff.compute(grd, pgs, use_gradient, xps, &server);
         PNG.save("image_grd.png",grd, NULL);
 
 
+        std::cerr << "-- Compute Laplacian" << std::endl;
         diff.compute(grd, pgs, use_laplacian, xps, &server);
         PNG.save("image_lap.png",grd, NULL);
 
         filter  F;
         pixmapf pmd(w,h);
-        F.apply(pmd,pgs, filter_median, xps, &server);
+        std::cerr << "-- Filter By Median" << std::endl;
+        F.apply(pmd,grd, filter_median, xps, &server);
         PNG.save("image_med.png",pmd, NULL);
 
+#if 0
+        std::cerr << "-- Filter By Average" << std::endl;
         F.apply(pmd,pgs, filter_average, xps, &server);
         PNG.save("image_ave.png",pmd, NULL);
-
+#endif
 
         return 0;
 

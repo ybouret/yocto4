@@ -99,7 +99,17 @@ namespace yocto
                     io_data &data = xp.make<io_data>();
                     data.vmin     = vmin;
                     data.vmax     = vmax;
-                    xp.enqueue(this, & differential::normalize<U>,server);
+                    switch(ops)
+                    {
+                        case use_gradient:
+                            xp.enqueue(this, & differential::toGrad<U>,server);
+                            break;
+
+                        case use_laplacian:
+                            xp.enqueue(this, & differential::toEdge<U>,server);
+                            break;
+                    }
+
                 }
                 if(server) server->flush();
             }
@@ -207,7 +217,7 @@ namespace yocto
             }
 
             template <typename U>
-            inline void normalize( xpatch &xp, lockable & ) throw()
+            inline void toGrad( xpatch &xp, lockable & ) throw()
             {
                 assert(target);
                 pixmap<U>             &tgt  = *static_cast< pixmap<U> *>(target);
@@ -232,19 +242,71 @@ namespace yocto
                 }
                 else
                 {
-                    //const real_t fac = 1.0f / (vmax-vmin);
-                    const real_t   fac = 1.0f / max_of(vmax,fabsf(vmin));
+                    const real_t fac = 1.0f/vmax;
                     for(unit_t j=ymax;j>=ymin;--j)
                     {
                         for(unit_t i=xmax;i>=xmin;--i)
                         {
-                            //const real_t v = clamp<real_t>(0,fac*(self[j][i]-vmin),1);
-                            const real_t v   = min_of<real_t>(1,fac*fabs(self[j][i]));
+                            const real_t v = clamp<real_t>(0,self[j][i]*fac,1);
                             tgt[j][i] = gist::float_to<U>(v);
                         }
                     }
                 }
             }
+
+            template <typename U>
+            inline void toEdge( xpatch &xp, lockable & ) throw()
+            {
+                assert(target);
+                pixmap<U>             &tgt  = *static_cast< pixmap<U> *>(target);
+                io_data               &data = xp.as<io_data>();
+                const real_t           vmin = data.vmin;
+                const real_t           vmax = data.vmax;
+                const unit_t           xmin = xp.lower.x;
+                const unit_t           xmax = xp.upper.x;
+                const unit_t           ymin = xp.lower.y;
+                const unit_t           ymax = xp.upper.y;
+                const pixmap<real_t>  &self = *this;
+                assert(vmax>=vmin);
+                if(vmax<=vmin)
+                {
+                    for(unit_t j=ymax;j>=ymin;--j)
+                    {
+                        for(unit_t i=xmax;i>=xmin;--i)
+                        {
+                            tgt[j][i] = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    for(unit_t j=ymax;j>=ymin;--j)
+                    {
+                        for(unit_t i=xmax;i>=xmin;--i)
+                        {
+                            const real_t u = self[j][i];
+                            if(u<0)
+                            {
+                                tgt[j][i] = gist::float_to<U>((u/vmin) );
+                            }
+                            else
+                            {
+                                if(u>0)
+                                {
+                                    tgt[j][i] = gist::float_to<U>(u/vmax);
+                                }
+                                else
+                                {
+                                    tgt[j][i] = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
             
             
         };
