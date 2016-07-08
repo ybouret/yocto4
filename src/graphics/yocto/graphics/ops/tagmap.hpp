@@ -86,16 +86,16 @@ namespace yocto
                     }
                 }
             }
-            
+
 
 
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tagmap);
             template <typename T>
-            void grow(const vertex    &v,
-                      const pixmap<T> &src,
-                      const size_t     links)
+            inline void grow(const vertex    &v,
+                             const pixmap<T> &src,
+                             const size_t     links)
             {
                 pixmap<size_t> &self = *this;
                 for(size_t k=0;k<links;++k)
@@ -110,9 +110,9 @@ namespace yocto
                         v_stack.push(tmp);
                     }
                 }
-
+                
             }
-
+            
         };
     }
 }
