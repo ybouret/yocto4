@@ -8,6 +8,7 @@
 #include "yocto/graphics/ops/gradient.hpp"
 #include "yocto/graphics/ops/blur.hpp"
 #include "yocto/graphics/ops/particles.hpp"
+#include "yocto/graphics/ops/differential.hpp"
 
 using namespace yocto;
 using namespace graphics;

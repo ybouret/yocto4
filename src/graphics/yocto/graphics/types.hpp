@@ -10,9 +10,10 @@ namespace yocto
 {
     namespace graphics
     {
-        typedef point2d<unit_t>      vertex; //!< base class for operations
-        typedef parallel::patch2D    patch;  //!< base class for patches
-        typedef math::complex<float> cplx_t; //!< complex for graphics...
+        typedef point2d<unit_t>       vertex; //!< base class for operations
+        typedef parallel::patch2D     patch;  //!< base class for patches
+        typedef float                 real_t; //!< default floating point
+        typedef math::complex<real_t> cplx_t; //!< complex for graphics...
 
         class vnode_type
         {
