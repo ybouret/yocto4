@@ -1,5 +1,5 @@
-#ifndef YOCTO_GRAPHICS_OPS_MEDIAN_INCLUDED
-#define YOCTO_GRAPHICS_OPS_MEDIAN_INCLUDED 1
+#ifndef YOCTO_GRAPHICS_OPS_FILTER_INCLUDED
+#define YOCTO_GRAPHICS_OPS_FILTER_INCLUDED 1
 
 #include "yocto/graphics/xpatch.hpp"
 #include "yocto/graphics/rawpix.hpp"
@@ -10,17 +10,17 @@ namespace yocto
     {
 
 
-        class median
+        class filter
         {
         public:
-            inline explicit median() throw() : tgt(0), src(0) {}
-            inline virtual ~median() throw() {}
+            inline explicit filter() throw() : tgt(0), src(0) {}
+            inline virtual ~filter() throw() {}
 
             template <typename T>
-            void filter(pixmap<T>         &target,
-                        const pixmap<T>   &source,
-                        xpatches          &xps,
-                        threading::engine *server)
+            void apply(pixmap<T>         &target,
+                       const pixmap<T>   &source,
+                       xpatches          &xps,
+                       threading::engine *server)
             {
                 tgt = &target;
                 src = &source;
@@ -28,7 +28,7 @@ namespace yocto
                 for(size_t i=np;i>0;--i)
                 {
                     xpatch &xp = xps[i];
-                    xp.enqueue(this, & median::apply<T>, server);
+                    xp.enqueue(this, & filter::run<T>, server);
                 }
                 if(server) server->flush();
             }
@@ -39,7 +39,7 @@ namespace yocto
             const void *src;
 
             template <typename T>
-            inline void apply( xpatch &xp, lockable & ) throw()
+            inline void run( xpatch &xp, lockable & ) throw()
             {
                 //assert(tgt); pixmap<T>       &target = *static_cast< pixmap<T> *      >(tgt);
                 assert(src); const pixmap<T> &source = *static_cast< const pixmap<T>* >(src);
@@ -67,12 +67,12 @@ namespace yocto
                         }
                     }
                 }
-
-
+                
+                
             }
-
+            
         };
-
+        
     }
 }
 
