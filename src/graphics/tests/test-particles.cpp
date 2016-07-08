@@ -13,6 +13,11 @@
 using namespace yocto;
 using namespace graphics;
 
+static inline float rgb2f(const RGB &C)
+{
+    return gist::greyscalef(C.r,C.g,C.b);
+}
+
 YOCTO_UNIT_TEST_IMPL(pa)
 {
     image &IMG = image::instance();
@@ -37,8 +42,20 @@ YOCTO_UNIT_TEST_IMPL(pa)
         xpatches xps;
         xpatch::create(xps, bmp, &server);
 
-        
+        pixmapf      pgs(bmp,rgb2f,bmp);
+        pixmapf      grd(w,h);
+        PNG.save("image_gs.png",pgs, NULL);
+        differential diff(w,h);
 
+        diff.compute(grd, pgs, use_gradient, xps, &server);
+        PNG.save("image_grd.png",grd, NULL);
+
+
+        diff.compute(grd, pgs, use_laplacian, xps, &server);
+        PNG.save("image_lap.png",grd, NULL);
+
+
+        return 0;
 
         std::cerr << "-- Looking Up Foreground..." << std::endl;
         pixmap3 fg(w,h);

@@ -2,7 +2,7 @@
 #define YOCTO_GRAPHICS_OPS_GRADIENT_INCLUDED 1
 
 #include "yocto/graphics/xpatch.hpp"
-#include "yocto/graphics/pixmap.hpp"
+#include "yocto/graphics/rawpix.hpp"
 #include "yocto/code/utils.hpp"
 
 namespace yocto
