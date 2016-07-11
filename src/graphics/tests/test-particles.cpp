@@ -113,15 +113,16 @@ YOCTO_UNIT_TEST_IMPL(pa)
         PNG.save("image_tag2.png",tmap,tmap.to_rgba,NULL);
 
 
-        return 0;
-
         {
             std::cerr << "Full Erosion..." << std::endl;
             while(pa.erode_and_check(tmap)>0)
             {
                 break;
             }
+            PNG.save("image_tag3.png",tmap,tmap.to_rgba,NULL);
 
+
+            return 0;
             pa.regroup_all();
             pa.split_all_using(tmap);
             part.copy(img);
@@ -129,7 +130,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
             {
                 pa[i]->transfer_contour(part, named_color::fetch( pa.size()+i*i ));
             }
-            PNG.save("image_part2.png",part,NULL);
+            PNG.save("image_part3.png",part,NULL);
 
         }
 

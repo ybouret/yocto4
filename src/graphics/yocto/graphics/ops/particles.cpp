@@ -122,34 +122,49 @@ namespace yocto
             return extra;
         }
 
-        size_t particle:: erode_with( tagmap &tmap ) throw()
+        size_t particle:: erode_with(tagmap &tmap) throw()
         {
+            const unit_t    w=tmap.w;
+            const unit_t    h=tmap.h;
+            pixmap<uint8_t> mask(w,h);
+            tagmap          tsub(w,h);
+            
             // intialize the particle
             regroup();
+            const size_t ntot = size;
+
+            // register the particle in tsub
+            tsub.ldz();
+            tsub.current = 0;
+
+            for(const vnode_type *node = head; node; node=node->next )
+            {
+                assert(mask.has(node->vtx));
+                mask[node->vtx] = 1;
+            }
+
             split_using(tmap);
-            assert(this->size==0);
-            size_t count = 0;
 
-            stencil<size_t> local;
+            // check if there is someting inside
+            if(inside.size<=0)
+                return 0;
 
+            const vertex in    = inside.head->vtx; assert(tsub.has(in));
+            size_t      &B     = tsub[in];
+            size_t       count = 0;
+
+            {
+                tsub.ldz(); tsub.current = 0;
+                assert( ntot == tsub.__build_particle(mask,in.x,in.y,B) );
+            }
+            
             while(border.size)
             {
                 vnode_type *node = border.pop_back();
                 bool        kill = false;
 
-                //! load local environment
-                local.load(tmap,node->vtx);
 
-#if 0
-                for(const vnode_type *sub = inside.head;sub;sub=sub->next)
-                {
-                    if( gist::are_touching(node->vtx,sub->vtx) )
-                    {
-                        kill = true;
-                        break;
-                    }
-                }
-#endif
+
 
                 if(kill)
                 {
@@ -328,7 +343,7 @@ namespace yocto
         }
 
 
-        size_t particles:: erode_and_check( tagmap &tmap )
+        size_t particles:: erode_and_check( tagmap &tmap)
         {
             _particles  &self = *this;
             const size_t n    = self.size();

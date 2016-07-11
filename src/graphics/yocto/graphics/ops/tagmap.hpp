@@ -11,6 +11,7 @@ namespace yocto
     {
 
         typedef pixmap<size_t> _tagmap;
+        class particle;
 
         //! class to build a map of tags associated to an image
         class tagmap : public _tagmap
@@ -70,6 +71,8 @@ namespace yocto
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tagmap);
+            friend class particle;
+            
             template <typename T>
             size_t __build_particle(const pixmap<T> &src,
                                     const unit_t     i,
