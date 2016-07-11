@@ -37,11 +37,35 @@ namespace yocto
 
             friend  std::ostream & operator<<( std::ostream &os, const stencil &S );
 
+            void ldz() throw();
+
+            template <typename T>
+            void load(const pixmap<T> &src,
+                      const vertex     org) throw()
+            {
+                for(size_t i=0;i<9;++i)
+                {
+                    const vertex probe = org+shift[i];
+                    if(src.has(probe))
+                    {
+                        v[i] = float(src[probe]);
+                    }
+                    else
+                    {
+                        v[i] = 0;
+                    }
+                }
+
+            }
+
         private:
             row     *rows;
             float    v[9];
             uint64_t wksp[ YOCTO_U64_FOR_SIZE( 3*sizeof(row) ) ];
             void setup() throw();
+
+        public:
+            static const vertex shift[9];
 
         };
 

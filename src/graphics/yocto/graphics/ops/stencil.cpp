@@ -30,18 +30,33 @@ namespace yocto
 
     namespace graphics
     {
+
+        const vertex stencil::shift[9] =
+        {
+            vertex(-1,-1), vertex(-1,0), vertex(-1,1),
+            vertex( 0,-1), vertex( 0,0), vertex( 0,1),
+            vertex( 1,-1), vertex( 1,0), vertex( 1,1)
+        };
+
+
         stencil:: stencil() throw() :
         rows(0),
         v(),
         wksp()
         {
-            memset(v,0,sizeof(v));
+            ldz();
             setup();
             std::cerr << "sizeof(stencil.wksp)=" << sizeof(wksp) << std::endl;
             std::cerr << "sizeof(stencil.v   )=" << sizeof(v)    << std::endl;
             std::cerr << "sizeof(stencil     )=" << sizeof(stencil) << std::endl;
 
         }
+
+        void stencil:: ldz() throw()
+        {
+            memset(v,0,sizeof(v));
+        }
+
 
         void stencil:: setup() throw()
         {

@@ -133,6 +133,8 @@ namespace yocto
             {
                 vnode_type *node = border.pop_back();
                 bool        kill = false;
+
+#if 0
                 for(const vnode_type *sub = inside.head;sub;sub=sub->next)
                 {
                     if( gist::are_touching(node->vtx,sub->vtx) )
@@ -140,8 +142,8 @@ namespace yocto
                         kill = true;
                         break;
                     }
-
                 }
+#endif
 
                 if(kill)
                 {

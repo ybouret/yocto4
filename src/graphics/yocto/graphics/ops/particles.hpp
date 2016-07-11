@@ -34,7 +34,7 @@ namespace yocto
                 }
             }
 
-            //! set target
+            //! set target to a given value
             template <typename T>
             void transfer( pixmap<T> &tgt, const T value) const
             {
@@ -50,8 +50,8 @@ namespace yocto
             //! compute extension 'a la' bounding box
             vertex compute_extension() const throw();
 
-            vnode_list inside;
-            vnode_list border;
+            vnode_list inside; //!< temporary inside list
+            vnode_list border; //!< temporary border list
 
             //! merge inside and border inside this.
             void regroup() throw();
@@ -59,6 +59,7 @@ namespace yocto
             //! split this into inside and border
             void split_using(const tagmap &tmap ) throw();
 
+            //! transfert inside source and border value...
             template <typename T>
             void transfer_with_contour(pixmap<T>       &tgt,
                                        const pixmap<T> &src,
@@ -80,6 +81,7 @@ namespace yocto
 
             }
 
+            //! transfert contour only
             template <typename T>
             void transfer_contour(pixmap<T>       &tgt,
                                   const T contour_value) const
