@@ -31,7 +31,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
     threading::engine server(true);
     timings           tmx;
 
-    stencil S;
+    stencil<float> S;
     float   xx=0;
     for(unit_t dy=-1;dy<=1;++dy)
     {
@@ -43,6 +43,9 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
     std::cerr << "S=" << S << std::endl;
 
+    stencil<uint8_t> s8;
+    stencil<RGB>     s3;
+    stencil<RGBA>    s4;
 
     if(argc>1)
     {

@@ -4,69 +4,141 @@
 #include "yocto/graphics/pixmap.hpp"
 #include "yocto/graphics/xpatch.hpp"
 #include "yocto/code/round.hpp"
+#include "yocto/code/bzset.hpp"
+#include <cstring>
 
 namespace yocto
 {
     namespace graphics
     {
 
+        class _stencil
+        {
+        public:
+            static const vertex shift[9];
+
+            inline virtual ~ _stencil() throw()
+            {
+            }
+
+        protected:
+            inline _stencil() throw() {}
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(_stencil);
+        };
+
+        template <typename T>
         class stencil
         {
         public:
             class row
             {
             public:
-                row(float *entry)  throw();
-                float &      operator[](const unit_t dx) throw();
-                const float &operator[](const unit_t dx) const throw();
+                inline row(T *entry)  throw() : addr(entry+1) { assert(entry); }
+
+                inline T &      operator[](const unit_t dx) throw()
+                {
+                    assert(dx>=-1); assert(dx<=1);return addr[dx];
+                }
+
+                const T &operator[](const unit_t dx) const throw()
+                {
+                    assert(dx>=-1); assert(dx<=1);return addr[dx];
+                }
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(row);
                 ~row() throw();
-                float *addr;
+                T *addr;
             };
 
-            stencil() throw();
-            ~stencil() throw();
-            stencil(const stencil &) throw();
-            stencil & operator=(const stencil &) throw();
+            inline stencil() throw() : rows(0), v(), wksp()
+            {
+                ldz();
+                setup();
+                std::cerr << "sizeof(stencil.wksp)=" << sizeof(wksp) << std::endl;
+                std::cerr << "sizeof(stencil.v   )=" << sizeof(v)    << std::endl;
+                std::cerr << "sizeof(stencil     )=" << sizeof(stencil) << std::endl;
+            }
 
-            row       & operator[](const unit_t dy) throw();
-            const row & operator[](const unit_t dy) const throw();
+            inline virtual ~stencil() throw() {}
+
+            inline stencil(const stencil &other) throw() :
+            rows(0),
+            v(),
+            wksp()
+            {
+                memcpy(v,other.v,sizeof(v));
+                setup();
+            }
+
+            inline stencil & operator=(const stencil &other) throw()
+            {
+                memmove(v,other.v,sizeof(v));
+                return *this;
+            }
+
+            inline row & operator[](const unit_t dy) throw()
+            {
+                assert(dy>=-1);assert(dy<=1); return rows[dy];
+            }
+
+            inline const row & operator[](const unit_t dy) const throw()
+            {
+                assert(dy>=-1);assert(dy<=1); return rows[dy];
+            }
 
 
 
-            friend  std::ostream & operator<<( std::ostream &os, const stencil &S );
+            inline friend  std::ostream & operator<<( std::ostream &os, const stencil &S )
+            {
+                os << '[';
+                os << S[-1][-1] << ' ' << S[-1][0] << ' ' << S[-1][1] << ';';
+                os << S[ 0][-1] << ' ' << S[ 0][0] << ' ' << S[ 0][1] << ';';
+                os << S[ 1][-1] << ' ' << S[ 1][0] << ' ' << S[ 1][1] << ']';
+                return os;
+            }
 
-            void ldz() throw();
+            inline void ldz() throw()
+            {
+                memset(v,0,sizeof(v));
+            }
 
-            template <typename T>
-            void load(const pixmap<T> &src,
-                      const vertex     org) throw()
+
+            template <typename U>
+            inline void load(const pixmap<U> &src,
+                             const vertex     org) throw()
             {
                 for(size_t i=0;i<9;++i)
                 {
-                    const vertex probe = org+shift[i];
+                    const vertex probe = org+ _stencil::shift[i];
                     if(src.has(probe))
                     {
-                        v[i] = float(src[probe]);
+                        v[i] = T(src[probe]);
                     }
                     else
                     {
-                        v[i] = 0;
+                        bzset(v[i]);
                     }
                 }
 
             }
 
+
         private:
             row     *rows;
-            float    v[9];
+            T        v[9];
             uint64_t wksp[ YOCTO_U64_FOR_SIZE( 3*sizeof(row) ) ];
-            void setup() throw();
-
-        public:
-            static const vertex shift[9];
-
+            inline void setup() throw()
+            {
+                row *r = (row *)&wksp[0];
+                rows = r+1;
+                new (&r[0]) row(v+0);
+                new (&r[1]) row(v+3);
+                new (&r[2]) row(v+6);
+            }
+            
         };
 
     }
