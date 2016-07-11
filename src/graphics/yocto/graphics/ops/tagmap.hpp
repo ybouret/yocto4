@@ -2,6 +2,7 @@
 #define YOCTO_GRAPHICS_OPS_TAGMAP_INCLUDED 1
 
 #include "yocto/graphics/pixmap.hpp"
+#include "yocto/graphics/data2rgba.hpp"
 #include "yocto/stock/stack.hpp"
 
 namespace yocto
@@ -15,8 +16,9 @@ namespace yocto
         public:
             explicit tagmap(const unit_t W, const unit_t H);
             virtual ~tagmap() throw();
-            size_t        current;
-            stack<vertex> v_stack;
+            size_t                   current;
+            stack<vertex>            v_stack;
+            get_named_color<size_t>  to_rgba;
 
             template <typename T>
             void build(const pixmap<T> &src,

@@ -103,7 +103,7 @@ namespace yocto
                 }
                 else
                 {
-                    size_t idx=n>>1;
+                    size_t idx = n>>1;
                     real_t sum = real_t(ra[idx]);
                     sum += real_t(ra[idx+1]);
                     sum *= 0.5f;

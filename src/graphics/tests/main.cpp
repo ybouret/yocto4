@@ -5,8 +5,6 @@
 
 YOCTO_UNIT_TEST_INIT(16)
 {
-    //const float sfac = (std::sqrt( -2.0f*std::log(FLT_EPSILON)));
-    //std::cerr << "sfac=" << sfac << std::endl;
     
     YOCTO_UNIT_TEST_DECL(bitmap);
     YOCTO_UNIT_TEST_DECL(pixmap);
@@ -17,6 +15,5 @@ YOCTO_UNIT_TEST_INIT(16)
     YOCTO_UNIT_TEST_DECL(block);
     YOCTO_UNIT_TEST_DECL(tiff);
     YOCTO_UNIT_TEST_DECL(pa);
-    YOCTO_UNIT_TEST_DECL(blobs);
 }
 YOCTO_UNIT_TEST_EXEC()

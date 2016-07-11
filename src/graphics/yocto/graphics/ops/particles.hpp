@@ -129,7 +129,7 @@ namespace yocto
             void load( const tagmap &tmap );
 
 
-            void   dilate_and_join( tagmap       &tmap );
+            void   dilate_and_join( tagmap &tmap );
 
             //! erode all particles, return #suppressed
             size_t erode_and_check( tagmap       &tmap );

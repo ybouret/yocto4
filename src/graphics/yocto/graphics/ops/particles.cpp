@@ -296,7 +296,7 @@ namespace yocto
                     particle &rhs = *self[j];
                     if(lhs.touches(rhs))
                     {
-                        std::cerr << "contact " << lhs.tag << "/" << rhs.tag << std::endl;
+                        //std::cerr << "contact " << lhs.tag << "/" << rhs.tag << std::endl;
                         __reassign(lhs,rhs.inside,tmap);
                         __reassign(lhs,rhs.border,tmap);
                         lhs.regroup();

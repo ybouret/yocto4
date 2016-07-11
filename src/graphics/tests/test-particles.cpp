@@ -4,7 +4,6 @@
 #include "yocto/graphics/image/jpeg.hpp"
 #include "yocto/graphics/image/tiff.hpp"
 #include "yocto/graphics/ops/histogram.hpp"
-#include "yocto/graphics/ops/blobs.hpp"
 #include "yocto/graphics/ops/gradient.hpp"
 #include "yocto/graphics/ops/blur.hpp"
 #include "yocto/graphics/ops/particles.hpp"
@@ -26,7 +25,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
     const image::format &PNG = IMG["PNG"];
 
-    threading::engine server(4,0,true);
+    threading::engine server(true);
 
     if(argc>1)
     {
@@ -70,8 +69,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
         tagmap tmap(w,h);
         tmap.build(fg,8);
 
-        get_named_color<size_t> tag2color;
-        PNG.save("image_tag.png",tmap,tag2color,NULL);
+        PNG.save("image_tag.png",tmap,tmap.to_rgba,NULL);
 
         std::cerr << "-- Create initial particles" << std::endl;
         particles pa;
