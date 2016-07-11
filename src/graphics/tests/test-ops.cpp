@@ -32,7 +32,15 @@ YOCTO_UNIT_TEST_IMPL(ops)
     timings           tmx;
 
     stencil S;
-    S[-1][-1] = 2;
+    float   xx=0;
+    for(unit_t dy=-1;dy<=1;++dy)
+    {
+        for(unit_t dx=-1;dx<=1;++dx)
+        {
+            S[dy][dx] = ++xx;
+        }
+    }
+
     std::cerr << "S=" << S << std::endl;
 
 
