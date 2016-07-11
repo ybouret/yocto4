@@ -68,15 +68,15 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
         std::cerr << "-- Building Initial Tag Map" << std::endl;
         tagmap tmap(w,h);
-        tmap.build(fg,8);
+        tmap.build(fg);
 
         PNG.save("image_tag.png",tmap,tmap.to_rgba,NULL);
 
         std::cerr << "-- Create initial particles" << std::endl;
         particles pa;
         pa.load(tmap);
-        std::cerr << "#particles=" << pa.size() << std::endl;
 
+        
         std::cerr << "-- Finding Borders..." << std::endl;
         pa.split_all_using(tmap);
 

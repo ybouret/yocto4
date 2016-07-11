@@ -10,8 +10,10 @@ namespace yocto
     namespace graphics
     {
 
+        typedef pixmap<size_t> _tagmap;
+
         //! class to build a map of tags associated to an image
-        class tagmap : public pixmap<size_t>
+        class tagmap : public _tagmap
         {
         public:
             explicit tagmap(const unit_t W, const unit_t H);
@@ -21,12 +23,10 @@ namespace yocto
             get_named_color<size_t>  to_rgba;
 
             template <typename T>
-            void build(const pixmap<T> &src,
-                       const size_t     links)
+            void build(const pixmap<T> &src)
             {
                 assert(w==src.w);
                 assert(h==src.h);
-                assert(links==4||links==8);
 
                 //______________________________________________________________
                 //
@@ -58,32 +58,8 @@ namespace yocto
                         size_t &B = B_j[i];
                         if( (B_j[i]<=0) && (!is_zero_pixel(S_j[i])) )
                         {
-                            //__________________________________________________
-                            //
-                            // start a new tag
-                            //__________________________________________________
-                            B = ++current;
 
-                            //__________________________________________________
-                            //
-                            // initialize stack with valid neighbors
-                            //__________________________________________________
-                            v_stack.free();
-                            {
-                                const vertex v(i,j);
-                                grow(v,src,links);
-                            }
-
-                            //__________________________________________________
-                            //
-                            // work on stack
-                            //__________________________________________________
-                            while(v_stack.size()>0)
-                            {
-                                const vertex v = v_stack.peek();
-                                v_stack.pop();
-                                grow(v,src,links);
-                            }
+                            (void)__build_particle(src,i,j,B);
                         }
                     }
                 }
@@ -95,12 +71,54 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tagmap);
             template <typename T>
+            size_t __build_particle(const pixmap<T> &src,
+                                    const unit_t     i,
+                                    const unit_t     j,
+                                    size_t          &B)
+            {
+                assert( &B == & (*this)[j][i] );
+                assert(  B <= 0 );
+                assert( !is_zero_pixel(src[j][i]) );
+
+                //__________________________________________________
+                //
+                // start a new tag
+                //__________________________________________________
+                B = ++current;
+                size_t count = 1;
+
+                //__________________________________________________
+                //
+                // initialize stack with valid neighbors
+                //__________________________________________________
+                v_stack.free();
+                {
+                    const vertex v(i,j);
+                    grow(v,src,count);
+                }
+
+                //__________________________________________________
+                //
+                // work on stack
+                //__________________________________________________
+                while(v_stack.size()>0)
+                {
+                    const vertex v = v_stack.peek();
+                    v_stack.pop();
+                    grow(v,src,count);
+                }
+                return count;
+            }
+
+
+
+            template <typename T>
             inline void grow(const vertex    &v,
                              const pixmap<T> &src,
-                             const size_t     links)
+                             size_t          &count)
             {
                 pixmap<size_t> &self = *this;
-                for(size_t k=0;k<links;++k)
+                for(size_t k=0;k<8;++k)
                 {
                     const vertex tmp = v + gist::delta[k];
                     if(this->has(tmp) &&        // inside working region
@@ -110,6 +128,7 @@ namespace yocto
                     {
                         self[tmp] = current;
                         v_stack.push(tmp);
+                        ++count;
                     }
                 }
                 
