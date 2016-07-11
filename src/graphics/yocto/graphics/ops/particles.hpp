@@ -53,7 +53,7 @@ namespace yocto
             vnode_list inside; //!< temporary inside list
             vnode_list border; //!< temporary border list
 
-            //! merge inside and border inside this.
+            //! merge inside and border inside this. Sort afterwards...
             void regroup() throw();
 
             //! split this into inside and border
@@ -101,14 +101,6 @@ namespace yocto
              */
             size_t dilate_with( tagmap &tmap ) throw();
 
-            //! erode using borders, split if necessary
-            /**
-             remove border points touching this tag.
-             the points are regrouped.
-             \return the number of eroded points
-             */
-            size_t   erode_with( tagmap &tmap ) throw();
-
             //! borders are touching, MUST be splitted
             bool touches( const particle &other ) const throw();
 
@@ -131,11 +123,7 @@ namespace yocto
             void load( const tagmap &tmap );
 
 
-            void   dilate_and_join( tagmap &tmap );
-
-            //! erode all particles, return #suppressed
-            size_t erode_and_check( tagmap &tmap );
-            
+            void dilate_and_join( tagmap &tmap );
             void split_all_using( const tagmap &tmap ) throw();
             void regroup_all() throw();
 

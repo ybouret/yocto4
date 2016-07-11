@@ -122,6 +122,8 @@ namespace yocto
 
             }
 
+            inline T       & operator()(const size_t indx) throw()       { assert(indx<9); return v[indx]; }
+            inline const T & operator()(const size_t indx) const throw() { assert(indx<9); return v[indx]; }
 
         private:
             row     *rows;

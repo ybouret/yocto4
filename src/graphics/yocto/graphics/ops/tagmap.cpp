@@ -17,7 +17,12 @@ namespace yocto
         {
         }
 
-        
+        void tagmap:: initialize() throw()
+        {
+            ldz();
+            current=0;
+        }
+
     }
 
 }

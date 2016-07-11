@@ -122,69 +122,8 @@ namespace yocto
             return extra;
         }
 
-        size_t particle:: erode_with(tagmap &tmap) throw()
-        {
-            const unit_t    w=tmap.w;
-            const unit_t    h=tmap.h;
-            pixmap<uint8_t> mask(w,h);
-            tagmap          tsub(w,h);
-            
-            // intialize the particle
-            regroup();
-            const size_t ntot = size;
 
-            // register the particle in tsub
-            tsub.ldz();
-            tsub.current = 0;
-
-            for(const vnode_type *node = head; node; node=node->next )
-            {
-                assert(mask.has(node->vtx));
-                mask[node->vtx] = 1;
-            }
-
-            split_using(tmap);
-
-            // check if there is someting inside
-            if(inside.size<=0)
-                return 0;
-
-            const vertex in    = inside.head->vtx; assert(tsub.has(in));
-            size_t      &B     = tsub[in];
-            size_t       count = 0;
-
-            {
-                tsub.ldz(); tsub.current = 0;
-                assert( ntot == tsub.__build_particle(mask,in.x,in.y,B) );
-            }
-            
-            while(border.size)
-            {
-                vnode_type *node = border.pop_back();
-                bool        kill = false;
-
-
-
-
-                if(kill)
-                {
-                    assert(tmap.has(node->vtx));
-                    tmap[node->vtx] = 0;
-                    delete node;
-                    ++count;
-                }
-                else
-                {
-                    this->push_back(node);
-                }
-
-            }
-
-            regroup();
-            return count;
-        }
-
-
+        
 
         bool particle:: touches( const particle &other ) const throw()
         {
@@ -319,7 +258,6 @@ namespace yocto
                     particle &rhs = *self[j];
                     if(lhs.touches(rhs))
                     {
-                        //std::cerr << "contact " << lhs.tag << "/" << rhs.tag << std::endl;
                         __reassign(lhs,rhs.inside,tmap);
                         __reassign(lhs,rhs.border,tmap);
                         lhs.regroup();
@@ -339,23 +277,13 @@ namespace yocto
                     }
                 }
             }
-            sort();
+
+            // regroup and sort
+            regroup_all();
         }
 
 
-        size_t particles:: erode_and_check( tagmap &tmap)
-        {
-            _particles  &self = *this;
-            const size_t n    = self.size();
-            size_t count = 0;
-            for(size_t i=1;i<=n;++i)
-            {
-                count += self[i]->erode_with(tmap);
-            }
-            sort();
-            return count;
-        }
-
+        
 
         void particles:: split_all_using( const tagmap &tmap ) throw()
         {
@@ -375,6 +303,7 @@ namespace yocto
             {
                 self[i]->regroup();
             }
+            sort();
         }
 
 

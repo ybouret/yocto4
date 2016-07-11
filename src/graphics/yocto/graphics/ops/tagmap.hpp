@@ -36,8 +36,7 @@ namespace yocto
                 //
                 //______________________________________________________________
                 pixmap<size_t> &self = *this;
-                ldz();             // clear pixmap
-                current = 0;       // blob counter/id
+                initialize();
 
                 //______________________________________________________________
                 //
@@ -66,8 +65,8 @@ namespace yocto
                 }
             }
 
-
-
+            //! ldz(), current=0
+            void initialize() throw();
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tagmap);

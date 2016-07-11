@@ -104,6 +104,12 @@ YOCTO_UNIT_TEST_IMPL(pa)
         pa.dilate_and_join(tmap);
         std::cerr << "#final_particle=" << pa.size() << std::endl;
 
+        for(size_t i=1;i<=pa.size();++i)
+        {
+            std::cerr << "particle.size=" << pa[i]->size << std::endl;
+        }
+
+        
         part.copy(img);
         for(size_t i=1;i<=pa.size();++i)
         {
@@ -112,27 +118,6 @@ YOCTO_UNIT_TEST_IMPL(pa)
         PNG.save("image_part2.png",part,NULL);
         PNG.save("image_tag2.png",tmap,tmap.to_rgba,NULL);
 
-
-        {
-            std::cerr << "Full Erosion..." << std::endl;
-            while(pa.erode_and_check(tmap)>0)
-            {
-                break;
-            }
-            PNG.save("image_tag3.png",tmap,tmap.to_rgba,NULL);
-
-
-            return 0;
-            pa.regroup_all();
-            pa.split_all_using(tmap);
-            part.copy(img);
-            for(size_t i=1;i<=pa.size();++i)
-            {
-                pa[i]->transfer_contour(part, named_color::fetch( pa.size()+i*i ));
-            }
-            PNG.save("image_part3.png",part,NULL);
-
-        }
 
         pa.discard(10,tmap);
 
