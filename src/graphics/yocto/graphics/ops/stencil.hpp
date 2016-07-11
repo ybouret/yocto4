@@ -3,7 +3,7 @@
 
 #include "yocto/graphics/pixmap.hpp"
 #include "yocto/graphics/xpatch.hpp"
-
+#include "yocto/code/round.hpp"
 
 namespace yocto
 {
@@ -13,26 +13,35 @@ namespace yocto
         class stencil
         {
         public:
+            class row
+            {
+            public:
+                row(float *entry)  throw();
+                float &      operator[](const unit_t dx) throw();
+                const float &operator[](const unit_t dx) const throw();
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(row);
+                ~row() throw();
+                float *addr;
+            };
+
             stencil() throw();
             ~stencil() throw();
             stencil(const stencil &) throw();
             stencil & operator=(const stencil &) throw();
 
-            float     v[3][3];
-            inline float * operator[](const unit_t dy) throw()
-            {
-                assert(dy>=-1);assert(dy<=1);
-                return &v[dy+1][1];
-            }
+            row       & operator[](const unit_t dy) throw();
+            const row & operator[](const unit_t dy) const throw();
+
+
 
             friend  std::ostream & operator<<( std::ostream &os, const stencil &S );
 
-            template <typename T>
-            void load(const pixmap<T> &pxm,
-                      const vertex    &v)
-            {
-                assert(pxm.has(v));
-            }
+        private:
+            row     *rows;
+            float    v[9];
+            uint64_t wksp[ YOCTO_U64_FOR_SIZE( 3*sizeof(row) ) ];
+            void setup() throw();
 
         };
 
