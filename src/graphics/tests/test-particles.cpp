@@ -54,6 +54,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
         pixmapf flt(w,h);
         {
+            std::cerr << "-- Filtering.." << std::endl;
             filter F;
             F.apply(flt,grd, filter_median, xps, &server);
             PNG.save("image_flt.png",flt, NULL);
@@ -92,17 +93,33 @@ YOCTO_UNIT_TEST_IMPL(pa)
         pa.regroup_all();
         for(size_t i=1;i<=pa.size();++i)
         {
+            break;
             particle &p = *pa[i];
             std::cerr << "#pixels =" << p.size << std::endl;
             std::cerr << "|_AABB  =" << p.compute_extension() << std::endl;
         }
 
+        std::cerr << "-- Make one fusion" << std::endl;
+        std::cerr << "#start_particle=" << pa.size() << std::endl;
+        pa.dilate_and_join(tmap);
+        std::cerr << "#final_particle=" << pa.size() << std::endl;
+
+        part.copy(img);
+        for(size_t i=1;i<=pa.size();++i)
+        {
+            pa[i]->transfer_contour(part, named_color::fetch( pa.size()+i*i ));
+        }
+        PNG.save("image_part2.png",part,NULL);
+        PNG.save("image_tag2.png",tmap,tmap.to_rgba,NULL);
+
+
+        return 0;
 
         {
             std::cerr << "Full Erosion..." << std::endl;
             while(pa.erode_and_check(tmap)>0)
             {
-                //break;
+                break;
             }
 
             pa.regroup_all();

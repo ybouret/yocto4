@@ -1,6 +1,7 @@
 #include "yocto/graphics/ops/particles.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/math/types.hpp"
+#include "yocto/graphics/ops/stencil.hpp"
 
 namespace yocto
 {
@@ -129,10 +130,15 @@ namespace yocto
             assert(this->size==0);
             size_t count = 0;
 
+            stencil<size_t> local;
+
             while(border.size)
             {
                 vnode_type *node = border.pop_back();
                 bool        kill = false;
+
+                //! load local environment
+                local.load(tmap,node->vtx);
 
 #if 0
                 for(const vnode_type *sub = inside.head;sub;sub=sub->next)

@@ -57,9 +57,6 @@ namespace yocto
             {
                 ldz();
                 setup();
-                std::cerr << "sizeof(stencil.wksp)=" << sizeof(wksp) << std::endl;
-                std::cerr << "sizeof(stencil.v   )=" << sizeof(v)    << std::endl;
-                std::cerr << "sizeof(stencil     )=" << sizeof(stencil) << std::endl;
             }
 
             inline virtual ~stencil() throw() {}
