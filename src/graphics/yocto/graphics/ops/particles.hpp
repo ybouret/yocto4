@@ -123,11 +123,19 @@ namespace yocto
             void load( const tagmap &tmap );
 
 
+            //! make a dilatation and join touching particles, updating tagmap
             void dilate_and_join( tagmap &tmap );
+
+            //! split all inside/border according to tag map
             void split_all_using( const tagmap &tmap ) throw();
+
+            //! regroup all and sort
             void regroup_all() throw();
 
+            //! discard small particles and update tagmap
             void discard(const size_t min_size, tagmap &tmap) throw();
+
+            
 
 
         private:

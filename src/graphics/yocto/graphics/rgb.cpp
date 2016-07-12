@@ -54,7 +54,13 @@ namespace yocto
         {
             return (x<=0);
         }
-        
+
+        template <> bool is_zero_pixel<size_t>(const size_t &x) throw()
+        {
+            return (x<=0);
+        }
+
+
         template <> bool is_zero_pixel<RGB>(const RGB &c) throw()
         {
             return (c.r<=0) && (c.g<=0) && (c.b<=0);

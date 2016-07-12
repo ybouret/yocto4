@@ -23,6 +23,8 @@ namespace yocto
             inline explicit filter() throw() : tgt(0), src(0), fid(filter_median) {}
             inline virtual ~filter() throw() {}
 
+
+
             template <typename T>
             void apply(pixmap<T>         &target,
                        const pixmap<T>   &source,
@@ -32,6 +34,7 @@ namespace yocto
             {
                 tgt = &target;
                 src = &source;
+                fid = ops;
                 const size_t np = xps.size();
                 for(size_t i=np;i>0;--i)
                 {
