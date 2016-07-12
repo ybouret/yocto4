@@ -54,6 +54,7 @@ namespace yocto
                 this->apply(target,source,fcn,xps,server);
             }
 
+            //! default algorithm, specialized later
             T median( array<T> &ra ) throw()
             {
                 assert(ra.size()>0);
@@ -76,6 +77,8 @@ namespace yocto
                 }
             }
 
+
+            //! default algorithm, specialized later
             T average( array<T> &ra ) throw()
             {
                 assert(ra.size()>0);
@@ -87,6 +90,38 @@ namespace yocto
                     sum += real_t(ra[i]);
                 }
                 return T(sum/n);
+            }
+
+            T expand( array<T> &ra ) throw()
+            {
+                assert(ra.size()>0);
+                assert(ra.size()<=9);
+                T ans = ra[1];
+                for(size_t i=ra.size();i>1;--i)
+                {
+                    const T tmp = ra[i];
+                    if(tmp>ans)
+                    {
+                        ans = tmp;
+                    }
+                }
+                return ans;
+            }
+
+            T erode( array<T> &ra ) throw()
+            {
+                assert(ra.size()>0);
+                assert(ra.size()<=9);
+                T ans = ra[1];
+                for(size_t i=ra.size();i>1;--i)
+                {
+                    const T tmp = ra[i];
+                    if(tmp<ans)
+                    {
+                        ans = tmp;
+                    }
+                }
+                return ans;
             }
 
 
@@ -186,6 +221,75 @@ namespace yocto
         {
             return average_colors(ra);
         }
+
+        template <>
+        inline RGB filter<RGB>:: expand(array<RGB> &ra) throw()
+        {
+            assert(ra.size()>0);
+            assert(ra.size()<=9);
+            RGB ans = ra[1];
+            for(size_t i=ra.size();i>0;--i)
+            {
+                const RGB tmp = ra[i];
+                if(compare_colors(ans,tmp)<0)
+                {
+                    ans = tmp;
+                }
+            }
+            return ans;
+        }
+
+        template <>
+        inline RGBA filter<RGBA>:: expand(array<RGBA> &ra) throw()
+        {
+            assert(ra.size()>0);
+            assert(ra.size()<=9);
+            RGBA ans = ra[1];
+            for(size_t i=ra.size();i>0;--i)
+            {
+                const RGBA tmp = ra[i];
+                if(compare_colors(ans,tmp)<0)
+                {
+                    ans = tmp;
+                }
+            }
+            return ans;
+        }
+
+        template <>
+        inline RGB filter<RGB>:: erode(array<RGB> &ra) throw()
+        {
+            assert(ra.size()>0);
+            assert(ra.size()<=9);
+            RGB ans = ra[1];
+            for(size_t i=ra.size();i>0;--i)
+            {
+                const RGB tmp = ra[i];
+                if(compare_colors(ans,tmp)>0)
+                {
+                    ans = tmp;
+                }
+            }
+            return ans;
+        }
+
+        template <>
+        inline RGBA filter<RGBA>:: erode(array<RGBA> &ra) throw()
+        {
+            assert(ra.size()>0);
+            assert(ra.size()<=9);
+            RGBA ans = ra[1];
+            for(size_t i=ra.size();i>0;--i)
+            {
+                const RGBA tmp = ra[i];
+                if(compare_colors(ans,tmp)>0)
+                {
+                    ans = tmp;
+                }
+            }
+            return ans;
+        }
+
 
 
         

@@ -23,7 +23,7 @@ namespace
         pixmap<T> org(src);
         pixmap<T> tgt(w,h);
 
-        for(unsigned i=1;i<=5;++i)
+        for(unsigned i=1;i<=4;++i)
         {
             F.apply(tgt,org,&F,&filter<T>::median,xps,server);
             const string med_id = "img" + id + vformat("_med%u.png",i);
@@ -32,13 +32,34 @@ namespace
         }
 
         org.copy(src);
-        for(unsigned i=1;i<=5;++i)
+        for(unsigned i=1;i<=4;++i)
         {
             F.apply(tgt,org,&F,&filter<T>::average,xps,server);
             const string ave_id = "img" + id + vformat("_ave%u.png",i);
             PNG.save(ave_id,tgt,NULL);
             org.copy(tgt);
         }
+
+
+        org.copy(src);
+        for(unsigned i=1;i<=4;++i)
+        {
+            F.apply(tgt,org,&F,&filter<T>::expand,xps,server);
+            const string ave_id = "img" + id + vformat("_exp%u.png",i);
+            PNG.save(ave_id,tgt,NULL);
+            org.copy(tgt);
+        }
+
+        org.copy(src);
+        for(unsigned i=1;i<=4;++i)
+        {
+            F.apply(tgt,org,&F,&filter<T>::erode,xps,server);
+            const string ave_id = "img" + id + vformat("_erd%u.png",i);
+            PNG.save(ave_id,tgt,NULL);
+            org.copy(tgt);
+        }
+
+
     }
 
 }
@@ -71,10 +92,10 @@ YOCTO_UNIT_TEST_IMPL(filter)
         xpatches xps;
         xpatch::create(xps, imgf, &server);
 
-        if(false) run_filter(imgf,xps,&server);
-        if(false) run_filter(img1,xps,&server);
-        if(true)  run_filter(img3,xps,&server);
-        if(false) run_filter(img4,xps,&server);
+        if(true) run_filter(imgf,xps,&server);
+        if(true) run_filter(img1,xps,&server);
+        if(true) run_filter(img3,xps,&server);
+        if(true) run_filter(img4,xps,&server);
 
     }
 
