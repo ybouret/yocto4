@@ -21,7 +21,6 @@ namespace yocto
             {
                 static const double amplitude( opaque );
                 const T ans(amplitude*x);
-                //std::cerr << x << "->" << double(ans) << std::endl;
                 return ans;
             }
         };
@@ -69,6 +68,47 @@ namespace yocto
         typedef rgb<uint8_t>  RGB;
         typedef rgba<uint8_t> RGBA;
 
+        template <typename RGB_TYPE>
+        inline int compare_colors(const RGB_TYPE &lhs, const RGB_TYPE &rhs ) throw()
+        {
+            const float L = gist::greyscalef(lhs.r,lhs.g,lhs.b);
+            const float R = gist::greyscalef(rhs.r,rhs.g,rhs.b);
+            return (L<R) ? -1 : ( (R<L) ? 1 : 0 );
+        }
+
+        template <typename RGB_TYPE>
+        inline RGB_TYPE average_colors(const RGB_TYPE &lhs, const RGB_TYPE &rhs ) throw()
+        {
+            const uint8_t r = uint8_t(0.5f*( float(lhs.r) + float(rhs.r) ));
+            const uint8_t g = uint8_t(0.5f*( float(lhs.g) + float(rhs.g) ));
+            const uint8_t b = uint8_t(0.5f*( float(lhs.b) + float(rhs.b) ));
+            return RGB_TYPE(r,g,b);
+        }
+
+        template <typename RGB_TYPE>
+        inline RGB_TYPE average_colors(const array<RGB_TYPE> &a) throw()
+        {
+            float r = 0;
+            float g = 0;
+            float b = 0;
+            const size_t n = a.size();
+            if(n>0)
+            {
+                for(size_t i=n;i>0;--i)
+                {
+                    const RGB_TYPE &C = a[i];
+                    r += float(C.r);
+                    g += float(C.g);
+                    b += float(C.b);
+                }
+                r = floorf(r/n+0.5f);
+                g = floorf(g/n+0.5f);
+                b = floorf(b/n+0.5f);
+            }
+            return RGB_TYPE(uint8_t(r),uint8_t(g),uint8_t(b));
+        }
+
+
         //______________________________________________________________________
         //
         // abstract operations
@@ -77,7 +117,11 @@ namespace yocto
         template <typename T> uint8_t project(const T&) throw();
         template <typename T> float   to_float(const T&) throw();
         template <typename T> T       invert_color(const T&) throw();
-
+        
+        //______________________________________________________________________
+        //
+        // making a default ramp
+        //______________________________________________________________________
         template <typename RGB_TYPE>
         inline RGB_TYPE default_ramp( double v, const double vmin=0, const double vmax=0)
         {

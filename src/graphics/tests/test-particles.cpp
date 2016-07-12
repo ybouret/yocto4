@@ -52,18 +52,23 @@ YOCTO_UNIT_TEST_IMPL(pa)
             PNG.save("image_grd.png",grd, NULL);
         }
 
-        pixmapf flt(w,h);
         {
+            filter<float> F;
+
+            pixmapf flt_ave(w,h);
             std::cerr << "-- Filtering.." << std::endl;
-            filter F;
-            F.apply(flt,grd, filter_median, xps, &server);
-            PNG.save("image_flt.png",flt, NULL);
+            F.apply(flt_ave,grd,&F, & filter<float>::average, xps, &server);
+            PNG.save("image_flt_ave.png",flt_ave, NULL);
+
+            pixmapf flt_med(w,h);
+            F.apply(flt_med,grd,&F, & filter<float>::median, xps, &server);
+            PNG.save("image_flt_median.png",flt_med, NULL);
         }
 
 
         std::cerr << "-- Looking Up Foreground..." << std::endl;
         pixmapf fg(w,h);
-        separate(threshold::keep_foreground,fg,flt,xps,&server);
+        separate(threshold::keep_foreground,fg,grd,xps,&server);
         PNG.save("image_fg.png",fg, NULL);
 
         std::cerr << "-- Building Initial Tag Map" << std::endl;
