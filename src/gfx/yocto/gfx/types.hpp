@@ -21,13 +21,19 @@ namespace yocto
 
         struct gist
         {
-            static const  float  unit_float[256]; //!< 0.0f..1.0f
-            static const  float  unit_float_r[256]; //!< (0.0f..1.0f)*YOCTO_GFX_R2GS
-            static const  float  unit_float_g[256]; //!< (0.0f..1.0f)*YOCTO_GFX_G2GS
-            static const  float  unit_float_b[256]; //!< (0.0f..1.0f)*YOCTO_GFX_B2GS
-            static inline float  greyscalef(const uint8_t R,const uint8_t G,const uint8_t B) throw()
+            static const  float   unit_float[256];   //!< 0.0f..1.0f
+            static const  float   unit_float_r[256]; //!< (0.0f..1.0f)*YOCTO_GFX_R2GS
+            static const  float   unit_float_g[256]; //!< (0.0f..1.0f)*YOCTO_GFX_G2GS
+            static const  float   unit_float_b[256]; //!< (0.0f..1.0f)*YOCTO_GFX_B2GS
+            static inline uint8_t float2byte(const float x) throw() { return uint8_t(x*255.0f+0.5f); }
+            static inline float   greyscalef(const uint8_t R,const uint8_t G,const uint8_t B) throw()
             {
                 return unit_float_r[R] + unit_float_g[R] + unit_float_b[B];
+            }
+
+            static inline uint8_t greyscale1(const uint8_t R,const uint8_t G,const uint8_t B) throw()
+            {
+                return float2byte(greyscalef(R,G,B));
             }
 
             static const vertex delta[8]; //!< the 4+4 coordinates around a single point

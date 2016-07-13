@@ -1,4 +1,4 @@
-#include "yocto/gfx/color/rgb.hpp"
+#include "yocto/gfx/color/yuv.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/ipower.hpp"
 #include "yocto/string.hpp"
@@ -33,6 +33,9 @@ YOCTO_UNIT_TEST_IMPL(types)
     RGBA D(4,5,6); std::cerr << "D=" << D << std::endl;
     std::cerr << "D'=" << D._rgb() << std::endl;
 
+    std::cerr << "sizeof(RGB) =" << sizeof(RGB)  << std::endl;
+    std::cerr << "sizeof(RGBA)=" << sizeof(RGBA) << std::endl;
+    std::cerr << "sizeof(YUV) =" << sizeof(YUV)  << std::endl;
 
 
 
