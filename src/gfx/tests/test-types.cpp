@@ -1,33 +1,35 @@
 #include "yocto/gfx/types.hpp"
 #include "yocto/utest/run.hpp"
-#include <cstdio>
+#include "yocto/code/ipower.hpp"
+#include "yocto/string.hpp"
+#include <cmath>
 
 using namespace yocto;
+using namespace gfx;
+
 
 YOCTO_UNIT_TEST_IMPL(types)
 {
-
-    for(int i=0;i<256;++i)
+    for(int r=0;r<256;++r)
     {
-        if(i<=0)
+        for(int g=0;g<256;++g)
         {
-            printf("%3d.0f       ",0);
-        }
-        else
-        {
-            if(i>=255)
+            for(int b=0;b<256;++b)
             {
-                printf("%3d.0f       ",1);
-            }
-            else
-            {
-                printf("%3d.0f/255.0f",i);
+                const float gs = gist::greyscalef(r,g,b);
+                if(gs<0.0f)
+                {
+                    throw exception("negative greyscale!");
+                }
+                if(gs>1.0f)
+                {
+                    throw exception("excessive greyscale!");
+                }
             }
         }
-        if(i<255) printf(",");
-        if(0==(1+i)%8) printf("\n"); else printf(" ");
     }
-    printf("\n");
+
+
 
 }
 YOCTO_UNIT_TEST_DONE()

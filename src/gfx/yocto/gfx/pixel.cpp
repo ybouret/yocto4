@@ -1,4 +1,4 @@
-#include "yocto/gfx/types.hpp"
+#include "yocto/gfx/pixel.hpp"
 
 namespace yocto
 {
@@ -6,13 +6,13 @@ namespace yocto
     {
 
         template <>
-        uint8_t pixel<uint8_t>::opaque = 0xff;
+        const uint8_t pixel<uint8_t>::opaque = 0xff;
 
         template <>
-        float pixel<float>::opaque = 1.0f;
+        const float pixel<float>::opaque = 1.0f;
 
         template <>
-        double pixel<double>::opaque = 1.0;
+        const double pixel<double>::opaque = 1.0;
 
 
 
