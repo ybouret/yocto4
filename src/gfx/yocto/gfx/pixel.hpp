@@ -8,7 +8,7 @@ namespace yocto
     namespace gfx
     {
 
-        //! abstract operation for pixmaps
+        //! abstract operation for pixmaps: uint8_t, float, RGB...
         template <typename T>
         struct pixel
         {

@@ -8,6 +8,17 @@ namespace yocto
     namespace gfx
     {
 
+#define YOCTO_GFX_COMPARE_OP(TYPE,OP) \
+inline friend bool operator OP ( const TYPE &lhs, const TYPE &rhs ) throw() { return TYPE::compare(lhs,rhs) OP 0; }
+
+#define YOCTO_GFX_COMPARE(TYPE) \
+YOCTO_GFX_COMPARE_OP(TYPE,==)\
+YOCTO_GFX_COMPARE_OP(TYPE,!=)\
+YOCTO_GFX_COMPARE_OP(TYPE,<)\
+YOCTO_GFX_COMPARE_OP(TYPE,>)\
+YOCTO_GFX_COMPARE_OP(TYPE,<=)\
+YOCTO_GFX_COMPARE_OP(TYPE,>=)
+
         template <typename T>
         class rgb
         {
@@ -28,6 +39,21 @@ namespace yocto
                 os << '(' << double(C.r) << ',' << double(C.g) << ',' << double(C.b) << ')';
                 return os;
             }
+
+            inline real_t intensity() const throw()
+            {
+                return YOCTO_GFX_R2GS * real_t(r) + YOCTO_GFX_G2GS * real_t(g) + YOCTO_GFX_B2GS * real_t(b);
+            }
+
+            static inline int compare(const rgb &lhs, const rgb &rhs) throw()
+            {
+                const real_t L = lhs.intensity();
+                const real_t R = rhs.intensity();
+                return (L<R) ? -1 : (  (R<L) ? 1 : 0);
+            }
+
+            YOCTO_GFX_COMPARE(rgb<T>)
+
         };
 
         template <typename T>
@@ -52,11 +78,19 @@ namespace yocto
             inline rgb<T>       & _rgb() throw()       { return *(rgb<T>       *)this; }
             inline const rgb<T> & _rgb() const throw() { return *(const rgb<T> *)this; }
 
+
             inline friend std::ostream & operator<<( std::ostream &os, const rgba<T> &C )
             {
                 os << '(' << double(C.r) << ',' << double(C.g) << ',' << double(C.b) << ',' << double(C.a) << ')';
                 return os;
             }
+
+            static inline int compare(const rgba &lhs, const rgba &rhs) throw()
+            {
+                return rgb<T>::compare( lhs._rgb(), rhs._rgb() );
+            }
+
+            YOCTO_GFX_COMPARE(rgba<T>)
 
         };
 
