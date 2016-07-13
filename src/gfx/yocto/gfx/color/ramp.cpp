@@ -1,8 +1,8 @@
-#include "yocto/graphics/ramp.hpp"
+#include "yocto/gfx/color/ramp.hpp"
 
 namespace yocto
 {
-    namespace graphics
+    namespace gfx
     {
         ramp:: ~ramp() throw()
         {

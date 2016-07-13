@@ -7,6 +7,9 @@
 #include "yocto/gfx/ops/histogram.hpp"
 #include "yocto/gfx/ops/blur.hpp"
 #include "yocto/gfx/ops/fft.hpp"
+#include "yocto/gfx/color/orange.hpp"
+#include "yocto/gfx/color/blue_to_red.hpp"
+#include "yocto/gfx/color/cold_to_hot.hpp"
 
 #include "yocto/code/rand.hpp"
 
@@ -14,6 +17,46 @@
 
 using namespace yocto;
 using namespace gfx;
+
+static inline void save_with_ramp(ramp                &rmp,
+                                  const pixmap<float> &px,
+                                  const string        &filename,
+                                  const imageIO       &IMG)
+{
+    rmp.vmax=rmp.vmin=px[0][0];
+    for(unit_t j=0;j<px.h;++j)
+    {
+        for(unit_t i=0;i<px.w;++i)
+        {
+            const float tmp = px[j][i];
+            rmp.vmin = min_of(tmp,rmp.vmin);
+            rmp.vmax = max_of(tmp,rmp.vmax);
+        }
+    }
+    IMG.save(filename,px,rmp,NULL);
+}
+
+static inline void save_with_ramp(ramp                &rmp,
+                                  const pixmapz       &px,
+                                  const string        &filename,
+                                  const imageIO       &IMG)
+{
+    pixmap<float> rpx(px.w,px.h);
+    rmp.vmax=rmp.vmin=px[0][0].mod();
+    for(unit_t j=0;j<px.h;++j)
+    {
+        for(unit_t i=0;i<px.w;++i)
+        {
+            const float tmp = px[j][i].mod();
+            rmp.vmin = min_of(tmp,rmp.vmin);
+            rmp.vmax = max_of(tmp,rmp.vmax);
+            rpx[j][i] = tmp;
+        }
+    }
+    IMG.save(filename,rpx,rmp,NULL);
+}
+
+
 
 YOCTO_UNIT_TEST_IMPL(ops)
 {
@@ -54,6 +97,14 @@ YOCTO_UNIT_TEST_IMPL(ops)
             }
         }
 
+        orange u_ramp;
+        save_with_ramp(u_ramp, fch[1], "img_u.png", IMG);
+
+        blue_to_red v_ramp;
+        save_with_ramp(v_ramp, fch[2], "img_v.png", IMG);
+
+
+
         std::cerr << "-- Merge" << std::endl;
         yuv_samples.merge(fch,yuv,xps,&server);
         IMG.save("img2.png",yuv,NULL);
@@ -85,7 +136,8 @@ YOCTO_UNIT_TEST_IMPL(ops)
         const unit_t hh = next_power_of_two(h);
         pixmapz zimg(ww,hh);
         fourier::forward(zimg,igs);
-
+        cold_to_hot z_ramp;
+        save_with_ramp(z_ramp,zimg, "img_fft.png", IMG);
 
 
     }

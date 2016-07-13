@@ -1,12 +1,11 @@
-#ifndef YOCTO_GRAPHICS_RAMP_INCLUDED
-#define YOCTO_GRAPHICS_RAMP_INCLUDED 1
+#ifndef YOCTO_GFX_RAMP_INCLUDED
+#define YOCTO_GFX_RAMP_INCLUDED 1
 
-#include "yocto/gfx/rgb.hpp"
 #include "yocto/gfx/color/data2rgba.hpp"
 
 namespace yocto
 {
-    namespace graphics
+    namespace gfx
     {
 
         class ramp : public data2rgba

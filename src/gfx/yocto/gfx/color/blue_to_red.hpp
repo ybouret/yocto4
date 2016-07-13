@@ -1,7 +1,7 @@
 #ifndef YOCTO_GRAPHICS_RAMP_BLUE_TO_RED_HPP_INCLUDED
 #define YOCTO_GRAPHICS_RAMP_BLUE_TO_RED_HPP_INCLUDED 1
-#include "yocto/graphics/ramp.hpp"
-namespace yocto { namespace graphics{
+#include "yocto/gfx/color/ramp.hpp"
+namespace yocto { namespace gfx{
 
 	class blue_to_red : public ramp {
 		public:
