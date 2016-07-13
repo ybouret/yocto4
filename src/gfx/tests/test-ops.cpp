@@ -6,6 +6,7 @@
 #include "yocto/gfx/ops/samples.hpp"
 #include "yocto/gfx/ops/histogram.hpp"
 #include "yocto/gfx/ops/blur.hpp"
+#include "yocto/gfx/ops/fft.hpp"
 
 #include "yocto/code/rand.hpp"
 
@@ -79,6 +80,12 @@ YOCTO_UNIT_TEST_IMPL(ops)
         std::cerr << "-- Blur Float" << std::endl;
         apply_blur(1.2, fgf, igs, xps, &server);
         IMG.save("blurf.png", fgf, NULL);
+
+        const unit_t ww = next_power_of_two(w);
+        const unit_t hh = next_power_of_two(h);
+        pixmapz zimg(ww,hh);
+        fourier::forward(zimg,igs);
+
 
 
     }
