@@ -1,4 +1,4 @@
-#include "yocto/gfx/types.hpp"
+#include "yocto/gfx/color/rgb.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/ipower.hpp"
 #include "yocto/string.hpp"
@@ -28,6 +28,11 @@ YOCTO_UNIT_TEST_IMPL(types)
             }
         }
     }
+
+    RGB  C(1,2,3); std::cerr << "C=" << C << std::endl;
+    RGBA D(4,5,6); std::cerr << "D=" << D << std::endl;
+    std::cerr << "D'=" << D._rgb() << std::endl;
+
 
 
 
