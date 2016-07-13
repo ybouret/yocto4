@@ -68,44 +68,7 @@ namespace yocto
 
             //! the 4+4 coordinates around a single point
             static const vertex delta[8];
-
-            //! way to fill when on border
-            enum filling
-            {
-                fill_with_zero,
-                fill_with_same,
-                fill_with_symm,
-                fill_with_asym,
-                fill_no_fluxes
-            };
-
-            template <typename T,typename U> static inline
-            T get_fill(const U      &f0,
-                       const U      &f1,
-                       const U      &f2,
-                       const filling fill) throw()
-            {
-                switch(fill)
-                {
-                    case fill_with_same:
-                        return T(f0);
-
-                    case fill_with_symm:
-                        return T(f1);
-
-                    case fill_with_asym:
-                        return T(f0)+T(f0)-T(f1);
-
-                    case fill_no_fluxes:
-                        return T(3) * ( T(f0) - T(f1) ) + T(f2);
-                        
-                    case fill_with_zero:
-                        break;
-                }
-                assert(fill_with_zero==fill);
-                return T(0);
-            }
-
+            
         };
 
         template <>
