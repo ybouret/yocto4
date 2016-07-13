@@ -1,11 +1,11 @@
-#ifndef YOCTO_GRAPHIX_RGBA2DATA_INCLUDED
-#define YOCTO_GRAPHIX_RGBA2DATA_INCLUDED 1
+#ifndef YOCTO_GFX_COLOR_RGBA2DATA_INCLUDED
+#define YOCTO_GFX_COLOR_RGBA2DATA_INCLUDED 1
 
-#include "yocto/graphics/rgb.hpp"
+#include "yocto/gfx/color/rgb.hpp"
 
 namespace yocto
 {
-    namespace graphics
+    namespace gfx
     {
 
         class rgba2data : public object
@@ -33,6 +33,7 @@ YOCTO_DISABLE_COPY_AND_ASSIGN(CLASS);                \
 virtual void put(void *addr,const RGBA &C) { CODE; } \
 }
 
+
         //! for pixmap4
         YOCTO_GRAPHIX_RGBA2DATA(put_rgba,*(RGBA *)addr=C);
 
@@ -40,12 +41,13 @@ virtual void put(void *addr,const RGBA &C) { CODE; } \
         YOCTO_GRAPHIX_RGBA2DATA(put_rgb,new (addr) RGB(C.r,C.g,C.b));
 
         //! for pixmapf, greyscale
-        YOCTO_GRAPHIX_RGBA2DATA(put_gsf,new (addr)  float(  gist::greyscalef(C.r, C.g, C.b)));
+        YOCTO_GRAPHIX_RGBA2DATA(put_gsf,*(float *)addr =  gist::greyscalef(C.r, C.g, C.b) );
 
         //! for pixmap1, greyscale
-        YOCTO_GRAPHIX_RGBA2DATA(put_gsu,new (addr) uint8_t( gist::greyscale1(C.r, C.g, C.b)));
-        
-    }
-}
+        YOCTO_GRAPHIX_RGBA2DATA(put_gsu,*(uint8_t*)addr = gist::greyscale1(C.r, C.g, C.b) );
 
+    }
+
+}
 #endif
+
