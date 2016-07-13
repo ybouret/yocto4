@@ -99,6 +99,33 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
 
         typedef rgb<uint8_t>  RGB;
         typedef rgba<uint8_t> RGBA;
+
+        template <> inline
+        uint8_t pixel<RGB>::project( const RGB C ) throw()
+        {
+            return gist::greyscale1(C.r,C.g,C.b);
+        }
+
+        template <> inline
+        RGB pixel<RGB>::invert(const RGB C) throw()
+        {
+            return RGB(255-C.r,255-C.g,255-C.b);
+        }
+
+        template <> inline
+        uint8_t pixel<RGBA>::project( const RGBA C ) throw()
+        {
+            return gist::greyscale1(C.r,C.g,C.b);
+        }
+
+        template <> inline
+        RGBA pixel<RGBA>::invert(const RGBA C) throw()
+        {
+            return RGBA(255-C.r,255-C.g,255-C.b);
+        }
+
+
+
     }
 }
 

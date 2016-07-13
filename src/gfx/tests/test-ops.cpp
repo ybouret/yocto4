@@ -4,6 +4,8 @@
 #include "yocto/gfx/image/tiff.hpp"
 
 #include "yocto/gfx/ops/samples.hpp"
+#include "yocto/gfx/ops/histogram.hpp"
+
 #include "yocto/code/rand.hpp"
 
 #include "yocto/utest/run.hpp"
@@ -58,7 +60,9 @@ YOCTO_UNIT_TEST_IMPL(ops)
         pixmapf igs(img,RGB::to_float,img);
         IMG.save("igs.png",igs,NULL);
         
-
+        pixmap3 fg3(w,h);
+        separate(threshold::keep_foreground,fg3,img, xps, &server);
+        IMG.save("fg3.png",fg3,NULL);
 
 
     }

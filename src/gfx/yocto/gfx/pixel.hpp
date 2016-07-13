@@ -14,6 +14,8 @@ namespace yocto
         {
             static const  T opaque;
             static bool     is_zero(const T) throw();
+            static uint8_t  project(const T) throw();
+            static T        invert(const T) throw();
         };
     }
 }
