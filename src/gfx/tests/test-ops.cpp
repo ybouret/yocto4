@@ -5,6 +5,7 @@
 
 #include "yocto/gfx/ops/samples.hpp"
 #include "yocto/gfx/ops/histogram.hpp"
+#include "yocto/gfx/ops/blur.hpp"
 
 #include "yocto/code/rand.hpp"
 
@@ -59,10 +60,25 @@ YOCTO_UNIT_TEST_IMPL(ops)
         std::cerr << "-- Greyscale..." << std::endl;
         pixmapf igs(img,RGB::to_float,img);
         IMG.save("igs.png",igs,NULL);
-        
+
+        std::cerr << "-- Keep Foreground RGB" << std::endl;
         pixmap3 fg3(w,h);
         separate(threshold::keep_foreground,fg3,img, xps, &server);
         IMG.save("fg3.png",fg3,NULL);
+
+        std::cerr << "-- Keep Foreground Float" << std::endl;
+        pixmapf fgf(w,h);
+        separate(threshold::keep_foreground,fgf,igs, xps, &server);
+        IMG.save("fgf.png",fgf,NULL);
+
+        std::cerr << "-- Blur RGB" << std::endl;
+        apply_blur(1.2, fg3, img, xps, &server);
+        IMG.save("blur3.png", fg3, NULL);
+
+
+        std::cerr << "-- Blur Float" << std::endl;
+        apply_blur(1.2, fgf, igs, xps, &server);
+        IMG.save("blurf.png", fgf, NULL);
 
 
     }

@@ -1,7 +1,7 @@
 #ifndef YOCTO_GFX_OPS_BLUR_INCLUDED
 #define YOCTO_GFX_OPS_BLUR_INCLUDED 1
 
-#include "yocto/gfx/pixmap.hpp"
+#include "yocto/gfx/rawpix.hpp"
 #include "yocto/gfx/xpatch.hpp"
 #include "yocto/code/utils.hpp"
 #include <cstdlib>
@@ -64,6 +64,14 @@ namespace yocto
                 __apply<float, float, 1>(tgt, src, xps, server);
             }
 
+            inline void apply(pixmap<RGB>       &tgt,
+                              const pixmap<RGB> &src,
+                              xpatches            &xps,
+                              threading::engine   *server
+                              )
+            {
+                __apply<RGB, uint8_t, 3>(tgt, src, xps, server);
+            }
 
         private:
 
