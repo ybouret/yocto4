@@ -1,7 +1,7 @@
 #ifndef YOCTO_GFX_COLOR_DATA2RGBA_INCLUDED
 #define YOCTO_GFX_COLOR_DATA2RGBA_INCLUDED 1
 
-#include "yocto/gfx/color/rgb.hpp"
+#include "yocto/gfx/color/yuv.hpp"
 
 namespace yocto
 {
@@ -37,20 +37,20 @@ virtual RGBA get(const void *addr) { CODE; } \
 }
 
         //! for pixmap4
-        YOCTO_GRAPHIX_DATA2RGBA(get_rgba,return *(const RGBA*)addr);
+        YOCTO_GRAPHIX_DATA2RGBA(rgba2rgba,return *(const RGBA*)addr);
 
         //! for pixmap3
-        YOCTO_GRAPHIX_DATA2RGBA(get_rgb, return RGBA(*(const RGB*)addr) );
+        YOCTO_GRAPHIX_DATA2RGBA(rgb2rgba, return RGBA(*(const RGB*)addr) );
 
         //! for pixmapf
-        YOCTO_GRAPHIX_DATA2RGBA(get_gsf,
+        YOCTO_GRAPHIX_DATA2RGBA(float2rgba,
                                 const uint8_t u=gist::float2byte(*(const float *)addr);
                                 return RGBA(u,u,u)
                                 );
 
 
         //! for pixmapu
-        YOCTO_GRAPHIX_DATA2RGBA(get_gsu,
+        YOCTO_GRAPHIX_DATA2RGBA(byte2rgba,
                                 const uint8_t u=*(const uint8_t *)addr;
                                 return RGBA(u,u,u)
                                 );
@@ -65,21 +65,23 @@ virtual RGBA get(const void *addr) { CODE; } \
 #endif
 
         //! for pixmap 1,red-scale
-        YOCTO_GRAPHIX_DATA2RGBA(get_red,   return RGBA(*(const uint8_t*)addr,0,0,255) );
+        YOCTO_GRAPHIX_DATA2RGBA(red2rgba,   return RGBA(*(const uint8_t*)addr,0,0,255) );
 
         //! for pixmap 1, green-scale
-        YOCTO_GRAPHIX_DATA2RGBA(get_green, return RGBA(0,*(const uint8_t*)addr,0,255) );
+        YOCTO_GRAPHIX_DATA2RGBA(green2rgba, return RGBA(0,*(const uint8_t*)addr,0,255) );
 
         //! for pixmap 1, blue-scale
-        YOCTO_GRAPHIX_DATA2RGBA(get_blue,  return RGBA(0,0,*(const uint8_t*)addr,255) );
+        YOCTO_GRAPHIX_DATA2RGBA(blue2rgba,  return RGBA(0,0,*(const uint8_t*)addr,255) );
 
         //! for complex to greyscale
-        YOCTO_GRAPHIX_DATA2RGBA(get_gsz,
+        YOCTO_GRAPHIX_DATA2RGBA(cplx2rgba,
                                 const cplx_t  c = *(const cplx_t *)addr;
                                 const uint8_t u = gist::float2byte(c.mod());
                                 return RGBA(u,u,u)
                                 );
 
+        //! for YUV
+        YOCTO_GRAPHIX_DATA2RGBA(yuv2rgba,return YUV::toRGB(*(const YUV*)addr) );
 
     }
 

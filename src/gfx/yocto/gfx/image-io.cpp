@@ -46,29 +46,35 @@ namespace yocto
     {
         void imageIO::save(const string &filename, const pixmap4 &bmp,const char *options) const
         {
-            get_rgba proc;
+            rgba2rgba proc;
             save(filename,bmp,proc,options);
         }
 
 
         void imageIO::save(const string &filename, const pixmap3 &bmp,const char *options) const
         {
-            get_rgb proc;
+            rgb2rgba proc;
             save(filename,bmp,proc,options);
         }
 
         void imageIO::save(const string &filename, const pixmap1 &bmp,const char *options) const
         {
-            get_gsu proc;
+            byte2rgba proc;
             save(filename,bmp,proc,options);
         }
         
         void imageIO::save(const string &filename, const pixmapf &bmp,const char *options) const
         {
-            get_gsf proc;
+            float2rgba proc;
             save(filename,bmp,proc,options);
         }
-        
+
+        void imageIO::save(const string &filename, const yuvmap &bmp,const char *options) const
+        {
+            yuv2rgba proc;
+            save(filename,bmp,proc,options);
+        }
+
     }
     
 }

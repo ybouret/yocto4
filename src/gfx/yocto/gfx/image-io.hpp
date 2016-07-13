@@ -46,6 +46,7 @@ namespace yocto
             void save(const string &filename, const pixmap3 &bmp, const char *options) const; //!< color
             void save(const string &filename, const pixmap1 &bmp, const char *options) const; //!< greyscale
             void save(const string &filename, const pixmapf &bmp, const char *options) const; //!< greyscale
+            void save(const string &filename, const yuvmap  &bmp, const char *options) const; //!< yuv->color
 
             
         protected:

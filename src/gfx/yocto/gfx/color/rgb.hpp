@@ -54,6 +54,7 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
 
             YOCTO_GFX_COMPARE(rgb<T>)
 
+            static inline float to_float( const rgb &C ) throw() { return gist::greyscalef(C.r,C.g,C.b); }
         };
 
         template <typename T>
@@ -89,6 +90,8 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
             {
                 return rgb<T>::compare( lhs._rgb(), rhs._rgb() );
             }
+
+            static inline float to_float( const rgba &C ) throw() { return gist::greyscalef(C.r,C.g,C.b); }
 
             YOCTO_GFX_COMPARE(rgba<T>)
 

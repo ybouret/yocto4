@@ -37,6 +37,25 @@ namespace yocto
                 if(server) server->flush();
             }
 
+
+            inline void merge(const pixmaps<T>         &channels,
+                              pixmap<COLOR_TYPE>       &target,
+                              xpatches                 &xps,
+                              threading::engine        *server
+                              )
+            {
+                nch = min_of(channels.size,max_channels);
+                src = &channels;
+                tgt = &target;
+                for(size_t i=xps.size();i>0;--i)
+                {
+                    xpatch &xp = xps[i];
+                    xp.enqueue(this,&samples<COLOR_TYPE>::__merge,server);
+                }
+                if(server) server->flush();
+            }
+
+
         private:
             size_t      nch;
             void       *tgt;
@@ -70,6 +89,35 @@ namespace yocto
                     }
                 }
             }
+
+
+            inline void __merge( xpatch &xp, lockable & ) throw()
+            {
+                assert(tgt);
+                assert(src);
+                const pixmaps<T>   &channels = *static_cast< const pixmaps<T>   *>(src);
+                pixmap<COLOR_TYPE> &target   = *static_cast< pixmap<COLOR_TYPE> *>(tgt);
+                assert(min_of(channels.size,max_channels)==nch);
+
+                const unit_t ymin = xp.lower.y;
+                const unit_t ymax = xp.upper.y;
+
+                const unit_t xmin = xp.lower.x;
+                const unit_t xmax = xp.upper.x;
+
+                for(unit_t y=ymax;y>=ymin;--y)
+                {
+                    for(unit_t x=xmax;x>=xmin;--x)
+                    {
+                        T *p = (T*)&target[y][x];
+                        for(size_t i=0;i<nch;++i)
+                        {
+                            p[i] = channels[i][y][x];
+                        }
+                    }
+                }
+            }
+
         };
 
 
