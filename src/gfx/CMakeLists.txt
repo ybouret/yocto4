@@ -21,6 +21,11 @@ SET(ops_srcs ${ops_impl} ${ops_decl})
 INSTALL( FILES ${ops_decl} DESTINATION include/yocto/gfx/ops )
 SOURCE_GROUP( gfx/ops FILES ${ops_srcs} )
 
+FILE(GLOB image_decl yocto/gfx/image/*.hpp)
+FILE(GLOB image_impl yocto/gfx/image/*.cpp)
+SET(image_srcs ${image_impl} ${image_decl})
+INSTALL( FILES ${image_decl} DESTINATION include/yocto/gfx/image )
+SOURCE_GROUP( gfx/image FILES ${image_srcs} )
 
 INCLUDE_DIRECTORIES( . ../main ../mk
 ../third_party/png
@@ -29,7 +34,7 @@ INCLUDE_DIRECTORIES( . ../main ../mk
 ${CMAKE_CURRENT_BINARY_DIR}/../third_party/tiff/libtiff)
 
 
-ADD_LIBRARY(y-gfx STATIC ${srcs} ${color_srcs} ${ops_srcs})
+ADD_LIBRARY(y-gfx STATIC ${srcs} ${color_srcs} ${ops_srcs} ${image_srcs} )
 TARGET_LINK_LIBRARIES(y-gfx y-tiff)
 
 INSTALL( TARGETS y-gfx ARCHIVE DESTINATION lib)

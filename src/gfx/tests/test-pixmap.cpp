@@ -1,5 +1,5 @@
 #include "yocto/gfx/ops/samples.hpp"
-#include "yocto/gfx/color/yuv.hpp"
+#include "yocto/gfx/rawpix.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/ipower.hpp"
 #include "yocto/string.hpp"
