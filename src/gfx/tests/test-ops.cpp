@@ -81,6 +81,39 @@ static inline void apply_filters(const pixmap<T>   &src,
         IMG.save(filename,dst,NULL);
     }
 
+    std::cerr << "-- Filtering " << id << " median" << std::endl;
+    dst.copy(src);
+    for(unsigned i=1;i<=4;++i)
+    {
+        org.copy(dst);
+        F.apply(dst,org,&F, &filter<T>::median,xps,server);
+        const string filename = "img_" + id + vformat("_med%u.png",i);
+        IMG.save(filename,dst,NULL);
+    }
+
+    std::cerr << "-- Filtering " << id << " dilate" << std::endl;
+    dst.copy(src);
+    for(unsigned i=1;i<=4;++i)
+    {
+        org.copy(dst);
+        F.apply(dst,org,&F, &filter<T>::dilate,xps,server);
+        const string filename = "img_" + id + vformat("_dilate%u.png",i);
+        IMG.save(filename,dst,NULL);
+    }
+
+    std::cerr << "-- Filtering " << id << " erode" << std::endl;
+    dst.copy(src);
+    for(unsigned i=1;i<=4;++i)
+    {
+        org.copy(dst);
+        F.apply(dst,org,&F, &filter<T>::erode,xps,server);
+        const string filename = "img_" + id + vformat("_erode%u.png",i);
+        IMG.save(filename,dst,NULL);
+    }
+
+
+
+
 }
 
 

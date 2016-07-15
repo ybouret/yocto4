@@ -7,6 +7,7 @@
 
 #include "yocto/sequence/lw-array.hpp"
 #include "yocto/functor.hpp"
+#include "yocto/sort/quick.hpp"
 
 namespace yocto
 {
@@ -74,6 +75,49 @@ namespace yocto
                 return pixel<T>::average(ra);
             }
 
+            inline T median( array<T> &ra ) throw()
+            {
+                assert(ra.size()>0);
+                quicksort(ra);
+                const size_t n = ra.size();
+                if( 0 != (n&1) )
+                {
+                    return ra[1+(n>>1)];
+                }
+                else
+                {
+                    const lw_array<T> sub( &ra[n>>1], 2 );
+                    return pixel<T>::average(sub);
+                }
+            }
+
+            inline T dilate( array<T> &ra ) throw()
+            {
+                assert(ra.size()>0);
+                size_t n  = ra.size();
+                T      v  = ra[n];
+                for(--n;n>0;--n)
+                {
+                    const T tmp = ra[n];
+                    if(v<=tmp) v = tmp;
+                }
+                return v;
+            }
+
+            inline T erode( array<T> &ra ) throw()
+            {
+                assert(ra.size()>0);
+                size_t n  = ra.size();
+                T      v  = ra[n];
+                for(--n;n>0;--n)
+                {
+                    const T tmp = ra[n];
+                    if(tmp<=v) v = tmp;
+                }
+                return v;
+            }
+
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(filter);
@@ -110,9 +154,10 @@ namespace yocto
                             {
                                 arr[count++] = source[probe];
                             }
-                            lw_array<T> ra(arr,count);
-                            target[center] = fn(ra);
                         }
+                        assert(count>0);
+                        lw_array<T> ra(arr,count);
+                        target[center] = fn(ra);
                     }
                 }
             }
