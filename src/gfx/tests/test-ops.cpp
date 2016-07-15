@@ -7,6 +7,7 @@
 #include "yocto/gfx/ops/histogram.hpp"
 #include "yocto/gfx/ops/blur.hpp"
 #include "yocto/gfx/ops/fft.hpp"
+#include "yocto/gfx/ops/filter.hpp"
 #include "yocto/gfx/color/orange.hpp"
 #include "yocto/gfx/color/blue_to_red.hpp"
 #include "yocto/gfx/color/cold_to_hot.hpp"
@@ -56,6 +57,31 @@ static inline void save_with_ramp(ramp                &rmp,
     IMG.save(filename,rpx,rmp,NULL);
 }
 
+template <typename T>
+static inline void apply_filters(const pixmap<T>   &src,
+                                 const string      &id,
+                                 xpatches           xps,
+                                 threading::engine *server)
+{
+    //const unit_t w = src.w;
+    //const unit_t h = src.h;
+    imageIO          &IMG = image::instance();
+
+
+    pixmap<T> org(src);
+    pixmap<T> dst(src);
+
+    filter<T> F;
+    std::cerr << "-- Filtering " << id << " average" << std::endl;
+    for(unsigned i=1;i<=4;++i)
+    {
+        org.copy(dst);
+        F.apply(dst,org,&F, &filter<T>::average,xps,server);
+        const string filename = "img_" + id + vformat("_ave%u.png",i);
+        IMG.save(filename,dst,NULL);
+    }
+
+}
 
 
 YOCTO_UNIT_TEST_IMPL(ops)
@@ -132,12 +158,39 @@ YOCTO_UNIT_TEST_IMPL(ops)
         apply_blur(1.2, fgf, igs, xps, &server);
         IMG.save("blurf.png", fgf, NULL);
 
+        std::cerr << "-- FFT..." << std::endl;
         const unit_t ww = next_power_of_two(w);
         const unit_t hh = next_power_of_two(h);
         pixmapz zimg(ww,hh);
         fourier::forward(zimg,igs);
         cold_to_hot z_ramp;
         save_with_ramp(z_ramp,zimg, "img_fft.png", IMG);
+
+        std::cerr << "-- iFFT..." << std::endl;
+        fourier::reverse(zimg);
+        pixmapf frev(w,h);
+        fourier::transfer(frev,zimg);
+        IMG.save("img_rev.png",frev,NULL);
+
+        std::cerr << "-- Filter..." << std::endl;
+
+        pixmap4 img4(w,h);
+        pixmap1 img1(w,h);
+        for(unit_t j=0;j<h;++j)
+        {
+            for(unit_t i=0;i<w;++i)
+            {
+                const RGB &C = img[j][i];
+                img4[j][i] = C;
+                img1[j][i] = gist::greyscale1(C.r,C.g,C.b);
+            }
+        }
+
+        apply_filters(img,"rgb"   , xps,&server);
+        apply_filters(igs,"gs",     xps,&server);
+        apply_filters(img4,"rgba",  xps,&server);
+        apply_filters(img1,"u",     xps,&server);
+
 
 
     }

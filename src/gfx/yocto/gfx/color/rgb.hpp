@@ -100,6 +100,10 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
         typedef rgb<uint8_t>  RGB;
         typedef rgba<uint8_t> RGBA;
 
+        //______________________________________________________________________
+        //
+        // RGB specs
+        //______________________________________________________________________
         template <> inline
         uint8_t pixel<RGB>::project( const RGB C ) throw()
         {
@@ -113,6 +117,33 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
         }
 
         template <> inline
+        RGB pixel<RGB>:: average(const array<RGB> &ra) throw()
+        {
+            const size_t n = ra.size();
+            if(n>0)
+            {
+                rgb<float> ans(0,0,0);
+                for(size_t i=n;i>0;--i)
+                {
+                    const RGB &C = ra[i];
+                    ans.r += float(C.r);
+                    ans.g += float(C.g);
+                    ans.b += float(C.b);
+                }
+                return RGB( uint8_t(ans.r/n), uint8_t(ans.g/n), uint8_t(ans.b/n) );
+            }
+            else
+            {
+                return RGB(0,0,0);
+            }
+        }
+
+
+        //______________________________________________________________________
+        //
+        // RGBA specs
+        //______________________________________________________________________
+        template <> inline
         uint8_t pixel<RGBA>::project( const RGBA C ) throw()
         {
             return gist::greyscale1(C.r,C.g,C.b);
@@ -124,6 +155,27 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
             return RGBA(255-C.r,255-C.g,255-C.b);
         }
 
+        template <> inline
+        RGBA pixel<RGBA>:: average(const array<RGBA> &ra) throw()
+        {
+            const size_t n = ra.size();
+            if(n>0)
+            {
+                rgba<float> ans(0,0,0);
+                for(size_t i=n;i>0;--i)
+                {
+                    const RGBA &C = ra[i];
+                    ans.r += float(C.r);
+                    ans.g += float(C.g);
+                    ans.b += float(C.b);
+                }
+                return RGBA( uint8_t(ans.r/n), uint8_t(ans.g/n), uint8_t(ans.b/n) );
+            }
+            else
+            {
+                return RGBA(0,0,0);
+            }
+        }
 
 
     }

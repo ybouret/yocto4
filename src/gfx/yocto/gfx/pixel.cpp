@@ -41,6 +41,75 @@ namespace yocto
         {
             return 1.0f-x;
         }
+
+        template <>
+        double pixel<double>::invert(const double x) throw()
+        {
+            return 1.0-x;
+        }
+
+
+        // average
+        template <>
+        uint8_t pixel<uint8_t>:: average(const array<uint8_t> &ra) throw()
+        {
+            const size_t n = ra.size();
+            if(n>0)
+            {
+                float ans = 0;
+                for(size_t i=n;i>0;--i)
+                {
+                    ans += float(ra[i]);
+                }
+                return uint8_t(ans/n);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        // average
+        template <>
+        float pixel<float>:: average(const array<float> &ra) throw()
+        {
+            const size_t n = ra.size();
+            if(n>0)
+            {
+                float ans = 0;
+                for(size_t i=n;i>0;--i)
+                {
+                    ans += ra[i];
+                }
+                return ans/n;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        // average
+        template <>
+        double pixel<double>:: average(const array<double> &ra) throw()
+        {
+            const size_t n = ra.size();
+            if(n>0)
+            {
+                double ans = 0;
+                for(size_t i=n;i>0;--i)
+                {
+                    ans += ra[i];
+                }
+                return ans/n;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+
     }
 
 }
