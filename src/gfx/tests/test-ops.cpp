@@ -232,6 +232,16 @@ YOCTO_UNIT_TEST_IMPL(ops)
             IMG.save("igs_lapl.png", grad_gs,NULL);
         }
 
+        {
+            pixmap1        grad1(w,h);
+            pixmaps<float> channels(1,w,h);
+            drvs.apply<uint8_t,uint8_t,1>(grad1,img1,channels,differential::gradient,xps, &server);
+            IMG.save("img_grad1.png",grad1,NULL);
+            drvs.apply<uint8_t,uint8_t,1>(grad1,img1,channels,differential::laplacian,xps, &server);
+            IMG.save("img_lapl1.png", grad1,NULL);
+        }
+
+
 
         {
             pixmap3        grad3(w,h);
@@ -241,6 +251,17 @@ YOCTO_UNIT_TEST_IMPL(ops)
             drvs.apply<RGB,uint8_t,3>(grad3,img,channels,differential::laplacian,xps, &server);
             IMG.save("img_lapl3.png", grad3,NULL);
         }
+
+        {
+            pixmap4        grad4(w,h);
+            pixmaps<float> channels(3,w,h);
+            drvs.apply<RGBA,uint8_t,3>(grad4,img4,channels,differential::gradient,xps, &server);
+            IMG.save("img_grad4.png",grad4,NULL);
+            drvs.apply<RGBA,uint8_t,3>(grad4,img4,channels,differential::laplacian,xps, &server);
+            IMG.save("img_lapl4.png", grad4,NULL);
+        }
+
+
 
 
         return 0;

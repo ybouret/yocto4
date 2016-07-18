@@ -6,6 +6,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/container/tuple.hpp"
 #include "yocto/gfx/pixel.hpp"
+#include "yocto/gfx/color/rgb.hpp"
 
 namespace yocto
 {
@@ -32,6 +33,7 @@ namespace yocto
             explicit differential();
             virtual ~differential() throw();
 
+            //! generic code
             template <typename COLOR, typename T, size_t NCH>
             void apply(pixmap<COLOR>         &target,
                        const pixmap<COLOR>   &source,
@@ -43,7 +45,7 @@ namespace yocto
                 tgt      = &target;
                 src      = &source;
                 chn      = &channels;
-
+                assert(channels.size>=NCH);
                 switch(ops)
                 {
                     case gradient:
@@ -103,6 +105,50 @@ namespace yocto
                 }
 
             }
+
+            inline void compute(pixmap<float>        &target,
+                                const pixmap<float>  &source,
+                                pixmaps<real_t>      &channels,
+                                const op_type         ops,
+                                xpatches             &xps,
+                                threading::engine    *server)
+            {
+                apply<float,float,1>(target,source,channels,ops,xps,server);
+            }
+
+            inline void compute(pixmap<uint8_t>        &target,
+                                const pixmap<uint8_t>  &source,
+                                pixmaps<real_t>        &channels,
+                                const op_type           ops,
+                                xpatches               &xps,
+                                threading::engine      *server)
+            {
+                apply<uint8_t,uint8_t,1>(target,source,channels,ops,xps,server);
+            }
+
+
+            inline void compute(pixmap<RGB>          &target,
+                                const pixmap<RGB>    &source,
+                                pixmaps<real_t>      &channels,
+                                const op_type         ops,
+                                xpatches             &xps,
+                                threading::engine    *server)
+            {
+                apply<RGB,uint8_t,3>(target,source,channels,ops,xps,server);
+            }
+
+            inline void compute(pixmap<RGBA>          &target,
+                                const pixmap<RGBA>    &source,
+                                pixmaps<real_t>       &channels,
+                                const op_type         ops,
+                                xpatches             &xps,
+                                threading::engine    *server)
+            {
+                apply<RGBA,uint8_t,3>(target,source,channels,ops,xps,server);
+            }
+
+
+
 
             static real_t core_proc_g(real_t Um, real_t U0, real_t Up) throw();
             static real_t side_proc_g_lo(real_t U0, real_t U1, real_t U2) throw();
@@ -326,8 +372,8 @@ namespace yocto
                     }
                 }
             }
-
-
+            
+            
             
         };
     }
