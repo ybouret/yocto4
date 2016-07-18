@@ -8,6 +8,7 @@
 #include "yocto/gfx/ops/blur.hpp"
 #include "yocto/gfx/ops/fft.hpp"
 #include "yocto/gfx/ops/filter.hpp"
+#include "yocto/gfx/ops/differential.hpp"
 #include "yocto/gfx/color/ramp/orange.hpp"
 #include "yocto/gfx/color/ramp/blue_to_red.hpp"
 #include "yocto/gfx/color/ramp/cold_to_hot.hpp"
@@ -205,7 +206,6 @@ YOCTO_UNIT_TEST_IMPL(ops)
         fourier::transfer(frev,zimg);
         IMG.save("img_rev.png",frev,NULL);
 
-        std::cerr << "-- Filter..." << std::endl;
 
         pixmap4 img4(w,h);
         pixmap1 img1(w,h);
@@ -219,6 +219,17 @@ YOCTO_UNIT_TEST_IMPL(ops)
             }
         }
 
+        std::cerr << "-- Gradients..." << std::endl;
+        differential drvs;
+        {
+            pixmapf        grad_gs(w,h);
+            pixmaps<float> channels(1,w,h);
+            drvs.apply<float, float, 1>(grad_gs,igs,channels,differential::gradient,xps, &server);
+        }
+
+        return 0;
+
+        std::cerr << "-- Filter..." << std::endl;
         apply_filters(img,"rgb"   , xps,&server);
         apply_filters(igs,"gs",     xps,&server);
         apply_filters(img4,"rgba",  xps,&server);
