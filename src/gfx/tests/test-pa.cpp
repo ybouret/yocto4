@@ -61,7 +61,13 @@ YOCTO_UNIT_TEST_IMPL(pa)
         indx2rgba<size_t> tagColors(YGFX_RED);
         IMG.save("img_tags.png", tmap, tagColors, NULL);
 
-
+        particles pa;
+        pa.load(tmap);
+        std::cerr << "#pa=" << pa.size() << std::endl;
+        for(size_t i=1;i<=pa.size();++i)
+        {
+            std::cerr << "#" << i << "=" << pa[i]->size << std::endl;
+        }
     }
 
 }

@@ -10,6 +10,8 @@ namespace yocto
     namespace gfx
     {
 
+
+
         typedef pixmap<size_t> _tagmap;
         typedef stack<vertex>  v_stack;
 
@@ -110,6 +112,40 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tagmap);
         };
+
+
+        class particle : public counted_object, public vlist
+        {
+        public:
+            typedef arc_ptr<particle> ptr;
+
+            explicit particle(const size_t id) throw();
+            virtual ~particle() throw();
+            const size_t tag;
+
+            
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(particle);
+        };
+
+        typedef vector<particle::ptr> _particles;
+
+        class particles : public _particles
+        {
+        public:
+            explicit particles() throw();
+            virtual ~particles() throw();
+
+            void sort() throw();
+
+            void load(const tagmap &tags);
+
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(particles);
+        };
+
 
     }
 }

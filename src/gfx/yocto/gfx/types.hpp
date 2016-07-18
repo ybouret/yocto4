@@ -4,6 +4,7 @@
 #include "yocto/math/point2d.hpp"
 #include "yocto/math/complex.hpp"
 #include "yocto/parallel/patch.hpp"
+#include "yocto/core/list.hpp"
 
 namespace yocto
 {
@@ -37,8 +38,27 @@ namespace yocto
             }
 
             static const vertex delta[8]; //!< the 4+4 coordinates around a single point
-
         };
+
+        class vnode
+        {
+        public:
+            vnode *next;
+            vnode *prev;
+            vertex vtx;
+            YOCTO_MAKE_OBJECT
+            inline  vnode() throw() : next(0), prev(0), vtx() {}
+            inline ~vnode() throw() {}
+            inline vnode(const vertex &v) throw() : next(0), prev(0), vtx(v) {}
+            inline vnode(const unit_t x, const unit_t y) throw() : next(0), prev(0), vtx(x,y) {}
+            inline vnode(const vnode &other) throw() : next(0), prev(0), vtx(other.vtx)  {}
+
+        private:
+            YOCTO_DISABLE_ASSIGN(vnode);
+        };
+
+        typedef core::list_of_cpp<vnode> vlist;
+
     }
 }
 
