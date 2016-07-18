@@ -43,9 +43,24 @@ namespace yocto
                 tgt      = &target;
                 src      = &source;
                 chn      = &channels;
-                coreProc = core_proc_g;
-                sideProc = side_proc_g;
-                evalProc = eval_proc_g;
+
+                switch(ops)
+                {
+                    case gradient:
+                        coreProc   = core_proc_g;
+                        sideProcLo = side_proc_g_lo;
+                        sideProcUp = side_proc_g_up;
+                        evalProc   = eval_proc_g;
+                        break;
+
+                    case laplacian:
+                        coreProc   = core_proc_l;
+                        sideProcLo = side_proc_l;
+                        sideProcUp = side_proc_l;
+                        evalProc   = eval_proc_l;
+                        break;
+                }
+
                 const size_t np = xps.size();
                 for(size_t i=np;i>0;--i)
                 {
@@ -73,7 +88,16 @@ namespace yocto
                     for(size_t i=np;i>0;--i)
                     {
                         xpatch     &xp  = xps[i];
-                        xp.enqueue(this,&differential::finalize<COLOR,T,NCH>,server);
+                        switch(ops)
+                        {
+                            case gradient:
+                                xp.enqueue(this,&differential::update_g<COLOR,T,NCH>,server);
+                                break;
+
+                            case laplacian:
+                                xp.enqueue(this,&differential::update_l<COLOR,T,NCH>,server);
+                                break;
+                        }
                     }
                     if(server) server->flush();
                 }
@@ -81,8 +105,13 @@ namespace yocto
             }
 
             static real_t core_proc_g(real_t Um, real_t U0, real_t Up) throw();
-            static real_t side_proc_g(real_t U0, real_t U1, real_t U2) throw();
+            static real_t side_proc_g_lo(real_t U0, real_t U1, real_t U2) throw();
+            static real_t side_proc_g_up(real_t U0, real_t U1, real_t U2) throw();
             static real_t eval_proc_g(real_t gx, real_t gy) throw();
+
+            static real_t core_proc_l(real_t Um, real_t U0, real_t Up) throw();
+            static real_t side_proc_l(real_t U0, real_t U1, real_t U2) throw();
+            static real_t eval_proc_l(real_t gx, real_t gy) throw();
 
 
         private:
@@ -91,7 +120,8 @@ namespace yocto
             const void      *src;
             pixmaps<real_t> *chn;
             core_proc        coreProc;
-            side_proc        sideProc;
+            side_proc        sideProcLo;
+            side_proc        sideProcUp;
             eval_proc        evalProc;
         public:
             info             global;
@@ -104,7 +134,8 @@ namespace yocto
                 assert(src);
                 assert(chn);
                 assert(coreProc);
-                assert(sideProc);
+                assert(sideProcLo);
+                assert(sideProcUp);
                 assert(evalProc);
 
                 bool                 init     = true;
@@ -138,7 +169,7 @@ namespace yocto
                                 const T     *p2 = (const T*)&C2;
                                 for(size_t k=0;k<NCH;++k)
                                 {
-                                    y_value[k] = sideProc(p0[k],p1[k],p2[k]);
+                                    y_value[k] = sideProcLo(p0[k],p1[k],p2[k]);
                                 }
                             } break;
 
@@ -162,7 +193,7 @@ namespace yocto
                                 const T     *p2 = (const T*)&C2;
                                 for(size_t k=0;k<NCH;++k)
                                 {
-                                    y_value[k] = -sideProc(p0[k],p1[k],p2[k]);
+                                    y_value[k] = sideProcUp(p0[k],p1[k],p2[k]);
                                 }
                             } break;
                         }
@@ -178,7 +209,7 @@ namespace yocto
                                 const T     *p2 = (const T*)&C2;
                                 for(size_t k=0;k<NCH;++k)
                                 {
-                                    x_value[k] = sideProc(p0[k],p1[k],p2[k]);
+                                    x_value[k] = sideProcLo(p0[k],p1[k],p2[k]);
                                 }
 
                             } break;
@@ -202,7 +233,7 @@ namespace yocto
                                 const T     *p2 = (const T*)&C2;
                                 for(size_t k=0;k<NCH;++k)
                                 {
-                                    x_value[k] = -sideProc(p0[k],p1[k],p2[k]);
+                                    x_value[k] = sideProcUp(p0[k],p1[k],p2[k]);
                                 }
 
                             } break;
@@ -236,7 +267,7 @@ namespace yocto
             }
 
             template <typename COLOR,typename T,size_t NCH>
-            void finalize( xpatch &xp, lockable & ) throw()
+            void update_g( xpatch &xp, lockable & ) throw()
             {
                 assert(tgt);
                 assert(src);
@@ -264,8 +295,39 @@ namespace yocto
                         }
                     }
                 }
-                
             }
+
+            template <typename COLOR,typename T,size_t NCH>
+            void update_l( xpatch &xp, lockable & ) throw()
+            {
+                assert(tgt);
+                assert(src);
+                assert(chn);
+
+                pixmaps<real_t>     &channels = *chn;
+                pixmap<COLOR>       &target   = *static_cast< pixmap<COLOR> *>(tgt);
+                const unit_t         ymin     = xp.lower.y;
+                const unit_t         ymax     = xp.upper.y;
+                const unit_t         xmin     = xp.lower.x;
+                const unit_t         xmax     = xp.upper.x;
+                const real_t         scale    = real_t(pixel<T>::opaque);
+                const real_t         delta    = max_of(-global.vmin,global.vmax);
+                for(unit_t y=ymax;y>=ymin;--y)
+                {
+                    for(unit_t x=xmax;x>=xmin;--x)
+                    {
+                        COLOR &C = target[y][x];
+                        T     *q = (T *)&C;
+                        for(size_t k=0;k<NCH;++k)
+                        {
+                            const real_t value = channels[k][y][x];
+                            q[k] = static_cast<T>( (scale*math::Fabs(value))/delta );
+                        }
+                    }
+                }
+            }
+
+
             
         };
     }

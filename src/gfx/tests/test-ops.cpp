@@ -221,14 +221,15 @@ YOCTO_UNIT_TEST_IMPL(ops)
             }
         }
 
-        std::cerr << "-- Gradients..." << std::endl;
+        std::cerr << "-- Differential..." << std::endl;
         differential     drvs;
         {
             pixmapf        grad_gs(w,h);
             pixmaps<float> channels(1,w,h);
             drvs.apply<float, float, 1>(grad_gs,igs,channels,differential::gradient,xps, &server);
-
-            IMG.save("igs_grad.png", channels[0],NULL);
+            IMG.save("igs_grad.png", grad_gs,NULL);
+            drvs.apply<float, float, 1>(grad_gs,igs,channels,differential::laplacian,xps, &server);
+            IMG.save("igs_lapl.png", grad_gs,NULL);
         }
 
 
@@ -237,6 +238,8 @@ YOCTO_UNIT_TEST_IMPL(ops)
             pixmaps<float> channels(3,w,h);
             drvs.apply<RGB,uint8_t,3>(grad3,img,channels,differential::gradient,xps, &server);
             IMG.save("img_grad3.png",grad3,NULL);
+            drvs.apply<RGB,uint8_t,3>(grad3,img,channels,differential::laplacian,xps, &server);
+            IMG.save("img_lapl3.png", grad3,NULL);
         }
 
 
