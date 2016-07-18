@@ -51,7 +51,7 @@ namespace yocto
                             //
                             // no current tag
                             //__________________________________________________
-                            if(pixel<T>::is_zero(src_j[i]))
+                            if(!pixel<T>::is_zero(src_j[i]))
                             {
                                 //______________________________________________
                                 //
@@ -90,7 +90,7 @@ namespace yocto
                                     for(size_t k=0;k<links;++k)
                                     {
                                         const vertex probe = here + gist::delta[k];
-                                        if(source.has(probe) && 0==self[probe] && pixel<T>::is_zero(source[probe]))
+                                        if(source.has(probe) && 0==self[probe] && !pixel<T>::is_zero(source[probe]))
                                         {
                                             self[probe]=current;
                                             vstk.push(probe);
@@ -103,6 +103,8 @@ namespace yocto
                         }
                     }
                 }
+
+                vstk.free();
             }
 
         private:

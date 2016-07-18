@@ -7,6 +7,7 @@
 #include "yocto/gfx/ops/differential.hpp"
 #include "yocto/gfx/ops/histogram.hpp"
 #include "yocto/gfx/ops/particles.hpp"
+#include "yocto/gfx/color/named-colors.hpp"
 
 #include "yocto/utest/run.hpp"
 
@@ -56,6 +57,10 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
         tmap.build(fg,8);
         std::cerr << "#current=" << tmap.current << std::endl;
+
+        indx2rgba<size_t> tagColors(YGFX_RED);
+        IMG.save("img_tags.png", tmap, tagColors, NULL);
+
 
     }
 
