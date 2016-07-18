@@ -1,4 +1,4 @@
-#include "yocto/gfx/color/orange.hpp"
+#include "yocto/gfx/color/ramp/orange.hpp"
 namespace yocto { namespace gfx{
 
 static const RGBA orange_codes[256]={

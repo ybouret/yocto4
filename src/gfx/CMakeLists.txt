@@ -14,6 +14,12 @@ SET(color_srcs ${color_impl} ${color_decl})
 INSTALL( FILES ${color_decl} DESTINATION include/yocto/gfx/color )
 SOURCE_GROUP( gfx/color FILES ${color_srcs} )
 
+FILE(GLOB color_ramp_decl yocto/gfx/color/ramp/*.hpp)
+FILE(GLOB color_ramp_impl yocto/gfx/color/ramp/*.cpp)
+SET(color_ramp_srcs ${color_ramp_impl} ${color_ramp_decl})
+INSTALL( FILES ${color_ramp_decl} DESTINATION include/yocto/gfx/color/ramp )
+SOURCE_GROUP( gfx/color/ramp FILES ${color_ramp_srcs} )
+
 
 FILE(GLOB ops_decl yocto/gfx/ops/*.hpp)
 FILE(GLOB ops_impl yocto/gfx/ops/*.cpp)
@@ -34,7 +40,7 @@ INCLUDE_DIRECTORIES( . ../main ../mk
 ${CMAKE_CURRENT_BINARY_DIR}/../third_party/tiff/libtiff)
 
 
-ADD_LIBRARY(y-gfx STATIC ${srcs} ${color_srcs} ${ops_srcs} ${image_srcs} )
+ADD_LIBRARY(y-gfx STATIC ${srcs} ${color_srcs} ${color_ramp_srcs} ${ops_srcs} ${image_srcs} )
 TARGET_LINK_LIBRARIES(y-gfx y-tiff)
 
 INSTALL( TARGETS y-gfx ARCHIVE DESTINATION lib)

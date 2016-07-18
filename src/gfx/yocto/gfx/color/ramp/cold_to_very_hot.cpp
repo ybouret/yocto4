@@ -1,4 +1,4 @@
-#include "yocto/gfx/color/cold_to_very_hot.hpp"
+#include "yocto/gfx/color/ramp/cold_to_very_hot.hpp"
 namespace yocto { namespace gfx{
 
 static const RGBA cold_to_very_hot_codes[256]={

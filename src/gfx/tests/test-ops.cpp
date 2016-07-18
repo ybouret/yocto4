@@ -8,9 +8,9 @@
 #include "yocto/gfx/ops/blur.hpp"
 #include "yocto/gfx/ops/fft.hpp"
 #include "yocto/gfx/ops/filter.hpp"
-#include "yocto/gfx/color/orange.hpp"
-#include "yocto/gfx/color/blue_to_red.hpp"
-#include "yocto/gfx/color/cold_to_hot.hpp"
+#include "yocto/gfx/color/ramp/orange.hpp"
+#include "yocto/gfx/color/ramp/blue_to_red.hpp"
+#include "yocto/gfx/color/ramp/cold_to_hot.hpp"
 
 #include "yocto/code/rand.hpp"
 

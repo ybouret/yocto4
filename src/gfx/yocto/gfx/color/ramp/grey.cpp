@@ -1,4 +1,4 @@
-#include "yocto/gfx/color/grey.hpp"
+#include "yocto/gfx/color/ramp/grey.hpp"
 namespace yocto { namespace gfx{
 
 static const RGBA grey_codes[256]={

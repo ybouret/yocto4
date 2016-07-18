@@ -1,4 +1,4 @@
-#include "yocto/gfx/color/blue_to_red.hpp"
+#include "yocto/gfx/color/ramp/blue_to_red.hpp"
 namespace yocto { namespace gfx{
 
 static const RGBA blue_to_red_codes[256]={
