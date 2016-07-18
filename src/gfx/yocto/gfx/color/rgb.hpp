@@ -138,6 +138,11 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
             }
         }
 
+        template <> inline
+        bool pixel<RGB>::is_zero(const RGB C) throw()
+        {
+            return (C.r<=0) && (C.g<=0) && (C.b<=0);
+        }
 
         //______________________________________________________________________
         //
