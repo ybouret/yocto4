@@ -3,6 +3,9 @@
 
 #include "yocto/gfx/pixmaps.hpp"
 #include "yocto/gfx/xpatch.hpp"
+#include "yocto/code/utils.hpp"
+#include "yocto/container/tuple.hpp"
+#include "yocto/gfx/pixel.hpp"
 
 namespace yocto
 {
@@ -17,10 +20,10 @@ namespace yocto
                 laplacian
             };
 
-            struct info
-            {
-                real_t vmin,vmax;
-            };
+
+            YOCTO_PAIR_DECL(info, real_t, vmin, real_t, vmax);
+            YOCTO_PAIR_END();
+
 
             typedef real_t (*core_proc)(real_t Um, real_t U0, real_t Up);
             typedef real_t (*side_proc)(real_t U0, real_t U1, real_t U2);
@@ -47,10 +50,34 @@ namespace yocto
                 for(size_t i=np;i>0;--i)
                 {
                     xpatch &xp = xps[i];
-                    xp.make<info>();
-                    xp.enqueue(this,&differential::run<COLOR,T,NCH>,server);
+                    xp.build<info,real_t,real_t>(0,0);
+                    xp.enqueue(this,&differential::initialize<COLOR,T,NCH>,server);
                 }
                 if(server) server->flush();
+
+                global = xps[1].as<info>();
+                for(size_t i=np;i>1;--i)
+                {
+                    xpatch     &xp  = xps[i];
+                    const info &tmp = xp.as<info>();
+                    global.vmin = min_of(global.vmin,tmp.vmin);
+                    global.vmax = max_of(global.vmax,tmp.vmax);
+                }
+
+                if(global.vmax<=global.vmin)
+                {
+                    target.ldz();
+                }
+                else
+                {
+                    for(size_t i=np;i>0;--i)
+                    {
+                        xpatch     &xp  = xps[i];
+                        xp.enqueue(this,&differential::finalize<COLOR,T,NCH>,server);
+                    }
+                    if(server) server->flush();
+                }
+
             }
 
             static real_t core_proc_g(real_t Um, real_t U0, real_t Up) throw();
@@ -63,12 +90,15 @@ namespace yocto
             void            *tgt;
             const void      *src;
             pixmaps<real_t> *chn;
-            core_proc   coreProc;
-            side_proc   sideProc;
-            eval_proc   evalProc;
-            
+            core_proc        coreProc;
+            side_proc        sideProc;
+            eval_proc        evalProc;
+        public:
+            info             global;
+
+        private:
             template <typename COLOR,typename T,size_t NCH>
-            void run( xpatch &xp, lockable & ) throw()
+            void initialize( xpatch &xp, lockable & ) throw()
             {
                 assert(tgt);
                 assert(src);
@@ -77,13 +107,13 @@ namespace yocto
                 assert(sideProc);
                 assert(evalProc);
 
-                bool             init     = true;
-                pixmaps<real_t> &channels = *chn;
-                const pixmap<T> &source   = *static_cast< const pixmap<COLOR> *>(src);
-                const unit_t     ymin     = xp.lower.y;
-                const unit_t     ymax     = xp.upper.y;
-                const unit_t     xmin     = xp.lower.x;
-                const unit_t     xmax     = xp.upper.x;
+                bool                 init     = true;
+                pixmaps<real_t>     &channels = *chn;
+                const pixmap<COLOR> &source   = *static_cast< const pixmap<COLOR> *>(src);
+                const unit_t         ymin     = xp.lower.y;
+                const unit_t         ymax     = xp.upper.y;
+                const unit_t         xmin     = xp.lower.x;
+                const unit_t         xmax     = xp.upper.x;
 
                 info   &params = xp.as<info>();
                 real_t &vmin   = params.vmin;
@@ -180,21 +210,63 @@ namespace yocto
 
                         if(init)
                         {
-
+                            const real_t tmp = evalProc(x_value[0],y_value[0]);
+                            vmin = vmax = tmp;
+                            channels[0][y][x] = tmp;
                             init=false;
                         }
                         else
                         {
+                            const real_t tmp = evalProc(x_value[0],y_value[0]);
+                            vmin = min_of(vmin,tmp);
+                            vmax = max_of(vmax,tmp);
+                            channels[0][y][x] = tmp;
+                        }
 
+                        for(size_t k=1;k<NCH;++k)
+                        {
+                            const real_t tmp = evalProc(x_value[k],y_value[k]);
+                            channels[k][y][x] = tmp;
+                            vmin = min_of(vmin,tmp);
+                            vmax = max_of(vmax,tmp);
                         }
 
                     }
                 }
-
-
             }
 
+            template <typename COLOR,typename T,size_t NCH>
+            void finalize( xpatch &xp, lockable & ) throw()
+            {
+                assert(tgt);
+                assert(src);
+                assert(chn);
 
+                pixmaps<real_t>     &channels = *chn;
+                pixmap<COLOR>       &target   = *static_cast< pixmap<COLOR> *>(tgt);
+                const unit_t         ymin     = xp.lower.y;
+                const unit_t         ymax     = xp.upper.y;
+                const unit_t         xmin     = xp.lower.x;
+                const unit_t         xmax     = xp.upper.x;
+                const real_t         scale    = real_t(pixel<T>::opaque);
+                const real_t         vmin     = global.vmin;
+                const real_t         delta    = global.vmax-vmin;
+                for(unit_t y=ymax;y>=ymin;--y)
+                {
+                    for(unit_t x=xmax;x>=xmin;--x)
+                    {
+                        COLOR &C = target[y][x];
+                        T     *q = (T *)&C;
+                        for(size_t k=0;k<NCH;++k)
+                        {
+                            const real_t value = channels[k][y][x];
+                            q[k] = static_cast<T>( (scale*(value-vmin))/delta );
+                        }
+                    }
+                }
+                
+            }
+            
         };
     }
 }

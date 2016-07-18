@@ -5,8 +5,13 @@ namespace yocto
     namespace gfx
     {
         differential::  differential() :
-        tgt(0), src(0), chn(0),
-        coreProc(0), sideProc(0), evalProc(0)
+        tgt(0),
+        src(0),
+        chn(0),
+        coreProc(0),
+        sideProc(0),
+        evalProc(0),
+        global(0,0)
         {}
         
         differential:: ~differential() throw() {}

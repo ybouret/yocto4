@@ -12,6 +12,8 @@
 #include "yocto/gfx/color/ramp/orange.hpp"
 #include "yocto/gfx/color/ramp/blue_to_red.hpp"
 #include "yocto/gfx/color/ramp/cold_to_hot.hpp"
+#include "yocto/gfx/color/ramp/cold_to_very_hot.hpp"
+#include "yocto/gfx/color/ramp/grey.hpp"
 
 #include "yocto/code/rand.hpp"
 
@@ -220,12 +222,23 @@ YOCTO_UNIT_TEST_IMPL(ops)
         }
 
         std::cerr << "-- Gradients..." << std::endl;
-        differential drvs;
+        differential     drvs;
         {
             pixmapf        grad_gs(w,h);
             pixmaps<float> channels(1,w,h);
             drvs.apply<float, float, 1>(grad_gs,igs,channels,differential::gradient,xps, &server);
+
+            IMG.save("igs_grad.png", channels[0],NULL);
         }
+
+
+        {
+            pixmap3        grad3(w,h);
+            pixmaps<float> channels(3,w,h);
+            drvs.apply<RGB,uint8_t,3>(grad3,img,channels,differential::gradient,xps, &server);
+            IMG.save("img_grad3.png",grad3,NULL);
+        }
+
 
         return 0;
 
