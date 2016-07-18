@@ -144,6 +144,24 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
             return (C.r<=0) && (C.g<=0) && (C.b<=0);
         }
 
+        template <> inline
+        RGB pixel<RGB>::blend(const RGB fg,const RGB bg,const uint8_t alpha) throw()
+        {
+            switch(alpha)
+            {
+                case 0:   return fg;
+                case 255: return bg;
+                default: break;
+            }
+            const unsigned WBG = alpha;
+            const unsigned WFG = 256-WBG;
+            const unsigned R   = unsigned(fg.r)*WFG + unsigned(bg.r)*WBG;
+            const unsigned G   = unsigned(fg.g)*WFG + unsigned(bg.g)*WBG;
+            const unsigned B   = unsigned(fg.b)*WFG + unsigned(bg.b)*WBG;
+            return RGB(R>>8,G>>8,B>>8);
+        }
+
+
         //______________________________________________________________________
         //
         // RGBA specs

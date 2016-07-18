@@ -18,6 +18,7 @@ namespace yocto
             static uint8_t  project(const T) throw();
             static T        invert(const T) throw();
             static T        average(const array<T> &ra) throw();
+            static T        blend(const T bg, const T fg, const uint8_t alpha) throw();
         };
     }
 }

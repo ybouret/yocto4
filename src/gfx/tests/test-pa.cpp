@@ -64,10 +64,14 @@ YOCTO_UNIT_TEST_IMPL(pa)
         particles pa;
         pa.load(tmap);
         std::cerr << "#pa=" << pa.size() << std::endl;
+        pixmap3 wksp(img);
+
         for(size_t i=1;i<=pa.size();++i)
         {
             std::cerr << "#" << i << "=" << pa[i]->size << std::endl;
+            pa[i]->mask(wksp, named_color::fetch(i), 128);
         }
+        IMG.save("img_pa.png", wksp, NULL);
     }
 
 }

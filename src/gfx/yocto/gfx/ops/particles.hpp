@@ -30,6 +30,7 @@ namespace yocto
                        const size_t     links)
             {
                 assert(same_metrics_than(source));
+                assert(4==links||8==links);
                 _tagmap &self = *this;
 
                 //______________________________________________________________
@@ -122,8 +123,25 @@ namespace yocto
             explicit particle(const size_t id) throw();
             virtual ~particle() throw();
             const size_t tag;
+            vlist        inside;
+            vlist        border;
 
-            
+            template <typename T>
+            inline void mask( pixmap<T> &src, const T C, const uint8_t alpha) const throw()
+            {
+                for(const vnode *node=head;node;node=node->next)
+                {
+                    assert(src.has(node->vtx));
+                    T &S = src[node->vtx];
+                    S    = pixel<T>::blend(S,C,alpha);
+                }
+            }
+
+
+
+            void regroup() throw();
+            void split_using( const tagmap &tags ) throw();
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(particle);

@@ -9,8 +9,43 @@ namespace yocto
     namespace gfx
     {
 
-        particle::  particle(const size_t id) throw() : vlist(), tag(id) {}
+        particle::  particle(const size_t id) throw() : vlist(), tag(id), inside(), border() {}
         particle:: ~particle() throw() {}
+
+        void particle:: regroup() throw()
+        {
+            merge_back(inside);
+            merge_back(border);
+        }
+
+        void particle:: split_using( const tagmap &tags ) throw()
+        {
+            regroup();
+            while(size)
+            {
+                vnode *node = pop_back();
+                assert(tags.has(node->vtx));
+                assert(tag==tags[node->vtx]);
+                const vertex here  = node->vtx;
+                size_t       count = 0;
+                for(size_t k=0;k<4;++k)
+                {
+                    const vertex probe = here + gist::delta[k];
+                    if(tags.has(probe)&&tag==tags[probe])
+                    {
+                        ++count;
+                    }
+                }
+                if(count>=4)
+                {
+                    inside.push_back(node);
+                }
+                else
+                {
+                    border.push_back(node);
+                }
+            }
+        }
 
 
 
