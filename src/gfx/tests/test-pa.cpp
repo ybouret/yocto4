@@ -70,8 +70,27 @@ YOCTO_UNIT_TEST_IMPL(pa)
         {
             std::cerr << "#" << i << "=" << pa[i]->size << std::endl;
             pa[i]->mask(wksp, named_color::fetch(i), 128);
+            pa[i]->split_using(tmap);
+            pa[i]->mask_border(wksp,named_color::fetch(YGFX_GREEN), 200);
         }
         IMG.save("img_pa.png", wksp, NULL);
+        
+        wksp.ldz();
+        if(pa.size()>0)
+        {
+            pa[1]->regroup();
+            pa[1]->transfer(wksp,fg);
+        }
+        IMG.save("img_big.png", wksp, NULL);
+        
+        pixmap3 dest(w,h);
+        
+        filter<RGB> F;
+        F.apply(dest,wksp, &F, & filter<RGB>::dilate, xps, &server);
+        IMG.save("img_big1.png",dest, NULL);
+        F.apply(wksp,dest,&F, & filter<RGB>::erode, xps, &server);
+        IMG.save("img_big2.png",wksp, NULL);
+
     }
 
 }
