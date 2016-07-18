@@ -57,6 +57,7 @@ namespace yocto
 
 
         private:
+		YOCTO_DISABLE_COPY_AND_ASSIGN(samples);
             size_t      nch;
             void       *tgt;
             const void *src;

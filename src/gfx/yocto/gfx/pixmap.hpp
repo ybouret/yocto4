@@ -82,10 +82,10 @@ namespace yocto
 
             inline void ld( typename type_traits<T>::parameter_type x ) throw()
             {
-                for(size_t j=0;j<h;++j)
+                for(unit_t j=0;j<h;++j)
                 {
                     row &r_j = rows[j];
-                    for(size_t i=0;i<w;++i)
+                    for(unit_t i=0;i<w;++i)
                     {
                         r_j[i] = x;
                     }

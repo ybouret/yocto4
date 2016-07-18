@@ -4,6 +4,7 @@
 
 #include <cstdlib>
 #include <cerrno>
+#include <cstring>
 
 namespace yocto
 {
