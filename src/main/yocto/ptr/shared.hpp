@@ -3,15 +3,11 @@
 
 
 #include "yocto/type/args.hpp"
+#include "yocto/ptr/ref.hpp"
 
 namespace yocto
 {
-	namespace core
-	{
-		size_t *create_ref();
-		void    delete_ref( size_t * & ) throw();
-	}
-	
+
 	template <typename T>
 	class shared_ptr
 	{
