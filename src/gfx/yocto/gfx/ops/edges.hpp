@@ -98,12 +98,42 @@ namespace yocto
                         for(size_t k=0;k<9;++k)
                         {
                             const vertex probe = here + shift[k];
+                            float        II    = 0;
                             if(has(probe))
                             {
-                                const float II = I[probe];
-                                sum1 += sobel1[k] * II;
-                                sum2 += sobel2[k] * II;
+                                II = I[probe];
                             }
+                            else
+                            {
+                                II = I[here];
+#if 0
+                                switch(k)
+                                {
+                                    case 0:   // (-1,-1)
+                                        break;
+                                    case 1:   // (-1,0)
+                                        break;
+                                    case 2:  // (-1,1)
+                                        break;
+
+                                    case 3: // (0,-1)
+                                        break;
+                                    case 4: assert( die("impossible") ); // (0,0)
+                                        break;
+                                    case 5: // (0,1)
+                                        break;
+
+                                    case 6: // (1,-1)
+                                        break;
+                                    case 7: // (1,0)
+                                        break;
+                                    case 8: // (1,1)
+                                        break;
+                                }
+#endif
+                            }
+                            sum1 += sobel1[k] * II;
+                            sum2 += sobel2[k] * II;
                         }
                         const float value = sqrtf(sum1*sum1+sum2*sum2);
                         self[y][x] = value;
