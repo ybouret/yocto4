@@ -66,19 +66,7 @@ namespace yocto
             quicksort(self,__compare_particles);
         }
 
-        tagmap:: tagmap(const unit_t W, const unit_t H) :
-        _tagmap(W,H),
-        current(0),
-        vstk()
-        {
-        }
-
-
-        tagmap:: ~tagmap() throw()
-        {
-            
-        }
-
+      
 
         void particles:: load(const tagmap &tags)
         {

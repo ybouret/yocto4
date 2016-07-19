@@ -70,11 +70,13 @@ namespace yocto
                 apply(target,source,fn,xps,server);
             }
 
+            //! replace pixel by its average
             inline T average( array<T> &ra ) throw()
             {
                 return pixel<T>::average(ra);
             }
 
+            //! replace pixel by its median
             inline T median( array<T> &ra ) throw()
             {
                 assert(ra.size()>0);
@@ -91,6 +93,7 @@ namespace yocto
                 }
             }
 
+            //! replace pixel by the its maximum
             inline T dilate( array<T> &ra ) throw()
             {
                 assert(ra.size()>0);
@@ -104,6 +107,7 @@ namespace yocto
                 return v;
             }
 
+            //! replace pixel by its minimum
             inline T erode( array<T> &ra ) throw()
             {
                 assert(ra.size()>0);
@@ -161,9 +165,51 @@ namespace yocto
                     }
                 }
             }
-
-
         };
+
+        //! filter with own memory
+        template <typename T>
+        class Filter : public pixmap<T>, public filter<T>
+        {
+        public:
+            typedef typename filter<T>::function function;
+
+            explicit Filter( const unit_t W, const unit_t H ) :
+            pixmap<T>(W,H), filter<T>()
+            {
+            }
+
+            virtual ~Filter() throw() {}
+
+            inline void Apply(pixmap<T>         &target,
+                              function          &fn,
+                              xpatches          &xps,
+                              threading::engine *server)
+            {
+                pixmap<T> &self = *this;
+                self.copy(target);
+                this->apply(target,self,fn,xps,server);
+            }
+
+            template <
+            typename HOST_POINTER,
+            typename METHOD_POINTER>
+            inline void Apply(pixmap<T>         &target,
+                              HOST_POINTER       host,
+                              METHOD_POINTER     method,
+                              xpatches          &xps,
+                              threading::engine *server)
+            {
+                function fn(host,method);
+                Apply(target,fn,xps,server);
+            }
+
+            
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Filter);
+        };
+
 
     }
 }

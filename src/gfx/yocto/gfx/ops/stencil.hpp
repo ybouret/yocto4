@@ -107,6 +107,7 @@ namespace yocto
             inline void load(const pixmap<U> &src,
                              const vertex     org) throw()
             {
+                assert(src.has(org));
                 for(size_t i=0;i<9;++i)
                 {
                     const vertex probe = org+ _stencil::shift[i];
