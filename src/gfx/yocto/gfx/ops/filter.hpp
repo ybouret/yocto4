@@ -227,6 +227,20 @@ namespace yocto
                 Apply(target,this,&filter<T>::average,xps);
             }
 
+            inline void Open(pixmap<T> &target,
+                             xpatches  &xps)
+            {
+                Erode(target,xps);
+                Dilate(target,xps);
+            }
+
+            inline void Close(pixmap<T> &target,
+                              xpatches  &xps)
+            {
+                Dilate(target,xps);
+                Erode(target,xps);
+            }
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Filter);
         };

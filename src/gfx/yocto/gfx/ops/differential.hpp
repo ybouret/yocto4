@@ -91,23 +91,6 @@ namespace yocto
                         case gradient:  xps.submit(this,&differential::update_g<COLOR,T,NCH>); break;
                         case laplacian: xps.submit(this,&differential::update_l<COLOR,T,NCH>); break;
                     }
-#if 0
-                    for(size_t i=np;i>0;--i)
-                    {
-                        xpatch     &xp  = xps[i];
-                        switch(ops)
-                        {
-                            case gradient:
-                                xp.enqueue(this,&differential::update_g<COLOR,T,NCH>,xps.server);
-                                break;
-
-                            case laplacian:
-                                xp.enqueue(this,&differential::update_l<COLOR,T,NCH>,xps.server);
-                                break;
-                        }
-                    }
-                    xps.server->flush();
-#endif
                 }
 
             }

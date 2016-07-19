@@ -99,10 +99,10 @@ YOCTO_UNIT_TEST_IMPL(pa)
         IMG.save("img_big.png", wksp, NULL);
         
 
-        F.Dilate(wksp,xps);
-        IMG.save("img_dil.png",wksp, NULL);
-        F.Erode(wksp,xps);
-        IMG.save("img_dil_ero.png",wksp, NULL);
+        F.Close(wksp,xps);
+        IMG.save("img_close.png", wksp, NULL);
+        F.Close(wksp,xps);
+        IMG.save("img_close2.png", wksp, NULL);
 
     }
 

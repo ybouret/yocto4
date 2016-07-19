@@ -47,8 +47,11 @@ namespace yocto
             
             void regroup() throw();
             void split_using( const tagmap &tags ) throw();
-            
-            
+
+            //! width of a regouped particle
+            vertex width() const throw();
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(particle);
             template <typename T>

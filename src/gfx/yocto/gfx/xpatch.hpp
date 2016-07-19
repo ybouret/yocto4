@@ -86,6 +86,11 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(xpatches);
         };
 
+#define YGFX_SUBMIT(HOST,METHOD,XPS,CODE) do        {\
+for(register size_t ipatch=XPS.size();ipatch>0;--i) {\
+xpatch &xp = XPS[ipatch]; do { CODE; } while(false)  \
+xp.enqueue(HOST,METHOD,XPS.server);                 }\
+xps.server->flush(); } while(false)
         
         
     }
