@@ -20,7 +20,7 @@ SET( geometry_srcs ${geometry_decl} ${geometry_impl} )
 INSTALL( FILES ${geometry_decl} DESTINATION include/yocto/spade/geometry )
 SOURCE_GROUP( spade/geometry FILES ${geometry_srcs} )
 
-INCLUDE_DIRECTORIES( . ../main ../mk ../graphics)
+INCLUDE_DIRECTORIES( . ../main ../mk ../gfx)
 
 ADD_LIBRARY(y-spade STATIC 
 	${srcs}

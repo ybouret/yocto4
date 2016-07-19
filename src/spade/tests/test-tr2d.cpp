@@ -1,20 +1,22 @@
 #include "yocto/spade/geometry/point-in-triangle2d.hpp"
 #include "yocto/utest/run.hpp"
-#include "yocto/graphics/image/png.hpp"
-#include "yocto/graphics/rawpix.hpp"
+#include "yocto/gfx/image/png.hpp"
+#include "yocto/gfx/rawpix.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/graphics/named-colors.hpp"
+#include "yocto/gfx/color/named-colors.hpp"
+#include "yocto/gfx/pixel.hpp"
 
 using namespace yocto;
 using namespace spade;
 
 YOCTO_UNIT_TEST_IMPL(tr2d)
 {
-    graphics::image      &IMG = graphics::image::instance();
-    graphics::png_format *PNG = new graphics::png_format();
+    gfx::image      &IMG = gfx::image::instance();
+    gfx::png_format *PNG = new gfx::png_format();
     IMG.declare(PNG);
+    gfx::imageIO     *png = PNG;
 
-    graphics::pixmap3 img(200,100);
+    gfx::pixmap3 img(200,100);
 
 
 
@@ -31,7 +33,7 @@ YOCTO_UNIT_TEST_IMPL(tr2d)
             tr[i].y = alea_lt(h);
         }
 
-        //const graphics::RGB c = graphics::named_color::fetch(iter);
+        const gfx::RGB c = gfx::named_color::fetch(iter);
         for(unit_t j=0;j<h;++j)
         {
             for(unit_t i=0;i<w;++i)
@@ -39,14 +41,14 @@ YOCTO_UNIT_TEST_IMPL(tr2d)
                 const vertex p(i,j);
                 if( point_in_triangle2d::check(p, tr[0], tr[1], tr[2], 0.001) )
                 {
-                    //img[j][i] = graphics::blend::mix(img[j][i], c, 128);
+                    img[j][i] = gfx::pixel<gfx::RGB>::blend(img[j][i], c, 128);
                 }
             }
         }
 
     }
 
-    PNG->yocto::graphics::imageIO::save("triangle.png", img, NULL);
+    png->save("triangle.png", img, NULL);
 
 
 
