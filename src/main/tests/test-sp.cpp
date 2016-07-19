@@ -76,3 +76,15 @@ YOCTO_UNIT_TEST_IMPL(alias_ptr)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/ptr/soft.hpp"
+YOCTO_UNIT_TEST_IMPL(soft_ptr)
+{
+    soft_ptr<double> p1(0);
+    soft_ptr<double> p2(p1);
+
+    soft_ptr<double> p3( new double(4) );
+    soft_ptr<double> p4( p3 );
+}
+YOCTO_UNIT_TEST_DONE()
+
+
