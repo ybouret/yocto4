@@ -184,12 +184,11 @@ namespace yocto
 
             inline void Apply(pixmap<T>         &target,
                               function          &fn,
-                              xpatches          &xps,
-                              threading::engine *server)
+                              xpatches          &xps)
             {
                 pixmap<T> &self = *this;
                 self.copy(target);
-                this->apply(target,self,fn,xps,server);
+                this->apply(target,self,fn,xps);
             }
 
             template <
@@ -198,14 +197,35 @@ namespace yocto
             inline void Apply(pixmap<T>         &target,
                               HOST_POINTER       host,
                               METHOD_POINTER     method,
-                              xpatches          &xps,
-                              threading::engine *server)
+                              xpatches          &xps)
             {
                 function fn(host,method);
-                Apply(target,fn,xps,server);
+                Apply(target,fn,xps);
             }
 
-            
+            inline void Dilate(pixmap<T> &target,
+                               xpatches  &xps)
+            {
+                Apply(target,this,&filter<T>::dilate,xps);
+            }
+
+            inline void Erode(pixmap<T> &target,
+                              xpatches  &xps)
+            {
+                Apply(target,this,&filter<T>::erode,xps);
+            }
+
+            inline void Median(pixmap<T> &target,
+                               xpatches  &xps)
+            {
+                Apply(target,this,&filter<T>::median,xps);
+            }
+
+            inline void Smooth(pixmap<T> &target,
+                               xpatches  &xps)
+            {
+                Apply(target,this,&filter<T>::average,xps);
+            }
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Filter);

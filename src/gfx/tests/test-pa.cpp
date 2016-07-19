@@ -27,6 +27,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
     if(argc>1)
     {
+
         const string filename = argv[1];
         pixmap3      img( IMG.load3(filename,NULL) );
         xpatches     xps(img, new threading::engine(4,0,true) );
@@ -35,6 +36,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
         const unit_t w=img.w;
         const unit_t h=img.h;
+        Filter<RGB> F(w,h);
 
         std::cerr << "-- Gradient..." << std::endl;
         pixmap3      grd(w,h);
@@ -44,11 +46,25 @@ YOCTO_UNIT_TEST_IMPL(pa)
         }
         IMG.save("img_grd.png",grd,0);
 
+        {
+            pixmap3 grd2(grd);
+            F.Median(grd2,xps);
+            IMG.save("img_grd2.png",grd2,0);
+        }
+
         std::cerr << "-- Foreground..." << std::endl;
         pixmap3     fg(w,h);
         separate(threshold::keep_foreground,fg,grd,xps);
 
+
         IMG.save("img_fg.png",fg,0);
+
+        {
+            pixmap3 fg2(fg);
+            F.Median(fg2,xps);
+            IMG.save("img_fg2.png",fg2,0);
+        }
+
 
         std::cerr << "-- Build Tags..." << std::endl;
 
@@ -82,13 +98,11 @@ YOCTO_UNIT_TEST_IMPL(pa)
         }
         IMG.save("img_big.png", wksp, NULL);
         
-        pixmap3 dest(w,h);
-        
-        filter<RGB> F;
-        F.apply(dest,wksp, &F, & filter<RGB>::dilate, xps);
-        IMG.save("img_big1.png",dest, NULL);
-        F.apply(wksp,dest,&F, & filter<RGB>::erode, xps);
-        IMG.save("img_big2.png",wksp, NULL);
+
+        F.Dilate(wksp,xps);
+        IMG.save("img_dil.png",wksp, NULL);
+        F.Erode(wksp,xps);
+        IMG.save("img_dil_ero.png",wksp, NULL);
 
     }
 
