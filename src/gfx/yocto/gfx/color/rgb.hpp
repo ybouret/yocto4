@@ -161,6 +161,11 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
             return RGB(R>>8,G>>8,B>>8);
         }
 
+        template <> inline
+        float pixel<RGB>::to_float(const RGB C) throw()
+        {
+            return RGB::to_float(C);
+        }
 
         //______________________________________________________________________
         //
@@ -200,6 +205,11 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
             }
         }
 
+        template <> inline
+        float pixel<RGBA>::to_float(const RGBA C) throw()
+        {
+            return RGBA::to_float(C);
+        }
 
     }
 }

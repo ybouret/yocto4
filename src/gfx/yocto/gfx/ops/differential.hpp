@@ -159,7 +159,7 @@ namespace yocto
 
         private:
             template <typename COLOR,typename T,size_t NCH>
-            void initialize( xpatch &xp, lockable & ) throw()
+            inline void initialize( xpatch &xp, lockable & ) throw()
             {
                 assert(tgt);
                 assert(src);
@@ -298,7 +298,7 @@ namespace yocto
             }
 
             template <typename COLOR,typename T,size_t NCH>
-            void update_g( xpatch &xp, lockable & ) throw()
+            inline void update_g( xpatch &xp, lockable & ) throw()
             {
                 assert(tgt);
                 assert(src);
@@ -329,7 +329,7 @@ namespace yocto
             }
 
             template <typename COLOR,typename T,size_t NCH>
-            void update_l( xpatch &xp, lockable & ) throw()
+            inline void update_l( xpatch &xp, lockable & ) throw()
             {
                 assert(tgt);
                 assert(src);
@@ -343,6 +343,7 @@ namespace yocto
                 const unit_t         xmax     = xp.upper.x;
                 const real_t         scale    = real_t(pixel<T>::opaque);
                 const real_t         delta    = max_of(-global.vmin,global.vmax);
+
                 for(unit_t y=ymax;y>=ymin;--y)
                 {
                     for(unit_t x=xmax;x>=xmin;--x)

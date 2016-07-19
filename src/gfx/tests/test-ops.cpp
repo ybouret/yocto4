@@ -14,6 +14,7 @@
 #include "yocto/gfx/color/ramp/cold_to_hot.hpp"
 #include "yocto/gfx/color/ramp/cold_to_very_hot.hpp"
 #include "yocto/gfx/color/ramp/grey.hpp"
+#include "yocto/gfx/ops/edges.hpp"
 
 #include "yocto/code/rand.hpp"
 
@@ -259,6 +260,12 @@ YOCTO_UNIT_TEST_IMPL(ops)
         }
 
 
+        std::cerr << "-- Edges..." << std::endl;
+
+        cold_to_very_hot e_ramp;
+        edges Ed(w,h);
+        Ed.build_from(img,xps);
+        IMG.save("edges.png", Ed, e_ramp, NULL);
 
 
         return 0;

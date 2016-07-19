@@ -10,7 +10,7 @@ namespace yocto
 
         ramp:: ramp(const RGBA *user_codes) throw() :
         vmin(0),
-        vmax(0),
+        vmax(1),
         codes(user_codes)
         {
             assert(codes!=NULL);
