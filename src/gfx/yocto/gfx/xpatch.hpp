@@ -5,6 +5,7 @@
 #include "yocto/container/vslot.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/threading/engine.hpp"
+#include "yocto/ptr/soft.hpp"
 
 namespace yocto
 {
@@ -13,6 +14,7 @@ namespace yocto
 
         class                  xpatch;
         typedef vector<xpatch> xpatches;
+
 
         //! execution patch
         class xpatch : public patch, public vslot
@@ -50,13 +52,14 @@ namespace yocto
                 }
             }
 
-            
-
 
         private:
             YOCTO_DISABLE_ASSIGN(xpatch);
         };
-        
+
+
+
+
         
         
     }
