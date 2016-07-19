@@ -26,12 +26,10 @@ YOCTO_UNIT_TEST_IMPL(pixmap)
     pixmap<YUV>        p12(p3,YUV::fromRGB,p3);
     pixmaps<YUV::type> channels(3,w,h);
 
-    threading::engine server(true);
-    xpatches          xps;
-    xpatch::create(xps,p12,&server);
+    xpatches          xps(p12,true);
 
     samples<YUV> yuv_samples;
-    yuv_samples.split(channels,p12,xps,&server);
+    yuv_samples.split(channels,p12,xps);
 
     pixmap<RGB>  img(w,h);
     for(unit_t j=0;j<h;++j)

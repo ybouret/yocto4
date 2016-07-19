@@ -41,12 +41,13 @@ namespace yocto
             inline void apply(pixmap<T>         &target,
                               const pixmap<T>   &source,
                               function          &fn,
-                              xpatches          &xps,
-                              threading::engine *server)
+                              xpatches          &xps)
             {
                 tgt = &target;
                 src = &source;
                 pfn = &fn;
+                xps.submit(this,&filter<T>::run);
+#if 0
                 const size_t np = xps.size();
                 for(size_t i=np;i>0;--i)
                 {
@@ -54,6 +55,7 @@ namespace yocto
                     xp.enqueue(this, & filter<T>::run, server);
                 }
                 if(server) server->flush();
+#endif
             }
 
             template <
@@ -63,11 +65,10 @@ namespace yocto
                               const pixmap<T>   &source,
                               HOST_POINTER       host,
                               METHOD_POINTER     method,
-                              xpatches          &xps,
-                              threading::engine *server)
+                              xpatches          &xps)
             {
                 function fn(host,method);
-                apply(target,source,fn,xps,server);
+                apply(target,source,fn,xps);
             }
 
             //! replace pixel by its average

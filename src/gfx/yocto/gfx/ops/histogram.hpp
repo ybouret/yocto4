@@ -61,8 +61,7 @@ namespace yocto
 
             template <typename T>
             void update(const pixmap<T>   &pxm,
-                        xpatches          &xps,
-                        threading::engine *server)
+                        xpatches          &xps)
             {
                 src = &pxm;
                 const size_t np = xps.size();
@@ -70,9 +69,10 @@ namespace yocto
                 {
                     xpatch    &xp = xps[i];
                     (void) xp.make<Histogram>();
-                    xp.enqueue(this, & Histogram::update_cb<T>, server);
+                    xp.enqueue(this, & Histogram::update_cb<T>, xps.server);
                 }
-                if(server) server->flush();
+                xps.server->flush();
+
                 for(size_t i=np;i>0;--i)
                 {
                     collect( xps[i].as<Histogram>() );
@@ -162,11 +162,10 @@ namespace yocto
         size_t separate(const threshold::mode_type mode,
                         pixmap<T>                 &target,
                         const pixmap<T>           &source,
-                        xpatches                  &xps,
-                        threading::engine         *server)
+                        xpatches                  &xps)
         {
             Histogram H;
-            H.update(source, xps, server);
+            H.update(source, xps);
             const size_t t = H.threshold();
             threshold::apply(target,t,source,mode);
             return t;

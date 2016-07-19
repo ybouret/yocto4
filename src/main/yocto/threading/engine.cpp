@@ -21,7 +21,8 @@ namespace yocto
 {
     namespace threading
     {
-        sequential_dispatcher:: sequential_dispatcher() throw() : access()
+        sequential_dispatcher:: sequential_dispatcher() throw() : access(),
+        juuid(0)
         {
         }
 
@@ -33,12 +34,17 @@ namespace yocto
         {
             job run(J);
             run(access);
-            return 0;
+            return ++juuid;
         }
 
         void sequential_dispatcher:: flush()
         {
             
+        }
+
+        size_t sequential_dispatcher:: levels() const throw()
+        {
+            return 1;
         }
     }
     
@@ -109,6 +115,10 @@ failed(0)
             quit();
         }
         
+        size_t engine:: levels() const throw()
+        {
+            return size;
+        }
         
         void engine:: init()
         {

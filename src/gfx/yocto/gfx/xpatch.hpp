@@ -5,16 +5,14 @@
 #include "yocto/container/vslot.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/threading/engine.hpp"
-#include "yocto/ptr/soft.hpp"
+#include "yocto/ptr/arc.hpp"
 
 namespace yocto
 {
     namespace gfx
     {
 
-        class                               xpatch;
-        typedef vector<xpatch>             _xpatches;
-        typedef soft_ptr<threading::engine> thread_server;
+        typedef arc_ptr<threading::dispatcher> thread_server;
 
 
         //! execution patch
@@ -23,34 +21,23 @@ namespace yocto
         public:
             explicit xpatch(const patch &p);
 
-            //! does not copy slot !
-            xpatch(const xpatch &other);
-            virtual ~xpatch() throw();
-            faked_lock        jlk;
-            threading::job_id jid;
 
-            static
-            void create( _xpatches &xp, const patch &source, threading::engine *server );
+            xpatch(const xpatch &other); //!< doesn't copy vslot nor jid
+            virtual ~xpatch() throw();   //!< default destructor
+            threading::job_id jid;       //!< last job ID
 
+            
             //! enqueue a method(xpatch&,lockable&)
             template <
             typename OBJECT_POINTER,
             typename METHOD_POINTER>
             inline void enqueue(OBJECT_POINTER     host,
                                 METHOD_POINTER     method,
-                                threading::engine *server)
+                                thread_server     &server)
             {
                 assert(host);
                 assert(method);
-                if(server)
-                {
-                    jid = server->enqueue<OBJECT_POINTER,METHOD_POINTER,xpatch>(host,method,*this);
-                }
-                else
-                {
-                    jid = 0;
-                    ( (*host).*method )(*this,jlk);
-                }
+                jid = server->enqueue2<OBJECT_POINTER,METHOD_POINTER,xpatch>(host,method,*this);
             }
 
 
@@ -59,11 +46,41 @@ namespace yocto
         };
 
 
+        //! base class for xpatches
+        typedef vector<xpatch>  _xpatches;
+
+        //! a vector of xpatch and with the thread dispatcher
         class xpatches : public _xpatches
         {
         public:
-            explicit xpatches() {}
-            virtual ~xpatches() throw() {}
+            //! default constructor
+            explicit xpatches(const patch &source, threading::dispatcher *srv);
+
+            //! make one patch (sequential)
+            explicit xpatches(const patch &source);
+
+            //! environment based layout
+            explicit xpatches(const patch &source, const bool setVerbose);
+
+            //! destructor
+            virtual ~xpatches() throw();
+
+            thread_server server;
+
+            //! enqueue all and flush
+            template <typename HOST_POINTER,typename METHOD_POINTER>
+            void submit(HOST_POINTER   host,
+                        METHOD_POINTER method)
+            {
+                _xpatches &self = *this;
+                for(size_t i=self.size();i>0;--i)
+                {
+                    self[i].enqueue<HOST_POINTER,METHOD_POINTER>(host,method,server);
+                }
+                server->flush();
+            }
+
+            void setup_from(const patch &source);
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(xpatches);

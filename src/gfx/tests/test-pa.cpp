@@ -23,14 +23,13 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
     imageIO          &IMG = image::instance();
     threading::engine server(4,0,true);
-    xpatches          xps;
     differential      drvs;
 
     if(argc>1)
     {
         const string filename = argv[1];
         pixmap3      img( IMG.load3(filename,NULL) );
-        xpatch::create(xps, img, &server);
+        xpatches     xps(img, new threading::engine(4,0,true) );
 
         IMG.save("img.png",img,0);
 
@@ -41,13 +40,13 @@ YOCTO_UNIT_TEST_IMPL(pa)
         pixmap3      grd(w,h);
         {
             pixmaps<real_t> channels(3,w,h);
-            drvs.compute(grd,img,channels,differential::gradient, xps, &server);
+            drvs.compute(grd,img,channels,differential::gradient, xps);
         }
         IMG.save("img_grd.png",grd,0);
 
         std::cerr << "-- Foreground..." << std::endl;
         pixmap3     fg(w,h);
-        separate(threshold::keep_foreground,fg,grd,xps,&server);
+        separate(threshold::keep_foreground,fg,grd,xps);
 
         IMG.save("img_fg.png",fg,0);
 
@@ -86,9 +85,9 @@ YOCTO_UNIT_TEST_IMPL(pa)
         pixmap3 dest(w,h);
         
         filter<RGB> F;
-        F.apply(dest,wksp, &F, & filter<RGB>::dilate, xps, &server);
+        F.apply(dest,wksp, &F, & filter<RGB>::dilate, xps);
         IMG.save("img_big1.png",dest, NULL);
-        F.apply(wksp,dest,&F, & filter<RGB>::erode, xps, &server);
+        F.apply(wksp,dest,&F, & filter<RGB>::erode, xps);
         IMG.save("img_big2.png",wksp, NULL);
 
     }

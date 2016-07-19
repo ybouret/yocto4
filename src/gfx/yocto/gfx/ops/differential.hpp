@@ -39,8 +39,7 @@ namespace yocto
                        const pixmap<COLOR>   &source,
                        pixmaps<real_t>       &channels,
                        const op_type          ops,
-                       xpatches              &xps,
-                       threading::engine     *server)
+                       xpatches              &xps)
             {
                 tgt      = &target;
                 src      = &source;
@@ -68,9 +67,9 @@ namespace yocto
                 {
                     xpatch &xp = xps[i];
                     xp.build<info,real_t,real_t>(0,0);
-                    xp.enqueue(this,&differential::initialize<COLOR,T,NCH>,server);
+                    xp.enqueue(this,&differential::initialize<COLOR,T,NCH>,xps.server);
                 }
-                if(server) server->flush();
+                xps.server->flush();
 
                 global = xps[1].as<info>();
                 for(size_t i=np;i>1;--i)
@@ -87,21 +86,28 @@ namespace yocto
                 }
                 else
                 {
+                    switch(ops)
+                    {
+                        case gradient:  xps.submit(this,&differential::update_g<COLOR,T,NCH>); break;
+                        case laplacian: xps.submit(this,&differential::update_l<COLOR,T,NCH>); break;
+                    }
+#if 0
                     for(size_t i=np;i>0;--i)
                     {
                         xpatch     &xp  = xps[i];
                         switch(ops)
                         {
                             case gradient:
-                                xp.enqueue(this,&differential::update_g<COLOR,T,NCH>,server);
+                                xp.enqueue(this,&differential::update_g<COLOR,T,NCH>,xps.server);
                                 break;
 
                             case laplacian:
-                                xp.enqueue(this,&differential::update_l<COLOR,T,NCH>,server);
+                                xp.enqueue(this,&differential::update_l<COLOR,T,NCH>,xps.server);
                                 break;
                         }
                     }
-                    if(server) server->flush();
+                    xps.server->flush();
+#endif
                 }
 
             }
@@ -110,20 +116,18 @@ namespace yocto
                                 const pixmap<float>  &source,
                                 pixmaps<real_t>      &channels,
                                 const op_type         ops,
-                                xpatches             &xps,
-                                threading::engine    *server)
+                                xpatches             &xps)
             {
-                apply<float,float,1>(target,source,channels,ops,xps,server);
+                apply<float,float,1>(target,source,channels,ops,xps);
             }
 
             inline void compute(pixmap<uint8_t>        &target,
                                 const pixmap<uint8_t>  &source,
                                 pixmaps<real_t>        &channels,
                                 const op_type           ops,
-                                xpatches               &xps,
-                                threading::engine      *server)
+                                xpatches               &xps)
             {
-                apply<uint8_t,uint8_t,1>(target,source,channels,ops,xps,server);
+                apply<uint8_t,uint8_t,1>(target,source,channels,ops,xps);
             }
 
 
@@ -131,20 +135,18 @@ namespace yocto
                                 const pixmap<RGB>    &source,
                                 pixmaps<real_t>      &channels,
                                 const op_type         ops,
-                                xpatches             &xps,
-                                threading::engine    *server)
+                                xpatches             &xps)
             {
-                apply<RGB,uint8_t,3>(target,source,channels,ops,xps,server);
+                apply<RGB,uint8_t,3>(target,source,channels,ops,xps);
             }
 
             inline void compute(pixmap<RGBA>          &target,
                                 const pixmap<RGBA>    &source,
                                 pixmaps<real_t>       &channels,
                                 const op_type         ops,
-                                xpatches             &xps,
-                                threading::engine    *server)
+                                xpatches             &xps)
             {
-                apply<RGBA,uint8_t,3>(target,source,channels,ops,xps,server);
+                apply<RGBA,uint8_t,3>(target,source,channels,ops,xps);
             }
 
 

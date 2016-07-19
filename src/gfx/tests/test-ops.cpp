@@ -63,8 +63,7 @@ static inline void save_with_ramp(ramp                &rmp,
 template <typename T>
 static inline void apply_filters(const pixmap<T>   &src,
                                  const string      &id,
-                                 xpatches          &xps,
-                                 threading::engine *server)
+                                 xpatches          &xps)
 {
     //const unit_t w = src.w;
     //const unit_t h = src.h;
@@ -79,7 +78,7 @@ static inline void apply_filters(const pixmap<T>   &src,
     for(unsigned i=1;i<=4;++i)
     {
         org.copy(dst);
-        F.apply(dst,org,&F, &filter<T>::average,xps,server);
+        F.apply(dst,org,&F, &filter<T>::average,xps);
         const string filename = "img_" + id + vformat("_ave%u.png",i);
         IMG.save(filename,dst,NULL);
     }
@@ -89,7 +88,7 @@ static inline void apply_filters(const pixmap<T>   &src,
     for(unsigned i=1;i<=4;++i)
     {
         org.copy(dst);
-        F.apply(dst,org,&F, &filter<T>::median,xps,server);
+        F.apply(dst,org,&F, &filter<T>::median,xps);
         const string filename = "img_" + id + vformat("_med%u.png",i);
         IMG.save(filename,dst,NULL);
     }
@@ -99,7 +98,7 @@ static inline void apply_filters(const pixmap<T>   &src,
     for(unsigned i=1;i<=4;++i)
     {
         org.copy(dst);
-        F.apply(dst,org,&F, &filter<T>::dilate,xps,server);
+        F.apply(dst,org,&F, &filter<T>::dilate,xps);
         const string filename = "img_" + id + vformat("_dilate%u.png",i);
         IMG.save(filename,dst,NULL);
     }
@@ -109,7 +108,7 @@ static inline void apply_filters(const pixmap<T>   &src,
     for(unsigned i=1;i<=4;++i)
     {
         org.copy(dst);
-        F.apply(dst,org,&F, &filter<T>::erode,xps,server);
+        F.apply(dst,org,&F, &filter<T>::erode,xps);
         const string filename = "img_" + id + vformat("_erode%u.png",i);
         IMG.save(filename,dst,NULL);
     }
@@ -129,14 +128,13 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
     imageIO          &IMG = image::instance();
     threading::engine server(true);
-    xpatches          xps;
     if(argc>1)
     {
         std::cerr << "-- Load" << std::endl;
         const string filename = argv[1];
         pixmap3      img( IMG.load3(filename,NULL) );
         IMG.save("img.png",img,NULL);
-        xpatch::create(xps, img, &server);
+        xpatches xps(img,true);
 
         std::cerr << "-- to YUV" << std::endl;
         yuvmap       yuv(img,YUV::fromRGB,img);
@@ -147,7 +145,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
         samples<YUV>   yuv_samples;
         pixmaps<float> fch(3,w,h);
 
-        yuv_samples.split(fch,yuv,xps,&server);
+        yuv_samples.split(fch,yuv,xps);
 
         IMG.save("img_y.png",fch[0],NULL);
 
@@ -168,7 +166,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
 
         std::cerr << "-- Merge" << std::endl;
-        yuv_samples.merge(fch,yuv,xps,&server);
+        yuv_samples.merge(fch,yuv,xps);
         IMG.save("img2.png",yuv,NULL);
 
         std::cerr << "-- Greyscale..." << std::endl;
@@ -177,21 +175,21 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
         std::cerr << "-- Keep Foreground RGB" << std::endl;
         pixmap3 fg3(w,h);
-        separate(threshold::keep_foreground,fg3,img, xps, &server);
+        separate(threshold::keep_foreground,fg3,img, xps);
         IMG.save("fg3.png",fg3,NULL);
 
         std::cerr << "-- Keep Foreground Float" << std::endl;
         pixmapf fgf(w,h);
-        separate(threshold::keep_foreground,fgf,igs, xps, &server);
+        separate(threshold::keep_foreground,fgf,igs, xps);
         IMG.save("fgf.png",fgf,NULL);
 
         std::cerr << "-- Blur RGB" << std::endl;
-        apply_blur(1.2, fg3, img, xps, &server);
+        apply_blur(1.2, fg3, img, xps);
         IMG.save("blur3.png", fg3, NULL);
 
 
         std::cerr << "-- Blur Float" << std::endl;
-        apply_blur(1.2, fgf, igs, xps, &server);
+        apply_blur(1.2, fgf, igs, xps);
         IMG.save("blurf.png", fgf, NULL);
 
         std::cerr << "-- FFT..." << std::endl;
@@ -226,18 +224,18 @@ YOCTO_UNIT_TEST_IMPL(ops)
         {
             pixmapf        grad_gs(w,h);
             pixmaps<float> channels(1,w,h);
-            drvs.apply<float, float, 1>(grad_gs,igs,channels,differential::gradient,xps, &server);
+            drvs.apply<float, float, 1>(grad_gs,igs,channels,differential::gradient,xps);
             IMG.save("igs_grad.png", grad_gs,NULL);
-            drvs.apply<float, float, 1>(grad_gs,igs,channels,differential::laplacian,xps, &server);
+            drvs.apply<float, float, 1>(grad_gs,igs,channels,differential::laplacian,xps);
             IMG.save("igs_lapl.png", grad_gs,NULL);
         }
 
         {
             pixmap1        grad1(w,h);
             pixmaps<float> channels(1,w,h);
-            drvs.apply<uint8_t,uint8_t,1>(grad1,img1,channels,differential::gradient,xps, &server);
+            drvs.apply<uint8_t,uint8_t,1>(grad1,img1,channels,differential::gradient,xps);
             IMG.save("img_grad1.png",grad1,NULL);
-            drvs.apply<uint8_t,uint8_t,1>(grad1,img1,channels,differential::laplacian,xps, &server);
+            drvs.apply<uint8_t,uint8_t,1>(grad1,img1,channels,differential::laplacian,xps);
             IMG.save("img_lapl1.png", grad1,NULL);
         }
 
@@ -246,18 +244,18 @@ YOCTO_UNIT_TEST_IMPL(ops)
         {
             pixmap3        grad3(w,h);
             pixmaps<float> channels(3,w,h);
-            drvs.apply<RGB,uint8_t,3>(grad3,img,channels,differential::gradient,xps, &server);
+            drvs.apply<RGB,uint8_t,3>(grad3,img,channels,differential::gradient,xps);
             IMG.save("img_grad3.png",grad3,NULL);
-            drvs.apply<RGB,uint8_t,3>(grad3,img,channels,differential::laplacian,xps, &server);
+            drvs.apply<RGB,uint8_t,3>(grad3,img,channels,differential::laplacian,xps);
             IMG.save("img_lapl3.png", grad3,NULL);
         }
 
         {
             pixmap4        grad4(w,h);
             pixmaps<float> channels(3,w,h);
-            drvs.apply<RGBA,uint8_t,3>(grad4,img4,channels,differential::gradient,xps, &server);
+            drvs.apply<RGBA,uint8_t,3>(grad4,img4,channels,differential::gradient,xps);
             IMG.save("img_grad4.png",grad4,NULL);
-            drvs.apply<RGBA,uint8_t,3>(grad4,img4,channels,differential::laplacian,xps, &server);
+            drvs.apply<RGBA,uint8_t,3>(grad4,img4,channels,differential::laplacian,xps);
             IMG.save("img_lapl4.png", grad4,NULL);
         }
 
@@ -267,10 +265,10 @@ YOCTO_UNIT_TEST_IMPL(ops)
         return 0;
 
         std::cerr << "-- Filter..." << std::endl;
-        apply_filters(img,"rgb"   , xps,&server);
-        apply_filters(igs,"gs",     xps,&server);
-        apply_filters(img4,"rgba",  xps,&server);
-        apply_filters(img1,"u",     xps,&server);
+        apply_filters(img,"rgb"   , xps);
+        apply_filters(igs,"gs",     xps);
+        apply_filters(img4,"rgba",  xps);
+        apply_filters(img1,"u",     xps);
 
 
 

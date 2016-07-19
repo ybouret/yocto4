@@ -22,37 +22,23 @@ namespace yocto
             
             inline void split(pixmaps<T>               &channels,
                               const pixmap<COLOR_TYPE> &source,
-                              xpatches                 &xps,
-                              threading::engine        *server
-                              )
+                              xpatches                 &xps)
             {
                 nch = min_of(channels.size,max_channels);
                 tgt = &channels;
                 src = &source;
-                for(size_t i=xps.size();i>0;--i)
-                {
-                    xpatch &xp = xps[i];
-                    xp.enqueue(this,&samples<COLOR_TYPE>::__split,server);
-                }
-                if(server) server->flush();
+                xps.submit(this,&samples<COLOR_TYPE>::__split);
             }
 
 
             inline void merge(const pixmaps<T>         &channels,
                               pixmap<COLOR_TYPE>       &target,
-                              xpatches                 &xps,
-                              threading::engine        *server
-                              )
+                              xpatches                 &xps)
             {
                 nch = min_of(channels.size,max_channels);
                 src = &channels;
                 tgt = &target;
-                for(size_t i=xps.size();i>0;--i)
-                {
-                    xpatch &xp = xps[i];
-                    xp.enqueue(this,&samples<COLOR_TYPE>::__merge,server);
-                }
-                if(server) server->flush();
+                xps.submit(this,&samples<COLOR_TYPE>::__merge);
             }
 
 

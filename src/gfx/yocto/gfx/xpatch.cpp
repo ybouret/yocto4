@@ -8,7 +8,6 @@ namespace yocto
         xpatch:: xpatch(const patch &p) :
         patch(p),
         vslot(),
-        jlk(),
         jid(0)
         {
         }
@@ -16,7 +15,6 @@ namespace yocto
         xpatch:: xpatch(const xpatch &other) :
         patch(other),
         vslot(),
-        jlk(),
         jid(0)
         {
         }
@@ -26,12 +24,43 @@ namespace yocto
         {
         }
 
-        void xpatch:: create(_xpatches         &xp,
-                             const patch       &source,
-                             threading::engine *server)
+    }
+
+}
+
+namespace yocto
+{
+    namespace gfx
+    {
+        xpatches:: xpatches(const patch &source, threading::dispatcher *srv) :
+        _xpatches(),
+        server(srv)
         {
-            parallel::build_patches(xp,(server?server->size:1),source);
+            setup_from(source);
         }
 
+        void xpatches:: setup_from(const patch &source)
+        {
+            parallel::build_patches(*this,server->levels(),source);
+        }
+
+        xpatches::xpatches(const patch &source) :
+        _xpatches(),
+        server( new threading::sequential_dispatcher() )
+        {
+            setup_from(source);
+        }
+
+        xpatches:: xpatches(const patch &source, const bool setVerbose) :
+        _xpatches(),
+        server( new threading::engine(setVerbose) )
+        {
+            setup_from(source);
+        }
+
+        xpatches:: ~xpatches() throw()
+        {
+        }
+        
     }
 }

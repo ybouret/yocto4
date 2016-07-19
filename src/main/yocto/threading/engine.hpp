@@ -15,6 +15,7 @@ namespace yocto
         typedef uint32_t                     job_id; //!< a unique id
         typedef functor<void,TL1(lockable&)> job;    //!< a job to execute
 
+        //! interface class: job dispatcher
         class dispatcher : public counted_object
         {
         public:
@@ -22,6 +23,50 @@ namespace yocto
 
             virtual job_id enqueue(const job &J ) = 0;
             virtual void   flush()                = 0;
+            virtual size_t levels() const throw() = 0;
+
+
+            //! wrapper for single instruction, multiple data
+            /**
+             METHOD_POINTER(T &,lockable &)
+             */
+            template <
+            typename OBJECT_POINTER,
+            typename METHOD_POINTER,
+            typename T
+            >
+            class jwrapper
+            {
+            public:
+
+                inline jwrapper(OBJECT_POINTER h, METHOD_POINTER c, T &d ) throw() :
+                host(h), call(c), data(d) {}
+
+                inline jwrapper(const jwrapper &other) throw() :
+                host(other.host), call(other.call), data(other.data) {}
+
+                inline ~jwrapper() throw() {}
+
+                inline void operator()( lockable &shared_lock )
+                {
+                    ((*host).*call)(data,shared_lock);
+                }
+
+            private:
+                OBJECT_POINTER host;
+                METHOD_POINTER call;
+                T             &data;
+                YOCTO_DISABLE_ASSIGN(jwrapper);
+            };
+
+            template <typename OBJECT_POINTER,typename METHOD_POINTER,typename T> inline
+            job_id enqueue2(OBJECT_POINTER host, METHOD_POINTER method, T &data)
+            {
+                const jwrapper<OBJECT_POINTER,METHOD_POINTER,T> jw(host,method,data);
+                const job   J(jw);
+                return enqueue(J);
+            }
+
 
         protected:
             explicit dispatcher() throw();
@@ -30,6 +75,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(dispatcher);
         };
 
+        
         //! failsafe sequential dispatcher
         class sequential_dispatcher : public dispatcher
         {
@@ -39,9 +85,11 @@ namespace yocto
 
             virtual job_id enqueue(const job &J);
             virtual void   flush();
-            
+            virtual size_t levels() const throw();
+
         private:
             faked_lock access;
+            job_id     juuid;
             YOCTO_DISABLE_COPY_AND_ASSIGN(sequential_dispatcher);
         };
 
@@ -62,6 +110,9 @@ namespace yocto
 
             //! wait until all jobs are done
             virtual void    flush() throw();
+
+            //! this->size
+            virtual size_t levels() const throw();
 
         private:
             threads   workers;    //!< list of threads, layout.size+1
@@ -138,46 +189,6 @@ namespace yocto
             job_id  failed; //!< last failed job
 
 
-            //! wrapper for single instruction, multiple data
-            /**
-             METHOD_POINTER(T &,lockable &)
-             */
-            template <
-            typename OBJECT_POINTER,
-            typename METHOD_POINTER,
-            typename T
-            >
-            class jwrapper
-            {
-            public:
-
-                inline jwrapper(OBJECT_POINTER h, METHOD_POINTER c, T &d ) throw() :
-                host(h), call(c), data(d) {}
-
-                inline jwrapper(const jwrapper &other) throw() :
-                host(other.host), call(other.call), data(other.data) {}
-
-                inline ~jwrapper() throw() {}
-
-                inline void operator()( lockable &shared_lock )
-                {
-                    ((*host).*call)(data,shared_lock);
-                }
-
-            private:
-                OBJECT_POINTER host;
-                METHOD_POINTER call;
-                T             &data;
-                YOCTO_DISABLE_ASSIGN(jwrapper);
-            };
-
-            template <typename OBJECT_POINTER,typename METHOD_POINTER,typename T> inline
-            job_id enqueue(OBJECT_POINTER host, METHOD_POINTER method, T &data)
-            {
-                const jwrapper<OBJECT_POINTER,METHOD_POINTER,T> jw(host,method,data);
-                const job   J(jw);
-                return enqueue(J);
-            }
 
 
         };

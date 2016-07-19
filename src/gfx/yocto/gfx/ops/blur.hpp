@@ -40,37 +40,29 @@ namespace yocto
             size_t   NCH>
             inline void __apply(pixmap<T>         &tgt,
                                 const pixmap<T>   &src,
-                                xpatches          &xps,
-                                threading::engine *server
+                                xpatches          &xps
                                 )
             {
                 source = &src;
                 target = &tgt;
-                for(size_t p=xps.size();p>0;--p)
-                {
-                    xpatch &xp = xps[p];
-                    xp.enqueue(this, & blur::eval<T,U,NCH>, server);
-                }
-                if(server) server->flush();
+                xps.submit(this,& blur::eval<T,U,NCH>);
             }
 
 
             inline void apply(pixmap<float>       &tgt,
                               const pixmap<float> &src,
-                              xpatches            &xps,
-                              threading::engine   *server
+                              xpatches            &xps
                               )
             {
-                __apply<float, float, 1>(tgt, src, xps, server);
+                __apply<float, float, 1>(tgt, src, xps);
             }
 
             inline void apply(pixmap<RGB>       &tgt,
                               const pixmap<RGB> &src,
-                              xpatches            &xps,
-                              threading::engine   *server
+                              xpatches            &xps
                               )
             {
-                __apply<RGB, uint8_t, 3>(tgt, src, xps, server);
+                __apply<RGB, uint8_t, 3>(tgt, src, xps);
             }
 
         private:
@@ -179,11 +171,10 @@ namespace yocto
         inline void apply_blur(const float          sig,
                                pixmap<T>           &dst,
                                const pixmap<T>     &src,
-                               xpatches            &xps,
-                               threading::engine   *server)
+                               xpatches            &xps)
         {
             blur B(sig);
-            B.apply(dst,src,xps,server);
+            B.apply(dst,src,xps);
         }
 
 
