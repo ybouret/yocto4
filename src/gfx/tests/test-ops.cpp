@@ -127,7 +127,6 @@ YOCTO_UNIT_TEST_IMPL(ops)
     YOCTO_GFX_DECL_FORMAT(tiff);
 
     imageIO          &IMG = image::instance();
-    threading::engine server(true);
     if(argc>1)
     {
         std::cerr << "-- Load" << std::endl;

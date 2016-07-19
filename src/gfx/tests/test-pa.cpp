@@ -22,7 +22,6 @@ YOCTO_UNIT_TEST_IMPL(pa)
     YOCTO_GFX_DECL_FORMAT(tiff);
 
     imageIO          &IMG = image::instance();
-    threading::engine server(4,0,true);
     differential      drvs;
 
     if(argc>1)
