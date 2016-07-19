@@ -5,6 +5,50 @@ namespace yocto
 {
     namespace threading
     {
+        dispatcher:: dispatcher() throw()
+        {
+        }
+
+        dispatcher:: ~dispatcher() throw()
+        {
+        }
+        
+    }
+
+}
+
+namespace yocto
+{
+    namespace threading
+    {
+        sequential_dispatcher:: sequential_dispatcher() throw() : access()
+        {
+        }
+
+        sequential_dispatcher:: ~sequential_dispatcher() throw()
+        {
+        }
+
+        job_id sequential_dispatcher:: enqueue(const job &J)
+        {
+            job run(J);
+            run(access);
+            return 0;
+        }
+
+        void sequential_dispatcher:: flush()
+        {
+            
+        }
+    }
+    
+}
+
+
+namespace yocto
+{
+    namespace threading
+    {
         
         engine:: task:: ~task() throw() {}
         engine:: task:: task( const job_id I, const job &J ) :

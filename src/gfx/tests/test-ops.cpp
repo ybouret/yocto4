@@ -63,7 +63,7 @@ static inline void save_with_ramp(ramp                &rmp,
 template <typename T>
 static inline void apply_filters(const pixmap<T>   &src,
                                  const string      &id,
-                                 xpatches           xps,
+                                 xpatches          &xps,
                                  threading::engine *server)
 {
     //const unit_t w = src.w;

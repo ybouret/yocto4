@@ -90,7 +90,7 @@ YOCTO_UNIT_TEST_IMPL(engine)
     for(size_t i=1;i<=nj;++i)
     {
         Work w(i);
-        const engine::job J(w);
+        const job J(w);
         Q.enqueue(J);
     }
     Q.flush();

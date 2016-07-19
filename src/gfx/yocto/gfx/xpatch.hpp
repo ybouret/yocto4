@@ -12,8 +12,9 @@ namespace yocto
     namespace gfx
     {
 
-        class                  xpatch;
-        typedef vector<xpatch> xpatches;
+        class                               xpatch;
+        typedef vector<xpatch>             _xpatches;
+        typedef soft_ptr<threading::engine> thread_server;
 
 
         //! execution patch
@@ -29,7 +30,7 @@ namespace yocto
             threading::job_id jid;
 
             static
-            void create( xpatches &xp, const patch &source, threading::engine *server );
+            void create( _xpatches &xp, const patch &source, threading::engine *server );
 
             //! enqueue a method(xpatch&,lockable&)
             template <
@@ -58,7 +59,15 @@ namespace yocto
         };
 
 
+        class xpatches : public _xpatches
+        {
+        public:
+            explicit xpatches() {}
+            virtual ~xpatches() throw() {}
 
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(xpatches);
+        };
 
         
         

@@ -4,6 +4,7 @@
 #include "yocto/threading/threads.hpp"
 #include "yocto/threading/condition.hpp"
 #include "yocto/threading/layout.hpp"
+#include "yocto/counted-object.hpp"
 #include "yocto/functor.hpp"
 
 namespace yocto
@@ -11,25 +12,56 @@ namespace yocto
     namespace threading
     {
 
-        typedef uint32_t job_id;
+        typedef uint32_t                     job_id; //!< a unique id
+        typedef functor<void,TL1(lockable&)> job;    //!< a job to execute
 
-        //! manage a given number of threads
-        class engine : public layout
+        class dispatcher : public counted_object
         {
         public:
-            //! using YOCTO_THREADING or default settinfs
+            virtual ~dispatcher() throw();
+
+            virtual job_id enqueue(const job &J ) = 0;
+            virtual void   flush()                = 0;
+
+        protected:
+            explicit dispatcher() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(dispatcher);
+        };
+
+        //! failsafe sequential dispatcher
+        class sequential_dispatcher : public dispatcher
+        {
+        public:
+            virtual ~sequential_dispatcher() throw();
+            explicit sequential_dispatcher() throw();
+
+            virtual job_id enqueue(const job &J);
+            virtual void   flush();
+            
+        private:
+            faked_lock access;
+            YOCTO_DISABLE_COPY_AND_ASSIGN(sequential_dispatcher);
+        };
+
+
+        //! manage a given number of threads
+        class engine : public layout, public dispatcher
+        {
+        public:
+            //! using YOCTO_THREADING or default settings
             explicit engine(bool setVerbose);
+
+            //! user tailored settings
             explicit engine(const size_t num_threads, const size_t threads_offset,bool setVerbose);
             virtual ~engine() throw();
 
-            //! a job to execute
-            typedef functor<void,TL1(lockable&)> job;
-
             //! execute a job
-            job_id enqueue( const job &J );
+            virtual job_id enqueue( const job &J );
 
             //! wait until all jobs are done
-            void    flush() throw();
+            virtual void    flush() throw();
 
         private:
             threads   workers;    //!< list of threads, layout.size+1

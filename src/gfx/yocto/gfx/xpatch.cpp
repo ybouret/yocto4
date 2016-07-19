@@ -26,7 +26,7 @@ namespace yocto
         {
         }
 
-        void xpatch:: create(xpatches          &xp,
+        void xpatch:: create(_xpatches         &xp,
                              const patch       &source,
                              threading::engine *server)
         {
