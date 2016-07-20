@@ -30,6 +30,11 @@ static inline bool is_upper_vertex(const vertex &v) throw()
     return v.y>=y_limit;
 }
 
+static inline uint8_t u8invert(uint8_t x) throw()
+{
+    return 0xff-x;
+}
+
 YOCTO_UNIT_TEST_IMPL(pa)
 {
 
@@ -91,12 +96,19 @@ YOCTO_UNIT_TEST_IMPL(pa)
         std::cerr << "Thresholding..." << std::endl;
         pixmap<uint8_t> edges_fg(w,h);
         separate(threshold::keep_foreground,edges_fg,edges_mask,xps);
-        pixmap<uint8_t> edevs_fg(w,h);
-        separate(threshold::keep_foreground,edevs_fg,edevs_mask,xps);
 
         IMG.save("img_edges_fg" + suffix,edges_fg,0);
-        IMG.save("img_edevs_fg" + suffix,edevs_fg,0);
 
+        std::cerr << "Thresholding BG" << std::endl;
+        pixmap<uint8_t> edges_bg(w,h);
+        separate(threshold::keep_background,edges_bg,edges_mask,xps);
+        //trans.apply(edges_bg,u8invert,edges_bg,xps);
+        IMG.save("img_edges_bg" + suffix,edges_bg,0);
+
+        std::cerr << "Closing BG" << std::endl;
+        Filter<uint8_t> F8(w,h);
+        F8.Close(edges_bg,xps);
+        IMG.save("img_edges_bg2" + suffix,edges_bg,0);
 
         std::cerr << "-- Build Tags..." << std::endl;
 
@@ -133,6 +145,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
             pa[i]->transfer(wksp,img);
         }
         IMG.save("img_wksp"+suffix, wksp, NULL);
+
 
 
 
