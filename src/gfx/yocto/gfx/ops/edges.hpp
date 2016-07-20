@@ -32,26 +32,18 @@ namespace yocto
                 xps.submit(this, & edges::buildI<T> );
 
                 // build edges indicator
-                const size_t np = xps.size();
-                for(size_t i=np;i>0;--i)
-                {
-                    xpatch &xp = xps[i];
-                    xp.make<float>() = 0;
-                    xp.enqueue(this,& edges::buildE,xps.server);
-                }
-                xps.server->flush();
-
+                YGFX_SUBMIT(this,&edges::buildE,xps,xp.make<float>()=0);
 
                 // get amplitude
                 amplitude = xps[1].as<float>();
-                for(size_t i=np;i>1;--i)
+                for(size_t i=xps.size();i>1;--i)
                 {
                     amplitude = max_of(amplitude,xps[i].as<float>());
                 }
 
+                // normalize
                 if(amplitude>0)
                 {
-                    //finalize
                     xps.submit(this, & edges::finalize );
                 }
                 else
@@ -66,6 +58,7 @@ namespace yocto
             const void *src;
             float       amplitude;
 
+            //! build intensity by patch
             template <typename T>
             inline void buildI(xpatch &xp, lockable &) throw()
             {
@@ -80,6 +73,7 @@ namespace yocto
                 }
             }
 
+            //! build edge representation
             inline void buildE( xpatch &xp, lockable & ) throw()
             {
                 const unit_t         ymin     = xp.lower.y;
@@ -118,6 +112,7 @@ namespace yocto
                 xp.as<float>() = vmax;
             }
 
+            //! normalize
             inline void finalize(xpatch &xp, lockable & ) throw()
             {
                 const unit_t         ymin     = xp.lower.y;

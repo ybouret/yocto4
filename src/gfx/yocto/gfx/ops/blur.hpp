@@ -161,23 +161,33 @@ namespace yocto
                 //
                 // LEAVE: loop over rows
                 //______________________________________________________________
-                
+
+            }
+
+        public:
+            template <typename T> static inline
+            void cover(const float          sig,
+                       pixmap<T>           &dst,
+                       const pixmap<T>     &src,
+                       xpatches            &xps)
+            {
+                blur B(sig);
+                B.apply(dst,src,xps);
             }
             
+            template <typename T> static inline
+            void cover(const float sig,
+                       pixmap<T>  &src,
+                       xpatches   &xps)
+            {
+                pixmap<T> tmp(src);
+                apply_blur(sig,src,tmp,xps);
+            }
             
         };
-
-        template <typename T>
-        inline void apply_blur(const float          sig,
-                               pixmap<T>           &dst,
-                               const pixmap<T>     &src,
-                               xpatches            &xps)
-        {
-            blur B(sig);
-            B.apply(dst,src,xps);
-        }
-
-
+        
+        
+        
     }
 }
 

@@ -53,8 +53,11 @@ namespace yocto
         class xpatches : public _xpatches
         {
         public:
-            //! default constructor
+            //! default constructor for standalone dispatcher
             explicit xpatches(const patch &source, threading::dispatcher *srv);
+
+            //! constructor for shared dispatcher
+            explicit xpatches(const patch &source, const thread_server &srv);
 
             //! make one patch (sequential)
             explicit xpatches(const patch &source);
@@ -86,10 +89,10 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(xpatches);
         };
 
-#define YGFX_SUBMIT(HOST,METHOD,XPS,CODE) do        {\
-for(register size_t ipatch=XPS.size();ipatch>0;--i) {\
-xpatch &xp = XPS[ipatch]; do { CODE; } while(false)  \
-xp.enqueue(HOST,METHOD,XPS.server);                 }\
+#define YGFX_SUBMIT(HOST,METHOD,XPS,CODE) do         {  \
+for(register size_t ixp=XPS.size();ixp>0;--ixp)      {  \
+xpatch &xp = XPS[ixp]; do { CODE; } while(false);       \
+xp.enqueue(HOST,METHOD,XPS.server);                  }  \
 xps.server->flush(); } while(false)
         
         

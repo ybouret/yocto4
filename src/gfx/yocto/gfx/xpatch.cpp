@@ -39,6 +39,13 @@ namespace yocto
             setup_from(source);
         }
 
+        xpatches:: xpatches(const patch &source, const thread_server &srv) :
+        _xpatches(),
+        server(srv)
+        {
+            setup_from(source);
+        }
+
         void xpatches:: setup_from(const patch &source)
         {
             parallel::build_patches(*this,server->levels(),source);

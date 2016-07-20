@@ -184,12 +184,12 @@ YOCTO_UNIT_TEST_IMPL(ops)
         IMG.save("fgf.png",fgf,NULL);
 
         std::cerr << "-- Blur RGB" << std::endl;
-        apply_blur(1.2, fg3, img, xps);
+        blur::cover(1.2, fg3, img, xps);
         IMG.save("blur3.png", fg3, NULL);
 
 
         std::cerr << "-- Blur Float" << std::endl;
-        apply_blur(1.2, fgf, igs, xps);
+        blur::cover(1.2, fgf, igs, xps);
         IMG.save("blurf.png", fgf, NULL);
 
         std::cerr << "-- FFT..." << std::endl;
@@ -262,7 +262,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
         std::cerr << "-- Edges..." << std::endl;
 
-        cold_to_very_hot e_ramp;
+        grey e_ramp;
         edges Ed(w,h);
         Ed.build_from(img,xps);
         IMG.save("edges.png", Ed, e_ramp, NULL);
