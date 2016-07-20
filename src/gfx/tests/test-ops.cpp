@@ -115,6 +115,16 @@ static inline void apply_filters(const pixmap<T>   &src,
     }
 
 
+    std::cerr << "-- Filtering " << id << " median" << std::endl;
+    dst.copy(src);
+    for(unsigned i=1;i<=4;++i)
+    {
+        org.copy(dst);
+        F.apply(dst,org,&F, &filter<T>::pseudo_median,xps);
+        const string filename = "img_" + id + vformat("_med_hl%u.png",i);
+        IMG.save(filename,dst,NULL);
+    }
+
 
 
 }
@@ -267,8 +277,6 @@ YOCTO_UNIT_TEST_IMPL(ops)
         IMG.save("edges.png", Ed,  NULL);
         IMG.save("edevs.png", Ed.S,NULL);
 
-        
-        return 0;
 
         std::cerr << "-- Filter..." << std::endl;
         apply_filters(img,"rgb"   , xps);

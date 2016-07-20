@@ -103,17 +103,26 @@ YOCTO_UNIT_TEST_IMPL(pa)
         std::cerr << "-- Loading Particles..." << std::endl;
         particles pa;
         pa.load(tmap);
+        std::cerr << "#particles=" << pa.size() << std::endl;
 
+        std::cerr << "-- Removing Shallow..." << std::endl;
+        pa.remove_shallow_with(tmap);
+        std::cerr << "#particles=" << pa.size() << std::endl;
+
+        IMG.save("img_tags2"+suffix, tmap, tagColors, NULL);
+
+        
         pixmap3 wksp(w,h);
         for(size_t i=1;i<=pa.size();++i)
         {
-            pa[i]->split_using(tmap);
-            pa[i]->transfer_inside(wksp,img);
-            //pa[i]->mask_border(wksp,named_color::fetch(i+(YGFX_RED-1)),200);
-            //pa[i]->regroup();
+            //pa[i]->split_using(tmap);
+            pa[i]->transfer(wksp,img);
         }
         IMG.save("img_wksp"+suffix, wksp, NULL);
 
+        std::cerr << "-- Slight Filter" << std::endl;
+        F.PseudoMedian(wksp,xps);
+        IMG.save("img_wksp2"+suffix,wksp,NULL);
     }
 
 }

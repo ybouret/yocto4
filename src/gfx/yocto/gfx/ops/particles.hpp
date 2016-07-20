@@ -115,8 +115,14 @@ namespace yocto
             void sort() throw();
             
             void load(const tagmap &tags);
-            
-            
+
+            void regroup_all() throw();
+            void split_all_using(const tagmap &tags) throw();
+
+            //! remove particles with empty inside
+            void remove_shallow_with(tagmap &tags) throw();
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(particles);
         };

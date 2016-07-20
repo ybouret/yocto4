@@ -76,6 +76,15 @@ namespace yocto
             }
         }
 
+    }
+
+}
+
+#include "yocto/sort/remove-if.hpp"
+
+namespace yocto {
+
+    namespace gfx {
 
         particles:: ~particles() throw()
         {
@@ -139,6 +148,52 @@ namespace yocto
             sort();
             assert(size()==tags.current);
         }
+
+
+        void particles::regroup_all() throw()
+        {
+            _particles &self = *this;
+            for(size_t i=self.size();i>0;--i)
+            {
+                self[i]->regroup();
+            }
+        }
+
+        void particles::split_all_using(const tagmap &tags) throw()
+        {
+            _particles &self = *this;
+            for(size_t i=self.size();i>0;--i)
+            {
+                self[i]->split_using(tags);
+            }
+        }
+
+        static inline bool is_shallow( const particle::ptr &p ) throw()
+        {
+            return p->inside.size<=0;
+        }
+
+        void particles:: remove_shallow_with(tagmap &tags) throw()
+        {
+            regroup_all();
+            split_all_using(tags);
+            _particles &self = *this;
+            for(size_t i=self.size();i>0;--i)
+            {
+                const particle &pa = *self[i];
+                if(pa.inside.size<=0)
+                {
+                    for(const vnode *node = pa.border.head;node;node=node->next)
+                    {
+                        assert(tags.has(node->vtx));
+                        tags[node->vtx] = 0;
+                    }
+                }
+            }
+            remove_if(self,is_shallow);
+            regroup_all();
+        }
+
 
     }
 

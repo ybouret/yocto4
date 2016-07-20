@@ -23,12 +23,12 @@ namespace yocto
 
         protected:
             explicit _filter() throw();
-            
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(_filter);
         };
 
-        
+
         template <typename T>
         class filter
         {
@@ -47,15 +47,6 @@ namespace yocto
                 src = &source;
                 pfn = &fn;
                 xps.submit(this,&filter<T>::run);
-#if 0
-                const size_t np = xps.size();
-                for(size_t i=np;i>0;--i)
-                {
-                    xpatch    &xp = xps[i];
-                    xp.enqueue(this, & filter<T>::run, server);
-                }
-                if(server) server->flush();
-#endif
             }
 
             template <
@@ -92,6 +83,39 @@ namespace yocto
                     const lw_array<T> sub( &ra[n>>1], 2 );
                     return pixel<T>::average(sub);
                 }
+            }
+
+            //! build the Hodges-Lhemann pseudo_median
+            inline T pseudo_median( array<T> &ra ) throw()
+            {
+                assert(ra.size()>0);
+                assert(ra.size()<=9);
+                static const size_t max_pairs = 9*(9+1)/2;
+
+                T            ave[max_pairs];
+                size_t       num=0;
+                const size_t n=ra.size();
+                {
+                    T           tmp[2];
+                    lw_array<T> sub(tmp,2);
+                    for(size_t i=1;i<=n;++i)
+                    {
+                        sub[1]=ra[i];
+                        for(size_t j=i;j<=n;++j)
+                        {
+                            sub[2] = ra[j];
+                            assert(num<max_pairs);
+                            ave[num++] = pixel<T>::average(sub);
+                        }
+                    }
+                }
+
+                {
+                    lw_array<T> rp(ave,num);
+                    quicksort(rp);
+                }
+                assert( (n*(n+1))/2 == num );
+                return ave[ (--num)>>1 ];
             }
 
             //! replace pixel by the its maximum
@@ -221,6 +245,12 @@ namespace yocto
                 Apply(target,this,&filter<T>::median,xps);
             }
 
+            inline void PseudoMedian(pixmap<T> &target,
+                                     xpatches  &xps)
+            {
+                Apply(target,this,&filter<T>::pseudo_median,xps);
+            }
+
             inline void Smooth(pixmap<T> &target,
                                xpatches  &xps)
             {
@@ -233,19 +263,19 @@ namespace yocto
                 Erode(target,xps);
                 Dilate(target,xps);
             }
-
+            
             inline void Close(pixmap<T> &target,
                               xpatches  &xps)
             {
                 Dilate(target,xps);
                 Erode(target,xps);
             }
-
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Filter);
         };
-
-
+        
+        
     }
 }
 
