@@ -12,39 +12,56 @@ namespace yocto
         {
         public:
             typedef arc_ptr<particle> ptr;
-            
+
             explicit particle(const size_t id) throw();
             virtual ~particle() throw();
             const size_t tag;
             vlist        inside;
             vlist        border;
-            
+
             template <typename T>
             inline void mask( pixmap<T> &src, const T C, const uint8_t alpha) const throw()
             {
                 mask_list(*this,src,C,alpha);
             }
-            
+
             template <typename T>
             inline void mask_inside( pixmap<T> &src, const T C, const uint8_t alpha) const throw()
             {
                 mask_list(inside,src,C,alpha);
             }
-            
+
             template <typename T>
             inline void mask_border( pixmap<T> &src, const T C, const uint8_t alpha) const throw()
             {
                 mask_list(border,src,C,alpha);
             }
-            
-            
+
+
             template <typename T>
             inline void transfer(pixmap<T>       &tgt,
                                  const pixmap<T> &src)  throw()
             {
                 transfer_list(*this,tgt,src);
             }
-            
+
+            template <typename T>
+            inline void transfer_border(pixmap<T>       &tgt,
+                                        const pixmap<T> &src)  throw()
+            {
+                transfer_list(border,tgt,src);
+            }
+
+
+            template <typename T>
+            inline void transfer_inside(pixmap<T>       &tgt,
+                                        const pixmap<T> &src)  throw()
+            {
+                transfer_list(inside,tgt,src);
+            }
+
+
+
             void regroup() throw();
             void split_using( const tagmap &tags ) throw();
 
@@ -67,7 +84,7 @@ namespace yocto
                     S    = pixel<T>::blend(S,C,alpha);
                 }
             }
-            
+
             template <typename T>
             static inline void transfer_list(const vlist     &L,
                                              pixmap<T>       &tgt,
@@ -80,8 +97,8 @@ namespace yocto
                     tgt[node->vtx] = src[node->vtx];
                 }
             }
-            
-            
+
+
         };
 
         //! base class for particles
@@ -93,7 +110,7 @@ namespace yocto
         public:
             explicit particles() throw();
             virtual ~particles() throw();
-
+            
             //! sort by decreasing size
             void sort() throw();
             

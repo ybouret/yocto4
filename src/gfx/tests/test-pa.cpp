@@ -42,7 +42,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
         }
         const string filename = argv[1];
         pixmap3      img( IMG.load3(filename,NULL) );
-        xpatches     xps(img, new threading::engine(4,0,true) );
+        xpatches     xps(img,true);
 
         IMG.save("img.png",img,0);
 
@@ -98,9 +98,21 @@ YOCTO_UNIT_TEST_IMPL(pa)
         tmap.build(edges_fg,8);
         std::cerr << "#current=" << tmap.current << std::endl;
         indx2rgba<size_t> tagColors(YGFX_RED);
-        IMG.save("img_tags" +suffix, tmap, tagColors, NULL);
+        IMG.save("img_tags"+suffix, tmap, tagColors, NULL);
 
-        
+        std::cerr << "-- Loading Particles..." << std::endl;
+        particles pa;
+        pa.load(tmap);
+
+        pixmap3 wksp(w,h);
+        for(size_t i=1;i<=pa.size();++i)
+        {
+            pa[i]->split_using(tmap);
+            pa[i]->transfer_inside(wksp,img);
+            //pa[i]->mask_border(wksp,named_color::fetch(i+(YGFX_RED-1)),200);
+            //pa[i]->regroup();
+        }
+        IMG.save("img_wksp"+suffix, wksp, NULL);
 
     }
 
