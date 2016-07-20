@@ -5,6 +5,7 @@
 #include "yocto/gfx/xpatch.hpp"
 #include "yocto/gfx/pixel.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/container/tuple.hpp"
 
 namespace yocto
 {
@@ -18,7 +19,14 @@ namespace yocto
             static const float  sobel1[9];
             static const float  sobel2[9];
 
-            pixmap<float> I;
+            YOCTO_PAIR_DECL(info,float,Emax,float,Smax);
+            info() throw() : Emax(0), Smax(0) {}
+            YOCTO_PAIR_END();
+
+        private:
+            pixmap<float> I; //!< internal intensity map
+        public:
+            pixmap<float> S; //!< variance map
 
             explicit edges(const unit_t W,const unit_t H);
             virtual ~edges() throw();
@@ -32,23 +40,27 @@ namespace yocto
                 xps.submit(this, & edges::buildI<T> );
 
                 // build edges indicator
-                YGFX_SUBMIT(this,&edges::buildE,xps,xp.make<float>()=0);
+                YGFX_SUBMIT(this,&edges::buildE,xps,xp.make<info>());
 
                 // get amplitude
-                amplitude = xps[1].as<float>();
+                global.Emax = xps[1].as<info>().Emax;
+                global.Smax = xps[1].as<info>().Smax;
                 for(size_t i=xps.size();i>1;--i)
                 {
-                    amplitude = max_of(amplitude,xps[i].as<float>());
+                    const info &local = xps[i].as<info>();
+                    global.Emax = max_of(global.Emax,local.Emax);
+                    global.Smax = max_of(global.Smax,local.Smax);
                 }
 
                 // normalize
-                if(amplitude>0)
+                if(global.Emax>0)
                 {
                     xps.submit(this, & edges::finalize );
                 }
                 else
                 {
                     ldz();
+                    S.ldz();
                 }
             }
 
@@ -56,7 +68,7 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(edges);
             const void *src;
-            float       amplitude;
+            info        global;
 
             //! build intensity by patch
             template <typename T>
@@ -74,62 +86,10 @@ namespace yocto
             }
 
             //! build edge representation
-            inline void buildE( xpatch &xp, lockable & ) throw()
-            {
-                const unit_t         ymin     = xp.lower.y;
-                const unit_t         ymax     = xp.upper.y;
-                const unit_t         xmin     = xp.lower.x;
-                const unit_t         xmax     = xp.upper.x;
-                float                vmax     = 0;
-                pixmap<float> &self = *this;
-                for(unit_t y=ymax;y>=ymin;--y)
-                {
-                    for(unit_t x=xmax;x>=xmin;--x)
-                    {
-                        const vertex here(x,y);
-                        float sum1 = 0;
-                        float sum2 = 0;
-                        for(size_t k=0;k<9;++k)
-                        {
-                            const vertex probe = here + shift[k];
-                            float        II    = 0;
-                            if(has(probe))
-                            {
-                                II = I[probe];
-                            }
-                            else
-                            {
-                                II = I[here];
-                            }
-                            sum1 += sobel1[k] * II;
-                            sum2 += sobel2[k] * II;
-                        }
-                        const float value = sqrtf(sum1*sum1+sum2*sum2);
-                        self[y][x] = value;
-                        if(value>vmax) vmax=value;
-                    }
-                }
-                xp.as<float>() = vmax;
-            }
+            void buildE( xpatch &xp, lockable & ) throw();
 
             //! normalize
-            inline void finalize(xpatch &xp, lockable & ) throw()
-            {
-                const unit_t         ymin     = xp.lower.y;
-                const unit_t         ymax     = xp.upper.y;
-                const unit_t         xmin     = xp.lower.x;
-                const unit_t         xmax     = xp.upper.x;
-                const float          vmax     = amplitude;
-                pixmap<float>       &self     = *this;
-
-                for(unit_t y=ymax;y>=ymin;--y)
-                {
-                    for(unit_t x=xmax;x>=xmin;--x)
-                    {
-                        self[y][x] /= vmax;
-                    }
-                }
-            }
+            void finalize(xpatch &xp, lockable & ) throw();
         };
 
     }

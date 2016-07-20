@@ -262,12 +262,12 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
         std::cerr << "-- Edges..." << std::endl;
 
-        grey e_ramp;
         edges Ed(w,h);
         Ed.build_from(img,xps);
-        IMG.save("edges.png", Ed, e_ramp, NULL);
+        IMG.save("edges.png", Ed,  NULL);
+        IMG.save("edevs.png", Ed.S,NULL);
 
-
+        
         return 0;
 
         std::cerr << "-- Filter..." << std::endl;

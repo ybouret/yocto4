@@ -7,9 +7,12 @@
 #include "yocto/gfx/ops/differential.hpp"
 #include "yocto/gfx/ops/histogram.hpp"
 #include "yocto/gfx/ops/particles.hpp"
+#include "yocto/gfx/ops/edges.hpp"
+
 #include "yocto/gfx/color/named-colors.hpp"
 
 #include "yocto/utest/run.hpp"
+#include "yocto/string/conv.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -26,7 +29,11 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
     if(argc>1)
     {
-
+        size_t ns = 0;
+        if(argc>2)
+        {
+            ns = strconv::to<size_t>(argv[2],"#smooth");
+        }
         const string filename = argv[1];
         pixmap3      img( IMG.load3(filename,NULL) );
         xpatches     xps(img, new threading::engine(4,0,true) );
@@ -35,73 +42,46 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
         const unit_t w=img.w;
         const unit_t h=img.h;
-        Filter<RGB> F(w,h);
+        Filter<RGB>  F(w,h);
 
-        std::cerr << "-- Gradient..." << std::endl;
-        pixmap3      grd(w,h);
+        std::cerr << "#Smoothing=" << ns << std::endl;
+        for(size_t i=0;i<ns;++i)
         {
-            pixmaps<real_t> channels(3,w,h);
-            drvs.compute(grd,img,channels,differential::gradient, xps);
+            std::cerr << ".";
+            F.Smooth(img,xps);
         }
-        IMG.save("img_grd.png",grd,0);
+        std::cerr << std::endl;
+        const string suffix = vformat("%u.png",unsigned(ns));
+        IMG.save("img_smooth" + suffix,img,0);
 
-        {
-            pixmap3 grd2(grd);
-            F.Median(grd2,xps);
-            IMG.save("img_grd2.png",grd2,0);
-        }
+        std::cerr << "Building Edges" << std::endl;
+        edges Edges(w,h);
+        Edges.build_from(img,xps);
+        IMG.save("img_edges" + suffix,Edges,0);
+        IMG.save("img_edevs" + suffix,Edges.S,0);
 
-        std::cerr << "-- Foreground..." << std::endl;
-        pixmap3     fg(w,h);
-        separate(threshold::keep_foreground,fg,grd,xps);
+        std::cerr << "Thresholding..." << std::endl;
+        pixmapf edges_fg(w,h);
+        separate(threshold::keep_foreground,edges_fg,Edges,xps);
 
+        pixmapf edevs_fg(w,h);
+        separate(threshold::keep_foreground,edevs_fg,Edges.S,xps);
 
-        IMG.save("img_fg.png",fg,0);
-
-        {
-            pixmap3 fg2(fg);
-            F.Median(fg2,xps);
-            IMG.save("img_fg2.png",fg2,0);
-        }
+        IMG.save("img_edges_fg" + suffix,edges_fg,0);
+        IMG.save("img_edevs_fg" + suffix,edevs_fg,0);
 
 
         std::cerr << "-- Build Tags..." << std::endl;
 
         tagmap tmap(w,h);
 
-        tmap.build(fg,8);
+        tmap.build(edges_fg,8);
         std::cerr << "#current=" << tmap.current << std::endl;
 
         indx2rgba<size_t> tagColors(YGFX_RED);
-        IMG.save("img_tags.png", tmap, tagColors, NULL);
+        IMG.save("img_tags" +suffix, tmap, tagColors, NULL);
 
-        particles pa;
-        pa.load(tmap);
-        std::cerr << "#pa=" << pa.size() << std::endl;
-        pixmap3 wksp(img);
 
-        for(size_t i=1;i<=pa.size();++i)
-        {
-            std::cerr << "#" << i << "=" << pa[i]->size << std::endl;
-            pa[i]->mask(wksp, named_color::fetch(i), 128);
-            pa[i]->split_using(tmap);
-            pa[i]->mask_border(wksp,named_color::fetch(YGFX_GREEN), 200);
-        }
-        IMG.save("img_pa.png", wksp, NULL);
-        
-        wksp.ldz();
-        if(pa.size()>0)
-        {
-            pa[1]->regroup();
-            pa[1]->transfer(wksp,fg);
-        }
-        IMG.save("img_big.png", wksp, NULL);
-        
-
-        F.Close(wksp,xps);
-        IMG.save("img_close.png", wksp, NULL);
-        F.Close(wksp,xps);
-        IMG.save("img_close2.png", wksp, NULL);
 
     }
 

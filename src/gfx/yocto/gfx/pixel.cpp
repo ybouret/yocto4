@@ -1,4 +1,5 @@
 #include "yocto/gfx/pixel.hpp"
+#include "yocto/math/types.hpp"
 
 namespace yocto
 {
@@ -17,6 +18,31 @@ namespace yocto
 
         template <>
         const double pixel<double>::opaque = 1.0;
+
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // is_zero
+        //
+        ////////////////////////////////////////////////////////////////////////
+        template <>
+        bool pixel<uint8_t>::is_zero(const uint8_t x) throw()
+        {
+            return (x<=0);
+        }
+
+        template <>
+        bool pixel<float>::is_zero(const float x) throw()
+        {
+            return fabsf(x) <= math::numeric<float>::minimum;
+        }
+
+        template <>
+        bool pixel<double>::is_zero(const double x) throw()
+        {
+            return fabs(x) <= math::numeric<double>::minimum;
+        }
+
 
         ////////////////////////////////////////////////////////////////////////
         //
@@ -171,6 +197,7 @@ namespace yocto
             }
         }
 
+        
 
     }
 
