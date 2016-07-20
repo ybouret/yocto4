@@ -36,6 +36,7 @@ namespace yocto
             }
 
         private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(transform);
             void       *tgt;
             const void *src;
             void       *pfn;
