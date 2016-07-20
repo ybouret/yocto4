@@ -8,6 +8,7 @@
 #include "yocto/gfx/ops/histogram.hpp"
 #include "yocto/gfx/ops/particles.hpp"
 #include "yocto/gfx/ops/edges.hpp"
+#include "yocto/gfx/ops/transform.hpp"
 
 #include "yocto/gfx/color/named-colors.hpp"
 
@@ -16,6 +17,11 @@
 
 using namespace yocto;
 using namespace gfx;
+
+static inline uint8_t f2u(const float f, const float gamma)
+{
+    return gist::float2byte( powf(f,gamma) );
+}
 
 YOCTO_UNIT_TEST_IMPL(pa)
 {
@@ -51,7 +57,7 @@ YOCTO_UNIT_TEST_IMPL(pa)
             F.Smooth(img,xps);
         }
         std::cerr << std::endl;
-        const string suffix = vformat("%u.png",unsigned(ns));
+        const string suffix = ".png";
         IMG.save("img_smooth" + suffix,img,0);
 
         std::cerr << "Building Edges" << std::endl;
@@ -60,12 +66,26 @@ YOCTO_UNIT_TEST_IMPL(pa)
         IMG.save("img_edges" + suffix,Edges,0);
         IMG.save("img_edevs" + suffix,Edges.S,0);
 
-        std::cerr << "Thresholding..." << std::endl;
-        pixmapf edges_fg(w,h);
-        separate(threshold::keep_foreground,edges_fg,Edges,xps);
+        std::cerr << "Projecting..." << std::endl;
+        transform       trans;
+        pixmap<uint8_t> edges_mask(w,h);
+        trans.apply(edges_mask, f2u, Edges, 2.0f, xps);
+        IMG.save("img_edges_mask2" + suffix,edges_mask,0);
 
-        pixmapf edevs_fg(w,h);
-        separate(threshold::keep_foreground,edevs_fg,Edges.S,xps);
+        trans.apply(edges_mask, f2u, Edges, 1.0f, xps);
+        IMG.save("img_edges_mask" + suffix,edges_mask,0);
+
+
+
+        pixmap<uint8_t> edevs_mask(w,h);
+        trans.apply(edevs_mask, gist::float2byte, Edges.S,xps);
+        IMG.save("img_edevs_mask" + suffix,edevs_mask,0);
+
+        std::cerr << "Thresholding..." << std::endl;
+        pixmap<uint8_t> edges_fg(w,h);
+        separate(threshold::keep_foreground,edges_fg,edges_mask,xps);
+        pixmap<uint8_t> edevs_fg(w,h);
+        separate(threshold::keep_foreground,edevs_fg,edevs_mask,xps);
 
         IMG.save("img_edges_fg" + suffix,edges_fg,0);
         IMG.save("img_edevs_fg" + suffix,edevs_fg,0);
@@ -77,11 +97,10 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
         tmap.build(edges_fg,8);
         std::cerr << "#current=" << tmap.current << std::endl;
-
         indx2rgba<size_t> tagColors(YGFX_RED);
         IMG.save("img_tags" +suffix, tmap, tagColors, NULL);
 
-
+        
 
     }
 
