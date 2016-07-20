@@ -2,6 +2,7 @@
 #define YOCTO_PARALLEL_BASIC_INCLUDED 1
 
 #include "yocto/os.hpp"
+#include <cmath>
 
 namespace yocto
 {
@@ -26,7 +27,18 @@ namespace yocto
             length = todo;
         }
 
-        
+        inline
+        double efficiency(const double speed_up,const size_t nthreads)
+        {
+            if(nthreads<=1)
+            {
+                return 100.0;
+            }
+            else
+            {
+                return floor(10000.0*(speed_up-1.0)/(nthreads-1))/100.0;
+            }
+        }
     }
 }
 
