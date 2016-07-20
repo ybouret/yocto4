@@ -23,6 +23,13 @@ static inline uint8_t f2u(const float f, const float gamma)
     return gist::float2byte( powf(f,gamma) );
 }
 
+static unit_t y_limit = 0;
+
+static inline bool is_upper_vertex(const vertex &v) throw()
+{
+    return v.y>=y_limit;
+}
+
 YOCTO_UNIT_TEST_IMPL(pa)
 {
 
@@ -105,24 +112,30 @@ YOCTO_UNIT_TEST_IMPL(pa)
         pa.load(tmap);
         std::cerr << "#particles=" << pa.size() << std::endl;
 
+
+        std::cerr << "-- Removing Upper Particles..." << std::endl;
+        y_limit = h/2;
+        pa.reject_all_vertices_from(tmap,is_upper_vertex);
+        std::cerr << "#particles=" << pa.size() << std::endl;
+        IMG.save("img_tags2"+suffix, tmap, tagColors, NULL);
+        
+
         std::cerr << "-- Removing Shallow..." << std::endl;
         pa.remove_shallow_with(tmap);
         std::cerr << "#particles=" << pa.size() << std::endl;
 
-        IMG.save("img_tags2"+suffix, tmap, tagColors, NULL);
+        IMG.save("img_tags3"+suffix, tmap, tagColors, NULL);
 
-        
+
         pixmap3 wksp(w,h);
         for(size_t i=1;i<=pa.size();++i)
         {
-            //pa[i]->split_using(tmap);
             pa[i]->transfer(wksp,img);
         }
         IMG.save("img_wksp"+suffix, wksp, NULL);
 
-        std::cerr << "-- Slight Filter" << std::endl;
-        F.PseudoMedian(wksp,xps);
-        IMG.save("img_wksp2"+suffix,wksp,NULL);
+
+
     }
 
 }

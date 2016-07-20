@@ -68,6 +68,29 @@ namespace yocto
             //! width of a regouped particle
             vertex width() const throw();
 
+            //! regroup and reject bad coord
+            template <typename FUNC>
+            inline void reject_from(tagmap &tags, FUNC &is_bad_vertex) throw()
+            {
+                regroup();
+                vlist stk;
+                while(size)
+                {
+                    vnode *node = pop_back();
+                    assert(tags.has(node->vtx));
+                    assert(tag==tags[node->vtx]);
+                    if(is_bad_vertex(node->vtx))
+                    {
+                        tags[node->vtx] = 0;
+                        delete node;
+                    }
+                    else
+                    {
+                        stk.push_back(node);
+                    }
+                }
+                stk.swap_with(*this);
+            }
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(particle);
@@ -122,9 +145,21 @@ namespace yocto
             //! remove particles with empty inside
             void remove_shallow_with(tagmap &tags) throw();
 
+            template <typename FUNC> inline
+            void reject_all_vertices_from(tagmap &tags, FUNC &is_bad_vertex) throw()
+            {
+                _particles &self = *this;
+                for(size_t i=self.size();i>0;--i)
+                {
+                    self[i]->reject_from(tags,is_bad_vertex);
+                }
+                remove_empty();
+            }
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(particles);
+            void remove_empty() throw();
         };
         
         

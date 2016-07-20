@@ -96,14 +96,14 @@ namespace yocto {
         {
             return __compare_decreasing(lhs->size,rhs->size);
         }
-        
+
         void particles:: sort() throw()
         {
             _particles &self = *this;
             quicksort(self,__compare_particles);
         }
 
-      
+
 
         void particles:: load(const tagmap &tags)
         {
@@ -168,9 +168,9 @@ namespace yocto {
             }
         }
 
-        static inline bool is_shallow( const particle::ptr &p ) throw()
+        static inline bool __is_shallow_particle( const particle::ptr &p ) throw()
         {
-            return p->inside.size<=0;
+            return (p->inside.size<=0);
         }
 
         void particles:: remove_shallow_with(tagmap &tags) throw()
@@ -190,11 +190,22 @@ namespace yocto {
                     }
                 }
             }
-            remove_if(self,is_shallow);
+            remove_if(self,__is_shallow_particle);
             regroup_all();
+            sort();
         }
 
-
+        static inline bool __is_empty_particle( const particle::ptr &p ) throw()
+        {
+            return (p->size<=0);
+        }
+        
+        void particles:: remove_empty() throw()
+        {
+            regroup_all();
+            remove_if(*this,__is_empty_particle);
+            sort();
+        }
     }
-
+    
 }
