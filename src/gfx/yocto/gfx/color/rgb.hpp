@@ -3,6 +3,14 @@
 
 #include "yocto/gfx/pixel.hpp"
 
+#if defined(RGB)
+#undef RGB
+#endif
+
+#if defined(RGBA)
+#undef RGBA
+#endif
+
 namespace yocto
 {
     namespace gfx
