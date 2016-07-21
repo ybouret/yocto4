@@ -30,10 +30,13 @@ static inline bool is_upper_vertex(const vertex &v) throw()
     return v.y>=y_limit;
 }
 
+#if 0
 static inline uint8_t u8invert(uint8_t x) throw()
 {
     return 0xff-x;
 }
+#endif
+
 
 YOCTO_UNIT_TEST_IMPL(pa)
 {

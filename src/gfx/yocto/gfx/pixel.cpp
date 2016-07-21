@@ -160,6 +160,14 @@ namespace yocto
         }
 
         template <>
+        uint8_t pixel<uint8_t>:: average(const uint8_t lhs, const uint8_t rhs) throw()
+        {
+            const unsigned L = lhs;
+            const unsigned R = rhs;
+            return (L+R)>>1;
+        }
+
+        template <>
         float pixel<float>:: average(const array<float> &ra) throw()
         {
             const size_t n = ra.size();
@@ -179,6 +187,12 @@ namespace yocto
         }
 
         template <>
+        float pixel<float>:: average(const float lhs, const float rhs) throw()
+        {
+            return 0.5f*(lhs+rhs);
+        }
+
+        template <>
         double pixel<double>:: average(const array<double> &ra) throw()
         {
             const size_t n = ra.size();
@@ -195,6 +209,12 @@ namespace yocto
             {
                 return 0;
             }
+        }
+
+        template <>
+        double pixel<double>:: average(const double lhs, const double rhs) throw()
+        {
+            return 0.5*(lhs+rhs);
         }
 
         

@@ -80,8 +80,10 @@ namespace yocto
                 }
                 else
                 {
-                    const lw_array<T> sub( &ra[n>>1], 2 );
-                    return pixel<T>::average(sub);
+                    const size_t idx=n>>1;
+                    const T      lhs=ra[idx];
+                    const T      rhs=ra[idx+1];
+                    return pixel<T>::average(lhs,rhs);
                 }
             }
 
@@ -96,16 +98,13 @@ namespace yocto
                 size_t       num=0;
                 const size_t n=ra.size();
                 {
-                    T           tmp[2];
-                    lw_array<T> sub(tmp,2);
                     for(size_t i=1;i<=n;++i)
                     {
-                        sub[1]=ra[i];
+                        const T lhs = ra[i];
                         for(size_t j=i;j<=n;++j)
                         {
-                            sub[2] = ra[j];
                             assert(num<max_pairs);
-                            ave[num++] = pixel<T>::average(sub);
+                            ave[num++] = pixel<T>::average(lhs,ra[j]);
                         }
                     }
                 }

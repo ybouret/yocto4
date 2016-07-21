@@ -115,7 +115,7 @@ static inline void apply_filters(const pixmap<T>   &src,
     }
 
 
-    std::cerr << "-- Filtering " << id << " median" << std::endl;
+    std::cerr << "-- Filtering " << id << " pseudo median" << std::endl;
     dst.copy(src);
     for(unsigned i=1;i<=4;++i)
     {

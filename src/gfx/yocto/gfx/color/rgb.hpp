@@ -147,6 +147,15 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
         }
 
         template <> inline
+        RGB pixel<RGB>:: average(const RGB lhs, const RGB rhs) throw()
+        {
+            const unsigned R = unsigned(lhs.r) + unsigned(rhs.r);
+            const unsigned G = unsigned(lhs.g) + unsigned(rhs.g);
+            const unsigned B = unsigned(lhs.b) + unsigned(rhs.b);
+            return RGB(R>>1,G>>1,B>>1);
+        }
+
+        template <> inline
         bool pixel<RGB>::is_zero(const RGB C) throw()
         {
             return (C.r<=0) && (C.g<=0) && (C.b<=0);
@@ -211,6 +220,15 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
             {
                 return RGBA(0,0,0);
             }
+        }
+
+        template <> inline
+        RGBA pixel<RGBA>:: average(const RGBA lhs, const RGBA rhs) throw()
+        {
+            const unsigned R = unsigned(lhs.r) + unsigned(rhs.r);
+            const unsigned G = unsigned(lhs.g) + unsigned(rhs.g);
+            const unsigned B = unsigned(lhs.b) + unsigned(rhs.b);
+            return RGBA(R>>1,G>>1,B>>1);
         }
 
         template <> inline
