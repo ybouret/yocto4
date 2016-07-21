@@ -55,14 +55,6 @@ virtual RGBA get(const void *addr) { CODE; } \
                                 return RGBA(u,u,u)
                                 );
 
-#if 0
-        //! for pixmap int/unsigned
-        template <typename T>
-        YOCTO_GRAPHIX_DATA2RGBA(get_named_color,
-                                const  T indx = *(const T *)addr;
-                                return (indx!=0) ? named_color::fetch(indx) : RGB(0,0,0)
-                                );
-#endif
 
         //! for pixmap 1,red-scale
         YOCTO_GRAPHIX_DATA2RGBA(red2rgba,   return RGBA(*(const uint8_t*)addr,0,0,255) );

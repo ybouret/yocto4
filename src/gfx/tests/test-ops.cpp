@@ -272,7 +272,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
         std::cerr << "-- Edges..." << std::endl;
 
-        edges Ed(w,h);
+        Edges Ed(w,h);
         Ed.build_from(img,xps);
         IMG.save("edges.png", Ed,  NULL);
         IMG.save("edevs.png", Ed.S,NULL);

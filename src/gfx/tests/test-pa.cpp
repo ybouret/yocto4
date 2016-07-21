@@ -76,24 +76,24 @@ YOCTO_UNIT_TEST_IMPL(pa)
         IMG.save("img_smooth" + suffix,img,0);
 
         std::cerr << "Building Edges" << std::endl;
-        edges Edges(w,h);
-        Edges.build_from(img,xps);
-        IMG.save("img_edges" + suffix,Edges,0);
-        IMG.save("img_edevs" + suffix,Edges.S,0);
+        Edges edges(w,h);
+        edges.build_from(img,xps);
+        IMG.save("img_edges" + suffix,edges,0);
+        IMG.save("img_edevs" + suffix,edges.S,0);
 
         std::cerr << "Projecting..." << std::endl;
         transform       trans;
         pixmap<uint8_t> edges_mask(w,h);
-        trans.apply(edges_mask, f2u, Edges, 2.0f, xps);
+        trans.apply(edges_mask, f2u, edges, 2.0f, xps);
         IMG.save("img_edges_mask2" + suffix,edges_mask,0);
 
-        trans.apply(edges_mask, f2u, Edges, 1.0f, xps);
+        trans.apply(edges_mask, f2u, edges, 1.0f, xps);
         IMG.save("img_edges_mask" + suffix,edges_mask,0);
 
 
 
         pixmap<uint8_t> edevs_mask(w,h);
-        trans.apply(edevs_mask, gist::float2byte, Edges.S,xps);
+        trans.apply(edevs_mask, gist::float2byte, edges.S,xps);
         IMG.save("img_edevs_mask" + suffix,edevs_mask,0);
 
         std::cerr << "Thresholding..." << std::endl;
@@ -119,8 +119,8 @@ YOCTO_UNIT_TEST_IMPL(pa)
 
         tmap.build(edges_fg,8);
         std::cerr << "#current=" << tmap.current << std::endl;
-        indx2rgba<size_t> tagColors(YGFX_RED);
-        IMG.save("img_tags"+suffix, tmap, tagColors, NULL);
+        tmap.colors.shift = YGFX_BLUE;
+        IMG.save("img_tags"+suffix, tmap, tmap.colors, NULL);
 
         std::cerr << "-- Loading Particles..." << std::endl;
         particles pa;
@@ -132,14 +132,14 @@ YOCTO_UNIT_TEST_IMPL(pa)
         y_limit = h/2;
         pa.reject_all_vertices_from(tmap,is_upper_vertex);
         std::cerr << "#particles=" << pa.size() << std::endl;
-        IMG.save("img_tags2"+suffix, tmap, tagColors, NULL);
+        IMG.save("img_tags2"+suffix, tmap, tmap.colors, NULL);
         
 
         std::cerr << "-- Removing Shallow..." << std::endl;
         pa.remove_shallow_with(tmap);
         std::cerr << "#particles=" << pa.size() << std::endl;
 
-        IMG.save("img_tags3"+suffix, tmap, tagColors, NULL);
+        IMG.save("img_tags3"+suffix, tmap, tmap.colors, NULL);
 
 
         pixmap3 wksp(w,h);

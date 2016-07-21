@@ -3,6 +3,7 @@
 #include "yocto/gfx/pixmap.hpp"
 #include "yocto/gfx/pixel.hpp"
 #include "yocto/stock/stack.hpp"
+#include "yocto/gfx/color/named-colors.hpp"
 
 namespace yocto
 {
@@ -18,8 +19,9 @@ namespace yocto
             explicit tagmap(const unit_t W, const unit_t H);
             virtual ~tagmap() throw();
 
-            size_t  current;
-            v_stack vstk;
+            size_t          current;
+            v_stack         vstk;
+            indx2rgba<type> colors;
 
             template <typename T>
             void build(const pixmap<T> &source,

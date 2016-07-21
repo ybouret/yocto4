@@ -4,7 +4,7 @@ namespace yocto
 {
     namespace gfx
     {
-        edges:: edges(const unit_t W, const unit_t H) :
+        Edges:: Edges(const unit_t W, const unit_t H) :
         pixmap<float>(W,H),
         I(W,H),
         S(W,H),
@@ -13,33 +13,33 @@ namespace yocto
         {
         }
 
-        edges:: ~edges() throw()
+        Edges:: ~Edges() throw()
         {
 
         }
 
-        const vertex edges::shift[9] =
+        const vertex Edges::shift[9] =
         {
             vertex(-1,-1), vertex(-1,0), vertex(-1,1),
             vertex( 0,-1), vertex( 0,0), vertex( 0,1),
             vertex( 1,-1), vertex( 1,0), vertex( 1,1)
         };
 
-        const float edges::sobel1[9] =
+        const float Edges::sobel1[9] =
         {
             1,0,-1,
             2,0,-2,
             1,0,-1
         };
 
-        const float edges::sobel2[9] =
+        const float Edges::sobel2[9] =
         {
             1,2,1,
             0,0,0,
             -1,-2,-1
         };
 
-        void edges:: buildE( xpatch &xp, lockable & ) throw()
+        void Edges:: buildE( xpatch &xp, lockable & ) throw()
         {
             const unit_t    ymin = xp.lower.y;
             const unit_t    ymax = xp.upper.y;
@@ -96,7 +96,7 @@ namespace yocto
             xp.as<info>() = local;
         }
 
-        void edges:: finalize(xpatch &xp, lockable & ) throw()
+        void Edges:: finalize(xpatch &xp, lockable & ) throw()
         {
             const unit_t         ymin     = xp.lower.y;
             const unit_t         ymax     = xp.upper.y;

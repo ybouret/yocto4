@@ -12,7 +12,7 @@ namespace yocto
     namespace gfx
     {
 
-        class edges : public pixmap<float>
+        class Edges : public pixmap<float>
         {
         public:
             static const vertex shift[9];
@@ -28,8 +28,8 @@ namespace yocto
         public:
             pixmap<float> S; //!< variance map
 
-            explicit edges(const unit_t W,const unit_t H);
-            virtual ~edges() throw();
+            explicit Edges(const unit_t W,const unit_t H);
+            virtual ~Edges() throw();
 
             template <typename T>
             void build_from(const pixmap<T> &source,
@@ -37,10 +37,10 @@ namespace yocto
             {
                 // build intensity map
                 src = &source;
-                xps.submit(this, & edges::buildI<T> );
+                xps.submit(this, & Edges::buildI<T> );
 
                 // build edges indicator
-                YGFX_SUBMIT(this,&edges::buildE,xps,xp.make<info>());
+                YGFX_SUBMIT(this,&Edges::buildE,xps,xp.make<info>());
 
                 // get amplitude
                 global.Emax = xps[1].as<info>().Emax;
@@ -55,7 +55,7 @@ namespace yocto
                 // normalize
                 if(global.Emax>0)
                 {
-                    xps.submit(this, & edges::finalize );
+                    xps.submit(this, & Edges::finalize );
                 }
                 else
                 {
@@ -66,7 +66,7 @@ namespace yocto
 
 
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(edges);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Edges);
             const void *src;
             info        global;
 

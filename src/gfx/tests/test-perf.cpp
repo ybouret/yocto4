@@ -100,7 +100,7 @@ YOCTO_UNIT_TEST_IMPL(perf)
         }
 
         {
-            edges Edg(w,h);
+            Edges Edg(w,h);
 #define     EDGES1(XPS) Edg.build_from(img1,XPS)
             TMX_FOR(EDGES1);
 #define     EDGES3(XPS) Edg.build_from(img3,XPS)
