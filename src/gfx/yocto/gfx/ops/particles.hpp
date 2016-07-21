@@ -45,6 +45,20 @@ namespace yocto
                 transfer_list(*this,tgt,src);
             }
 
+            template <typename T,typename FUNC,typename U>
+            inline void transfer(pixmap<T>       &tgt,
+                                 FUNC            &fcn,
+                                 const pixmap<U> &src)
+            {
+                std::cerr << "Tranfer/Func: #" << size << std::endl;
+                for(const vnode *node=head;node;node=node->next)
+                {
+                    assert(src.has(node->vtx));
+                    assert(tgt.has(node->vtx));
+                    tgt[node->vtx] = fcn(src[node->vtx]);
+                }
+            }
+
             template <typename T>
             inline void transfer_border(pixmap<T>       &tgt,
                                         const pixmap<T> &src)  throw()

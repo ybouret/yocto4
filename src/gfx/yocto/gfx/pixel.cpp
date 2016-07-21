@@ -119,7 +119,7 @@ namespace yocto
         template <>
         uint8_t pixel<uint8_t>::invert(const uint8_t x) throw()
         {
-            return 255-x;
+            return 0xff-x;
         }
 
         template <>

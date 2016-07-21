@@ -42,7 +42,7 @@ namespace yocto
                 // build edges indicator
                 YGFX_SUBMIT(this,&Edges::buildE,xps,xp.make<info>());
 
-                // get amplitude
+                // get amplitudes
                 global.Emax = xps[1].as<info>().Emax;
                 global.Smax = xps[1].as<info>().Smax;
                 for(size_t i=xps.size();i>1;--i)
