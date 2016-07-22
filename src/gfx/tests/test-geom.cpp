@@ -60,3 +60,69 @@ YOCTO_UNIT_TEST_IMPL(geom)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/math/opt/cgrad.hpp"
+#include "yocto/gfx/color/named-colors.hpp"
+#include "yocto/gfx/ops/symmetry-finder.hpp"
+
+YOCTO_UNIT_TEST_IMPL(symfind)
+{
+
+    YOCTO_GFX_DECL_FORMAT(jpeg);
+    YOCTO_GFX_DECL_FORMAT(png);
+    YOCTO_GFX_DECL_FORMAT(tiff);
+
+    imageIO          &IMG = image::instance();
+    if(argc>1)
+    {
+        const string filename = argv[1];
+        std::cerr << "-- Loading " << filename << std::endl;
+        const pixmap3 img( IMG.load3(filename,NULL) );
+        IMG.save("img.png",img, NULL);
+
+        pixmap3       tgt(img.w,img.h);
+        xpatches xps(img,true);
+
+        symmetry_finder<RGB> sym(tgt,img,xps);
+        math::cgrad<float>::callback cb( &sym, & symmetry_finder<RGB>::__callback);
+
+        vector<float> aorg(2);
+        vector<bool>  used(2,true);
+        //used[1] = false;
+
+        aorg[2] = -img.w/2+5;
+        if(math::cgrad<float>::optimize(sym.scalarF,sym.vectorF, aorg, used, 1e-4, &cb))
+        {
+            std::cerr << "converged" << std::endl;
+            std::cerr << aorg << std::endl;
+            sym.scalarF(aorg);
+
+            const float alpha = aorg[1];
+            const float a     = cosf(alpha);
+            const float b     = sinf(alpha);
+            const float c     = aorg[2];
+
+            const RGB Cm = named_color::fetch(YGFX_BLUE);
+            const RGB Cp = named_color::fetch(YGFX_RED);
+            for(unit_t j=0;j<img.h;++j)
+            {
+                for(unit_t i=0;i<img.w;++i)
+                {
+                    const RGB C = ( (a*float(i)+b*float(j)+c)<=0 ) ? Cm : Cp;
+                    tgt[j][i] = pixel<RGB>::blend(tgt[j][i], C, 128);
+                }
+            }
+
+            IMG.save("out.png",tgt, NULL);
+
+        }
+        else
+        {
+            std::cerr << "not converged..." << std::endl;
+        }
+
+    }
+
+}
+YOCTO_UNIT_TEST_DONE()
+
+
