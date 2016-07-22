@@ -14,7 +14,7 @@ namespace yocto
         typedef parallel::patch2D     patch;  //!< base class for patches
         typedef float                 real_t; //!< default floating point
         typedef math::complex<real_t> cplx_t; //!< complex for graphics...
-
+        typedef point2d<real_t>       point;  //!< real point
 
 #define YOCTO_GFX_R2GS 0.2126f
 #define YOCTO_GFX_G2GS 0.7152f
