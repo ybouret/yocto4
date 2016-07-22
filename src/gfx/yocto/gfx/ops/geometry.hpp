@@ -3,6 +3,7 @@
 
 #include "yocto/gfx/pixmap.hpp"
 #include "yocto/gfx/xpatch.hpp"
+#include "yocto/code/bzset.hpp"
 
 namespace yocto
 {
@@ -12,7 +13,7 @@ namespace yocto
         class geometry
         {
         public:
-            explicit geometry() throw() : tgt(0), src(0), vtx(), arg(0) {}
+            explicit geometry() throw() : tgt(0), src(0), vtx(), arg(0), brg(0), crg(0) {}
             virtual ~geometry() throw() {}
 
             template <typename T>
@@ -29,12 +30,31 @@ namespace yocto
                 xps.submit(this, & geometry::__rotate<T>);
             }
 
+            template <typename T>
+            void symmetry(pixmap<T>       &target,
+                          const pixmap<T> &source,
+                          const float      a,
+                          const float      b,
+                          const float      c,
+                          xpatches        &xps)
+            {
+                tgt = &target;
+                src = &source;
+                arg = a;
+                brg = b;
+                crg = c;
+                xps.submit(this, & geometry::__symline<T>);
+
+            }
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(geometry);
             void       *tgt;
             const void *src;
             vertex      vtx;
             float       arg;
+            float       brg;
+            float       crg;
 
             template <typename T>
             inline void __rotate( xpatch &xp, lockable & ) throw()
@@ -64,10 +84,55 @@ namespace yocto
                         {
                             target[y][x] = source[from];
                         }
+                        else
+                        {
+                            bzset(target[y][x]);
+                        }
                     }
                 }
 
             }
+
+
+            template <typename T>
+            inline void __symline( xpatch &xp, lockable & ) throw()
+            {
+                assert(tgt);
+                assert(src);
+
+                const unit_t     ymin     = xp.lower.y;
+                const unit_t     ymax     = xp.upper.y;
+                const unit_t     xmin     = xp.lower.x;
+                const unit_t     xmax     = xp.upper.x;
+                pixmap<T>       &target = *static_cast<pixmap<T> *      >(tgt);
+                const pixmap<T> &source = *static_cast<const pixmap<T> *>(src);
+                const float      a      = arg;
+                const float      b      = brg;
+                const float      c      = crg;
+                const point      N(a,b);
+                const float      den = N.norm2();
+                for(unit_t y=ymax;y>=ymin;--y)
+                {
+                    for(unit_t x=xmax;x>=xmin;--x)
+                    {
+                        const point   here(x,y);
+                        const float   num = N*here+c;
+                        const float   fac = (num+num)/den;
+                        const point   sym = here - fac * N;
+                        const vertex  from( unit_t(floorf(sym.x+0.5f)), unit_t(floorf(sym.y+0.5f)) );
+                        if(source.has(from))
+                        {
+                            target[y][x] = source[from];
+                        }
+                        else
+                        {
+                            bzset(target[y][x]);
+                        }
+                    }
+                }
+
+            }
+
 
         };
 

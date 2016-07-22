@@ -21,7 +21,7 @@ YOCTO_UNIT_TEST_IMPL(geom)
     {
         std::cerr << "-- Load" << std::endl;
         const string filename = argv[1];
-        pixmap3      img( IMG.load3(filename,NULL) );
+        const pixmap3 img( IMG.load3(filename,NULL) );
         IMG.save("img.png",img,NULL);
         xpatches xps(img,true);
         const unit_t w=img.w;
@@ -31,6 +31,16 @@ YOCTO_UNIT_TEST_IMPL(geom)
         pixmap3     tgt(w,h);
         geom.rotate(tgt,img,vertex(w/2,h/2), math::Deg2Rad(15.0f),xps);
         IMG.save("img_rot.png",tgt,NULL);
+
+        geom.symmetry(tgt, img, -1.0f,0.0f,0.55f*float(w),xps);
+        IMG.save("img_symx.png",tgt,NULL);
+
+        geom.symmetry(tgt, img, 0.0f,-1.0f,0.55f*float(h),xps);
+        IMG.save("img_symy.png",tgt,NULL);
+
+        geom.symmetry(tgt, img, 1.0f,-1.0f,0.0f,xps);
+        IMG.save("img_symm.png",tgt,NULL);
+
 
     }
 
