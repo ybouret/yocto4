@@ -9,6 +9,7 @@ namespace yocto
     namespace gfx
     {
 
+        //! pixel-wise transformation
         class transform
         {
         public:
