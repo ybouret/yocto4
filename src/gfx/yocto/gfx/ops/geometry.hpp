@@ -44,7 +44,6 @@ namespace yocto
                 brg = b;
                 crg = c;
                 xps.submit(this, & geometry::__symline<T>);
-
             }
 
         private:
@@ -133,8 +132,9 @@ namespace yocto
 
             }
 
-
         };
+
+
 
     }
 }

@@ -6,6 +6,7 @@
 #include "yocto/gfx/ops/geometry.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/math/trigconv.hpp"
+#include "yocto/sys/timings.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -27,18 +28,29 @@ YOCTO_UNIT_TEST_IMPL(geom)
         const unit_t w=img.w;
         const unit_t h=img.h;
 
-        geometry geom;
+        geometry    geom;
         pixmap3     tgt(w,h);
-        geom.rotate(tgt,img,vertex(w/2,h/2), math::Deg2Rad(15.0f),xps);
+        timings     tmx;
+
+#define DURATION 1
+        std::cerr << "Rotation..." << std::endl;
+        YOCTO_TIMINGS(tmx,DURATION,geom.rotate(tgt,img,vertex(w/2,h/2), math::Deg2Rad(15.0f),xps));
+        std::cerr << "speed=" << tmx.speed << std::endl;
         IMG.save("img_rot.png",tgt,NULL);
 
-        geom.symmetry(tgt, img, -1.0f,0.0f,0.55f*float(w),xps);
+        std::cerr << "Sym/X" << std::endl;
+        YOCTO_TIMINGS(tmx,DURATION,geom.symmetry(tgt, img, -1.0f,0.0f,0.55f*float(w),xps));
+        std::cerr << "speed=" << tmx.speed << std::endl;
         IMG.save("img_symx.png",tgt,NULL);
 
-        geom.symmetry(tgt, img, 0.0f,-1.0f,0.55f*float(h),xps);
+        std::cerr << "Sym/Y" << std::endl;
+        YOCTO_TIMINGS(tmx,DURATION,geom.symmetry(tgt, img, 0.0f,-1.0f,0.55f*float(h),xps));
+        std::cerr << "speed=" << tmx.speed << std::endl;
         IMG.save("img_symy.png",tgt,NULL);
 
-        geom.symmetry(tgt, img, 1.0f,-1.0f,0.0f,xps);
+        std::cerr << "Sym/XY" << std::endl;
+        YOCTO_TIMINGS(tmx,DURATION,geom.symmetry(tgt, img, 1.0f,-1.0f,0.0f,xps));
+        std::cerr << "speed=" << tmx.speed << std::endl;
         IMG.save("img_symm.png",tgt,NULL);
 
 
