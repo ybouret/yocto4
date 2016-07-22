@@ -48,34 +48,7 @@ namespace yocto
             }
         }
 
-        vertex particle:: width() const throw()
-        {
-            if(size<=0)
-            {
-                return vertex(0,0);
-            }
-            else
-            {
-                const vnode *node = head;
-                vertex       lo = node->vtx;
-                vertex       hi = lo;
-                for(node=node->next;node;node=node->next)
-                {
-                    const vertex v = node->vtx;
-                    lo.x = min_of(lo.x,v.x);
-                    lo.y = min_of(lo.y,v.y);
-
-                    hi.x = max_of(hi.x,v.x);
-                    hi.y = max_of(hi.y,v.y);
-
-                }
-                hi-=lo;
-                ++hi.x;
-                ++hi.y;
-                return hi;
-            }
-        }
-
+        
     }
 
 }

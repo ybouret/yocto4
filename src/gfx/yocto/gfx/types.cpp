@@ -1,4 +1,5 @@
 #include "yocto/gfx/types.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -70,5 +71,61 @@ U(240),U(241),U(242),U(243),U(244),U(245),U(246),U(247),U(248),U(249),U(250),U(2
             vertex(1,-1),
             vertex(-1,-1)
         };
+        
+        vlist:: vlist() throw() : _vlist()
+        {
+        }
+        
+        vlist:: ~vlist() throw()
+        {
+        }
+        
+        vlist:: vlist(const vlist &other) : _vlist(other) {}
+        
+        vertex vlist:: width() const throw()
+        {
+            if(size<=0)
+            {
+                return vertex(0,0);
+            }
+            else
+            {
+                const vnode *node = head;
+                vertex       lo = node->vtx;
+                vertex       hi = lo;
+                for(node=node->next;node;node=node->next)
+                {
+                    const vertex v = node->vtx;
+                    lo.x = min_of(lo.x,v.x);
+                    lo.y = min_of(lo.y,v.y);
+                    
+                    hi.x = max_of(hi.x,v.x);
+                    hi.y = max_of(hi.y,v.y);
+                    
+                }
+                hi-=lo;
+                ++hi.x;
+                ++hi.y;
+                return hi;
+            }
+
+        }
+        
+        vertex vlist:: center() const throw()
+        {
+            vertex G(0,0);
+            if(size>0)
+            {
+                for(const vnode *node=head;node;node=node->next)
+                {
+                    G += node->vtx;
+                }
+                G /= float(size);
+            }
+            return G;
+        }
+
+        
+        
     }
 }

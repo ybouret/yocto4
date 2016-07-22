@@ -57,8 +57,24 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(vnode);
         };
 
-        typedef core::list_of_cpp<vnode> vlist;
-
+        typedef core::list_of_cpp<vnode> _vlist;
+        
+        class vlist : public _vlist
+        {
+        public:
+            explicit vlist() throw();
+            virtual ~vlist() throw();
+            vlist(const vlist &other);
+            
+            vertex width() const throw();
+            vertex center() const throw();
+            
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(vlist);
+        };
+        
+        
     }
 }
 

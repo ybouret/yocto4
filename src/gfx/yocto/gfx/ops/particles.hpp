@@ -50,7 +50,6 @@ namespace yocto
                                  FUNC            &fcn,
                                  const pixmap<U> &src)
             {
-                std::cerr << "Tranfer/Func: #" << size << std::endl;
                 for(const vnode *node=head;node;node=node->next)
                 {
                     assert(src.has(node->vtx));
@@ -79,9 +78,8 @@ namespace yocto
             void regroup() throw();
             void split_using( const tagmap &tags ) throw();
 
-            //! width of a regouped particle
-            vertex width() const throw();
-
+            
+            
             //! regroup and reject bad coord
             template <typename FUNC>
             inline void reject_from(tagmap &tags, FUNC &is_bad_vertex) throw()
