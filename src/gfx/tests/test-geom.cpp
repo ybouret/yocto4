@@ -76,14 +76,14 @@ YOCTO_UNIT_TEST_IMPL(symfind)
     {
         const string filename = argv[1];
         std::cerr << "-- Loading " << filename << std::endl;
-        const pixmapf img( IMG.loadf(filename,NULL) );
+        const pixmap3 img( IMG.load3(filename,NULL) );
         IMG.save("img.png",img, NULL);
 
-        pixmapf  tgt(img.w,img.h);
+        pixmap3  tgt(img.w,img.h);
         xpatches xps(img,true);
 
-        symmetry_finder<float> sym(tgt,img,xps);
-        math::cgrad<float>::callback cb( &sym, & symmetry_finder<float>::__callback);
+        symmetry_finder<RGB> sym(tgt,img,xps);
+        math::cgrad<float>::callback cb( &sym, & symmetry_finder<RGB>::__callback);
 
         vector<float> aorg(2);
         vector<bool>  used(2,true);
@@ -101,15 +101,15 @@ YOCTO_UNIT_TEST_IMPL(symfind)
             const float b     = sinf(alpha);
             const float c     = aorg[2];
 
-            //const RGB Cm = named_color::fetch(YGFX_BLUE);
-            //const RGB Cp = named_color::fetch(YGFX_RED);
+            const RGB Cm = named_color::fetch(YGFX_BLUE);
+            const RGB Cp = named_color::fetch(YGFX_RED);
             for(unit_t j=0;j<img.h;++j)
             {
                 for(unit_t i=0;i<img.w;++i)
                 {
                     const bool flag = ( (a*float(i)+b*float(j)+c)<=0 );
-                    //tgt[j][i] = pixel<float>::blend(tgt[j][i], C, 128);
-                    
+                    const RGB  C    = flag ? Cm : Cp;
+                    tgt[j][i] = pixel<RGB>::blend(tgt[j][i], C, 128);
                 }
             }
 

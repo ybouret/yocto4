@@ -87,7 +87,7 @@ namespace yocto
         float pixel<float>::blend(const float bg, const float fg, const uint8_t alpha) throw()
         {
             const int a = alpha;
-            return ((255-a)*fg + a*bg)/255.0f;
+            return (a*fg + (255-a)*bg)/255.0f;
         }
 
 
