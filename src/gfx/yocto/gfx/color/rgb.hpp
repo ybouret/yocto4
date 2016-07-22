@@ -190,7 +190,7 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
             const float dr = float(X.r) - float(Y.r);
             const float dg = float(X.g) - float(Y.g);
             const float db = float(X.b) - float(Y.b);
-            return dr*dr + db*db + dg*dg;
+            return (dr*dr + db*db + dg*dg)/65025.0f;
         }
 
         //______________________________________________________________________
@@ -252,7 +252,7 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
             const float dr = float(X.r) - float(Y.r);
             const float dg = float(X.g) - float(Y.g);
             const float db = float(X.b) - float(Y.b);
-            return dr*dr + db*db + dg*dg;
+            return (dr*dr + db*db + dg*dg)/65025.0f;
         }
 
     }

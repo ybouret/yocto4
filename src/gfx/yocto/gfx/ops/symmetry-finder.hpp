@@ -23,6 +23,7 @@ namespace yocto
             xps(user_xps),
             atmp(2),
             I0( diff.L2(source,xps) ),
+            //I0(1),
             scalarF(this, & symmetry_finder::__scalar ),
             vectorF(this, & symmetry_finder::__vector )
             {
@@ -63,10 +64,12 @@ namespace yocto
                 static const float delta_deg   = 1.0f;
                 static const float scale_alpha = math::Deg2Rad(delta_deg+delta_deg);
 
+                const float alpha_deg = math::Rad2Deg(aorg[1]);
+                const float c         = aorg[2];
+
                 // one degree trial
                 {
-                    const float alpha_deg = math::Rad2Deg(aorg[1]);
-                    atmp[2] = aorg[2];
+                    atmp[2] = c;
                     atmp[1] = math::Deg2Rad( alpha_deg + delta_deg );
                     const float vp = __scalar(atmp);
                     atmp[1] = math::Deg2Rad( alpha_deg - delta_deg );
@@ -79,11 +82,10 @@ namespace yocto
                 // one pixel trial
                 {
                     atmp[1] = aorg[1];
-                    const float c = aorg[2];
                     atmp[2] = c + delta_c;
-                    const float vp = __scalar(atmp);
+                    const float vp = __scalar(atmp); std::cerr << "Ip(" << atmp << ")=" << vp << std::endl;
                     atmp[2] = c - delta_c;
-                    const float vm = __scalar(atmp);
+                    const float vm = __scalar(atmp); std::cerr << "Im(" << atmp << ")=" << vm << std::endl;
                     drvs[2] = (vp-vm)/scale_c;
                 }
             }

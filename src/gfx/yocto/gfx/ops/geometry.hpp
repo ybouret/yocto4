@@ -43,6 +43,7 @@ namespace yocto
                 arg = a;
                 brg = b;
                 crg = c;
+                //std::cerr << "a=" << arg << ",b=" << brg << ",c=" << crg << std::endl;
                 xps.submit(this, & geometry::__symline<T>);
             }
 
