@@ -10,6 +10,7 @@
 #include "yocto/gfx/ops/filter.hpp"
 #include "yocto/gfx/ops/differential.hpp"
 #include "yocto/gfx/ops/edges.hpp"
+#include "yocto/gfx/ops/diff.hpp"
 #include "yocto/parallel/basic.hpp"
 #include "yocto/code/rand.hpp"
 
@@ -118,6 +119,31 @@ YOCTO_UNIT_TEST_IMPL(perf)
 #define     BLUR3(XPS) B.apply(tgt3,img3,XPS)
             TMX_FOR(BLUR3);
         }
+
+        {
+            difference diff;
+#define DIF1(XPS) diff.L2(img1,XPS)
+            TMX_FOR(DIF1);
+#define DIF3(XPS) diff.L2(img3,XPS)
+            TMX_FOR(DIF3);
+#define DIF4(XPS) diff.L2(img4,XPS)
+            TMX_FOR(DIF4);
+#define DIFf(XPS) diff.L2(imgf,XPS)
+            TMX_FOR(DIFf);
+        }
+
+        {
+            difference diff;
+#define DIFF1(XPS) diff.L2(img1,tgt1,XPS)
+            TMX_FOR(DIFF1);
+#define DIFF3(XPS) diff.L2(img3,tgt3,XPS)
+            TMX_FOR(DIFF3);
+#define DIFF4(XPS) diff.L2(img4,tgt4,XPS)
+            TMX_FOR(DIFF4);
+#define DIFFf(XPS) diff.L2(imgf,tgtf,XPS)
+            TMX_FOR(DIFFf);
+        }
+
     }
 }
 YOCTO_UNIT_TEST_DONE()

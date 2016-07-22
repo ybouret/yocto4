@@ -184,6 +184,15 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
             return RGB::to_float(C);
         }
 
+        template <> inline
+        float   pixel<RGB>:: L2(const RGB X, const RGB Y) throw()
+        {
+            const float dr = float(X.r) - float(Y.r);
+            const float dg = float(X.g) - float(Y.g);
+            const float db = float(X.b) - float(Y.b);
+            return dr*dr + db*db + dg*dg;
+        }
+
         //______________________________________________________________________
         //
         // RGBA specs
@@ -235,6 +244,15 @@ YOCTO_GFX_COMPARE_OP(TYPE,>=)
         float pixel<RGBA>::to_float(const RGBA C) throw()
         {
             return RGBA::to_float(C);
+        }
+
+        template <> inline
+        float   pixel<RGBA>:: L2(const RGBA X, const RGBA Y) throw()
+        {
+            const float dr = float(X.r) - float(Y.r);
+            const float dg = float(X.g) - float(Y.g);
+            const float db = float(X.b) - float(Y.b);
+            return dr*dr + db*db + dg*dg;
         }
 
     }

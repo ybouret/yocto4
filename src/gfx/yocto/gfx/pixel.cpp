@@ -134,6 +134,25 @@ namespace yocto
             return 1.0-x;
         }
 
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // L2 distance
+        //
+        ////////////////////////////////////////////////////////////////////////
+        template <>
+        float   pixel<float>:: L2(const float a, const float b) throw()
+        {
+            const float del = a-b;
+            return del*del;
+        }
+
+        template <>
+        float   pixel<uint8_t>:: L2(const uint8_t a, const uint8_t b) throw()
+        {
+            const float del = float(a)-float(b);
+            return del*del;
+        }
+
 
         ////////////////////////////////////////////////////////////////////////
         //

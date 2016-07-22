@@ -21,6 +21,7 @@ namespace yocto
             static T        average(const T lhs, const T rhs) throw();
             static T        blend(const T bg, const T fg, const uint8_t alpha) throw();
             static float    to_float(const T) throw();
+            static float    L2(const T a, const T b) throw();
         };
     }
 }
