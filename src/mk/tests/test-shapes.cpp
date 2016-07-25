@@ -277,6 +277,20 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         std::cerr << "radius=" << radius << std::endl;
         std::cerr << "rotation=" << rotation << std::endl;
 
+        {
+            ios::ocstream fp("ell_fit.dat",false);
+
+            for(double theta=0; theta <= 6.3; theta += 0.1)
+            {
+                const double c  = Cos(theta);
+                const double s  = Sin(theta);
+                const point2d<double> R(radius.x*c,radius.y*s);
+                point2d<double> v;
+                tao::mul(v, rotation, R);
+                v += center;
+                fp("%g %g\n", v.x, v.y);
+            }
+        }
 
     }
     YOCTO_UNIT_TEST_DONE()
