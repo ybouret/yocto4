@@ -7,12 +7,14 @@
 #define YOCTO_TUPLE_INI()   {
 #define YOCTO_TUPLE_END()   }
 
+#define YOCTO_TUPLE_PARAM(T) typename type_traits<T>::parameter_type
+
 #define YOCTO_PAIR_DECL(CLASS,T1,N1,T2,N2) \
 class CLASS \
 YOCTO_TUPLE_INI() \
 public:\
-typedef type_traits<T1>::parameter_type PARAM1;\
-typedef type_traits<T2>::parameter_type PARAM2;\
+typedef YOCTO_TUPLE_PARAM(T1) PARAM1;\
+typedef YOCTO_TUPLE_PARAM(T2) PARAM2;\
 inline CLASS( PARAM1 P1, PARAM2 P2) :\
 N1(P1),N2(P2) {} \
 inline CLASS(const CLASS &other) : \
@@ -34,9 +36,9 @@ T2 N2
 class CLASS \
 YOCTO_TUPLE_INI() \
 public:\
-typedef type_traits<T1>::parameter_type PARAM1;\
-typedef type_traits<T2>::parameter_type PARAM2;\
-typedef type_traits<T3>::parameter_type PARAM3;\
+typedef YOCTO_TUPLE_PARAM(T1) PARAM1;\
+typedef YOCTO_TUPLE_PARAM(T2) PARAM2;\
+typedef YOCTO_TUPLE_PARAM(T3) PARAM3;\
 inline CLASS( PARAM1 P1, PARAM2 P2, PARAM3 P3) :\
 N1(P1),N2(P2),N3(P3) {} \
 inline CLASS(const CLASS &other) : \
@@ -58,10 +60,10 @@ T3 N3
 class CLASS \
 YOCTO_TUPLE_INI() \
 public:\
-typedef type_traits<T1>::parameter_type PARAM1;\
-typedef type_traits<T2>::parameter_type PARAM2;\
-typedef type_traits<T3>::parameter_type PARAM3;\
-typedef type_traits<T4>::parameter_type PARAM4;\
+typedef YOCTO_TUPLE_PARAM(T1) PARAM1;\
+typedef YOCTO_TUPLE_PARAM(T2) PARAM2;\
+typedef YOCTO_TUPLE_PARAM(T3) PARAM3;\
+typedef YOCTO_TUPLE_PARAM(T4) PARAM4;\
 inline CLASS( PARAM1 P1, PARAM2 P2, PARAM3 P3, PARAM4 P4) :\
 N1(P1),N2(P2),N3(P3),N4(P4) {} \
 inline CLASS(const CLASS &other) : \
@@ -85,11 +87,11 @@ T4 N4
 class CLASS \
 YOCTO_TUPLE_INI() \
 public:\
-typedef type_traits<T1>::parameter_type PARAM1;\
-typedef type_traits<T2>::parameter_type PARAM2;\
-typedef type_traits<T3>::parameter_type PARAM3;\
-typedef type_traits<T4>::parameter_type PARAM4;\
-typedef type_traits<T5>::parameter_type PARAM5;\
+typedef YOCTO_TUPLE_PARAM(T1) PARAM1;\
+typedef YOCTO_TUPLE_PARAM(T2) PARAM2;\
+typedef YOCTO_TUPLE_PARAM(T3) PARAM3;\
+typedef YOCTO_TUPLE_PARAM(T4) PARAM4;\
+typedef YOCTO_TUPLE_PARAM(T5) PARAM5;\
 inline CLASS( PARAM1 P1, PARAM2 P2, PARAM3 P3, PARAM4 P4, PARAM5 P5) :\
 N1(P1),N2(P2),N3(P3),N4(P4),N5(P5) {} \
 inline CLASS(const CLASS &other) : \
@@ -113,12 +115,12 @@ T5 N5
 class CLASS \
 YOCTO_TUPLE_INI() \
 public:\
-typedef type_traits<T1>::parameter_type PARAM1;\
-typedef type_traits<T2>::parameter_type PARAM2;\
-typedef type_traits<T3>::parameter_type PARAM3;\
-typedef type_traits<T4>::parameter_type PARAM4;\
-typedef type_traits<T5>::parameter_type PARAM5;\
-typedef type_traits<T6>::parameter_type PARAM6;\
+typedef YOCTO_TUPLE_PARAM(T1) PARAM1;\
+typedef YOCTO_TUPLE_PARAM(T2) PARAM2;\
+typedef YOCTO_TUPLE_PARAM(T3) PARAM3;\
+typedef YOCTO_TUPLE_PARAM(T4) PARAM4;\
+typedef YOCTO_TUPLE_PARAM(T5) PARAM5;\
+typedef YOCTO_TUPLE_PARAM(T6) PARAM6;\
 inline CLASS( PARAM1 P1, PARAM2 P2, PARAM3 P3, PARAM4 P4, PARAM5 P5, PARAM6 P6) :\
 N1(P1),N2(P2),N3(P3),N4(P4),N5(P5),N6(P6) {} \
 inline CLASS(const CLASS &other) : \
