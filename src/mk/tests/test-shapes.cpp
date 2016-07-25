@@ -38,7 +38,7 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
             const double Y     = Yc+R * Sin(theta) + (0.5-alea<double>());
             const double weight = 1+0.5*alea<double>();
             fcd.append(X,Y,weight);
-            fcf.append(X,Y,weight);
+            fcf.append(X,Y);
             fp("%g %g\n",X,Y);
         }
     }
@@ -48,7 +48,7 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
 
     fcd.compute(cd,rd);
     {
-        std::cerr << std::endl;
+        std::cerr << "\nweighted double..." << std::endl;
         std::cerr << "xc=" << cd.x << std::endl;
         std::cerr << "yc=" << cd.y << std::endl;
         std::cerr << "r =" << rd   << std::endl;
@@ -68,6 +68,7 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
 
     fcf.compute(cf,rf);
     {
+        std::cerr << "\nunweighted float..." << std::endl;
         std::cerr << "xc=" << cf.x << std::endl;
         std::cerr << "yc=" << cf.y << std::endl;
         std::cerr << "r =" << rf   << std::endl;
@@ -102,6 +103,7 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
 
 
     FitConic<double> fcd;
+    FitConic<float>  fcf;
 
     {
         ios::ocstream fp("ell.dat", false);
@@ -114,7 +116,10 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             const double x     = Xc + X*CosPhi - Y*SinPhi + (0.5 - alea<double>()) * noise;
             const double y     = Yc + X*SinPhi + Y*CosPhi + (0.5 - alea<double>()) * noise;;
             fp("%g %g\n", x, y);
+
+            const double weight = 1+0.5*alea<double>();
             fcd.append(x,y);
+            fcf.append(x,y,weight);
         }
     }
 
@@ -149,6 +154,35 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             v += center;
             fp("%g %g\n", v.x, v.y);
         }
+    }
+
+    return 0;
+
+    std::cerr << "unweighted float..." << std::endl;
+    vector<float> paramf(6);
+    fcf.compute(FitConicEllipse,paramf);
+
+    point2d<float> centerf, radiusf;
+    matrix<float>  rotationf(2,2);
+    fcf.Reduce(centerf, radiusf, rotationf, paramf);
+    std::cerr << "center=" << center << std::endl;
+    std::cerr << "radius=" << radius << std::endl;
+    std::cerr << "rotation=" << rotation << std::endl;
+
+    {
+        ios::ocstream fp("ell_fitf.dat",false);
+
+        for(float theta=0; theta <= 6.3; theta += 0.1)
+        {
+            const float c  = Cos(theta);
+            const float s  = Sin(theta);
+            const point2d<float> R(radiusf.x*c,radiusf.y*s);
+            point2d<float> v;
+            tao::mul(v, rotation, R);
+            v += centerf;
+            fp("%g %g\n", v.x, v.y);
+        }
+
     }
 
     }

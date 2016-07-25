@@ -154,6 +154,7 @@ namespace yocto
 for(size_t i=N;i>0;--i)                     \
 {                                           \
 const Data &value = data[i];                \
+const T     w2    = value.w2;               \
 u[i] = EXPR;                                \
 }                                           \
 quicksort(u);                               \
@@ -205,43 +206,43 @@ DEST = sum;                                 \
                 //
                 // build Sqq matrices , sum of Q*Q', Q = [xx xy yy]'
                 //______________________________________________________________
-                YOCTO_MK_FIT_CONIC(Sqq[1][1],          value.xx*value.xx);
-                YOCTO_MK_FIT_CONIC(Sqq[1][2]=Sqq[2][1],value.xx*value.xy);
-                YOCTO_MK_FIT_CONIC(Sqq[1][3]=Sqq[3][1],value.xx*value.yy);
+                YOCTO_MK_FIT_CONIC(Sqq[1][1],          w2*value.xx*value.xx);
+                YOCTO_MK_FIT_CONIC(Sqq[1][2]=Sqq[2][1],w2*value.xx*value.xy);
+                YOCTO_MK_FIT_CONIC(Sqq[1][3]=Sqq[3][1],w2*value.xx*value.yy);
 
-                YOCTO_MK_FIT_CONIC(Sqq[2][2],          value.xy*value.xy);
-                YOCTO_MK_FIT_CONIC(Sqq[2][3]=Sqq[3][2],value.xy*value.yy);
+                YOCTO_MK_FIT_CONIC(Sqq[2][2],          w2*value.xy*value.xy);
+                YOCTO_MK_FIT_CONIC(Sqq[2][3]=Sqq[3][2],w2*value.xy*value.yy);
 
-                YOCTO_MK_FIT_CONIC(Sqq[3][3],          value.yy*value.yy);
+                YOCTO_MK_FIT_CONIC(Sqq[3][3],          w2*value.yy*value.yy);
 
                 //______________________________________________________________
                 //
                 // build Szz matrix, sum of Z*Z', Z=[x y 1]'
                 //______________________________________________________________
-                YOCTO_MK_FIT_CONIC(Szz[1][1],          value.xx);
-                YOCTO_MK_FIT_CONIC(Szz[1][2]=Szz[2][1],value.xy);
-                YOCTO_MK_FIT_CONIC(Szz[1][3]=Szz[3][1],value.x);
+                YOCTO_MK_FIT_CONIC(Szz[1][1],          w2*value.xx);
+                YOCTO_MK_FIT_CONIC(Szz[1][2]=Szz[2][1],w2*value.xy);
+                YOCTO_MK_FIT_CONIC(Szz[1][3]=Szz[3][1],w2*value.x);
 
-                YOCTO_MK_FIT_CONIC(Szz[2][2],value.yy);
-                YOCTO_MK_FIT_CONIC(Szz[2][3]=Szz[3][2],value.y);
+                YOCTO_MK_FIT_CONIC(Szz[2][2],w2*value.yy);
+                YOCTO_MK_FIT_CONIC(Szz[2][3]=Szz[3][2],w2*value.y);
 
-                Szz[3][3] = N;
+                YOCTO_MK_FIT_CONIC(Szz[3][3],w2);
 
                 //______________________________________________________________
                 //
                 // build Sqz matrix, sum of Q*Z'
                 //______________________________________________________________
-                YOCTO_MK_FIT_CONIC(Sqz[1][1],value.xx*value.x);
-                YOCTO_MK_FIT_CONIC(Sqz[1][2],value.xx*value.y);
-                YOCTO_MK_FIT_CONIC(Sqz[1][3],value.xx);
+                YOCTO_MK_FIT_CONIC(Sqz[1][1],w2*value.xx*value.x);
+                YOCTO_MK_FIT_CONIC(Sqz[1][2],w2*value.xx*value.y);
+                YOCTO_MK_FIT_CONIC(Sqz[1][3],w2*value.xx);
 
-                YOCTO_MK_FIT_CONIC(Sqz[2][1],value.xy*value.x);
-                YOCTO_MK_FIT_CONIC(Sqz[2][2],value.xy*value.y);
-                YOCTO_MK_FIT_CONIC(Sqz[2][3],value.xy);
+                YOCTO_MK_FIT_CONIC(Sqz[2][1],w2*value.xy*value.x);
+                YOCTO_MK_FIT_CONIC(Sqz[2][2],w2*value.xy*value.y);
+                YOCTO_MK_FIT_CONIC(Sqz[2][3],w2*value.xy);
 
-                YOCTO_MK_FIT_CONIC(Sqz[3][1],value.yy*value.x);
-                YOCTO_MK_FIT_CONIC(Sqz[3][2],value.yy*value.y);
-                YOCTO_MK_FIT_CONIC(Sqz[3][3],value.yy);
+                YOCTO_MK_FIT_CONIC(Sqz[3][1],w2*value.yy*value.x);
+                YOCTO_MK_FIT_CONIC(Sqz[3][2],w2*value.yy*value.y);
+                YOCTO_MK_FIT_CONIC(Sqz[3][3],w2*value.yy);
 
                 if( !LU<T>::build(Szz) )
                 {
@@ -295,7 +296,6 @@ DEST = sum;                                 \
                 {
                     throw imported::exception(fn,"no real eigenvalue"); // shouldn't happen in dim=3
                 }
-                std::cerr << "nr=" << nr << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -398,6 +398,8 @@ DEST = sum;                                 \
                     goto BUILD_S;
                 }
 
+                std::cerr << "param=" << param << std::endl;
+
                 if( lam[1]>0 && lam[2]>0)
                 {
                     //__________________________________________________________
@@ -418,26 +420,30 @@ DEST = sum;                                 \
                     }
                     const T lamX = lam[1];
                     const T lamY = lam[2];
+                    std::cerr << "S=" << S << std::endl;
+                    std::cerr << "Q=" << Q << std::endl;
+                    std::cerr << "lamX=" << lamX << std::endl;
+                    std::cerr << "lamY=" << lamY << std::endl;
 
-                    //__________________________________________________________
-                    // ( D )                  ( d )
-                    // (   ) = transpose(Q) * (   )
-                    // ( E )                  ( e )
-                    //__________________________________________________________
-                    const T D   = (Q[1][1] * d + Q[2][1] * e);
-                    const T E   = (Q[1][2] * d + Q[2][2] * e);
+                    vector<T> L(2); L[1] = d; L[2] = e;
+                    std::cerr << "L=" << L << std::endl;
+                    vector<T> tmp(2);
+                    tao::mul_trn(tmp,Q,L);
+                    tmp[1]/=lamX;
+                    tmp[2]/=lamY;
+                    tao::mul(L,Q,tmp);
+                    tao::mulby(T(-0.5),L);
+                    center.x = L[1];
+                    center.y = L[2];
+                    std::cerr << "center=" << center << std::endl;
+                    tao::mul(tmp,S,L);
+                    std::cerr << "SC=" << tmp << std::endl;
+                    const T rhs = tmp[1]*L[1]+tmp[2]*L[2]-f;
+                    const T R2  = (rhs>0) ? rhs : 0;
 
-                    const T Dp  = D/lamX;
-                    const T Ep  = E/lamY;
-                    
-                    center.x  = -T(0.5) * (Q[1][1] * Dp + Q[1][2] * Ep);
-                    center.y  = -T(0.5) * (Q[2][1] * Dp + Q[2][2] * Ep);
-                    const T rhs = T(0.25) * ( D*Dp + E*Ep) - f;
-                    const T R2  = (rhs > 0) ? rhs : 0;
-                    
-                    radius.x  = Sqrt(R2/lamX);
-                    radius.y =  Sqrt(R2/lamY);
-                    
+                    radius.x = Sqrt(R2/lamX);
+                    radius.y = Sqrt(R2/lamY);
+
                     return;
                 }
                 
