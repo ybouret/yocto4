@@ -204,20 +204,20 @@ DEST = sum;                                 \
                 //
                 // build Sqq matrices , sum of Q*Q', Q = [xx xy yy]'
                 //______________________________________________________________
-                YOCTO_MK_FIT_CONIC(Sqq[1][1],value.xx*value.xx);
-                YOCTO_MK_FIT_CONIC(Sqq[1][2]=Sqq[2][1],value.xx*value.yy);
-                YOCTO_MK_FIT_CONIC(Sqq[1][3]=Sqq[3][1],value.xx*value.xy);
+                YOCTO_MK_FIT_CONIC(Sqq[1][1],          value.xx*value.xx);
+                YOCTO_MK_FIT_CONIC(Sqq[1][2]=Sqq[2][1],value.xx*value.xy);
+                YOCTO_MK_FIT_CONIC(Sqq[1][3]=Sqq[3][1],value.xx*value.yy);
 
-                YOCTO_MK_FIT_CONIC(Sqq[2][2],value.xy*value.xy);
+                YOCTO_MK_FIT_CONIC(Sqq[2][2],          value.xy*value.xy);
                 YOCTO_MK_FIT_CONIC(Sqq[2][3]=Sqq[3][2],value.xy*value.yy);
 
-                YOCTO_MK_FIT_CONIC(Sqq[3][3],value.yy*value.yy);
+                YOCTO_MK_FIT_CONIC(Sqq[3][3],          value.yy*value.yy);
 
                 //______________________________________________________________
                 //
                 // build Szz matrix, sum of Z*Z', Z=[x y 1]'
                 //______________________________________________________________
-                YOCTO_MK_FIT_CONIC(Szz[1][1],value.xx);
+                YOCTO_MK_FIT_CONIC(Szz[1][1],          value.xx);
                 YOCTO_MK_FIT_CONIC(Szz[1][2]=Szz[2][1],value.xy);
                 YOCTO_MK_FIT_CONIC(Szz[1][3]=Szz[3][1],value.x);
 
