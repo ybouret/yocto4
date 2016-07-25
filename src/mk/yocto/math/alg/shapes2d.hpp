@@ -34,9 +34,7 @@ namespace yocto
         {
         public:
             inline explicit FitCircle() throw() :
-            data(),
-            S(3),
-            Q(3)
+            data()
             {
             }
 
@@ -72,6 +70,8 @@ DEST = sum;                                 \
             {
                 assert(data.size()>0);
                 const size_t N = data.size();
+                matrix<T>    S(3);
+                vector<T>    Q(3);
                 vector<T>    u(N);
                 S[3][3] = N;
                 YOCTO_MK_FIT_CIRCLE(S[1][3]=S[3][1], value.x );
@@ -82,16 +82,13 @@ DEST = sum;                                 \
                 YOCTO_MK_FIT_CIRCLE(Q[1],value.z*value.x);
                 YOCTO_MK_FIT_CIRCLE(Q[2],value.z*value.y);
                 YOCTO_MK_FIT_CIRCLE(Q[3],value.z        );
-                std::cerr << "S=" << S << std::endl;
-                std::cerr << "Q=" << Q << std::endl;
 
-                matrix<T> U(S);
-                if( !LU<T>::build(U) )
+                if( !LU<T>::build(S) )
                 {
                     return false;
                 }
 
-                LU<T>::solve(U,Q);
+                LU<T>::solve(S,Q);
 
                 const T a = Q[1];
                 const T b = Q[2];
@@ -101,13 +98,118 @@ DEST = sum;                                 \
                 radius  = Sqrt( max_of<T>(0,c + xcenter*xcenter + ycenter*ycenter) );
                 return true;
             }
+#undef YOCTO_MK_FIT_CIRCLE
 
         private:
-            matrix<T>    S;
-            vector<T>    Q;
             YOCTO_DISABLE_COPY_AND_ASSIGN(FitCircle);
-
         };
+    }
+}
+
+namespace yocto
+{
+    namespace math
+    {
+        template <typename T>
+        class FitConic
+        {
+        public:
+
+            YOCTO_PENTUPLE_DECL(Data,T,xx,T,xy,T,yy,T,x,T,y);
+            YOCTO_PENTUPLE_END();
+
+            inline virtual void reset() throw() { data.free(); }
+            inline virtual void append(const T x,const T y)
+            {
+                const Data tmp(x*x,x*y,y*y,x,y);
+                data.push_back(tmp);
+            }
+
+            inline explicit FitConic() throw() : data()
+            {
+
+            }
+
+            inline virtual ~FitConic() throw()
+            {
+            }
+
+
+            vector<Data> data;
+
+#define YOCTO_MK_FIT_CONIC(DEST,EXPR) do {  \
+for(size_t i=N;i>0;--i)                     \
+{                                           \
+const Data &value = data[i];                \
+u[i] = EXPR;                                \
+}                                           \
+quicksort(u);                               \
+T sum = 0;                                  \
+for(size_t i=1;i<=N;++i) sum += u[i];       \
+DEST = sum;                                 \
+} while(false)
+            virtual bool compute()
+            {
+                assert(data.size()>0);
+                const size_t N = data.size();
+                matrix<T> Sqq(3), Sqz(3), Szz(3);
+                vector<T> u(N);
+
+                //______________________________________________________________
+                //
+                // build Sqq matrices , sum of Q*Q', Q = [xx xy yy]'
+                //______________________________________________________________
+                YOCTO_MK_FIT_CONIC(Sqq[1][1],value.xx*value.xx);
+                YOCTO_MK_FIT_CONIC(Sqq[1][2]=Sqq[2][1],value.xx*value.yy);
+                YOCTO_MK_FIT_CONIC(Sqq[1][3]=Sqq[3][1],value.xx*value.xy);
+
+                YOCTO_MK_FIT_CONIC(Sqq[2][2],value.xy*value.xy);
+                YOCTO_MK_FIT_CONIC(Sqq[2][3]=Sqq[3][2],value.xy*value.yy);
+
+                YOCTO_MK_FIT_CONIC(Sqq[3][3],value.yy*value.yy);
+
+                //______________________________________________________________
+                //
+                // build Szz matrix, sum of Z*Z', Z=[x y 1]'
+                //______________________________________________________________
+                YOCTO_MK_FIT_CONIC(Szz[1][1],value.xx);
+                YOCTO_MK_FIT_CONIC(Szz[1][2]=Szz[2][1],value.xy);
+                YOCTO_MK_FIT_CONIC(Szz[1][3]=Szz[3][1],value.x);
+
+                YOCTO_MK_FIT_CONIC(Szz[2][2],value.yy);
+                YOCTO_MK_FIT_CONIC(Szz[2][3]=Szz[3][2],value.y);
+
+                Szz[3][3] = N;
+
+                //______________________________________________________________
+                //
+                // build Sqz matrix, sum of Q*Z'
+                //______________________________________________________________
+                YOCTO_MK_FIT_CONIC(Sqz[1][1],value.xx*value.x);
+                YOCTO_MK_FIT_CONIC(Sqz[1][2],value.xx*value.y);
+                YOCTO_MK_FIT_CONIC(Sqz[1][3],value.xx);
+
+                YOCTO_MK_FIT_CONIC(Sqz[2][1],value.xy*value.x);
+                YOCTO_MK_FIT_CONIC(Sqz[2][2],value.xy*value.y);
+                YOCTO_MK_FIT_CONIC(Sqz[2][3],value.xy);
+
+                YOCTO_MK_FIT_CONIC(Sqz[3][1],value.yy*value.x);
+                YOCTO_MK_FIT_CONIC(Sqz[3][2],value.yy*value.y);
+                YOCTO_MK_FIT_CONIC(Sqz[3][3],value.yy);
+
+                std::cerr << "Sqq=" << Sqq << std::endl;
+                std::cerr << "Sqz=" << Sqz << std::endl;
+                std::cerr << "Szz=" << Szz << std::endl;
+
+
+                return true;
+            }
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(FitConic);
+        };
+
+
     }
 }
 

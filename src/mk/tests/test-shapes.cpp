@@ -153,10 +153,10 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
 
     }
     YOCTO_UNIT_TEST_DONE()
-    
-    
+
+
 #include "yocto/math/alg/shapes2d.hpp"
-    YOCTO_UNIT_TEST_IMPL(shapes2d)
+    YOCTO_UNIT_TEST_IMPL(circle2d)
     {
         size_t n = 10;
         if(argc>1)
@@ -172,6 +172,7 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
 
         FitCircle<double> fcd;
         FitCircle<float>  fcf;
+
         {
             ios::ocstream fp("circ.dat",false);
             for( size_t i=1; i <= n; ++i )
@@ -188,21 +189,83 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         //std::cerr << "fcd.data=" << fcd.data << std::endl;
         point2d<double> cd;
         double          rd=0;
-        fcd.compute(cd.x,cd.y,rd);
-        std::cerr << "xc=" << cd.x << std::endl;
-        std::cerr << "yc=" << cd.y << std::endl;
-        std::cerr << "r =" << rd   << std::endl;
+
+        if(fcd.compute(cd.x,cd.y,rd))
+        {
+            std::cerr << "xc=" << cd.x << std::endl;
+            std::cerr << "yc=" << cd.y << std::endl;
+            std::cerr << "r =" << rd   << std::endl;
+
+            {
+                ios::ocstream fp("circ_fit.dat",false);
+                for(double theta=0; theta <= 6.3; theta += 0.01 )
+                {
+                    fp("%g %g\n", cd.x + rd * cos(theta), cd.y + rd * sin(theta) );
+                }
+            }
+        }
+        else
+        {
+            std::cerr << "Couldn't compute FitCircle<double>" << std::endl;
+        }
+
+        point2d<float> cf;
+        float          rf=0;
+
+        if(fcf.compute(cf.x,cf.y,rf))
+        {
+            std::cerr << "xc=" << cf.x << std::endl;
+            std::cerr << "yc=" << cf.y << std::endl;
+            std::cerr << "r =" << rf   << std::endl;
+        }
+        else
+        {
+            std::cerr << "Couldn't compute FitCircle<float>" << std::endl;
+        }
+
+    }
+    YOCTO_UNIT_TEST_DONE()
+
+    YOCTO_UNIT_TEST_IMPL(conic2d)
+    {
+        size_t n = 10;
+        double noise = 0.1;
+        if(argc>1)
+            n = strconv::to<size_t>(argv[1],"n");
+
+
+        const double Xc = 10 + (alea<double>() - 0.5) * 20;
+        const double Yc = 10 + (alea<double>() - 0.5) * 20;
+
+        const double Ra     = 4 + 2*alea<double>();
+        const double Rb     = 1.5 + alea<double>();
+        const double phi    = alea<double>() * numeric<double>::two_pi;
+        const double CosPhi = Cos(phi);
+        const double SinPhi = Sin(phi);
+
+        FitConic<double> fcd;
 
         {
-            ios::ocstream fp("circ_fit.dat",false);
-            for(double theta=0; theta <= 6.3; theta += 0.01 )
+            ios::ocstream fp("ell.dat", false);
+
+            for( size_t i=1; i <= n; ++i )
             {
-                fp("%g %g\n", cd.x + rd * cos(theta), cd.y + rd * sin(theta) );
+                const double theta = alea<double>() * numeric<double>::two_pi;
+                const double X     = Ra * Cos(theta);
+                const double Y     = Rb * Sin(theta);
+                const double x     = Xc + X*CosPhi - Y*SinPhi + (0.5 - alea<double>()) * noise;
+                const double y     = Yc + X*SinPhi + Y*CosPhi + (0.5 - alea<double>()) * noise;;
+                fp("%g %g\n", x, y);
+                fcd.append(x,y);
             }
         }
 
-        
+        if( fcd.compute() )
+        {
+            
+        }
+
+
     }
     YOCTO_UNIT_TEST_DONE()
-    
     
