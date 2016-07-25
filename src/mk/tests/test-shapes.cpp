@@ -14,7 +14,9 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
 {
     size_t n = 10;
     if(argc>1)
+    {
         n = strconv::to<size_t>(argv[1],"n");
+    }
 
     const double Xc = 10 + (alea<double>() - 0.5) * 20;
     const double Yc = 10 + (alea<double>() - 0.5) * 20;
@@ -34,9 +36,9 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
             const double theta = alea<double>() * numeric<double>::two_pi;
             const double X     = Xc+R * Cos(theta) + (0.5-alea<double>());
             const double Y     = Yc+R * Sin(theta) + (0.5-alea<double>());
-
-            fcd.append(X,Y);
-            fcf.append(X,Y);
+            const double weight = 1+0.5*alea<double>();
+            fcd.append(X,Y,weight);
+            fcf.append(X,Y,weight);
             fp("%g %g\n",X,Y);
         }
     }
@@ -46,6 +48,7 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
 
     fcd.compute(cd,rd);
     {
+        std::cerr << std::endl;
         std::cerr << "xc=" << cd.x << std::endl;
         std::cerr << "yc=" << cd.y << std::endl;
         std::cerr << "r =" << rd   << std::endl;
@@ -79,25 +82,26 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
     size_t n = 10;
     double noise = 0.1;
     if(argc>1)
+    {
         n = strconv::to<size_t>(argv[1],"n");
+    }
+
+    const double Xc = 10 + (alea<double>() - 0.5) * 20;
+    const double Yc = 10 + (alea<double>() - 0.5) * 20;
+
+    const double Ra     = 4 + 2*alea<double>();
+    const double Rb     = 1.5 + alea<double>();
+    const double phi    = alea<double>() * numeric<double>::two_pi;
+    const double CosPhi = Cos(phi);
+    const double SinPhi = Sin(phi);
+
+    std::cerr << "Xc=" << Xc << std::endl;
+    std::cerr << "Yc=" << Yc << std::endl;
+    std::cerr << "Ra=" << Ra << std::endl;
+    std::cerr << "Rb=" << Rb << std::endl;
 
 
-        const double Xc = 10 + (alea<double>() - 0.5) * 20;
-        const double Yc = 10 + (alea<double>() - 0.5) * 20;
-
-        const double Ra     = 4 + 2*alea<double>();
-        const double Rb     = 1.5 + alea<double>();
-        const double phi    = alea<double>() * numeric<double>::two_pi;
-        const double CosPhi = Cos(phi);
-        const double SinPhi = Sin(phi);
-
-        std::cerr << "Xc=" << Xc << std::endl;
-        std::cerr << "Yc=" << Yc << std::endl;
-        std::cerr << "Ra=" << Ra << std::endl;
-        std::cerr << "Rb=" << Rb << std::endl;
-
-
-        FitConic<double> fcd;
+    FitConic<double> fcd;
 
     {
         ios::ocstream fp("ell.dat", false);
@@ -114,22 +118,23 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         }
     }
 
-        std::cerr << "Compute Generic..." << std::endl;
-        vector<double> param(6);
-        fcd.compute(FitConicGeneric,param);
-        std::cerr << "param_generic=" << param << std::endl;
+    std::cerr << "Compute Generic..." << std::endl;
+    vector<double> param(6);
+    fcd.compute(FitConicGeneric,param);
+    std::cerr << "param_generic=" << param << std::endl;
 
-        std::cerr << "Compute Ellipse..." << std::endl;
-        fcd.compute(FitConicEllipse,param);
-        std::cerr << "param_ellipse=" << param << std::endl;
+    std::cerr << "Compute Ellipse..." << std::endl;
+    fcd.compute(FitConicEllipse,param);
+    std::cerr << "param_ellipse=" << param << std::endl;
 
-        std::cerr << "Reducing..." << std::endl;
-        point2d<double> center, radius;
-        matrix<double>  rotation(2,2);
-        fcd.Reduce(center, radius, rotation, param);
-        std::cerr << "center=" << center << std::endl;
-        std::cerr << "radius=" << radius << std::endl;
-        std::cerr << "rotation=" << rotation << std::endl;
+    std::cerr << "Reducing..." << std::endl;
+    point2d<double> center, radius;
+    matrix<double>  rotation(2,2);
+    fcd.Reduce(center, radius, rotation, param);
+    std::cerr << "center=" << center << std::endl;
+    std::cerr << "radius=" << radius << std::endl;
+    std::cerr << "rotation=" << rotation << std::endl;
+
 
     {
         ios::ocstream fp("ell_fit.dat",false);
@@ -146,6 +151,6 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         }
     }
 
-        }
-        YOCTO_UNIT_TEST_DONE()
-
+    }
+    YOCTO_UNIT_TEST_DONE()
+    

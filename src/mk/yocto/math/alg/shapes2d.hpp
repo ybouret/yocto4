@@ -24,8 +24,8 @@ namespace yocto
             inline virtual ~FitShape2D() throw() {}
 
             virtual void reset() throw() = 0;
-            virtual void append(const T x, const T y) = 0;
-            inline  void append(const point2d<T> &p) { append(p.x,p.y); }
+            virtual void append(const T x, const T y, const T w=1) = 0;
+            inline  void append(const point2d<T> &p,const T w=1) { append(p.x,p.y,w); }
 
         protected:
             inline explicit FitShape2D() throw() {}
@@ -46,15 +46,15 @@ namespace yocto
 
             inline virtual ~FitCircle() throw() {}
 
-            YOCTO_SEXTUPLE_DECL(Data,T,x,T,y,T,xx,T,yy,T,xy,T,z);
-            YOCTO_SEXTUPLE_END();
+            YOCTO_HEPTUPLE_DECL(Data,T,x,T,y,T,xx,T,yy,T,xy,T,z,T,w2);
+            YOCTO_HEPTUPLE_END();
 
             inline virtual void reset() throw() { data.free(); }
-            inline void append(const T x, const T y)
+            inline void append(const T x, const T y,const T w=1)
             {
                 const T    xx = x*x;
                 const T    yy = y*y;
-                const Data tmp(x,y,xx,yy,x*y,xx+yy);
+                const Data tmp(x,y,xx,yy,x*y,xx+yy,w*w);
                 data.push_back(tmp);
             }
 
@@ -64,6 +64,7 @@ namespace yocto
 for(size_t i=N;i>0;--i)                     \
 {                                           \
 const Data &value = data[i];                \
+const T     w2    = value.w2;               \
 u[i] = EXPR;                                \
 }                                           \
 quicksort(u);                               \
@@ -79,15 +80,15 @@ DEST = sum;                                 \
                 matrix<T>    S(3);
                 vector<T>    Q(3);
                 vector<T>    u(N);
-                S[3][3] = N;
-                YOCTO_MK_FIT_CIRCLE(S[1][3]=S[3][1], value.x );
-                YOCTO_MK_FIT_CIRCLE(S[2][3]=S[3][2], value.y );
-                YOCTO_MK_FIT_CIRCLE(S[1][1],         value.xx);
-                YOCTO_MK_FIT_CIRCLE(S[2][2],         value.yy);
-                YOCTO_MK_FIT_CIRCLE(S[1][2]=S[2][1], value.xy);
-                YOCTO_MK_FIT_CIRCLE(Q[1],value.z*value.x);
-                YOCTO_MK_FIT_CIRCLE(Q[2],value.z*value.y);
-                YOCTO_MK_FIT_CIRCLE(Q[3],value.z        );
+                YOCTO_MK_FIT_CIRCLE(S[3][3],         w2);
+                YOCTO_MK_FIT_CIRCLE(S[1][3]=S[3][1], w2*value.x );
+                YOCTO_MK_FIT_CIRCLE(S[2][3]=S[3][2], w2*value.y );
+                YOCTO_MK_FIT_CIRCLE(S[1][1],         w2*value.xx);
+                YOCTO_MK_FIT_CIRCLE(S[2][2],         w2*value.yy);
+                YOCTO_MK_FIT_CIRCLE(S[1][2]=S[2][1], w2*value.xy);
+                YOCTO_MK_FIT_CIRCLE(Q[1],w2*value.z*value.x);
+                YOCTO_MK_FIT_CIRCLE(Q[2],w2*value.z*value.y);
+                YOCTO_MK_FIT_CIRCLE(Q[3],w2*value.z        );
 
                 if( !LU<T>::build(S) )
                 {
@@ -127,13 +128,13 @@ namespace yocto
         {
         public:
 
-            YOCTO_PENTUPLE_DECL(Data,T,xx,T,xy,T,yy,T,x,T,y);
-            YOCTO_PENTUPLE_END();
+            YOCTO_SEXTUPLE_DECL(Data,T,xx,T,xy,T,yy,T,x,T,y,T,w2);
+            YOCTO_SEXTUPLE_END();
 
             inline virtual void reset() throw() { data.free(); }
-            inline virtual void append(const T x,const T y)
+            inline virtual void append(const T x,const T y,const T w=1)
             {
-                const Data tmp(x*x,x*y,y*y,x,y);
+                const Data tmp(x*x,x*y,y*y,x,y,w*w);
                 data.push_back(tmp);
             }
 

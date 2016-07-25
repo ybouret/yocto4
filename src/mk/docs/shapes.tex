@@ -64,6 +64,29 @@ Solving \eqref{eq:circ} yields
 	\right.
 \end{equation}
 
+When adding a weight $w_i$ to each point we have to solve
+\begin{equation}
+	\label{eq:circ}
+	\begin{bmatrix}
+	\sum w_i^2 x_i^2 & \sum w_i^2 x_iy_i & \sum w_i^2 x_i\\
+	\sum w_i^2 x_iy_i & \sum w_i^2 y_i^2 & \sum w_i^2 y_i\\
+	\sum w_i^2x_i    & \sum w_i^2y_i & \sum w_i^2 \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	a\\
+	b\\
+	c\\
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+	\sum w_i^2z_i x_i\\
+	\sum w_i^2z_i y_i\\
+	\sum w_i^2z_i\\
+	\end{bmatrix}
+\end{equation}
+
+
+
 \section{Fitting to an Ellipse}
 \subsection{Algebraic definition}
 An algebraic equation is
