@@ -190,7 +190,7 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         point2d<double> cd;
         double          rd=0;
 
-        if(fcd.compute(cd.x,cd.y,rd))
+        fcd.compute(cd,rd);
         {
             std::cerr << "xc=" << cd.x << std::endl;
             std::cerr << "yc=" << cd.y << std::endl;
@@ -204,24 +204,18 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
                 }
             }
         }
-        else
-        {
-            std::cerr << "Couldn't compute FitCircle<double>" << std::endl;
-        }
+
 
         point2d<float> cf;
         float          rf=0;
 
-        if(fcf.compute(cf.x,cf.y,rf))
+        fcf.compute(cf,rf);
         {
             std::cerr << "xc=" << cf.x << std::endl;
             std::cerr << "yc=" << cf.y << std::endl;
             std::cerr << "r =" << rf   << std::endl;
         }
-        else
-        {
-            std::cerr << "Couldn't compute FitCircle<float>" << std::endl;
-        }
+
 
     }
     YOCTO_UNIT_TEST_DONE()
@@ -243,6 +237,12 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         const double CosPhi = Cos(phi);
         const double SinPhi = Sin(phi);
 
+        std::cerr << "Xc=" << Xc << std::endl;
+        std::cerr << "Yc=" << Yc << std::endl;
+        std::cerr << "Ra=" << Ra << std::endl;
+        std::cerr << "Rb=" << Rb << std::endl;
+        
+
         FitConic<double> fcd;
 
         {
@@ -260,10 +260,22 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             }
         }
 
-        if( fcd.compute() )
-        {
-            
-        }
+        std::cerr << "Compute Generic..." << std::endl;
+        vector<double> param(6);
+        fcd.compute(FitConicGeneric,param);
+        std::cerr << "param_generic=" << param << std::endl;
+
+        std::cerr << "Compute Ellipse..." << std::endl;
+        fcd.compute(FitConicEllipse,param);
+        std::cerr << "param_ellipse=" << param << std::endl;
+
+        std::cerr << "Reducing..." << std::endl;
+        point2d<double> center, radius;
+        matrix<double>  rotation(2,2);
+        fcd.Reduce(center, radius, rotation, param);
+        std::cerr << "center=" << center << std::endl;
+        std::cerr << "radius=" << radius << std::endl;
+        std::cerr << "rotation=" << rotation << std::endl;
 
 
     }
