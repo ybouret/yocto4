@@ -37,7 +37,7 @@ namespace yocto
 
 
         template <typename T>
-        class FitCircle
+        class FitCircle : public FitShape2D<T>
         {
         public:
             inline explicit FitCircle() throw() :
@@ -125,7 +125,7 @@ namespace yocto
         };
 
         template <typename T>
-        class FitConic
+        class FitConic : public FitShape2D<T>
         {
         public:
 
@@ -265,7 +265,7 @@ T sum = 0;                                  \
 for(size_t i=1;i<=N;++i) sum += u[i];       \
 DEST = sum;                                 \
 } while(false)
-            
+
             void compute( const FitConicType t, array<T> &A)
             {
                 assert(A.size()>=6);
@@ -283,7 +283,7 @@ DEST = sum;                                 \
                         C[2][2] =   1;
                         C[3][3] =   1;
                         break;
-                        
+
                     case FitConicEllipse: //! a*c-b^2/4=1
                         C[2][2] = -0.25;
                         C[1][3] = 0.5;
@@ -364,7 +364,7 @@ DEST = sum;                                 \
                 //______________________________________________________________
                 matrix<T> evec(nr,6);
                 diag<T>::eigv(evec,M, wr);
-
+                
                 //______________________________________________________________
                 //
                 // select the biggest real ev
