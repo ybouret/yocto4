@@ -474,7 +474,11 @@ DEST = sum;                                 \
                         C[3][1] = 0.5;
                         break;
                 }
-                std::cerr << "C=" << C << std::endl;
+
+                //______________________________________________________________
+                //
+                // S: matrix of moments
+                //______________________________________________________________
                 matrix<T> S(6);
                 const size_t N = data.size();
                 vector<T> u(N);
@@ -508,16 +512,21 @@ DEST = sum;                                 \
 
                 YOCTO_MK_FIT_CONIC(S[6][6],w2);
 
-                std::cerr << "S=" << S << std::endl;
+                //______________________________________________________________
+                //
+                // M = inv(S)*C: matrix of the eigen problen
+                //______________________________________________________________
                 if(!LU<T>::build(S))
                 {
                     throw imported::exception(fn,"singular distribution");
                 }
                 matrix<T> M(C,YOCTO_MATRIX_ENLARGE);
                 LU<T>::solve(S,M);
-                std::cerr << "M=" << M << std::endl;
 
+                //______________________________________________________________
+                //
                 // Diagonalise...
+                //______________________________________________________________
                 vector<T> wr(6);
                 vector<T> wi(6);
                 size_t    nr=0;
@@ -532,10 +541,6 @@ DEST = sum;                                 \
                 {
                     throw exception("no real eigenvalue found");
                 }
-                std::cerr << "nr=" << nr << std::endl;
-                std::cerr << "wr=" << wr << std::endl;
-                std::cerr << "wi=" << wi << std::endl;
-
 
                 //______________________________________________________________
                 //
@@ -544,8 +549,11 @@ DEST = sum;                                 \
                 matrix<T> evec(nr,6);
                 diag<T>::eigv(evec,M, wr);
 
+                //______________________________________________________________
+                //
+                // select the biggest real ev
+                //______________________________________________________________
                 const array<T> &U   = evec[nr];
-                std::cerr << "U=" << U << std::endl;
                 const T         UCU = tao::quadratic(C,U);
                 if(UCU<=0)
                 {
@@ -553,7 +561,6 @@ DEST = sum;                                 \
                 }
                 const T scale = Sqrt(UCU);
                 for(size_t i=6;i>0;--i) A[i] = U[i]/scale;
-                std::cerr << "A=" << A << std::endl;
             }
             
             
