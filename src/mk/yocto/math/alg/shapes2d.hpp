@@ -11,6 +11,7 @@
 #include "yocto/math/core/symdiag.hpp"
 #include "yocto/math/point2d.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/sequence/some-arrays.hpp"
 
 namespace yocto
 {
@@ -150,6 +151,108 @@ namespace yocto
 
             vector<Data> data;
 
+
+
+
+            static inline T Eval(const array<T> &param, const T x, const T y) throw()
+            {
+                assert(param.size()>=6);
+                return param[1] * x*x + param[2] * x*y + param[3] * y*y + param[4] * x + param[5] * y + param[6];
+            }
+
+            static inline void Reduce(point2d<T>     &center,
+                                      point2d<T>     &radius,
+                                      matrix<T>      &rotation,
+                                      const array<T> &A)
+            {
+                static const char   fn[] = "FitConic::Reduce";
+                static const size_t nvar = 6;
+                assert(rotation.rows==2);
+                assert(rotation.cols==2);
+                assert(A.size()>=nvar);
+
+                vector<double> param(nvar);
+                for(size_t i=nvar;i>0;--i)
+                {
+                    param[i] = A[i];
+                }
+                const T &a = param[1];
+                const T &b = param[2];
+                const T &c = param[3];
+                const T &d = param[4];
+                const T &e = param[5];
+                const T &f = param[6];
+
+                matrix<T>  Q(2);
+                matrix<T> &R = rotation;
+
+                some_arrays<5,T,memory::global> arr;
+                arr.allocate(2);
+                array<T> &lam = arr.next_array();
+                array<T> &L   = arr.next_array();
+                array<T> &RtL = arr.next_array();
+                array<T> &tmp = arr.next_array();
+                array<T> &J   = arr.next_array();
+
+            BUILD_S:
+                Q[1][1] = a;
+                Q[2][2] = c;
+                Q[1][2] = Q[2][1] = b/2;
+
+
+                if( !symdiag<T>::build(Q,lam,R) )
+                    throw imported::exception(fn,"invalid parameters");
+
+                if( lam[1] <0 && lam[2] < 0)
+                {
+                    // change sign
+                    for(size_t i=1;i<=nvar; ++i ) param[i] = -param[i];
+                    goto BUILD_S;
+                }
+
+                L[1] = d;
+                L[2] = e;
+                if( lam[1]>0 && lam[2]>0 )
+                {
+
+                    //__________________________________________________________
+                    //
+                    // smaller ev to 'X' axis => bigger radius
+                    //__________________________________________________________
+                    T lx = lam[1];
+                    T ly = lam[2];
+                    if(lx>ly)
+                    {
+                        cswap(lx,ly);
+                        R.swap_cols(1,2);
+                    }
+
+                    //__________________________________________________________
+                    //
+                    // diag(lx,ly) = R'*Q*R
+                    // inv(Q)      = R*diag(1/lx,1/ly)*R'
+                    // center      = -0.5*inv(Q)*L = -0.5*R*diag(1/lx,1/ly)*R'*L
+                    // L'*inv(Q)*L = (L'*R)*diag(1/lx,1/ly)*(R'*L)
+                    //__________________________________________________________
+                    tao::mul_trn(RtL,R,L);
+                    tmp[1] = RtL[1]/(lx+lx);
+                    tmp[2] = RtL[2]/(ly+ly);
+                    tao::mul(J,R,tmp);
+                    center.x = -J[1];
+                    center.y = -J[2];
+
+                    const T rhs = T(0.25) * (Square(RtL[1])/lx + Square(RtL[2])/ly)-f;
+                    const T R2  = (rhs>0) ? rhs : 0;
+                    radius.x = Sqrt(R2/lx);
+                    radius.y = Sqrt(R2/ly);
+                    return;
+                }
+
+
+                throw imported::exception(fn,"can't reduce this kind of conic");
+
+            }
+
 #define YOCTO_MK_FIT_CONIC(DEST,EXPR) do {  \
 for(size_t i=N;i>0;--i)                     \
 {                                           \
@@ -162,301 +265,8 @@ T sum = 0;                                  \
 for(size_t i=1;i<=N;++i) sum += u[i];       \
 DEST = sum;                                 \
 } while(false)
-            virtual void compute(const FitConicType t, array<T> &param)
-            {
-                assert(param.size()>=6);
-                assert(data.size()>0);
-                static const char fn[] = "FitConic";
-                //______________________________________________________________
-                //
-                // C=constraint matrix
-                //______________________________________________________________
-                matrix<T>   C(3,3);
-                switch(t)
-                {
-                    case FitConicGeneric:
-                        C[1][1] =   1;
-                        C[2][2] = 0.5;
-                        C[3][3] =   1;
-                        break;
-
-                    case FitConicEllipse:
-                        C[2][2] = -1;
-                        C[1][3] = 2;
-                        C[3][1] = 2;
-                        break;
-                }
-
-                //______________________________________________________________
-                //
-                // I=inv(C)
-                //______________________________________________________________
-                matrix<T> I(C,YOCTO_MATRIX_ENLARGE);
-                if( !LU<T>::build(I) )
-                {
-                    throw imported::exception(fn,"singular constraints matrix");
-                }
-
-
-                const size_t N = data.size();
-                matrix<T> Sqq(3), Sqz(3), Szz(3);
-                vector<T> u(N);
-
-                //______________________________________________________________
-                //
-                // build Sqq matrices , sum of Q*Q', Q = [xx xy yy]'
-                //______________________________________________________________
-                YOCTO_MK_FIT_CONIC(Sqq[1][1],          w2*value.xx*value.xx);
-                YOCTO_MK_FIT_CONIC(Sqq[1][2]=Sqq[2][1],w2*value.xx*value.xy);
-                YOCTO_MK_FIT_CONIC(Sqq[1][3]=Sqq[3][1],w2*value.xx*value.yy);
-
-                YOCTO_MK_FIT_CONIC(Sqq[2][2],          w2*value.xy*value.xy);
-                YOCTO_MK_FIT_CONIC(Sqq[2][3]=Sqq[3][2],w2*value.xy*value.yy);
-
-                YOCTO_MK_FIT_CONIC(Sqq[3][3],          w2*value.yy*value.yy);
-
-                //______________________________________________________________
-                //
-                // build Szz matrix, sum of Z*Z', Z=[x y 1]'
-                //______________________________________________________________
-                YOCTO_MK_FIT_CONIC(Szz[1][1],          w2*value.xx);
-                YOCTO_MK_FIT_CONIC(Szz[1][2]=Szz[2][1],w2*value.xy);
-                YOCTO_MK_FIT_CONIC(Szz[1][3]=Szz[3][1],w2*value.x);
-
-                YOCTO_MK_FIT_CONIC(Szz[2][2],w2*value.yy);
-                YOCTO_MK_FIT_CONIC(Szz[2][3]=Szz[3][2],w2*value.y);
-
-                YOCTO_MK_FIT_CONIC(Szz[3][3],w2);
-
-                //______________________________________________________________
-                //
-                // build Sqz matrix, sum of Q*Z'
-                //______________________________________________________________
-                YOCTO_MK_FIT_CONIC(Sqz[1][1],w2*value.xx*value.x);
-                YOCTO_MK_FIT_CONIC(Sqz[1][2],w2*value.xx*value.y);
-                YOCTO_MK_FIT_CONIC(Sqz[1][3],w2*value.xx);
-
-                YOCTO_MK_FIT_CONIC(Sqz[2][1],w2*value.xy*value.x);
-                YOCTO_MK_FIT_CONIC(Sqz[2][2],w2*value.xy*value.y);
-                YOCTO_MK_FIT_CONIC(Sqz[2][3],w2*value.xy);
-
-                YOCTO_MK_FIT_CONIC(Sqz[3][1],w2*value.yy*value.x);
-                YOCTO_MK_FIT_CONIC(Sqz[3][2],w2*value.yy*value.y);
-                YOCTO_MK_FIT_CONIC(Sqz[3][3],w2*value.yy);
-
-                if( !LU<T>::build(Szz) )
-                {
-                    throw imported::exception(fn,"singular distribution");
-                }
-
-                //______________________________________________________________
-                //
-                // build matrix Beta = inv(Szz)*Sqz'
-                //______________________________________________________________
-                matrix<T> Beta(Sqz,YOCTO_MATRIX_TRANSPOSE); //! Beta = inv(Szz)*Sqz'
-                LU<T>::solve(Szz,Beta);
-
-                //______________________________________________________________
-                //
-                // build matrix J = Sqq - Sqz*Beta
-                //______________________________________________________________
-                matrix<T> J(3,3);
-                tao::mmul(J,Sqz,Beta);
-                for(size_t i=3;i>0;--i)
-                {
-                    for(size_t j=3;j>0;--j)
-                    {
-                        J[i][j] = Sqq[i][j] - J[i][j];
-                    }
-                }
-
-                //______________________________________________________________
-                //
-                // build matrix M = inv(C)*(Sqq - Sqz*Beta)
-                //______________________________________________________________
-                matrix<T> M(3);
-                tao::mmul(M, I, J);
-
-                //______________________________________________________________
-                //
-                // find eigenvalues
-                //______________________________________________________________
-                vector<T> wr(3);
-                vector<T> wi(3);
-                size_t    nr=0;
-                {
-                    matrix<T> MM(M);
-                    if( !diag<T>::eig(MM, wr, wi, nr) )
-                    {
-                        throw imported::exception(fn,"cannot find eigenvalues");
-                    }
-                }
-
-                if(nr<=0 )
-                {
-                    throw imported::exception(fn,"no real eigenvalue"); // shouldn't happen in dim=3
-                }
-
-                //______________________________________________________________
-                //
-                // find eigenvectors
-                //______________________________________________________________
-                matrix<T> evec(nr,3);
-                diag<T>::eigv(evec, M, wr);
-
-                //______________________________________________________________
-                //
-                // find acceptable eigenvectors
-                //______________________________________________________________
-                size_t na    = 0;
-                size_t ia[3] = {0};
-                T      wa[3] = {0};
-                for(size_t i=1; i <= nr; ++i)
-                {
-                    const array<T> &v = evec[i];
-                    tao::mul(wi,C,v);
-                    const T tmp = tao::dot(wi,v);
-                    if(tmp>0)
-                    {
-                        ia[na] = i;
-                        wa[na] = tmp;
-                        ++na;
-                    }
-                }
-
-                if( na <= 0 )
-                {
-                    throw imported::exception(fn,"no acceptable eigenvalue");
-                }
-
-                //______________________________________________________________
-                //
-                // keep the eigenvector with the smallest eigenvalue
-                //______________________________________________________________
-                assert(ia[0]>=1);
-                assert(ia[0]<=3);
-                const size_t  i0 = ia[0];
-                array<T>     &A  = evec[i0];
-                {
-                    const T fac = T(1)/Sqrt(wa[0]);
-                    for(size_t i=3;i>0;--i) A[i] *= fac;
-                }
-
-                //______________________________________________________________
-                //
-                // compute the second part
-                //______________________________________________________________
-                vector<T> &B = wi;
-                tao::mul(B,Beta,A);
-                for(size_t i=3;i>0;--i) B[i] = -B[i];
-
-                param[1] = A[1];
-                param[2] = A[2];
-                param[3] = A[3];
-
-                param[4] = B[1];
-                param[5] = B[2];
-                param[6] = B[3];
-
-
-            }
-
-
-            static inline T Eval(const array<T> &param, const T x, const T y) throw()
-            {
-                assert(param.size()>=6);
-                return param[1] * x*x + param[2] * x*y + param[3] * y*y + param[4] * x + param[5] * y + param[6];
-            }
-
-            static inline void Reduce(point2d<T>   &center,
-                                      point2d<T>   &radius,
-                                      matrix<T>    &rotation,
-                                      array<T>     &param)
-            {
-                static const char  fn[] = "FitConic::Reduce";
-                static const size_t nvar = 6;
-                assert(param.size()>=nvar);
-                assert(rotation.rows==2);
-                assert(rotation.cols==2);
-                matrix<T> S(2);
-                const T &a = param[1];
-                const T &b = param[2];
-                const T &c = param[3];
-                const T &d = param[4];
-                const T &e = param[5];
-                const T &f = param[6];
-
-            BUILD_S:
-                S[1][1] = a;
-                S[2][2] = c;
-                S[1][2] = S[2][1] = b/2;
-                matrix<T> &Q = rotation;
-                vector<T> lam(2);
-
-                if( !symdiag<T>::build(S,lam,Q) )
-                    throw imported::exception(fn,"invalid parameters");
-
-                if( lam[1] <0 && lam[2] < 0)
-                {
-                    // change sign
-                    for(size_t i=1;i<=nvar; ++i ) param[i] = -param[i];
-                    goto BUILD_S;
-                }
-
-                std::cerr << "param=" << param << std::endl;
-
-                if( lam[1]>0 && lam[2]>0)
-                {
-                    //__________________________________________________________
-                    //
-                    // ellipse
-                    //
-                    //__________________________________________________________
-
-                    //__________________________________________________________
-                    //
-                    // greater axis => X
-                    // lam[1] <= lam[2]
-                    //__________________________________________________________
-                    if(lam[1]>lam[2])
-                    {
-                        cswap(lam[1],lam[2]);
-                        Q.swap_cols(1,2);
-                    }
-                    const T lamX = lam[1];
-                    const T lamY = lam[2];
-                    std::cerr << "S=" << S << std::endl;
-                    std::cerr << "Q=" << Q << std::endl;
-                    std::cerr << "lamX=" << lamX << std::endl;
-                    std::cerr << "lamY=" << lamY << std::endl;
-
-                    vector<T> L(2); L[1] = d; L[2] = e;
-                    std::cerr << "L=" << L << std::endl;
-                    vector<T> tmp(2);
-                    tao::mul_trn(tmp,Q,L);
-                    tmp[1]/=lamX;
-                    tmp[2]/=lamY;
-                    tao::mul(L,Q,tmp);
-                    tao::mulby(T(-0.5),L);
-                    center.x = L[1];
-                    center.y = L[2];
-                    std::cerr << "center=" << center << std::endl;
-                    tao::mul(tmp,S,L);
-                    std::cerr << "SC=" << tmp << std::endl;
-                    const T rhs = tmp[1]*L[1]+tmp[2]*L[2]-f;
-                    const T R2  = (rhs>0) ? rhs : 0;
-
-                    radius.x = Sqrt(R2/lamX);
-                    radius.y = Sqrt(R2/lamY);
-
-                    return;
-                }
-
-                throw imported::exception(fn,"can't reduce this kind of conic");
-
-            }
-
-            void compute2( const FitConicType t, array<T> &A)
+            
+            void compute( const FitConicType t, array<T> &A)
             {
                 assert(A.size()>=6);
                 assert(data.size()>0);

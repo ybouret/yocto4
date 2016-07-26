@@ -109,6 +109,9 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
     double xmax = Xc;
     double ymin = Yc;
     double ymax = Yc;
+    vector<double> XX(n,as_capacity);
+    vector<double> YY(n,as_capacity);
+
     {
         ios::ocstream fp("ell.dat", false);
 
@@ -129,18 +132,20 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             const double weight = 1+0.5*alea<double>();
             fcd.append(x,y);
             fcf.append(x,y,weight);
+            XX.push_back(x);
+            YY.push_back(y);
         }
     }
 
     std::cerr << "Compute Generic..." << std::endl;
     vector<double> Ag(6);
-    fcd.compute2(FitConicGeneric,Ag);
+    fcd.compute(FitConicGeneric,Ag);
     std::cerr << "param_generic=" << Ag << std::endl;
 
 
     std::cerr << "Compute Ellipse..." << std::endl;
     vector<double> Ae(6);
-    fcd.compute2(FitConicEllipse,Ae);
+    fcd.compute(FitConicEllipse,Ae);
     std::cerr << "param_ellipse=" << Ae << std::endl;
 
     {
@@ -171,32 +176,37 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         }
     }
 
-#if 0
     std::cerr << "Reducing..." << std::endl;
     point2d<double> center, radius;
     matrix<double>  rotation(2,2);
-    fcd.Reduce(center, radius, rotation, param);
+    FitConic<double>::Reduce(center, radius, rotation, Ae);
     std::cerr << "center=" << center << std::endl;
     std::cerr << "radius=" << radius << std::endl;
-    std::cerr << "rotation=" << rotation << std::endl;
+    std::cerr << "rotate=" << rotation << std::endl;
+    
+    {
+        ios::wcstream fp("ell_center.dat");
+        for(size_t i=1;i<=n;++i)
+        {
+            fp("%g %g\n%g %g\n\n", center.x, center.y,XX[i],YY[i]);
+        }
+    }
 
 
     {
-        ios::ocstream fp("ell_fit.dat",false);
-
-        for(double theta=0; theta <= 6.3; theta += 0.1)
+        ios::wcstream fp("ell_fit.dat");
+        for(double theta=0;theta<=6.3;theta+=0.01)
         {
-            const double c  = Cos(theta);
-            const double s  = Sin(theta);
-            const point2d<double> R(radius.x*c,radius.y*s);
+            const double c  = cos(theta);
+            const double s  = sin(theta);
+            const point2d<double> rr(radius.x*c,radius.y*s);
             point2d<double> v;
-            tao::mul(v, rotation, R);
+            tao::mul(v, rotation, rr);
             v += center;
             fp("%g %g\n", v.x, v.y);
         }
     }
-#endif
-
+    
 
     }
     YOCTO_UNIT_TEST_DONE()

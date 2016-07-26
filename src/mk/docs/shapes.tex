@@ -145,6 +145,61 @@ Then we get
 \begin{equation}
 	\vec{A} = \pm\dfrac{1}{\sqrt{\vec{U}^t \bm{C} \vec{U}}} \vec{U}
 \end{equation}
+
+\subsection{Elliptic Reduction}
+We can rewrite the quadratic form with
+\begin{equation}
+	\vec{P} = \begin{bmatrix}
+		x\\
+		y
+		\end{bmatrix},
+		\;
+		\bm{Q} = \begin{bmatrix}
+		a & \dfrac{b}{2}\\
+		\dfrac{b}{2} & c
+		\end{bmatrix},\;
+		\vec{L} = \begin{bmatrix}
+		d\\
+		e
+		\end{bmatrix}
+\end{equation}
+as
+\begin{equation}
+	\vec{P}^t \bm{Q} \vec{P} + \vec{L}\cdot\vec{P} + f = 0.
+\end{equation}
+At the center $\vec{J}$ of the ellipse, the gradient of the quadratic form 
+vanishes, so that formally
+\begin{equation}
+	\bm{Q}\vec{J} = -\dfrac{1}{2}\vec{L}\text{ or }\vec{J} = -\dfrac{1}{2} \bm{Q}^{-1} \vec{L}.
+\end{equation}
+We now translate the quadratic form with
+\begin{equation}
+	\vec{P} = \vec{P}' + \vec{J}.
+\end{equation}
+We get
+\begin{equation}
+	\left(\vec{P}' + \vec{J}\right)^t \bm{Q} \left(\vec{P}' + \vec{J}\right) +
+	\vec{L}\cdot\left(\vec{P}' + \vec{J}\right) + f = 0
+\end{equation}
+then
+\begin{equation}
+	\vec{P}'^t \bm{Q} \vec{P'} + 2 \vec{P}'^t \bm{Q} \vec{J} + \vec{J}^t \bm{Q} \vec{J} + 
+	\vec{L}\cdot\vec{P}' + \vec{L}\cdot\vec{J} + f = 0.
+\end{equation}
+Moreover
+\begin{equation}
+	\vec{P}'^t \bm{Q} \vec{P'} - \vec{L}\cdot\vec{P}' - \dfrac{1}{2} \vec{L}\cdot\vec{J} +
+    \vec{L}\cdot\vec{P}' + \vec{L}\cdot\vec{J} + f = 0
+\end{equation}
+or
+\begin{equation}
+	\vec{P}'^t \bm{Q} \vec{P} + \dfrac{1}{2} \vec{L}\cdot\vec{J} + f = 0
+\end{equation}
+and finally
+\begin{equation}
+	\vec{P}'^t \bm{Q} \vec{P} = \dfrac{1}{4} \vec{L}' \bm{Q}^{-1} \vec{L} -f.
+\end{equation}
+
 \end{document}
 
 \section{Fitting to an Ellipse}
