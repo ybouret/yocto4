@@ -105,6 +105,10 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
     FitConic<double> fcd;
     FitConic<float>  fcf;
 
+    double xmin = Xc;
+    double xmax = Xc;
+    double ymin = Yc;
+    double ymax = Yc;
     {
         ios::ocstream fp("ell.dat", false);
 
@@ -116,6 +120,11 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             const double x     = Xc + X*CosPhi - Y*SinPhi + (0.5 - alea<double>()) * noise;
             const double y     = Yc + X*SinPhi + Y*CosPhi + (0.5 - alea<double>()) * noise;;
             fp("%g %g\n", x, y);
+            xmin = min_of(xmin,x);
+            xmax = max_of(xmax,x);
+            ymin = min_of(ymin,y);
+            ymax = max_of(ymax,y);
+
 
             const double weight = 1+0.5*alea<double>();
             fcd.append(x,y);
@@ -124,13 +133,43 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
     }
 
     std::cerr << "Compute Generic..." << std::endl;
-    vector<double> param(6);
-    fcd.compute2(FitConicGeneric,param);
-    std::cerr << "param_generic=" << param << std::endl;
+    vector<double> Ag(6);
+    fcd.compute2(FitConicGeneric,Ag);
+    std::cerr << "param_generic=" << Ag << std::endl;
+
 
     std::cerr << "Compute Ellipse..." << std::endl;
-    fcd.compute2(FitConicEllipse,param);
-    std::cerr << "param_ellipse=" << param << std::endl;
+    vector<double> Ae(6);
+    fcd.compute2(FitConicEllipse,Ae);
+    std::cerr << "param_ellipse=" << Ae << std::endl;
+
+    {
+        ios::wcstream fpg("fit_g.dat");
+        ios::wcstream fpe("fit_e.gat");
+        const double dx  = xmax-xmin;
+        const double dy  = ymax-ymin;
+        const size_t NP  = 50;
+        const double vcg = FitConic<double>::Eval(Ag,Xc,Yc);
+        const double vce = FitConic<double>::Eval(Ae,Xc,Yc);
+        for(size_t i=0;i<=NP;++i)
+        {
+            const double x = xmin + (dx*i)/NP;
+            for(size_t j=0;j<=NP;++j)
+            {
+                const double y  = ymin + (dy*j)/NP;
+                const double vg = FitConic<double>::Eval(Ag,x,y);
+                const double ve = FitConic<double>::Eval(Ae,x,y);
+                if(vg*vcg>=0)
+                {
+                    fpg("%g %g\n",x,y);
+                }
+                if(ve*vce>=0)
+                {
+                    fpe("%g %g\n",x,y);
+                }
+            }
+        }
+    }
 
 #if 0
     std::cerr << "Reducing..." << std::endl;

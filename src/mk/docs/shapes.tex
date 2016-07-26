@@ -85,7 +85,67 @@ When adding a weight $w_i$ to each point we have to solve
 	\end{bmatrix}
 \end{equation}
 
-
+\section{Fitting to a Conic}
+\subsection{Algebraic definition}
+	
+\begin{equation}
+\label{eq:ell_alg}
+	a\,x^2+b\,xy+c\,y^2 + d\,x+e\,y+f = 0
+\end{equation}
+which requires some constraints on $a,b,c$ to be univocal.
+We define rewrite the problem with
+\begin{equation}
+	\vec{A} = \begin{bmatrix}
+	a\\
+	b\\
+	c\\
+	d\\
+	e\\
+	f
+	\end{bmatrix}, 
+	\; 
+	\vec{Z}_i = 
+	\begin{bmatrix}
+	x_i^2\\
+	x_iy_i\\
+	y_i^2\\
+	x_i\\
+	y_i\\
+	1\\
+	\end{bmatrix}
+\end{equation}
+and we want to minimize
+\begin{equation}
+F^2\left(\vec{A}\right) = \sum_i \left(\vec{A}.\vec{Z}_i\right) 
+= \vec{A}^t \underbrace{\left(\sum_i \vec{Z}_i \otimes \vec{Z}_i \right)}_{\bm{S}} \vec{A}
+\end{equation}
+under the constraint
+\begin{equation}
+	\vec{A}^t \bm{C} \vec{A} = 1.
+\end{equation}
+Using the Lagrange multiplier $\lambda$, we need to minimize
+\begin{equation}
+	\mathcal{L}\left(\vec{A},\lambda\right) = F^2\left(\vec{A}\right) - \lambda \left( \vec{A}^t \bm{C} \vec{A} -1 \right).
+\end{equation}
+The vectorial part verifies
+\begin{equation}
+	\bm{S} \vec{A} = \lambda \vec{C} \vec{A}.
+\end{equation}
+Then $\bm{S}$ must be invertible and we get the eigen problem
+\begin{equation}
+	\underbrace{\bm{S}^{-1}\bm{C}}_{\displaystyle \bm{M}} \vec{A} = \dfrac{1}{\lambda} \vec{A}.
+\end{equation}
+To match the constraint and minimize $F^2$, $\bm{M}$ must have a greatest positive eigenvalue
+and its associated eigenvector $\vec{U}$, which must also verify 
+\begin{equation}
+	\vec{U}^t \bm{C} \vec{U} > 0,
+\end{equation}
+which should be exact...\\
+Then we get
+\begin{equation}
+	\vec{A} = \pm\dfrac{1}{\sqrt{\vec{U}^t \bm{C} \vec{U}}} \vec{U}
+\end{equation}
+\end{document}
 
 \section{Fitting to an Ellipse}
 \subsection{Algebraic definition}
@@ -352,46 +412,5 @@ and
 	\lambda_X X^2 + \lambda_Y Y^2 = \dfrac{1}{4}\left(\dfrac{D^2}{\lambda_X} + \dfrac{E^2}{\lambda_Y}\right) - f
 \end{equation}
 
-\section{Ellipse}
-In it's own reference
-\begin{equation}
-	A^2X^2+B^2Y^2=1
-\end{equation}
-or
-\begin{equation}
-	\begin{bmatrix}
-	X & Y
-	\end{bmatrix}
-	\underbrace{
-	\begin{bmatrix}
-	A^2&0\\
-	0&B^2
-	\end{bmatrix}
-	}_{\displaystyle \bm{\Delta}}
-	\begin{bmatrix}
-	X\\
-	Y
-	\end{bmatrix}
-	=1
-\end{equation}
-There exist 
-\begin{equation}
-	\bm{Q} =
-	\begin{bmatrix}
-	\cos\phi & -\sin\phi\\
-	\sin\phi & \cos\phi\\
-	\end{bmatrix}
-\end{equation}
-suck that
-\begin{equation}
-	\begin{bmatrix}
-	x-x_c & y-y_c
-	\end{bmatrix}
-	\bm{Q}\bm{\Delta}\bm{Q}^t
-	\begin{bmatrix}
-	x-x_c\\
-	y-y_c
-	\end{bmatrix} = 1
-\end{equation}
-
+\
 \end{document}

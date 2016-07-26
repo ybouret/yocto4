@@ -362,6 +362,12 @@ DEST = sum;                                 \
             }
 
 
+            static inline T Eval(const array<T> &param, const T x, const T y) throw()
+            {
+                assert(param.size()>=6);
+                return param[1] * x*x + param[2] * x*y + param[3] * y*y + param[4] * x + param[5] * y + param[6];
+            }
+
             static inline void Reduce(point2d<T>   &center,
                                       point2d<T>   &radius,
                                       matrix<T>    &rotation,
