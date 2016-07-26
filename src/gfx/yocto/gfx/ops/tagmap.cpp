@@ -8,7 +8,8 @@ namespace yocto
         tagmap:: tagmap(const unit_t W, const unit_t H) :
         _tagmap(W,H),
         current(0),
-        vstk()
+        vstk(),
+	colors()
         {
         }
 
