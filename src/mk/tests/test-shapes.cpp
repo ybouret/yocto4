@@ -125,13 +125,14 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
 
     std::cerr << "Compute Generic..." << std::endl;
     vector<double> param(6);
-    fcd.compute(FitConicGeneric,param);
+    fcd.compute2(FitConicGeneric,param);
     std::cerr << "param_generic=" << param << std::endl;
 
     std::cerr << "Compute Ellipse..." << std::endl;
-    fcd.compute(FitConicEllipse,param);
+    fcd.compute2(FitConicEllipse,param);
     std::cerr << "param_ellipse=" << param << std::endl;
 
+#if 0
     std::cerr << "Reducing..." << std::endl;
     point2d<double> center, radius;
     matrix<double>  rotation(2,2);
@@ -155,36 +156,9 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             fp("%g %g\n", v.x, v.y);
         }
     }
+#endif
 
-    return 0;
-
-    std::cerr << "unweighted float..." << std::endl;
-    vector<float> paramf(6);
-    fcf.compute(FitConicEllipse,paramf);
-
-    point2d<float> centerf, radiusf;
-    matrix<float>  rotationf(2,2);
-    fcf.Reduce(centerf, radiusf, rotationf, paramf);
-    std::cerr << "center=" << center << std::endl;
-    std::cerr << "radius=" << radius << std::endl;
-    std::cerr << "rotation=" << rotation << std::endl;
-
-    {
-        ios::ocstream fp("ell_fitf.dat",false);
-
-        for(float theta=0; theta <= 6.3; theta += 0.1)
-        {
-            const float c  = Cos(theta);
-            const float s  = Sin(theta);
-            const point2d<float> R(radiusf.x*c,radiusf.y*s);
-            point2d<float> v;
-            tao::mul(v, rotation, R);
-            v += centerf;
-            fp("%g %g\n", v.x, v.y);
-        }
-
-    }
 
     }
     YOCTO_UNIT_TEST_DONE()
-    
+

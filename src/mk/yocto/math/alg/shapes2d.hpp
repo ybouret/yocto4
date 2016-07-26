@@ -296,7 +296,7 @@ DEST = sum;                                 \
                 {
                     throw imported::exception(fn,"no real eigenvalue"); // shouldn't happen in dim=3
                 }
-                
+
                 //______________________________________________________________
                 //
                 // find eigenvectors
@@ -361,7 +361,6 @@ DEST = sum;                                 \
 
             }
 
-#undef YOCTO_MK_FIT_CONIC
 
             static inline void Reduce(point2d<T>   &center,
                                       point2d<T>   &radius,
@@ -446,10 +445,117 @@ DEST = sum;                                 \
 
                     return;
                 }
-                
+
                 throw imported::exception(fn,"can't reduce this kind of conic");
-                
+
             }
+
+            void compute2( const FitConicType t, array<T> &A)
+            {
+                assert(A.size()>=6);
+                assert(data.size()>0);
+                static const char fn[] = "FitConic::compute";
+                //______________________________________________________________
+                //
+                // C=constraint matrix
+                //______________________________________________________________
+                matrix<T>   C(6,6);
+                switch(t)
+                {
+                    case FitConicGeneric: // a^2+b^2+c^2=1
+                        C[1][1] =   1;
+                        C[2][2] =   1;
+                        C[3][3] =   1;
+                        break;
+                        
+                    case FitConicEllipse: //! a*c-b^2/4=1
+                        C[2][2] = -0.25;
+                        C[1][3] = 0.5;
+                        C[3][1] = 0.5;
+                        break;
+                }
+                std::cerr << "C=" << C << std::endl;
+                matrix<T> S(6);
+                const size_t N = data.size();
+                vector<T> u(N);
+
+                // sums of Z = [xx xy yy x y 1]'
+                YOCTO_MK_FIT_CONIC(S[1][1],        w2*value.xx*value.xx);
+                YOCTO_MK_FIT_CONIC(S[1][2]=S[2][1],w2*value.xx*value.xy);
+                YOCTO_MK_FIT_CONIC(S[1][3]=S[3][1],w2*value.xx*value.yy);
+                YOCTO_MK_FIT_CONIC(S[1][4]=S[4][1],w2*value.xx*value.x );
+                YOCTO_MK_FIT_CONIC(S[1][5]=S[5][1],w2*value.xx*value.y );
+                YOCTO_MK_FIT_CONIC(S[1][6]=S[6][1],w2*value.xx         );
+
+                YOCTO_MK_FIT_CONIC(S[2][2],        w2*value.xy*value.xy);
+                YOCTO_MK_FIT_CONIC(S[2][3]=S[3][2],w2*value.xy*value.yy);
+                YOCTO_MK_FIT_CONIC(S[2][4]=S[4][2],w2*value.xy*value.x );
+                YOCTO_MK_FIT_CONIC(S[2][5]=S[5][2],w2*value.xy*value.y );
+                YOCTO_MK_FIT_CONIC(S[2][6]=S[6][2],w2*value.xy         );
+
+
+                YOCTO_MK_FIT_CONIC(S[3][3],        w2*value.yy*value.yy);
+                YOCTO_MK_FIT_CONIC(S[3][4]=S[4][3],w2*value.yy*value.x );
+                YOCTO_MK_FIT_CONIC(S[3][5]=S[5][3],w2*value.yy*value.y );
+                YOCTO_MK_FIT_CONIC(S[3][6]=S[6][3],w2*value.yy         );
+
+                YOCTO_MK_FIT_CONIC(S[4][4],        w2*value.x*value.x);
+                YOCTO_MK_FIT_CONIC(S[4][5]=S[5][4],w2*value.x*value.y);
+                YOCTO_MK_FIT_CONIC(S[4][6]=S[6][4],w2*value.x        );
+
+                YOCTO_MK_FIT_CONIC(S[5][5],        w2*value.y*value.y);
+                YOCTO_MK_FIT_CONIC(S[5][6]=S[6][5],w2*value.y        );
+
+                YOCTO_MK_FIT_CONIC(S[6][6],w2);
+
+                std::cerr << "S=" << S << std::endl;
+                if(!LU<T>::build(S))
+                {
+                    throw imported::exception(fn,"singular distribution");
+                }
+                matrix<T> M(C,YOCTO_MATRIX_ENLARGE);
+                LU<T>::solve(S,M);
+                std::cerr << "M=" << M << std::endl;
+
+                // Diagonalise...
+                vector<T> wr(6);
+                vector<T> wi(6);
+                size_t    nr=0;
+                {
+                    matrix<T> MM(M);
+                    if( !diag<T>::eig(MM, wr, wi, nr) )
+                    {
+                        throw imported::exception(fn,"cannot find eigenvalues");
+                    }
+                }
+                if(nr<=0)
+                {
+                    throw exception("no real eigenvalue found");
+                }
+                std::cerr << "nr=" << nr << std::endl;
+                std::cerr << "wr=" << wr << std::endl;
+                std::cerr << "wi=" << wi << std::endl;
+
+
+                //______________________________________________________________
+                //
+                // find eigenvectors
+                //______________________________________________________________
+                matrix<T> evec(nr,6);
+                diag<T>::eigv(evec,M, wr);
+
+                const array<T> &U   = evec[nr];
+                std::cerr << "U=" << U << std::endl;
+                const T         UCU = tao::quadratic(C,U);
+                if(UCU<=0)
+                {
+                    throw exception("invalid eigenvector");
+                }
+                const T scale = Sqrt(UCU);
+                for(size_t i=6;i>0;--i) A[i] = U[i]/scale;
+                std::cerr << "A=" << A << std::endl;
+            }
+            
             
             
         private:
