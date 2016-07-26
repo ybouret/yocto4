@@ -197,7 +197,24 @@ or
 \end{equation}
 and finally
 \begin{equation}
-	\vec{P}'^t \bm{Q} \vec{P} = \dfrac{1}{4} \vec{L}' \bm{Q}^{-1} \vec{L} -f.
+	\vec{P}'^t \bm{Q} \vec{P} = \underbrace{\dfrac{1}{4} \vec{L}' \bm{Q}^{-1} \vec{L} -f}_{\rho^2}.
+\end{equation}
+
+There exist $\bm{R}\in\mathbb{O}^3$ such that
+\begin{equation}
+\bm{R}^tQ\bm{R} = \begin{bmatrix}
+\Lambda_X & 0 \\
+0         & \Lambda_Y\\
+\end{bmatrix}
+\end{equation}
+with $\Lambda_X\leq\Lambda_Y$, so that the equation becomes
+\begin{equation}
+	\Lambda_X X^2 + \Lambda_Y Y^2 = \rho^2
+\end{equation}
+and finally
+\begin{equation}
+	\left(\dfrac{X}{\sqrt{\dfrac{\rho^2}{\Lambda_X}}}\right)^2
+	 + \left(\dfrac{Y}{\sqrt{\dfrac{\rho^2}{\Lambda_Y}}}\right)^2 = 1.
 \end{equation}
 
 \end{document}
