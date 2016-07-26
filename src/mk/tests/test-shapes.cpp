@@ -145,7 +145,7 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
 
     {
         ios::wcstream fpg("fit_g.dat");
-        ios::wcstream fpe("fit_e.gat");
+        ios::wcstream fpe("fit_e.dat");
         const double dx  = xmax-xmin;
         const double dy  = ymax-ymin;
         const size_t NP  = 50;
