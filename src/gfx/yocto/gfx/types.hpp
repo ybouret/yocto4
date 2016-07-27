@@ -38,6 +38,8 @@ namespace yocto
             }
 
             static const vertex delta[8]; //!< the 4+4 coordinates around a single point
+
+            static inline unit_t float2unit(const float x) throw() { return unit_t(floorf(x+0.5f)); }
         };
 
         class vnode
