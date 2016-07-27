@@ -232,7 +232,7 @@ assert(tail_+1==top_)
 
 
         //! reserve extra memory
-        inline virtual void reserve(const size_t n)
+        inline virtual void reserve(size_t n)
         {
             if(n>0)
             {

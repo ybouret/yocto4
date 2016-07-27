@@ -83,14 +83,14 @@ YOCTO_UNIT_TEST_IMPL(symfind)
         xpatches xps(img,true);
 
         symmetry_finder<RGB> sym(tgt,img,xps);
-        math::cgrad<float>::callback cb( &sym, & symmetry_finder<RGB>::__callback);
+        math::cgrad<float>::callback cb( &sym, & symmetry_finder<RGB>::work_callback);
 
         vector<float> aorg(2);
         vector<bool>  used(2,true);
         used[1] = false;
 
-        aorg[2] = -img.w/2+5;
-        if(math::cgrad<float>::optimize(sym.scalarF,sym.vectorF, aorg, used, 1e-4, &cb))
+        aorg[2] = float(-img.w/2+5);
+        if(math::cgrad<float>::optimize(sym.scalarF,sym.vectorF, aorg, used, 1e-4f, &cb))
         {
             std::cerr << "converged" << std::endl;
             std::cerr << aorg << std::endl;

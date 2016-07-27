@@ -22,7 +22,7 @@ namespace yocto
             };
 
 
-            YOCTO_PAIR_DECL(info, real_t, vmin, real_t, vmax);
+            YOCTO_PAIR_DECL(YOCTO_TUPLE_STANDARD,info, real_t, vmin, real_t, vmax);
             YOCTO_PAIR_END();
 
 

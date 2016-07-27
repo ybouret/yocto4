@@ -19,7 +19,7 @@ namespace yocto
             static const float  sobel1[9];
             static const float  sobel2[9];
 
-            YOCTO_PAIR_DECL(info,float,Emax,float,Smax);
+            YOCTO_PAIR_DECL(YOCTO_TUPLE_STANDARD,info,float,Emax,float,Smax);
             info() throw() : Emax(0), Smax(0) {}
             YOCTO_PAIR_END();
 

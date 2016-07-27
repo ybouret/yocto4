@@ -47,7 +47,7 @@ namespace yocto
 
             inline virtual ~FitCircle() throw() {}
 
-            YOCTO_HEPTUPLE_DECL(Data,T,x,T,y,T,xx,T,yy,T,xy,T,z,T,w2);
+            YOCTO_HEPTUPLE_DECL(YOCTO_TUPLE_TEMPLATE,Data,T,x,T,y,T,xx,T,yy,T,xy,T,z,T,w2);
             YOCTO_HEPTUPLE_END();
 
             inline virtual void reset() throw() { data.free(); }
@@ -129,7 +129,7 @@ namespace yocto
         {
         public:
 
-            YOCTO_SEXTUPLE_DECL(Data,T,xx,T,xy,T,yy,T,x,T,y,T,w2);
+            YOCTO_SEXTUPLE_DECL(YOCTO_TUPLE_TEMPLATE,Data,T,xx,T,xy,T,yy,T,x,T,y,T,w2);
             YOCTO_SEXTUPLE_END();
 
             inline virtual void reset() throw() { data.free(); }

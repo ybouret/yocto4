@@ -70,15 +70,15 @@ namespace yocto
                 const pixmap<T> &source = *static_cast<const pixmap<T> *>(src);
                 const float      ca     = cosf(arg);
                 const float      sa     = sinf(arg);
-                const point      center(vtx.x,vtx.y);
+                const point2d<float>      center(float(vtx.x),float(vtx.y));
 
                 for(unit_t y=ymax;y>=ymin;--y)
                 {
                     for(unit_t x=xmax;x>=xmin;--x)
                     {
-                        const point   here(x,y);
-                        const point   curr = here-center;
-                        const point   prev(ca*curr.x+sa*curr.y,-sa*curr.x+ca*curr.y);
+                        const point2d<float>   here(float(x),float(y));
+                        const point2d<float>   curr = here-center;
+                        const point2d<float>   prev(ca*curr.x+sa*curr.y,-sa*curr.x+ca*curr.y);
                         const vertex  from( unit_t( floorf(center.x+prev.x+0.5f) ), unit_t( floorf(center.y+prev.y+0.5f) ) );
                         if(source.has(from))
                         {
@@ -115,7 +115,7 @@ namespace yocto
                 {
                     for(unit_t x=xmax;x>=xmin;--x)
                     {
-                        const point   here(x,y);
+                        const point   here(float(x),float(y));
                         const float   num = N*here+c;
                         const float   fac = (num+num)/den;
                         const point   sym = here - fac * N;

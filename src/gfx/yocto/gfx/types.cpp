@@ -113,16 +113,18 @@ U(240),U(241),U(242),U(243),U(244),U(245),U(246),U(247),U(248),U(249),U(250),U(2
         
         vertex vlist:: center() const throw()
         {
-            vertex G(0,0);
+            point2d<float> G(0,0);
             if(size>0)
             {
                 for(const vnode *node=head;node;node=node->next)
                 {
-                    G += node->vtx;
+					const vertex v = node->vtx;
+					const point2d<float> p(float(v.x),float(v.y));
+                    G += p;
                 }
                 G /= float(size);
             }
-            return G;
+            return vertex( unit_t(floorf(G.x+0.5f)), unit_t(floorf(G.y+0.5f)));
         }
 
         

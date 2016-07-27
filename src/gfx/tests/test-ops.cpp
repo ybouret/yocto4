@@ -194,12 +194,12 @@ YOCTO_UNIT_TEST_IMPL(ops)
         IMG.save("fgf.png",fgf,NULL);
 
         std::cerr << "-- Blur RGB" << std::endl;
-        blur::cover(1.2, fg3, img, xps);
+        blur::cover(1.2f, fg3, img, xps);
         IMG.save("blur3.png", fg3, NULL);
 
 
         std::cerr << "-- Blur Float" << std::endl;
-        blur::cover(1.2, fgf, igs, xps);
+        blur::cover(1.2f, fgf, igs, xps);
         IMG.save("blurf.png", fgf, NULL);
 
         std::cerr << "-- FFT..." << std::endl;

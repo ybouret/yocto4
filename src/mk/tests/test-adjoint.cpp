@@ -24,7 +24,7 @@ void __test_adjoint()
                 for(size_t j=1;j<=n;++j)
                 {
                     const int64_t x = -int64_t(n) + int64_t(alea_leq(2*n));
-                    M[i][j] = x;
+                    M[i][j] = T(x);
                 }
             }
             std::cerr << "M=" << M << std::endl;

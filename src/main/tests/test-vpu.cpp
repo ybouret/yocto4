@@ -84,8 +84,8 @@ namespace
 for(size_t i=1;i<=data.size();++i)\
 {\
     data[i]  = 1;\
-    idata[i] = i;\
-    sdata[i] = i;\
+    idata[i] = int(i);\
+    sdata[i] = float(i);\
 }\
 mark = rt_clock::ticks();\
 } while(false)

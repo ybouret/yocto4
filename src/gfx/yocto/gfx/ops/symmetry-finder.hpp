@@ -96,7 +96,7 @@ namespace yocto
             math::numeric<float>::scalar_field scalarF;
             math::numeric<float>::vector_field vectorF;
 
-            inline bool __callback(const array<float> &aorg)
+            inline bool work_callback(const array<float> &aorg)
             {
                 vector<float> drvs(2);
                 __vector(drvs,aorg);

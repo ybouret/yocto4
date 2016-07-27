@@ -38,7 +38,7 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
             const double Y     = Yc+R * Sin(theta) + (0.5-alea<double>());
             const double weight = 1+0.5*alea<double>();
             fcd.append(X,Y,weight);
-            fcf.append(X,Y);
+            fcf.append(float(X),float(Y));
             fp("%g %g\n",X,Y);
         }
     }
@@ -131,7 +131,7 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
 
             const double weight = 1+0.5*alea<double>();
             fcd.append(x,y);
-            fcf.append(x,y,weight);
+            fcf.append(float(x),float(y),float(weight));
             XX.push_back(x);
             YY.push_back(y);
         }
