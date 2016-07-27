@@ -76,7 +76,7 @@ namespace yocto
                 {
                     for(unit_t x=xmax;x>=xmin;--x)
                     {
-                        const point2d<float>   here(float(x),float(y));
+                        const point2d<float>   here((float(x)),(float(y)));
                         const point2d<float>   curr = here-center;
                         const point2d<float>   prev(ca*curr.x+sa*curr.y,-sa*curr.x+ca*curr.y);
                         const vertex  from( unit_t( floorf(center.x+prev.x+0.5f) ), unit_t( floorf(center.y+prev.y+0.5f) ) );
@@ -115,7 +115,7 @@ namespace yocto
                 {
                     for(unit_t x=xmax;x>=xmin;--x)
                     {
-                        const point   here(float(x),float(y));
+                        const point   here((float(x)),(float(y)));
                         const float   num = N*here+c;
                         const float   fac = (num+num)/den;
                         const point   sym = here - fac * N;

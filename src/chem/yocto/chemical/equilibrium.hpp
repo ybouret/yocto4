@@ -44,10 +44,11 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(actor);
             };
             
-            YOCTO_TRIPLE_DECL(xi_ctrl,
-                            bool,   blocked,
-                            bool,   limited,
-                            double, maximum);
+            YOCTO_TRIPLE_DECL(YOCTO_TUPLE_STANDARD,
+                              xi_ctrl,
+                              bool,   blocked,
+                              bool,   limited,
+                              double, maximum);
             YOCTO_TRIPLE_END();
             
             //__________________________________________________________________

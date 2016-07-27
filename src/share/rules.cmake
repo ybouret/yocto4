@@ -74,11 +74,11 @@ IF( "${CC_NAME}" MATCHES "^gcc.*" )
   SET(YOCTO_KNOWN_COMPILER ON)
   MESSAGE( STATUS "Using GNU compilers" )
   
-  SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS} ${PIC_FLAGS} -fstack-protector" )
+  SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS} ${PIC_FLAGS}" )
   SET(CMAKE_C_FLAGS_DEBUG   "${COMMON_C_FLAGS} -g -O0" )
   SET(CMAKE_C_FLAGS_RELEASE "${COMMON_C_FLAGS} -O2 -DNDEBUG=1 -D_FORTIFY_SOURCE=2")
   
-  SET(COMMON_CXX_FLAGS        "-Wall -pipe -fexceptions -Weffc++ ${MY_CXXFLAGS} ${PIC_FLAGS} -fstack-protector" )
+  SET(COMMON_CXX_FLAGS        "-Wall -pipe -fexceptions -Weffc++ ${MY_CXXFLAGS} ${PIC_FLAGS}" )
   SET(CMAKE_CXX_FLAGS_DEBUG   "${COMMON_CXX_FLAGS} -g -O0" )
   SET(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -O2 -DNDEBUG=1 -D_FORTIFY_SOURCE=2")
 
@@ -100,11 +100,11 @@ IF( "${CC_NAME}" MATCHES "^clang.*" )
   SET(YOCTO_KNOWN_COMPILER ON)
   MESSAGE( STATUS "Using CLANG compilers" )
   
-  SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS} ${PIC_FLAGS} -fstack-protector" )
+  SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS} ${PIC_FLAGS}" )
   SET(CMAKE_C_FLAGS_DEBUG   "${COMMON_C_FLAGS} -g -O0" )
   SET(CMAKE_C_FLAGS_RELEASE "${COMMON_C_FLAGS} -O2 -DNDEBUG=1 -D_FORTIFY_SOURCE=2")
   
-  SET(COMMON_CXX_FLAGS        "-Wall -pipe -fexceptions -Weffc++ ${MY_CXXFLAGS} ${PIC_FLAGS} -fstack-protector" )
+  SET(COMMON_CXX_FLAGS        "-Wall -pipe -fexceptions -Weffc++ ${MY_CXXFLAGS} ${PIC_FLAGS}" )
   SET(CMAKE_CXX_FLAGS_DEBUG   "${COMMON_CXX_FLAGS} -g -O0" )
   SET(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -O2 -DNDEBUG=1 -D_FORTIFY_SOURCE=2")
 ENDIF()
@@ -121,11 +121,11 @@ IF( "${CC_NAME}" MATCHES "^icc.*" )
 
   MESSAGE( STATUS "Using Intel compilers" )
   
-  SET(COMMON_C_FLAGS        "-Wall -pipe -wd981 ${MY_CFLAGS} -fstack-protector" )
+  SET(COMMON_C_FLAGS        "-Wall -pipe -wd981 ${MY_CFLAGS}" )
   SET(CMAKE_C_FLAGS_DEBUG   "${COMMON_C_FLAGS} -g" )
   SET(CMAKE_C_FLAGS_RELEASE "${COMMON_C_FLAGS} -O2 -DNDEBUG=1 -DFORTIFY_SOURCE=2")
   
-  SET(COMMON_CXX_FLAGS        "-Wall -pipe -wd981 -fexceptions${MY_CXXFLAGS} -fstack-protector" )
+  SET(COMMON_CXX_FLAGS        "-Wall -pipe -wd981 -fexceptions${MY_CXXFLAGS}" )
   SET(CMAKE_CXX_FLAGS_DEBUG   "${COMMON_CXX_FLAGS} -g" )
   SET(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -O2 -DNDEBUG=1 -DFORTIFY_SOURCE=2")
 ENDIF()
