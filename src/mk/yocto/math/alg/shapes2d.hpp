@@ -11,7 +11,6 @@
 #include "yocto/math/core/symdiag.hpp"
 #include "yocto/math/point2d.hpp"
 #include "yocto/exceptions.hpp"
-#include "yocto/sequence/some-arrays.hpp"
 
 namespace yocto
 {
@@ -162,17 +161,20 @@ namespace yocto
 
             static inline void Reduce(point2d<T>     &center,
                                       point2d<T>     &radius,
-                                      matrix<T>      &rotation,
+                                      matrix<T>      &rotate,
                                       const array<T> &A)
             {
                 static const char   fn[] = "FitConic::Reduce";
-                static const size_t nvar = 6;
-                assert(rotation.rows==2);
-                assert(rotation.cols==2);
-                assert(A.size()>=nvar);
+                assert(rotate.rows==2);
+                assert(rotate.cols==2);
+                assert(A.size()>=6);
 
-                vector<double> param(nvar);
-                for(size_t i=nvar;i>0;--i)
+                //______________________________________________________________
+                //
+                // prepare parameters
+                //______________________________________________________________
+                vector<double> param(6);
+                for(size_t i=6;i>0;--i)
                 {
                     param[i] = A[i];
                 }
@@ -184,16 +186,13 @@ namespace yocto
                 const T &f = param[6];
 
                 matrix<T>  Q(2);
-                matrix<T> &R = rotation;
+                matrix<T> &R = rotate;
+                vector<T>  lam(2);
 
-                some_arrays<5,T,memory::global> arr;
-                arr.allocate(2);
-                array<T> &lam = arr.next_array();
-                array<T> &L   = arr.next_array();
-                array<T> &RtL = arr.next_array();
-                array<T> &tmp = arr.next_array();
-                array<T> &J   = arr.next_array();
-
+                //______________________________________________________________
+                //
+                // diagonalise quadratic part
+                //______________________________________________________________
             BUILD_S:
                 Q[1][1] = a;
                 Q[2][2] = c;
@@ -201,17 +200,19 @@ namespace yocto
 
 
                 if( !symdiag<T>::build(Q,lam,R) )
+                {
                     throw imported::exception(fn,"invalid parameters");
+                }
 
                 if( lam[1] <0 && lam[2] < 0)
                 {
                     // change sign
-                    for(size_t i=1;i<=nvar; ++i ) param[i] = -param[i];
+                    for(size_t i=1;i<=6; ++i ) param[i] = -param[i];
                     goto BUILD_S;
                 }
 
-                L[1] = d;
-                L[2] = e;
+                
+                const point2d<T> L(d,e);
                 if( lam[1]>0 && lam[2]>0 )
                 {
 
@@ -234,14 +235,12 @@ namespace yocto
                     // center      = -0.5*inv(Q)*L = -0.5*R*diag(1/lx,1/ly)*R'*L
                     // L'*inv(Q)*L = (L'*R)*diag(1/lx,1/ly)*(R'*L)
                     //__________________________________________________________
+                    point2d<T>  RtL;
                     tao::mul_trn(RtL,R,L);
-                    tmp[1] = RtL[1]/(lx+lx);
-                    tmp[2] = RtL[2]/(ly+ly);
-                    tao::mul(J,R,tmp);
-                    center.x = -J[1];
-                    center.y = -J[2];
+                    const point2d<T> tmp(-RtL.x/(lx+lx),-RtL.y/(ly+ly));
+                    tao::mul(center,R,tmp);
 
-                    const T rhs = T(0.25) * (Square(RtL[1])/lx + Square(RtL[2])/ly)-f;
+                    const T rhs = T(0.25) * (Square(RtL.x)/lx + Square(RtL.y)/ly)-f;
                     const T R2  = (rhs>0) ? rhs : 0;
                     radius.x = Sqrt(R2/lx);
                     radius.y = Sqrt(R2/ly);
