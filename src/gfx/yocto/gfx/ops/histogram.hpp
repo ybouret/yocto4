@@ -84,6 +84,9 @@ namespace yocto
             //! Ostu threshold
             size_t threshold() const throw();
 
+            //! mode
+            size_t mode() const throw();
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Histogram);
             const void *src;

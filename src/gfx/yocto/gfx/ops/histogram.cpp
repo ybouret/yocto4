@@ -149,8 +149,25 @@ namespace yocto
             }
             return ans;
         }
-        
+
+
+        size_t Histogram:: mode() const throw()
+        {
+            word_type vmax = count[0];
+            size_t    imax = 0;
+            for(size_t i=bins-1;i>0;--i)
+            {
+                const word_type tmp = count[i];
+                if(tmp>vmax)
+                {
+                    vmax = tmp;
+                    imax = i;
+                }
+            }
+            return imax;
+        }
+
     }
-    
+
 }
 
