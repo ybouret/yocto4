@@ -15,7 +15,7 @@ namespace yocto
                               unit_t        x1,
                               unit_t        y1,
                               const  T      C,
-                              const uint8_t alpha)
+                              const uint8_t alpha=0xff)
         {
             unit_t dx =  std::abs(x1-x0), sx = (x0<x1) ? 1 : -1;
             unit_t dy = -std::abs(y1-y0), sy = (y0<y1) ? 1 : -1;
@@ -38,6 +38,17 @@ namespace yocto
                     err += dx; y0 += sy;
                 }
             }
+        }
+
+        template <typename T>
+        inline void draw_line(pixmap<T>    &img,
+                              vertex        v0,
+                              vertex        v1,
+                              const  T      C,
+                              const uint8_t alpha=0xff)
+
+        {
+            draw_line<T>(img,v0.x,v0.y,v1.x,v1.y,C,alpha);
         }
     }
 }

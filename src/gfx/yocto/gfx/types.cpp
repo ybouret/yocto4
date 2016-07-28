@@ -1,5 +1,6 @@
 #include "yocto/gfx/types.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -124,10 +125,29 @@ U(240),U(241),U(242),U(243),U(244),U(245),U(246),U(247),U(248),U(249),U(250),U(2
                 }
                 G /= float(size);
             }
-            return vertex( unit_t(floorf(G.x+0.5f)), unit_t(floorf(G.y+0.5f)));
+            return vertex( gist::float2unit(G.x) , gist::float2unit(G.y) );
         }
 
-        
-        
+        patch  vlist:: aabb() const
+        {
+            if(size<=0) throw exception("empty particle to compute AABB");
+            const vnode *node = head;
+            vertex       lo = node->vtx;
+            vertex       hi = lo;
+            for(node=node->next;node;node=node->next)
+            {
+                const vertex v = node->vtx;
+                lo.x = min_of(lo.x,v.x);
+                lo.y = min_of(lo.y,v.y);
+
+                hi.x = max_of(hi.x,v.x);
+                hi.y = max_of(hi.y,v.y);
+
+            }
+            return patch(lo,hi);
+        }
+
+
+
     }
 }

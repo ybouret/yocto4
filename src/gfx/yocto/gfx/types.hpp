@@ -70,7 +70,7 @@ namespace yocto
             
             vertex width() const throw();
             vertex center() const throw();
-            
+            patch  aabb() const; //!< Axis Aligned Bounding Box
             
         private:
             YOCTO_DISABLE_ASSIGN(vlist);
