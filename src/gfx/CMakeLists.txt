@@ -35,6 +35,12 @@ SET(image_srcs ${image_impl} ${image_decl})
 INSTALL( FILES ${image_decl} DESTINATION include/yocto/gfx/image )
 SOURCE_GROUP( gfx/image FILES ${image_srcs} )
 
+FILE(GLOB draw_decl yocto/gfx/draw/*.hpp)
+FILE(GLOB draw_impl yocto/gfx/draw/*.cpp)
+SET(draw_srcs ${draw_impl} ${draw_decl})
+INSTALL( FILES ${draw_decl} DESTINATION include/yocto/gfx/draw )
+SOURCE_GROUP( gfx/draw FILES ${draw_srcs} )
+
 INCLUDE_DIRECTORIES( . ../main ../mk
 ../third_party/png
 ../third_party/jpeg
@@ -42,7 +48,7 @@ INCLUDE_DIRECTORIES( . ../main ../mk
 ${CMAKE_CURRENT_BINARY_DIR}/../third_party/tiff/libtiff)
 
 
-ADD_LIBRARY(y-gfx STATIC ${srcs} ${color_srcs} ${color_ramp_srcs} ${ops_srcs} ${image_srcs} )
+ADD_LIBRARY(y-gfx STATIC ${srcs} ${color_srcs} ${color_ramp_srcs} ${ops_srcs} ${image_srcs} ${draw_srcs} )
 TARGET_LINK_LIBRARIES(y-gfx y-tiff)
 
 INSTALL( TARGETS y-gfx ARCHIVE DESTINATION lib)
