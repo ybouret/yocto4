@@ -7,14 +7,14 @@ namespace yocto
 {
     namespace math
     {
-        
+
         template <typename T>
         class cgrad : public gradient<T>
         {
         public:
             typedef functor<bool,TL1(const array<T>)> callback;
-            
-            
+
+
             //! return false only if callback returns false !
             /**
              this is the standalone version.
@@ -31,11 +31,11 @@ namespace yocto
                                  const T                            ftol,
                                  callback                          *cb = 0
                                  );
-            
-            
+
+
             explicit cgrad();
             virtual ~cgrad() throw();
-            
+
             //! return false only if callback returns false !
             /**
              The gradient is internally computed.
@@ -51,18 +51,24 @@ namespace yocto
                      const T                            ftol,
                      callback                          *cb = 0
                      );
-            
+
+            void compute_error(array<T>                          &perr,
+                               typename numeric<T>::scalar_field &func,
+                               const array<T>                    &p,
+                               const array<T>                    &dp);
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(cgrad);
             typename numeric<T>::vector_field  G;
             const array<T>                    *pdp;
-            
+
             void compute_gradient( array<T> &dFdx, const array<T> &x );
-            
+
         };
-        
-        
-        
+
+
+
     }
 }
 

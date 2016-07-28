@@ -95,6 +95,9 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
     cg.run(Func, X, used, dX, ftol, &cb);
     std::cerr << "X=" << X << std::endl;
     std::cerr << "#calls=" << P.count << std::endl;
+    std::cerr << "F=" << Func(X) << std::endl;
+    vector<double> perr(X.size());
+    cg.compute_error(perr,Func,X,dX);
     
 }
 YOCTO_UNIT_TEST_DONE()
@@ -185,6 +188,7 @@ YOCTO_UNIT_TEST_IMPL(cgrad2)
     cgrad<double>::optimize(Func,Grad,var,used,ftol,&cb);
     std::cerr << "var=" << var << std::endl;
     std::cerr << "count=" << param.count << std::endl;
+    std::cerr << "F=" << Func(var) << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
 
