@@ -48,7 +48,19 @@ namespace yocto
 		}
 		while( inc > 1 );
 	}
-	
+
+    template <typename T>
+    inline void make_rank(array<T>            &rra,
+                          const array<size_t> &idx,
+                          array<T>            &tmp )
+    {
+        assert(rra.size()==idx.size());
+        assert(idx.size()==rra.size());
+        const size_t n = rra.size();
+        for(size_t i=n;i>0;--i) tmp[i] = rra[i];
+        for(size_t i=n;i>0;--i) rra[i] = tmp[ idx[i] ];
+    }
+
     //! make index, C-style
 	template <typename T>
 	inline void make_c_index( const T *addr, size_t num_items, size_t *indx )
