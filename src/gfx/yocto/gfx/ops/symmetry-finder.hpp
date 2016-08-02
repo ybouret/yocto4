@@ -18,6 +18,8 @@ namespace yocto
             inline  symmetry_finder(pixmap<T>       &user_target,
                                     const pixmap<T> &user_source,
                                     xpatches        &user_xps) throw() :
+	geom(),
+	diff(),
             target(user_target),
             source(user_source),
             xps(user_xps),

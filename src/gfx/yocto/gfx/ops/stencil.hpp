@@ -53,7 +53,7 @@ namespace yocto
                 T *addr;
             };
 
-            inline stencil() throw() : rows(0), v(), wksp()
+            inline stencil() throw() : rows(0), v(), w(1), wksp()
             {
                 ldz();
                 setup();
