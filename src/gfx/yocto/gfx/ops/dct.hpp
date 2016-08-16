@@ -17,10 +17,10 @@ namespace yocto
             inline  DCT() throw() : COS(), LAM(), pix() { setup(); }
             inline ~DCT() throw() {}
 
-            const float COS[N][N];
-            const float LAM[N][N];
-            float       pix[4][N][N];
-            float       dct[4][N][N];
+            const double COS[N][N];
+            const double LAM[N][N];
+            double       pix[4][N][N];
+            double       dct[4][N][N];
 
 
             inline void forward(const size_t nch) throw()
@@ -31,15 +31,15 @@ namespace yocto
                 {
                     for(size_t j=0;j<N;++j)
                     {
-                        float      q[4]    = {0,0,0,0};
-                        const float LAM_ij = LAM[i][j];
+                        double       q[4]    = {0,0,0,0};
+                        const double LAM_ij = LAM[i][j];
                         for(size_t x=0;x<N;++x)
                         {
-                            const float Cxi = COS[x][i];
+                            const double Cxi = COS[x][i];
                             for(size_t y=0;y<N;++y)
                             {
-                                const float Cyj    = COS[y][j];
-                                const float weight = Cxi*Cyj;
+                                const double Cyj    = COS[y][j];
+                                const double weight = Cxi*Cyj;
                                 for(size_t k=0;k<nch;++k)
                                 {
                                     q[k] += pix[k][x][y] * weight;
@@ -61,14 +61,14 @@ namespace yocto
                 {
                     for(size_t y=0;y<N;++y)
                     {
-                        float q[4] = { 0,0,0,0 };
+                        double q[4] = { 0,0,0,0 };
                         for(size_t i=0;i<N;++i)
                         {
-                            const float Cxi = COS[x][i];
+                            const double Cxi = COS[x][i];
                             for(size_t j=0;j<N;++j)
                             {
-                                const float Cyj    = COS[y][j];
-                                const float weight = LAM[i][j] * Cxi * Cyj;
+                                const double Cyj    = COS[y][j];
+                                const double weight = LAM[i][j] * Cxi * Cyj;
                                 for(size_t k=0;k<nch;++k)
                                 {
                                     q[k] += dct[k][i][j] * weight;
@@ -99,36 +99,27 @@ namespace yocto
                 {
                     for(size_t j=0;j<N;++j)
                     {
-                        const float arg      = (((2*i+1)*j)*3.1415927410125732421875f)/NN;
-                        (float &)(COS[i][j]) = cosf(arg);
+                        const double arg      = (((2*i+1)*j)*3.141592653589793115997963468544185161590576171875)/NN;
+                        (double &)(COS[i][j]) = cos(arg);
                     }
                 }
                 zpix();
                 zdct();
 
-                static const float two_over_N = 2.0f / N;
-                static const float sq2_over_N = sqrtf(2.0f)/N;
+                static const double two_over_N = 2.0 / N;
+                static const double sq2_over_N = sqrt(2.0)/N;
                 for(size_t i=1;i<N;++i)
                 {
-                    (float&)(LAM[0][i]) = sq2_over_N;
-                    (float&)(LAM[i][0]) = sq2_over_N;
+                    (double&)(LAM[0][i]) = sq2_over_N;
+                    (double&)(LAM[i][0]) = sq2_over_N;
                     for(size_t j=1;j<N;++j)
                     {
-                        (float&)(LAM[i][j]) = two_over_N;
+                        (double&)(LAM[i][j]) = two_over_N;
                     }
                 }
 
-                (float&)(LAM[0][0]) = 1.0f/N;
+                (double&)(LAM[0][0]) = 1.0/N;
 
-                std::cerr << "LAM=" << std::endl;
-                for(size_t i=0;i<N;++i)
-                {
-                    for(size_t j=0;j<N;++j)
-                    {
-                        std::cerr << (N*LAM[i][j]*0.5f) << " ";
-                    }
-                    std::cerr << std::endl;
-                }
 
                 }
 
