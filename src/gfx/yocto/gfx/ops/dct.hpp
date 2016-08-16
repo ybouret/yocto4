@@ -11,8 +11,7 @@ namespace yocto
     namespace gfx
     {
 
-        class DCT :
-        public pixmap<double>
+        class DCT : public pixmaps<double>
         {
         public:
             typedef parallel::field2D<double> Table;
@@ -28,10 +27,12 @@ namespace yocto
                          const unit_t     xx,
                          const unit_t     yy)
             {
-                pixmap<double> &self = *this;
+                assert(NCH>0);
+                assert(NCH<=4);
+                pixmaps<double> &self = *this;
                 const unit_t    N    = w;
                 const unit_t    M    = h;
-                
+
                 for(unit_t j=0;j<M;++j)
                 {
                     for(unit_t i=0;i<N;++i)
@@ -54,59 +55,30 @@ namespace yocto
                             }
                         }
 
-                        U *t = (U *)&self[j][i];
                         for(size_t k=0;k<NCH;++k)
                         {
-                            t[k] = q[k] * wij;
+                            self[k][j][i] = q[k] * wij;
                         }
 
                     }
                 }
             }
-#if 0
-            //! pixmap<T>, T = NCH * U
+
             template <
             typename T,
             typename U,
             size_t   NCH>
-            void forward1(pixmap<T>       &tgt,
-                          const pixmap<T> &src,
-                          const unit_t     xx,
-                          const unit_t     yy)
+            void reverse(pixmap<T>       &src,
+                         const unit_t     xx,
+                         const unit_t     yy) const
             {
-                const size_t N = size;
-                for(size_t j=0;j<N;++j)
-                {
-                    for(size_t i=0;i<N;++i)
-                    {
-                        double       q[NCH];
-                        memset(q,0,sizeof(q));
-                        const double wij = LAM[i][j];
-                        for(size_t y=0;y<N;++y)
-                        {
-                            const double Cyj    = COS[y][j];
-                            for(size_t x=0;x<N;++x)
-                            {
-                                const double Cxi = COS[x][i];
-                                const double wxy = Cxi*Cyj;
-                                const U     *s   = (const U *)&src[yy+y][xx+x];
-                                for(size_t k=0;k<NCH;++k)
-                                {
-                                    q[k] += double(s[k]) * wxy;
-                                }
-                            }
-                        }
-
-                        U *t = (U *)&tgt[yy+j][xx+i];
-                        for(size_t k=0;k<NCH;++k)
-                        {
-                            t[k] = q[k] * wij;
-                        }
-                    }
-                }
-
+                assert(NCH>0);
+                assert(NCH<=4);
+                const pixmaps<double> &self = *this;
+                const unit_t           N    = w;
+                const unit_t           M    = h;
             }
-#endif
+
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(DCT);

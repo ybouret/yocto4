@@ -11,7 +11,7 @@ namespace yocto
 
 
         DCT:: DCT(const unit_t W, const unit_t H) :
-        pixmap<double>(W,H),
+        pixmaps<double>(4,W,H),
         XCOS( patch(vertex(0,0),vertex(w-1,w-1) ) ),
         YCOS( patch(vertex(0,0),vertex(h-1,h-1) ) ),
         LAMBDA(*this)
