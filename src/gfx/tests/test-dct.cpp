@@ -13,8 +13,8 @@ static inline void run_dct()
     std::cerr << "DCT<" << N << ">" << std::endl;
     std::cerr << "----------------" << std::endl;
 
-    DCT<N> dct;
-    std::cerr << "sizeof(DCT)=" << sizeof(DCT<N>) << std::endl;
+    DCT0<N> dct;
+    std::cerr << "sizeof(DCT)=" << sizeof(DCT0<N>) << std::endl;
 
     for(size_t i=0;i<dct.BLOCK_SIZE;++i)
     {
@@ -49,5 +49,14 @@ YOCTO_UNIT_TEST_IMPL(dct)
     run_dct<10>();
     run_dct<16>();
 
+    for(unit_t w=1;w<=16;++w)
+    {
+        for(unit_t h=1;h<=16;++h)
+        {
+            std::cerr << std::endl;
+            std::cerr << "w=" << w << ", h=" << h << std::endl;
+            DCT dct(w,h);
+        }
+    }
 }
 YOCTO_UNIT_TEST_DONE()

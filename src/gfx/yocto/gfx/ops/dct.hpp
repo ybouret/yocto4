@@ -3,19 +3,84 @@
 
 #include "yocto/gfx/pixmaps.hpp"
 #include "yocto/gfx/pixel.hpp"
+#include "yocto/parallel/field.hpp"
 #include <cstring>
 
 namespace yocto
 {
     namespace gfx
     {
+
+        class DCT :
+        public pixmap<double>
+        {
+        public:
+            typedef parallel::field2D<double> Table;
+
+            virtual ~DCT() throw();
+            explicit DCT(const unit_t W, const unit_t H);
+
+#if 0
+            //! pixmap<T>, T = NCH * U
+            template <
+            typename T,
+            typename U,
+            size_t   NCH>
+            void forward1(pixmap<T>       &tgt,
+                          const pixmap<T> &src,
+                          const unit_t     xx,
+                          const unit_t     yy)
+            {
+                const size_t N = size;
+                for(size_t j=0;j<N;++j)
+                {
+                    for(size_t i=0;i<N;++i)
+                    {
+                        double       q[NCH];
+                        memset(q,0,sizeof(q));
+                        const double wij = LAM[i][j];
+                        for(size_t y=0;y<N;++y)
+                        {
+                            const double Cyj    = COS[y][j];
+                            for(size_t x=0;x<N;++x)
+                            {
+                                const double Cxi = COS[x][i];
+                                const double wxy = Cxi*Cyj;
+                                const U     *s   = (const U *)&src[yy+y][xx+x];
+                                for(size_t k=0;k<NCH;++k)
+                                {
+                                    q[k] += double(s[k]) * wxy;
+                                }
+                            }
+                        }
+
+                        U *t = (U *)&tgt[yy+j][xx+i];
+                        for(size_t k=0;k<NCH;++k)
+                        {
+                            t[k] = q[k] * wij;
+                        }
+                    }
+                }
+
+            }
+#endif
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(DCT);
+            Table XCOS;
+            Table YCOS;
+            Table LAMBDA; //! warning: Lambda[j][i] !!!
+        };
+
+
+
         template <size_t N>
-        class DCT
+        class DCT0
         {
         public:
             static const size_t BLOCK_SIZE=N;
-            inline  DCT() throw() : COS(), LAM(), pix() { setup(); }
-            inline ~DCT() throw() {}
+            inline  DCT0() throw() : COS(), LAM(), pix() { setup(); }
+            inline ~DCT0() throw() {}
 
             const double COS[N][N];
             const double LAM[N][N];
@@ -90,7 +155,7 @@ namespace yocto
 
 
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(DCT);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(DCT0);
 
             inline void setup() throw()
             {
@@ -172,7 +237,7 @@ namespace yocto
                 }
 
 
-                inline friend std::ostream & operator<<(std::ostream &os, const DCT<N> &dct)
+                inline friend std::ostream & operator<<(std::ostream &os, const DCT0<N> &dct)
                 {
                     os << '[';
                     for(size_t i=0;i<N;++i)

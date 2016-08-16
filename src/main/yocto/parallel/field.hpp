@@ -283,9 +283,12 @@ namespace yocto
 
             inline void clean_up() throw()
             {
-                if(wlen) memory::kind<memory::global>::release(wksp, wlen);
-                    }
-
+                if(wlen)
+                {
+                    memory::kind<memory::global>::release(wksp, wlen);
+                }
+            }
+            
             inline void map_rows(const size_t nr,const size_t nc)
             {
                 size_t        ir = 0;
