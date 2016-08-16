@@ -22,13 +22,13 @@ namespace yocto
         typename MATRIX,
         typename ARRAY
         >
-        inline void contour2d(const MATRIX  &d,
-                              const unit_t   ilb,
-                              const unit_t   iub,
-                              const unit_t   jlb,
-                              const unit_t   jub,
-                              const ARRAY   &x,
-                              const ARRAY    &y,
+        inline void contour2d(const MATRIX        &d,
+                              const unit_t         ilb,
+                              const unit_t         iub,
+                              const unit_t         jlb,
+                              const unit_t         jub,
+                              const ARRAY         &x,
+                              const ARRAY         &y,
                               const array<double> &z,
                               void (*proc)(double,double,double,double,double,void *),
                               void  *args
@@ -39,7 +39,7 @@ namespace yocto
             int m3,case_value;
             double x1=0,x2=0,y1=0,y2=0;
             double h[5];
-            int sh[5];
+            int    sh[5];
             double xh[5],yh[5];
             static const unit_t im[4] = {0,1,1,0},jm[4]={0,0,1,1};
             static const int    castab[3][3][3] =
@@ -50,7 +50,7 @@ namespace yocto
             };
             double temp1,temp2;
             
-            const size_t nc = z.size();
+            const size_t nc  = z.size();
             const double zlo = z[1];
             const double zhi = z[nc];
             for(unit_t j=(jub-1);j>=jlb;--j)
