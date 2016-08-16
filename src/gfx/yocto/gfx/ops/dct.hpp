@@ -20,6 +20,49 @@ namespace yocto
             virtual ~DCT() throw();
             explicit DCT(const unit_t W, const unit_t H);
 
+            template <
+            typename T,
+            typename U,
+            size_t   NCH>
+            void forward(const pixmap<T> &src,
+                         const unit_t     xx,
+                         const unit_t     yy)
+            {
+                pixmap<double> &self = *this;
+                const unit_t    N    = w;
+                const unit_t    M    = h;
+                
+                for(unit_t j=0;j<M;++j)
+                {
+                    for(unit_t i=0;i<N;++i)
+                    {
+                        double       q[NCH];
+                        memset(q,0,sizeof(q));
+                        const double wij = LAMBDA[j][i];
+                        for(unit_t y=0;y<M;++y)
+                        {
+                            const double Cyj    = YCOS[y][j];
+                            for(unit_t x=0;x<N;++x)
+                            {
+                                const double Cxi = XCOS[x][i];
+                                const double wxy = Cxi*Cyj;
+                                const U     *s   = (const U *)&src[yy+y][xx+x];
+                                for(size_t k=0;k<NCH;++k)
+                                {
+                                    q[k] += double(s[k]) * wxy;
+                                }
+                            }
+                        }
+
+                        U *t = (U *)&self[j][i];
+                        for(size_t k=0;k<NCH;++k)
+                        {
+                            t[k] = q[k] * wij;
+                        }
+
+                    }
+                }
+            }
 #if 0
             //! pixmap<T>, T = NCH * U
             template <
