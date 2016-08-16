@@ -22,10 +22,14 @@ YOCTO_UNIT_TEST_IMPL(dct)
     }
 
     std::cerr << "pix:" << std::endl;
-    dct8.show_pix(4);
+    dct8.show_pix(1);
     dct8.forward(4);
     std::cerr << "dct: " << std::endl;
-    dct8.show_dct(4);
+    dct8.show_dct(1);
+    dct8.zpix();
+    dct8.reverse(4);
+    std::cerr << "pix:" << std::endl;
+    dct8.show_pix(1);
 
 }
 YOCTO_UNIT_TEST_DONE()

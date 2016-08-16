@@ -22,22 +22,8 @@ namespace yocto
             float       pix[4][N][N];
             float       dct[4][N][N];
 
-            inline friend std::ostream & operator<<(std::ostream &os, const DCT<N> &dct)
-            {
-                os << '[';
-                for(size_t i=0;i<N;++i)
-                {
-                    for(size_t j=0;j<N;++j)
-                    {
-                        os << ' ' << dct.COS[i][j];
-                    }
-                    if(i<N-1) os << ';';
-                }
-                os << ']';
-                return os;
-            }
 
-            inline void forward(const size_t nch)
+            inline void forward(const size_t nch) throw()
             {
                 assert(nch>0);
                 assert(nch<=4);
@@ -69,71 +55,150 @@ namespace yocto
                 }
             }
 
-            inline void reverse(const size_t nch) const
+            inline void reverse(const size_t nch) throw()
             {
-
-            }
-
-
-            //! which=0 => pix, which=1 => dct
-            inline void show_local(const int which, const size_t nch) const
-            {
-                assert(nch>0);
-                assert(nch<=4);
-                assert(which<=1);
-                const bool is_pix = (which==0);
-                for(size_t i=0;i<N;++i)
+                for(size_t x=0;x<N;++x)
                 {
-                    for(size_t j=0;j<N;++j)
+                    for(size_t y=0;y<N;++y)
                     {
-                        std::cerr << '(';
-                        for(size_t k=0;k<nch;++k)
+                        float q[4] = { 0,0,0,0 };
+                        for(size_t i=0;i<N;++i)
                         {
-                            std::cerr << (is_pix?pix[k][i][j]:dct[k][i][j]);
-                            if(k<nch-1)
+                            const float Cxi = COS[x][i];
+                            for(size_t j=0;j<N;++j)
                             {
-                                std::cerr << ',';
+                                const float Cyj    = COS[y][j];
+                                const float weight = LAM[i][j] * Cxi * Cyj;
+                                for(size_t k=0;k<nch;++k)
+                                {
+                                    q[k] += dct[k][i][j] * weight;
+                                }
                             }
                         }
-                        std::cerr << ')' << ' ';
+
+                        for(size_t k=0;k<nch;++k)
+                        {
+                            pix[k][x][y] = q[k];
+                        }
                     }
-                    std::cerr << std::endl;
                 }
             }
 
-            inline void show_pix(const size_t nch) const
-            {
-                show_local(0,nch);
-            }
-            inline void show_dct(const size_t nch) const
-            {
-                show_local(1,nch);
-            }
+
+
+
 
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(DCT);
+
             inline void setup() throw()
             {
-                static const size_t NN = N<<1;
-                static const float  isqrt2 = 1.0f/sqrtf(2.0f);
-                for(register size_t i=0;i<N;++i)
+                static const size_t NN     = N<<1;
+                for(size_t i=0;i<N;++i)
                 {
-                    const float lam_i = (i<=0) ? isqrt2 : 1.0f;
-                    for(register size_t j=0;j<N;++j)
+                    for(size_t j=0;j<N;++j)
                     {
-                        const float lam_j = (j<=0) ? isqrt2 : 1.0f;
-                        const float arg   = (((2*j+1)*i)*3.1415927410125732421875f)/NN;
+                        const float arg      = (((2*i+1)*j)*3.1415927410125732421875f)/NN;
                         (float &)(COS[i][j]) = cosf(arg);
-                        const float lam_ij   = lam_i * lam_j;
-                        (float&)(LAM[i][j])  = (lam_ij+lam_ij)/N;
                     }
                 }
-                memset(pix,0,sizeof(pix));
-                memset(dct,0,sizeof(dct));
-            }
-        };
-    }
-}
+                zpix();
+                zdct();
 
+                static const float two_over_N = 2.0f / N;
+                static const float sq2_over_N = sqrtf(2.0f)/N;
+                for(size_t i=1;i<N;++i)
+                {
+                    (float&)(LAM[0][i]) = sq2_over_N;
+                    (float&)(LAM[i][0]) = sq2_over_N;
+                    for(size_t j=1;j<N;++j)
+                    {
+                        (float&)(LAM[i][j]) = two_over_N;
+                    }
+                }
+
+                (float&)(LAM[0][0]) = 1.0f/N;
+
+                std::cerr << "LAM=" << std::endl;
+                for(size_t i=0;i<N;++i)
+                {
+                    for(size_t j=0;j<N;++j)
+                    {
+                        std::cerr << (N*LAM[i][j]*0.5f) << " ";
+                    }
+                    std::cerr << std::endl;
+                }
+
+                }
+
+            public:
+                inline void show_pix(const size_t nch) const
+                {
+                    show_local(0,nch);
+                }
+                inline void show_dct(const size_t nch) const
+                {
+                    show_local(1,nch);
+                }
+
+                //! which=0 => pix, which=1 => dct
+                inline void show_local(const int which, const size_t nch) const
+                {
+                    assert(nch>0);
+                    assert(nch<=4);
+                    assert(which<=1);
+                    const bool is_pix = (which==0);
+
+                    for(size_t i=0;i<N;++i)
+                    {
+                        for(size_t j=0;j<N;++j)
+                        {
+                            std::cerr << '(';
+                            for(size_t k=0;k<nch;++k)
+                            {
+                                std::cerr << (is_pix?pix[k][i][j]:dct[k][i][j]);
+                                if(k<nch-1)
+                                {
+                                    std::cerr << ',';
+                                }
+                            }
+                            std::cerr << ')' << ' ';
+                        }
+                        std::cerr << std::endl;
+                    }
+                }
+
+
+                inline void zpix() throw()
+                {
+                    memset(pix,0,sizeof(pix));
+                }
+
+                inline void zdct() throw()
+                {
+                    memset(dct,0,sizeof(dct));
+                }
+
+
+                inline friend std::ostream & operator<<(std::ostream &os, const DCT<N> &dct)
+                {
+                    os << '[';
+                    for(size_t i=0;i<N;++i)
+                    {
+                        for(size_t j=0;j<N;++j)
+                        {
+                            os << ' ' << dct.COS[i][j];
+                        }
+                        if(i<N-1) os << ';';
+                    }
+                    os << ']';
+                    return os;
+                }
+                
+                };
+                
+                }
+                }
+                
 #endif
