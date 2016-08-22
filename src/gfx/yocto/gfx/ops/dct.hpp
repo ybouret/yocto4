@@ -10,14 +10,31 @@ namespace yocto
 {
     namespace gfx
     {
-        
+
+        //! Discrete Cosine Transform Interface
         class DCT : public pixmap<double>
         {
         public:
             typedef parallel::field2D<double> Table;
-            
+
             virtual ~DCT() throw();
+            pixmap<double> pix; //!< where to store reverse double data
+
+        protected:
             explicit DCT(const unit_t W, const unit_t H);
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(DCT);
+        };
+
+
+        //! Common (a.k.a) rectangular DCT
+        class CommonDCT : public DCT
+        {
+        public:
+
+            virtual ~CommonDCT() throw();
+            explicit CommonDCT(const unit_t W, const unit_t H);
             
             template <typename T>
             void forward(const pixmap<T> &src,
@@ -78,15 +95,28 @@ namespace yocto
             }
             
             
-            pixmap<double> pix; //!< where to store reverse
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(DCT);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(CommonDCT);
             Table XCOS;
             Table YCOS;
             Table LAMBDA; //! warning: Lambda[j][i] !!!
         };
         
-        
+
+        //! Square DCT
+        class SquareDCT : public DCT
+        {
+        public:
+            virtual ~SquareDCT() throw();
+            explicit SquareDCT(const unit_t W);
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(SquareDCT);
+            Table COS;
+            Table LAMBDA;
+        };
+
+
         
         template <size_t N>
         class DCT0

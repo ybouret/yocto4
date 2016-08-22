@@ -67,7 +67,7 @@ YOCTO_UNIT_TEST_IMPL(dct)
         {
             std::cerr << std::endl;
             std::cerr << "w=" << w << ", h=" << h << std::endl;
-            DCT dct(w,h);
+            CommonDCT dct(w,h);
 
             dct.forward(ipx,xx,yy);
             dct.reverse();
