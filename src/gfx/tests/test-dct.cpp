@@ -49,6 +49,18 @@ YOCTO_UNIT_TEST_IMPL(dct)
     run_dct<10>();
     run_dct<16>();
 
+    pixmap<int> ipx(100,200);
+    for(unit_t j=0;j<ipx.h;++j)
+    {
+        for(unit_t i=0;i<ipx.w;++i)
+        {
+            ipx[j][i] = (i+1) + (2*j+1);
+        }
+    }
+
+    const unit_t xx = 0;
+    const unit_t yy = 0;
+
     for(unit_t w=1;w<=16;++w)
     {
         for(unit_t h=1;h<=16;++h)
@@ -56,6 +68,18 @@ YOCTO_UNIT_TEST_IMPL(dct)
             std::cerr << std::endl;
             std::cerr << "w=" << w << ", h=" << h << std::endl;
             DCT dct(w,h);
+
+            dct.forward(ipx,xx,yy);
+            dct.reverse();
+            for(unit_t j=0;j<dct.h;++j)
+            {
+                for(unit_t i=0;i<dct.w;++i)
+                {
+                    std::cerr << "(" << ipx[yy+j][xx+i] << "," << dct.pix[j][i] << ") ";
+                }
+                std::cerr << std::endl;
+            }
+
         }
     }
 }
