@@ -1,5 +1,6 @@
 #include "yocto/gfx/ops/dct.hpp"
 #include "yocto/utest/run.hpp"
+#include "yocto/sys/timings.hpp"
 
 using namespace yocto;
 using namespace gfx;
@@ -57,5 +58,29 @@ YOCTO_UNIT_TEST_IMPL(dct)
 
         }
     }
+
+    timings tmx;
+
+    static const double dct_duration = 0.5;
+
+    for(int p=3;p<=5;++p)
+    {
+        const unit_t w = unit_t(1<<p);
+        std::cerr << std::endl;
+        std::cerr << "BLOCK_SIZE=" << w << std::endl;
+        SquareDCT sdct(w);
+        CommonDCT cdct(w,w);
+        YOCTO_TIMINGS(tmx,dct_duration,sdct.forward(ipx,xx,yy));
+        std::cerr << "\tsquare dct forward speed: " << tmx.speed << std::endl;
+        YOCTO_TIMINGS(tmx,dct_duration,sdct.reverse());
+        std::cerr << "\tsquare dct reverse speed: " << tmx.speed << std::endl;
+
+        YOCTO_TIMINGS(tmx,dct_duration,cdct.forward(ipx,xx,yy));
+        std::cerr << "\tcommon dct forward speed: " << tmx.speed << std::endl;
+        YOCTO_TIMINGS(tmx,dct_duration,cdct.reverse());
+        std::cerr << "\tcommon dct reverse speed: " << tmx.speed << std::endl;
+
+    }
+
 }
 YOCTO_UNIT_TEST_DONE()
