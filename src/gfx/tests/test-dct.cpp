@@ -4,51 +4,10 @@
 using namespace yocto;
 using namespace gfx;
 
-template <size_t N>
-static inline void run_dct()
-{
-
-    std::cerr << std::endl;
-    std::cerr << "----------------" << std::endl;
-    std::cerr << "DCT<" << N << ">" << std::endl;
-    std::cerr << "----------------" << std::endl;
-
-    DCT0<N> dct;
-    std::cerr << "sizeof(DCT)=" << sizeof(DCT0<N>) << std::endl;
-
-    for(size_t i=0;i<dct.BLOCK_SIZE;++i)
-    {
-        for(size_t j=0;j<dct.BLOCK_SIZE;++j)
-        {
-            for(size_t k=0;k<4;++k)
-            {
-                dct.pix[k][i][j] = double(k)+double(i+1) + double(2*j+1);
-            }
-        }
-    }
-
-    std::cerr << "pix:" << std::endl;
-    dct.show_pix(1);
-    dct.forward(4);
-    std::cerr << "dct: " << std::endl;
-    dct.show_dct(1);
-    dct.zpix();
-    dct.reverse(4);
-    std::cerr << "pix:" << std::endl;
-    dct.show_pix(1);
-
-}
 
 YOCTO_UNIT_TEST_IMPL(dct)
 {
-    run_dct<1>();
-    run_dct<2>();
-    run_dct<3>();
-    run_dct<4>();
-    run_dct<8>();
-    run_dct<10>();
-    run_dct<16>();
-
+    
     pixmap<int> ipx(100,200);
     for(unit_t j=0;j<ipx.h;++j)
     {
@@ -64,6 +23,7 @@ YOCTO_UNIT_TEST_IMPL(dct)
     for(unit_t w=1;w<=16;++w)
     {
         SquareDCT sdct(w);
+
         for(unit_t h=1;h<=16;++h)
         {
             std::cerr << std::endl;
@@ -73,17 +33,23 @@ YOCTO_UNIT_TEST_IMPL(dct)
             cdct.forward(ipx,xx,yy);
             cdct.pix.ldz();
             cdct.reverse();
+
             if(h==w)
             {
                 sdct.forward(ipx,xx,yy);
                 sdct.pix.ldz();
                 sdct.reverse();
             }
+
             for(unit_t j=0;j<cdct.h;++j)
             {
                 for(unit_t i=0;i<cdct.w;++i)
                 {
                     std::cerr << "(" << ipx[yy+j][xx+i] << "," << cdct.pix[j][i];
+                    if(h==w)
+                    {
+                        std::cerr << "," << sdct.pix[j][i];
+                    }
                     std::cerr << ") ";
                 }
                 std::cerr << std::endl;
