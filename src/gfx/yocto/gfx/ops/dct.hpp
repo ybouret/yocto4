@@ -1,5 +1,5 @@
 #ifndef YOCTO_GFX_OPS_DCT_INCLUDED
-#define YOCTO_GFS_OPS_DCT_INCLUDED 1
+#define YOCTO_GFX_OPS_DCT_INCLUDED 1
 
 #include "yocto/gfx/pixmaps.hpp"
 #include "yocto/gfx/pixel.hpp"
