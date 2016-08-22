@@ -10,35 +10,29 @@ namespace yocto
 {
     namespace gfx
     {
-
-        class DCT : public pixmaps<double>
+        
+        class DCT : public pixmap<double>
         {
         public:
             typedef parallel::field2D<double> Table;
-
+            
             virtual ~DCT() throw();
             explicit DCT(const unit_t W, const unit_t H);
-
-            template <
-            typename T,
-            typename U,
-            size_t   NCH>
+            
+            template <typename T>
             void forward(const pixmap<T> &src,
                          const unit_t     xx,
-                         const unit_t     yy)
+                         const unit_t     yy) throw()
             {
-                assert(NCH>0);
-                assert(NCH<=4);
-                pixmaps<double> &self = *this;
-                const unit_t    N    = w;
-                const unit_t    M    = h;
-
+                pixmap<double> &self  = *this;
+                const unit_t    N     = w;
+                const unit_t    M     = h;
+                
                 for(unit_t j=0;j<M;++j)
                 {
                     for(unit_t i=0;i<N;++i)
                     {
-                        double       q[NCH];
-                        memset(q,0,sizeof(q));
+                        double       q   = 0;
                         const double wij = LAMBDA[j][i];
                         for(unit_t y=0;y<M;++y)
                         {
@@ -47,48 +41,53 @@ namespace yocto
                             {
                                 const double Cxi = XCOS[x][i];
                                 const double wxy = Cxi*Cyj;
-                                const U     *s   = (const U *)&src[yy+y][xx+x];
-                                for(size_t k=0;k<NCH;++k)
-                                {
-                                    q[k] += double(s[k]) * wxy;
-                                }
+                                q += double( src[yy+y][xx+x] ) * wxy;
                             }
                         }
-
-                        for(size_t k=0;k<NCH;++k)
-                        {
-                            self[k][j][i] = q[k] * wij;
-                        }
-
+                        
+                        self[j][i] = q * wij;
                     }
                 }
             }
-
-            template <
-            typename T,
-            typename U,
-            size_t   NCH>
-            void reverse(pixmap<T>       &src,
-                         const unit_t     xx,
-                         const unit_t     yy) const
+            
+            inline void reverse() throw()
             {
-                assert(NCH>0);
-                assert(NCH<=4);
-                const pixmaps<double> &self = *this;
-                const unit_t           N    = w;
-                const unit_t           M    = h;
+                const pixmap<double> &dct = *this;
+                const size_t N = w;
+                const size_t M = h;
+                for(size_t y=0;y<M;++y)
+                {
+                    for(size_t x=0;x<N;++x)
+                    {
+                        
+                        double q = 0;
+                        for(size_t j=0;j<M;++j)
+                        {
+                            const double Cyj    = YCOS[y][j];
+                            for(size_t i=0;i<N;++i)
+                            {
+                                const double Cxi    = XCOS[x][i];
+                                const double weight = LAMBDA[j][i] * Cxi * Cyj;
+                                q += dct[j][i] * weight;
+                            }
+                        }
+                        pix[y][x] = q;
+                    }
+                }
+                
             }
-
-
+            
+            
+            pixmap<double> pix; //!< where to store reverse
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(DCT);
             Table XCOS;
             Table YCOS;
             Table LAMBDA; //! warning: Lambda[j][i] !!!
         };
-
-
-
+        
+        
+        
         template <size_t N>
         class DCT0
         {
@@ -96,13 +95,13 @@ namespace yocto
             static const size_t BLOCK_SIZE=N;
             inline  DCT0() throw() : COS(), LAM(), pix() { setup(); }
             inline ~DCT0() throw() {}
-
+            
             const double COS[N][N];
             const double LAM[N][N];
             double       pix[4][N][N];
             double       dct[4][N][N];
-
-
+            
+            
             inline void forward(const size_t nch) throw()
             {
                 assert(nch>0);
@@ -126,7 +125,7 @@ namespace yocto
                                 }
                             }
                         }
-
+                        
                         for(size_t k=0;k<nch;++k)
                         {
                             dct[k][i][j] = q[k] * LAM_ij;
@@ -134,7 +133,7 @@ namespace yocto
                     }
                 }
             }
-
+            
             inline void reverse(const size_t nch) throw()
             {
                 for(size_t x=0;x<N;++x)
@@ -155,7 +154,7 @@ namespace yocto
                                 }
                             }
                         }
-
+                        
                         for(size_t k=0;k<nch;++k)
                         {
                             pix[k][x][y] = q[k];
@@ -163,15 +162,15 @@ namespace yocto
                     }
                 }
             }
-
-
-
-
-
-
+            
+            
+            
+            
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(DCT0);
-
+            
             inline void setup() throw()
             {
                 static const size_t NN     = N<<1;
@@ -185,7 +184,7 @@ namespace yocto
                 }
                 zpix();
                 zdct();
-
+                
                 static const double two_over_N = 2.0 / N;
                 static const double sq2_over_N = sqrt(2.0)/N;
                 for(size_t i=1;i<N;++i)
@@ -197,12 +196,12 @@ namespace yocto
                         (double&)(LAM[i][j]) = two_over_N;
                     }
                 }
-
+                
                 (double&)(LAM[0][0]) = 1.0/N;
-
-
+                
+                
                 }
-
+                
             public:
                 inline void show_pix(const size_t nch) const
                 {
@@ -212,7 +211,7 @@ namespace yocto
                 {
                     show_local(1,nch);
                 }
-
+                
                 //! which=0 => pix, which=1 => dct
                 inline void show_local(const int which, const size_t nch) const
                 {
@@ -220,7 +219,7 @@ namespace yocto
                     assert(nch<=4);
                     assert(which<=1);
                     const bool is_pix = (which==0);
-
+                    
                     for(size_t i=0;i<N;++i)
                     {
                         for(size_t j=0;j<N;++j)
@@ -239,19 +238,19 @@ namespace yocto
                         std::cerr << std::endl;
                     }
                 }
-
-
+                
+                
                 inline void zpix() throw()
                 {
                     memset(pix,0,sizeof(pix));
                 }
-
+                
                 inline void zdct() throw()
                 {
                     memset(dct,0,sizeof(dct));
                 }
-
-
+                
+                
                 inline friend std::ostream & operator<<(std::ostream &os, const DCT0<N> &dct)
                 {
                     os << '[';
