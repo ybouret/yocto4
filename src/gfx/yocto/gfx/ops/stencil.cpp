@@ -144,6 +144,7 @@ namespace yocto
     }
 }
 
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -152,7 +153,7 @@ namespace yocto
         stencil_gauss:: ~stencil_gauss() throw() {}
 
         stencil_gauss:: stencil_gauss(const size_t w, const float sig) :
-        stencil( (2*w+1) * (2*w+1) )
+        stencil( square_of(2*w+1) )
         {
             assert(sig>0);
             stencil     &self = *this;

@@ -29,6 +29,12 @@ namespace yocto
 	{
 		return (a<amin) ? amin : ( (amax<a) ? amax : a );
 	}
+
+    template <typename T>
+    inline T square_of( T a )
+    {
+        return a*a;
+    }
 	
 	//! integer hash
 	uint32_t ihash32( uint32_t ) throw();
