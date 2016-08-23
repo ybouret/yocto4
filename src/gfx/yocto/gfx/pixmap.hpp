@@ -136,6 +136,21 @@ namespace yocto
                 }
             }
 
+            inline void minmax(T &vmin, T &vmax) const throw()
+            {
+                const pixmap<T> &self = *this;
+                vmin = vmax = self[0][0];
+                for(unit_t j=0;j<h;++j)
+                {
+                    for(unit_t i=0;i<w;++i)
+                    {
+                        const T tmp = self[j][i];
+                        if(tmp<vmin) vmin = tmp;
+                        if(tmp>vmax) vmax = tmp;
+                    }
+                }
+            }
+
 
         private:
             YOCTO_DISABLE_ASSIGN(pixmap);

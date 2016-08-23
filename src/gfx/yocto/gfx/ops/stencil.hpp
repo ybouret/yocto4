@@ -3,215 +3,139 @@
 
 #include "yocto/gfx/pixmap.hpp"
 #include "yocto/gfx/xpatch.hpp"
-#include "yocto/code/round.hpp"
-#include "yocto/code/bzset.hpp"
-#include <cstring>
+#include "yocto/container/tuple.hpp"
+#include "yocto/code/unroll.hpp"
 
 namespace yocto
 {
     namespace gfx
     {
 
-        class _stencil
-        {
-        public:
-            static const vertex shift[9];
-
-            inline virtual ~ _stencil() throw()
-            {
-            }
-
-        protected:
-            inline _stencil() throw() {}
-
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(_stencil);
-        };
-
-        template <typename T>
         class stencil
         {
         public:
-            class row
+            YOCTO_PAIR_DECL(YOCTO_TUPLE_STANDARD,mask,vertex,r,float,weight);
+            YOCTO_PAIR_END();
+
+            virtual ~stencil() throw();
+            explicit stencil(const size_t n);
+            stencil(const stencil &other);
+
+            const size_t size;
+            const mask & operator[](const size_t i) const throw();
+            mask       & operator[](const size_t i) throw();
+
+            template <typename T, typename U>
+            inline void apply(pixmap<T>       &target,
+                              const pixmap<U> &source,
+                              xpatches        &xps)
             {
-            public:
-                inline row(T *entry)  throw() : addr(entry+1) { assert(entry); }
-
-                inline T &      operator[](const unit_t dx) throw()
-                {
-                    assert(dx>=-1); assert(dx<=1);return addr[dx];
-                }
-
-                const T &operator[](const unit_t dx) const throw()
-                {
-                    assert(dx>=-1); assert(dx<=1);return addr[dx];
-                }
-
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(row);
-                ~row() throw();
-                T *addr;
-            };
-
-            inline stencil() throw() : rows(0), v(), w(1), wksp()
-            {
-                ldz();
-                setup();
-            }
-
-            inline virtual ~stencil() throw() {}
-
-            inline stencil(const stencil &other) throw() :
-            rows(0),
-            v(),
-            w(1),
-            wksp()
-            {
-                memcpy(v,other.v,sizeof(v));
-                setup();
-            }
-
-            inline stencil & operator=(const stencil &other) throw()
-            {
-                memmove(v,other.v,sizeof(v));
-                return *this;
-            }
-
-            inline row & operator[](const unit_t dy) throw()
-            {
-                assert(dy>=-1);assert(dy<=1); return rows[dy];
-            }
-
-            inline const row & operator[](const unit_t dy) const throw()
-            {
-                assert(dy>=-1);assert(dy<=1); return rows[dy];
+                tgt = &target;
+                src = &source;
+                xps.submit(this, &stencil::run<T,U>);
             }
 
 
+#define YGFX_STENCIL_LOOP(I)              \
+const mask   &msk = masks[I];             \
+const vertex  pos = center + msk.r;       \
+if(source.has(pos))                       \
+sum += float(source[pos])*msk.weight;     \
+else                                      \
+sum += v0*msk.weight
 
-            inline friend  std::ostream & operator<<( std::ostream &os, const stencil &S )
+
+            template <typename T,typename U>
+            inline T dot(const pixmap<U> &source,
+                         const vertex    &center) throw()
             {
-                os << '[';
-                os << S[-1][-1] << ' ' << S[-1][0] << ' ' << S[-1][1] << ';';
-                os << S[ 0][-1] << ' ' << S[ 0][0] << ' ' << S[ 0][1] << ';';
-                os << S[ 1][-1] << ' ' << S[ 1][0] << ' ' << S[ 1][1] << ']';
-                return os;
+                assert(size>0);
+                assert(source.has(center));
+                const float v0  = float(source[center]);
+                float       sum = 0.0f;
+                YOCTO_LOOP_FUNC_(size,YGFX_STENCIL_LOOP,0);
+                return T(sum);
             }
-
-            inline void ldz() throw()
-            {
-                memset(v,0,sizeof(v));
-                w=0;
-            }
-
-            inline void update() throw()
-            {
-                w = 0;
-                for(size_t i=0;i<9;++i) w += real_t(v[i]);
-            }
-
-            template <typename U>
-            inline void load(const pixmap<U> &src,
-                             const vertex     org) throw()
-            {
-                assert(src.has(org));
-                for(size_t i=0;i<9;++i)
-                {
-                    const vertex probe = org+ _stencil::shift[i];
-                    if(src.has(probe))
-                    {
-                        v[i] = T(src[probe]);
-                    }
-                    else
-                    {
-                        bzset(v[i]);
-                    }
-                }
-
-            }
-
-            inline T       & operator()(const size_t indx) throw()       { assert(indx<9); return v[indx]; }
-            inline const T & operator()(const size_t indx) const throw() { assert(indx<9); return v[indx]; }
-
-            template <typename U>
-            U dot(const stencil<U> &y)
-            {
-                const T *X = v;
-                const U *Y = y.v;
-                real_t sum_xy = 0;
-                for(size_t i=0;i<9;++i)
-                {
-                    const real_t xx=real_t(X[i]);
-                    sum_xy += xx * real_t(Y[i]);
-                }
-                return U(sum_xy/w);
-            }
-
-            void load_smooth() throw()
-            {
-                for(size_t i=0;i<9;++i) v[i] = T(1);
-            }
-
-            void load_sharpen() throw()
-            {
-                for(size_t i=0;i<9;++i)
-                {
-                    v[i] = T(-1);
-                }
-                (*this)[0][0] = T(12);
-            }
-
-            void load_gauss() throw()
-            {
-                stencil &S = *this;
-                S[0][0]    = 4;
-                S[-1][0]   = S[1][0]  = S[0][-1] = S[0][1] = 2;
-                S[-1][-1]  = S[-1][1] = S[1][-1] = S[1][1] = 1;
-            }
-
-            template <typename COLOR,typename U,size_t NCH>
-            COLOR dot(const stencil<COLOR> &y)
-            {
-                const T     *X = v;
-                const COLOR *Y = y.v;
-                real_t   sum[NCH];
-                for(size_t k=0;k<NCH;++k) sum[k] = 0;
-                for(size_t i=0;i<9;++i)
-                {
-                    const COLOR &C = Y[i];
-                    const U     *c = (const U *)&C;
-                    for(size_t k=0;k<NCH;++k)
-                    {
-                        sum[k] += real_t(c[k]);
-                    }
-                }
-                COLOR Q;
-                U    *q = (U *)&Q;
-                for(size_t k=0;k<NCH;++k)
-                {
-                    q[k] = U(sum[k]/w);
-                }
-                return Q;
-            }
-
 
         private:
-            row     *rows;
-            T        v[9];
-            real_t   w;
-            uint64_t wksp[ YOCTO_U64_FOR_SIZE( 3*sizeof(row) ) ];
+            YOCTO_DISABLE_ASSIGN(stencil);
+            size_t       nmask;
+            mask        *masks;
+            void        *tgt;
+            const void  *src;
 
-
-            inline void setup() throw()
+            template <typename T,typename U>
+            inline void run( xpatch &xp, lockable & ) throw()
             {
-                row *r = (row *)&wksp[0];
-                rows = r+1;
-                new (&r[0]) row(v+0);
-                new (&r[1]) row(v+3);
-                new (&r[2]) row(v+6);
+                assert(tgt);
+                assert(src);
+                pixmap<T>       &target = *static_cast<pixmap<T>      *>(tgt);
+                const pixmap<U> &source = *static_cast<const pixmap<U>*>(src);
+                vertex v;
+                for(v.y=xp.upper.y;v.y>=xp.lower.y;--v.y)
+                {
+                    for(v.x=xp.upper.x;v.x>=xp.lower.x;--v.x)
+                    {
+                        target[v] = dot<T,U>(source,v);
+                    }
+                }
             }
             
         };
+
+
+        class stencil_grad_x : public stencil
+        {
+        public:
+            explicit stencil_grad_x();
+            virtual ~stencil_grad_x() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_grad_x);
+        };
+
+
+        class stencil_grad_y : public stencil
+        {
+        public:
+            explicit stencil_grad_y();
+            virtual ~stencil_grad_y() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_grad_y);
+        };
+
+
+        class stencil_sobel_x : public stencil
+        {
+        public:
+            explicit stencil_sobel_x();
+            virtual ~stencil_sobel_x() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_sobel_x);
+        };
+
+        class stencil_sobel_y : public stencil
+        {
+        public:
+            explicit stencil_sobel_y();
+            virtual ~stencil_sobel_y() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_sobel_y);
+        };
+
+        class stencil_gauss : public stencil
+        {
+        public:
+            explicit stencil_gauss(const size_t w, const float sig);
+            virtual ~stencil_gauss() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_gauss);
+        };
+
 
     }
 }
