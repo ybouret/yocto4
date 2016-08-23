@@ -2,7 +2,6 @@
 #define YOCTO_PARALLEL_FIELD_INCLUDED 1
 
 #include "yocto/parallel/patch.hpp"
-//#include "yocto/memory/global.hpp"
 #include "yocto/object.hpp"
 
 namespace yocto
