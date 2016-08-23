@@ -16,8 +16,8 @@ using namespace gfx;
 static inline void display_stencil( stencil &S, const char *id)
 {
     std::cerr << "raw " << id << ":"; S.display();
-    S.optimize();
-    std::cerr << "opt " << id << ":"; S.display();
+    //S.optimize();
+    //std::cerr << "opt " << id << ":"; S.display();
 }
 
 YOCTO_UNIT_TEST_IMPL(stencil)

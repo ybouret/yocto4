@@ -98,6 +98,7 @@ namespace yocto
         {
             masks[0].r = vertex(-1,0); masks[0].weight = -1;
             masks[1].r = vertex( 1,0); masks[1].weight =  1;
+            optimize();
         }
 
         stencil_grad_x:: ~stencil_grad_x() throw()
@@ -116,6 +117,7 @@ namespace yocto
         {
             masks[0].r = vertex(0,-1); masks[0].weight = -1;
             masks[1].r = vertex(0, 1); masks[1].weight =  1;
+            optimize();
         }
 
         stencil_grad_y:: ~stencil_grad_y() throw()
@@ -139,7 +141,7 @@ namespace yocto
             masks[3].r = vertex(1,-1);  masks[3].weight =  1;
             masks[4].r = vertex(1, 0);  masks[4].weight =  2;
             masks[5].r = vertex(1, 1);  masks[5].weight =  1;
-
+            optimize();
         }
 
         stencil_sobel_x:: ~stencil_sobel_x() throw()
@@ -165,7 +167,7 @@ namespace yocto
             masks[3].r = vertex(-1,1);  masks[3].weight =  1;
             masks[4].r = vertex( 0,1);  masks[4].weight =  2;
             masks[5].r = vertex( 1,1);  masks[5].weight =  1;
-
+            optimize();
         }
 
         stencil_sobel_y:: ~stencil_sobel_y() throw()
@@ -210,6 +212,7 @@ namespace yocto
             {
                 masks[i].weight/=sum;
             }
+            optimize();
         }
     }
 
