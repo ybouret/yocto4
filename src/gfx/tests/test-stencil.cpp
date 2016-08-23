@@ -13,6 +13,12 @@
 using namespace yocto;
 using namespace gfx;
 
+static inline void display_stencil( stencil &S, const char *id)
+{
+    std::cerr << "raw " << id << ":"; S.display();
+    S.optimize();
+    std::cerr << "opt " << id << ":"; S.display();
+}
 
 YOCTO_UNIT_TEST_IMPL(stencil)
 {
@@ -43,6 +49,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
 
         pixmapf      tgt(w,h);
 
+        
         gx.apply(tgt,imgf,xps);
         tgt.minmax(rmp.vmin,rmp.vmax);
         IMG.save("img-gx.png",tgt,rmp,0);
@@ -70,6 +77,13 @@ YOCTO_UNIT_TEST_IMPL(stencil)
         g5.apply(tgt,imgf,xps);
         tgt.minmax(rmp.vmin,rmp.vmax);
         IMG.save("img-g5.png",tgt,grmp,0);
+
+        display_stencil(gx,"grad_x");
+        display_stencil(gy,"grad_y");
+        display_stencil(sx,"sobel_x");
+        display_stencil(sy,"sobel_y");
+        display_stencil(g3,"g3x3");
+        display_stencil(g5,"g5x5");
 
     }
 }

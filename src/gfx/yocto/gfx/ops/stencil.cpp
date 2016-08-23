@@ -1,5 +1,8 @@
 #include "yocto/gfx/ops/stencil.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/sort/quick.hpp"
+#include "yocto/sequence/lw-array.hpp"
+
 #include <cstring>
 
 namespace yocto
@@ -35,19 +38,52 @@ masks( memory::kind<memory::global>::acquire_as<mask>(nmask) )
             memcpy(masks,other.masks,size*sizeof(mask));
         }
 
-
-        stencil::mask & stencil:: operator[](const size_t i) throw()
-        {
-            assert(i<size);
-            return masks[i];
-        }
-
+        
+        
         const stencil::mask & stencil:: operator[](const size_t i) const throw()
         {
             assert(i<size);
             return masks[i];
         }
-
+        
+        static inline int __compare_masks(const stencil::mask &lhs,
+                                          const stencil::mask &rhs) throw()
+        {
+            const vertex L = lhs.r;
+            const vertex R = rhs.r;
+            if(L.y<R.y)
+            {
+                return -1;
+            }
+            else
+            {
+                if(R.y<L.y)
+                {
+                    return 1;
+                }
+                else
+                {
+                    assert(L.y==R.y);
+                    return __compare(L.x,R.x);
+                }
+            }
+        }
+        
+        void stencil:: optimize() throw()
+        {
+            lw_array<mask> m(masks,size);
+            quicksort(m,__compare_masks);
+        }
+        
+        void stencil:: display() const
+        {
+            std::cerr << "stencil#=" << size << std::endl;
+            for(size_t i=0;i<size;++i)
+            {
+                std::cerr << masks[i].r << " => " << masks[i].weight << std::endl;
+            }
+        }
+        
     }
 
 }
@@ -60,9 +96,8 @@ namespace yocto
 
         stencil_grad_x:: stencil_grad_x() : stencil(2)
         {
-            stencil &self = *this;
-            self[0].r = vertex(-1,0); self[0].weight = -1;
-            self[1].r = vertex( 1,0); self[1].weight =  1;
+            masks[0].r = vertex(-1,0); masks[0].weight = -1;
+            masks[1].r = vertex( 1,0); masks[1].weight =  1;
         }
 
         stencil_grad_x:: ~stencil_grad_x() throw()
@@ -79,9 +114,8 @@ namespace yocto
 
         stencil_grad_y:: stencil_grad_y() : stencil(2)
         {
-            stencil &self = *this;
-            self[0].r = vertex(0,-1); self[0].weight = -1;
-            self[1].r = vertex(0, 1); self[1].weight =  1;
+            masks[0].r = vertex(0,-1); masks[0].weight = -1;
+            masks[1].r = vertex(0, 1); masks[1].weight =  1;
         }
 
         stencil_grad_y:: ~stencil_grad_y() throw()
@@ -98,14 +132,13 @@ namespace yocto
 
         stencil_sobel_x:: stencil_sobel_x() : stencil(6)
         {
-            stencil &self = *this;
-            self[0].r = vertex(-1,-1); self[0].weight = -1;
-            self[1].r = vertex(-1, 0); self[1].weight = -2;
-            self[2].r = vertex(-1, 1); self[2].weight = -1;
+            masks[0].r = vertex(-1,-1); masks[0].weight = -1;
+            masks[1].r = vertex(-1, 0); masks[1].weight = -2;
+            masks[2].r = vertex(-1, 1); masks[2].weight = -1;
 
-            self[3].r = vertex(1,-1);  self[3].weight =  1;
-            self[4].r = vertex(1, 0);  self[4].weight =  2;
-            self[5].r = vertex(1, 1);  self[5].weight =  1;
+            masks[3].r = vertex(1,-1);  masks[3].weight =  1;
+            masks[4].r = vertex(1, 0);  masks[4].weight =  2;
+            masks[5].r = vertex(1, 1);  masks[5].weight =  1;
 
         }
 
@@ -125,14 +158,13 @@ namespace yocto
 
         stencil_sobel_y:: stencil_sobel_y() : stencil(6)
         {
-            stencil &self = *this;
-            self[0].r = vertex(-1,-1); self[0].weight = -1;
-            self[1].r = vertex( 0,-1); self[1].weight = -2;
-            self[2].r = vertex( 1,-1); self[2].weight = -1;
+            masks[0].r = vertex(-1,-1); masks[0].weight = -1;
+            masks[1].r = vertex( 0,-1); masks[1].weight = -2;
+            masks[2].r = vertex( 1,-1); masks[2].weight = -1;
 
-            self[3].r = vertex(-1,1);  self[3].weight =  1;
-            self[4].r = vertex( 0,1);  self[4].weight =  2;
-            self[5].r = vertex( 1,1);  self[5].weight =  1;
+            masks[3].r = vertex(-1,1);  masks[3].weight =  1;
+            masks[4].r = vertex( 0,1);  masks[4].weight =  2;
+            masks[5].r = vertex( 1,1);  masks[5].weight =  1;
 
         }
 
@@ -156,7 +188,6 @@ namespace yocto
         stencil( square_of(2*w+1) )
         {
             assert(sig>0);
-            stencil     &self = *this;
             const unit_t W   = unit_t(w);
             const float  den = 2.0f * sig * sig;
             vertex       r;
@@ -170,14 +201,14 @@ namespace yocto
                     const float yy     = float(r.y*r.y);
                     const float weight = expf(-(xx+yy)/den );
                     sum += weight;
-                    self[idx].r      = r;
-                    self[idx].weight = weight;
+                    masks[idx].r      = r;
+                    masks[idx].weight = weight;
                 }
             }
             assert(size==idx);
             for(size_t i=0;i<size;++i)
             {
-                self[i].weight/=sum;
+                masks[i].weight/=sum;
             }
         }
     }

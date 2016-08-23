@@ -23,8 +23,9 @@ namespace yocto
 
             const size_t size;
             const mask & operator[](const size_t i) const throw();
-            mask       & operator[](const size_t i) throw();
-
+            void optimize() throw();
+            void display() const;
+            
             template <typename T, typename U>
             inline void apply(pixmap<T>       &target,
                               const pixmap<U> &source,
@@ -60,7 +61,9 @@ sum += v0*msk.weight
         private:
             YOCTO_DISABLE_ASSIGN(stencil);
             size_t       nmask;
+        protected:
             mask        *masks;
+        private:
             void        *tgt;
             const void  *src;
 
