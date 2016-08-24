@@ -117,3 +117,40 @@ namespace yocto
 
     }
 }
+
+
+namespace yocto
+{
+    namespace gfx
+    {
+        EdgeDetector:: ~EdgeDetector() throw()
+        {
+        }
+
+        EdgeDetector:: EdgeDetector(const unit_t W, const unit_t H) :
+        pixmap<float>(W,H),
+        A(W,H),
+        src(0),
+        ddx(0),
+        ddy(0),
+        Gmax(0)
+        {
+        }
+
+
+        void EdgeDetector:: normalize(xpatch &xp, lockable &) throw()
+        {
+            assert(Gmax>0);
+            pixmap<float> &G  = *this;
+            const float   fac = 1.0f/Gmax;
+            for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
+            {
+                for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
+                {
+                    G[y][x] *= fac;
+                }
+            }
+        }
+
+    }
+}

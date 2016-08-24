@@ -107,7 +107,7 @@ sum += v0*msk.weight
 
             template <typename U>
             inline float dot(const pixmap<U> &source,
-                             const vertex    &center) throw()
+                             const vertex    &center) const throw()
             {
                 assert(size>0);
                 assert(source.has(center));
