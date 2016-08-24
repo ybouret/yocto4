@@ -49,44 +49,75 @@ YOCTO_UNIT_TEST_IMPL(stencil)
 
         pixmapf      tgt(w,h);
 
-        
+        std::cerr << "grad x" << std::endl;
         gx.apply(tgt,imgf,xps);
-        //tgt.minmax(rmp.vmin,rmp.vmax);
         rmp.vmin = gx.global.vmin;
         rmp.vmax = gx.global.vmax;
-
         IMG.save("img-gx.png",tgt,rmp,0);
 
+        std::cerr << "grad y" << std::endl;
         gy.apply(tgt,imgf,xps);
-        tgt.minmax(rmp.vmin,rmp.vmax);
+        rmp.vmin = gy.global.vmin;
+        rmp.vmax = gy.global.vmax;
         IMG.save("img-gy.png",tgt,rmp,0);
 
+        std::cerr << "sobel x" << std::endl;
         stencil_sobel_x sx;
         sx.apply(tgt,imgf,xps);
-        tgt.minmax(rmp.vmin,rmp.vmax);
+        rmp.vmin = sx.global.vmin;
+        rmp.vmax = sx.global.vmax;
         IMG.save("img-sx.png",tgt,rmp,0);
 
+        std::cerr << "sobel y" << std::endl;
         stencil_sobel_y sy;
         sy.apply(tgt,imgf,xps);
-        tgt.minmax(rmp.vmin,rmp.vmax);
+        rmp.vmin = sy.global.vmin;
+        rmp.vmax = sy.global.vmax;
         IMG.save("img-sy.png",tgt,rmp,0);
 
+        std::cerr << "gauss 3x3" << std::endl;
         stencil_gauss g3(1,1.4f);
         g3.apply(tgt,imgf,xps);
-        tgt.minmax(rmp.vmin,rmp.vmax);
+        rmp.vmin = g3.global.vmin;
+        rmp.vmax = g3.global.vmax;
         IMG.save("img-g3.png",tgt,grmp,0);
 
+        std::cerr << "gauss 5x5" << std::endl;
         stencil_gauss g5(2,1.4f);
         g5.apply(tgt,imgf,xps);
-        tgt.minmax(rmp.vmin,rmp.vmax);
+        rmp.vmin = g5.global.vmin;
+        rmp.vmax = g5.global.vmax;
         IMG.save("img-g5.png",tgt,grmp,0);
 
-        display_stencil(gx,"grad_x");
-        display_stencil(gy,"grad_y");
-        display_stencil(sx,"sobel_x");
-        display_stencil(sy,"sobel_y");
-        display_stencil(g3,"g3x3");
-        display_stencil(g5,"g5x5");
+        //if(false)
+        {
+            display_stencil(gx,"grad_x");
+            display_stencil(gy,"grad_y");
+            display_stencil(sx,"sobel_x");
+            display_stencil(sy,"sobel_y");
+            display_stencil(g3,"g3x3");
+            display_stencil(g5,"g5x5");
+        }
+
+        pixmap3 tgt3(w,h);
+        pixmaps<float> channels(3,w,h);
+
+        std::cerr << "grad x rgb..." << std::endl;
+        gx.apply<RGB,uint8_t,3>(tgt3,img3, channels,xps);
+        IMG.save("img-gx-rgb.png",tgt3,0);
+
+        std::cerr << "grad y rgb..." << std::endl;
+        gy.apply<RGB,uint8_t,3>(tgt3,img3, channels,xps);
+        IMG.save("img-gy-rgb.png",tgt3,0);
+
+        std::cerr << "gauss 3x3 rgb..." << std::endl;
+        g3.apply<RGB,uint8_t,3>(tgt3,img3, channels,xps);
+        IMG.save("img-g3-rgb.png",tgt3,0);
+
+        std::cerr << "gauss 5x5 rgb..." << std::endl;
+        g5.apply<RGB,uint8_t,3>(tgt3,img3, channels,xps);
+        IMG.save("img-g5-rgb.png",tgt3,0);
+
 
     }
 }

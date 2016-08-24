@@ -18,11 +18,12 @@ namespace yocto
 #define YGFX_STENCIL_CTOR() \
 nmask(size), \
 masks( memory::kind<memory::global>::acquire_as<mask>(nmask) ), \
-tgt(0), src(0)
+tgt(0), src(0), chn(0), global()
         
         stencil:: stencil(const size_t n) :
         size(n),
-        YGFX_STENCIL_CTOR()        {
+        YGFX_STENCIL_CTOR()
+        {
             if(size<=0)
             {
                 throw imported::exception("stencil constructor","size=0");

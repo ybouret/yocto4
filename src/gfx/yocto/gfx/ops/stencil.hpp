@@ -1,7 +1,8 @@
 #ifndef YOCTO_GFX_OPS_STENCIL_INCLUDED
 #define YOCTO_GFX_OPS_STENCIL_INCLUDED 1
 
-#include "yocto/gfx/pixmap.hpp"
+#include "yocto/gfx/pixmaps.hpp"
+#include "yocto/gfx/pixel.hpp"
 #include "yocto/gfx/xpatch.hpp"
 #include "yocto/container/tuple.hpp"
 #include "yocto/code/unroll.hpp"
@@ -31,7 +32,8 @@ namespace yocto
             const mask & operator[](const size_t i) const throw();
             void optimize() throw();
             void display() const;
-            
+
+            //! raw computation source => target, keep track of min/max
             template <typename T, typename U>
             inline void apply(pixmap<T>       &target,
                               const pixmap<U> &source,
@@ -39,7 +41,10 @@ namespace yocto
             {
                 tgt = &target;
                 src = &source;
+                // run on all patches
                 YGFX_SUBMIT(this, (&stencil::run<T,U>) , xps, xp.make<info>() );
+
+                // collect scaling
                 global = xps[1].as<info>();
                 for(size_t i=xps.size();i>1;--i)
                 {
@@ -48,6 +53,47 @@ namespace yocto
                     global.vmax = max_of(local.vmax,global.vmax);
                 }
             }
+
+
+            template <
+            typename T,
+            typename U,
+            size_t   NCH>
+            inline void apply(pixmap<T>       &target,
+                              const pixmap<T> &source,
+                              pixmaps<float>  &channels,
+                              xpatches        &xps)
+            {
+                assert(NCH>0);
+                assert(channels.size>=NCH);
+
+                tgt = &target;
+                src = &source;
+                chn = &channels;
+
+                // run on all patches, all channels
+                YGFX_SUBMIT(this, (&stencil::collect<T,U,NCH>) , xps, xp.make<info>() );
+
+                // collect scaling
+                global = xps[1].as<info>();
+                for(size_t i=xps.size();i>1;--i)
+                {
+                    const info &local = xps[i].as<info>();
+                    global.vmin = min_of(local.vmin,global.vmin);
+                    global.vmax = max_of(local.vmax,global.vmax);
+                }
+
+                // distribute target
+                if(global.vmin<global.vmax)
+                {
+                    xps.submit(this, &stencil::dispatch<T,U,NCH> );
+                }
+                else
+                {
+                    target.ldz();
+                }
+            }
+
 
 
 #define YGFX_STENCIL_LOOP(I)              \
@@ -79,10 +125,14 @@ sum += v0*msk.weight
         private:
             void        *tgt;
             const void  *src;
+            void        *chn;
         public:
             info         global;
 
         private:
+
+
+            //! raw computation
             template <typename T,typename U>
             inline void run( xpatch &xp, lockable & ) throw()
             {
@@ -112,6 +162,117 @@ sum += v0*msk.weight
                     }
                 }
             }
+
+            //! raw computation, NCH channels
+            template <typename T,typename U,size_t NCH>
+            inline void collect( xpatch &xp, lockable & ) throw()
+            {
+                assert(tgt);
+                assert(src);
+                assert(chn);
+                //pixmap<T>       &target   = *static_cast<pixmap<T>      *>(tgt);
+                const pixmap<T> &source   = *static_cast<const pixmap<T>*>(src);
+                pixmaps<float>  &channels = *static_cast<pixmaps<float> *>(chn);
+                info            &local  = xp.as<info>();
+                bool             init   = true;
+                float            sum[NCH];
+                float            v0[NCH];
+                vertex           v;
+                for(v.y=xp.upper.y;v.y>=xp.lower.y;--v.y)
+                {
+                    for(v.x=xp.upper.x;v.x>=xp.lower.x;--v.x)
+                    {
+                        // initialize
+                        {
+                            const U *p = (const U *)&source[v];
+                            for(size_t i=0;i<NCH;++i)
+                            {
+                                sum[i] = 0;
+                                v0[i]  = p[i];
+                            }
+                        }
+
+                        // compute the dot products
+                        for(size_t j=0;j<size;++j)
+                        {
+                            const mask  &msk    = masks[j];
+                            const vertex pos    = msk.r + v;
+                            const float  weight = msk.weight;
+
+                            if(source.has(pos))
+                            {
+                                const U *q =(const U *)&source[pos];
+                                for(size_t i=0;i<NCH;++i)
+                                {
+                                    sum[i] += q[i] * weight;
+                                }
+                            }
+                            else
+                            {
+                                for(size_t i=0;i<NCH;++i)
+                                {
+                                    sum[i] += v0[i] * weight;
+                                }
+                            }
+                        }
+
+                        // transfert results
+                        if(init)
+                        {
+                            init = false;
+                            channels[0][v] = sum[0];
+                            local.vmin = local.vmax = sum[0];
+                            for(size_t i=1;i<NCH;++i)
+                            {
+                                const float ans = sum[i];
+                                channels[i][v] = ans;
+                                local.vmin = min_of(local.vmin,ans);
+                                local.vmax = max_of(local.vmax,ans);
+                            }
+                        }
+                        else
+                        {
+                            for(size_t i=0;i<NCH;++i)
+                            {
+                                const float ans = sum[i];
+                                channels[i][v] = ans;
+                                local.vmin = min_of(local.vmin,ans);
+                                local.vmax = max_of(local.vmax,ans);
+                            }
+
+                        }
+                    }
+                }
+
+            }
+
+
+            template <typename T,typename U,size_t NCH>
+            inline void dispatch( xpatch &xp, lockable & ) throw()
+            {
+                static const float scale = float(pixel<U>::opaque);
+                assert(tgt);
+                assert(src);
+                assert(chn);
+                pixmap<T>             &target   = *static_cast<pixmap<T>      *>(tgt);
+                const pixmaps<float>  &channels = *static_cast<pixmaps<float> *>(chn);
+                const float            vmin     = global.vmin;
+                const float            vmax     = global.vmax;
+                const float            delta    = vmax - vmin;
+                for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
+                {
+                    for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
+                    {
+                        U *Q = (U *)&target[y][x];
+                        for(size_t i=0;i<NCH;++i)
+                        {
+                            const float f = clamp<float>(0,(channels[i][y][x]-vmin)/delta,1);
+                            Q[i] = U(floorf(f*scale+0.5f));
+                        }
+                    }
+                }
+            }
+
             
         };
 
