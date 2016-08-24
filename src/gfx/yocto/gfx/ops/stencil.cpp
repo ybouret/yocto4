@@ -178,8 +178,6 @@ namespace yocto
     }
 }
 
-#include "yocto/code/utils.hpp"
-
 namespace yocto
 {
     namespace gfx

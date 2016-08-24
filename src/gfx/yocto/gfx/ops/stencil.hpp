@@ -5,6 +5,7 @@
 #include "yocto/gfx/xpatch.hpp"
 #include "yocto/container/tuple.hpp"
 #include "yocto/code/unroll.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -15,6 +16,11 @@ namespace yocto
         {
         public:
             YOCTO_PAIR_DECL(YOCTO_TUPLE_STANDARD,mask,vertex,r,float,weight);
+            YOCTO_PAIR_END();
+
+            YOCTO_PAIR_DECL(YOCTO_TUPLE_STANDARD,info,float,vmin,float,vmax);
+            inline info() throw() : vmin(0), vmax(0) {}
+            inline info & operator=(const info &other) throw() { vmin = other.vmin; vmax = other.vmax; return *this; }
             YOCTO_PAIR_END();
 
             virtual ~stencil() throw();
@@ -33,7 +39,14 @@ namespace yocto
             {
                 tgt = &target;
                 src = &source;
-                xps.submit(this, &stencil::run<T,U>);
+                YGFX_SUBMIT(this, (&stencil::run<T,U>) , xps, xp.make<info>() );
+                global = xps[1].as<info>();
+                for(size_t i=xps.size();i>1;--i)
+                {
+                    const info &local = xps[i].as<info>();
+                    global.vmin = min_of(local.vmin,global.vmin);
+                    global.vmax = max_of(local.vmax,global.vmax);
+                }
             }
 
 
@@ -46,16 +59,16 @@ else                                      \
 sum += v0*msk.weight
 
 
-            template <typename T,typename U>
-            inline T dot(const pixmap<U> &source,
-                         const vertex    &center) throw()
+            template <typename U>
+            inline float dot(const pixmap<U> &source,
+                             const vertex    &center) throw()
             {
                 assert(size>0);
                 assert(source.has(center));
                 const float v0  = float(source[center]);
                 float       sum = 0.0f;
                 YOCTO_LOOP_FUNC_(size,YGFX_STENCIL_LOOP,0);
-                return T(sum);
+                return sum;
             }
 
         private:
@@ -66,7 +79,10 @@ sum += v0*msk.weight
         private:
             void        *tgt;
             const void  *src;
+        public:
+            info         global;
 
+        private:
             template <typename T,typename U>
             inline void run( xpatch &xp, lockable & ) throw()
             {
@@ -74,12 +90,25 @@ sum += v0*msk.weight
                 assert(src);
                 pixmap<T>       &target = *static_cast<pixmap<T>      *>(tgt);
                 const pixmap<U> &source = *static_cast<const pixmap<U>*>(src);
+                info            &local  = xp.as<info>();
+                bool             init   = true;
                 vertex v;
                 for(v.y=xp.upper.y;v.y>=xp.lower.y;--v.y)
                 {
                     for(v.x=xp.upper.x;v.x>=xp.lower.x;--v.x)
                     {
-                        target[v] = dot<T,U>(source,v);
+                        const float ans = dot<U>(source,v);
+                        target[v] = T(ans);
+                        if(init)
+                        {
+                            init = false;
+                            local.vmin = local.vmax = ans;
+                        }
+                        else
+                        {
+                            if(ans<local.vmin) local.vmin = ans;
+                            if(ans>local.vmax) local.vmax = ans;
+                        }
                     }
                 }
             }

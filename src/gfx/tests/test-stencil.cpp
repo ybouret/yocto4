@@ -51,7 +51,10 @@ YOCTO_UNIT_TEST_IMPL(stencil)
 
         
         gx.apply(tgt,imgf,xps);
-        tgt.minmax(rmp.vmin,rmp.vmax);
+        //tgt.minmax(rmp.vmin,rmp.vmax);
+        rmp.vmin = gx.global.vmin;
+        rmp.vmax = gx.global.vmax;
+
         IMG.save("img-gx.png",tgt,rmp,0);
 
         gy.apply(tgt,imgf,xps);
