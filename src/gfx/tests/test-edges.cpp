@@ -4,6 +4,7 @@
 #include "yocto/gfx/image/tiff.hpp"
 
 #include "yocto/gfx/ops/edges.hpp"
+#include "yocto/gfx/color/ramp/cold_to_very_hot.hpp"
 
 #include "yocto/code/rand.hpp"
 
@@ -18,6 +19,10 @@ YOCTO_UNIT_TEST_IMPL(edges)
     YOCTO_GFX_DECL_FORMAT(jpeg);
     YOCTO_GFX_DECL_FORMAT(png);
     YOCTO_GFX_DECL_FORMAT(tiff);
+
+    cold_to_very_hot rmp;
+    rmp.vmin = -3.15;
+    rmp.vmax =  3.15;
 
     imageIO          &IMG = image::instance();
     if(argc>1)
@@ -40,8 +45,11 @@ YOCTO_UNIT_TEST_IMPL(edges)
         ED.build_from(img, gx, gy, xps);
         IMG.save("img-grad.png",ED,0);
 
+        IMG.save("img-grad-th.png",ED.A,rmp,0);
+
         ED.build_from(img, sx, sy, xps);
         IMG.save("img-sobel.png",ED,0);
+        IMG.save("img-sobel-th.png",ED.A,rmp,0);
 
     }
 
