@@ -63,10 +63,16 @@ YOCTO_UNIT_TEST_IMPL(edges)
 
         ED.build_from(img, gx, gy, xps);
         IMG.save("img-grad-f.png",ED,0);
+        IMG.save("img-angl-f.png",ED.A,rmp,0);
+
         ED.build_from(img3, gx, gy, xps);
         IMG.save("img-grad-3.png",ED,0);
+        IMG.save("img-angl-3.png",ED.A,rmp,0);
+
+
         ED.build_from(img5, gx, gy, xps);
         IMG.save("img-grad-5.png",ED,0);
+        IMG.save("img-angl-5.png",ED.A,rmp,0);
 
 
 
