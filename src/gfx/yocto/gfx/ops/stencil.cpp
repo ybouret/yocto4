@@ -199,6 +199,59 @@ namespace yocto
     }
 }
 
+
+namespace yocto
+{
+    namespace gfx
+    {
+
+        stencil_scharr_x:: stencil_scharr_x() : stencil(6,true)
+        {
+            masks[0].r = vertex(-1,-1); masks[0].weight = -3;
+            masks[1].r = vertex(-1, 0); masks[1].weight = -10;
+            masks[2].r = vertex(-1, 1); masks[2].weight = -3;
+
+            masks[3].r = vertex(1,-1);  masks[3].weight =  3;
+            masks[4].r = vertex(1, 0);  masks[4].weight =  10;
+            masks[5].r = vertex(1, 1);  masks[5].weight =  3;
+            optimize();
+        }
+
+        stencil_scharr_x:: ~stencil_scharr_x() throw()
+        {
+
+        }
+
+    }
+}
+
+
+namespace yocto
+{
+    namespace gfx
+    {
+
+        stencil_scharr_y:: stencil_scharr_y() : stencil(6,true)
+        {
+            masks[0].r = vertex(-1,-1); masks[0].weight = -3;
+            masks[1].r = vertex( 0,-1); masks[1].weight = -10;
+            masks[2].r = vertex( 1,-1); masks[2].weight = -3;
+
+            masks[3].r = vertex(-1,1);  masks[3].weight =  3;
+            masks[4].r = vertex( 0,1);  masks[4].weight =  10;
+            masks[5].r = vertex( 1,1);  masks[5].weight =  3;
+            optimize();
+        }
+
+        stencil_scharr_y:: ~stencil_scharr_y() throw()
+        {
+
+        }
+
+    }
+}
+
+
 namespace yocto
 {
     namespace gfx

@@ -398,6 +398,29 @@ sum += v0*msk.weight
             YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_sobel_y);
         };
 
+
+        class stencil_scharr_x : public stencil
+        {
+        public:
+            explicit stencil_scharr_x();
+            virtual ~stencil_scharr_x() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_scharr_x);
+        };
+
+        class stencil_scharr_y : public stencil
+        {
+        public:
+            explicit stencil_scharr_y();
+            virtual ~stencil_scharr_y() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_scharr_y);
+        };
+
+
+
         class stencil_gauss : public stencil
         {
         public:

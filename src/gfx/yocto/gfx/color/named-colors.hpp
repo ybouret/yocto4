@@ -4,6 +4,7 @@
 #include "yocto/gfx/color/data2rgba.hpp"
 #include "yocto/gfx/color/named-colors-def.hpp"
 #include "yocto/string.hpp"
+#include "yocto/code/ipower.hpp"
 
 namespace yocto
 {
@@ -26,10 +27,12 @@ namespace yocto
         class indx2rgba : public data2rgba
         {
         public:
-            inline explicit indx2rgba(const size_t d=0) throw() : shift(d) {}
+            inline explicit indx2rgba(const size_t d=0,const size_t p=1) throw() :
+            shift(d), power(p<=0?1:p) {}
             inline virtual ~indx2rgba() throw() {}
 
-            size_t shift;
+            size_t       shift;
+            const size_t power;
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(indx2rgba);
@@ -42,7 +45,7 @@ namespace yocto
                 }
                 else
                 {
-                    return named_color::fetch(shift+indx);
+                    return named_color::fetch(shift+ipower(indx,power));
                 }
             }
 

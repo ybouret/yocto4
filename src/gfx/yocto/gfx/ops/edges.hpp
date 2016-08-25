@@ -2,6 +2,7 @@
 #define YOCTO_GFX_OPS_EDGES_INCLUDED 1
 
 #include "yocto/gfx/ops/stencil.hpp"
+#include "yocto/math/trigconv.hpp"
 
 namespace yocto
 {
@@ -96,7 +97,7 @@ namespace yocto
             virtual ~EdgeDetector() throw();
             explicit EdgeDetector(const unit_t W,const unit_t H);
 
-            pixmap<float> A;
+            pixmap<uint8_t> A;
 
             template <typename T>
             void build_from(const pixmap<T> &source,
@@ -156,6 +157,10 @@ namespace yocto
                 {
                     for(x=xp.upper.x;x>=xp.lower.x;--x)
                     {
+                        static const float a22_5  = math::Deg2Rad(22.5f);
+                        static const float a67_5  = math::Deg2Rad(67.5f);
+                        static const float a112_5 = math::Deg2Rad(112.5f);
+                        static const float a157_5 = math::Deg2Rad(157.5f);
                         const float Gx = gx.dot(source,v);
                         const float Gy = gy.dot(source,v);
                         const float G  = sqrtf( Gx*Gx + Gy*Gy );
@@ -164,7 +169,30 @@ namespace yocto
                             localGmax = G;
                         }
                         self[v] = G;
-                        A[v]    = math::Atan2(Gy,Gx);
+                        uint8_t &d = A[v];
+                        if(G<=0)
+                        {
+                            d=0; continue;
+                        }
+                        const float a  = math::Atan2(Gy,Gx);
+                        const float aa = math::Fabs(a);
+
+                        if(aa<=a22_5||aa>=a157_5)
+                        {
+                            d=1; continue;
+                        }
+
+                        if(aa>=a67_5&&aa<=a112_5)
+                        {
+                            d=3; continue;
+                        }
+
+                        if( (a>=a22_5&&a<=a67_5) || (a<=-a112_5&&a>=-a157_5) )
+                        {
+                            d=2; continue;
+                        }
+
+                        d=4;
                     }
                 }
 
