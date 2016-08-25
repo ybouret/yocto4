@@ -7,7 +7,7 @@ namespace yocto {
         real_t Atan2( real_t x, real_t y ) throw()
         {
             static const real_t full_pi = numeric<real_t>::pi;
-            static const real_t half_pi = numeric<real_t>::pi/2;
+            static const real_t half_pi = numeric<real_t>::half_pi;
             
             if( x > 0 )
             {

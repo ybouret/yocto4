@@ -42,6 +42,7 @@ namespace yocto
 			static const T      maximum;
 			static const T      pi;
 			static const T      two_pi;
+            static const T      half_pi;
 			static const size_t dig;
 			static const T      ftol;      //!< 10^{-dig}
             static const T      sqrt_ftol; //!< 10^{-dig/2-1}

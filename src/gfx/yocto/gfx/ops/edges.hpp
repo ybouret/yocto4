@@ -124,8 +124,9 @@ namespace yocto
                 {
                     ldz();
                 }
-
             }
+
+            void clean_angles(xpatches &xps);
 
 
         private:
@@ -171,6 +172,7 @@ namespace yocto
             }
 
             void normalize(xpatch &xp, lockable &) throw();
+            void on_clean_angles(xpatch &xp, lockable &) throw();
 
         };
 

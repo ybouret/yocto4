@@ -11,6 +11,7 @@ namespace yocto
 		template <> const real_t numeric<real_t>::maximum      = REAL_MAX;
 		template <> const real_t numeric<real_t>::pi           = REAL_PI;
 		template <> const real_t numeric<real_t>::two_pi       = REAL_TWO_PI;
+        template <> const real_t numeric<real_t>::half_pi      = REAL_PI*REAL(0.5);
 		template <> const real_t numeric<real_t>::sqrt_epsilon = Sqrt( REAL_EPSILON );
 		template <> const real_t numeric<real_t>::min_exp      = REAL_MIN_EXP;
 		template <> const real_t numeric<real_t>::max_exp      = REAL_MAX_EXP;

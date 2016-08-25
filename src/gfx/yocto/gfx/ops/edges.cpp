@@ -152,5 +152,21 @@ namespace yocto
             }
         }
 
+        void EdgeDetector:: clean_angles( xpatches &xps )
+        {
+            xps.submit(this, & EdgeDetector::on_clean_angles);
+        }
+
+        void EdgeDetector:: on_clean_angles(xpatch &xp,  lockable &) throw()
+        {
+            for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
+            {
+                for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
+                {
+                    if( (*this)[y][x] <= 0 ) A[y][x] = 0;
+                }
+            }
+        }
+
     }
 }
