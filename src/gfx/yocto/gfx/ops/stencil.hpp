@@ -2,6 +2,7 @@
 #define YOCTO_GFX_OPS_STENCIL_INCLUDED 1
 
 #include "yocto/gfx/pixmaps.hpp"
+#include "yocto/gfx/rawpix.hpp"
 #include "yocto/gfx/pixel.hpp"
 #include "yocto/gfx/xpatch.hpp"
 #include "yocto/container/tuple.hpp"
@@ -25,7 +26,7 @@ namespace yocto
             YOCTO_PAIR_END();
 
             virtual ~stencil() throw();
-            explicit stencil(const size_t n);
+            explicit stencil(const size_t n,const bool rescaling);
             stencil(const stencil &other);
 
             const size_t size;
@@ -55,6 +56,10 @@ namespace yocto
             }
 
 
+            //! computation by channel
+            /**
+             rescale can be set to false in the case of a mass conserving stencil.
+             */
             template <
             typename T,
             typename U,
@@ -86,7 +91,14 @@ namespace yocto
                 // distribute target
                 if(global.vmin<global.vmax)
                 {
-                    xps.submit(this, &stencil::dispatch<T,U,NCH> );
+                    if(is_rescaling)
+                    {
+                        xps.submit(this, &stencil::expand<T,U,NCH> );
+                    }
+                    else
+                    {
+                        xps.submit(this, &stencil::transfer<T,U,NCH> );
+                    }
                 }
                 else
                 {
@@ -128,6 +140,7 @@ sum += v0*msk.weight
             void        *chn;
         public:
             info         global;
+            const bool   is_rescaling;
 
         private:
 
@@ -248,7 +261,30 @@ sum += v0*msk.weight
 
 
             template <typename T,typename U,size_t NCH>
-            inline void dispatch( xpatch &xp, lockable & ) throw()
+            inline void transfer( xpatch &xp, lockable & ) throw()
+            {
+                static const float scale = float(pixel<U>::opaque);
+                assert(tgt);
+                assert(src);
+                assert(chn);
+                pixmap<T>             &target   = *static_cast<pixmap<T>      *>(tgt);
+                const pixmaps<float>  &channels = *static_cast<pixmaps<float> *>(chn);
+                for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
+                {
+                    for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
+                    {
+                        U *Q = (U *)&target[y][x];
+                        for(size_t i=0;i<NCH;++i)
+                        {
+                            const float f = clamp<float>(0,channels[i][y][x],scale);
+                            Q[i] = U(f);
+                        }
+                    }
+                }
+            }
+
+            template <typename T,typename U,size_t NCH>
+            inline void expand( xpatch &xp, lockable & ) throw()
             {
                 static const float scale = float(pixel<U>::opaque);
                 assert(tgt);
@@ -266,14 +302,57 @@ sum += v0*msk.weight
                         U *Q = (U *)&target[y][x];
                         for(size_t i=0;i<NCH;++i)
                         {
-                            const float f = clamp<float>(0,(channels[i][y][x]-vmin)/delta,1);
-                            Q[i] = U(floorf(f*scale+0.5f));
+                            const float f = clamp<float>(0,scale*(channels[i][y][x]-vmin)/delta,scale);
+                            Q[i] = U(f);
                         }
                     }
                 }
             }
 
-            
+
+        public:
+            // with local memory
+            class dispatcher : public pixmaps<float>
+            {
+            public:
+                explicit dispatcher(const unit_t W, const unit_t H);
+                virtual ~dispatcher() throw();
+
+                template <
+                typename T,
+                typename U,
+                size_t   NCH>
+                void apply(const stencil   &S,
+                           pixmap<T>       &target,
+                           const pixmap<T> &source,
+                           xpatches        &xps)
+                {
+                    stencil &sten = (stencil &)S;
+                    sten.apply<T,U,NCH>(target,source,*this,xps);
+                }
+
+                inline void operator()(const stencil       &S,
+                                       pixmap<float>       &target,
+                                       const pixmap<float> &source,
+                                       xpatches            &xps)
+                {
+                    apply<float,float,1>(S,target,source,xps);
+                }
+
+                inline void operator()(const stencil     &S,
+                                       pixmap<RGB>       &target,
+                                       const pixmap<RGB> &source,
+                                       xpatches          &xps)
+                {
+                    apply<RGB,uint8_t,3>(S,target,source,xps);
+                }
+
+                
+
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(dispatcher);
+            };
+
         };
 
 

@@ -100,23 +100,26 @@ YOCTO_UNIT_TEST_IMPL(stencil)
         }
 
         pixmap3 tgt3(w,h);
-        pixmaps<float> channels(3,w,h);
+
+        stencil::dispatcher dsp(w,h);
+
 
         std::cerr << "grad x rgb..." << std::endl;
-        gx.apply<RGB,uint8_t,3>(tgt3,img3, channels,xps);
+        dsp(gx,tgt3,img3,xps);
         IMG.save("img-gx-rgb.png",tgt3,0);
 
         std::cerr << "grad y rgb..." << std::endl;
-        gy.apply<RGB,uint8_t,3>(tgt3,img3, channels,xps);
+        dsp(gy,tgt3,img3,xps);
         IMG.save("img-gy-rgb.png",tgt3,0);
 
         std::cerr << "gauss 3x3 rgb..." << std::endl;
-        g3.apply<RGB,uint8_t,3>(tgt3,img3, channels,xps);
+        dsp(g3,tgt3,img3,xps);
         IMG.save("img-g3-rgb.png",tgt3,0);
 
         std::cerr << "gauss 5x5 rgb..." << std::endl;
-        g5.apply<RGB,uint8_t,3>(tgt3,img3, channels,xps);
+        dsp(g5,tgt3,img3,xps);
         IMG.save("img-g5-rgb.png",tgt3,0);
+
 
 
     }

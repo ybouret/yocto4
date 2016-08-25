@@ -20,9 +20,10 @@ nmask(size), \
 masks( memory::kind<memory::global>::acquire_as<mask>(nmask) ), \
 tgt(0), src(0), chn(0), global()
         
-        stencil:: stencil(const size_t n) :
+        stencil:: stencil(const size_t n, const bool rescaling) :
         size(n),
-        YGFX_STENCIL_CTOR()
+        YGFX_STENCIL_CTOR(),
+        is_rescaling(rescaling)
         {
             if(size<=0)
             {
@@ -33,7 +34,8 @@ tgt(0), src(0), chn(0), global()
         
         stencil:: stencil(const stencil &other) :
         size(other.size),
-        YGFX_STENCIL_CTOR()
+        YGFX_STENCIL_CTOR(),
+        is_rescaling(other.is_rescaling)
         {
             assert(size>0);
             memcpy(masks,other.masks,size*sizeof(mask));
@@ -89,13 +91,31 @@ tgt(0), src(0), chn(0), global()
     
 }
 
+namespace yocto
+{
+    namespace gfx
+    {
+
+        stencil:: dispatcher:: ~dispatcher() throw()
+        {
+        }
+
+        stencil:: dispatcher:: dispatcher(const unit_t W, const unit_t H ) :
+        pixmaps<float>(4,W,H)
+        {
+            
+        }
+
+    }
+}
+
 
 namespace yocto
 {
     namespace gfx
     {
         
-        stencil_grad_x:: stencil_grad_x() : stencil(2)
+        stencil_grad_x:: stencil_grad_x() : stencil(2,true)
         {
             masks[0].r = vertex(-1,0); masks[0].weight = -1;
             masks[1].r = vertex( 1,0); masks[1].weight =  1;
@@ -114,7 +134,7 @@ namespace yocto
     namespace gfx
     {
         
-        stencil_grad_y:: stencil_grad_y() : stencil(2)
+        stencil_grad_y:: stencil_grad_y() : stencil(2,true)
         {
             masks[0].r = vertex(0,-1); masks[0].weight = -1;
             masks[1].r = vertex(0, 1); masks[1].weight =  1;
@@ -133,7 +153,7 @@ namespace yocto
     namespace gfx
     {
         
-        stencil_sobel_x:: stencil_sobel_x() : stencil(6)
+        stencil_sobel_x:: stencil_sobel_x() : stencil(6,true)
         {
             masks[0].r = vertex(-1,-1); masks[0].weight = -1;
             masks[1].r = vertex(-1, 0); masks[1].weight = -2;
@@ -159,7 +179,7 @@ namespace yocto
     namespace gfx
     {
         
-        stencil_sobel_y:: stencil_sobel_y() : stencil(6)
+        stencil_sobel_y:: stencil_sobel_y() : stencil(6,true)
         {
             masks[0].r = vertex(-1,-1); masks[0].weight = -1;
             masks[1].r = vertex( 0,-1); masks[1].weight = -2;
@@ -186,7 +206,7 @@ namespace yocto
         stencil_gauss:: ~stencil_gauss() throw() {}
         
         stencil_gauss:: stencil_gauss(const size_t w, const float sig) :
-        stencil( square_of(2*w+1) )
+        stencil( square_of(2*w+1), false )
         {
             assert(sig>0);
             const unit_t W   = unit_t(w);
