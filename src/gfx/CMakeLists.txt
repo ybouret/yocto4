@@ -1,5 +1,5 @@
-#ADD_EXECUTABLE(make_ramp make_ramp.cpp)
-#TARGET_LINK_YOCTO(make_ramp)
+ADD_EXECUTABLE(make_ramp make_ramp.cpp)
+TARGET_LINK_YOCTO(make_ramp)
 
 #ADD_EXECUTABLE(make_named_colors make_named_colors.cpp)
 #TARGET_LINK_YOCTO(make_named_colors)

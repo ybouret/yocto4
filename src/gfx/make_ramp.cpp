@@ -153,8 +153,8 @@ if(VALUE<0||VALUE>255) throw exception("%u: invalid " #VALUE "=%d", iline, VALUE
         const string guard = build_guard(header_name);
         hdr << "#ifndef " << guard << "\n";
         hdr << "#define " << guard << " 1\n";
-        hdr << "#include \"yocto/graphics/ramp.hpp\"\n";
-        hdr << "namespace yocto { namespace graphics{\n\n";
+        hdr << "#include \"yocto/gfx/color/ramp.hpp\"\n";
+        hdr << "namespace yocto { namespace gfx {\n\n";
 
         hdr << "\tclass " << class_name << " : public ramp {\n";
         hdr << "\t\tpublic:\n";
@@ -170,7 +170,7 @@ if(VALUE<0||VALUE>255) throw exception("%u: invalid " #VALUE "=%d", iline, VALUE
     {
         ios::wcstream src(source_name);
         src << "#include \"" << header_name << "\"\n";
-        src << "namespace yocto { namespace graphics{\n\n";
+        src << "namespace yocto { namespace gfx {\n\n";
 
         // emit codes
         const string codes_name = class_name + "_codes";

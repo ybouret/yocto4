@@ -4,7 +4,7 @@
 #include "yocto/gfx/image/tiff.hpp"
 
 #include "yocto/gfx/ops/edges.hpp"
-#include "yocto/gfx/color/ramp/cold_to_very_hot.hpp"
+#include "yocto/gfx/color/ramp/double_hot.hpp"
 
 #include "yocto/code/rand.hpp"
 #include "yocto/string/conv.hpp"
@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(edges)
     YOCTO_GFX_DECL_FORMAT(png);
     YOCTO_GFX_DECL_FORMAT(tiff);
 
-    cold_to_very_hot rmp;
+    double_hot rmp;
     rmp.vmin = -3.15;
     rmp.vmax =  3.15;
 
