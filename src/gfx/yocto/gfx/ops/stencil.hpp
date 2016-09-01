@@ -29,7 +29,8 @@ namespace yocto
             explicit stencil(const size_t n,const bool rescaling);
             stencil(const stencil &other);
 
-            const size_t size;
+            const size_t size; //!< number of non zero steps
+
             const mask & operator[](const size_t i) const throw();
             void optimize() throw();
             void display() const;
@@ -58,7 +59,7 @@ namespace yocto
 
             //! computation by channel
             /**
-             rescale can be set to false in the case of a mass conserving stencil.
+             rescale according to stencil's flag 'is_rescaling'
              */
             template <
             typename T,
@@ -143,7 +144,6 @@ sum += v0*msk.weight
             const bool   is_rescaling;
 
         private:
-
 
             //! raw computation
             template <typename T,typename U>
