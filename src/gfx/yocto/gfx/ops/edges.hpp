@@ -98,7 +98,8 @@ namespace yocto
             explicit EdgeDetector(const unit_t W,const unit_t H);
 
             pixmap<uint8_t> A;
-
+            pixmap<uint8_t> B;
+            
             template <typename T>
             void build_from(const pixmap<T> &source,
                             const stencil   &gx,
@@ -170,8 +171,10 @@ namespace yocto
                         }
                         self[v] = G;
                         uint8_t &d = A[v];
+                        B[v]    = 0xff;
                         if(G<=0)
                         {
+                            B[v] = 0x00;
                             d=0; continue;
                         }
                         const float a  = math::Atan2(Gy,Gx);

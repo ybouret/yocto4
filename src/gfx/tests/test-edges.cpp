@@ -79,7 +79,8 @@ YOCTO_UNIT_TEST_IMPL(edges)
         if(true)
         {
             img.ldz();
-            draw_circle(img, w/2, h/2, min_of(w,h)/4, 1.0f);
+            //draw_circle(img, w/2, h/2, min_of(w,h)/4, 1.0f);
+            draw_disk(img, w/2, h/2, min_of(w,h)/4, 1.0f);
         }
 
         IMG.save("img-f.png",img,NULL);
@@ -105,27 +106,32 @@ YOCTO_UNIT_TEST_IMPL(edges)
         IMG.save("img-3.png",img3,NULL);
         IMG.save("img-5.png",img5,NULL);
 
+#if 0
         const stencil_grad_x  gx;
         const stencil_grad_y  gy;
 
         const stencil_sobel_x sx;
         const stencil_sobel_y sy;
-
+#endif
+        
         const stencil_scharr_x Sx;
         const stencil_scharr_y Sy;
 
         ED.build_from(img, Sx, Sy, xps);
         IMG.save("img-grad-f.png",ED,0);
         IMG.save("img-angl-f.png",ED.A,rmp,0);
+        IMG.save("img-mask-f.png",ED.B,0);
 
         ED.build_from(img3, Sx, Sy, xps);
         IMG.save("img-grad-3.png",ED,0);
         IMG.save("img-angl-3.png",ED.A,rmp,0);
+        IMG.save("img-mask-3.png",ED.B,0);
 
 
         ED.build_from(img5, Sx, Sy, xps);
         IMG.save("img-grad-5.png",ED,0);
         IMG.save("img-angl-5.png",ED.A,rmp,0);
+        IMG.save("img-mask-5.png",ED.B,0);
 
 
 
