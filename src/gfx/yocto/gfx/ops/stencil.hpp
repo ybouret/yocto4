@@ -259,7 +259,7 @@ sum += v0*msk.weight
 
             }
 
-
+            // use for not-rescaling stencils
             template <typename T,typename U,size_t NCH>
             inline void transfer( xpatch &xp, lockable & ) throw()
             {
@@ -283,6 +283,7 @@ sum += v0*msk.weight
                 }
             }
 
+            // use for rescaling stencils
             template <typename T,typename U,size_t NCH>
             inline void expand( xpatch &xp, lockable & ) throw()
             {
