@@ -130,6 +130,7 @@ namespace yocto
         EdgeDetector:: EdgeDetector(const unit_t W, const unit_t H) :
         pixmap<float>(W,H),
         A(W,H), B(W,H),
+        E(W,H),
         src(0),
         ddx(0),
         ddy(0),
@@ -152,21 +153,22 @@ namespace yocto
             }
         }
 
-        void EdgeDetector:: clean_angles( xpatches &xps )
+        void EdgeDetector:: non_maxima_suppress( xpatches &xps )
         {
-            xps.submit(this, & EdgeDetector::on_clean_angles);
+            xps.submit(this, & EdgeDetector::non_maxima_suppress_cb);
         }
 
-        void EdgeDetector:: on_clean_angles(xpatch &xp,  lockable &) throw()
+        void EdgeDetector:: non_maxima_suppress_cb(xpatch &xp,  lockable &) throw()
         {
             for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
             {
                 for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
                 {
-                    if( (*this)[y][x] <= 0 ) A[y][x] = 0;
+                    
                 }
             }
         }
+
 
     }
 }

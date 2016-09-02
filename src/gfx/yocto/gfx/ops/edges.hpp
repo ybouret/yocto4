@@ -99,6 +99,7 @@ namespace yocto
 
             pixmap<uint8_t> A;
             pixmap<uint8_t> B;
+            pixmap<float>   E;
             
             template <typename T>
             void build_from(const pixmap<T> &source,
@@ -128,8 +129,6 @@ namespace yocto
                 }
             }
 
-            void clean_angles(xpatches &xps);
-
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(EdgeDetector);
@@ -137,6 +136,8 @@ namespace yocto
             const stencil *ddx;
             const stencil *ddy;
             float          Gmax;
+
+
 
             //! build intensity by patch
             template <typename T>
@@ -203,8 +204,9 @@ namespace yocto
             }
 
             void normalize(xpatch &xp, lockable &) throw();
-            void on_clean_angles(xpatch &xp, lockable &) throw();
-
+            void non_maxima_suppress(xpatches &xps);
+            void non_maxima_suppress_cb(xpatch &xp, lockable &) throw();
+            
         };
 
     }
