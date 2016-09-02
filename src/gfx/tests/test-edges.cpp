@@ -144,7 +144,7 @@ YOCTO_UNIT_TEST_IMPL(edges)
         
         
         
-#if 1
+#if 0
         FILE *fp = NULL;
         fp = fopen("data.dat","wb");
         std::cerr.flush();
