@@ -26,7 +26,7 @@ namespace yocto
             static const  float   unit_float_r[256]; //!< (0.0f..1.0f)*YOCTO_GFX_R2GS
             static const  float   unit_float_g[256]; //!< (0.0f..1.0f)*YOCTO_GFX_G2GS
             static const  float   unit_float_b[256]; //!< (0.0f..1.0f)*YOCTO_GFX_B2GS
-            static inline uint8_t float2byte(const float x) throw() { return uint8_t(x*255.0f+0.5f); }
+            static inline uint8_t float2byte(const float x) throw() { return uint8_t(floorf(x*255.0f+0.5f)); }
             static inline float   greyscalef(const uint8_t R,const uint8_t G,const uint8_t B) throw()
             {
                 return unit_float_r[R] + unit_float_g[R] + unit_float_b[B];
@@ -40,6 +40,27 @@ namespace yocto
             static const vertex delta[8]; //!< the 4+4 coordinates around a single point
 
             static inline unit_t float2unit(const float x) throw() { return unit_t(floorf(x+0.5f)); }
+            
+            //! x in [0:1] => x in [0:255]/255
+            static inline float reduced(float x) throw()
+            {
+                if(x<=0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    if(x>=1)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return unit_float[ uint8_t(floorf(x*255.0f+0.5f)) ];
+                    }
+                }
+            }
+            
         };
 
         class vnode
