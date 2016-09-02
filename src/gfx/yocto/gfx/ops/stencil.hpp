@@ -145,7 +145,10 @@ sum += v0*msk.weight
 
         private:
 
+            //__________________________________________________________________
+            //
             //! raw computation
+            //__________________________________________________________________
             template <typename T,typename U>
             inline void run( xpatch &xp, lockable & ) throw()
             {
@@ -176,7 +179,10 @@ sum += v0*msk.weight
                 }
             }
 
+            //__________________________________________________________________
+            //
             //! raw computation, NCH channels
+            //__________________________________________________________________
             template <typename T,typename U,size_t NCH>
             inline void collect( xpatch &xp, lockable & ) throw()
             {
@@ -259,11 +265,16 @@ sum += v0*msk.weight
 
             }
 
-            // use for not-rescaling stencils
+
+            //__________________________________________________________________
+            //
+            //! use for not-rescaling stencils
+            //__________________________________________________________________
             template <typename T,typename U,size_t NCH>
             inline void transfer( xpatch &xp, lockable & ) throw()
             {
-                static const float scale = float(pixel<U>::opaque);
+                static const float scale      = float(pixel<U>::opaque);
+                static const float resolution = 255.0f * scale;
                 assert(tgt);
                 assert(src);
                 assert(chn);
@@ -276,18 +287,22 @@ sum += v0*msk.weight
                         U *Q = (U *)&target[y][x];
                         for(size_t i=0;i<NCH;++i)
                         {
-                            const float f = clamp<float>(0,channels[i][y][x],scale);
+                            const float f = floorf(clamp<float>(0,255.0f*channels[i][y][x],resolution)+0.5f)*0.00392156862745098f;
                             Q[i] = U(f);
                         }
                     }
                 }
             }
 
-            // use for rescaling stencils
+            //__________________________________________________________________
+            //
+            //! use for rescaling stencils
+            //__________________________________________________________________
             template <typename T,typename U,size_t NCH>
             inline void expand( xpatch &xp, lockable & ) throw()
             {
-                static const float scale = float(pixel<U>::opaque);
+                static const float scale      = float(pixel<U>::opaque);
+                static const float resolution = 255.0f * scale;
                 assert(tgt);
                 assert(src);
                 assert(chn);
@@ -303,7 +318,7 @@ sum += v0*msk.weight
                         U *Q = (U *)&target[y][x];
                         for(size_t i=0;i<NCH;++i)
                         {
-                            const float f = clamp<float>(0,scale*(channels[i][y][x]-vmin)/delta,scale);
+                            const float f = floorf(clamp<float>(0,resolution*(channels[i][y][x]-vmin)/delta,resolution)+0.5f)*0.00392156862745098f;
                             Q[i] = U(f);
                         }
                     }
