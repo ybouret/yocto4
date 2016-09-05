@@ -189,6 +189,10 @@ namespace yocto
                             }
                         } break;
 
+                        case DIR_DIAG_RIGHT: {
+                            
+                        } break;
+
                         default:
                             break;
                     }
