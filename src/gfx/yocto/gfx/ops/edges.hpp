@@ -2,6 +2,7 @@
 #define YOCTO_GFX_OPS_EDGES_INCLUDED 1
 
 #include "yocto/gfx/ops/stencil.hpp"
+#include "yocto/gfx/ops/histogram.hpp"
 #include "yocto/math/trigconv.hpp"
 
 namespace yocto
@@ -101,9 +102,8 @@ namespace yocto
             virtual ~EdgeDetector() throw();
             explicit EdgeDetector(const unit_t W,const unit_t H);
 
-            pixmap<uint8_t> A;
-            pixmap<uint8_t> B;
-            pixmap<float>   E;
+            pixmap<uint8_t> A; //! direction/angles
+            pixmap<uint8_t> E; //!< Edge map
             
             template <typename T>
             void build_from(const pixmap<T> &source,
@@ -129,6 +129,13 @@ namespace yocto
                 {
                     std::cerr << "Non Maxima Suppress" << std::endl;
                     xps.submit(this, &EdgeDetector::non_maxima_suppress);
+                    std::cerr << "Build Histogram" << std::endl;
+                    H.reset();
+                    H.update(E,xps);
+                    level_up = H.threshold();
+                    level_lo = level_up/2;
+                    std::cerr << "Threshold=" << level_up << std::endl;
+                    xps.submit(this, &EdgeDetector::apply_thresholds);
                 }
                 else
                 {
@@ -145,6 +152,10 @@ namespace yocto
         public:
             float          Gmax;
         private:
+            Histogram      H;
+            size_t         level_up;
+            size_t         level_lo;
+
 
             //! build intensity by patch
             template <typename T>
@@ -179,10 +190,8 @@ namespace yocto
                         }
                         self[v]    = G;
                         uint8_t &d = A[v];
-                        B[v]       = 0xff;
                         if(G<=0)
                         {
-                            B[v] = 0x00;
                             d=0; continue;
                         }
                         const float a  = math::Atan2(Gy,Gx);
@@ -212,7 +221,7 @@ namespace yocto
 
             //void normalize(xpatch &xp, lockable &) throw();
             void non_maxima_suppress(xpatch &xp, lockable &) throw();
-            
+            void apply_thresholds(xpatch &xp, lockable &) throw();
         };
 
     }

@@ -129,7 +129,7 @@ namespace yocto
 
         EdgeDetector:: EdgeDetector(const unit_t W, const unit_t H) :
         pixmap<float>(W,H),
-        A(W,H), B(W,H),
+        A(W,H),
         E(W,H),
         src(0),
         ddx(0),
@@ -201,9 +201,25 @@ namespace yocto
 
                     if(keep)
                     {
-                        E[y][x] = G0*fac;
+                        E[y][x] = gist::float2byte(G0*fac);
                     }
                     else
+                    {
+                        E[y][x] = 0;
+                    }
+                }
+            }
+        }
+
+
+        void EdgeDetector:: apply_thresholds(xpatch &xp, lockable &) throw()
+        {
+            for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
+            {
+                for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
+                {
+                    const uint8_t v = E[y][x];
+                    if(v<=level_lo)
                     {
                         E[y][x] = 0;
                     }

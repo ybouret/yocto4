@@ -111,7 +111,7 @@ namespace yocto
 
             template <typename T>
             inline static
-            void apply(pixmap<T>      &target,
+            void apply(pixmap<T>       &target,
                        const size_t     t,
                        const pixmap<T> &source,
                        mode_type        m ) throw()
