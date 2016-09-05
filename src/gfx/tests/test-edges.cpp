@@ -94,7 +94,7 @@ YOCTO_UNIT_TEST_IMPL(edges)
         const unit_t w=img.w;
         const unit_t h=img.h;
 
-        if(true)
+        if(false)
         {
             img.ldz();
             //draw_circle(img, w/2, h/2, min_of(w,h)/4, 1.0f);

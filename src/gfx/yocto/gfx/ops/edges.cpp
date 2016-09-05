@@ -161,41 +161,44 @@ namespace yocto
             assert(Gmax>0);
             pixmap<float> &G   = *this;
             const float    fac = 1.0f/Gmax;
-            for(unit_t y=xp.upper.y,yl=y-1,yu=y+1;y>=xp.lower.y;--y,--yl,--yu)
+            for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
             {
                 const bitmap::position_type ypos = y_position(y);
-                for(unit_t x=xp.upper.x,xl=x-1,xu=x+1;x>=xp.lower.x;--x,--xl,--xu)
+                unit_t                      yu   = y+1;
+                unit_t                      yl   = y-1;
+                switch(ypos)
+                {
+                    case bitmap::at_lower: yl = y; break;
+                    case bitmap::at_upper: yu = y; break;
+                    default:
+                        break;
+                }
+                for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
                 {
                     const bitmap::position_type xpos = x_position(x);
                     const float                 G0   = G[y][x];
                     bool                        keep = false;
-                    switch(A[y][x])
+                    unit_t                      xu   = x+1;
+                    unit_t                      xl   = x-1;
+
+                    switch(xpos)
                     {
-                        case DIR_VERT: {
-                            switch( ypos )
-                            {
-                                case bitmap::at_lower: keep = (G0>=G[yu][x]); break;
-                                case bitmap::at_upper: keep = (G0>=G[yl][x]); break;
-                                case bitmap::is_inner: keep = (G0>=G[yu][x] && G0>=G[yl][x]); break;
-                            }
-                        } break;
-
-                        case DIR_HORZ: {
-                            switch( xpos )
-                            {
-                                case bitmap::at_lower: keep = (G0>=G[y][xu]); break;
-                                case bitmap::at_upper: keep = (G0>=G[y][xl]); break;
-                                case bitmap::is_inner: keep = (G0>=G[y][xu] && G0>=G[y][xl]); break;
-                            }
-                        } break;
-
-                        case DIR_DIAG_RIGHT: {
-                            
-                        } break;
-
+                        case bitmap::at_lower: xl=x; break;
+                        case bitmap::at_upper: xu=x; break;
                         default:
                             break;
                     }
+
+                    switch(A[y][x])
+                    {
+                        case DIR_VERT:       keep = ( G[yu][x] <=G0 && G[yl][x] <=G0); break;
+                        case DIR_HORZ:       keep = ( G[y][xu] <=G0 && G[y][xl] <=G0); break;
+                        case DIR_DIAG_RIGHT: keep = ( G[yu][xu]<=G0 && G[yl][xl]<=G0); break;
+                        case DIR_DIAG_LEFT:  keep = ( G[yl][xu]<=G0 && G[yu][xl]<=G0); break;
+                        default:
+                            break;
+                    }
+
                     if(keep)
                     {
                         E[y][x] = G0*fac;
