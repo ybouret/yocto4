@@ -219,7 +219,6 @@ namespace yocto
                 xp.as<float>() = localGmax;
             }
 
-            //void normalize(xpatch &xp, lockable &) throw();
             void non_maxima_suppress(xpatch &xp, lockable &) throw();
             void apply_thresholds(xpatch &xp, lockable &) throw();
         };

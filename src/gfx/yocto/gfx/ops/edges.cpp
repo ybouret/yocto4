@@ -221,9 +221,15 @@ namespace yocto
                     const uint8_t v = E[y][x];
                     if(v<=level_lo)
                     {
-                        E[y][x] = 0;
+                        E[y][x] = 0; return;
                     }
+                    if(v<=level_up)
+                    {
+                        E[y][x] = 127; return ;
+                    }
+                    E[y][x] = 255; return;
                 }
+
             }
         }
 

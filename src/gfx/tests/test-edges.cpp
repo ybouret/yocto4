@@ -18,10 +18,6 @@ using namespace yocto;
 using namespace gfx;
 using namespace math;
 
-static inline float enhance_cb( float f )
-{
-    return powf(f, 0.1);
-}
 
 class dir2col : public data2rgba
 {
@@ -130,17 +126,14 @@ YOCTO_UNIT_TEST_IMPL(edges)
         const stencil_scharr_x Sx;
         const stencil_scharr_y Sy;
 
-        //transform F;
 
         ED.build_from(img, Sx, Sy, xps);
-        //F.apply(ED,enhance_cb,ED,xps);
         grmp.vmax = ED.Gmax;
         IMG.save("img-grad-f.png",ED,grmp,0);
         IMG.save("img-angl-f.png",ED.A,rmp,0);
         IMG.save("img-nmax-f.png",ED.E,0);
 
         ED.build_from(img3, Sx, Sy, xps);
-        //F.apply(ED,enhance_cb,ED,xps);
         grmp.vmax = ED.Gmax;
         IMG.save("img-grad-3.png",ED,grmp,0);
         IMG.save("img-angl-3.png",ED.A,rmp,0);
@@ -148,7 +141,6 @@ YOCTO_UNIT_TEST_IMPL(edges)
 
 
         ED.build_from(img5, Sx, Sy, xps);
-        //F.apply(ED,enhance_cb,ED,xps);
         grmp.vmax = ED.Gmax;
         IMG.save("img-grad-5.png",ED,grmp,0);
         IMG.save("img-angl-5.png",ED.A,rmp,0);
