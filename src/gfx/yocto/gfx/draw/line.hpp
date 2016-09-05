@@ -17,8 +17,8 @@ namespace yocto
                               const  T      C,
                               const uint8_t alpha=0xff)
         {
-            unit_t dx =  std::abs(x1-x0), sx = (x0<x1) ? 1 : -1;
-            unit_t dy = -std::abs(y1-y0), sy = (y0<y1) ? 1 : -1;
+            unit_t dx =  abs_of(x1-x0), sx = (x0<x1) ? 1 : -1;
+            unit_t dy = -abs_of(y1-y0), sy = (y0<y1) ? 1 : -1;
             unit_t err = dx+dy, e2;                                   /* error value e_xy */
 
             for (;;){                                                          /* loop */

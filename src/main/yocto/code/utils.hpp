@@ -36,6 +36,12 @@ namespace yocto
         return a*a;
     }
 	
+	template <typename T>
+	inline T abs_of( T a )
+	{
+		return (a<0) ? -a : a;
+	}
+	
 	//! integer hash
 	uint32_t ihash32( uint32_t ) throw();
 	
