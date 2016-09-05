@@ -139,6 +139,7 @@ namespace yocto
         }
 
 
+#if 0
         void EdgeDetector:: normalize(xpatch &xp, lockable &) throw()
         {
             assert(Gmax>0);
@@ -152,19 +153,53 @@ namespace yocto
                 }
             }
         }
+#endif
 
-        void EdgeDetector:: non_maxima_suppress( xpatches &xps )
-        {
-            xps.submit(this, & EdgeDetector::non_maxima_suppress_cb);
-        }
 
-        void EdgeDetector:: non_maxima_suppress_cb(xpatch &xp,  lockable &) throw()
+        void EdgeDetector:: non_maxima_suppress(xpatch &xp,  lockable &) throw()
         {
-            for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
+            assert(Gmax>0);
+            pixmap<float> &G   = *this;
+            const float    fac = 1.0f/Gmax;
+            for(unit_t y=xp.upper.y,yl=y-1,yu=y+1;y>=xp.lower.y;--y,--yl,--yu)
             {
-                for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
+                const bitmap::position_type ypos = y_position(y);
+                for(unit_t x=xp.upper.x,xl=x-1,xu=x+1;x>=xp.lower.x;--x,--xl,--xu)
                 {
-                    
+                    const bitmap::position_type xpos = x_position(x);
+                    const float                 G0   = G[y][x];
+                    bool                        keep = false;
+                    switch(A[y][x])
+                    {
+                        case DIR_VERT: {
+                            switch( ypos )
+                            {
+                                case bitmap::at_lower: keep = (G0>=G[yu][x]); break;
+                                case bitmap::at_upper: keep = (G0>=G[yl][x]); break;
+                                case bitmap::is_inner: keep = (G0>=G[yu][x] && G0>=G[yl][x]); break;
+                            }
+                        } break;
+
+                        case DIR_HORZ: {
+                            switch( xpos )
+                            {
+                                case bitmap::at_lower: keep = (G0>=G[y][xu]); break;
+                                case bitmap::at_upper: keep = (G0>=G[y][xl]); break;
+                                case bitmap::is_inner: keep = (G0>=G[y][xu] && G0>=G[y][xl]); break;
+                            }
+                        } break;
+
+                        default:
+                            break;
+                    }
+                    if(keep)
+                    {
+                        E[y][x] = G0*fac;
+                    }
+                    else
+                    {
+                        E[y][x] = 0;
+                    }
                 }
             }
         }

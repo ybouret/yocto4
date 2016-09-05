@@ -93,6 +93,10 @@ namespace yocto
         class EdgeDetector : public pixmap<float>
         {
         public:
+            static const uint8_t DIR_VERT       = 1;
+            static const uint8_t DIR_DIAG_RIGHT = 2;
+            static const uint8_t DIR_HORZ       = 3;
+            static const uint8_t DIR_DIAG_LEFT  = 4;
 
             virtual ~EdgeDetector() throw();
             explicit EdgeDetector(const unit_t W,const unit_t H);
@@ -108,12 +112,14 @@ namespace yocto
                             xpatches        &xps)
             {
                 // build intensity map
+                std::cerr << "Build Maps" << std::endl;
                 src = &source;
                 ddx = &gx;
                 ddy = &gy;
-                //xps.submit(this, & EdgeDetector::buildI<T> );
                 YGFX_SUBMIT(this, & EdgeDetector::build<T>, xps, xp.make<float>() = 0);
                 Gmax = xps[1].as<float>();
+
+                // get the global max
                 for(size_t i=xps.size();i>1;--i)
                 {
                     Gmax = max_of(Gmax,xps[i].as<float>());
@@ -121,7 +127,8 @@ namespace yocto
 
                 if(Gmax>0)
                 {
-                    xps.submit(this, &EdgeDetector::normalize);
+                    std::cerr << "Non Maxima Suppress" << std::endl;
+                    xps.submit(this, &EdgeDetector::non_maxima_suppress);
                 }
                 else
                 {
@@ -135,9 +142,9 @@ namespace yocto
             const void    *src;
             const stencil *ddx;
             const stencil *ddy;
+        public:
             float          Gmax;
-
-
+        private:
 
             //! build intensity by patch
             template <typename T>
@@ -170,9 +177,9 @@ namespace yocto
                         {
                             localGmax = G;
                         }
-                        self[v] = G;
+                        self[v]    = G;
                         uint8_t &d = A[v];
-                        B[v]    = 0xff;
+                        B[v]       = 0xff;
                         if(G<=0)
                         {
                             B[v] = 0x00;
@@ -183,29 +190,28 @@ namespace yocto
 
                         if(aa<=a22_5||aa>=a157_5)
                         {
-                            d=1; continue;
+                            d=DIR_VERT; continue; // VERTICAL
                         }
 
                         if(aa>=a67_5&&aa<=a112_5)
                         {
-                            d=3; continue;
+                            d=DIR_HORZ; continue; // HORIZONTAL
                         }
 
                         if( (a>=a22_5&&a<=a67_5) || (a<=-a112_5&&a>=-a157_5) )
                         {
-                            d=2; continue;
+                            d=DIR_DIAG_RIGHT; continue; // RIGHT DIAGONAL
                         }
 
-                        d=4;
+                        d=DIR_DIAG_LEFT; // LEFT DIAGONAL
                     }
                 }
 
                 xp.as<float>() = localGmax;
             }
 
-            void normalize(xpatch &xp, lockable &) throw();
-            void non_maxima_suppress(xpatches &xps);
-            void non_maxima_suppress_cb(xpatch &xp, lockable &) throw();
+            //void normalize(xpatch &xp, lockable &) throw();
+            void non_maxima_suppress(xpatch &xp, lockable &) throw();
             
         };
 
