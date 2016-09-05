@@ -2,8 +2,8 @@
 #define YOCTO_GFX_OPS_TAGMAP_INCLUDED 1
 #include "yocto/gfx/pixmap.hpp"
 #include "yocto/gfx/pixel.hpp"
-#include "yocto/stock/stack.hpp"
 #include "yocto/gfx/color/named-colors.hpp"
+#include "yocto/stock/stack.hpp"
 
 namespace yocto
 {

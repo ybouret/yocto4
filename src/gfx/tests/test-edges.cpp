@@ -118,7 +118,7 @@ YOCTO_UNIT_TEST_IMPL(edges)
             std::cerr << "Gauss5x5" << std::endl;
             dsp(g5,img5,img,xps);
         }
-        IMG.save("img-f.png",img,crmp,NULL);
+        IMG.save("img-0.png",img,crmp,NULL);
         IMG.save("img-3.png",img3,crmp,NULL);
         IMG.save("img-5.png",img5,crmp,NULL);
 
@@ -129,15 +129,17 @@ YOCTO_UNIT_TEST_IMPL(edges)
 
         ED.build_from(img, Sx, Sy, xps);
         grmp.vmax = ED.Gmax;
-        IMG.save("img-grad-f.png",ED,grmp,0);
-        IMG.save("img-angl-f.png",ED.A,rmp,0);
-        IMG.save("img-nmax-f.png",ED.E,0);
+        IMG.save("img-grad-0.png",ED,grmp,0);
+        IMG.save("img-angl-0.png",ED.A,rmp,0);
+        IMG.save("img-nmax-0.png",ED.E,0);
+        IMG.save("img-blob-0.png",ED.tags,ED.tags.colors,0);
 
         ED.build_from(img3, Sx, Sy, xps);
         grmp.vmax = ED.Gmax;
         IMG.save("img-grad-3.png",ED,grmp,0);
         IMG.save("img-angl-3.png",ED.A,rmp,0);
         IMG.save("img-nmax-3.png",ED.E,0);
+        IMG.save("img-blob-3.png",ED.tags,ED.tags.colors,0);
 
 
         ED.build_from(img5, Sx, Sy, xps);
@@ -145,6 +147,7 @@ YOCTO_UNIT_TEST_IMPL(edges)
         IMG.save("img-grad-5.png",ED,grmp,0);
         IMG.save("img-angl-5.png",ED.A,rmp,0);
         IMG.save("img-nmax-5.png",ED.E,0);
+        IMG.save("img-blob-5.png",ED.tags,ED.tags.colors,0);
 
 
 

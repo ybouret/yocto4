@@ -129,12 +129,16 @@ namespace yocto
 
         EdgeDetector:: EdgeDetector(const unit_t W, const unit_t H) :
         pixmap<float>(W,H),
-        A(W,H),
-        E(W,H),
+        A(w,h),
+        E(w,h),
         src(0),
         ddx(0),
         ddy(0),
-        Gmax(0)
+        Gmax(0),
+        H(),
+        level_up(0),
+        level_lo(0),
+        tags(w,h)
         {
         }
 
@@ -229,7 +233,6 @@ namespace yocto
                     }
                     E[y][x] = 255; return;
                 }
-
             }
         }
 

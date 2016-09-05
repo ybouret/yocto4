@@ -3,6 +3,8 @@
 
 #include "yocto/gfx/ops/stencil.hpp"
 #include "yocto/gfx/ops/histogram.hpp"
+#include "yocto/gfx/ops/histogram.hpp"
+#include "yocto/gfx/ops/particles.hpp"
 #include "yocto/math/trigconv.hpp"
 
 namespace yocto
@@ -112,7 +114,7 @@ namespace yocto
                             xpatches        &xps)
             {
                 // build intensity map
-                std::cerr << "Build Maps" << std::endl;
+                std::cerr << "|_Build Maps" << std::endl;
                 src = &source;
                 ddx = &gx;
                 ddy = &gy;
@@ -127,15 +129,17 @@ namespace yocto
 
                 if(Gmax>0)
                 {
-                    std::cerr << "Non Maxima Suppress" << std::endl;
+                    std::cerr << "|_Non Maxima Suppress" << std::endl;
                     xps.submit(this, &EdgeDetector::non_maxima_suppress);
-                    std::cerr << "Build Histogram" << std::endl;
+                    std::cerr << "|_Build Histogram" << std::endl;
                     H.reset();
                     H.update(E,xps);
                     level_up = H.threshold();
                     level_lo = level_up/2;
-                    std::cerr << "Threshold=" << level_up << std::endl;
+                    std::cerr << "|_Threshold=" << level_up << std::endl;
                     xps.submit(this, &EdgeDetector::apply_thresholds);
+                    std::cerr << "|_Blobs" << std::endl;
+                    tags.build(E,8);
                 }
                 else
                 {
@@ -155,7 +159,8 @@ namespace yocto
             Histogram      H;
             size_t         level_up;
             size_t         level_lo;
-
+        public:
+            tagmap         tags;
 
             //! build intensity by patch
             template <typename T>
