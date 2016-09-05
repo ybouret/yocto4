@@ -109,18 +109,24 @@ YOCTO_UNIT_TEST_IMPL(edges)
 
         pixmapf img3(w,h);
         pixmapf img5(w,h);
+        pixmapf img7(w,h);
         {
             const stencil_gauss   g3(1,sig);
             const stencil_gauss   g5(2,sig);
+            const stencil_gauss   g7(3,sig);
             stencil::dispatcher   dsp(w,h);
-            std::cerr << "Gauss3x3" << std::endl;
+            std::cerr << "Gauss3x3,sigma=" << sig << std::endl;
             dsp(g3,img3,img,xps);
-            std::cerr << "Gauss5x5" << std::endl;
+            std::cerr << "Gauss5x5,sigma=" << sig << std::endl;
             dsp(g5,img5,img,xps);
+            std::cerr << "Gauss7x7,sigma=" << sig << std::endl;
+            dsp(g7,img7,img,xps);
+
         }
-        IMG.save("img-0.png",img,crmp,NULL);
-        IMG.save("img-3.png",img3,crmp,NULL);
-        IMG.save("img-5.png",img5,crmp,NULL);
+        IMG.save("img-0.png",img,NULL);
+        IMG.save("img-3.png",img3,NULL);
+        IMG.save("img-5.png",img5,NULL);
+        IMG.save("img-7.png",img5,NULL);
 
 
         const stencil_scharr_x Sx;
@@ -150,7 +156,12 @@ YOCTO_UNIT_TEST_IMPL(edges)
         IMG.save("img-nmax-5.png",ED.E,0);
         IMG.save("img-blob-5.png",ED.tags,ED.tags.colors,0);
 
-
+        ED.build_from(img7, Sx, Sy, xps);
+        grmp.vmax = ED.Gmax;
+        IMG.save("img-grad-7.png",ED,grmp,0);
+        IMG.save("img-angl-7.png",ED.A,rmp,0);
+        IMG.save("img-nmax-7.png",ED.E,0);
+        IMG.save("img-blob-7.png",ED.tags,ED.tags.colors,0);
 
 
 
