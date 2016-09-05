@@ -118,7 +118,7 @@ namespace yocto
     }
 }
 
-
+#include "yocto/sort/remove-if.hpp"
 namespace yocto
 {
     namespace gfx
@@ -138,29 +138,98 @@ namespace yocto
         H(),
         level_up(0),
         level_lo(0),
-        tags(w,h)
+        tags(w,h),
+        edges()
         {
         }
 
 
-#if 0
-        void EdgeDetector:: normalize(xpatch &xp, lockable &) throw()
+        inline bool __is_empty_particle( const particle::ptr &p ) throw()
         {
-            assert(Gmax>0);
-            pixmap<float> &G  = *this;
-            const float   fac = 1.0f/Gmax;
-            for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
+            return (p->size<=0);
+        }
+
+        void EdgeDetector:: post_build(xpatches &xps)
+        {
+            edges.free();
+
+            // get the global max
+            Gmax = xps[1].as<float>();
+            for(size_t i=xps.size();i>1;--i)
             {
-                for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
-                {
-                    G[y][x] *= fac;
-                }
+                Gmax = max_of(Gmax,xps[i].as<float>());
             }
+
+
+            if(Gmax>0)
+            {
+                std::cerr << "|_Non Maxima Suppress" << std::endl;
+                xps.submit(this, &EdgeDetector::non_maxima_suppress);
+
+                std::cerr << "|_Build Histogram" << std::endl;
+                H.reset();
+                H.update(E,xps);
+
+
+                std::cerr << "|_Compute Threshold" << std::endl;
+                level_up = H.threshold();
+                level_lo = level_up/2;
+
+                std::cerr << "|_Apply Threshold=" << level_up << "->" << level_lo << std::endl;
+                xps.submit(this, &EdgeDetector::apply_thresholds);
+
+                std::cerr << "|_Blobs" << std::endl;
+                tags.build(E,8);
+
+                std::cerr << "|_Edges" << std::endl;
+                edges.load(tags);
+
+
+                // removing weak only edges
+                std::cerr << "|_Remove Weak..." << std::endl;
+                for(size_t i=edges.size();i>0;--i)
+                {
+                    particle &p = *edges[i];
+                    assert(p.size>0);
+                    assert(p.inside.size<=0);
+                    assert(p.border.size<=0);
+                    // detect if at least one strong connected edge
+                    bool is_strong = false;
+                    for(const vnode *node = p.head;node;node=node->next)
+                    {
+                        if(STRONG==E[node->vtx])
+                        {
+                            is_strong=true;
+                            break;
+                        }
+                    }
+
+                    // remove it !
+                    if(!is_strong)
+                    {
+                        while(p.size)
+                        {
+                            vnode *node = p.pop_back();
+                            tags[node->vtx] = 0;
+                            E[node->vtx]    = 0;
+                            delete node;
+                        }
+                    }
+                }
+                remove_if(edges,__is_empty_particle);
+                std::cerr << "#edges=" << edges.size() << std::endl;
+            }
+            else
+            {
+                ldz();
+                E.ldz();
+                tags.ldz();
+            }
+
         }
-#endif
 
 
-        void EdgeDetector:: non_maxima_suppress(xpatch &xp,  lockable &) throw()
+        void EdgeDetector:: non_maxima_suppress(xpatch &xp,  lockable &access) throw()
         {
             assert(Gmax>0);
             pixmap<float> &G   = *this;
@@ -205,7 +274,8 @@ namespace yocto
 
                     if(keep)
                     {
-                        E[y][x] = gist::float2byte(G0*fac);
+                        const uint8_t px = gist::float2byte(G0*fac);
+                        E[y][x] = px;
                     }
                     else
                     {
@@ -216,22 +286,25 @@ namespace yocto
         }
 
 
-        void EdgeDetector:: apply_thresholds(xpatch &xp, lockable &) throw()
+        void EdgeDetector:: apply_thresholds(xpatch &xp, lockable &access) throw()
         {
             for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
             {
                 for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
                 {
+
                     const uint8_t v = E[y][x];
                     if(v<=level_lo)
                     {
-                        E[y][x] = 0; return;
+                        E[y][x] = 0; continue;
                     }
+
                     if(v<=level_up)
                     {
-                        E[y][x] = 127; return ;
+                        E[y][x] = WEAK; continue ;
                     }
-                    E[y][x] = 255; return;
+
+                    E[y][x] = STRONG;
                 }
             }
         }

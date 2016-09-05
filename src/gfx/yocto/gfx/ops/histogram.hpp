@@ -27,9 +27,9 @@ namespace yocto
 
             //! for parallel code
             template <typename T>
-            static inline void __update(word_type *arr,
+            static inline void __update(word_type       *arr,
                                         const pixmap<T> &pxm,
-                                        const patch &area) throw()
+                                        const patch     &area) throw()
             {
                 assert(arr);
                 assert(pxm.contains(area));
@@ -64,16 +64,10 @@ namespace yocto
                         xpatches          &xps)
             {
                 src = &pxm;
-                const size_t np = xps.size();
-                for(size_t i=np;i>0;--i)
-                {
-                    xpatch    &xp = xps[i];
-                    (void) xp.make<Histogram>();
-                    xp.enqueue(this, & Histogram::update_cb<T>, xps.server);
-                }
+                YGFX_SUBMIT(this, & Histogram::update_cb<T>, xps, (void) xp.make<Histogram>() );
                 xps.server->flush();
 
-                for(size_t i=np;i>0;--i)
+                for(size_t i=xps.size();i>0;--i)
                 {
                     collect( xps[i].as<Histogram>() );
                 }

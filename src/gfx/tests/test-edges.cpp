@@ -134,6 +134,7 @@ YOCTO_UNIT_TEST_IMPL(edges)
         IMG.save("img-nmax-0.png",ED.E,0);
         IMG.save("img-blob-0.png",ED.tags,ED.tags.colors,0);
 
+
         ED.build_from(img3, Sx, Sy, xps);
         grmp.vmax = ED.Gmax;
         IMG.save("img-grad-3.png",ED,grmp,0);

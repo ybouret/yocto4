@@ -101,6 +101,9 @@ namespace yocto
             static const uint8_t DIR_HORZ       = 3;
             static const uint8_t DIR_DIAG_LEFT  = 4;
 
+            static const uint8_t STRONG = 255;
+            static const uint8_t WEAK   = 127;
+            
             virtual ~EdgeDetector() throw();
             explicit EdgeDetector(const unit_t W,const unit_t H);
 
@@ -114,37 +117,11 @@ namespace yocto
                             xpatches        &xps)
             {
                 // build intensity map
-                std::cerr << "|_Build Maps" << std::endl;
                 src = &source;
                 ddx = &gx;
                 ddy = &gy;
                 YGFX_SUBMIT(this, & EdgeDetector::build<T>, xps, xp.make<float>() = 0);
-                Gmax = xps[1].as<float>();
-
-                // get the global max
-                for(size_t i=xps.size();i>1;--i)
-                {
-                    Gmax = max_of(Gmax,xps[i].as<float>());
-                }
-
-                if(Gmax>0)
-                {
-                    std::cerr << "|_Non Maxima Suppress" << std::endl;
-                    xps.submit(this, &EdgeDetector::non_maxima_suppress);
-                    std::cerr << "|_Build Histogram" << std::endl;
-                    H.reset();
-                    H.update(E,xps);
-                    level_up = H.threshold();
-                    level_lo = level_up/2;
-                    std::cerr << "|_Threshold=" << level_up << std::endl;
-                    xps.submit(this, &EdgeDetector::apply_thresholds);
-                    std::cerr << "|_Blobs" << std::endl;
-                    tags.build(E,8);
-                }
-                else
-                {
-                    ldz();
-                }
+                post_build(xps);
             }
 
 
@@ -161,7 +138,10 @@ namespace yocto
             size_t         level_lo;
         public:
             tagmap         tags;
+            particles      edges;
 
+            void post_build(xpatches &);
+            
             //! build intensity by patch
             template <typename T>
             inline void build(xpatch &xp, lockable &) throw()
