@@ -18,24 +18,12 @@
 using namespace yocto;
 using namespace gfx;
 
-static inline uint8_t f2u(const float f, const float gamma)
-{
-    return gist::float2byte( powf(f,gamma) );
-}
-
 static unit_t y_limit = 0;
 
 static inline bool is_upper_vertex(const vertex &v) throw()
 {
     return v.y>=y_limit;
 }
-
-#if 0
-static inline uint8_t u8invert(uint8_t x) throw()
-{
-    return 0xff-x;
-}
-#endif
 
 
 YOCTO_UNIT_TEST_IMPL(pa)
@@ -75,71 +63,32 @@ YOCTO_UNIT_TEST_IMPL(pa)
         const string suffix = ".png";
         IMG.save("img_smooth" + suffix,img,0);
 
-        std::cerr << "Building Edges" << std::endl;
-        Edges edges(w,h);
-        edges.build_from(img,xps);
-        IMG.save("img_edges" + suffix,edges,0);
-        IMG.save("img_edevs" + suffix,edges.S,0);
+        std::cerr << "-- Keep Foreground" << std::endl;
+        pixmap3 fg(w,h);
+        separate(threshold::keep_foreground,fg,img,xps);
 
-        std::cerr << "Projecting..." << std::endl;
-        transform       trans;
-        pixmap<uint8_t> edges_mask(w,h);
-        trans.apply(edges_mask, f2u, edges, 2.0f, xps);
-        IMG.save("img_edges_mask2" + suffix,edges_mask,0);
-
-        trans.apply(edges_mask, f2u, edges, 1.0f, xps);
-        IMG.save("img_edges_mask" + suffix,edges_mask,0);
-
-
-
-        pixmap<uint8_t> edevs_mask(w,h);
-        trans.apply(edevs_mask, gist::float2byte, edges.S,xps);
-        IMG.save("img_edevs_mask" + suffix,edevs_mask,0);
-
-        std::cerr << "Thresholding..." << std::endl;
-        pixmap<uint8_t> edges_fg(w,h);
-        separate(threshold::keep_foreground,edges_fg,edges_mask,xps);
-
-        IMG.save("img_edges_fg" + suffix,edges_fg,0);
-
-        std::cerr << "Thresholding BG" << std::endl;
-        pixmap<uint8_t> edges_bg(w,h);
-        separate(threshold::keep_background,edges_bg,edges_mask,xps);
-        //trans.apply(edges_bg,u8invert,edges_bg,xps);
-        IMG.save("img_edges_bg" + suffix,edges_bg,0);
-
-        std::cerr << "Closing BG" << std::endl;
-        Filter<uint8_t> F8(w,h);
-        F8.Close(edges_bg,xps);
-        IMG.save("img_edges_bg2" + suffix,edges_bg,0);
-
-        std::cerr << "-- Build Tags..." << std::endl;
-
+        std::cerr << "-- Build Blobs" << std::endl;
         tagmap tmap(w,h);
 
-        tmap.build(edges_fg,8);
-        std::cerr << "#current=" << tmap.current << std::endl;
-        tmap.colors.shift = YGFX_BLUE;
-        IMG.save("img_tags"+suffix, tmap, tmap.colors, NULL);
+        tmap.build(fg,8);
+        IMG.save("img_tags0" + suffix, tmap, tmap.colors, 0 );
 
-        std::cerr << "-- Loading Particles..." << std::endl;
+        std::cerr << "-- Load Particles" << std::endl;
         particles pa;
         pa.load(tmap);
-        std::cerr << "#particles=" << pa.size() << std::endl;
-
 
         std::cerr << "-- Removing Upper Particles..." << std::endl;
         y_limit = h/2;
         pa.reject_all_vertices_from(tmap,is_upper_vertex);
         std::cerr << "#particles=" << pa.size() << std::endl;
-        IMG.save("img_tags2"+suffix, tmap, tmap.colors, NULL);
+        IMG.save("img_tags1"+suffix, tmap, tmap.colors, NULL);
         
 
         std::cerr << "-- Removing Shallow..." << std::endl;
         pa.remove_shallow_with(tmap);
         std::cerr << "#particles=" << pa.size() << std::endl;
 
-        IMG.save("img_tags3"+suffix, tmap, tmap.colors, NULL);
+        IMG.save("img_tags2"+suffix, tmap, tmap.colors, NULL);
 
 
         pixmap3 wksp(w,h);

@@ -9,6 +9,7 @@
 #include "yocto/gfx/draw/circle.hpp"
 #include "yocto/gfx/color/ramp/cold_to_very_hot.hpp"
 #include "yocto/gfx/color/ramp/cold_to_hot.hpp"
+#include "yocto/gfx/color/ramp/grey.hpp"
 
 #include "yocto/code/rand.hpp"
 #include "yocto/string/conv.hpp"
@@ -69,13 +70,14 @@ YOCTO_UNIT_TEST_IMPL(edges)
 
     dir2col          rmp;
     cold_to_hot      crmp;
-    cold_to_hot      grmp;
+    grey             grmp;
 
     crmp.vmin = 0;
     crmp.vmax = 1;
 
     grmp.vmin = 0;
-    
+    grmp.vmax = 0;
+
 
     imageIO          &IMG = image::instance();
     if(argc>1)
@@ -126,7 +128,7 @@ YOCTO_UNIT_TEST_IMPL(edges)
         IMG.save("img-0.png",img,NULL);
         IMG.save("img-3.png",img3,NULL);
         IMG.save("img-5.png",img5,NULL);
-        IMG.save("img-7.png",img5,NULL);
+        IMG.save("img-7.png",img7,NULL);
 
 
         const stencil_scharr_x Sx;
@@ -134,7 +136,6 @@ YOCTO_UNIT_TEST_IMPL(edges)
 
 
         ED.build_from(img, Sx, Sy, xps);
-        grmp.vmax = ED.Gmax;
         IMG.save("img-grad-0.png",ED,grmp,0);
         IMG.save("img-angl-0.png",ED.A,rmp,0);
         IMG.save("img-nmax-0.png",ED.E,0);
@@ -142,7 +143,6 @@ YOCTO_UNIT_TEST_IMPL(edges)
 
 
         ED.build_from(img3, Sx, Sy, xps);
-        grmp.vmax = ED.Gmax;
         IMG.save("img-grad-3.png",ED,grmp,0);
         IMG.save("img-angl-3.png",ED.A,rmp,0);
         IMG.save("img-nmax-3.png",ED.E,0);
@@ -150,14 +150,12 @@ YOCTO_UNIT_TEST_IMPL(edges)
 
 
         ED.build_from(img5, Sx, Sy, xps);
-        grmp.vmax = ED.Gmax;
         IMG.save("img-grad-5.png",ED,grmp,0);
         IMG.save("img-angl-5.png",ED.A,rmp,0);
         IMG.save("img-nmax-5.png",ED.E,0);
         IMG.save("img-blob-5.png",ED.tags,ED.tags.colors,0);
 
         ED.build_from(img7, Sx, Sy, xps);
-        grmp.vmax = ED.Gmax;
         IMG.save("img-grad-7.png",ED,grmp,0);
         IMG.save("img-angl-7.png",ED.A,rmp,0);
         IMG.save("img-nmax-7.png",ED.E,0);

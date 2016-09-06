@@ -1,124 +1,6 @@
 #include "yocto/gfx/ops/edges.hpp"
-
-namespace yocto
-{
-    namespace gfx
-    {
-        Edges:: Edges(const unit_t W, const unit_t H) :
-        pixmap<float>(W,H),
-        I(W,H),
-        S(W,H),
-        src(0),
-        global()
-        {
-        }
-
-        Edges:: ~Edges() throw()
-        {
-
-        }
-
-        const vertex Edges::shift[9] =
-        {
-            vertex(-1,-1), vertex(-1,0), vertex(-1,1),
-            vertex( 0,-1), vertex( 0,0), vertex( 0,1),
-            vertex( 1,-1), vertex( 1,0), vertex( 1,1)
-        };
-
-        const float Edges::sobel1[9] =
-        {
-            1,0,-1,
-            2,0,-2,
-            1,0,-1
-        };
-
-        const float Edges::sobel2[9] =
-        {
-            1,2,1,
-            0,0,0,
-            -1,-2,-1
-        };
-
-        void Edges:: buildE( xpatch &xp, lockable & ) throw()
-        {
-            const unit_t    ymin = xp.lower.y;
-            const unit_t    ymax = xp.upper.y;
-            const unit_t    xmin = xp.lower.x;
-            const unit_t    xmax = xp.upper.x;
-            info            local;
-            pixmap<float>  &E    = *this;
-            float           arr[9];
-
-            for(unit_t y=ymax;y>=ymin;--y)
-            {
-                for(unit_t x=xmax;x>=xmin;--x)
-                {
-                    const vertex here(x,y);
-                    float sum1 = 0; //! for sobel1
-                    float sum2 = 0; //! for sobel2
-                    float Iave = 0; //! for I average
-                    for(size_t k=0;k<9;++k)
-                    {
-                        const vertex probe = here + shift[k];
-                        float        II    = 0;
-                        if(has(probe))
-                        {
-                            II = I[probe];
-                        }
-                        else
-                        {
-                            II = I[here];
-                        }
-                        sum1 += sobel1[k] * II;
-                        sum2 += sobel2[k] * II;
-                        arr[k] = II;
-                        Iave  += II;
-                    }
-
-                    // build edge field
-                    const float E_val = sqrtf(sum1*sum1+sum2*sum2);
-                    E[y][x] = E_val;
-                    local.Emax = max_of(local.Emax,E_val);
-
-                    //build std dev field
-                    Iave /= 9;
-                    float S_val = 0;
-                    for(register size_t k=0;k<9;++k)
-                    {
-                        const float delta = arr[k] - Iave;
-                        S_val += delta*delta;
-                    }
-                    S_val = sqrtf(0.125f*S_val);
-                    S[y][x] = S_val;
-                    local.Smax = max_of(local.Smax,S_val);
-                }
-            }
-            xp.as<info>() = local;
-        }
-
-        void Edges:: finalize(xpatch &xp, lockable & ) throw()
-        {
-            const unit_t         ymin     = xp.lower.y;
-            const unit_t         ymax     = xp.upper.y;
-            const unit_t         xmin     = xp.lower.x;
-            const unit_t         xmax     = xp.upper.x;
-            const info           local(global);
-            pixmap<float>       &E     = *this;
-
-            for(unit_t y=ymax;y>=ymin;--y)
-            {
-                for(unit_t x=xmax;x>=xmin;--x)
-                {
-                    E[y][x] /= local.Emax;
-                    S[y][x] /= local.Smax;
-                }
-            }
-        }
-
-    }
-}
-
 #include "yocto/sort/remove-if.hpp"
+
 namespace yocto
 {
     namespace gfx
@@ -143,8 +25,22 @@ namespace yocto
         {
         }
 
+        void EdgeDetector::normalize(xpatch &xp, lockable & ) throw()
+        {
+            assert(Gmax>0);
+            pixmap<float> &G   = *this;
+            const float    fac = 1.0f/Gmax;
+            for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
+            {
+                pixmap<float>::row &Gy = G[y];
+                for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
+                {
+                    Gy[x] = min_of(1.0f,fac*Gy[x]);
+                }
+            }
+        }
 
-        inline bool __is_empty_particle( const particle::ptr &p ) throw()
+        static inline bool __is_empty_particle( const particle::ptr &p ) throw()
         {
             return (p->size<=0);
         }
@@ -163,30 +59,30 @@ namespace yocto
 
             if(Gmax>0)
             {
-                std::cerr << "|_Non Maxima Suppress" << std::endl;
+                //! normalize as probability
+                xps.submit(this, &EdgeDetector::normalize );
+
+                //! non local maxima suprresion
                 xps.submit(this, &EdgeDetector::non_maxima_suppress);
 
-                std::cerr << "|_Build Histogram" << std::endl;
+                //! thresholds computation
                 H.reset();
                 H.update(E,xps);
-
-
-                std::cerr << "|_Compute Threshold" << std::endl;
                 level_up = H.threshold();
                 level_lo = level_up/2;
 
-                std::cerr << "|_Apply Threshold=" << level_up << "->" << level_lo << std::endl;
+                //! apply threshold
                 xps.submit(this, &EdgeDetector::apply_thresholds);
 
-                std::cerr << "|_Blobs" << std::endl;
+                //! build blobs
                 tags.build(E,8);
 
-                std::cerr << "|_Edges" << std::endl;
+                //! find individual edges
                 edges.load(tags);
 
 
                 // removing weak only edges
-                std::cerr << "|_Remove Weak..." << std::endl;
+                pixmap<float> &G = *this;
                 for(size_t i=edges.size();i>0;--i)
                 {
                     particle &p = *edges[i];
@@ -209,15 +105,19 @@ namespace yocto
                     {
                         while(p.size)
                         {
-                            vnode *node = p.pop_back();
-                            tags[node->vtx] = 0;
-                            E[node->vtx]    = 0;
+                            vnode       *node = p.pop_back();
+                            const vertex q    = node->vtx;
+
+                            tags[q] = 0;
+                            E[q]    = 0;
+                            G[q]    = 0;
+
                             delete node;
                         }
                     }
                 }
                 remove_if(edges,__is_empty_particle);
-                std::cerr << "#edges=" << edges.size() << std::endl;
+                //std::cerr << "#edges=" << edges.size() << std::endl;
             }
             else
             {
@@ -233,7 +133,6 @@ namespace yocto
         {
             assert(Gmax>0);
             pixmap<float> &G   = *this;
-            const float    fac = 1.0f/Gmax;
             for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
             {
                 const bitmap::position_type ypos = y_position(y);
@@ -246,6 +145,7 @@ namespace yocto
                     default:
                         break;
                 }
+
                 for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
                 {
                     const bitmap::position_type xpos = x_position(x);
@@ -274,7 +174,7 @@ namespace yocto
 
                     if(keep)
                     {
-                        const uint8_t px = gist::float2byte(G0*fac);
+                        const uint8_t px = gist::float2byte(G0);
                         E[y][x] = px;
                     }
                     else
@@ -290,21 +190,26 @@ namespace yocto
         {
             for(unit_t y=xp.upper.y;y>=xp.lower.y;--y)
             {
+                pixmap<uint8_t>::row &Ey = E[y];
+                pixmap<float>::row   &Gy = (*this)[y];
                 for(unit_t x=xp.upper.x;x>=xp.lower.x;--x)
                 {
 
-                    const uint8_t v = E[y][x];
+                    const uint8_t v = Ey[x];
                     if(v<=level_lo)
                     {
-                        E[y][x] = 0; continue;
+                        Gy[x] = 0;
+                        Ey[x] = 0;
+                        continue;
                     }
 
                     if(v<=level_up)
                     {
-                        E[y][x] = WEAK; continue ;
+                        Ey[x] = WEAK;
+                        continue ;
                     }
 
-                    E[y][x] = STRONG;
+                    Ey[x] = STRONG;
                 }
             }
         }

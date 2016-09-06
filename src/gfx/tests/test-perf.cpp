@@ -101,18 +101,6 @@ YOCTO_UNIT_TEST_IMPL(perf)
         }
 
         {
-            Edges Edg(w,h);
-#define     EDGES1(XPS) Edg.build_from(img1,XPS)
-            TMX_FOR(EDGES1);
-#define     EDGES3(XPS) Edg.build_from(img3,XPS)
-            TMX_FOR(EDGES3);
-#define     EDGES4(XPS) Edg.build_from(img4,XPS)
-            TMX_FOR(EDGES4);
-#define     EDGESf(XPS) Edg.build_from(imgf,XPS)
-            TMX_FOR(EDGESf);
-        }
-
-        {
             blur B(2.0f);
 #define     BLURf(XPS) B.apply(tgtf,imgf,XPS)
             TMX_FOR(BLURf);
