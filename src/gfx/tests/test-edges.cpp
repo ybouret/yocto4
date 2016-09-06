@@ -4,7 +4,6 @@
 #include "yocto/gfx/image/tiff.hpp"
 
 #include "yocto/gfx/ops/edges.hpp"
-#include "yocto/gfx/ops/transform.hpp"
 #include "yocto/gfx/color/named-colors.hpp"
 #include "yocto/gfx/draw/circle.hpp"
 #include "yocto/gfx/color/ramp/cold_to_very_hot.hpp"
@@ -134,13 +133,11 @@ YOCTO_UNIT_TEST_IMPL(edges)
         const stencil_scharr_x Sx;
         const stencil_scharr_y Sy;
 
-
         ED.build_from(img, Sx, Sy, xps);
         IMG.save("img-grad-0.png",ED,grmp,0);
         IMG.save("img-angl-0.png",ED.A,rmp,0);
         IMG.save("img-nmax-0.png",ED.E,0);
         IMG.save("img-blob-0.png",ED.tags,ED.tags.colors,0);
-
 
         ED.build_from(img3, Sx, Sy, xps);
         IMG.save("img-grad-3.png",ED,grmp,0);
@@ -160,6 +157,7 @@ YOCTO_UNIT_TEST_IMPL(edges)
         IMG.save("img-angl-7.png",ED.A,rmp,0);
         IMG.save("img-nmax-7.png",ED.E,0);
         IMG.save("img-blob-7.png",ED.tags,ED.tags.colors,0);
+
 
 
 
