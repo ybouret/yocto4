@@ -29,17 +29,29 @@ namespace yocto
 
             pixmap<uint8_t> A; //!< direction/angles
             pixmap<uint8_t> E; //!< Edge map
-            
+
+            //! build Edges with a Canny algorithm
+            /**
+             - use the stencils to build a gradient representation: amplitude and direction:
+             a Scharr stencil is better for rounded shapes
+             - use the directions to suppress the non maxima gradient
+             - an Ostu's algorithm is applied to sort out STRONG from WEAK gradients.
+             - The user_weak_intake is used to compute how much WEAK gradient is retained
+             - Then all the particles are detected
+             - And the particle with no STRONG component are discarded.
+             */
             template <typename T>
             void build_from(const pixmap<T> &source,
                             const stencil   &gx,
                             const stencil   &gy,
-                            xpatches        &xps)
+                            xpatches        &xps,
+                            const float      user_weak_intake=1.0f)
             {
                 // build intensity map
                 src = &source;
                 ddx = &gx;
                 ddy = &gy;
+                weak_intake = clamp(0.0f,user_weak_intake,1.0f);
                 YGFX_SUBMIT(this, & EdgeDetector::build<T>, xps, xp.make<float>() = 0);
 
                 // then apply algorithm
@@ -58,6 +70,7 @@ namespace yocto
             Histogram      H;
             size_t         level_up;
             size_t         level_lo;
+            float          weak_intake;
         public:
             tagmap         tags;
             particles      edges;

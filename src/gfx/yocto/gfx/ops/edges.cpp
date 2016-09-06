@@ -69,7 +69,9 @@ namespace yocto
                 H.reset();
                 H.update(E,xps);
                 level_up = H.threshold();
-                level_lo = level_up/2;
+                const size_t level_min   = level_lo/2;
+                const size_t level_delta = size_t( floor( (level_up-level_min) * weak_intake + 0.5f) );
+                level_lo = level_up-level_delta;
 
                 //! apply threshold
                 xps.submit(this, &EdgeDetector::apply_thresholds);
