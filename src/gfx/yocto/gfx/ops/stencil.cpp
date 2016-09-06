@@ -251,6 +251,154 @@ namespace yocto
     }
 }
 
+namespace yocto
+{
+    namespace gfx
+    {
+
+        static const int xSobel5[5][5] =
+        {
+            { -1, -2, 0 , 2 , 1 },
+            { -4, -8, 0 , 4,  8 },
+            { -6, -12, 0, 12, 6 },
+            { -4, -8, 0 , 4,  8 },
+            { -1, -2, 0 , 2 , 1 }
+        };
+
+        stencil_sobel_x5:: stencil_sobel_x5() : stencil(20,true)
+        {
+            vertex p;
+            size_t i = 0;
+            for(p.x=-2;p.x<=2;++p.x)
+            {
+                for(p.y=-2;p.y<=2;++p.y)
+                {
+                    const int coef = xSobel5[p.y+2][p.x+2];
+                    if(coef!=0)
+                    {
+                        assert(i<size);
+                        masks[i].r      = p;
+                        masks[i].weight = float(coef);
+                        ++i;
+                    }
+                }
+            }
+            assert(i==size);
+            optimize();
+        }
+
+        stencil_sobel_x5:: ~stencil_sobel_x5() throw()
+        {
+            
+        }
+
+        stencil_sobel_y5:: stencil_sobel_y5() : stencil(20,true)
+        {
+            vertex p;
+            size_t i = 0;
+            for(p.x=-2;p.x<=2;++p.x)
+            {
+                for(p.y=-2;p.y<=2;++p.y)
+                {
+                    const int coef = xSobel5[p.x+2][p.y+2];
+                    if(coef!=0)
+                    {
+                        assert(i<size);
+                        masks[i].r      = p;
+                        masks[i].weight = float(coef);
+                        ++i;
+                    }
+                }
+            }
+            assert(i==size);
+            optimize();
+        }
+
+        stencil_sobel_y5:: ~stencil_sobel_y5() throw()
+        {
+
+        }
+
+
+
+    }
+
+}
+
+namespace yocto
+{
+    namespace gfx
+    {
+
+        static const int xScharr5[5][5] =
+        {
+            { -1, -1, 0 , 1 , 1 },
+            { -2, -2, 0 , 2,  2 },
+            { -3, -6, 0,  6,  3 },
+            { -2, -2, 0 , 2,  3 },
+            { -1, -1, 0 , 1 , 1 }
+        };
+
+        stencil_scharr_x5:: stencil_scharr_x5() : stencil(20,true)
+        {
+            vertex p;
+            size_t i = 0;
+            for(p.x=-2;p.x<=2;++p.x)
+            {
+                for(p.y=-2;p.y<=2;++p.y)
+                {
+                    const int coef = xScharr5[p.y+2][p.x+2];
+                    if(coef!=0)
+                    {
+                        assert(i<size);
+                        masks[i].r      = p;
+                        masks[i].weight = float(coef);
+                        ++i;
+                    }
+                }
+            }
+            assert(i==size);
+            optimize();
+        }
+
+        stencil_scharr_x5:: ~stencil_scharr_x5() throw()
+        {
+
+        }
+
+        stencil_scharr_y5:: stencil_scharr_y5() : stencil(20,true)
+        {
+            vertex p;
+            size_t i = 0;
+            for(p.x=-2;p.x<=2;++p.x)
+            {
+                for(p.y=-2;p.y<=2;++p.y)
+                {
+                    const int coef = xScharr5[p.x+2][p.y+2];
+                    if(coef!=0)
+                    {
+                        assert(i<size);
+                        masks[i].r      = p;
+                        masks[i].weight = float(coef);
+                        ++i;
+                    }
+                }
+            }
+            assert(i==size);
+            optimize();
+        }
+
+        stencil_scharr_y5:: ~stencil_scharr_y5() throw()
+        {
+            
+        }
+        
+        
+        
+    }
+    
+}
+
 
 namespace yocto
 {

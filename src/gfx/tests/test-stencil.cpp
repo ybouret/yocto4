@@ -75,6 +75,49 @@ YOCTO_UNIT_TEST_IMPL(stencil)
         rmp.vmax = sy.global.vmax;
         IMG.save("img-sy.png",tgt,rmp,0);
 
+        std::cerr << "scharr x" << std::endl;
+        stencil_scharr_x srx;
+        srx.apply(tgt,imgf,xps);
+        rmp.vmin = srx.global.vmin;
+        rmp.vmax = srx.global.vmax;
+        IMG.save("img-srx.png",tgt,rmp,0);
+
+        std::cerr << "scharr y" << std::endl;
+        stencil_scharr_y sry;
+        sry.apply(tgt,imgf,xps);
+        rmp.vmin = sry.global.vmin;
+        rmp.vmax = sry.global.vmax;
+        IMG.save("img-sry.png",tgt,rmp,0);
+
+        std::cerr << "sobel x5" << std::endl;
+        stencil_sobel_x5 sx5;
+        sx5.apply(tgt,imgf,xps);
+        rmp.vmin = sx5.global.vmin;
+        rmp.vmax = sx5.global.vmax;
+        IMG.save("img-sx5.png",tgt,rmp,0);
+
+        std::cerr << "sobel y5" << std::endl;
+        stencil_sobel_y5 sy5;
+        sy5.apply(tgt,imgf,xps);
+        rmp.vmin = sy5.global.vmin;
+        rmp.vmax = sy5.global.vmax;
+        IMG.save("img-sy5.png",tgt,rmp,0);
+
+
+        std::cerr << "scharr x5" << std::endl;
+        stencil_scharr_x5 srx5;
+        srx5.apply(tgt,imgf,xps);
+        rmp.vmin = srx5.global.vmin;
+        rmp.vmax = srx5.global.vmax;
+        IMG.save("img-srx5.png",tgt,rmp,0);
+
+        std::cerr << "scharr y5" << std::endl;
+        stencil_scharr_y5 sry5;
+        sry5.apply(tgt,imgf,xps);
+        rmp.vmin = sry5.global.vmin;
+        rmp.vmax = sry5.global.vmax;
+        IMG.save("img-sry5.png",tgt,rmp,0);
+
         std::cerr << "gauss 3x3" << std::endl;
         stencil_gauss g3(1,1.4f);
         g3.apply(tgt,imgf,xps);
@@ -97,6 +140,7 @@ YOCTO_UNIT_TEST_IMPL(stencil)
             display_stencil(sy,"sobel_y");
             display_stencil(g3,"g3x3");
             display_stencil(g5,"g5x5");
+            display_stencil(sx5,"sobel_x5");
         }
 
         pixmap3 tgt3(w,h);

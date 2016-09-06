@@ -372,6 +372,7 @@ sum += v0*msk.weight
         };
 
 
+        //! 3x1 standard gradient
         class stencil_grad_x : public stencil
         {
         public:
@@ -383,6 +384,7 @@ sum += v0*msk.weight
         };
 
 
+        //! 1x3 standard gradient
         class stencil_grad_y : public stencil
         {
         public:
@@ -393,7 +395,7 @@ sum += v0*msk.weight
             YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_grad_y);
         };
 
-
+        //! 3x3 Sobel Filter, X
         class stencil_sobel_x : public stencil
         {
         public:
@@ -404,6 +406,7 @@ sum += v0*msk.weight
             YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_sobel_x);
         };
 
+        //! 3x3 Sobel Filter, Y
         class stencil_sobel_y : public stencil
         {
         public:
@@ -415,6 +418,7 @@ sum += v0*msk.weight
         };
 
 
+        //! 3x3 Scharr Filter, X
         class stencil_scharr_x : public stencil
         {
         public:
@@ -425,6 +429,7 @@ sum += v0*msk.weight
             YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_scharr_x);
         };
 
+        //! 3x3 Scharr Filter, Y
         class stencil_scharr_y : public stencil
         {
         public:
@@ -435,8 +440,56 @@ sum += v0*msk.weight
             YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_scharr_y);
         };
 
+        //! 5x5 Sobel Filter, X
+        class stencil_sobel_x5 : public stencil
+        {
+        public:
+            explicit stencil_sobel_x5();
+            virtual ~stencil_sobel_x5() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_sobel_x5);
+        };
 
 
+        //! 5x5 Sobel Filter, Y
+        class stencil_sobel_y5 : public stencil
+        {
+        public:
+            explicit stencil_sobel_y5();
+            virtual ~stencil_sobel_y5() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_sobel_y5);
+        };
+
+
+        //! 5x5 Scharr Filter, X
+        class stencil_scharr_x5 : public stencil
+        {
+        public:
+            explicit stencil_scharr_x5();
+            virtual ~stencil_scharr_x5() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_scharr_x5);
+        };
+
+        //! 5x5 Scharr Filter, Y
+        class stencil_scharr_y5 : public stencil
+        {
+        public:
+            explicit stencil_scharr_y5();
+            virtual ~stencil_scharr_y5() throw();
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(stencil_scharr_y5);
+        };
+
+
+
+
+        //! Weighted Gaussian Filter
         class stencil_gauss : public stencil
         {
         public:
