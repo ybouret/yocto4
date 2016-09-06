@@ -130,8 +130,8 @@ YOCTO_UNIT_TEST_IMPL(edges)
         IMG.save("img-7.png",img7,NULL);
 
 
-        const stencil_scharr_x Sx;
-        const stencil_scharr_y Sy;
+        const stencil_scharr_x5 Sx;
+        const stencil_scharr_y5 Sy;
 
         ED.build_from(img, Sx, Sy, xps);
         IMG.save("img-grad-0.png",ED,grmp,0);
