@@ -12,9 +12,11 @@ namespace yocto
 
         _TIFF:: ~ _TIFF() throw()
         {
-            assert(handle);
-            TIFFClose((TIFF *)handle);
-            handle=0;
+            if(handle)
+            {
+                TIFFClose((TIFF *)handle);
+                handle=0;
+            }
         }
     }
 }
